@@ -13,7 +13,9 @@ export const VERBS = {
   'table.insert': z.object({
     verb: z.literal('table.insert'),
     table: z.string().min(1),
-    data: z.record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.null()])).default({}),
+    data: z
+      .record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.null()]))
+      .default({}),
   }),
   'url.open': z.object({ verb: z.literal('url.open'), url: z.url({ protocol: /^https$/ }) }),
 } as const
@@ -26,9 +28,7 @@ export interface HankoIssue {
   message: string
 }
 
-export type HankoResult =
-  | { ok: true; action: HankoAction }
-  | { ok: false; issues: HankoIssue[] }
+export type HankoResult = { ok: true; action: HankoAction } | { ok: false; issues: HankoIssue[] }
 
 export function checkAction(input: unknown): HankoResult {
   const verb = (input as { verb?: unknown })?.verb

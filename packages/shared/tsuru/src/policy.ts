@@ -57,7 +57,11 @@ export function checkUrl(rawUrl: string, policy: FetchPolicy): PolicyVerdict {
     return { ok: false, reason: 'private and loopback addresses are blocked' }
   }
   if (!hostAllowed(url.hostname, policy.allowedHosts)) {
-    return { ok: false, reason: `host "${url.hostname}" is not on the allowlist`, needsApproval: true }
+    return {
+      ok: false,
+      reason: `host "${url.hostname}" is not on the allowlist`,
+      needsApproval: true,
+    }
   }
   return { ok: true, url }
 }

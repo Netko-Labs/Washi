@@ -1,16 +1,12 @@
+import type { AgentHost } from '@washi/desktop-service'
 import { rpc } from 'mirinjs/rpc'
 
-/**
- * tsuru (fetch) and hanko (actions) land with M2. The routes exist now so the
- * renderer's capability surface is stable; until then they refuse politely.
- */
-export function capabilityRoutes() {
+/** Sheet-facing capabilities: tsuru fetch + hanko actions, same gates as agents. */
+export function capabilityRoutes(host: AgentHost) {
   return {
-    fetchUrl: rpc.query(({ url }: { url: string }): Promise<string> => {
-      throw new Error(`fetch is not available yet (requested ${new URL(url).hostname})`)
-    }),
-    runAction: rpc.mutation(({ action }: { action: { verb: string } }): void => {
-      throw new Error(`unknown action verb "${action.verb}"`)
+    fetchUrl: rpc.query(({ url }: { url: string }): Promise<string> => host.fetchForSheet(url)),
+    runAction: rpc.mutation(async ({ action }: { action: { verb: string } }): Promise<void> => {
+      await host.executeAction(action)
     }),
   }
 }

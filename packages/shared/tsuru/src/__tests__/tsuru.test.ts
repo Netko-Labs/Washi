@@ -35,7 +35,10 @@ describe('private address detection', () => {
 
 describe('url policy', () => {
   test('https only, no creds, no odd ports', () => {
-    expect(checkUrl('http://api.example.com/x', policy)).toMatchObject({ ok: false, reason: 'https only' })
+    expect(checkUrl('http://api.example.com/x', policy)).toMatchObject({
+      ok: false,
+      reason: 'https only',
+    })
     expect(checkUrl('https://user:pw@api.example.com/x', policy)).toMatchObject({ ok: false })
     expect(checkUrl('https://api.example.com:8443/x', policy)).toMatchObject({ ok: false })
     expect(checkUrl('ftp://api.example.com', policy)).toMatchObject({ ok: false })

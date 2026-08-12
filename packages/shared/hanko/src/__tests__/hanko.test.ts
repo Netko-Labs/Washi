@@ -4,7 +4,9 @@ import { checkAction, runAction } from '../index'
 describe('hanko', () => {
   test('valid verbs parse', () => {
     expect(checkAction({ verb: 'sheet.open', sheet: 'abc' }).ok).toBe(true)
-    expect(checkAction({ verb: 'table.insert', table: 'tasks', data: { title: 'x' } }).ok).toBe(true)
+    expect(checkAction({ verb: 'table.insert', table: 'tasks', data: { title: 'x' } }).ok).toBe(
+      true,
+    )
     expect(checkAction({ verb: 'url.open', url: 'https://example.com' }).ok).toBe(true)
   })
 
@@ -33,12 +35,15 @@ describe('hanko', () => {
     )
     expect(opened).toEqual(['s1'])
     await expect(
-      runAction({ verb: 'nope' }, {
-        'sheet.open': () => {},
-        'sheet.create': () => {},
-        'table.insert': () => {},
-        'url.open': () => {},
-      }),
+      runAction(
+        { verb: 'nope' },
+        {
+          'sheet.open': () => {},
+          'sheet.create': () => {},
+          'table.insert': () => {},
+          'url.open': () => {},
+        },
+      ),
     ).rejects.toThrow('unknown action verb')
   })
 })

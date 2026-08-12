@@ -5,6 +5,6 @@ export {
   type HankoIssue,
   type HankoResult,
   runAction,
-  type Verb,
   VERBS,
+  type Verb,
 } from './registry'

@@ -8,7 +8,7 @@ import {
   listTables,
   saveWindowState,
 } from '@washi/desktop-repository'
-import { createSheetFromSource } from '@washi/desktop-service'
+import { AgentHost, createSheetFromSource } from '@washi/desktop-service'
 import { app, devtools, menu } from 'mirinjs'
 
 // App data dir keyed on the bundle id. `mirin dev` gets a `-dev` suffix so
@@ -43,7 +43,13 @@ if (listSheets().length === 0) {
   console.log('[Washi] seeded welcome sheet')
 }
 
-app.serve(createRouter())
+const agents = new AgentHost()
+const served = app.serve(createRouter(agents))
+agents.setEvents({
+  update: (sessionId, entry) => served.rpc.agentUpdate.broadcast({ sessionId, entry }),
+  approval: (request) => served.rpc.approvalRequested.broadcast(request),
+  openSheet: (id) => served.rpc.openSheetRequested.broadcast({ id }),
+})
 
 devtools.expose('store', () => ({
   sheets: listSheets().length,
