@@ -1,4 +1,3 @@
-export { compareHlc, createHlcClock, type HlcClock } from './hlc'
 export {
   type AgentSession,
   type AgentUpdate,
@@ -24,3 +23,4 @@ export {
   userTableSchema,
   type WindowState,
 } from './entities/tables'
+export { compareHlc, createHlcClock, type HlcClock } from './hlc'

@@ -1,5 +1,7 @@
 import { rpc } from 'mirinjs/rpc'
+import { sheetRoutes } from './routes/sheets'
 import { systemRoutes } from './routes/system'
+import { tableRoutes } from './routes/tables'
 
 /**
  * Washi's RPC surface as a mirin router. The renderer imports only the `Router`
@@ -9,6 +11,8 @@ import { systemRoutes } from './routes/system'
 export function createRouter() {
   return rpc.router({
     ...systemRoutes(),
+    ...sheetRoutes(),
+    ...tableRoutes(),
   })
 }
 
