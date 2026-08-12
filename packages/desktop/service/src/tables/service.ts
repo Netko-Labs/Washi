@@ -3,6 +3,7 @@ import {
   defineTable,
   deleteRecords,
   executeQuery,
+  findRecordTableId,
   getTableByName,
   insertRecord,
   matchRecordIds,
@@ -73,7 +74,8 @@ export function runMutation(mutation: InkMutation): { affected: number; id?: str
 }
 
 /** Task checkbox write-back: flip `done` on one record by id. */
-export function toggleTaskRecord(tableName: string, recordId: string, done: boolean): void {
-  const table = requireTable(tableName)
-  updateRecords(table.id, [recordId], { done })
+export function toggleTaskRecord(recordId: string, done: boolean): void {
+  const tableId = findRecordTableId(recordId)
+  if (!tableId) throw new InkError(`unknown record "${recordId}"`)
+  updateRecords(tableId, [recordId], { done })
 }

@@ -1,12 +1,20 @@
 import { homedir } from 'node:os'
 import { join } from 'node:path'
 import { createRouter } from '@washi/desktop-api'
-import { app, menu } from 'mirinjs'
+import {
+  getWindowState,
+  initializeDb,
+  listSheets,
+  listTables,
+  saveWindowState,
+} from '@washi/desktop-repository'
+import { createSheetFromSource } from '@washi/desktop-service'
+import { app, devtools, menu } from 'mirinjs'
 
 // App data dir keyed on the bundle id. `mirin dev` gets a `-dev` suffix so
 // development never reads or writes the installed app's database.
 const appId = app.id ?? 'dev.netko.washi'
-export const appDataDir = join(
+const appDataDir = join(
   process.platform === 'darwin'
     ? join(homedir(), 'Library', 'Application Support')
     : process.platform === 'win32'
@@ -15,10 +23,77 @@ export const appDataDir = join(
   app.isDev ? `${appId}-dev` : appId,
 )
 
+initializeDb(join(appDataDir, 'washi.db'))
+console.log(`[Washi] storage at ${appDataDir}`)
+
+const WELCOME_SOURCE = `<Sheet title="Welcome to Washi" icon="📜">
+  <H1>Welcome to Washi</H1>
+  <P>Notes here are WSX — JSX rendered by a closed component registry. Agents write them; you direct.</P>
+  <Callout tone="info">Open the agent panel and ask Claude to create or edit a sheet.</Callout>
+  <Toggle label="What can a sheet contain?">
+    <P>Headings, callouts, tasks, tables bound to local data, boards, refs to other sheets.</P>
+  </Toggle>
+  <Divider />
+  <P>This sheet is plain data. Nothing in it can execute.</P>
+</Sheet>
+`
+
+if (listSheets().length === 0) {
+  createSheetFromSource({ title: 'Welcome to Washi', icon: '📜', source: WELCOME_SOURCE })
+  console.log('[Washi] seeded welcome sheet')
+}
+
 app.serve(createRouter())
 
+devtools.expose('store', () => ({
+  sheets: listSheets().length,
+  tables: listTables().length,
+}))
+
 app.on('ready', async () => {
-  await app.windows.open('main')
+  const saved = getWindowState()
+  const win = await app.windows.open({
+    name: 'main',
+    url: 'app://ui/index.html',
+    title: 'Washi',
+    titleBarStyle: 'hiddenInset',
+    trafficLightPosition: { x: 13, y: 13 },
+    show: 'ready',
+    minWidth: 880,
+    minHeight: 600,
+    x: saved.x,
+    y: saved.y,
+    width: saved.width,
+    height: saved.height,
+  })
+
+  if (saved.isMaximized) setTimeout(() => void win.maximize(), 150)
+
+  // Persist the frame periodically; while maximized only flip the flag so
+  // un-maximizing returns to the last normal size.
+  const saveInterval = setInterval(() => {
+    try {
+      if (win.isMaximized()) {
+        const current = getWindowState()
+        if (!current.isMaximized) saveWindowState({ ...current, isMaximized: true })
+        return
+      }
+      const frame = win.getFrame()
+      if (frame.width > 0 && frame.height > 0) {
+        saveWindowState({
+          x: Math.round(frame.x),
+          y: Math.round(frame.y),
+          width: Math.round(frame.width),
+          height: Math.round(frame.height),
+          isMaximized: false,
+        })
+      }
+    } catch {
+      // window may be closing; ignore
+    }
+  }, 2000)
+
+  win.on('closed', () => clearInterval(saveInterval))
 })
 
 app.on('ready', () => {

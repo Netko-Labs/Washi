@@ -1,4 +1,5 @@
 import { rpc } from 'mirinjs/rpc'
+import { capabilityRoutes } from './routes/capabilities'
 import { sheetRoutes } from './routes/sheets'
 import { systemRoutes } from './routes/system'
 import { tableRoutes } from './routes/tables'
@@ -13,6 +14,7 @@ export function createRouter() {
     ...systemRoutes(),
     ...sheetRoutes(),
     ...tableRoutes(),
+    ...capabilityRoutes(),
   })
 }
 

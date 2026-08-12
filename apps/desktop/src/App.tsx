@@ -1,15 +1,14 @@
-import { useEffect, useState } from 'react'
-import { api } from './lib/rpc'
+import { useEffect } from 'react'
+import { SheetView } from '@/components/sheet/SheetView'
+import { Sidebar } from '@/components/sidebar/Sidebar'
+import { useSheetsStore } from '@/stores/sheets/sheets-store'
 
 export function App() {
-  const [pong, setPong] = useState<string | null>(null)
+  const refresh = useSheetsStore((state) => state.refresh)
 
   useEffect(() => {
-    api
-      .ping({})
-      .then(setPong)
-      .catch(() => setPong(null))
-  }, [])
+    void refresh()
+  }, [refresh])
 
   return (
     <div className="flex h-dvh flex-col bg-background text-foreground">
@@ -21,14 +20,12 @@ export function App() {
           Washi
         </div>
       </header>
-      <main className="grid flex-1 place-items-center">
-        <div className="text-center">
-          <h1 className="font-bold text-4xl tracking-tight">washi。</h1>
-          <p className="mt-2 text-muted-foreground text-sm">
-            {pong === 'pong' ? 'main process connected' : 'connecting…'}
-          </p>
-        </div>
-      </main>
+      <div className="flex min-h-0 flex-1">
+        <Sidebar />
+        <main className="flex min-w-0 flex-1 flex-col">
+          <SheetView />
+        </main>
+      </div>
     </div>
   )
 }

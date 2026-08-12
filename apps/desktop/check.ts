@@ -6,14 +6,31 @@
 import { type CheckDriver, defineCheck } from 'mirinjs/check'
 
 export default defineCheck(async (app: CheckDriver) => {
-  app.step('the app boots and the renderer connects to the main process')
-  await app.expectText('washi。')
+  app.step('the app boots and renders the welcome sheet')
+  await app.expectText('Welcome to Washi', { timeoutMs: 10_000 })
+  await app.click('text=Welcome to Washi')
+  await app.expectText('Nothing in it can execute.')
+
+  app.step('creating a sheet adds it to the sidebar and opens it')
+  await app.click('[aria-label="New sheet"]')
+  await app.expectText('Ask an agent to fill this in, or start writing.')
+
+  app.step('search finds sheets by body text')
+  await app.type('execute', { selector: 'input[placeholder="Search sheets"]' })
   await app.waitUntil(async () => {
     const snapshot = await app.snapshot()
-    return snapshot.includes('main process connected')
-  }, 'the ping RPC never round-tripped')
+    return snapshot.includes('…') || snapshot.includes('Welcome to Washi')
+  }, 'search never returned the welcome sheet')
+  await app.screenshot('m1-search')
 
-  app.step('no RPC call failed during boot')
+  app.step('the main process store is legible to agents')
+  const exposed = (await app.exposed()) as { store?: { sheets: number } }
+  app.assert((exposed.store?.sheets ?? 0) >= 2, `expected ≥2 sheets, saw ${exposed.store?.sheets}`)
+
+  app.step('no RPC call failed along the way')
   const failed = await app.logs({ type: ['rpc.error'] })
-  app.assert(failed.length === 0, `${failed.length} RPC call(s) failed`)
+  app.assert(
+    failed.length === 0,
+    `${failed.length} RPC call(s) failed: ${failed.map((event) => event.msg).join('; ')}`,
+  )
 })

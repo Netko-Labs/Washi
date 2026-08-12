@@ -21,10 +21,8 @@ export function tableRoutes() {
       ({ mutation }: { mutation: InkMutation }): { affected: number; id?: string } =>
         runMutation(mutationSchema.parse(mutation)),
     ),
-    toggleTask: rpc.mutation(
-      ({ table, recordId, done }: { table: string; recordId: string; done: boolean }): void => {
-        toggleTaskRecord(table, recordId, done)
-      },
-    ),
+    toggleTask: rpc.mutation(({ recordId, done }: { recordId: string; done: boolean }): void => {
+      toggleTaskRecord(recordId, done)
+    }),
   }
 }

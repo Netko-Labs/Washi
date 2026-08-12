@@ -24,6 +24,7 @@ export {
 export {
   defineTable,
   deleteRecords,
+  findRecordTableId,
   getTableByName,
   insertRecord,
   listTables,

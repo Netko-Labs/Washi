@@ -61,6 +61,15 @@ export function insertRecord(tableId: string, data: RecordData): string {
   return id
 }
 
+export function findRecordTableId(recordId: string): string | null {
+  const [row] = getDb()
+    .select({ tableId: recordTable.tableId })
+    .from(recordTable)
+    .where(and(eq(recordTable.id, recordId), isNull(recordTable.deletedAt)))
+    .all()
+  return row?.tableId ?? null
+}
+
 export function updateRecords(tableId: string, ids: string[], patch: RecordData): number {
   if (ids.length === 0) return 0
   const db = getDb()
