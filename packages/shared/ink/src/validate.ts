@@ -45,10 +45,7 @@ export function validateRecord(spec: TableSpec, data: RecordData): InkIssue[] {
 }
 
 /** Columns referenced by a query that don't exist on the table. */
-export function unknownQueryColumns(
-  spec: TableSpec,
-  referenced: { column: string }[],
-): InkIssue[] {
+export function unknownQueryColumns(spec: TableSpec, referenced: { column: string }[]): InkIssue[] {
   const known = new Set(spec.columns.map((column) => column.name))
   return referenced
     .filter(({ column }) => !known.has(column))

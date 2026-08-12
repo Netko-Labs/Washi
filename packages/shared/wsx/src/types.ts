@@ -1,12 +1,6 @@
 import type { z } from 'zod'
 
-export type WsxValue =
-  | string
-  | number
-  | boolean
-  | null
-  | WsxValue[]
-  | { [key: string]: WsxValue }
+export type WsxValue = string | number | boolean | null | WsxValue[] | { [key: string]: WsxValue }
 
 export interface WsxElement {
   kind: 'element'

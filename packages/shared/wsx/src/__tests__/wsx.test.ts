@@ -6,8 +6,8 @@ import {
   parse,
   serialize,
   validate,
-  type WsxRegistry,
   WsxParseError,
+  type WsxRegistry,
 } from '../index'
 
 const SAMPLE = `
@@ -75,9 +75,7 @@ describe('validate', () => {
   }
 
   test('flags unknown components, bad props, child policy violations', () => {
-    const root = parse(
-      '<Sheet title="t"><H1><Divider /></H1><Divider>x</Divider><Ghost /></Sheet>',
-    )
+    const root = parse('<Sheet title="t"><H1><Divider /></H1><Divider>x</Divider><Ghost /></Sheet>')
     const diagnostics = validate(root, registry)
     const messages = diagnostics.map((diagnostic) => diagnostic.message).join('\n')
     expect(messages).toContain('takes text children only')
