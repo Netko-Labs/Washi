@@ -14,7 +14,8 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@washi/typescript-config": "workspace:*",
-    "@types/bun": "latest"
+    "@babel/types": "^7.29.0",
+    "@types/bun": "latest",
+    "@washi/typescript-config": "workspace:*"
   }
 }
