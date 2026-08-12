@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { AgentPanel } from '@/components/agent/AgentPanel'
 import { SheetView } from '@/components/sheet/SheetView'
 import { Sidebar } from '@/components/sidebar/Sidebar'
 import { useSheetsStore } from '@/stores/sheets/sheets-store'
@@ -25,6 +26,7 @@ export function App() {
         <main className="flex min-w-0 flex-1 flex-col">
           <SheetView />
         </main>
+        <AgentPanel />
       </div>
     </div>
   )
