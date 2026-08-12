@@ -1,0 +1,10 @@
+{
+  "extends": "@washi/typescript-config/bun.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "../../node_modules/.tmp/washi-desktop-bun.tsbuildinfo",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src/bun"]
+}

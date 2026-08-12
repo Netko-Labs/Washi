@@ -1,0 +1,15 @@
+{
+  "files": [],
+  "references": [
+    { "path": "apps/desktop" },
+    { "path": "packages/desktop/domain" },
+    { "path": "packages/desktop/repository" },
+    { "path": "packages/desktop/service" },
+    { "path": "packages/desktop/api" },
+    { "path": "packages/shared/wsx" },
+    { "path": "packages/shared/paper" },
+    { "path": "packages/shared/ink" },
+    { "path": "packages/shared/tsuru" },
+    { "path": "packages/shared/hanko" }
+  ]
+}

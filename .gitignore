@@ -1,0 +1,9 @@
+node_modules/
+dist/
+build/
+.turbo/
+.mirin/
+.cache/
+*.tsbuildinfo
+.DS_Store
+*.local

@@ -1,0 +1,12 @@
+{
+  "extends": "@washi/typescript-config/react.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "../../node_modules/.tmp/washi-desktop-app.tsbuildinfo",
+    "types": ["vite/client"],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["src/bun", "src/**/__tests__"]
+}

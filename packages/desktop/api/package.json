@@ -1,0 +1,24 @@
+{
+  "name": "@washi/desktop-api",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "check-types": "tsgo -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@washi/desktop-domain": "workspace:*",
+    "@washi/desktop-repository": "workspace:*",
+    "@washi/desktop-service": "workspace:*",
+    "@washi/hanko": "workspace:*",
+    "@washi/ink": "workspace:*",
+    "mirinjs": "0.1.0-alpha.19"
+  },
+  "devDependencies": {
+    "@washi/typescript-config": "workspace:*",
+    "@types/bun": "latest"
+  }
+}

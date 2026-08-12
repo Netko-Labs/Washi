@@ -1,0 +1,27 @@
+{
+  "name": "@washi/paper",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./registry": "./src/registry/index.ts"
+  },
+  "scripts": {
+    "check-types": "tsgo -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@washi/ink": "workspace:*",
+    "@washi/wsx": "workspace:*",
+    "zod": "^4.4.3"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@washi/typescript-config": "workspace:*",
+    "@types/bun": "latest",
+    "@types/react": "^19.2.17",
+    "react": "^19.2.7"
+  }
+}

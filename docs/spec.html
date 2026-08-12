@@ -1,0 +1,584 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Washi — spec v0.2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@700;900&family=Karla:ital,wght@0,400;0,600;0,800;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --paper: #f8f6f1;
+    --paper-2: #fffdf9;
+    --ink: #26241f;
+    --ink-soft: #5c574c;
+    --line: #e4ddd0;
+    --hanko: #c63d2f;
+    --tape-pink: #f27ba9;
+    --tape-teal: #2fb8a6;
+    --tape-blue: #5b9bd5;
+    --tape-mustard: #e8a93d;
+    --tape-violet: #8b7bd8;
+    --tape-moss: #7fa35c;
+    --tape-slate: #7d8ba1;
+    --radius: 14px;
+    --w: 46rem;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    margin: 0;
+    background: var(--paper);
+    background-image: radial-gradient(#00000006 1px, transparent 1px);
+    background-size: 22px 22px;
+    color: var(--ink);
+    font: 400 1.02rem/1.65 "Karla", system-ui, sans-serif;
+  }
+  h1, h2, h3 { font-family: "Zen Kaku Gothic New", "Karla", sans-serif; line-height: 1.15; margin: 0; }
+  code, pre, .mono { font-family: "JetBrains Mono", monospace; }
+  a { color: inherit; }
+
+  /* ── sticky nav ─────────────────────────────── */
+  nav {
+    position: sticky; top: 0; z-index: 10;
+    display: flex; align-items: center; gap: .9rem;
+    padding: .55rem 1.2rem;
+    background: color-mix(in oklab, var(--paper) 88%, white);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--line);
+    overflow-x: auto; white-space: nowrap;
+  }
+  nav .brand { font-family: "Zen Kaku Gothic New"; font-weight: 900; font-size: 1rem; letter-spacing: .02em; }
+  nav .brand em { font-style: normal; color: var(--hanko); }
+  nav a.dot {
+    font: 600 .74rem/1 "JetBrains Mono", monospace;
+    text-decoration: none; color: var(--ink-soft);
+    padding: .38rem .6rem; border-radius: 999px; border: 1px solid transparent;
+  }
+  nav a.dot:hover, nav a.dot:focus-visible { border-color: var(--line); background: var(--paper-2); }
+  nav a.dot::before { content: "●"; margin-right: .4rem; font-size: .6rem; color: var(--c, var(--ink-soft)); }
+  :focus-visible { outline: 2px solid var(--hanko); outline-offset: 2px; }
+
+  main { max-width: var(--w); margin: 0 auto; padding: 2.5rem 1.2rem 6rem; }
+
+  /* ── washi tape strips (signature) ──────────── */
+  .tape {
+    display: inline-block;
+    font: 800 .78rem/1 "Karla", sans-serif; letter-spacing: .14em; text-transform: uppercase;
+    color: #fff; padding: .5rem 1.3rem;
+    background:
+      repeating-linear-gradient(90deg, #ffffff26 0 6px, transparent 6px 14px),
+      var(--c, var(--tape-pink));
+    clip-path: polygon(2% 0, 98% 4%, 100% 92%, 1% 100%);
+    transform: rotate(-1.2deg);
+    box-shadow: 0 2px 4px #00000018;
+    opacity: .96;
+  }
+  section:nth-of-type(even) .tape { transform: rotate(1deg); }
+
+  /* ── hero ───────────────────────────────────── */
+  header.hero { padding: 3.5rem 0 1.5rem; }
+  .hero .kanji {
+    font-family: "Zen Kaku Gothic New"; font-weight: 900;
+    font-size: clamp(3.2rem, 9vw, 5.4rem); letter-spacing: .04em;
+  }
+  .hero .kanji span { color: var(--hanko); }
+  .hero p.pitch { font-size: 1.18rem; max-width: 38rem; margin: .9rem 0 0; }
+  .hero p.pitch strong { font-weight: 800; }
+  .meta-chips { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.1rem; }
+  .meta-chips span {
+    font: 600 .72rem/1 "JetBrains Mono", monospace; color: var(--ink-soft);
+    border: 1px solid var(--line); background: var(--paper-2);
+    padding: .42rem .65rem; border-radius: 999px;
+  }
+
+  /* ── tl;dr ──────────────────────────────────── */
+  .tldr {
+    background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 1.4rem 1.5rem; margin: 1.6rem 0 0;
+    box-shadow: 0 3px 14px #0000000a;
+  }
+  .tldr h2 { font-size: 1rem; letter-spacing: .12em; text-transform: uppercase; color: var(--hanko); }
+  .tldr ul { margin: .8rem 0 0; padding: 0; list-style: none; display: grid; gap: .55rem; }
+  .tldr li { padding-left: 1.5rem; position: relative; }
+  .tldr li::before { content: attr(data-k); position: absolute; left: 0; top: .1em; font-size: .95rem; }
+
+  /* ── sections ───────────────────────────────── */
+  section { margin-top: 3.6rem; }
+  section > .card {
+    background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 1.6rem 1.7rem 1.7rem; margin-top: -0.9rem;
+    box-shadow: 0 3px 14px #0000000a;
+  }
+  section h2.title { font-size: 1.7rem; font-weight: 900; margin: 1.1rem 0 .2rem; }
+  .point {
+    font-weight: 800; font-size: 1.02rem; margin: .5rem 0 1rem;
+    padding: .6rem .9rem; border-left: 4px solid var(--c, var(--tape-pink));
+    background: color-mix(in oklab, var(--c, var(--tape-pink)) 8%, var(--paper-2));
+    border-radius: 0 8px 8px 0;
+  }
+  .point::before { content: "the point → "; font: 600 .72rem/1 "JetBrains Mono", monospace; color: var(--ink-soft); display: block; margin-bottom: .2rem; letter-spacing: .08em; }
+  section ul.tight { margin: .6rem 0; padding-left: 1.15rem; }
+  section ul.tight li { margin: .45rem 0; }
+  section ul.tight li::marker { color: var(--c, var(--ink-soft)); }
+  strong { font-weight: 800; }
+
+  /* chips */
+  .chip {
+    display: inline-flex; align-items: center; gap: .35rem;
+    font: 600 .68rem/1 "JetBrains Mono", monospace; letter-spacing: .06em;
+    padding: .3rem .55rem; border-radius: 6px; vertical-align: middle;
+  }
+  .chip.decided { background: #c63d2f14; color: var(--hanko); border: 1px solid #c63d2f3d; }
+  .chip.decided::before { content: "決"; font-weight: 400; font-size: .8rem; }
+  .chip.open { background: #e8a93d1c; color: #8a6414; border: 1px solid #e8a93d55; }
+  .chip.open::before { content: "?"; }
+  .chip.later { background: #7d8ba118; color: #57637a; border: 1px solid #7d8ba14d; }
+  .chip.later::before { content: "→"; }
+
+  /* code */
+  pre {
+    background: #2a2721; color: #efe9dc; border-radius: 10px;
+    padding: 1rem 1.2rem; overflow-x: auto; font-size: .84rem; line-height: 1.6;
+    margin: 1rem 0;
+  }
+  pre .t { color: #f2a7c5; }   /* tag */
+  pre .a { color: #8fd3c7; }   /* attr */
+  pre .v { color: #e8c583; }   /* value */
+  pre .c { color: #8d867a; }   /* comment */
+  code:not(pre code) {
+    background: #26241f0d; border: 1px solid var(--line);
+    padding: .1rem .35rem; border-radius: 5px; font-size: .85em;
+  }
+
+  /* details / progressive disclosure */
+  details {
+    border: 1px dashed var(--line); border-radius: 10px;
+    padding: .7rem 1rem; margin: .9rem 0; background: var(--paper);
+  }
+  details summary {
+    cursor: pointer; font-weight: 800; font-size: .9rem; list-style: none;
+    display: flex; align-items: center; gap: .5rem; color: var(--ink-soft);
+  }
+  details summary::before { content: "▸"; color: var(--c, var(--ink-soft)); transition: transform .15s; }
+  details[open] summary::before { transform: rotate(90deg); }
+  details[open] summary { margin-bottom: .5rem; }
+  @media (prefers-reduced-motion: reduce) { details summary::before { transition: none; } }
+
+  /* tables */
+  table { border-collapse: collapse; width: 100%; font-size: .88rem; margin: .8rem 0; }
+  th { text-align: left; font: 600 .7rem/1.4 "JetBrains Mono", monospace; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-soft); }
+  th, td { padding: .5rem .6rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  td code { white-space: nowrap; }
+
+  /* ── architecture diagram ───────────────────── */
+  .diagram { display: grid; gap: .7rem; margin: 1.2rem 0; }
+  .proc { border: 1.5px solid var(--line); border-radius: 12px; padding: .9rem 1rem; background: var(--paper); }
+  .proc > .lbl { font: 600 .68rem/1 "JetBrains Mono", monospace; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: .6rem; }
+  .boxes { display: flex; flex-wrap: wrap; gap: .5rem; }
+  .box {
+    font: 600 .78rem/1.35 "JetBrains Mono", monospace;
+    background: var(--paper-2); border: 1px solid var(--line); border-top: 3px solid var(--bc, var(--tape-blue));
+    border-radius: 8px; padding: .55rem .7rem;
+  }
+  .box small { display: block; font: 400 .68rem/1.3 "Karla", sans-serif; color: var(--ink-soft); margin-top: .15rem; }
+  .flow { text-align: center; font: 600 .72rem/1 "JetBrains Mono", monospace; color: var(--ink-soft); }
+
+  /* ── milestones timeline ────────────────────── */
+  .timeline { list-style: none; margin: 1.2rem 0 0; padding: 0; }
+  .timeline li { display: grid; grid-template-columns: 3.4rem 1fr; gap: 1rem; position: relative; padding-bottom: 1.3rem; }
+  .timeline li::before {
+    content: ""; position: absolute; left: 1.62rem; top: 2.2rem; bottom: 0;
+    width: 2px; background: var(--line);
+  }
+  .timeline li:last-child::before { display: none; }
+  .timeline .m {
+    width: 3.3rem; height: 2rem; display: grid; place-items: center;
+    font: 800 .8rem/1 "JetBrains Mono", monospace; color: #fff;
+    background: var(--mc, var(--tape-slate)); border-radius: 7px;
+    transform: rotate(-2deg); box-shadow: 0 2px 4px #00000018;
+  }
+  .timeline h3 { font-size: 1.02rem; margin-top: .2rem; }
+  .timeline p { margin: .25rem 0 0; font-size: .92rem; color: var(--ink-soft); }
+  .demo-flag { font: 600 .68rem/1 "JetBrains Mono", monospace; color: var(--hanko); }
+
+  /* ── open questions ─────────────────────────── */
+  .qgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr)); gap: 1rem; margin-top: 1.2rem; }
+  .q {
+    background: var(--paper-2); border: 1px solid var(--line); border-radius: 4px 18px 4px 16px;
+    padding: 1.05rem 1.15rem; position: relative;
+    box-shadow: 0 3px 10px #0000000a;
+  }
+  .q .qn {
+    position: absolute; top: -0.7rem; left: .9rem;
+    font: 800 .72rem/1 "JetBrains Mono", monospace; color: #fff;
+    background: var(--hanko); padding: .32rem .55rem; border-radius: 6px;
+    transform: rotate(-2deg); box-shadow: 0 1px 3px #00000022;
+  }
+  .q h3 { font-size: .98rem; margin: .2rem 0 .4rem; }
+  .q p { margin: .3rem 0; font-size: .88rem; color: var(--ink-soft); }
+  .q .rec { color: var(--ink-soft); font-size: .84rem; margin-top: .55rem; padding-top: .55rem; border-top: 1px dashed var(--line); }
+  .q .rec::before { content: "rec → "; font: 600 .68rem/1 "JetBrains Mono", monospace; color: var(--ink-soft); }
+  .q .pick { color: var(--ink); font-size: .88rem; font-weight: 800; margin-top: .4rem; }
+  .q .pick::before { content: "決 call → "; font: 600 .68rem/1 "JetBrains Mono", monospace; color: var(--hanko); font-weight: 600; }
+
+  footer { margin-top: 4rem; padding-top: 1.2rem; border-top: 1px solid var(--line); font-size: .82rem; color: var(--ink-soft); display: flex; justify-content: space-between; flex-wrap: wrap; gap: .5rem; }
+
+  @media (max-width: 640px) {
+    .hero .kanji { font-size: 2.9rem; }
+    section > .card { padding: 1.2rem 1.1rem 1.3rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav aria-label="Sections">
+  <span class="brand">和紙 <em>WASHI</em> · spec v0.2</span>
+  <a class="dot" href="#tldr" style="--c:var(--hanko)">tl;dr</a>
+  <a class="dot" href="#concepts" style="--c:var(--tape-pink)">concepts</a>
+  <a class="dot" href="#wsx" style="--c:var(--tape-teal)">wsx</a>
+  <a class="dot" href="#arch" style="--c:var(--tape-blue)">arch</a>
+  <a class="dot" href="#data" style="--c:var(--tape-mustard)">data</a>
+  <a class="dot" href="#agents" style="--c:var(--tape-violet)">agents</a>
+  <a class="dot" href="#ui" style="--c:var(--tape-moss)">ui</a>
+  <a class="dot" href="#sync" style="--c:var(--tape-slate)">sync</a>
+  <a class="dot" href="#milestones" style="--c:var(--ink)">plan</a>
+  <a class="dot" href="#questions" style="--c:var(--hanko)">decisions</a>
+</nav>
+
+<main>
+
+<header class="hero">
+  <div class="kanji">washi<span>。</span></div>
+  <p class="pitch"><strong>Notion/Obsidian, but the primary author is an agent.</strong>
+  Notes are JSX — not markdown — rendered by a closed component library with live bindings
+  into a local database. Local-first, sync-ready, built on mirin.</p>
+  <div class="meta-chips">
+    <span>mirin desktop</span><span>bun + CEF</span><span>repo shape: Anko 1:1</span>
+    <span>claude-agent-sdk + ACP</span><span>bun:sqlite</span><span>v0.2 · decided</span>
+  </div>
+
+  <div class="tldr" id="tldr">
+    <h2>30-second version</h2>
+    <ul>
+      <li data-k="📄"><strong>Sheets are WSX</strong> — JSX as a serialization format. Closed component registry, JSON-literal props, zero executable code. Agents can't malform it; validation errors are actionable.</li>
+      <li data-k="🤖"><strong>Two agent ports, one UI.</strong> Embedded Claude Agent SDK is the native path; external agents (Gemini, Codex) arrive later over ACP. The transcript UI speaks ACP vocabulary for both.</li>
+      <li data-k="🗄️"><strong>Ink, the data DSL.</strong> One typed query/mutation grammar (<code>@washi/ink</code>) shared by Paper <code>bind</code> props, agent tools, and the UI — agents define tables, add rows, and query through it. The outside world only via capabilities: policy-gated fetch + stamped actions. Never fs or shell.</li>
+      <li data-k="🔁"><strong>Sync-ready day 1, sync later.</strong> Sheet text in Loro CRDTs from day 1; ULIDs + HLC + tombstones + oplog for everything else; self-hosted Bun/Elysia relay at M5.</li>
+    </ul>
+  </div>
+</header>
+
+<!-- ═══════════ CONCEPTS ═══════════ -->
+<section id="concepts" style="--c:var(--tape-pink)">
+  <span class="tape" style="--c:var(--tape-pink)">01 · core concepts</span>
+  <div class="card">
+    <h2 class="title">Eight nouns, one bet</h2>
+    <p class="point">Humans direct, agents write. Everything an agent touches is typed, scoped, and closed.</p>
+    <ul class="tight">
+      <li><strong>Sheet</strong> — one note. A <code>.wsx</code> document stored in SQLite (not loose files).</li>
+      <li><strong>Paper</strong> — the closed UI kit (<code>@washi/paper</code>). The only components a sheet may use.</li>
+      <li><strong>Tables</strong> — user/agent-defined structured data, Notion-database style. Sheets embed live views via <code>bind</code> props.</li>
+      <li><strong>Ink</strong> — the typed data DSL (<code>@washi/ink</code>): define tables, insert, update, query (filters, sorts, group-by aggregations). One grammar shared by <code>bind</code> props, agent tools, and the UI.</li>
+      <li><strong>Tsuru</strong> — scoped fetch (<code>@washi/tsuru</code>): https-only, domain allowlist + per-domain prompts, private ranges blocked. Shared by agent <code>fetch_url</code> and the sheet <code>Fetch</code> component.</li>
+      <li><strong>Hanko</strong> — safe actions (<code>@washi/hanko</code>): a closed registry of stamped verbs (open sheet, insert row, open URL…) — the only side-effect channel for sheets and agents.</li>
+      <li><strong>Agents as first-class editors</strong> — embedded Claude native, ACP agents pluggable.</li>
+      <li><strong>Closed APIs</strong> — sheet CRUD, table query/mutate, search. Zod at every boundary, permission-gated.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══════════ WSX ═══════════ -->
+<section id="wsx" style="--c:var(--tape-teal)">
+  <span class="tape" style="--c:var(--tape-teal)">02 · wsx format</span>
+  <div class="card">
+    <h2 class="title">JSX as data, not code</h2>
+    <p class="point">A sheet is a validated AST wearing JSX syntax. Nothing executes — a hallucinating agent writes wrong <em>content</em>, never running code.</p>
+
+<pre><code>&lt;<span class="t">Sheet</span> <span class="a">title</span>=<span class="v">"Q3 Roadmap"</span> <span class="a">icon</span>=<span class="v">"🗺️"</span> <span class="a">tags</span>=<span class="v">{['planning']}</span>&gt;
+  &lt;<span class="t">H1</span>&gt;Q3 Roadmap&lt;/<span class="t">H1</span>&gt;
+  &lt;<span class="t">Callout</span> <span class="a">tone</span>=<span class="v">"warning"</span> <span class="a">class</span>=<span class="v">"mt-6 font-medium"</span>&gt;Dates aspirational.&lt;/<span class="t">Callout</span>&gt;
+  &lt;<span class="t">TaskList</span> <span class="a">bind</span>=<span class="v">{{ table: 'tasks', where: { tag: 'q3' } }}</span> /&gt;
+  &lt;<span class="t">Table</span> <span class="a">bind</span>=<span class="v">{{ table: 'tasks' }}</span> <span class="a">columns</span>=<span class="v">{['title','status','owner']}</span> /&gt;
+  &lt;<span class="t">Button</span> <span class="a">action</span>=<span class="v">{{ verb: 'table.insert', table: 'tasks' }}</span>&gt;Add task&lt;/<span class="t">Button</span>&gt;
+  &lt;<span class="t">Ref</span> <span class="a">sheet</span>=<span class="v">"01J8…"</span>&gt;design doc&lt;/<span class="t">Ref</span>&gt;
+&lt;/<span class="t">Sheet</span>&gt;</code></pre>
+
+    <h3>Grammar <span class="chip decided">DECIDED</span></h3>
+    <ul class="tight">
+      <li><strong>Elements:</strong> Paper registry components only. No host elements, no imports, no user components (v1).</li>
+      <li><strong>Props:</strong> JSON literals + <code>bind</code> ink descriptors + sheet refs. No functions, no expressions.</li>
+      <li><strong>Style:</strong> Tailwind is the styling language — a <code>class</code> prop of utility classes, validated against Paper's curated pre-generated allowlist. No inline styles, no arbitrary CSS, no runtime compiler. <span class="chip decided">DECIDED</span></li>
+      <li><strong>Actions:</strong> interactive components carry <code>action</code> props — hanko descriptors from the closed verb registry. No callbacks, no scripts.</li>
+      <li><strong>Children:</strong> elements, text, <code>{literal}</code>.</li>
+      <li><strong>Validation:</strong> Zod props schema per component (lives in <code>domain</code>), runs before persist <em>and</em> before render. <code>sheet_check</code> returns diagnostics agents can act on.</li>
+    </ul>
+
+    <details style="--c:var(--tape-teal)">
+      <summary>Why JSX over markdown</summary>
+      <ul class="tight">
+        <li>Typed structure agents can't malform — parse + schema errors instead of silently broken markdown.</li>
+        <li>Richer-than-markdown blocks: kanban, live tables, charts, columns — one grammar for content and layout.</li>
+        <li>Interactivity lives <em>inside</em> Paper components (task toggle, cell edit) writing back through fixed RPC mutations.</li>
+      </ul>
+    </details>
+
+    <details style="--c:var(--tape-teal)">
+      <summary>Paper v0 — ~15 components</summary>
+      <p><code>Sheet</code> · <code>H1–H3</code> · <code>P</code> · <code>Quote</code> · <code>Callout</code> · <code>Code</code> · <code>Divider</code> · <code>Img</code> · <code>Ref</code> · <code>Tag</code> · <code>TaskList/Task</code> · <code>Table</code> · <code>Board</code> · <code>Toggle</code> · <code>Columns/Column</code> · <code>Button</code> · <code>Fetch</code> (tsuru-policied, async render, cached last-good)</p>
+      <p>Impls wrap <strong>shadcn/ui primitives</strong> (base-mira) — app chrome and sheet content share one design system and one token set.</p>
+    </details>
+  </div>
+</section>
+
+<!-- ═══════════ ARCHITECTURE ═══════════ -->
+<section id="arch" style="--c:var(--tape-blue)">
+  <span class="tape" style="--c:var(--tape-blue)">03 · architecture</span>
+  <div class="card">
+    <h2 class="title">Anko's skeleton on mirin</h2>
+    <p class="point">Clone the proven shape: layered packages, typed mirin RPC, everything heavy in the Bun main worker.</p>
+
+    <div class="diagram" role="img" aria-label="Architecture: CEF renderer talks over typed RPC to the Bun main worker, which owns the api, service, repository, sqlite, and the agent host connecting to the Claude Agent SDK in-process and ACP agents over stdio">
+      <div class="proc">
+        <div class="lbl">CEF renderer</div>
+        <div class="boxes">
+          <div class="box" style="--bc:var(--tape-moss)">React 19 UI<small>Zustand stores, Tailwind v4, shadcn</small></div>
+          <div class="box" style="--bc:var(--tape-pink)">@washi/paper<small>registry components</small></div>
+          <div class="box" style="--bc:var(--tape-teal)">WSX render<small>validated AST → React</small></div>
+        </div>
+      </div>
+      <div class="flow">⇅ typed RPC + events (mirinjs, token-auth loopback WS)</div>
+      <div class="proc">
+        <div class="lbl">Bun main worker</div>
+        <div class="boxes">
+          <div class="box" style="--bc:var(--tape-blue)">api<small>rpc router</small></div>
+          <div class="box" style="--bc:var(--tape-blue)">service<small>wsx, search, agent host</small></div>
+          <div class="box" style="--bc:var(--tape-mustard)">repository<small>folder-per-op</small></div>
+          <div class="box" style="--bc:var(--tape-mustard)">bun:sqlite<small>washi.db · WAL</small></div>
+          <div class="box" style="--bc:var(--tape-violet)">Claude Agent SDK<small>in-process MCP tools</small></div>
+          <div class="box" style="--bc:var(--tape-violet)">ACP agents<small>stdio JSON-RPC · M4</small></div>
+        </div>
+      </div>
+    </div>
+
+    <details style="--c:var(--tape-blue)" open>
+      <summary>Workspace layout</summary>
+      <table>
+        <tr><th>path</th><th>package</th><th>owns</th></tr>
+        <tr><td><code>apps/desktop</code></td><td><code>@washi/desktop</code></td><td>mirin shell — <code>ui/</code> + <code>main/</code></td></tr>
+        <tr><td><code>packages/desktop/domain</code></td><td><code>@washi/desktop-domain</code></td><td>schemas, entities, Paper prop schemas</td></tr>
+        <tr><td><code>packages/desktop/repository</code></td><td><code>@washi/desktop-repository</code></td><td>storage queries/mutations, DDL</td></tr>
+        <tr><td><code>packages/desktop/service</code></td><td><code>@washi/desktop-service</code></td><td>agent host, wsx service, search</td></tr>
+        <tr><td><code>packages/desktop/api</code></td><td><code>@washi/desktop-api</code></td><td>rpc routes</td></tr>
+        <tr><td><code>packages/shared/wsx</code></td><td><code>@washi/wsx</code></td><td>parse / validate / serialize / patch (isomorphic, no DOM)</td></tr>
+        <tr><td><code>packages/shared/paper</code></td><td><code>@washi/paper</code></td><td>registry + React impls (renderer-only)</td></tr>
+        <tr><td><code>packages/shared/ink</code></td><td><code>@washi/ink</code></td><td>typed table DSL — column specs, filters, mutations (isomorphic descriptors, executed in repository)</td></tr>
+        <tr><td><code>packages/shared/tsuru</code></td><td><code>@washi/tsuru</code></td><td>scoped fetch — policy types + client (executed in service)</td></tr>
+        <tr><td><code>packages/shared/hanko</code></td><td><code>@washi/hanko</code></td><td>action registry — verb descriptors + Zod schemas (executed in service)</td></tr>
+        <tr><td><code>packages/shared/typescript-config</code></td><td><code>@washi/typescript-config</code></td><td>base / bun / react tsconfigs</td></tr>
+      </table>
+      <p>Layering one-way: <code>domain → repository → service → api → ui</code>.</p>
+    </details>
+
+    <details style="--c:var(--tape-blue)">
+      <summary>Stack (all Anko-proven)</summary>
+      <p>Bun · Turborepo · TS strict + tsgo · Biome 2.5.3 (Anko config) · React 19 + rolldown-vite ·
+      Tailwind v4 + <strong>shadcn base-mira as the UI backbone</strong> (app chrome and Paper both wrap its primitives) + tabler icons · Zustand 5 feature stores ·
+      Drizzle-as-query-builder over bun:sqlite (idempotent DDL + <code>ensureColumn</code>) ·
+      emoji commitlint · <code>docs/conventions.md</code> forked from nukk's portable master.</p>
+    </details>
+  </div>
+</section>
+
+<!-- ═══════════ DATA ═══════════ -->
+<section id="data" style="--c:var(--tape-mustard)">
+  <span class="tape" style="--c:var(--tape-mustard)">04 · data layer</span>
+  <div class="card">
+    <h2 class="title">One SQLite file, sync-shaped</h2>
+    <p class="point">ULIDs + HLC timestamps + tombstones + oplog from day 1. Cheap now, cursed to retrofit.</p>
+    <ul class="tight">
+      <li><code>&lt;appDataDir&gt;/washi.db</code>, dev fork via <code>app.isDev</code>. WAL, FKs on.</li>
+      <li>All writes route through repository ops that <strong>also append to <code>oplog</code></strong> — the future sync unit.</li>
+      <li>Table reads/writes travel as <code>@washi/ink</code> descriptors — the same objects whether they come from a <code>bind</code> prop, an agent tool, or the UI.</li>
+      <li>Sheet writes are whole-source replaces <span class="chip decided">DECIDED</span> — Loro merges them at the text level when devices diverge.</li>
+      <li>Sheet source is a <strong>Loro text doc from day 1</strong> <span class="chip decided">DECIDED</span> — snapshots + update log persisted in SQLite; tables and metadata stay LWW via HLC + oplog.</li>
+    </ul>
+    <details style="--c:var(--tape-mustard)">
+      <summary>Tables</summary>
+      <table>
+        <tr><th>table</th><th>holds</th></tr>
+        <tr><td><code>sheets</code></td><td>id (ULID), title, icon, <code>source</code> (wsx text), tags, hlc_created/updated, deleted_at</td></tr>
+        <tr><td><code>sheet_links</code></td><td>src → dst, extracted on save (backlinks / graph)</td></tr>
+        <tr><td><code>tables · table_columns · records</code></td><td>user-defined tables; records validated by <code>@washi/ink</code> column specs</td></tr>
+        <tr><td><code>agent_sessions · agent_turns</code></td><td>provider, ACP-shaped transcript, cost</td></tr>
+        <tr><td><code>approvals</code></td><td>permission requests + resolutions (audit trail)</td></tr>
+        <tr><td><code>oplog</code></td><td>append-only: op_id (HLC), device_id, entity, JSON patch</td></tr>
+        <tr><td><code>search</code></td><td>FTS5 over sheet text extraction + records</td></tr>
+        <tr><td><code>app_meta · window_state</code></td><td>KV + single-row frame state</td></tr>
+      </table>
+    </details>
+  </div>
+</section>
+
+<!-- ═══════════ AGENTS ═══════════ -->
+<section id="agents" style="--c:var(--tape-violet)">
+  <span class="tape" style="--c:var(--tape-violet)">05 · agent layer</span>
+  <div class="card">
+    <h2 class="title">Two ports, one vocabulary</h2>
+    <p class="point">The transcript UI renders ACP semantics — message chunks, tool cards, diffs, plans, permission options — no matter which agent is behind it. claude-agent-acp proves the SDK→ACP mapping is 1:1.</p>
+
+    <h3>Embedded Claude — native path <span class="chip decided">M2</span></h3>
+    <ul class="tight">
+      <li><code>@anthropic-ai/claude-agent-sdk</code> in the main worker.</li>
+      <li>Tools via <code>createSdkMcpServer</code> (in-process, zero IPC): <code>sheet_list/get/create/replace/patch</code>, <code>sheet_check</code>, <code>db_define/insert/update/query</code> (thin wrappers over <code>@washi/ink</code> descriptors), <code>fetch_url</code> (tsuru), <code>action_run</code> (hanko), <code>search</code>, <code>link_graph</code>.</li>
+      <li>Default tools (Bash, fs, web) <strong>disallowed</strong>; opt-in per session via permission UI.</li>
+      <li><code>canUseTool</code> → approvals store → renderer prompts (Anko's approval-manager pattern, generalized).</li>
+      <li>Hooks for audit · <code>maxBudgetUsd</code> per session · sessions persisted/resumable.</li>
+    </ul>
+
+    <h3>ACP client — external agents <span class="chip later">M4</span></h3>
+    <ul class="tight">
+      <li>Spawn agent binaries (gemini <code>--experimental-acp</code>, codex-acp, claude-agent-acp) via <code>Bun.spawn</code>; <code>@agentclientprotocol/sdk</code> over stdio.</li>
+      <li>Washi's tools reach them via MCP passthrough at <code>session/new</code> — reuse Anko's token-auth loopback HTTP MCP server.</li>
+    </ul>
+
+    <details style="--c:var(--tape-violet)">
+      <summary>Trust model</summary>
+      <ul class="tight">
+        <li>Agent-written WSX is <strong>inert data</strong> — registry-only, no expressions. Worst case: wrong content, never code execution.</li>
+        <li>DB access only through Zod-validated tools; no raw SQL surface.</li>
+        <li>Network only through tsuru: https-only, domain allowlist + per-domain prompts, size/time caps, loopback and private ranges always blocked — agents can never reach the mirin RPC or MCP loopback servers.</li>
+        <li>Side effects only through hanko verbs — each stamped by the approvals flow, each an auditable row.</li>
+        <li>Loopback servers token-gated, off in packaged builds unless explicitly enabled.</li>
+        <li>Streaming: agent host normalizes both ports into one update shape → <code>rpc.event</code> broadcast → Zustand agent store → transcript UI.</li>
+      </ul>
+    </details>
+  </div>
+</section>
+
+<!-- ═══════════ UI ═══════════ -->
+<section id="ui" style="--c:var(--tape-moss)">
+  <span class="tape" style="--c:var(--tape-moss)">06 · ui surfaces</span>
+  <div class="card">
+    <h2 class="title">Three panes, no router</h2>
+    <p class="point">"Edit by asking" is the product bet — human editing stays deliberately thin in v1.</p>
+    <ul class="tight">
+      <li><strong>Left:</strong> sheet tree / tags / tables + cmdk search.</li>
+      <li><strong>Center:</strong> rendered WSX; inline light edits (task toggles, table cells, text runs); interactive components fire hanko verbs over RPC.</li>
+      <li><strong>Right:</strong> agent chat — transcript, tool cards, WSX diffs with before/after render preview, permission prompts, session picker (provider + budget).</li>
+      <li>Anko-style: hash/panel state in Zustand, <code>titleBarStyle: hiddenInset</code>, no router.</li>
+      <li>Full block editor = later milestone, only if the bet needs hedging.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══════════ SYNC ═══════════ -->
+<section id="sync" style="--c:var(--tape-slate)">
+  <span class="tape" style="--c:var(--tape-slate)">07 · sync (future)</span>
+  <div class="card">
+    <h2 class="title">Self-hosted relay, not a merge brain</h2>
+    <p class="point">Server pushes/pulls oplog and holds auth. It never merges — which keeps E2E encryption on the table.</p>
+    <ul class="tight">
+      <li><code>apps/sync</code> — Bun + Elysia + Eden, Better Auth (JWT/jose), Postgres. Docker for self-host, Railway template for one-click.</li>
+      <li>Conflicts: sheet <code>source</code> merges via Loro (already in place since M1); metadata/records = per-entity LWW via HLC.</li>
+      <li>E2EE of op payloads: decide before sync ships. Feasible because the server is blind.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══════════ MILESTONES ═══════════ -->
+<section id="milestones" style="--c:var(--ink)">
+  <span class="tape" style="--c:var(--ink); color:#f8f6f1">08 · milestones</span>
+  <div class="card">
+    <h2 class="title">M0 → M5</h2>
+    <ol class="timeline">
+      <li><span class="m" style="--mc:var(--tape-slate)">M0</span><div>
+        <h3>Scaffold</h3><p>mirin init → Anko shape, conventions + CLAUDE.md, CI, check scenario.</p></div></li>
+      <li><span class="m" style="--mc:var(--tape-teal)">M1</span><div>
+        <h3>Sheets core</h3><p>Schema + DDL, Loro-backed sheet store, <code>@washi/wsx</code> parse/validate/serialize, Paper v0, read-only render, sidebar, FTS search.</p></div></li>
+      <li><span class="m" style="--mc:var(--tape-violet)">M2</span><div>
+        <h3>Embedded Claude <span class="demo-flag">← the demo moment</span></h3><p>Agent host, in-process tools, approvals UI, transcript + diff UI, persisted sessions.</p></div></li>
+      <li><span class="m" style="--mc:var(--tape-mustard)">M3</span><div>
+        <h3>Structured data</h3><p>Tables/records, live <code>bind</code> views with aggregations, <code>Fetch</code> component, inline human edits.</p></div></li>
+      <li><span class="m" style="--mc:var(--tape-blue)">M4</span><div>
+        <h3>ACP</h3><p>External agent support, MCP loopback endpoint.</p></div></li>
+      <li><span class="m" style="--mc:var(--tape-pink)">M5</span><div>
+        <h3>Sync</h3><p>Self-hosted server (Loro sync + oplog relay), E2EE decision, multi-device.</p></div></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ═══════════ OPEN QUESTIONS ═══════════ -->
+<section id="questions" style="--c:var(--hanko)">
+  <span class="tape" style="--c:var(--hanko)">09 · decisions</span>
+  <div class="card">
+    <h2 class="title">Decision log — all ten called</h2>
+    <p class="point">Locked 2026-08-12. Three diverge from the original recommendation — flagged on their cards.</p>
+    <div class="qgrid">
+      <div class="q"><span class="qn">Q1</span>
+        <h3>WSX expressiveness</h3>
+        <p>Registry-only + literal props vs scoped expressions / user components later. Escape hatch design?</p>
+        <p class="pick">closed, additive registry — forever. Power grows by adding components/verbs, never a scripting escape hatch.</p>
+      </div>
+      <div class="q"><span class="qn">Q2</span>
+        <h3>Sheet granularity</h3>
+        <p>Whole-doc source vs block rows. Decides <code>sheet_patch</code>, human editing, sync merge. The big one.</p>
+        <p class="pick">whole-doc source — agents rewrite cheap, humans edit thin.</p>
+      </div>
+      <div class="q"><span class="qn">Q3</span>
+        <h3><code>sheet_patch</code> semantics</h3>
+        <p>AST-path ops vs text diff vs replace-only in v1?</p>
+        <p class="pick">replace-only v1; AST ops when block editing lands.</p>
+      </div>
+      <div class="q"><span class="qn">Q4</span>
+        <h3>CRDT now vs later</h3>
+        <p>Loro from day 1 for sheet source, or oplog + LWW until M5?</p>
+        <p class="rec">defer — oplog + LWW carries us to M5. (diverged)</p>
+        <p class="pick">Loro from day 1 — sheet source lives in a Loro text doc; multi-device merge solved before sync exists.</p>
+      </div>
+      <div class="q"><span class="qn">Q5</span>
+        <h3>Naming bikeshed</h3>
+        <p>"sheet" · <code>@washi/paper</code> · <code>.wsx</code> — keep?</p>
+        <p class="pick">keep all — sheet · .wsx · paper · ink · tsuru · hanko.</p>
+      </div>
+      <div class="q"><span class="qn">Q6</span>
+        <h3>Vault export</h3>
+        <p>Obsidian-style files-on-disk export/import — v1, later, never?</p>
+        <p class="pick">later, post-M3 — SQLite stays the single source of truth; export/import once wsx serialize exists.</p>
+      </div>
+      <div class="q"><span class="qn">Q7</span>
+        <h3>ACP ordering</h3>
+        <p>M4 after embedded SDK, or ACP-first to force provider-neutral UI?</p>
+        <p class="pick">embedded first, ACP at M4 — ship the demo; ACP vocabulary keeps the UI honest meanwhile.</p>
+      </div>
+      <div class="q"><span class="qn">Q8</span>
+        <h3>Tables scope</h3>
+        <p>Full Notion-database (views, formulas) is a tarpit.</p>
+        <p class="rec">flat columns + filters + sorts only. (diverged — went broader)</p>
+        <p class="pick">columns + filters + sorts + group-by aggregations (count/sum/avg) in v1. Relations, formulas, saved views later.</p>
+      </div>
+      <div class="q"><span class="qn">Q9</span>
+        <h3>Tailwind in WSX</h3>
+        <p>Agent-written classes are runtime data — the build-time JIT never sees them. Curated pre-generated allowlist vs <code>@tailwindcss/browser</code> runtime compile?</p>
+        <p class="pick">curated allowlist — Paper ships a pre-generated utility subset (spacing, type, color, grid, flex).</p>
+      </div>
+      <div class="q"><span class="qn">Q10</span>
+        <h3>Network in sheets</h3>
+        <p>Is tsuru agent-only, or can sheets embed live web data (feeds, widgets) via a bind-like prop?</p>
+        <p class="rec">agent-only v1 — sheets stay deterministic. (diverged)</p>
+        <p class="pick">sheets can fetch — a <code>Fetch</code> component with tsuru-policied URL props; rendered async with cached last-good data so sheets stay offline-readable.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>washi · spec v0.2 · decisions locked 2026-08-12</span>
+  <span class="mono">docs/spec.html</span>
+</footer>
+
+</main>
+</body>
+</html>

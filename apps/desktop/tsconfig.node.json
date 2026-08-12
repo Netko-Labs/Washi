@@ -1,0 +1,11 @@
+{
+  "extends": "@washi/typescript-config/base.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "../../node_modules/.tmp/washi-desktop-node.tsbuildinfo",
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "types": ["node"],
+    "erasableSyntaxOnly": true
+  },
+  "include": ["mirin.config.ts", "vite.config.ts", "check.ts"]
+}
