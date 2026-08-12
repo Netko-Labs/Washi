@@ -11,16 +11,18 @@ function cx(base: string, extra?: string): string {
 
 export function H1({ className, children }: BlockProps) {
   return (
-    <h1 className={cx('mt-6 mb-2 font-bold text-3xl tracking-tight', className)}>{children}</h1>
+    <h1 className={cx('mt-6 mb-2 font-bold font-display text-3xl tracking-tight', className)}>
+      {children}
+    </h1>
   )
 }
 
 export function H2({ className, children }: BlockProps) {
-  return <h2 className={cx('mt-5 mb-2 font-semibold text-2xl', className)}>{children}</h2>
+  return <h2 className={cx('mt-5 mb-2 font-bold font-display text-2xl', className)}>{children}</h2>
 }
 
 export function H3({ className, children }: BlockProps) {
-  return <h3 className={cx('mt-4 mb-1 font-semibold text-lg', className)}>{children}</h3>
+  return <h3 className={cx('mt-4 mb-1 font-bold font-display text-lg', className)}>{children}</h3>
 }
 
 export function P({ className, children }: BlockProps) {

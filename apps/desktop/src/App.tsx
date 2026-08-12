@@ -14,11 +14,15 @@ export function App() {
   return (
     <div className="flex h-dvh flex-col bg-background text-foreground">
       <header
-        className="h-9 shrink-0 border-border border-b"
+        className="h-9 shrink-0 border-border border-b bg-background"
         style={{ appRegion: 'drag' } as never}
       >
-        <div className="flex h-full items-center justify-center font-medium text-muted-foreground text-xs">
-          Washi
+        <div className="flex h-full items-center justify-center gap-1.5">
+          <span className="font-display font-bold text-muted-foreground text-xs">和紙</span>
+          <span className="font-display font-bold text-foreground text-xs tracking-widest">
+            WASHI
+          </span>
+          <span className="size-1.5 rounded-full bg-primary" />
         </div>
       </header>
       <div className="flex min-h-0 flex-1">

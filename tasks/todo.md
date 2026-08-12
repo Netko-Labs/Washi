@@ -29,6 +29,20 @@ Acceptance met: `bun test` 42 green, `turbo check-types` green, `biome check` gr
 - [x] ui: right panel — transcript, tool cards, wsx diff, permission prompts
 - [x] check.ts: agent panel renders; session creation drivable without API key
 
+## Design feature gaps (from the spec-parity pass, 2026-08-12)
+
+Elements of docs/spec.html's language that the current model cannot express — features, not hacks:
+
+- [ ] **Sheet accent color** — tape color on the page card is hash-derived from the sheet id;
+      no `accent` field in the sheet schema, so neither user nor agent can choose it.
+- [ ] **`Tape`/sticker Paper primitive** — decorative tape strips exist only as app chrome;
+      sheets can't carry them as WSX content.
+- [ ] **Styling variants in WSX** — the class allowlist has no `hover:`/`dark:` variants, so
+      sheet content can't do interactive or theme-conditional styling (closed by design; revisit
+      as registry-level presets rather than raw variants).
+- [ ] **Page-level theming** — no cover images, no per-sheet typography/display-font choices.
+- [ ] **Dark mode toggle** — tokens exist for `.dark`, no UI or persistence wired.
+
 ## Known gaps (post-M2)
 
 - Live SDK loop not covered by automated tests (would bill + need auth); unit tests
@@ -48,3 +62,5 @@ Acceptance met: `bun test` 42 green, `turbo check-types` green, `biome check` gr
 - `mirin check` runs against the persistent dev db — scenarios must be state-robust
   (click the target sheet, don't assume first-boot state).
 - babel parser pairs with @babel/types@^7 — v8 types mismatch v7 AST.
+- `mirin check` and `mirin dev` can't run simultaneously — CDP port 9222 collides and the
+  check dies with "never published an inspector endpoint". Stop dev first.

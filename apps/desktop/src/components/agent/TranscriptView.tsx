@@ -31,6 +31,17 @@ function DiffView({ diff }: { diff: { path: string; oldText: string; newText: st
   )
 }
 
+const KIND_SPINES: Record<string, string> = {
+  read: 'border-l-tape-teal',
+  edit: 'border-l-tape-pink',
+  search: 'border-l-tape-blue',
+  fetch: 'border-l-tape-violet',
+  execute: 'border-l-tape-mustard',
+  delete: 'border-l-destructive',
+  think: 'border-l-tape-slate',
+  other: 'border-l-tape-slate',
+}
+
 function ToolCard({ update, followups }: { update: AgentUpdate; followups: AgentUpdate[] }) {
   if (update.kind !== 'tool_call') return null
   const latest = followups.at(-1)
@@ -47,7 +58,12 @@ function ToolCard({ update, followups }: { update: AgentUpdate; followups: Agent
     .at(-1)?.output
 
   return (
-    <div className="my-1 rounded-md border border-border bg-muted/40 px-2 py-1.5" data-tool-card>
+    <div
+      className={`my-1 rounded-md border border-border border-l-3 bg-card px-2 py-1.5 shadow-sm ${
+        KIND_SPINES[update.toolKind] ?? KIND_SPINES.other
+      }`}
+      data-tool-card
+    >
       <details>
         <summary className="flex cursor-pointer items-center gap-1.5 text-xs">
           <IconChevronRight className="size-3 transition-transform [details[open]>summary>&]:rotate-90" />
@@ -86,7 +102,10 @@ export function TranscriptView({ transcript }: { transcript: TranscriptEntry[] }
         switch (update.kind) {
           case 'user_message':
             return (
-              <div key={entry.id} className="my-1 ml-8 rounded-lg bg-primary/10 px-3 py-2 text-sm">
+              <div
+                key={entry.id}
+                className="my-1 ml-8 rounded-lg rounded-br-sm border border-primary/15 bg-primary/10 px-3 py-2 text-sm"
+              >
                 {update.text}
               </div>
             )
@@ -114,8 +133,13 @@ export function TranscriptView({ transcript }: { transcript: TranscriptEntry[] }
                 {update.error ?? 'the turn failed'}
               </div>
             ) : (
-              <div key={entry.id} className="my-1 text-muted-foreground text-xs">
+              <div
+                key={entry.id}
+                className="my-2 flex items-center gap-2 font-mono text-[10px] text-muted-foreground uppercase tracking-widest"
+              >
+                <span className="h-px flex-1 bg-border" />
                 done{update.costUsd != null ? ` · $${update.costUsd.toFixed(4)}` : ''}
+                <span className="h-px flex-1 bg-border" />
               </div>
             )
           default:

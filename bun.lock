@@ -26,6 +26,9 @@
       "name": "@washi/desktop",
       "version": "0.1.0",
       "dependencies": {
+        "@fontsource-variable/jetbrains-mono": "^5.3.0",
+        "@fontsource-variable/karla": "^5.3.0",
+        "@fontsource/zen-kaku-gothic-new": "^5.3.0",
         "@tabler/icons-react": "^3.44.0",
         "@tailwindcss/vite": "^4.3.2",
         "@washi/desktop-api": "workspace:*",
@@ -361,6 +364,12 @@
     "@esbuild/win32-ia32": ["@esbuild/win32-ia32@0.28.2", "", { "os": "win32", "cpu": "ia32" }, "sha512-YmJbfTlvU7Sdn9BB+4PRES4oB6pxgS37MAONj+hBr/cpXS1aBPKXxNnDbu+QCWPj0o9dgyxeq79g6c5P8KeuYA=="],
 
     "@esbuild/win32-x64": ["@esbuild/win32-x64@0.28.2", "", { "os": "win32", "cpu": "x64" }, "sha512-5ebpxr3nWMzrL/rnUI755Jkuee0bHL/Gq0WTF9lvcpv73wAp5eu8MfBUgWK9bhWvZjj7yX8etf/8tI8Ney695g=="],
+
+    "@fontsource-variable/jetbrains-mono": ["@fontsource-variable/jetbrains-mono@5.3.0", "", {}, "sha512-F32xpS2NsGYoQi2ADSkKTgpJj7ozajsGgDJ8woTnqjmIB+dxDIqImjl4pXZVEExu8UFZ2ndhmX18EBS/hdz3Lw=="],
+
+    "@fontsource-variable/karla": ["@fontsource-variable/karla@5.3.0", "", {}, "sha512-CypH/IGhvpU0I4sue6YG+ZDyx5heglFJAiU2NClTkKOh+jsqjZ7AAgWKGG59+X1dGCN/9L4BLLacCXD7TBBETA=="],
+
+    "@fontsource/zen-kaku-gothic-new": ["@fontsource/zen-kaku-gothic-new@5.3.0", "", {}, "sha512-2t88gAaUkqIAFARfO8GkT1x57QBRx8A0pWeB0CIrIahnzdanWjcV4thPCSv9BJmpeRndq6qbFx1KYglHykiPhw=="],
 
     "@hono/node-server": ["@hono/node-server@2.1.0", "", { "peerDependencies": { "hono": "^4" } }, "sha512-XovyyCCnBzW+zKu+z/zq8hwNs4KOR5rEMAOxo2f40Q5xoOI37IMm6MIg2COOUtUApo0i6850MTBKH2u4QLGIqg=="],
 

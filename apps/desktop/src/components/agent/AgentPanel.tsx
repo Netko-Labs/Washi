@@ -10,12 +10,15 @@ function ApprovalBar() {
   if (!next) return null
 
   return (
-    <div className="border-border border-t bg-muted/60 px-3 py-2" data-approval-bar>
-      <div className="mb-1.5 text-xs">
-        <span className="font-medium">approval needed:</span>{' '}
-        <span className="font-mono">{next.toolName}</span>
+    <div className="border-primary/40 border-t-2 bg-primary/5 px-3 py-2" data-approval-bar>
+      <div className="mb-1.5 flex items-center gap-1.5 text-xs">
+        <span className="grid size-4 place-items-center rounded-full bg-primary font-bold text-[9px] text-primary-foreground">
+          決
+        </span>
+        <span className="font-medium">approval needed</span>
+        <span className="font-mono text-muted-foreground">{next.toolName}</span>
         {approvals.length > 1 && (
-          <span className="text-muted-foreground"> (+{approvals.length - 1} more)</span>
+          <span className="text-muted-foreground">(+{approvals.length - 1} more)</span>
         )}
       </div>
       <pre className="mb-2 max-h-24 overflow-auto rounded bg-muted p-1.5 text-xs">
@@ -78,15 +81,21 @@ export function AgentPanel() {
 
   return (
     <aside
-      className="flex w-96 shrink-0 flex-col border-border border-l bg-muted/20"
+      className="flex w-96 shrink-0 flex-col border-border border-l bg-secondary/50"
       data-agent-panel
     >
+      <div className="flex items-center gap-2 px-4 pt-3 pb-1">
+        <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">
+          agent
+        </span>
+        <span className="h-0.5 flex-1 rounded-full bg-tape-violet/60" />
+      </div>
       <div className="flex items-center gap-1 border-border border-b px-2 py-1.5">
         <select
           value={activeSessionId ?? ''}
           onChange={(event) => void selectSession(event.target.value)}
           aria-label="Agent session"
-          className="h-7 min-w-0 flex-1 rounded-md border border-input bg-background px-1.5 text-xs outline-none"
+          className="h-7 min-w-0 flex-1 rounded-md border border-input bg-card px-1.5 text-xs outline-none"
         >
           {sessions.length === 0 && <option value="">no sessions yet</option>}
           {sessions.map((session) => (
@@ -125,7 +134,7 @@ export function AgentPanel() {
             }}
             placeholder={running ? 'agent is working…' : 'Ask the agent'}
             rows={2}
-            className="min-h-0 flex-1 resize-none rounded-md border border-input bg-background px-2 py-1.5 text-sm outline-none focus:ring-1 focus:ring-ring"
+            className="min-h-0 flex-1 resize-none rounded-md border border-input bg-card px-2 py-1.5 text-sm outline-none focus:ring-1 focus:ring-ring"
           />
           <button
             type="button"

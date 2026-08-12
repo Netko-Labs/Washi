@@ -12,6 +12,22 @@ interface Loaded {
   error: string | null
 }
 
+const TAPES = [
+  'bg-tape-pink',
+  'bg-tape-teal',
+  'bg-tape-blue',
+  'bg-tape-mustard',
+  'bg-tape-violet',
+  'bg-tape-moss',
+]
+
+/** Stable tape color per sheet — derived, since sheets have no accent field (yet). */
+function tapeFor(id: string): string {
+  let hash = 0
+  for (const char of id) hash = (hash * 31 + char.charCodeAt(0)) | 0
+  return TAPES[Math.abs(hash) % TAPES.length] ?? TAPES[0]!
+}
+
 export function SheetView() {
   const activeId = useSheetsStore((state) => state.activeId)
   const [loaded, setLoaded] = useState<Loaded | null>(null)
@@ -37,23 +53,39 @@ export function SheetView() {
 
   if (!activeId || !loaded) {
     return (
-      <div className="grid flex-1 place-items-center text-muted-foreground text-sm">
-        select or create a sheet
+      <div className="paper-canvas grid flex-1 place-items-center">
+        <div className="text-center">
+          <div className="font-display font-bold text-2xl text-muted-foreground/60">
+            washi<span className="text-primary">。</span>
+          </div>
+          <p className="mt-1 text-muted-foreground text-sm">select or create a sheet</p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="flex-1 overflow-y-auto" data-sheet-id={loaded.sheet.id}>
-      {loaded.error ? (
-        <div className="mx-auto max-w-2xl px-8 py-6 text-destructive text-sm">{loaded.error}</div>
-      ) : (
-        loaded.root && (
-          <PaperProvider host={paperHost}>
-            <WsxView root={loaded.root} />
-          </PaperProvider>
-        )
-      )}
+    <div className="paper-canvas flex-1 overflow-y-auto px-6 py-8" data-sheet-id={loaded.sheet.id}>
+      <div className="relative mx-auto max-w-2xl rounded-xl border border-border bg-card shadow-[0_3px_14px_rgb(0_0_0/0.05)]">
+        <span
+          aria-hidden
+          className={`-top-3 -rotate-2 absolute left-8 h-6 w-24 rounded-xs opacity-80 shadow-sm ${tapeFor(loaded.sheet.id)}`}
+          style={{
+            backgroundImage:
+              'repeating-linear-gradient(90deg, rgb(255 255 255 / 0.18) 0 6px, transparent 6px 14px)',
+            clipPath: 'polygon(2% 0, 98% 5%, 100% 92%, 1% 100%)',
+          }}
+        />
+        {loaded.error ? (
+          <div className="px-8 py-6 text-destructive text-sm">{loaded.error}</div>
+        ) : (
+          loaded.root && (
+            <PaperProvider host={paperHost}>
+              <WsxView root={loaded.root} />
+            </PaperProvider>
+          )
+        )}
+      </div>
     </div>
   )
 }
