@@ -72,6 +72,25 @@ describe('paper registry', () => {
     expect(validate(root, paperRegistry)).toEqual([])
   })
 
+  test('controls + sheet state validate; bad state keys are refused', () => {
+    const root = parse(`
+      <Sheet title="t" state={{ view: 'a', open: false, n: 3 }}>
+        <Tabs labels={['a', 'b']} state="view"><Tab><P>a</P></Tab><Tab><P>b</P></Tab></Tabs>
+        <Switch state="open" label="toggle" />
+        <Show when="open"><Callout>hidden</Callout></Show>
+        <Slider state="n" min={0} max={10} />
+        <Dialog trigger="Open" title="t"><P>x</P></Dialog>
+        <Accordion><AccordionItem title="q"><P>a</P></AccordionItem></Accordion>
+        <P><Badge tone="outline">b</Badge><Avatar label="Juan V" /><Kbd>⌘K</Kbd></P>
+        <Progress value={62} />
+      </Sheet>
+    `)
+    expect(validate(root, paperRegistry)).toEqual([])
+
+    const bad = parse(`<Sheet title="t" state={{ fn: 'x' }}><Show>oops</Show></Sheet>`)
+    expect(validate(bad, paperRegistry).length).toBeGreaterThan(0)
+  })
+
   test('presets validate; unknown presets are refused', () => {
     for (const preset of ['washi', 'midnight', 'broadsheet', 'sticker', 'terminal', 'blueprint']) {
       const root = parse(`<Sheet title="t" theme={{ preset: '${preset}' }}><P>x</P></Sheet>`)

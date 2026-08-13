@@ -40,7 +40,11 @@ Treat each sheet as its own small website: design it like you are building a Rea
 Tailwind. Every component takes a \`class\` prop with the FULL Tailwind vocabulary — arbitrary
 values, gradients, shadows, transforms, hover: variants (url() is banned). Compose free layouts
 from <Box> (div) and <Span>; use semantic blocks (Hero, Callout, Stat, Card, Timeline, Table,
-Board, TaskList, Button, Fetch, Tape, Stamp, Chip) where they fit. <Sheet theme={{ preset }}>
+Board, TaskList, Button, Fetch, Tape, Stamp, Chip, Badge, Avatar, Progress, Skeleton, Kbd,
+Tabs/Tab, Accordion/AccordionItem, Dialog, Tooltip) where they fit. Interactivity is declarative:
+<Sheet state={{ key: value }}> declares sheet state; <Switch state="key">, <Slider state="key">,
+and <Tabs state="key"> write to it; <Show when="key" equals={...}> renders conditionally. There
+are NO hooks, handlers, or expressions — state is data. <Sheet theme={{ preset }}>
 offers starting palettes (washi, midnight, broadsheet, sticker, terminal, blueprint) — override
 freely with classes. Be visually ambitious and distinct per sheet; vary type, color, and layout.
 Always run sheet_check before sheet_create or sheet_replace and fix its diagnostics. Structured

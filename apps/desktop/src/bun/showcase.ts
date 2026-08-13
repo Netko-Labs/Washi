@@ -135,6 +135,44 @@ const MOODBOARD = `<Sheet title="Neon Moodboard" icon="🌃" class="bg-[#0b0b12]
 </Sheet>
 `
 
+const INTERACTIVE = `<Sheet title="Interactive Kit" icon="🎛️" theme={{ preset: 'washi', accent: 'violet' }} state={{ view: 'controls', details: false, budget: 40 }}>
+  <Tape color="violet">stateful · still data</Tape>
+  <Hero title="Interactive Kit" subtitle="Hook-shaped interactivity with zero executable content: controls write to sheet state, Show reads it." />
+  <Tabs labels={['controls', 'feedback', 'overlay']} state="view">
+    <Tab>
+      <Switch state="details" label="Show the fine print" />
+      <Show when="details">
+        <Callout tone="info">This paragraph exists because a switch flipped a state key — no handlers were written.</Callout>
+      </Show>
+      <Slider state="budget" min={0} max={100} step={5} label="Budget burn" />
+      <Show when="details">
+        <P class="text-xs text-muted-foreground">State keys: view · details · budget. All declared on the Sheet, all plain scalars.</P>
+      </Show>
+    </Tab>
+    <Tab>
+      <P>Status chips: <Badge>shipped</Badge> <Badge tone="outline">review</Badge> <Badge tone="destructive">blocked</Badge></P>
+      <P>Owners: <Avatar label="Juan Vasquez" /> <Avatar label="Washi Agent" /> <Tooltip label="hover works too"><Span class="underline decoration-dotted">hover me</Span></Tooltip></P>
+      <Progress value={62} />
+      <Skeleton class="w-1/2" />
+      <P>Shortcuts: <Kbd>⌘K</Kbd> <Kbd>⌘Enter</Kbd></P>
+    </Tab>
+    <Tab>
+      <Dialog trigger="Open a dialog" title="Native, sandboxed, boring">
+        <P>Even this modal is declarative — a trigger label and children. The sheet never sees an event handler.</P>
+      </Dialog>
+      <Accordion>
+        <AccordionItem title="Why no hooks?">
+          <P>Hooks are code. Sheets are paper. A prompt-injected agent should never be able to make paper execute.</P>
+        </AccordionItem>
+        <AccordionItem title="What if I need real logic?">
+          <P>Bind data with ink, trigger verbs with hanko, or ask the spec for Q11: sandboxed expressions.</P>
+        </AccordionItem>
+      </Accordion>
+    </Tab>
+  </Tabs>
+</Sheet>
+`
+
 const LAUNCH_TASKS = [
   { title: 'Cut release branch', status: 'shipped', points: 2 },
   { title: 'Bundle CEF locales', status: 'shipped', points: 3 },
@@ -174,6 +212,7 @@ export function seedShowcase(): void {
     { title: 'Ops Log', icon: '🖥️', source: OPS_LOG },
     { title: 'System Map', icon: '📐', source: SYSTEM_MAP },
     { title: 'Neon Moodboard', icon: '🌃', source: MOODBOARD },
+    { title: 'Interactive Kit', icon: '🎛️', source: INTERACTIVE },
   ]
   for (const seed of seeds) {
     const existingId = byTitle.get(seed.title)

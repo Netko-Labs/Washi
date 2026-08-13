@@ -1,10 +1,27 @@
 import type { WsxElement, WsxNode } from '@washi/wsx'
 import type { CSSProperties, ReactNode } from 'react'
+import {
+  Accordion,
+  AccordionItem,
+  Avatar,
+  Badge,
+  Dialog,
+  Kbd,
+  Progress,
+  Show,
+  Skeleton,
+  Slider,
+  Switch,
+  Tab,
+  Tabs,
+  Tooltip,
+} from './components/controls'
 import { Board, Table, Task, TaskList } from './components/data'
 import { Card, Chip, Hero, Stamp, Stat, Step, Tape, Timeline } from './components/display'
 import { Button, Column, Columns, Fetch, Img, Ref, Toggle } from './components/interactive'
 import { SHEET_PRESETS, type SheetPreset } from './components/themes'
 import { Callout, Code, Divider, H1, H2, H3, P, Quote, Tag } from './components/typography'
+import { SheetStateProvider, type SheetStateValue } from './state'
 
 const THEME_FACES: Record<string, string> = {
   gothic: 'font-display',
@@ -80,6 +97,20 @@ function renderElement(node: WsxElement): ReactNode {
     }
     case 'Box': return <div className={p.class}>{kids}</div>
     case 'Span': return <span className={p.class}>{kids}</span>
+    case 'Show': return <Show when={p.when} equals={p.equals} not={p.not}>{kids}</Show>
+    case 'Switch': return <Switch state={p.state} label={p.label} className={p.class} />
+    case 'Slider': return <Slider state={p.state} min={p.min} max={p.max} step={p.step} label={p.label} className={p.class} />
+    case 'Tabs': return <Tabs labels={p.labels} state={p.state} className={p.class}>{kids}</Tabs>
+    case 'Tab': return <Tab className={p.class}>{kids}</Tab>
+    case 'Accordion': return <Accordion className={p.class}>{kids}</Accordion>
+    case 'AccordionItem': return <AccordionItem title={p.title} className={p.class}>{kids}</AccordionItem>
+    case 'Dialog': return <Dialog trigger={p.trigger} title={p.title} className={p.class}>{kids}</Dialog>
+    case 'Tooltip': return <Tooltip label={p.label} className={p.class}>{kids}</Tooltip>
+    case 'Badge': return <Badge tone={p.tone} className={p.class}>{kids}</Badge>
+    case 'Avatar': return <Avatar label={p.label} className={p.class} />
+    case 'Progress': return <Progress value={p.value} max={p.max} className={p.class} />
+    case 'Skeleton': return <Skeleton className={p.class} />
+    case 'Kbd': return <Kbd className={p.class}>{kids}</Kbd>
     case 'Hero': return <Hero title={p.title} subtitle={p.subtitle} align={p.align} size={p.size} className={p.class} />
     case 'Tape': return <Tape color={p.color} className={p.class}>{kids}</Tape>
     case 'Stamp': return <Stamp label={p.label} tone={p.tone} className={p.class} />
@@ -118,5 +149,10 @@ function WsxElementView({ node }: { node: WsxElement }) {
 
 /** Render a parsed, validated WSX tree. Validate first — this trusts its input. */
 export function WsxView({ root }: { root: WsxElement }) {
-  return <WsxElementView node={root} />
+  const initial = (root.props.state as Record<string, SheetStateValue> | undefined) ?? {}
+  return (
+    <SheetStateProvider initial={initial}>
+      <WsxElementView node={root} />
+    </SheetStateProvider>
+  )
 }

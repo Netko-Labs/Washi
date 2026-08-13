@@ -84,7 +84,7 @@ export function SheetView() {
           ) : (
             loaded.root && (
               <PaperProvider host={paperHost}>
-                <WsxView root={loaded.root} />
+                <WsxView key={loaded.sheet.id} root={loaded.root} />
               </PaperProvider>
             )
           )}

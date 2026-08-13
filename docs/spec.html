@@ -327,7 +327,11 @@
 
     <details style="--c:var(--tape-teal)">
       <summary>Paper v0 — ~15 components</summary>
-      <p><code>Sheet</code> · <code>H1–H3</code> · <code>P</code> · <code>Quote</code> · <code>Callout</code> · <code>Code</code> · <code>Divider</code> · <code>Img</code> · <code>Ref</code> · <code>Tag</code> · <code>TaskList/Task</code> · <code>Table</code> · <code>Board</code> · <code>Toggle</code> · <code>Columns/Column</code> · <code>Button</code> · <code>Fetch</code> (tsuru-policied, async render, cached last-good) · <code>Hero</code> · <code>Tape</code> · <code>Stamp</code> · <code>Chip</code> · <code>Stat</code> · <code>Card</code> · <code>Timeline/Step</code></p>
+      <p><code>Sheet</code> · <code>H1–H3</code> · <code>P</code> · <code>Quote</code> · <code>Callout</code> · <code>Code</code> · <code>Divider</code> · <code>Img</code> · <code>Ref</code> · <code>Tag</code> · <code>TaskList/Task</code> · <code>Table</code> · <code>Board</code> · <code>Toggle</code> · <code>Columns/Column</code> · <code>Button</code> · <code>Fetch</code> (tsuru-policied, async render, cached last-good) · <code>Hero</code> · <code>Tape</code> · <code>Stamp</code> · <code>Chip</code> · <code>Stat</code> · <code>Card</code> · <code>Timeline/Step</code> · <code>Box/Span</code> · <code>Tabs/Tab</code> · <code>Accordion/AccordionItem</code> · <code>Dialog</code> · <code>Tooltip</code> · <code>Badge</code> · <code>Avatar</code> · <code>Progress</code> · <code>Skeleton</code> · <code>Switch</code> · <code>Slider</code> · <code>Kbd</code> · <code>Show</code></p>
+      <p><strong>Sheet state (the "hooks" answer):</strong> <code>state={{ key: scalar }}</code> on
+      <code>&lt;Sheet&gt;</code> declares a validated store; Switch/Slider/Tabs write keys,
+      <code>&lt;Show when equals&gt;</code> reads them. Interactivity as data — no handlers, no hooks.
+      Sandboxed expressions are open question Q11.</p>
       <p><strong>Sheet themes:</strong> <code>theme={{ accent, face, paper }}</code> — closed presets
       (tape-color accent · gothic/serif/rounded face · plain/dots/lines paper), so one registry
       carries many design directions. Showcase sheets seed with the app.</p>
@@ -567,6 +571,13 @@
         <p>Agent-written classes are runtime data — the build-time JIT never sees them. Curated pre-generated allowlist vs <code>@tailwindcss/browser</code> runtime compile?</p>
         <p class="rec">curated allowlist — closed beats clever. (revised)</p>
         <p class="pick">REVISED 2026-08-13: full Tailwind via <code>@tailwindcss/browser</code> runtime engine + <code>url()</code> ban. Sheets should feel like building a React app — the allowlist capped the LLM's creativity, and the actual security boundary was never CSS, it's execution + network (both still closed).</p>
+      </div>
+      <div class="q"><span class="qn">Q11</span>
+        <h3>Executable sheets?</h3>
+        <p>Full React hooks in WSX would make agent-written notes executable — the one line the
+        trust model forbids. Declarative sheet state (shipped 2026-08-13) covers most needs.</p>
+        <p class="rec">if more logic is ever needed: a sandboxed, capability-free expression language
+        (formulas over state + binds), never raw JS. OPEN.</p>
       </div>
       <div class="q"><span class="qn">Q10</span>
         <h3>Network in sheets</h3>
