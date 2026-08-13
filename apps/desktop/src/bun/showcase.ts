@@ -24,8 +24,8 @@ const WELCOME = `<Sheet title="Welcome to Washi" icon="📜" theme={{ accent: 'p
 </Sheet>
 `
 
-const DASHBOARD = `<Sheet title="Launch Dashboard" icon="📊" theme={{ accent: 'teal', paper: 'plain' }}>
-  <Tape color="teal">live data</Tape>
+const DASHBOARD = `<Sheet title="Launch Dashboard" icon="📊" theme={{ preset: 'midnight' }}>
+  <Tape>live data</Tape>
   <Hero title="Launch Dashboard" subtitle="Stats and views bound to the launch_tasks table with ink — edit the data and the sheet follows." />
   <Columns>
     <Column><Stat value="7" label="open tasks" hint="db_query · count" /></Column>
@@ -39,7 +39,7 @@ const DASHBOARD = `<Sheet title="Launch Dashboard" icon="📊" theme={{ accent: 
 </Sheet>
 `
 
-const EDITORIAL = `<Sheet title="On Paper" icon="🖋️" theme={{ accent: 'moss', face: 'serif', paper: 'lines' }}>
+const EDITORIAL = `<Sheet title="On Paper" icon="🖋️" theme={{ preset: 'broadsheet' }}>
   <Hero size="lg" title="On Paper" subtitle="Why the oldest interface still wins — a short essay on washi, wabi-sabi, and software." />
   <P>Handmade paper survives because it holds exactly what is placed on it — no more, no less. A sheet does not interpret. It does not execute. It carries.</P>
   <Quote>The paper is not the message. The paper is the promise that the message stays.</Quote>
@@ -49,7 +49,7 @@ const EDITORIAL = `<Sheet title="On Paper" icon="🖋️" theme={{ accent: 'moss
 </Sheet>
 `
 
-const PLAYBOOK = `<Sheet title="Release Playbook" icon="🚀" theme={{ accent: 'blue', face: 'rounded', paper: 'dots' }}>
+const PLAYBOOK = `<Sheet title="Release Playbook" icon="🚀" theme={{ preset: 'sticker' }}>
   <Hero align="center" title="Release Playbook" subtitle="The path from branch to shipped, as a living checklist." />
   <P class="text-center"><Chip color="blue">repeatable</Chip><Chip color="mustard">low-drama</Chip><Chip color="moss">reversible</Chip></P>
   <Timeline>
@@ -63,6 +63,41 @@ const PLAYBOOK = `<Sheet title="Release Playbook" icon="🚀" theme={{ accent: '
     <Column><Card title="Rollback" accent="mustard"><P>Previous artifact stays live until the new one survives an hour.</P></Card></Column>
   </Columns>
   <Callout tone="success">Add release tasks to the dashboard with the agent — it writes to the same table.</Callout>
+</Sheet>
+`
+
+const OPS_LOG = `<Sheet title="Ops Log" icon="🖥️" theme={{ preset: 'terminal' }}>
+  <Tape>uptime 99.98%</Tape>
+  <Hero title="Ops Log" subtitle="incident notes and runbook fragments. green means calm." />
+  <Code lang="bash">$ washi doctor --all
+  storage ......... ok (wal, 3ms)
+  loro snapshots .. ok (12 docs)
+  mcp loopback .... refused (as designed)</Code>
+  <Callout tone="success">No open incidents. Last page: 2026-08-02, resolved in 41m.</Callout>
+  <H3>Standing checks</H3>
+  <TaskList>
+    <Task done>rotate tsuru allowlist quarterly</Task>
+    <Task done>verify oplog compaction</Task>
+    <Task>chaos-test approval timeout path</Task>
+  </TaskList>
+  <Divider />
+  <P>Rule one: roll back beats hotfix. Rule two: see rule one.</P>
+</Sheet>
+`
+
+const SYSTEM_MAP = `<Sheet title="System Map" icon="📐" theme={{ preset: 'blueprint' }}>
+  <Tape>rev C</Tape>
+  <Hero title="System Map" subtitle="Washi's process topology, as a field drawing." />
+  <Columns>
+    <Column><Card title="CEF renderer"><P>React UI · paper components · WSX render</P></Card></Column>
+    <Column><Card title="Bun worker"><P>router · services · sqlite · agent host</P></Card></Column>
+  </Columns>
+  <Timeline>
+    <Step marker="RPC" title="typed loopback websocket">token-gated, one router, ctx carries the window</Step>
+    <Step marker="MCP" title="in-process tools">sheet_*, db_*, tsuru fetch, hanko actions</Step>
+    <Step marker="SYNC" title="future: loro + oplog relay">server is a durable relay, never a merge brain</Step>
+  </Timeline>
+  <Callout tone="info">Every line on this sheet is data. The map cannot execute the territory.</Callout>
 </Sheet>
 `
 
@@ -102,6 +137,8 @@ export function seedShowcase(): void {
     { title: 'Launch Dashboard', icon: '📊', source: DASHBOARD },
     { title: 'On Paper', icon: '🖋️', source: EDITORIAL },
     { title: 'Release Playbook', icon: '🚀', source: PLAYBOOK },
+    { title: 'Ops Log', icon: '🖥️', source: OPS_LOG },
+    { title: 'System Map', icon: '📐', source: SYSTEM_MAP },
   ]
   for (const seed of seeds) {
     const existingId = byTitle.get(seed.title)

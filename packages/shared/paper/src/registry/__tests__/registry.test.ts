@@ -65,6 +65,15 @@ describe('paper registry', () => {
     expect(validate(root, paperRegistry)).toEqual([])
   })
 
+  test('presets validate; unknown presets are refused', () => {
+    for (const preset of ['washi', 'midnight', 'broadsheet', 'sticker', 'terminal', 'blueprint']) {
+      const root = parse(`<Sheet title="t" theme={{ preset: '${preset}' }}><P>x</P></Sheet>`)
+      expect(validate(root, paperRegistry)).toEqual([])
+    }
+    const bad = parse(`<Sheet title="t" theme={{ preset: 'vaporwave' }} />`)
+    expect(validate(bad, paperRegistry).length).toBeGreaterThan(0)
+  })
+
   test('bad themes and off-enum colors are refused', () => {
     const root = parse(`
       <Sheet title="t" theme={{ accent: 'chartreuse', gradient: true }}>

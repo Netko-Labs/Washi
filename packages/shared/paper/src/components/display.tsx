@@ -19,7 +19,7 @@ export const TAPE_BG: Record<TapeColor, string> = {
 
 /** Accent-or-explicit fill: falls back to the sheet theme's --sheet-accent. */
 function fillStyle(color?: TapeColor): CSSProperties | undefined {
-  return color ? undefined : { backgroundColor: 'var(--sheet-accent, var(--color-primary))' }
+  return color ? undefined : { backgroundColor: 'var(--sheet-accent, var(--primary))' }
 }
 
 export function Hero({
@@ -41,7 +41,7 @@ export function Hero({
         className={`font-bold tracking-tight ${size === 'lg' ? 'text-5xl leading-none' : 'text-4xl'}`}
       >
         {title}
-        <span style={{ color: 'var(--sheet-accent, var(--color-primary))' }}>。</span>
+        <span style={{ color: 'var(--sheet-accent, var(--primary))' }}>。</span>
       </h1>
       {subtitle && (
         <p className="mt-3 max-w-xl text-lg text-muted-foreground leading-snug">{subtitle}</p>
@@ -86,10 +86,10 @@ export function Stamp({
       )}
       style={
         tone === 'ink'
-          ? { borderColor: 'var(--color-foreground)', color: 'var(--color-foreground)' }
+          ? { borderColor: 'var(--foreground)', color: 'var(--foreground)' }
           : {
-              borderColor: 'var(--sheet-accent, var(--color-primary))',
-              color: 'var(--sheet-accent, var(--color-primary))',
+              borderColor: 'var(--sheet-accent, var(--primary))',
+              color: 'var(--sheet-accent, var(--primary))',
             }
       }
     >

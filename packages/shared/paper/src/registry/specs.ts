@@ -23,8 +23,11 @@ export const tapeColorSchema = z.enum([
 /** Per-sheet design direction — closed presets, no arbitrary CSS (spec Q9). */
 export const sheetThemeSchema = z
   .object({
+    preset: z
+      .enum(['washi', 'midnight', 'broadsheet', 'sticker', 'terminal', 'blueprint'])
+      .optional(),
     accent: tapeColorSchema.optional(),
-    face: z.enum(['gothic', 'serif', 'rounded']).optional(),
+    face: z.enum(['gothic', 'serif', 'rounded', 'mono']).optional(),
     paper: z.enum(['plain', 'dots', 'lines']).optional(),
   })
   .strict()

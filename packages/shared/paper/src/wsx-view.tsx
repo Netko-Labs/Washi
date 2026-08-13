@@ -3,39 +3,51 @@ import type { CSSProperties, ReactNode } from 'react'
 import { Board, Table, Task, TaskList } from './components/data'
 import { Card, Chip, Hero, Stamp, Stat, Step, Tape, Timeline } from './components/display'
 import { Button, Column, Columns, Fetch, Img, Ref, Toggle } from './components/interactive'
+import { SHEET_PRESETS, type SheetPreset } from './components/themes'
 import { Callout, Code, Divider, H1, H2, H3, P, Quote, Tag } from './components/typography'
 
 const THEME_FACES: Record<string, string> = {
   gothic: 'font-display',
   serif: 'font-serif',
   rounded: 'font-rounded',
+  mono: 'font-mono',
 }
 
 const THEME_PAPERS: Record<string, CSSProperties> = {
   plain: {},
   dots: {
     backgroundImage:
-      'radial-gradient(color-mix(in oklab, var(--color-foreground) 6%, transparent) 1px, transparent 1px)',
+      'radial-gradient(color-mix(in oklab, var(--foreground) 6%, transparent) 1px, transparent 1px)',
     backgroundSize: '20px 20px',
   },
   lines: {
     backgroundImage:
-      'repeating-linear-gradient(0deg, transparent 0 27px, color-mix(in oklab, var(--color-foreground) 7%, transparent) 27px 28px)',
+      'repeating-linear-gradient(0deg, transparent 0 27px, color-mix(in oklab, var(--foreground) 7%, transparent) 27px 28px)',
   },
 }
 
-interface SheetTheme {
+export interface SheetTheme {
+  preset?: SheetPreset
   accent?: string
   face?: string
   paper?: string
 }
 
 function sheetStyle(theme: SheetTheme | undefined): CSSProperties {
-  const style: CSSProperties = { ...(theme?.paper ? THEME_PAPERS[theme.paper] : {}) }
+  const preset = SHEET_PRESETS[theme?.preset ?? 'washi'] ?? SHEET_PRESETS.washi
+  const style: CSSProperties = {
+    ...preset.style,
+    ...(theme?.paper ? THEME_PAPERS[theme.paper] : {}),
+  }
   if (theme?.accent) {
-    ;(style as Record<string, string>)['--sheet-accent'] = `var(--color-tape-${theme.accent})`
+    ;(style as Record<string, string>)['--sheet-accent'] = `var(--tape-${theme.accent})`
   }
   return style
+}
+
+function sheetFace(theme: SheetTheme | undefined): string {
+  if (theme?.face) return THEME_FACES[theme.face] ?? ''
+  return (SHEET_PRESETS[theme?.preset ?? 'washi'] ?? SHEET_PRESETS.washi).faceClass
 }
 
 function renderChildren(nodes: WsxNode[]): ReactNode[] {
@@ -51,10 +63,9 @@ function renderElement(node: WsxElement): ReactNode {
   switch (node.name) {
     case 'Sheet': {
       const theme = p.theme as SheetTheme | undefined
-      const face = theme?.face ? (THEME_FACES[theme.face] ?? '') : ''
       return (
         <article
-          className={`mx-auto w-full max-w-2xl rounded-xl px-8 py-6 ${face} ${p.class ?? ''}`}
+          className={`mx-auto w-full max-w-2xl rounded-xl px-8 py-6 ${sheetFace(theme)} ${p.class ?? ''}`}
           style={sheetStyle(theme)}
         >
           {kids}
