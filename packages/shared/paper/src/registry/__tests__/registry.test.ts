@@ -2,16 +2,23 @@ import { describe, expect, test } from 'bun:test'
 import { parse, validate } from '@washi/wsx'
 import { invalidClasses, paperRegistry } from '../index'
 
-describe('tailwind allowlist', () => {
-  test('accepts curated utilities', () => {
+describe('tailwind class guard', () => {
+  test('accepts the full vocabulary — arbitrary values, gradients, variants', () => {
     expect(invalidClasses('mt-6 flex items-center gap-2 text-sm text-muted-foreground')).toEqual([])
-    expect(invalidClasses('grid grid-cols-3 rounded-lg border bg-muted p-4')).toEqual([])
+    expect(invalidClasses('mt-[13px] hover:bg-red-500 bg-gradient-to-r from-fuchsia-500')).toEqual(
+      [],
+    )
+    expect(invalidClasses('grid-cols-[1fr_2fr] rotate-[17deg] shadow-[0_8px_30px_#0003]')).toEqual(
+      [],
+    )
   })
 
-  test('rejects arbitrary values, hover variants, unknown utilities', () => {
-    expect(invalidClasses('mt-[13px]')).toEqual(['mt-[13px]'])
-    expect(invalidClasses('hover:bg-red-500')).toEqual(['hover:bg-red-500'])
-    expect(invalidClasses('bg-[url(https://x)] blur-3xl')).toHaveLength(2)
+  test('rejects network-capable and breakout tokens', () => {
+    expect(invalidClasses('bg-[url(https://evil.example/x)]')).toHaveLength(1)
+    expect(invalidClasses('bg-[URL(//x)]')).toHaveLength(1)
+    expect(invalidClasses('content-["hi"]')).toHaveLength(1)
+    expect(invalidClasses('p-2;}body{background:red')).toHaveLength(1)
+    expect(invalidClasses(`w-[${'x'.repeat(140)}]`)).toHaveLength(1)
   })
 })
 
@@ -30,10 +37,10 @@ describe('paper registry', () => {
     expect(validate(root, paperRegistry)).toEqual([])
   })
 
-  test('flags off-allowlist classes, http urls, unknown props', () => {
+  test('flags url() classes, http urls, unknown props', () => {
     const root = parse(`
       <Sheet title="t">
-        <P class="hover:underline">x</P>
+        <P class="bg-[url(https://evil.example)]">x</P>
         <Img src="http://insecure.example/pic.png" />
         <H1 onClick="alert">hi</H1>
       </Sheet>
@@ -42,7 +49,7 @@ describe('paper registry', () => {
     const text = diagnostics
       .map((diagnostic) => `${diagnostic.path}: ${diagnostic.message}`)
       .join('\n')
-    expect(text).toContain('allowlist')
+    expect(text).toContain('forbidden tokens')
     expect(text).toMatch(/Img.*(protocol|url|Invalid)/i)
     expect(text).toMatch(/H1.*onClick/)
   })

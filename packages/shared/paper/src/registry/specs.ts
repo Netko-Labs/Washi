@@ -44,6 +44,8 @@ export const paperRegistry: WsxRegistry = {
       .strict(),
     children: 'nodes',
   },
+  Box: { props: styled.strict(), children: 'nodes' },
+  Span: { props: styled.strict(), children: 'nodes' },
   Hero: {
     props: styled
       .extend({

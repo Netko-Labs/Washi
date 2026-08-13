@@ -33,11 +33,17 @@ export interface SheetTheme {
   paper?: string
 }
 
-function sheetStyle(theme: SheetTheme | undefined): CSSProperties {
+function sheetStyle(theme: SheetTheme | undefined, classProp: string | undefined): CSSProperties {
   const preset = SHEET_PRESETS[theme?.preset ?? 'washi'] ?? SHEET_PRESETS.washi
   const style: CSSProperties = {
     ...preset.style,
     ...(theme?.paper ? THEME_PAPERS[theme.paper] : {}),
+  }
+  // A sheet styling its own background via classes beats the preset's inline one.
+  if (classProp && /(?:^|\s)(?:bg-|from-|via-|to-)/.test(classProp)) {
+    style.backgroundColor = undefined
+    style.backgroundImage = undefined
+    style.backgroundSize = undefined
   }
   if (theme?.accent) {
     ;(style as Record<string, string>)['--sheet-accent'] = `var(--tape-${theme.accent})`
@@ -66,12 +72,14 @@ function renderElement(node: WsxElement): ReactNode {
       return (
         <article
           className={`mx-auto w-full max-w-2xl rounded-xl px-8 py-6 ${sheetFace(theme)} ${p.class ?? ''}`}
-          style={sheetStyle(theme)}
+          style={sheetStyle(theme, p.class)}
         >
           {kids}
         </article>
       )
     }
+    case 'Box': return <div className={p.class}>{kids}</div>
+    case 'Span': return <span className={p.class}>{kids}</span>
     case 'Hero': return <Hero title={p.title} subtitle={p.subtitle} align={p.align} size={p.size} className={p.class} />
     case 'Tape': return <Tape color={p.color} className={p.class}>{kids}</Tape>
     case 'Stamp': return <Stamp label={p.label} tone={p.tone} className={p.class} />

@@ -101,6 +101,40 @@ const SYSTEM_MAP = `<Sheet title="System Map" icon="📐" theme={{ preset: 'blue
 </Sheet>
 `
 
+const MOODBOARD = `<Sheet title="Neon Moodboard" icon="🌃" class="bg-[#0b0b12] text-[#ecebff] px-0 py-0">
+  <Box class="bg-gradient-to-br from-fuchsia-600 via-purple-700 to-indigo-900 px-10 pt-14 pb-12">
+    <Span class="font-mono text-[11px] uppercase tracking-[0.35em] text-fuchsia-200">wsx · unrestricted</Span>
+    <Box class="mt-3 font-display text-5xl font-bold leading-none">Design like it's a website</Box>
+    <Box class="mt-4 max-w-md text-fuchsia-100/80">This sheet uses no preset — every surface below is raw Tailwind written by hand (or by an agent).</Box>
+  </Box>
+  <Box class="grid grid-cols-3 gap-3 px-10 -mt-6">
+    <Box class="rounded-2xl bg-[#17172a] p-5 shadow-[0_20px_60px_#000a] hover:-translate-y-1 transition-transform">
+      <Box class="text-3xl font-bold text-fuchsia-400">92%</Box>
+      <Box class="mt-1 text-xs text-[#8b8aa8]">of this card is vibes</Box>
+    </Box>
+    <Box class="rounded-2xl bg-[#17172a] p-5 shadow-[0_20px_60px_#000a] hover:-translate-y-1 transition-transform">
+      <Box class="text-3xl font-bold text-cyan-300">0</Box>
+      <Box class="mt-1 text-xs text-[#8b8aa8]">lines of executable code</Box>
+    </Box>
+    <Box class="rounded-2xl bg-[#17172a] p-5 shadow-[0_20px_60px_#000a] hover:-translate-y-1 transition-transform">
+      <Box class="text-3xl font-bold text-amber-300">∞</Box>
+      <Box class="mt-1 text-xs text-[#8b8aa8]">aesthetics per vault</Box>
+    </Box>
+  </Box>
+  <Box class="px-10 py-8">
+    <Box class="flex items-center gap-3">
+      <Span class="h-px flex-1 bg-gradient-to-r from-transparent via-fuchsia-500/60 to-transparent" />
+      <Span class="font-mono text-[10px] uppercase tracking-widest text-[#8b8aa8]">still just data</Span>
+      <Span class="h-px flex-1 bg-gradient-to-r from-transparent via-fuchsia-500/60 to-transparent" />
+    </Box>
+    <Box class="mt-6 rounded-xl border border-fuchsia-500/20 bg-[#12121f] p-5 text-sm leading-relaxed text-[#c9c7e8]">
+      Ask the agent for brutalist, or pastel, or corporate-memphis — the grammar carries it.
+      Validation still rejects anything executable, and url() never ships.
+    </Box>
+  </Box>
+</Sheet>
+`
+
 const LAUNCH_TASKS = [
   { title: 'Cut release branch', status: 'shipped', points: 2 },
   { title: 'Bundle CEF locales', status: 'shipped', points: 3 },
@@ -139,6 +173,7 @@ export function seedShowcase(): void {
     { title: 'Release Playbook', icon: '🚀', source: PLAYBOOK },
     { title: 'Ops Log', icon: '🖥️', source: OPS_LOG },
     { title: 'System Map', icon: '📐', source: SYSTEM_MAP },
+    { title: 'Neon Moodboard', icon: '🌃', source: MOODBOARD },
   ]
   for (const seed of seeds) {
     const existingId = byTitle.get(seed.title)
