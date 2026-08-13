@@ -33,15 +33,17 @@ Acceptance met: `bun test` 42 green, `turbo check-types` green, `biome check` gr
 
 Elements of docs/spec.html's language that the current model cannot express — features, not hacks:
 
-- [ ] **Sheet accent color** — tape color on the page card is hash-derived from the sheet id;
-      no `accent` field in the sheet schema, so neither user nor agent can choose it.
-- [ ] **`Tape`/sticker Paper primitive** — decorative tape strips exist only as app chrome;
-      sheets can't carry them as WSX content.
+- [x] **Sheet accent color** — `theme.accent` tape preset on <Sheet> (2026-08-12).
+- [x] **`Tape` Paper primitive** — plus Stamp/Chip/Hero/Stat/Card/Timeline/Step (2026-08-12).
+- [x] **Page-level typography/texture** — `theme.face` (gothic/serif/rounded) + `theme.paper`
+      (plain/dots/lines). Cover images still open.
+- [ ] **Cover images for sheets** — needs an asset story (https-only Img exists; local assets don't).
 - [ ] **Styling variants in WSX** — the class allowlist has no `hover:`/`dark:` variants, so
       sheet content can't do interactive or theme-conditional styling (closed by design; revisit
       as registry-level presets rather than raw variants).
-- [ ] **Page-level theming** — no cover images, no per-sheet typography/display-font choices.
 - [ ] **Dark mode toggle** — tokens exist for `.dark`, no UI or persistence wired.
+- [ ] **Sheet page-card tape** still hash-derived in app chrome — should read `theme.accent`
+      when the sheet has one (small SheetView follow-up).
 
 ## Known gaps (post-M2)
 

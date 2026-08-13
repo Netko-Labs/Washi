@@ -9,7 +9,14 @@ export default defineCheck(async (app: CheckDriver) => {
   app.step('the app boots and renders the welcome sheet')
   await app.expectText('Welcome to Washi', { timeoutMs: 10_000 })
   await app.click('text=Welcome to Washi')
-  await app.expectText('Nothing in it can execute.')
+  await app.expectText('Notes agents can design')
+
+  app.step('showcase sheets render their design directions')
+  await app.click('text=Launch Dashboard')
+  await app.expectText('sum(points)')
+  await app.click('text=Release Playbook')
+  await app.expectText('Freeze')
+  await app.screenshot('showcase-playbook')
 
   app.step('creating a sheet adds it to the sidebar and opens it')
   await app.click('[aria-label="New sheet"]')

@@ -1,8 +1,42 @@
 import type { WsxElement, WsxNode } from '@washi/wsx'
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import { Board, Table, Task, TaskList } from './components/data'
+import { Card, Chip, Hero, Stamp, Stat, Step, Tape, Timeline } from './components/display'
 import { Button, Column, Columns, Fetch, Img, Ref, Toggle } from './components/interactive'
 import { Callout, Code, Divider, H1, H2, H3, P, Quote, Tag } from './components/typography'
+
+const THEME_FACES: Record<string, string> = {
+  gothic: 'font-display',
+  serif: 'font-serif',
+  rounded: 'font-rounded',
+}
+
+const THEME_PAPERS: Record<string, CSSProperties> = {
+  plain: {},
+  dots: {
+    backgroundImage:
+      'radial-gradient(color-mix(in oklab, var(--color-foreground) 6%, transparent) 1px, transparent 1px)',
+    backgroundSize: '20px 20px',
+  },
+  lines: {
+    backgroundImage:
+      'repeating-linear-gradient(0deg, transparent 0 27px, color-mix(in oklab, var(--color-foreground) 7%, transparent) 27px 28px)',
+  },
+}
+
+interface SheetTheme {
+  accent?: string
+  face?: string
+  paper?: string
+}
+
+function sheetStyle(theme: SheetTheme | undefined): CSSProperties {
+  const style: CSSProperties = { ...(theme?.paper ? THEME_PAPERS[theme.paper] : {}) }
+  if (theme?.accent) {
+    ;(style as Record<string, string>)['--sheet-accent'] = `var(--color-tape-${theme.accent})`
+  }
+  return style
+}
 
 function renderChildren(nodes: WsxNode[]): ReactNode[] {
   return nodes.map((node, index) =>
@@ -15,7 +49,26 @@ function renderElement(node: WsxElement): ReactNode {
   const p = node.props as Record<string, never>
   const kids = renderChildren(node.children)
   switch (node.name) {
-    case 'Sheet': return <article className={`mx-auto w-full max-w-2xl px-8 py-6 ${p.class ?? ''}`}>{kids}</article>
+    case 'Sheet': {
+      const theme = p.theme as SheetTheme | undefined
+      const face = theme?.face ? (THEME_FACES[theme.face] ?? '') : ''
+      return (
+        <article
+          className={`mx-auto w-full max-w-2xl rounded-xl px-8 py-6 ${face} ${p.class ?? ''}`}
+          style={sheetStyle(theme)}
+        >
+          {kids}
+        </article>
+      )
+    }
+    case 'Hero': return <Hero title={p.title} subtitle={p.subtitle} align={p.align} size={p.size} className={p.class} />
+    case 'Tape': return <Tape color={p.color} className={p.class}>{kids}</Tape>
+    case 'Stamp': return <Stamp label={p.label} tone={p.tone} className={p.class} />
+    case 'Chip': return <Chip color={p.color} className={p.class}>{kids}</Chip>
+    case 'Stat': return <Stat value={p.value} label={p.label} hint={p.hint} className={p.class} />
+    case 'Card': return <Card title={p.title} accent={p.accent} className={p.class}>{kids}</Card>
+    case 'Timeline': return <Timeline className={p.class}>{kids}</Timeline>
+    case 'Step': return <Step marker={p.marker} title={p.title} color={p.color} className={p.class}>{kids}</Step>
     case 'H1': return <H1 className={p.class}>{kids}</H1>
     case 'H2': return <H2 className={p.class}>{kids}</H2>
     case 'H3': return <H3 className={p.class}>{kids}</H3>

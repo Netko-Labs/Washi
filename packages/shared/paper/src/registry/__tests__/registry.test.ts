@@ -48,6 +48,36 @@ describe('paper registry', () => {
   })
 
   test('every registry component parses its own defaults', () => {
-    expect(Object.keys(paperRegistry).length).toBeGreaterThanOrEqual(20)
+    expect(Object.keys(paperRegistry).length).toBeGreaterThanOrEqual(28)
+  })
+
+  test('themes and display components validate clean', () => {
+    const root = parse(`
+      <Sheet title="Playbook" theme={{ accent: 'blue', face: 'rounded', paper: 'dots' }}>
+        <Tape color="teal">live data</Tape>
+        <Hero size="lg" align="center" title="Big" subtitle="small" />
+        <P><Chip color="pink">wsx</Chip><Stamp label="決" /></P>
+        <Columns><Column><Stat value="7" label="open" hint="count" /></Column></Columns>
+        <Card title="Owner" accent="mustard"><P>x</P></Card>
+        <Timeline><Step marker="01" title="Freeze" color="slate">no new features</Step></Timeline>
+      </Sheet>
+    `)
+    expect(validate(root, paperRegistry)).toEqual([])
+  })
+
+  test('bad themes and off-enum colors are refused', () => {
+    const root = parse(`
+      <Sheet title="t" theme={{ accent: 'chartreuse', gradient: true }}>
+        <Tape color="neon">x</Tape>
+        <Hero title="t" size="xl" />
+      </Sheet>
+    `)
+    const text = validate(root, paperRegistry)
+      .map((diagnostic) => diagnostic.message)
+      .join('\n')
+    expect(text).toMatch(/accent/)
+    expect(text).toMatch(/gradient/)
+    expect(text).toMatch(/color/)
+    expect(text).toMatch(/size/)
   })
 })

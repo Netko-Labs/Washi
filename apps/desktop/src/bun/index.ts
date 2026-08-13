@@ -8,8 +8,9 @@ import {
   listTables,
   saveWindowState,
 } from '@washi/desktop-repository'
-import { AgentHost, createSheetFromSource } from '@washi/desktop-service'
+import { AgentHost } from '@washi/desktop-service'
 import { app, devtools, menu } from 'mirinjs'
+import { seedShowcase } from './showcase'
 
 // App data dir keyed on the bundle id. `mirin dev` gets a `-dev` suffix so
 // development never reads or writes the installed app's database.
@@ -26,22 +27,7 @@ const appDataDir = join(
 initializeDb(join(appDataDir, 'washi.db'))
 console.log(`[Washi] storage at ${appDataDir}`)
 
-const WELCOME_SOURCE = `<Sheet title="Welcome to Washi" icon="📜">
-  <H1>Welcome to Washi</H1>
-  <P>Notes here are WSX — JSX rendered by a closed component registry. Agents write them; you direct.</P>
-  <Callout tone="info">Open the agent panel and ask Claude to create or edit a sheet.</Callout>
-  <Toggle label="What can a sheet contain?">
-    <P>Headings, callouts, tasks, tables bound to local data, boards, refs to other sheets.</P>
-  </Toggle>
-  <Divider />
-  <P>This sheet is plain data. Nothing in it can execute.</P>
-</Sheet>
-`
-
-if (listSheets().length === 0) {
-  createSheetFromSource({ title: 'Welcome to Washi', icon: '📜', source: WELCOME_SOURCE })
-  console.log('[Washi] seeded welcome sheet')
-}
+seedShowcase()
 
 const agents = new AgentHost()
 const served = app.serve(createRouter(agents))

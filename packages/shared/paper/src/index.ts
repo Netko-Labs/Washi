@@ -1,4 +1,5 @@
 export { Board, Table, Task, TaskList } from './components/data'
+export { Card, Chip, Hero, Stamp, Stat, Step, Tape, Timeline } from './components/display'
 export { Button, Column, Columns, Fetch, Img, Ref, Toggle } from './components/interactive'
 export { Callout, Code, Divider, H1, H2, H3, P, Quote, Tag } from './components/typography'
 export { type ActionRef, type PaperHost, PaperProvider, usePaperHost } from './provider'

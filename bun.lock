@@ -28,6 +28,8 @@
       "dependencies": {
         "@fontsource-variable/jetbrains-mono": "^5.3.0",
         "@fontsource-variable/karla": "^5.3.0",
+        "@fontsource/m-plus-rounded-1c": "^5.3.0",
+        "@fontsource/shippori-mincho": "^5.3.0",
         "@fontsource/zen-kaku-gothic-new": "^5.3.0",
         "@tabler/icons-react": "^3.44.0",
         "@tailwindcss/vite": "^4.3.2",
@@ -368,6 +370,10 @@
     "@fontsource-variable/jetbrains-mono": ["@fontsource-variable/jetbrains-mono@5.3.0", "", {}, "sha512-F32xpS2NsGYoQi2ADSkKTgpJj7ozajsGgDJ8woTnqjmIB+dxDIqImjl4pXZVEExu8UFZ2ndhmX18EBS/hdz3Lw=="],
 
     "@fontsource-variable/karla": ["@fontsource-variable/karla@5.3.0", "", {}, "sha512-CypH/IGhvpU0I4sue6YG+ZDyx5heglFJAiU2NClTkKOh+jsqjZ7AAgWKGG59+X1dGCN/9L4BLLacCXD7TBBETA=="],
+
+    "@fontsource/m-plus-rounded-1c": ["@fontsource/m-plus-rounded-1c@5.3.0", "", {}, "sha512-eB/JxJBRXLdfTsBDElsAZDMtHXM58Hf1tKkHoDVZAaUN7a+qYfwNKh4Q2f7Fk9YNg4xPFjTwooVlQyqbhi8CWQ=="],
+
+    "@fontsource/shippori-mincho": ["@fontsource/shippori-mincho@5.3.0", "", {}, "sha512-S41kRxQuubAaYss+LeXu0IOc02RQwsPaJbR1cWZx4VV15hXaYZViH3WAve9HpDVFqKYd/BVk86Bg7lp9ytV3KQ=="],
 
     "@fontsource/zen-kaku-gothic-new": ["@fontsource/zen-kaku-gothic-new@5.3.0", "", {}, "sha512-2t88gAaUkqIAFARfO8GkT1x57QBRx8A0pWeB0CIrIahnzdanWjcV4thPCSv9BJmpeRndq6qbFx1KYglHykiPhw=="],
 
