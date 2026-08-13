@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <mask id="glyph">
+      <path d="M150 1100 L150 620 C150 520 200 480 300 472 C380 466 430 452 512 452 C580 452 650 456 700 462 L874 620 L874 1100 Z" fill="#FFFFFF"></path>
+      <rect x="286" y="952" width="140" height="130" rx="60" fill="#FFFFFF"></rect>
+      <rect x="598" y="952" width="140" height="130" rx="60" fill="#FFFFFF"></rect>
+      <path d="M700 462 L874 620 L706 606 Q690 530 700 462 Z" fill="#999999"></path>
+      <circle cx="372" cy="672" r="54" fill="#000000"></circle>
+      <circle cx="652" cy="672" r="54" fill="#000000"></circle>
+      <circle cx="390" cy="654" r="19" fill="#FFFFFF"></circle><circle cx="356" cy="688" r="9" fill="#FFFFFF"></circle>
+      <circle cx="670" cy="654" r="19" fill="#FFFFFF"></circle><circle cx="636" cy="688" r="9" fill="#FFFFFF"></circle>
+      <path d="M458 742 Q512 730 566 742 Q556 812 512 816 Q468 812 458 742 Z" fill="#000000"></path>
+      <rect x="272" y="938" width="168" height="14" fill="#000000"></rect>
+      <rect x="584" y="938" width="168" height="14" fill="#000000"></rect>
+    </mask>
+    <clipPath id="frame"><rect width="1024" height="1024"></rect></clipPath>
+  </defs>
+  <g clip-path="url(#frame)">
+    <rect width="1024" height="1024" fill="#FFFFFF" opacity="0.96" mask="url(#glyph)"></rect>
+  </g>
+</svg>

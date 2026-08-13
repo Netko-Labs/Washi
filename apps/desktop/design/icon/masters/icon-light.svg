@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#D4713F"></stop><stop offset="1" stop-color="#E28C55"></stop>
+    </linearGradient>
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="4" result="n"></feTurbulence>
+      <feColorMatrix in="n" type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.5 0" result="c"></feColorMatrix>
+      <feComposite in="c" in2="SourceAlpha" operator="in"></feComposite>
+    </filter>
+    <filter id="fiber">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012 0.22" numOctaves="2" seed="11" result="n"></feTurbulence>
+      <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.45 0 0 0 0 0.37 0 0 0 0 0.26 0 0 0 0.9 0" result="c"></feColorMatrix>
+      <feComposite in="c" in2="SourceAlpha" operator="in"></feComposite>
+    </filter>
+    <clipPath id="frame"><rect width="1024" height="1024"></rect></clipPath>
+  </defs>
+  <g clip-path="url(#frame)">
+    <rect width="1024" height="1024" fill="url(#bg)"></rect>
+    <rect width="1024" height="1024" fill="#000" opacity="0.10" filter="url(#grain)"></rect>
+    <path d="M150 1100 L150 620 C150 520 200 480 300 472 C380 466 430 452 512 452 C580 452 650 456 700 462 L874 620 L874 1100 Z" fill="#FFF6E4" stroke="#FFF6E4" stroke-width="72" stroke-linejoin="round"></path>
+    <path d="M150 1100 L150 620 C150 520 200 480 300 472 C380 466 430 452 512 452 C580 452 650 456 700 462 L874 620 L874 1100 Z" fill="#F7EDD6" stroke="#6B3A1F" stroke-width="18" stroke-linejoin="round"></path>
+    <path d="M150 1100 L150 620 C150 520 200 480 300 472 C380 466 430 452 512 452 C580 452 650 456 700 462 L874 620 L874 1100 Z" fill="#000" opacity="0.07" filter="url(#fiber)"></path>
+    <path d="M700 462 L874 620 L706 606 Q690 530 700 462 Z" fill="#AEBB9A" stroke="#6B3A1F" stroke-width="18" stroke-linejoin="round"></path>
+    <circle cx="372" cy="672" r="54" fill="#2A1B12"></circle>
+    <circle cx="652" cy="672" r="54" fill="#2A1B12"></circle>
+    <circle cx="390" cy="654" r="19" fill="#FFFFFF"></circle><circle cx="356" cy="688" r="9" fill="#FFFFFF"></circle>
+    <circle cx="670" cy="654" r="19" fill="#FFFFFF"></circle><circle cx="636" cy="688" r="9" fill="#FFFFFF"></circle>
+    <ellipse cx="266" cy="750" rx="48" ry="30" fill="#F0A487" opacity="0.9"></ellipse>
+    <ellipse cx="758" cy="750" rx="48" ry="30" fill="#F0A487" opacity="0.9"></ellipse>
+    <path d="M458 742 Q512 730 566 742 Q556 812 512 816 Q468 812 458 742 Z" fill="#7A3A22"></path>
+    <ellipse cx="512" cy="798" rx="34" ry="18" fill="#E8836B"></ellipse>
+    <rect x="286" y="952" width="140" height="130" rx="60" fill="#F7EDD6" stroke="#6B3A1F" stroke-width="18"></rect>
+    <rect x="598" y="952" width="140" height="130" rx="60" fill="#F7EDD6" stroke="#6B3A1F" stroke-width="18"></rect>
+  </g>
+</svg>

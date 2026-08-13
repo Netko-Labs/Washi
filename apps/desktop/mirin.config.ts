@@ -5,6 +5,7 @@ export default defineConfig({
   name: 'Washi',
   publisher: 'Netko Labs',
   main: 'src/bun/index.ts',
+  icon: 'icon.iconset',
 
   cef: {
     locales: ['en-US'],

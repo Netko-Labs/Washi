@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#31261E"></stop><stop offset="1" stop-color="#221A14"></stop>
+    </linearGradient>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="60"></feGaussianBlur></filter>
+    <clipPath id="frame"><rect width="1024" height="1024"></rect></clipPath>
+  </defs>
+  <g clip-path="url(#frame)">
+    <rect width="1024" height="1024" fill="url(#bg)"></rect>
+    <path d="M150 1100 L150 620 C150 520 200 480 300 472 C380 466 430 452 512 452 C580 452 650 456 700 462 L874 620 L874 1100 Z" fill="#E8A85C" opacity="0.55" filter="url(#glow)"></path>
+    <path d="M150 1100 L150 620 C150 520 200 480 300 472 C380 466 430 452 512 452 C580 452 650 456 700 462 L874 620 L874 1100 Z" fill="#FBEECB" stroke="#FBEECB" stroke-width="56" stroke-linejoin="round" opacity="0.35"></path>
+    <path d="M150 1100 L150 620 C150 520 200 480 300 472 C380 466 430 452 512 452 C580 452 650 456 700 462 L874 620 L874 1100 Z" fill="#F4E2B8" stroke="#4A2E1B" stroke-width="18" stroke-linejoin="round"></path>
+    <path d="M700 462 L874 620 L706 606 Q690 530 700 462 Z" fill="#D2A360" stroke="#4A2E1B" stroke-width="18" stroke-linejoin="round"></path>
+    <circle cx="372" cy="672" r="54" fill="#2A1B12"></circle>
+    <circle cx="652" cy="672" r="54" fill="#2A1B12"></circle>
+    <circle cx="390" cy="654" r="19" fill="#FFF8E0"></circle><circle cx="356" cy="688" r="9" fill="#FFF8E0"></circle>
+    <circle cx="670" cy="654" r="19" fill="#FFF8E0"></circle><circle cx="636" cy="688" r="9" fill="#FFF8E0"></circle>
+    <ellipse cx="266" cy="750" rx="48" ry="30" fill="#E39A6E" opacity="0.9"></ellipse>
+    <ellipse cx="758" cy="750" rx="48" ry="30" fill="#E39A6E" opacity="0.9"></ellipse>
+    <path d="M458 742 Q512 730 566 742 Q556 812 512 816 Q468 812 458 742 Z" fill="#6E351E"></path>
+    <ellipse cx="512" cy="798" rx="34" ry="18" fill="#DA7B5C"></ellipse>
+    <rect x="286" y="952" width="140" height="130" rx="60" fill="#F4E2B8" stroke="#4A2E1B" stroke-width="18"></rect>
+    <rect x="598" y="952" width="140" height="130" rx="60" fill="#F4E2B8" stroke="#4A2E1B" stroke-width="18"></rect>
+  </g>
+</svg>
