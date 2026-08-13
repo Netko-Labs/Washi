@@ -310,7 +310,7 @@
     <ul class="tight">
       <li><strong>Elements:</strong> Paper registry components only. No host elements, no imports, no user components (v1).</li>
       <li><strong>Props:</strong> JSON literals + <code>bind</code> ink descriptors + sheet refs. No functions, no expressions.</li>
-      <li><strong>Style:</strong> Tailwind is the styling language — a <code>class</code> prop of utility classes, validated against Paper's curated pre-generated allowlist. No inline styles, no arbitrary CSS, no runtime compiler. <span class="chip decided">DECIDED</span></li>
+      <li><strong>Style:</strong> Tailwind is the styling language — every component takes a <code>class</code> prop with the <strong>full utility vocabulary</strong> (arbitrary values, gradients, variants), compiled at runtime by <code>@tailwindcss/browser</code>. Guard: no <code>url()</code>, no quotes/braces — styling is expression, never a network capability. Generic <code>Box</code>/<code>Span</code> primitives make free-form layout possible. <span class="chip decided">REVISED 2026-08-13</span></li>
       <li><strong>Actions:</strong> interactive components carry <code>action</code> props — hanko descriptors from the closed verb registry. No callbacks, no scripts.</li>
       <li><strong>Children:</strong> elements, text, <code>{literal}</code>.</li>
       <li><strong>Validation:</strong> Zod props schema per component (lives in <code>domain</code>), runs before persist <em>and</em> before render. <code>sheet_check</code> returns diagnostics agents can act on.</li>
@@ -565,7 +565,8 @@
       <div class="q"><span class="qn">Q9</span>
         <h3>Tailwind in WSX</h3>
         <p>Agent-written classes are runtime data — the build-time JIT never sees them. Curated pre-generated allowlist vs <code>@tailwindcss/browser</code> runtime compile?</p>
-        <p class="pick">curated allowlist — Paper ships a pre-generated utility subset (spacing, type, color, grid, flex).</p>
+        <p class="rec">curated allowlist — closed beats clever. (revised)</p>
+        <p class="pick">REVISED 2026-08-13: full Tailwind via <code>@tailwindcss/browser</code> runtime engine + <code>url()</code> ban. Sheets should feel like building a React app — the allowlist capped the LLM's creativity, and the actual security boundary was never CSS, it's execution + network (both still closed).</p>
       </div>
       <div class="q"><span class="qn">Q10</span>
         <h3>Network in sheets</h3>

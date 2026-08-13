@@ -38,9 +38,9 @@ Elements of docs/spec.html's language that the current model cannot express — 
 - [x] **Page-level typography/texture** — `theme.face` (gothic/serif/rounded) + `theme.paper`
       (plain/dots/lines). Cover images still open.
 - [ ] **Cover images for sheets** — needs an asset story (https-only Img exists; local assets don't).
-- [ ] **Styling variants in WSX** — the class allowlist has no `hover:`/`dark:` variants, so
-      sheet content can't do interactive or theme-conditional styling (closed by design; revisit
-      as registry-level presets rather than raw variants).
+- [x] **Styling freedom in WSX** — Q9 revised 2026-08-13: full Tailwind vocabulary (arbitrary
+      values, variants, gradients) via `@tailwindcss/browser`; `url()` banned. Box/Span primitives
+      added; six presets remain as starting palettes.
 - [ ] **Dark mode toggle** — tokens exist for `.dark`, no UI or persistence wired.
 - [ ] **Sheet page-card tape** still hash-derived in app chrome — should read `theme.accent`
       when the sheet has one (small SheetView follow-up).
