@@ -115,3 +115,19 @@ export const VAULT_TOPICS: Record<string, VaultTopic> = {
 }
 
 export type VaultTopicName = keyof typeof VAULT_TOPICS
+
+/** Handoff display order — pickers offer every character in the set. */
+export const VAULT_TOPIC_ORDER = [
+  'journal',
+  'work',
+  'ideas',
+  'study',
+  'recipes',
+  'travel',
+  'finance',
+  'music',
+  'anime',
+  'gaming',
+  'reading',
+  'plants',
+] as const

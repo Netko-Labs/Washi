@@ -8,10 +8,11 @@ import {
 } from '@tabler/icons-react'
 import { AgentMascot } from '@/components/mascot/AgentMascot'
 import { VaultIcon } from '@/components/mascot/VaultIcon'
+import { VAULT_TOPIC_ORDER } from '@/components/mascot/vault-topics'
 import { HeroDone, HeroSync, HeroVaults, HeroWelcome, Toggle } from './OnboardingArt'
 import type { ChoiceCardProps, ConsentCardProps, StepProps } from './types'
 
-const VAULT_CHOICES = ['journal', 'work', 'ideas', 'study', 'reading', 'plants']
+const VAULT_CHOICES = VAULT_TOPIC_ORDER
 
 const PITCH_ROWS = [
   {

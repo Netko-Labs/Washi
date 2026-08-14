@@ -1,8 +1,9 @@
 import { IconFolder } from '@tabler/icons-react'
 import { useState } from 'react'
 import { VaultIcon } from '@/components/mascot/VaultIcon'
+import { VAULT_TOPIC_ORDER } from '@/components/mascot/vault-topics'
 
-const VAULT_CHOICES = ['journal', 'work', 'ideas', 'study', 'reading', 'plants']
+const VAULT_CHOICES = VAULT_TOPIC_ORDER
 
 const SYNC_NOTES = {
   local: 'Files stay in this folder. You can connect it to your server later.',
