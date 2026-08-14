@@ -137,6 +137,8 @@
   .chip.open::before { content: "?"; }
   .chip.later { background: #7d8ba118; color: #57637a; border: 1px solid #7d8ba14d; }
   .chip.later::before { content: "→"; }
+  .chip.done { background: #5e7d5a1a; color: #3e5c3a; border: 1px solid #5e7d5a4d; }
+  .chip.done::before { content: "✓"; }
 
   /* code */
   pre {
@@ -237,6 +239,7 @@
 <nav aria-label="Sections">
   <span class="brand">和紙 <em>WASHI</em> · spec v0.2</span>
   <a class="dot" href="#tldr" style="--c:var(--hanko)">tl;dr</a>
+  <a class="dot" href="#status" style="--c:var(--tape-moss)">status</a>
   <a class="dot" href="#concepts" style="--c:var(--tape-pink)">concepts</a>
   <a class="dot" href="#wsx" style="--c:var(--tape-teal)">wsx</a>
   <a class="dot" href="#arch" style="--c:var(--tape-blue)">arch</a>
@@ -257,7 +260,7 @@
   into a local database. Local-first, sync-ready, built on mirin.</p>
   <div class="meta-chips">
     <span>mirin desktop</span><span>bun + CEF</span><span>repo shape: Anko 1:1</span>
-    <span>claude-agent-sdk + ACP</span><span>bun:sqlite</span><span>v0.2 · decided</span>
+    <span>claude-agent-sdk + ACP</span><span>bun:sqlite</span><span>v0.3 · built to M2 + design rev 2</span>
   </div>
 
   <div class="tldr" id="tldr">
@@ -270,6 +273,58 @@
     </ul>
   </div>
 </header>
+
+<!-- ═══════════ STATUS ═══════════ -->
+<section id="status" style="--c:var(--tape-moss)">
+  <span class="tape" style="--c:var(--tape-moss)">00 · status &amp; handoff</span>
+  <div class="card">
+    <h2 class="title">Where we are · 2026-08-14</h2>
+    <p class="point">Built and verified through M2, plus a full design implementation (rev 2 of the claude.ai handoff). Everything below is committed on <code>main</code> and green: 46 unit tests, 10-step <code>mirin check</code>, typecheck, biome.</p>
+
+    <h3>Shipped <span class="chip done">M0–M2</span></h3>
+    <ul class="tight">
+      <li><strong>Sheets core</strong> — Loro-backed sheet store (snapshot blob in sqlite, <code>source</code> is a cache), <code>@washi/wsx</code> parse/validate/serialize, FTS5 search, oplog, HLC stamps.</li>
+      <li><strong>Paper registry</strong> — ~35 components incl. the shadcn control set, declarative sheet state (<code>state=</code> + Switch/Slider/Tabs write, <code>Show</code> reads), theme presets (six full design systems via scoped token rebinds), and creative mode: full Tailwind via <code>@tailwindcss/browser</code> with the <code>url()</code> ban (Q9 revised).</li>
+      <li><strong>Embedded agent host</strong> — Claude Agent SDK in the main worker; ink/tsuru/hanko tools via in-process MCP; <code>canUseTool</code> approvals flow; persisted, resumable sessions. Live loop verified with real turns.</li>
+      <li><strong>Capability packages</strong> — <code>@washi/ink</code> (incl. group-by aggregations), <code>@washi/tsuru</code>, <code>@washi/hanko</code> all real and tested.</li>
+    </ul>
+
+    <h3>Shipped · design rev 2 <span class="chip done">2026-08-14</span></h3>
+    <ul class="tight">
+      <li><strong>Tab strip</strong> — sheets and views (Dashboard, Inbox, Daily note, Settings) open as browser-style tabs; Graph view removed per the design.</li>
+      <li><strong>Agent popover + FAB</strong> — panel is a 400px popover above the mascot FAB (⌘J), with conversation switcher, expand-to-center, and starter prompts.</li>
+      <li><strong>Onboarding</strong> — 5 steps incl. "This is you" (name/email/accent), persisting identity to the view store → byline, greeting, user row, settings.</li>
+      <li><strong>Mascot system + chibi app icon</strong> — shared SVG rig, state faces, squircle iconset pipeline (<code>scripts/make-icons.ts</code>).</li>
+      <li>Design source of truth: <code>design/handoff/Washi.dc.html</code>. <strong>Always re-fetch designs fresh before diffing</strong> — they get updated upstream.</li>
+    </ul>
+
+    <h3>Known gaps <span class="chip open">honest list</span></h3>
+    <ul class="tight">
+      <li>Inbox reviews/activity, Daily-note streak + pull card, and dashboard cards are <strong>static design copy</strong> — not wired to real agent activity; dismissals reset on reload.</li>
+      <li>Tables/records exist in domain + ink but have <strong>no dedicated UI</strong> yet; <code>bind</code> views render but nothing creates tables outside agent tools.</li>
+      <li><code>Fetch</code> component + tsuru policy UI unproven end-to-end in sheets.</li>
+      <li>Human editing is thin by design — inline edits limited to what Paper components expose.</li>
+    </ul>
+
+    <h3>Next <span class="chip later">in order</span></h3>
+    <ul class="tight">
+      <li><strong>Wire the design to real data</strong> — Inbox rows from agent proposals (approvals/oplog), Daily note as a real per-day sheet, dashboard from actual vault stats.</li>
+      <li><strong>M3 structured data</strong> — tables/records UI, live <code>bind</code> views with aggregations surfaced, <code>Fetch</code> end-to-end, inline human edits.</li>
+      <li><strong>Q11</strong> — sandboxed expression language over state + binds, if declarative state proves insufficient. Still OPEN; never raw JS.</li>
+      <li><strong>M4 ACP</strong> — external agents over stdio, MCP loopback passthrough.</li>
+      <li><strong>M5 sync</strong> — Bun/Elysia relay, E2EE decision.</li>
+    </ul>
+
+    <details style="--c:var(--tape-moss)">
+      <summary>Agent orientation — read these first</summary>
+      <ul class="tight">
+        <li><code>CLAUDE.md</code> — project facts, commands, topology. <code>docs/conventions.md</code> — structure rules (wins for structure).</li>
+        <li>Run: <code>bun dev</code> (root) · <code>bun run typecheck</code> · <code>bun test</code> · <code>bun run --cwd apps/desktop check</code> (e2e; <strong>stop dev first</strong> — CDP port collision).</li>
+        <li>Hard lines: agents only touch ink/tsuru/hanko — never fs/shell/raw SQL. WSX is inert data. Registry stays closed.</li>
+      </ul>
+    </details>
+  </div>
+</section>
 
 <!-- ═══════════ CONCEPTS ═══════════ -->
 <section id="concepts" style="--c:var(--tape-pink)">
@@ -469,13 +524,13 @@
 <section id="ui" style="--c:var(--tape-moss)">
   <span class="tape" style="--c:var(--tape-moss)">06 · ui surfaces</span>
   <div class="card">
-    <h2 class="title">Three panes, no router</h2>
-    <p class="point">"Edit by asking" is the product bet — human editing stays deliberately thin in v1.</p>
+    <h2 class="title">Sidebar + tabs + agent popover, no router <span class="chip decided">REV 2</span></h2>
+    <p class="point">"Edit by asking" is the product bet — human editing stays deliberately thin in v1. Layout follows design rev 2 (<code>design/handoff/Washi.dc.html</code>).</p>
     <ul class="tight">
-      <li><strong>Left:</strong> sheet tree / tags / tables + cmdk search.</li>
-      <li><strong>Center:</strong> rendered WSX; inline light edits (task toggles, table cells, text runs); interactive components fire hanko verbs over RPC.</li>
-      <li><strong>Right:</strong> agent chat — transcript, tool cards, WSX diffs with before/after render preview, permission prompts, session picker (provider + budget).</li>
-      <li>Anko-style: hash/panel state in Zustand, <code>titleBarStyle: hiddenInset</code>, no router.</li>
+      <li><strong>Left:</strong> sidebar — vault switcher, nav (Dashboard · Inbox with pending badge · Daily note), sheet tree, ⌘K palette.</li>
+      <li><strong>Center:</strong> browser-style <strong>tab strip</strong> — sheets and views open as closable tabs; rendered WSX below; interactive components fire hanko verbs over RPC.</li>
+      <li><strong>Agent:</strong> mascot FAB (⌘J) opens a <strong>popover chat</strong> — transcript, tool cards, WSX diffs, permission prompts, conversation switcher, expand-to-center.</li>
+      <li>Tab/panel state in Zustand (<code>view-store</code>), <code>titleBarStyle: hiddenInset</code>, no router. Identity (name/email/accent) persisted from onboarding.</li>
       <li>Full block editor = later milestone, only if the bet needs hedging.</li>
     </ul>
   </div>
@@ -502,13 +557,13 @@
     <h2 class="title">M0 → M5</h2>
     <ol class="timeline">
       <li><span class="m" style="--mc:var(--tape-slate)">M0</span><div>
-        <h3>Scaffold</h3><p>mirin init → Anko shape, conventions + CLAUDE.md, CI, check scenario.</p></div></li>
+        <h3>Scaffold <span class="chip done">DONE</span></h3><p>mirin init → Anko shape, conventions + CLAUDE.md, CI, check scenario.</p></div></li>
       <li><span class="m" style="--mc:var(--tape-teal)">M1</span><div>
-        <h3>Sheets core</h3><p>Schema + DDL, Loro-backed sheet store, <code>@washi/wsx</code> parse/validate/serialize, Paper v0, read-only render, sidebar, FTS search.</p></div></li>
+        <h3>Sheets core <span class="chip done">DONE</span></h3><p>Schema + DDL, Loro-backed sheet store, <code>@washi/wsx</code> parse/validate/serialize, Paper v0, read-only render, sidebar, FTS search.</p></div></li>
       <li><span class="m" style="--mc:var(--tape-violet)">M2</span><div>
-        <h3>Embedded Claude <span class="demo-flag">← the demo moment</span></h3><p>Agent host, in-process tools, approvals UI, transcript + diff UI, persisted sessions.</p></div></li>
+        <h3>Embedded Claude <span class="chip done">DONE</span> <span class="demo-flag">← the demo moment</span></h3><p>Agent host, in-process tools, approvals UI, transcript + diff UI, persisted sessions. Plus off-plan: full design implementation (rev 2), creative-mode WSX, sheet state, presets, mascot + icon.</p></div></li>
       <li><span class="m" style="--mc:var(--tape-mustard)">M3</span><div>
-        <h3>Structured data</h3><p>Tables/records, live <code>bind</code> views with aggregations, <code>Fetch</code> component, inline human edits.</p></div></li>
+        <h3>Structured data <span class="chip later">NEXT</span></h3><p>Tables/records UI, live <code>bind</code> views with aggregations, <code>Fetch</code> component, inline human edits — plus wiring Inbox/Daily/Dashboard to real agent activity.</p></div></li>
       <li><span class="m" style="--mc:var(--tape-blue)">M4</span><div>
         <h3>ACP</h3><p>External agent support, MCP loopback endpoint.</p></div></li>
       <li><span class="m" style="--mc:var(--tape-pink)">M5</span><div>
@@ -590,7 +645,7 @@
 </section>
 
 <footer>
-  <span>washi · spec v0.2 · decisions locked 2026-08-12</span>
+  <span>washi · spec v0.3 · decisions locked 2026-08-12 · status updated 2026-08-14</span>
   <span class="mono">docs/spec.html</span>
 </footer>
 
