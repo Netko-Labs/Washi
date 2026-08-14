@@ -22,21 +22,24 @@ export default defineCheck(async (app: CheckDriver) => {
   await app.click('[aria-label="New sheet"]')
   await app.expectText('Ask an agent to fill this in, or start writing.')
 
-  app.step('search finds sheets by body text')
-  await app.type('execute', { selector: 'input[placeholder="Search sheets"]' })
+  app.step('the command palette searches pages')
+  await app.click('text=Search sheets')
+  await app.waitFor('input[placeholder="Search pages, blocks and agents…"]')
+  await app.type('welcome', { selector: 'input[placeholder="Search pages, blocks and agents…"]' })
   await app.waitUntil(async () => {
     const snapshot = await app.snapshot()
-    return snapshot.includes('…') || snapshot.includes('Welcome to Washi')
-  }, 'search never returned the welcome sheet')
+    return snapshot.includes('Welcome to Washi')
+  }, 'the palette never listed the welcome sheet')
+  await app.key('Escape')
   await app.screenshot('m1-search')
 
   app.step('the main process store is legible to agents')
   const exposed = (await app.exposed()) as { store?: { sheets: number } }
   app.assert((exposed.store?.sheets ?? 0) >= 2, `expected ≥2 sheets, saw ${exposed.store?.sheets}`)
 
-  app.step('the agent panel renders with composer and session picker')
+  app.step('the agent panel renders with composer and status header')
   await app.waitFor('[data-agent-panel]')
-  await app.expectText('Ask the agent')
+  await app.expectText('watching this vault')
 
   app.step('creating an agent session populates the picker and empty transcript')
   await app.click('[aria-label="New session"]')
@@ -44,7 +47,7 @@ export default defineCheck(async (app: CheckDriver) => {
     const snapshot = await app.snapshot()
     return snapshot.includes('Session ')
   }, 'the new session never appeared in the picker')
-  await app.expectText('create or edit sheets')
+  await app.expectText('All caught up')
   await app.screenshot('m2-agent-panel')
 
   app.step('no RPC call failed along the way')

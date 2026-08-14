@@ -1,48 +1,43 @@
 import {
   IconAlertTriangle,
-  IconCheck,
-  IconChevronRight,
-  IconLoader2,
-  IconX,
+  IconFileText,
+  IconGitPullRequest,
+  IconPencil,
+  IconSearch,
+  IconWorld,
 } from '@tabler/icons-react'
 import type { AgentUpdate, TranscriptEntry } from '@washi/desktop-domain'
+import type { ReactNode } from 'react'
+import { Mascot } from '@/components/mascot/Mascot'
 
-function ToolStatusIcon({ status }: { status: string }) {
-  if (status === 'completed') return <IconCheck className="size-3.5 text-green-600" />
-  if (status === 'failed') return <IconX className="size-3.5 text-destructive" />
-  return <IconLoader2 className="size-3.5 animate-spin text-muted-foreground" />
+function toolIcon(update: Extract<AgentUpdate, { kind: 'tool_call' }>): ReactNode {
+  if (update.title.startsWith('sheet_replace') || update.title.startsWith('sheet_create'))
+    return <IconGitPullRequest className="size-[13px]" />
+  if (update.toolKind === 'edit') return <IconPencil className="size-[13px]" />
+  if (update.toolKind === 'search') return <IconSearch className="size-[13px]" />
+  if (update.toolKind === 'fetch') return <IconWorld className="size-[13px]" />
+  return <IconFileText className="size-[13px]" />
 }
 
 function DiffView({ diff }: { diff: { path: string; oldText: string; newText: string } }) {
   return (
-    <div className="mt-1 overflow-hidden rounded-md border border-border text-xs">
-      <div className="border-border border-b bg-muted/60 px-2 py-1 font-medium">
-        proposed change · {diff.path}
+    <div className="my-1.5 overflow-hidden rounded-xl border border-agent text-[12px]">
+      <div className="border-border border-b bg-muted px-3 py-1.5 font-medium">
+        Washi suggests an edit · {diff.path}
       </div>
-      <div className="grid grid-cols-2 divide-x divide-border">
-        <pre className="max-h-48 overflow-auto bg-destructive/5 p-2 whitespace-pre-wrap">
-          {diff.oldText}
+      <div className="max-h-44 space-y-1 overflow-auto p-2.5">
+        <pre className="whitespace-pre-wrap rounded-md bg-[rgb(231_0_11/0.08)] px-2 py-1 text-muted-foreground line-through">
+          {diff.oldText.slice(0, 600)}
         </pre>
-        <pre className="max-h-48 overflow-auto bg-green-500/5 p-2 whitespace-pre-wrap">
-          {diff.newText}
+        <pre className="whitespace-pre-wrap rounded-md bg-[rgb(34_197_94/0.12)] px-2 py-1">
+          {diff.newText.slice(0, 600)}
         </pre>
       </div>
     </div>
   )
 }
 
-const KIND_SPINES: Record<string, string> = {
-  read: 'border-l-tape-teal',
-  edit: 'border-l-tape-pink',
-  search: 'border-l-tape-blue',
-  fetch: 'border-l-tape-violet',
-  execute: 'border-l-tape-mustard',
-  delete: 'border-l-destructive',
-  think: 'border-l-tape-slate',
-  other: 'border-l-tape-slate',
-}
-
-function ToolCard({ update, followups }: { update: AgentUpdate; followups: AgentUpdate[] }) {
+function ToolPill({ update, followups }: { update: AgentUpdate; followups: AgentUpdate[] }) {
   if (update.kind !== 'tool_call') return null
   const latest = followups.at(-1)
   const status = latest?.kind === 'tool_call_update' ? latest.status : update.status
@@ -58,31 +53,22 @@ function ToolCard({ update, followups }: { update: AgentUpdate; followups: Agent
     .at(-1)?.output
 
   return (
-    <div
-      className={`my-1 rounded-md border border-border border-l-3 bg-card px-2 py-1.5 shadow-sm ${
-        KIND_SPINES[update.toolKind] ?? KIND_SPINES.other
-      }`}
-      data-tool-card
-    >
+    <div className="my-1" data-tool-card>
       <details>
-        <summary className="flex cursor-pointer items-center gap-1.5 text-xs">
-          <IconChevronRight className="size-3 transition-transform [details[open]>summary>&]:rotate-90" />
-          <ToolStatusIcon status={status} />
-          <span className="font-mono font-medium">{update.title}</span>
-          <span className="ml-auto text-muted-foreground">{update.toolKind}</span>
+        <summary
+          className={`inline-flex h-6 cursor-pointer list-none items-center gap-1.5 rounded-full bg-muted px-2.5 font-medium text-[11px] text-muted-foreground ${
+            status === 'failed' ? 'text-destructive' : ''
+          }`}
+        >
+          {toolIcon(update)}
+          {update.title}
+          {status === 'in_progress' && <span className="animate-pulse">…</span>}
         </summary>
-        <div className="mt-1 space-y-1 pl-4">
-          {update.input != null && (
-            <pre className="max-h-32 overflow-auto rounded bg-muted p-1.5 text-xs">
-              {JSON.stringify(update.input, null, 2)}
-            </pre>
-          )}
-          {output && (
-            <pre className="max-h-32 overflow-auto rounded bg-muted p-1.5 text-muted-foreground text-xs">
-              {output}
-            </pre>
-          )}
-        </div>
+        {output && (
+          <pre className="mt-1 max-h-32 overflow-auto rounded-lg bg-muted p-2 text-[11px] text-muted-foreground">
+            {output}
+          </pre>
+        )}
       </details>
       {diff && <DiffView diff={diff} />}
     </div>
@@ -96,7 +82,7 @@ export function TranscriptView({ transcript }: { transcript: TranscriptEntry[] }
       .filter((update) => update.kind === 'tool_call_update' && update.toolCallId === toolCallId)
 
   return (
-    <div className="flex flex-col gap-1 px-3 py-2">
+    <div className="flex flex-col gap-1 px-4 py-4">
       {transcript.map((entry) => {
         const { update } = entry
         switch (update.kind) {
@@ -104,20 +90,20 @@ export function TranscriptView({ transcript }: { transcript: TranscriptEntry[] }
             return (
               <div
                 key={entry.id}
-                className="my-1 ml-8 rounded-lg rounded-br-sm border border-primary/15 bg-primary/10 px-3 py-2 text-sm"
+                className="my-1 max-w-[85%] self-end rounded-2xl rounded-br-md bg-muted px-3.5 py-2 text-[13px] leading-relaxed"
               >
                 {update.text}
               </div>
             )
           case 'message_chunk':
             return (
-              <div key={entry.id} className="my-1 mr-4 whitespace-pre-wrap text-sm">
+              <div key={entry.id} className="my-1 whitespace-pre-wrap text-[13.5px] leading-[1.7]">
                 {update.text}
               </div>
             )
           case 'tool_call':
             return (
-              <ToolCard
+              <ToolPill
                 key={entry.id}
                 update={update}
                 followups={followupsFor(update.toolCallId)}
@@ -127,19 +113,14 @@ export function TranscriptView({ transcript }: { transcript: TranscriptEntry[] }
             return update.stopReason === 'error' ? (
               <div
                 key={entry.id}
-                className="my-1 flex items-center gap-1.5 text-destructive text-xs"
+                className="my-1 flex items-center gap-1.5 text-[12px] text-destructive"
               >
                 <IconAlertTriangle className="size-3.5" />
                 {update.error ?? 'the turn failed'}
               </div>
             ) : (
-              <div
-                key={entry.id}
-                className="my-2 flex items-center gap-2 font-mono text-[10px] text-muted-foreground uppercase tracking-widest"
-              >
-                <span className="h-px flex-1 bg-border" />
+              <div key={entry.id} className="my-1.5 text-[11px] text-muted-foreground">
                 done{update.costUsd != null ? ` · $${update.costUsd.toFixed(4)}` : ''}
-                <span className="h-px flex-1 bg-border" />
               </div>
             )
           default:
@@ -147,8 +128,12 @@ export function TranscriptView({ transcript }: { transcript: TranscriptEntry[] }
         }
       })}
       {transcript.length === 0 && (
-        <div className="px-1 py-6 text-center text-muted-foreground text-sm">
-          Ask the agent to create or edit sheets, define tables, or fetch data.
+        <div className="flex flex-col items-center gap-3 px-2 py-10 text-center">
+          <Mascot face="sleep" motion="breathe" size={72} className="mascot-motion" />
+          <div className="font-serif text-[19px] text-foreground italic">All caught up</div>
+          <p className="max-w-56 text-[13px] text-muted-foreground leading-relaxed">
+            Ask Washi to draft, tidy, or link your pages — nothing lands without your accept.
+          </p>
         </div>
       )}
     </div>

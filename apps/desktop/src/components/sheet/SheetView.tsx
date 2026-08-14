@@ -2,6 +2,7 @@ import type { SheetDetail } from '@washi/desktop-domain'
 import { PaperProvider, WsxView } from '@washi/paper'
 import { parse, type WsxElement } from '@washi/wsx'
 import { useEffect, useState } from 'react'
+import { Mascot } from '@/components/mascot/Mascot'
 import { paperHost } from '@/lib/paper-host'
 import { api } from '@/lib/rpc'
 import { useSheetsStore } from '@/stores/sheets/sheets-store'
@@ -56,11 +57,19 @@ export function SheetView() {
   if (!activeId || !loaded) {
     return (
       <div className="paper-canvas grid flex-1 place-items-center">
-        <div className="text-center">
-          <div className="font-display font-bold text-2xl text-muted-foreground/60">
-            washi<span className="text-primary">。</span>
-          </div>
-          <p className="mt-1 text-muted-foreground text-sm">select or create a sheet</p>
+        <div className="flex flex-col items-center gap-3 text-center">
+          <Mascot face="happy" motion="bob" size={120} className="mascot-motion" />
+          <div className="font-serif text-[23px] italic">Nothing written here yet</div>
+          <p className="max-w-72 text-[14px] text-muted-foreground leading-relaxed">
+            Start a note and Washi will keep it tidy, tagged and findable.
+          </p>
+          <button
+            type="button"
+            onClick={() => void useSheetsStore.getState().createSheet()}
+            className="mt-1 rounded-xl bg-primary px-5 py-2.5 font-bold text-[14px] text-primary-foreground"
+          >
+            New note
+          </button>
         </div>
       </div>
     )

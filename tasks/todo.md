@@ -45,6 +45,30 @@ Elements of docs/spec.html's language that the current model cannot express — 
 - [ ] **Sheet page-card tape** still hash-derived in app chrome — should read `theme.accent`
       when the sheet has one (small SheetView follow-up).
 
+## Design-handoff implementation (2026-08-13) — shipped vs remaining
+
+Shipped from the claude.ai design projects: handoff tokens (light + pure-black dark), Inter,
+248px sidebar (vault switcher w/ VaultIcon, ⌘K search button, page tree, sync row), 48px
+breadcrumb header + "Washi watching" pill (AgentMascot state-driven), 334px agent panel
+(un-bubbled messages, tool pills, suggestion chips, pill composer, mascot header), command
+palette (cmdk), mascot system (MascotDefs + Mascot 7 faces + AgentMascot 8 states + VaultIcon
+12 topics + design keyframes), UI-state empty states, suggested-edit diff styling.
+
+Remaining from the handoffs (each is real scope, not styling):
+
+- [ ] **Onboarding flow** — 4-step first-run (local-first pitch, vault creation, sync choice,
+      agent consent) + server path variants. Needs first-run detection + vault naming.
+- [ ] **Dashboard view** — greeting, stat cards, review queue, recent pages, activity timeline.
+- [ ] **Graph view** — backlink graph on dotted canvas (sheet_links data exists).
+- [ ] **Settings view** — 4 tabs incl. agent autonomy segmented control + scheduled runs.
+- [ ] **Multi-workspace/vault backend** — switcher popover, create-workspace dialog, per-vault db.
+- [ ] **Model picker + context meter** in composer (SDK setModel / usage_update plumbing).
+- [ ] **In-note agent affordances** — authorship captions, agentColor block borders, inline
+      accept/reject on suggested edits (needs block-level anchors → spec Q2/Q3 territory).
+- [ ] **Dark mode toggle** (tokens shipped), theme segmented control.
+- [ ] **Toast faces + thinking bar + dropzone** from UI states (components exist, not wired).
+- [ ] Sidebar folders (tree grouping), user/account row, Share.
+
 ## Known gaps (post-M2)
 
 - Live SDK loop not covered by automated tests (would bill + need auth); unit tests

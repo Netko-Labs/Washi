@@ -14,6 +14,8 @@ interface AgentState {
   transcript: TranscriptEntry[]
   approvals: ApprovalRequest[]
   running: boolean
+  panelOpen: boolean
+  togglePanel: () => void
   init: () => Promise<void>
   createSession: () => Promise<void>
   selectSession: (id: string) => Promise<void>
@@ -23,12 +25,39 @@ interface AgentState {
 
 let subscribed = false
 
+/** Header/panel mascot state from the transcript tail (design: agent status lives in chrome). */
+export function mascotStateFor(
+  transcript: TranscriptEntry[],
+  running: boolean,
+  approvals: ApprovalRequest[],
+): 'idle' | 'reading' | 'thinking' | 'writing' | 'suggesting' | 'done' | 'flagged' {
+  if (approvals.length > 0) return 'suggesting'
+  const last = transcript.at(-1)?.update
+  if (!running) {
+    if (last?.kind === 'turn_done') return last.stopReason === 'error' ? 'flagged' : 'done'
+    return 'idle'
+  }
+  for (let index = transcript.length - 1; index >= 0; index--) {
+    const update = transcript[index]?.update
+    if (update?.kind === 'tool_call') {
+      if (update.toolKind === 'read' || update.toolKind === 'search' || update.toolKind === 'fetch')
+        return 'reading'
+      if (update.toolKind === 'edit') return 'writing'
+      return 'thinking'
+    }
+    if (update?.kind === 'user_message') break
+  }
+  return 'thinking'
+}
+
 export const useAgentStore = create<AgentState>((set, get) => ({
   sessions: [],
   activeSessionId: null,
   transcript: [],
   approvals: [],
   running: false,
+  panelOpen: true,
+  togglePanel: () => set((state) => ({ panelOpen: !state.panelOpen })),
 
   init: async () => {
     if (!subscribed) {

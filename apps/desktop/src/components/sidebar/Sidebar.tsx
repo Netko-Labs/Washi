@@ -1,119 +1,111 @@
-import { IconFilePlus, IconSearch, IconTrash, IconX } from '@tabler/icons-react'
+import {
+  IconChevronDown,
+  IconCircleDot,
+  IconFileText,
+  IconPlus,
+  IconSearch,
+  IconTrash,
+} from '@tabler/icons-react'
+import { VaultIcon } from '@/components/mascot/VaultIcon'
+import { useAgentStore } from '@/stores/agent/agent-store'
 import { useSheetsStore } from '@/stores/sheets/sheets-store'
 
-/** HLC stamps lead with zero-padded wall-clock ms — cheap relative time. */
-function relativeTime(hlc: string): string {
-  const ms = Number(hlc.slice(0, 14))
-  if (!Number.isFinite(ms) || ms === 0) return ''
-  const minutes = Math.floor((Date.now() - ms) / 60_000)
-  if (minutes < 1) return 'now'
-  if (minutes < 60) return `${minutes}m`
-  if (minutes < 60 * 24) return `${Math.floor(minutes / 60)}h`
-  return `${Math.floor(minutes / (60 * 24))}d`
-}
-
+/** 248px sidebar per Washi.dc.html: switcher, search, tree, sync row. */
 export function Sidebar() {
-  const { sheets, activeId, searchTerm, searchHits, select, createSheet, deleteSheet, search } =
-    useSheetsStore()
-  const searching = searchTerm.trim().length > 0
+  const { sheets, activeId, select, createSheet, deleteSheet, openPalette } = useSheetsStore()
+  const running = useAgentStore((state) => state.running)
 
   return (
-    <aside className="flex w-64 shrink-0 flex-col border-border border-r bg-secondary/50">
-      <div className="flex items-center gap-1 px-3 pt-3 pb-1.5">
-        <div className="relative flex-1">
-          <IconSearch className="absolute top-1.5 left-2 size-4 text-muted-foreground" />
-          <input
-            value={searchTerm}
-            onChange={(event) => void search(event.target.value)}
-            placeholder="Search sheets"
-            className="h-7 w-full rounded-md border border-input bg-card pr-6 pl-7 text-sm outline-none focus:ring-1 focus:ring-ring"
-          />
-          {searching && (
-            <button
-              type="button"
-              aria-label="Clear search"
-              onClick={() => void search('')}
-              className="absolute top-1.5 right-1.5 text-muted-foreground hover:text-foreground"
-            >
-              <IconX className="size-4" />
-            </button>
-          )}
-        </div>
+    <aside className="flex w-[248px] shrink-0 flex-col border-border border-r bg-muted">
+      {/* real traffic lights live here (hiddenInset) — keep it draggable */}
+      <div className="h-9 shrink-0" style={{ appRegion: 'drag' } as never} />
+
+      <button
+        type="button"
+        className="mx-2 flex items-center gap-2.5 rounded-[10px] px-2 py-1.5 text-left hover:bg-accent"
+        data-workspace-switcher
+      >
+        <VaultIcon topic="journal" size={26} className="rounded-lg" />
+        <span className="min-w-0 flex-1">
+          <span className="block truncate font-semibold text-[13px]">Personal vault</span>
+          <span className="block truncate text-[11px] text-muted-foreground">
+            {sheets.length} pages · local
+          </span>
+        </span>
+        <IconChevronDown className="size-3.5 text-muted-foreground" />
+      </button>
+
+      <div className="px-2 pt-2">
         <button
           type="button"
-          aria-label="New sheet"
-          title="New sheet"
-          onClick={() => void createSheet()}
-          className="grid size-7 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+          onClick={openPalette}
+          className="flex h-8 w-full items-center gap-2 rounded-[10px] border border-border bg-background px-2.5 text-[13px] text-muted-foreground hover:text-foreground"
         >
-          <IconFilePlus className="size-4" />
+          <IconSearch className="size-3.5" />
+          Search sheets
+          <kbd className="ml-auto rounded border border-border bg-muted px-1 font-mono text-[10px]">
+            ⌘K
+          </kbd>
         </button>
       </div>
 
-      <div className="flex items-center gap-2 px-4 pt-2 pb-1">
-        <span className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">
-          {searching ? 'results' : 'sheets'}
-        </span>
-        <span className="h-0.5 flex-1 rounded-full bg-tape-pink/60" />
+      <div className="px-4 pt-[18px] pb-1.5 font-semibold text-[11px] text-muted-foreground uppercase tracking-[0.06em]">
+        Workspace
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-2 pb-3">
-        {searching
-          ? searchHits.map((hit) => (
+      <nav className="flex-1 space-y-px overflow-y-auto px-2 pb-2">
+        {sheets.map((sheet) => {
+          const active = sheet.id === activeId
+          return (
+            <div
+              key={sheet.id}
+              className={`group flex h-[29px] items-center rounded-lg ${
+                active ? 'bg-accent font-medium' : 'text-muted-foreground hover:bg-accent'
+              }`}
+            >
               <button
-                key={hit.id}
                 type="button"
-                onClick={() => select(hit.id)}
-                className="block w-full rounded-md px-2 py-1.5 text-left hover:bg-accent"
+                onClick={() => select(sheet.id)}
+                className="flex h-full min-w-0 flex-1 items-center gap-2 px-2 text-left text-[13px]"
               >
-                <div className="truncate font-medium text-sm">
-                  {hit.icon ? `${hit.icon} ` : ''}
-                  {hit.title}
-                </div>
-                <div className="truncate text-muted-foreground text-xs">{hit.snippet}</div>
+                <IconFileText className="size-[15px] shrink-0" />
+                <span className="truncate">
+                  {sheet.icon ? `${sheet.icon} ` : ''}
+                  {sheet.title}
+                </span>
+                {active && running && (
+                  <span
+                    className="ml-auto size-1.5 shrink-0 rounded-full bg-agent"
+                    style={{ animation: 'wdot 2s ease-in-out infinite' }}
+                  />
+                )}
               </button>
-            ))
-          : sheets.map((sheet) => {
-              const active = sheet.id === activeId
-              return (
-                <div
-                  key={sheet.id}
-                  className={`group relative flex items-center rounded-md ${
-                    active ? 'bg-card shadow-sm' : 'hover:bg-accent/60'
-                  }`}
-                >
-                  {active && (
-                    <span className="absolute top-1.5 bottom-1.5 left-0 w-0.75 rounded-full bg-tape-pink" />
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => select(sheet.id)}
-                    className="min-w-0 flex-1 px-2.5 py-1.5 text-left"
-                  >
-                    <span className="block truncate font-medium text-sm">
-                      {sheet.icon ? `${sheet.icon} ` : ''}
-                      {sheet.title}
-                    </span>
-                    <span className="block truncate font-mono text-[10px] text-muted-foreground">
-                      {relativeTime(sheet.hlcUpdated)}
-                      {sheet.tags.length > 0 ? ` · ${sheet.tags.join(' · ')}` : ''}
-                    </span>
-                  </button>
-                  <button
-                    type="button"
-                    aria-label={`Delete ${sheet.title}`}
-                    onClick={() => void deleteSheet(sheet.id)}
-                    className="mr-1 hidden size-6 shrink-0 place-items-center rounded text-muted-foreground hover:text-destructive group-hover:grid"
-                  >
-                    <IconTrash className="size-3.5" />
-                  </button>
-                </div>
-              )
-            })}
-        {searching && searchHits.length === 0 && (
-          <div className="px-2 py-4 text-muted-foreground text-sm">no matches</div>
-        )}
+              <button
+                type="button"
+                aria-label={`Delete ${sheet.title}`}
+                onClick={() => void deleteSheet(sheet.id)}
+                className="mr-1 hidden size-5 shrink-0 place-items-center rounded text-muted-foreground group-hover:grid hover:text-destructive"
+              >
+                <IconTrash className="size-3" />
+              </button>
+            </div>
+          )
+        })}
+        <button
+          type="button"
+          aria-label="New sheet"
+          onClick={() => void createSheet()}
+          className="flex h-[29px] w-full items-center gap-2 rounded-lg px-2 text-[13px] text-muted-foreground hover:bg-accent"
+        >
+          <IconPlus className="size-3.5" />
+          New page
+        </button>
       </nav>
+
+      <div className="flex items-center gap-2 border-border border-t px-3 py-2 text-[11.5px] text-muted-foreground">
+        <IconCircleDot className="size-3.5 text-green-600" />
+        Local · this device only
+      </div>
     </aside>
   )
 }

@@ -1,0 +1,1765 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="_ds/shadcn-ui-design-system-reui-ec5e3ec8-51e4-42ec-a614-95192ed636ad/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/shadcn-ui-design-system-reui-ec5e3ec8-51e4-42ec-a614-95192ed636ad/tokens/fig-tokens.css">
+<link rel="stylesheet" href="_ds/shadcn-ui-design-system-reui-ec5e3ec8-51e4-42ec-a614-95192ed636ad/tokens/fig-typography.css">
+<link rel="stylesheet" href="_ds/shadcn-ui-design-system-reui-ec5e3ec8-51e4-42ec-a614-95192ed636ad/tokens/semantic.css">
+<link rel="stylesheet" href="_ds/shadcn-ui-design-system-reui-ec5e3ec8-51e4-42ec-a614-95192ed636ad/styles.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="_ds/shadcn-ui-design-system-reui-ec5e3ec8-51e4-42ec-a614-95192ed636ad/_ds_bundle.js"></script>
+<style>
+  :root {
+    --background: #fbf5ea; --foreground: #453325;
+    --card: #fffdf6; --card-foreground: #453325;
+    --popover: #fffcf3; --popover-foreground: #453325;
+    --muted: #f4ead7; --muted-foreground: #97815f;
+    --accent: #f2e3cc; --accent-foreground: #453325;
+    --secondary: #f4ead7; --secondary-foreground: #453325;
+    --border: #e8dbc2; --input: #e2d3b6;
+    --primary: #cf6b36; --primary-foreground: #fff6e4;
+  }
+  :root[data-theme="dark"], .dark {
+    --background: #000000; --foreground: #e8e6e1;
+    --card: #0e0e0e; --card-foreground: #e8e6e1;
+    --popover: #141414; --popover-foreground: #e8e6e1;
+    --muted: #161616; --muted-foreground: #8a8a85;
+    --accent: #1f1f1f; --accent-foreground: #e8e6e1;
+    --secondary: #161616; --secondary-foreground: #e8e6e1;
+    --border: #262626; --input: #262626;
+    --primary: #e8e6e1; --primary-foreground: #111111;
+  }
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body { font-family: Inter, system-ui, sans-serif; }
+  a { color: var(--foreground); text-decoration: underline; text-underline-offset: 3px; }
+  a:hover { opacity: .7; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 999px; border: 3px solid transparent; background-clip: content-box; }
+  @keyframes vpulse { 0%,100% { opacity: .35 } 50% { opacity: 1 } }
+  @keyframes vfade { from { opacity: 0; transform: translateY(4px) } to { opacity: 1; transform: none } }
+  @keyframes wbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+  @keyframes wblink{0%,90%,100%{transform:scaleY(1)}93%{transform:scaleY(.08)}96%{transform:scaleY(1)}}
+  @keyframes wscan{0%,100%{transform:translateX(-26px)}50%{transform:translateX(26px)}}
+  @keyframes wdot{0%,100%{opacity:.15;transform:translateY(0)}50%{opacity:1;transform:translateY(-8px)}}
+  @keyframes wscrib{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(7deg)}}
+  @keyframes wpop{0%,100%{opacity:0;transform:scale(.3)}20%,60%{opacity:1;transform:scale(1)}80%{opacity:0}}
+  @keyframes wwob{0%,100%{transform:rotate(-2.4deg)}50%{transform:rotate(2.4deg)}}
+  @keyframes wbounce{0%,100%{transform:translateY(0)}30%{transform:translateY(-26px)}55%{transform:translateY(0)}70%{transform:translateY(-8px)}}
+  @keyframes wfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  @keyframes wbub{0%{opacity:0;transform:translateY(0) scale(.6)}30%{opacity:.9}100%{opacity:0;transform:translateY(-70px) scale(1.1)}}
+  @keyframes oBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  @keyframes oBreathe{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+  @keyframes oWave{0%,100%{transform:rotate(-14deg)}50%{transform:rotate(26deg)}}
+  @keyframes oSparkle{0%,100%{transform:scale(.5);opacity:0}50%{transform:scale(1.15);opacity:1}}
+  @keyframes oPop{0%{transform:scale(0)}10%{transform:scale(1.14)}15%{transform:scale(1)}78%{transform:scale(1);opacity:1}90%,100%{transform:scale(.85);opacity:0}}
+  @keyframes oFly{0%{transform:translate(96px,-56px) rotate(14deg);opacity:0}25%{opacity:1}75%{opacity:1}100%{transform:translate(-6px,10px) rotate(-4deg);opacity:0}}
+  @keyframes oFall{0%{transform:translateY(-30px) rotate(0);opacity:0}12%{opacity:1}88%{opacity:1}100%{transform:translateY(190px) rotate(200deg);opacity:0}}
+  @keyframes oSway{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+  @keyframes oDraw{0%{stroke-dashoffset:340}55%{stroke-dashoffset:0}75%{stroke-dashoffset:0;opacity:1}85%,100%{stroke-dashoffset:0;opacity:0}}
+  @keyframes oRing{0%,55%,100%{transform:rotate(0)}62%{transform:rotate(-16deg)}70%{transform:rotate(13deg)}78%{transform:rotate(-8deg)}86%{transform:rotate(4deg)}}
+  @keyframes oPulse{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(1.5);opacity:.35}}
+  @keyframes oShipR{0%{transform:translate(0,0) rotate(-4deg);opacity:0}15%{opacity:1}50%{transform:translate(75px,-26px) rotate(4deg)}85%{opacity:1}100%{transform:translate(150px,0) rotate(-2deg);opacity:0}}
+  @keyframes oShipL{0%{transform:translate(0,0) rotate(4deg);opacity:0}15%{opacity:1}50%{transform:translate(-75px,26px) rotate(-4deg)}85%{opacity:1}100%{transform:translate(-150px,0) rotate(2deg);opacity:0}}
+  @keyframes oLed{0%,100%{opacity:1}50%{opacity:.25}}
+  @keyframes oPass{0%,20%{transform:translate(0,0) rotate(0);opacity:0}30%{opacity:1}55%{transform:translate(52px,-34px) rotate(10deg)}75%{transform:translate(104px,-6px) rotate(-4deg);opacity:1}88%,100%{transform:translate(104px,-6px);opacity:0}}
+  @keyframes oFlicker{0%,100%{opacity:.9}12%{opacity:.15}24%{opacity:.7}36%{opacity:.1}60%{opacity:.5}80%{opacity:.15}}
+</style>
+</helmet>
+
+<svg width="0" height="0" aria-hidden="true" style="position:absolute; pointer-events:none;">
+  <defs>
+    <clipPath id="wclip"><rect x="12" y="12" width="1000" height="1000" rx="220"></rect></clipPath>
+    <g id="oBody">
+      <ellipse cx="120" cy="250" rx="72" ry="10" fill="#6B3A1F" opacity="0.12"></ellipse>
+      <rect x="12" y="172" width="42" height="34" rx="17" fill="#F7EDD6" stroke="#6B3A1F" stroke-width="8"></rect>
+      <rect x="186" y="172" width="42" height="34" rx="17" fill="#F7EDD6" stroke="#6B3A1F" stroke-width="8"></rect>
+      <path d="M64 34 H150 L206 90 V196 C206 218 190 232 168 232 H72 C50 232 34 218 34 196 V70 C34 48 46 34 64 34 Z" fill="#F7EDD6" stroke="#6B3A1F" stroke-width="8" stroke-linejoin="round"></path>
+      <path d="M150 34 L206 90 H166 C156 90 150 84 150 74 Z" fill="#AEBB9A" stroke="#6B3A1F" stroke-width="8" stroke-linejoin="round"></path>
+    </g>
+    <g id="oHappy">
+      <ellipse cx="62" cy="152" rx="16" ry="9" fill="#F0A487" opacity="0.85"></ellipse>
+      <ellipse cx="178" cy="152" rx="16" ry="9" fill="#F0A487" opacity="0.85"></ellipse>
+      <circle cx="90" cy="130" r="14" fill="#2A1B12"></circle><circle cx="95" cy="125" r="5" fill="#fff"></circle>
+      <circle cx="150" cy="130" r="14" fill="#2A1B12"></circle><circle cx="155" cy="125" r="5" fill="#fff"></circle>
+      <path d="M108 156 Q120 150 132 156 Q129 175 120 177 Q111 175 108 156 Z" fill="#7A3A22"></path>
+      <ellipse cx="120" cy="170" rx="9" ry="5" fill="#E8836B"></ellipse>
+    </g>
+    <g id="oWink">
+      <ellipse cx="62" cy="152" rx="16" ry="9" fill="#F0A487" opacity="0.85"></ellipse>
+      <ellipse cx="178" cy="152" rx="16" ry="9" fill="#F0A487" opacity="0.85"></ellipse>
+      <circle cx="90" cy="130" r="14" fill="#2A1B12"></circle><circle cx="95" cy="125" r="5" fill="#fff"></circle>
+      <path d="M138 132 Q150 120 162 132" fill="none" stroke="#2A1B12" stroke-width="8" stroke-linecap="round"></path>
+      <path d="M104 154 Q120 148 136 154 Q132 178 120 180 Q108 178 104 154 Z" fill="#7A3A22"></path>
+      <ellipse cx="120" cy="172" rx="10" ry="5" fill="#E8836B"></ellipse>
+    </g>
+    <g id="oCurious">
+      <ellipse cx="62" cy="154" rx="15" ry="8" fill="#F0A487" opacity="0.8"></ellipse>
+      <ellipse cx="178" cy="154" rx="15" ry="8" fill="#F0A487" opacity="0.8"></ellipse>
+      <circle cx="88" cy="128" r="16" fill="#2A1B12"></circle><circle cx="94" cy="122" r="6" fill="#fff"></circle>
+      <circle cx="152" cy="132" r="11" fill="#2A1B12"></circle><circle cx="156" cy="128" r="4" fill="#fff"></circle>
+      <ellipse cx="120" cy="164" rx="10" ry="12" fill="#7A3A22"></ellipse>
+    </g>
+    <g id="oFocus">
+      <ellipse cx="62" cy="152" rx="16" ry="9" fill="#F0A487" opacity="0.85"></ellipse>
+      <ellipse cx="178" cy="152" rx="16" ry="9" fill="#F0A487" opacity="0.85"></ellipse>
+      <path d="M78 130 Q90 138 102 130" fill="none" stroke="#2A1B12" stroke-width="9" stroke-linecap="round"></path>
+      <path d="M138 130 Q150 138 162 130" fill="none" stroke="#2A1B12" stroke-width="9" stroke-linecap="round"></path>
+      <path d="M112 160 Q120 166 128 160" fill="none" stroke="#7A3A22" stroke-width="7" stroke-linecap="round"></path>
+    </g>
+    <g id="oSad">
+      <ellipse cx="62" cy="154" rx="15" ry="8" fill="#F0A487" opacity="0.7"></ellipse>
+      <ellipse cx="178" cy="154" rx="15" ry="8" fill="#F0A487" opacity="0.7"></ellipse>
+      <circle cx="90" cy="134" r="13" fill="#2A1B12"></circle><circle cx="86" cy="139" r="5" fill="#fff"></circle>
+      <circle cx="150" cy="134" r="13" fill="#2A1B12"></circle><circle cx="146" cy="139" r="5" fill="#fff"></circle>
+      <path d="M74 114 Q88 106 100 112" fill="none" stroke="#2A1B12" stroke-width="6" stroke-linecap="round" opacity="0.75"></path>
+      <path d="M166 114 Q152 106 140 112" fill="none" stroke="#2A1B12" stroke-width="6" stroke-linecap="round" opacity="0.75"></path>
+      <path d="M108 170 Q120 160 132 170" fill="none" stroke="#7A3A22" stroke-width="7" stroke-linecap="round"></path>
+    </g>
+    <g id="oServer">
+      <rect x="0" y="0" width="120" height="150" rx="16" fill="#E7DCC8" stroke="#6B3A1F" stroke-width="8"></rect>
+      <rect x="18" y="22" width="84" height="14" rx="7" fill="#C9B896"></rect>
+      <rect x="18" y="48" width="84" height="14" rx="7" fill="#C9B896"></rect>
+      <rect x="18" y="74" width="58" height="14" rx="7" fill="#C9B896"></rect>
+      <circle cx="96" cy="118" r="9" fill="#AEBB9A" stroke="#6B3A1F" stroke-width="5"></circle>
+    </g>
+    <g id="oTile"><rect x="0" y="0" width="64" height="64" rx="18" stroke="#6B3A1F" stroke-width="6" fill="#E8B36A"></rect></g>
+    <g id="oSheet"><path d="M4 4 H30 L46 20 V52 C46 58 42 62 36 62 H12 C7 62 4 58 4 54 Z" fill="#FFFDF6" stroke="#6B3A1F" stroke-width="6" stroke-linejoin="round"></path><path d="M30 4 L46 20 H34 C31 20 30 18 30 15 Z" fill="#AEBB9A" stroke="#6B3A1F" stroke-width="6" stroke-linejoin="round"></path></g>
+    <g id="wbody">
+      <path d="M150 1100 L150 620 C150 520 200 480 300 472 C380 466 430 452 512 452 C580 452 650 456 700 462 L874 620 L874 1100 Z" fill="#FFF6E4" stroke="#FFF6E4" stroke-width="72" stroke-linejoin="round"></path>
+      <path d="M150 1100 L150 620 C150 520 200 480 300 472 C380 466 430 452 512 452 C580 452 650 456 700 462 L874 620 L874 1100 Z" fill="#F7EDD6" stroke="#6B3A1F" stroke-width="18" stroke-linejoin="round"></path>
+      <path d="M700 462 L874 620 L706 606 Q690 530 700 462 Z" fill="#AEBB9A" stroke="#6B3A1F" stroke-width="18" stroke-linejoin="round"></path>
+    </g>
+    <g id="whands">
+      <rect x="286" y="952" width="140" height="130" rx="60" fill="#F7EDD6" stroke="#6B3A1F" stroke-width="18"></rect>
+      <rect x="598" y="952" width="140" height="130" rx="60" fill="#F7EDD6" stroke="#6B3A1F" stroke-width="18"></rect>
+    </g>
+    <g id="wblush">
+      <ellipse cx="266" cy="750" rx="48" ry="30" fill="#F0A487" opacity="0.9"></ellipse>
+      <ellipse cx="758" cy="750" rx="48" ry="30" fill="#F0A487" opacity="0.9"></ellipse>
+    </g>
+    <g id="weyes">
+      <circle cx="372" cy="672" r="54" fill="#2A1B12"></circle><circle cx="652" cy="672" r="54" fill="#2A1B12"></circle>
+      <circle cx="390" cy="654" r="19" fill="#FFFFFF"></circle><circle cx="670" cy="654" r="19" fill="#FFFFFF"></circle>
+    </g>
+
+    <symbol id="w-idle" viewBox="0 0 1024 1024">
+      <g clip-path="url(#wclip)">
+        <rect x="12" y="12" width="1000" height="1000" fill="#DF8552"></rect>
+        <g style="animation:wbob 3.6s ease-in-out infinite; transform-box:fill-box; transform-origin:center">
+          <use href="#wbody"></use>
+          <use href="#wblush"></use>
+          <g style="animation:wblink 4.4s infinite; transform-box:fill-box; transform-origin:center"><use href="#weyes"></use></g>
+          <path d="M460 764 Q512 800 564 764" fill="none" stroke="#7A3A22" stroke-width="22" stroke-linecap="round"></path>
+          <use href="#whands"></use>
+        </g>
+      </g>
+    </symbol>
+
+    <symbol id="w-read" viewBox="0 0 1024 1024">
+      <g clip-path="url(#wclip)">
+        <rect x="12" y="12" width="1000" height="1000" fill="#DF8552"></rect>
+        <use href="#wbody"></use>
+        <use href="#wblush"></use>
+        <g style="animation:wscan 3.2s ease-in-out infinite; transform-box:fill-box; transform-origin:center"><use href="#weyes"></use></g>
+        <path d="M474 776 Q512 794 550 776" fill="none" stroke="#7A3A22" stroke-width="20" stroke-linecap="round"></path>
+        <use href="#whands"></use>
+        <path d="M352 938 Q432 902 512 938 Q592 902 672 938 L672 1070 Q592 1034 512 1070 Q432 1034 352 1070 Z" fill="#FDF8EC" stroke="#6B3A1F" stroke-width="16" stroke-linejoin="round"></path>
+        <path d="M512 938 V1070" stroke="#6B3A1F" stroke-width="12"></path>
+      </g>
+    </symbol>
+
+    <symbol id="w-think" viewBox="0 0 1024 1024">
+      <g clip-path="url(#wclip)">
+        <rect x="12" y="12" width="1000" height="1000" fill="#DF8552"></rect>
+        <circle cx="330" cy="330" r="22" fill="#FFF6E4" style="animation:wdot 1.8s infinite; transform-box:fill-box; transform-origin:center"></circle>
+        <circle cx="416" cy="270" r="28" fill="#FFF6E4" style="animation:wdot 1.8s infinite .3s; transform-box:fill-box; transform-origin:center"></circle>
+        <circle cx="520" cy="230" r="34" fill="#FFF6E4" style="animation:wdot 1.8s infinite .6s; transform-box:fill-box; transform-origin:center"></circle>
+        <use href="#wbody"></use>
+        <use href="#wblush"></use>
+        <circle cx="372" cy="672" r="54" fill="#2A1B12"></circle><circle cx="652" cy="672" r="54" fill="#2A1B12"></circle>
+        <circle cx="352" cy="646" r="19" fill="#FFFFFF"></circle><circle cx="632" cy="646" r="19" fill="#FFFFFF"></circle>
+        <ellipse cx="512" cy="784" rx="22" ry="16" fill="#7A3A22"></ellipse>
+        <use href="#whands"></use>
+      </g>
+    </symbol>
+
+    <symbol id="w-write" viewBox="0 0 1024 1024">
+      <g clip-path="url(#wclip)">
+        <rect x="12" y="12" width="1000" height="1000" fill="#DF8552"></rect>
+        <use href="#wbody"></use>
+        <use href="#wblush"></use>
+        <g style="animation:wblink 5s infinite; transform-box:fill-box; transform-origin:center"><use href="#weyes"></use></g>
+        <path d="M482 780 H542" stroke="#7A3A22" stroke-width="20" stroke-linecap="round"></path>
+        <use href="#whands"></use>
+        <g style="animation:wscrib .4s ease-in-out infinite; transform-box:fill-box; transform-origin:50% 90%">
+          <g transform="translate(668,1000) rotate(-32)">
+            <rect x="-18" y="-160" width="36" height="160" rx="8" fill="#E8A23F" stroke="#6B3A1F" stroke-width="12"></rect>
+            <path d="M-18 -160 L0 -204 L18 -160 Z" fill="#F4DDB8" stroke="#6B3A1F" stroke-width="12" stroke-linejoin="round"></path>
+          </g>
+        </g>
+      </g>
+    </symbol>
+
+    <symbol id="w-suggest" viewBox="0 0 1024 1024">
+      <g clip-path="url(#wclip)">
+        <rect x="12" y="12" width="1000" height="1000" fill="#DF8552"></rect>
+        <path d="M810 146 Q820 180 854 190 Q820 200 810 234 Q800 200 766 190 Q800 180 810 146 Z" fill="#F7DC8A" style="animation:wpop 2.4s infinite; transform-box:fill-box; transform-origin:center"></path>
+        <path d="M240 174 Q246 194 266 200 Q246 206 240 226 Q234 206 214 200 Q234 194 240 174 Z" fill="#FFF6E4" style="animation:wpop 2.4s infinite .8s; transform-box:fill-box; transform-origin:center"></path>
+        <g style="animation:wwob 2.2s ease-in-out infinite; transform-box:fill-box; transform-origin:50% 100%">
+          <use href="#wbody"></use>
+          <use href="#wblush"></use>
+          <use href="#weyes"></use>
+          <path d="M458 742 Q512 730 566 742 Q556 812 512 816 Q468 812 458 742 Z" fill="#7A3A22"></path>
+          <ellipse cx="512" cy="798" rx="34" ry="18" fill="#E8836B"></ellipse>
+          <use href="#whands"></use>
+        </g>
+      </g>
+    </symbol>
+
+    <symbol id="w-done" viewBox="0 0 1024 1024">
+      <g clip-path="url(#wclip)">
+        <rect x="12" y="12" width="1000" height="1000" fill="#DF8552"></rect>
+        <path d="M810 200 Q818 228 846 236 Q818 244 810 272 Q802 244 774 236 Q802 228 810 200 Z" fill="#F7DC8A" style="animation:wpop 1.8s infinite; transform-box:fill-box; transform-origin:center"></path>
+        <path d="M230 260 Q236 280 256 286 Q236 292 230 312 Q224 292 204 286 Q224 280 230 260 Z" fill="#FFF6E4" style="animation:wpop 1.8s infinite .6s; transform-box:fill-box; transform-origin:center"></path>
+        <g style="animation:wbounce 1.6s ease-in-out infinite; transform-box:fill-box; transform-origin:center">
+          <use href="#wbody"></use>
+          <use href="#wblush"></use>
+          <path d="M320 678 Q372 636 424 678" fill="none" stroke="#2A1B12" stroke-width="24" stroke-linecap="round"></path>
+          <path d="M600 678 Q652 636 704 678" fill="none" stroke="#2A1B12" stroke-width="24" stroke-linecap="round"></path>
+          <path d="M458 742 Q512 730 566 742 Q556 812 512 816 Q468 812 458 742 Z" fill="#7A3A22"></path>
+          <ellipse cx="512" cy="798" rx="34" ry="18" fill="#E8836B"></ellipse>
+          <use href="#whands"></use>
+        </g>
+      </g>
+    </symbol>
+
+    <symbol id="w-flag" viewBox="0 0 1024 1024">
+      <g clip-path="url(#wclip)">
+        <rect x="12" y="12" width="1000" height="1000" fill="#DF8552"></rect>
+        <g style="animation:wfloat 1.6s ease-in-out infinite; transform-box:fill-box; transform-origin:center">
+          <path d="M512 170 L588 300 L436 300 Z" fill="#F7DC8A" stroke="#6B3A1F" stroke-width="14" stroke-linejoin="round"></path>
+          <circle cx="512" cy="256" r="10" fill="#6B3A1F"></circle>
+          <rect x="504" y="204" width="16" height="34" rx="8" fill="#6B3A1F"></rect>
+        </g>
+        <g style="animation:wwob .9s ease-in-out infinite; transform-box:fill-box; transform-origin:50% 100%">
+          <use href="#wbody"></use>
+          <circle cx="372" cy="672" r="46" fill="#2A1B12"></circle><circle cx="652" cy="672" r="46" fill="#2A1B12"></circle>
+          <circle cx="386" cy="658" r="15" fill="#FFFFFF"></circle><circle cx="666" cy="658" r="15" fill="#FFFFFF"></circle>
+          <path d="M300 596 L420 620 M724 596 L604 620" stroke="#2A1B12" stroke-width="20" stroke-linecap="round"></path>
+          <path d="M470 796 Q512 772 554 796" fill="none" stroke="#7A3A22" stroke-width="20" stroke-linecap="round"></path>
+          <use href="#whands"></use>
+        </g>
+      </g>
+    </symbol>
+
+    <symbol id="w-sleep" viewBox="0 0 1024 1024">
+      <g clip-path="url(#wclip)">
+        <rect x="12" y="12" width="1000" height="1000" fill="#DF8552"></rect>
+        <circle cx="740" cy="380" r="16" fill="#FFF6E4" style="animation:wbub 3.4s infinite; transform-box:fill-box; transform-origin:center"></circle>
+        <circle cx="790" cy="330" r="24" fill="#FFF6E4" style="animation:wbub 3.4s infinite 1.1s; transform-box:fill-box; transform-origin:center"></circle>
+        <circle cx="850" cy="270" r="32" fill="#FFF6E4" style="animation:wbub 3.4s infinite 2.2s; transform-box:fill-box; transform-origin:center"></circle>
+        <g style="animation:wfloat 5s ease-in-out infinite; transform-box:fill-box; transform-origin:center">
+          <use href="#wbody"></use>
+          <use href="#wblush"></use>
+          <path d="M320 666 Q372 706 424 666" fill="none" stroke="#2A1B12" stroke-width="24" stroke-linecap="round"></path>
+          <path d="M600 666 Q652 706 704 666" fill="none" stroke="#2A1B12" stroke-width="24" stroke-linecap="round"></path>
+          <circle cx="512" cy="786" r="18" fill="#7A3A22"></circle>
+          <use href="#whands"></use>
+        </g>
+      </g>
+    </symbol>
+
+    <symbol id="v-journal" viewBox="0 0 1024 1024">
+      <g clip-path="url(#wclip)">
+        <rect x="12" y="12" width="1000" height="1000" fill="#DF8552"></rect>
+        <use href="#wbody"></use>
+        <use href="#wblush"></use>
+        <use href="#weyes"></use>
+        <path d="M458 742 Q512 730 566 742 Q556 812 512 816 Q468 812 458 742 Z" fill="#7A3A22"></path>
+        <ellipse cx="512" cy="798" rx="34" ry="18" fill="#E8836B"></ellipse>
+        <use href="#whands"></use>
+        <g transform="translate(668,1000) rotate(-32)">
+          <rect x="-18" y="-160" width="36" height="160" rx="8" fill="#E8A23F" stroke="#6B3A1F" stroke-width="12"></rect>
+          <path d="M-18 -160 L0 -204 L18 -160 Z" fill="#F4DDB8" stroke="#6B3A1F" stroke-width="12" stroke-linejoin="round"></path>
+        </g>
+      </g>
+    </symbol>
+
+    <symbol id="v-work" viewBox="0 0 1024 1024">
+      <g clip-path="url(#wclip)">
+        <rect x="12" y="12" width="1000" height="1000" fill="#A08D77"></rect>
+        <use href="#wbody"></use>
+        <circle cx="372" cy="672" r="40" fill="#2A1B12"></circle><circle cx="652" cy="672" r="40" fill="#2A1B12"></circle>
+        <circle cx="384" cy="660" r="12" fill="#FFFFFF"></circle><circle cx="664" cy="660" r="12" fill="#FFFFFF"></circle>
+        <circle cx="372" cy="672" r="76" fill="none" stroke="#3A2A1E" stroke-width="16"></circle>
+        <circle cx="652" cy="672" r="76" fill="none" stroke="#3A2A1E" stroke-width="16"></circle>
+        <path d="M448 664 Q512 640 576 664" fill="none" stroke="#3A2A1E" stroke-width="16"></path>
+        <path d="M462 782 Q512 806 562 782" fill="none" stroke="#7A3A22" stroke-width="22" stroke-linecap="round"></path>
+        <path d="M512 862 L558 912 L512 998 L466 912 Z" fill="#8A4A36" stroke="#6B3A1F" stroke-width="12" stroke-linejoin="round"></path>
+        <use href="#whands"></use>
+      </g>
+    </symbol>
+
+    <symbol id="v-ideas" viewBox="0 0 1024 1024">
+      <g clip-path="url(#wclip)">
+        <rect x="12" y="12" width="1000" height="1000" fill="#E2BC6F"></rect>
+        <use href="#wbody"></use>
+        <use href="#wblush"></use>
+        <path d="M372 610 Q384 660 434 672 Q384 684 372 734 Q360 684 310 672 Q360 660 372 610 Z" fill="#2A1B12"></path>
+        <path d="M652 610 Q664 660 714 672 Q664 684 652 734 Q640 684 590 672 Q640 660 652 610 Z" fill="#2A1B12"></path>
+        <path d="M458 742 Q512 730 566 742 Q556 812 512 816 Q468 812 458 742 Z" fill="#7A3A22"></path>
+        <ellipse cx="512" cy="798" rx="34" ry="18" fill="#E8836B"></ellipse>
+        <circle cx="236" cy="286" r="64" fill="#F7DC8A" stroke="#6B3A1F" stroke-width="14"></circle>
+        <rect x="212" y="344" width="48" height="36" rx="10" fill="#A08D77" stroke="#6B3A1F" stroke-width="12"></rect>
+        <path d="M236 176 V140 M330 220 L356 194 M142 220 L116 194" stroke="#6B3A1F" stroke-width="14" stroke-linecap="round"></path>
+        <use href="#whands"></use>
+      </g>
+    </symbol>
+
+    <symbol id="v-study" viewBox="0 0 1024 1024">
+      <g clip-path="url(#wclip)">
+        <rect x="12" y="12" width="1000" height="1000" fill="#ABB894"></rect>
+        <use href="#wbody"></use>
+        <use href="#wblush"></use>
+        <use href="#weyes"></use>
+        <path d="M460 764 Q512 806 564 764" fill="none" stroke="#7A3A22" stroke-width="22" stroke-linecap="round"></path>
+        <path d="M512 330 L716 404 L512 478 L308 404 Z" fill="#4A3A2E" stroke="#2A1B12" stroke-width="12" stroke-linejoin="round"></path>
+        <path d="M716 404 L738 520" stroke="#E2BC6F" stroke-width="12" stroke-linecap="round"></path>
+        <circle cx="738" cy="534" r="18" fill="#E2BC6F" stroke="#6B3A1F" stroke-width="10"></circle>
+        <use href="#whands"></use>
+      </g>
+    </symbol>
+
+    <symbol id="v-reading" viewBox="0 0 1024 1024">
+      <g clip-path="url(#wclip)">
+        <rect x="12" y="12" width="1000" height="1000" fill="#BFA37E"></rect>
+        <use href="#wbody"></use>
+        <use href="#wblush"></use>
+        <path d="M320 678 Q372 636 424 678" fill="none" stroke="#2A1B12" stroke-width="24" stroke-linecap="round"></path>
+        <path d="M600 678 Q652 636 704 678" fill="none" stroke="#2A1B12" stroke-width="24" stroke-linecap="round"></path>
+        <path d="M470 768 Q512 794 554 768" fill="none" stroke="#7A3A22" stroke-width="20" stroke-linecap="round"></path>
+        <use href="#whands"></use>
+        <path d="M352 938 Q432 902 512 938 Q592 902 672 938 L672 1070 Q592 1034 512 1070 Q432 1034 352 1070 Z" fill="#FDF8EC" stroke="#6B3A1F" stroke-width="16" stroke-linejoin="round"></path>
+        <path d="M512 938 V1070" stroke="#6B3A1F" stroke-width="12"></path>
+      </g>
+    </symbol>
+
+    <symbol id="v-plants" viewBox="0 0 1024 1024">
+      <g clip-path="url(#wclip)">
+        <rect x="12" y="12" width="1000" height="1000" fill="#93A582"></rect>
+        <use href="#wbody"></use>
+        <path d="M512 452 Q506 400 512 366" fill="none" stroke="#4A6A3A" stroke-width="18" stroke-linecap="round"></path>
+        <ellipse cx="462" cy="352" rx="50" ry="27" fill="#7FA06A" stroke="#4A6A3A" stroke-width="12" transform="rotate(-32 462 352)"></ellipse>
+        <ellipse cx="562" cy="352" rx="50" ry="27" fill="#7FA06A" stroke="#4A6A3A" stroke-width="12" transform="rotate(32 562 352)"></ellipse>
+        <use href="#wblush"></use>
+        <use href="#weyes"></use>
+        <path d="M458 742 Q512 730 566 742 Q556 812 512 816 Q468 812 458 742 Z" fill="#7A3A22"></path>
+        <ellipse cx="512" cy="798" rx="34" ry="18" fill="#E8836B"></ellipse>
+        <use href="#whands"></use>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="{{ themeClass }}" style="display:flex; height:100vh; overflow:hidden; position:relative; background:var(--background); color:var(--foreground); font-size:14px;">
+
+  <!-- SIDEBAR -->
+  <sc-if value="{{ sidebarOpen }}" hint-placeholder-val="{{ true }}">
+  <aside style="width:248px; flex:none; display:flex; flex-direction:column; border-right:1px solid var(--border); background:var(--muted);">
+    <div style="display:flex; align-items:center; gap:7px; padding:12px 10px 2px 14px;" data-comment-anchor="b93a0adad0-div">
+      <span style="width:12px; height:12px; border-radius:999px; background:#ff5f57;"></span>
+      <span style="width:12px; height:12px; border-radius:999px; background:#febc2e;"></span>
+      <span style="width:12px; height:12px; border-radius:999px; background:#28c840;"></span>
+      <span style="flex:1;"></span>
+      <button onClick="{{ goBack }}" title="Back" style="display:flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:7px; border:0; background:transparent; color:var(--muted-foreground); cursor:pointer;" style-hover="background:var(--accent); color:var(--foreground)">
+        <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="arrow-left" size="{{ s14 }}" hint-size="14px,14px"></x-import>
+      </button>
+      <button onClick="{{ openUntitled }}" title="New page" style="display:flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:7px; border:0; background:transparent; color:var(--muted-foreground); cursor:pointer;" style-hover="background:var(--accent); color:var(--foreground)">
+        <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="square-pen" size="{{ s14 }}" hint-size="14px,14px"></x-import>
+      </button>
+      <button onClick="{{ toggleSidebar }}" title="Collapse sidebar" style="display:flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:7px; border:0; background:transparent; color:var(--muted-foreground); cursor:pointer;" style-hover="background:var(--accent); color:var(--foreground)">
+        <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="panel-left-close" size="{{ s14 }}" hint-size="14px,14px"></x-import>
+      </button>
+    </div>
+    <div style="position:relative; padding:6px 8px 4px;">
+      <button onClick="{{ toggleWs }}" style="display:flex; align-items:center; gap:8px; width:100%; padding:6px; border:0; border-radius:10px; background:{{ wsBtnBg }}; color:var(--foreground); font:inherit; cursor:pointer; text-align:left;" style-hover="background:var(--accent)">
+        <sc-if value="{{ wsVault }}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 1024 1024" style="width:26px; height:26px; border-radius:8px; display:block; flex:none;"><use href="{{ wsVault }}"></use></svg></sc-if>
+        <span style="min-width:0;">
+          <span style="display:block; font-weight:600; letter-spacing:-0.01em; font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ wsName }}</span>
+          <span style="display:block; font-size:11px; color:var(--muted-foreground);">{{ wsMeta }}</span>
+        </span>
+        <span style="margin-left:auto; opacity:.5; display:flex;">
+          <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="chevrons-up-down" size="{{ s14 }}" hint-size="14px,14px"></x-import>
+        </span>
+      </button>
+      <sc-if value="{{ wsOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute; left:8px; right:8px; top:48px; z-index:70; background:var(--popover); border:1px solid var(--border); border-radius:12px; box-shadow:0 8px 28px rgba(0,0,0,.16); padding:5px; animation:vfade .12s ease both;">
+          <div style="padding:6px 8px 3px; font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--muted-foreground);">Workspaces</div>
+          <sc-for list="{{ workspaces }}" as="w" hint-placeholder-count="2">
+            <button onClick="{{ w.pick }}" style="display:flex; align-items:center; gap:9px; width:100%; height:34px; padding:0 8px; border:0; border-radius:8px; background:transparent; color:var(--foreground); font:inherit; font-size:13px; text-align:left; cursor:pointer;" style-hover="background:var(--accent)">
+              <sc-if value="{{ w.vault }}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 1024 1024" style="width:20px; height:20px; border-radius:6px; display:block; flex:none;"><use href="{{ w.vault }}"></use></svg></sc-if>
+              <span style="flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ w.name }}</span>
+              <sc-if value="{{ w.active }}" hint-placeholder-val="{{ false }}">
+                <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="check" size="{{ s14 }}" hint-size="14px,14px"></x-import>
+              </sc-if>
+            </button>
+          </sc-for>
+          <div style="height:1px; background:var(--border); margin:5px 4px;"></div>
+          <button onClick="{{ openNewWs }}" style="display:flex; align-items:center; gap:9px; width:100%; height:32px; padding:0 8px; border:0; border-radius:8px; background:transparent; color:var(--muted-foreground); font:inherit; font-size:13px; text-align:left; cursor:pointer;" style-hover="background:var(--accent)">
+            <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="plus" size="{{ s14 }}" hint-size="14px,14px"></x-import>Create workspace</button>
+        </div>
+      </sc-if>
+    </div>
+
+    <div style="padding:0 10px 10px;">
+      <button onClick="{{ openPalette }}" style="width:100%; display:flex; align-items:center; gap:8px; height:32px; padding:0 8px; border-radius:10px; border:1px solid var(--border); background:var(--background); color:var(--muted-foreground); font:inherit; font-size:13px; cursor:pointer;" style-hover="border-color:var(--muted-foreground)">
+        <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="search" size="{{ s14 }}" hint-size="14px,14px"></x-import>
+        <span>Search…</span>
+        <span style="margin-left:auto;">
+          <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Kbd" hint-size="auto,18px">⌘K</x-import>
+        </span>
+      </button>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:1px; padding:0 8px;">
+      <button onClick="{{ goDashboard }}" style="display:flex; align-items:center; gap:9px; height:30px; padding:0 8px; border:0; border-radius:8px; font:inherit; font-size:13px; cursor:pointer; text-align:left; background:{{ navDash.bg }}; color:{{ navDash.fg }}; font-weight:{{ navDash.fw }};" style-hover="background:var(--accent)">
+        <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="layout-dashboard" size="{{ s15 }}" hint-size="15px,15px"></x-import>Dashboard</button>
+      <button onClick="{{ goGraph }}" style="display:flex; align-items:center; gap:9px; height:30px; padding:0 8px; border:0; border-radius:8px; font:inherit; font-size:13px; cursor:pointer; text-align:left; background:{{ navGraph.bg }}; color:{{ navGraph.fg }}; font-weight:{{ navGraph.fw }};" style-hover="background:var(--accent)">
+        <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="git-fork" size="{{ s15 }}" hint-size="15px,15px"></x-import>Graph</button>
+      <button onClick="{{ goSettings }}" style="display:flex; align-items:center; gap:9px; height:30px; padding:0 8px; border:0; border-radius:8px; font:inherit; font-size:13px; cursor:pointer; text-align:left; background:{{ navSettings.bg }}; color:{{ navSettings.fg }}; font-weight:{{ navSettings.fw }};" style-hover="background:var(--accent)">
+        <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="settings" size="{{ s15 }}" hint-size="15px,15px"></x-import>Settings</button>
+    </div>
+
+    <div style="display:flex; align-items:center; gap:6px; padding:18px 16px 6px; font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted-foreground);">Workspace</div>
+
+    <div style="flex:1; overflow-y:auto; padding:0 8px 8px; display:flex; flex-direction:column; gap:1px;">
+      <div style="display:flex; align-items:center; gap:7px; height:28px; padding:0 8px; font-size:13px; color:var(--muted-foreground);">
+        <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="chevron-down" size="{{ s14 }}" hint-size="14px,14px"></x-import>
+        <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="folder-open" size="{{ s15 }}" hint-size="15px,15px"></x-import>
+        <span style="font-weight:500; color:var(--foreground);">Design specs</span>
+        <span style="margin-left:auto; font-size:11px;">3</span>
+      </div>
+
+      <button onClick="{{ openNullbyte }}" style="display:flex; align-items:center; gap:8px; height:29px; padding:0 8px 0 22px; border:0; border-radius:8px; font:inherit; font-size:13px; cursor:pointer; text-align:left; background:{{ pgNullbyte.bg }}; color:{{ pgNullbyte.fg }}; font-weight:{{ pgNullbyte.fw }};" style-hover="background:var(--accent)">
+        <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="file-text" size="{{ s15 }}" hint-size="15px,15px"></x-import>
+        <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Nullbyte terminal</span>
+      </button>
+      <button onClick="{{ openHearth }}" style="display:flex; align-items:center; gap:8px; height:29px; padding:0 8px 0 22px; border:0; border-radius:8px; font:inherit; font-size:13px; cursor:pointer; text-align:left; background:{{ pgHearth.bg }}; color:{{ pgHearth.fg }}; font-weight:{{ pgHearth.fw }};" style-hover="background:var(--accent)">
+        <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="file-text" size="{{ s15 }}" hint-size="15px,15px"></x-import>
+        <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Hearth recipes</span>
+        <span style="margin-left:auto; width:6px; height:6px; border-radius:999px; background:{{ agentColor }}; animation:vpulse 2s infinite;"></span>
+      </button>
+      <button onClick="{{ openSlab }}" style="display:flex; align-items:center; gap:8px; height:29px; padding:0 8px 0 22px; border:0; border-radius:8px; font:inherit; font-size:13px; cursor:pointer; text-align:left; background:{{ pgSlab.bg }}; color:{{ pgSlab.fg }}; font-weight:{{ pgSlab.fw }};" style-hover="background:var(--accent)">
+        <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="file-text" size="{{ s15 }}" hint-size="15px,15px"></x-import>
+        <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">SLAB marketplace</span>
+      </button>
+
+      <div style="display:flex; align-items:center; gap:7px; height:28px; margin-top:6px; padding:0 8px; font-size:13px; color:var(--muted-foreground);">
+        <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="chevron-right" size="{{ s14 }}" hint-size="14px,14px"></x-import>
+        <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="folder" size="{{ s15 }}" hint-size="15px,15px"></x-import>
+        <span style="font-weight:500; color:var(--foreground);">Research</span>
+        <span style="margin-left:auto; font-size:11px;">12</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:7px; height:28px; padding:0 8px; font-size:13px; color:var(--muted-foreground);">
+        <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="chevron-right" size="{{ s14 }}" hint-size="14px,14px"></x-import>
+        <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="folder" size="{{ s15 }}" hint-size="15px,15px"></x-import>
+        <span style="font-weight:500; color:var(--foreground);">Meeting notes</span>
+        <span style="margin-left:auto; font-size:11px;">31</span>
+      </div>
+
+      <button onClick="{{ openUntitled }}" style="display:flex; align-items:center; gap:8px; height:29px; margin-top:6px; padding:0 8px; border:0; border-radius:8px; font:inherit; font-size:13px; cursor:pointer; text-align:left; color:var(--muted-foreground); background:{{ pgUntitled.bg }};" style-hover="background:var(--accent)">
+        <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="plus" size="{{ s14 }}" hint-size="14px,14px"></x-import>New page</button>
+    </div>
+
+    <button onClick="{{ goSettings }}" style="display:flex; align-items:center; gap:8px; width:100%; padding:8px 12px; border:0; border-top:1px solid var(--border); background:transparent; color:var(--muted-foreground); font:inherit; font-size:11.5px; text-align:left; cursor:pointer;" style-hover="background:var(--accent)">
+      <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="{{ syncIcon }}" size="{{ s14 }}" hint-size="14px,14px"></x-import>
+      <span style="flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ syncLabel }}</span>
+      <span style="width:6px; height:6px; border-radius:999px; background:{{ syncDot }}; flex:none;"></span>
+    </button>
+
+    <div style="border-top:1px solid var(--border); padding:10px 12px; position:relative; display:flex; align-items:center; gap:9px;" data-comment-anchor="b7f7de1b90-div">
+      <button onClick="{{ toggleUserMenu }}" style="flex:1; min-width:0; display:flex; align-items:center; gap:9px; padding:4px; margin:-4px; border:0; border-radius:9px; background:transparent; font:inherit; color:var(--foreground); text-align:left; cursor:pointer;" style-hover="background:var(--accent)">
+        <span style="position:relative; flex:none; display:flex;">
+          <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Avatar" size="sm" fallback="MK" hint-size="28px,28px"></x-import>
+          <span style="position:absolute; right:-1px; bottom:-1px; width:9px; height:9px; border-radius:999px; background:{{ syncDot }}; border:2px solid var(--muted);"></span>
+        </span>
+        <span style="min-width:0;">
+          <span style="display:block; font-size:12.5px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Mira Kaneko</span>
+          <span style="display:block; font-size:11px; color:var(--muted-foreground); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ userSub }}</span>
+        </span>
+        <span style="margin-left:auto; opacity:.5; display:flex; flex:none;">
+          <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="chevrons-up-down" size="{{ s13 }}" hint-size="13px,13px"></x-import>
+        </span>
+      </button>
+      <sc-if value="{{ userMenuOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute; left:10px; bottom:52px; width:224px; z-index:70; background:var(--popover); border:1px solid var(--border); border-radius:12px; box-shadow:0 8px 28px rgba(0,0,0,.16); padding:5px; animation:vfade .12s ease both;">
+          <div style="display:flex; align-items:center; gap:9px; padding:8px;">
+            <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Avatar" size="sm" fallback="MK" hint-size="28px,28px"></x-import>
+            <span style="min-width:0;"><span style="display:block; font-size:12.5px; font-weight:500;">Mira Kaneko</span><span style="display:block; font-size:11px; color:var(--muted-foreground);">mira@hollowmoor.net</span></span>
+          </div>
+          <div style="height:1px; background:var(--border); margin:2px 4px 4px;"></div>
+          <div style="display:flex; align-items:center; gap:9px; height:34px; padding:0 8px; font-size:12.5px; color:var(--foreground);">
+            <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="{{ themeIcon }}" size="{{ s14 }}" hint-size="14px,14px"></x-import>
+            <span style="flex:1;">Theme</span>
+            <span style="display:flex; border:1px solid var(--border); border-radius:8px; overflow:hidden;">
+              <button onClick="{{ setThemeLight }}" style="height:24px; padding:0 9px; border:0; font:inherit; font-size:11.5px; cursor:pointer; background:{{ themeSegLight.bg }}; color:{{ themeSegLight.fg }};">Light</button>
+              <button onClick="{{ setThemeDark }}" style="height:24px; padding:0 9px; border:0; border-left:1px solid var(--border); font:inherit; font-size:11.5px; cursor:pointer; background:{{ themeSegDark.bg }}; color:{{ themeSegDark.fg }};">Dark</button>
+            </span>
+          </div>
+          <div style="height:1px; background:var(--border); margin:4px;"></div>
+          <button onClick="{{ goSettingsFromUser }}" style="display:flex; align-items:center; gap:9px; width:100%; height:30px; padding:0 8px; border:0; border-radius:8px; background:transparent; color:var(--foreground); font:inherit; font-size:12.5px; text-align:left; cursor:pointer;" style-hover="background:var(--accent)">
+            <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="user" size="{{ s14 }}" hint-size="14px,14px"></x-import>Profile</button>
+          <button onClick="{{ goSettingsFromUser }}" style="display:flex; align-items:center; gap:9px; width:100%; height:30px; padding:0 8px; border:0; border-radius:8px; background:transparent; color:var(--foreground); font:inherit; font-size:12.5px; text-align:left; cursor:pointer;" style-hover="background:var(--accent)">
+            <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="key-round" size="{{ s14 }}" hint-size="14px,14px"></x-import>Devices &amp; keys</button>
+          <button onClick="{{ goSettingsFromUser }}" style="display:flex; align-items:center; gap:9px; width:100%; height:30px; padding:0 8px; border:0; border-radius:8px; background:transparent; color:var(--foreground); font:inherit; font-size:12.5px; text-align:left; cursor:pointer;" style-hover="background:var(--accent)">
+            <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="settings" size="{{ s14 }}" hint-size="14px,14px"></x-import>Settings</button>
+          <div style="height:1px; background:var(--border); margin:4px;"></div>
+          <button onClick="{{ toggleUserMenu }}" style="display:flex; align-items:center; gap:9px; width:100%; height:30px; padding:0 8px; border:0; border-radius:8px; background:transparent; color:var(--muted-foreground); font:inherit; font-size:12.5px; text-align:left; cursor:pointer;" style-hover="background:var(--accent)">
+            <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="log-out" size="{{ s14 }}" hint-size="14px,14px"></x-import>Lock vault</button>
+        </div>
+      </sc-if>
+    </div>
+  </aside>
+  </sc-if>
+
+  <!-- MAIN -->
+  <main style="flex:1; min-width:0; display:flex; flex-direction:column;">
+    <header style="height:48px; flex:none; display:flex; align-items:center; gap:10px; padding:0 16px; border-bottom:1px solid var(--border);">
+      <sc-if value="{{ sidebarClosed }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex; align-items:center; gap:7px; flex:none;">
+          <span style="width:12px; height:12px; border-radius:999px; background:#ff5f57;"></span>
+          <span style="width:12px; height:12px; border-radius:999px; background:#febc2e;"></span>
+          <span style="width:12px; height:12px; border-radius:999px; background:#28c840;"></span>
+          <button onClick="{{ toggleSidebar }}" title="Show sidebar" style="display:flex; align-items:center; justify-content:center; width:26px; height:26px; margin-left:4px; border-radius:8px; border:0; background:transparent; color:var(--muted-foreground); cursor:pointer;" style-hover="background:var(--accent); color:var(--foreground)">
+            <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="panel-left" size="{{ s15 }}" hint-size="15px,15px"></x-import>
+          </button>
+        </div>
+      </sc-if>
+      <div style="display:flex; align-items:center; gap:7px; font-size:13px; color:var(--muted-foreground); flex:1 1 auto; min-width:0; white-space:nowrap;">
+        <sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}">
+          <span style="flex:0 1 auto; overflow:hidden; text-overflow:ellipsis;">{{ crumbRoot }}</span>
+          <span style="flex:none; opacity:.5;">/</span>
+        </sc-if>
+        <span style="flex:1 1 auto; min-width:0; color:var(--foreground); font-weight:500; overflow:hidden; text-overflow:ellipsis;">{{ crumbLeaf }}</span>
+      </div>
+      <div style="margin-left:auto; flex:none; display:flex; align-items:center; gap:6px;">
+        <sc-if value="{{ pillVisible }}" hint-placeholder-val="{{ true }}">
+          <span style="display:flex; align-items:center; gap:6px; height:26px; padding:0 9px; flex:none; white-space:nowrap; border-radius:999px; border:1px dashed {{ agentColor }}; font-size:12px; color:var(--muted-foreground);">
+            <svg viewBox="0 0 1024 1024" style="width:17px; height:17px; border-radius:5px; display:block; margin-left:-3px;"><use href="#w-idle"></use></svg>{{ agentName }} watching
+          </span>
+        </sc-if>
+        <button onClick="{{ toggleAgent }}" style="display:flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:9px; border:1px solid var(--border); background:var(--background); color:var(--muted-foreground); cursor:pointer;" style-hover="color:var(--foreground)">
+          <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="bot" size="{{ s15 }}" hint-size="15px,15px"></x-import>
+        </button>
+        <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Button" size="sm" hint-size="auto,32px">Share</x-import>
+      </div>
+    </header>
+
+    <div style="flex:1; overflow-y:auto;" data-comment-anchor="b24fef8bf2-div">
+
+      <!-- ===== NOTE: NULLBYTE (hacker) ===== -->
+      <sc-if value="{{ isNullbyte }}" hint-placeholder-val="{{ true }}">
+      <article data-screen-label="Note — Nullbyte" style="max-width:760px; margin:0 auto; padding:56px 40px 30px; animation:vfade .18s ease both;">
+        <div style="display:flex; align-items:center; gap:8px; font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; color:#22c55e; margin-bottom:14px;">
+          <span>~/specs/nullbyte</span><span style="opacity:.4;">·</span><span style="opacity:.7;">v0.4.2</span>
+        </div>
+        <h1 style="margin:0 0 10px; font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:40px; line-height:1.1; font-weight:700; letter-spacing:-0.02em;">nullbyte<span style="color:#22c55e;">_</span></h1>
+        <p style="margin:0 0 22px; font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:14px; color:var(--muted-foreground);">A terminal client for people who never leave the keyboard.</p>
+
+        <div style="display:flex; align-items:center; gap:8px; padding-bottom:20px; margin-bottom:24px; border-bottom:1px solid var(--border);">
+          <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Avatar" size="sm" fallback="MK" hint-size="28px,28px"></x-import>
+          <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Avatar" size="sm" fallback="AR" hint-size="28px,28px"></x-import>
+          <svg viewBox="0 0 1024 1024" style="width:28px; height:28px; border-radius:999px; display:block;"><use href="#w-idle"></use></svg>
+          <span style="font-size:12px; color:var(--muted-foreground); margin-left:4px;">Edited 4 min ago · 38% of this page written by {{ agentName }}</span>
+        </div>
+
+        <div style="background:#0a0a0a; border:1px solid #1f2937; border-radius:10px; padding:16px 18px; font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:13px; line-height:1.7; color:#22c55e; margin-bottom:26px;">
+          <div style="color:#64748b;"># design principles</div>
+          <div>01 &nbsp;every action reachable in ≤ 2 keystrokes</div>
+          <div>02 &nbsp;no chrome that isn't information</div>
+          <div>03 &nbsp;latency is the only aesthetic that matters</div>
+        </div>
+
+        <h2 style="margin:0 0 10px; font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:19px; font-weight:700;">Command surface</h2>
+        <p style="margin:0 0 18px; line-height:1.75; color:var(--foreground);">The palette is the app. Everything — panes, sessions, SSH targets, theme — resolves through a single fuzzy input bound to <code style="font-family:ui-monospace, monospace; font-size:12px; background:var(--muted); border:1px solid var(--border); border-radius:6px; padding:2px 5px;">ctrl-space</code>. Menus exist only as a discoverability fallback and are never the fastest path.</p>
+
+        <!-- agent-authored block -->
+        <sc-if value="{{ showAttribution }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex; align-items:center; gap:7px; margin-bottom:6px; font-size:11px; color:var(--muted-foreground);">
+            <svg viewBox="0 0 1024 1024" style="width:17px; height:17px; border-radius:5px; display:block; flex:none;"><use href="#w-done"></use></svg>
+            Written by {{ agentName }} · from 6 sources in Research
+          </div>
+        </sc-if>
+        <p style="margin:0 0 22px; padding-left:12px; border-left:2px solid {{ agentColor }}; line-height:1.75; color:var(--foreground);">Benchmarks across four competing clients put p99 keystroke-to-glyph latency between 8ms and 41ms. Anything above ~16ms is perceptible during fast repeat input, so the render budget for a frame should be treated as a hard ceiling, not a target.</p>
+
+        <!-- suggested diff -->
+        <sc-if value="{{ suggestionPending }}" hint-placeholder-val="{{ true }}">
+          <div style="border:1px solid {{ agentColor }}; border-radius:12px; overflow:hidden; margin-bottom:22px;">
+            <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:9px 12px; background:var(--muted); border-bottom:1px solid var(--border); font-size:12px;">
+              <svg viewBox="0 0 1024 1024" style="width:18px; height:18px; border-radius:5px; display:block; flex:none;"><use href="#w-suggest"></use></svg>
+              <span style="font-weight:500;">{{ agentName }} suggests an edit</span>
+              <span style="color:var(--muted-foreground);">· tightens the scrollback claim</span>
+              <span style="margin-left:auto; flex:none; display:flex; gap:6px;">
+                <button onClick="{{ rejectSuggestion }}" style="height:26px; padding:0 10px; border-radius:8px; border:1px solid var(--border); background:var(--background); color:var(--foreground); font:inherit; font-size:12px; cursor:pointer;" style-hover="background:var(--accent)">Reject</button>
+                <button onClick="{{ acceptSuggestion }}" style="height:26px; padding:0 10px; border-radius:8px; border:1px solid transparent; background:var(--primary); color:var(--primary-foreground); font:inherit; font-size:12px; font-weight:500; cursor:pointer;" style-hover="opacity:.9">Accept</button>
+              </span>
+            </div>
+            <div style="padding:12px 14px; line-height:1.75; font-size:14px;">
+              <div style="background:rgba(231,0,11,.08); border-radius:6px; padding:4px 8px; margin-bottom:4px; text-decoration:line-through; color:var(--muted-foreground);">Scrollback should be basically infinite so users never lose anything.</div>
+              <div style="background:rgba(34,197,94,.12); border-radius:6px; padding:4px 8px;">Scrollback is capped at 200k lines per pane and spills to a memory-mapped file on disk, so history survives restarts without holding the buffer in RAM.</div>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ suggestionAccepted }}" hint-placeholder-val="{{ false }}">
+          <p style="margin:0 0 22px; line-height:1.75;">Scrollback is capped at 200k lines per pane and spills to a memory-mapped file on disk, so history survives restarts without holding the buffer in RAM.</p>
+        </sc-if>
+        <sc-if value="{{ suggestionRejected }}" hint-placeholder-val="{{ false }}">
+          <p style="margin:0 0 22px; line-height:1.75;">Scrollback should be basically infinite so users never lose anything.</p>
+        </sc-if>
+
+        <h2 style="margin:0 0 10px; font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:19px; font-weight:700;">Open questions</h2>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <label style="display:flex; gap:10px; align-items:flex-start; line-height:1.7;"><input type="checkbox" checked="{{ true }}" readOnly="{{ true }}" style="margin-top:5px;"><span style="color:var(--muted-foreground); text-decoration:line-through;">Ship with tmux keybindings by default?</span></label>
+          <label style="display:flex; gap:10px; align-items:flex-start; line-height:1.7;"><input type="checkbox" style="margin-top:5px;"><span>GPU renderer on Linux — worth the driver support burden?</span></label>
+          <label style="display:flex; gap:10px; align-items:flex-start; line-height:1.7;"><input type="checkbox" style="margin-top:5px;"><span>Ask <span style="background:rgba(43,127,255,.12); color:#2b7fff; border-radius:5px; padding:1px 5px; font-weight:500;">@{{ agentName }}</span> to benchmark ligature rendering cost</span></label>
+        </div>
+      </article>
+      </sc-if>
+
+      <!-- ===== NOTE: HEARTH (cozy) ===== -->
+      <sc-if value="{{ isHearth }}" hint-placeholder-val="{{ false }}">
+      <article data-screen-label="Note — Hearth" style="max-width:700px; margin:0 auto; padding:56px 40px 30px; animation:vfade .18s ease both;">
+        <div style="font-family:Georgia, 'Iowan Old Style', serif; font-style:italic; font-size:14px; color:#b8865b; margin-bottom:12px;">A recipe app that smells like a kitchen</div>
+        <h1 style="margin:0 0 12px; font-family:Georgia, 'Iowan Old Style', serif; font-size:44px; line-height:1.15; font-weight:400; letter-spacing:-0.015em;">Hearth</h1>
+        <p style="margin:0 0 24px; font-family:Georgia, serif; font-size:17px; line-height:1.7; color:var(--muted-foreground);">Slow software. The app should feel like a well-worn cookbook — warm paper, soft corners, nothing blinking for attention.</p>
+
+        <div style="display:flex; align-items:center; gap:8px; padding-bottom:20px; margin-bottom:26px; border-bottom:1px solid var(--border);">
+          <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Avatar" size="sm" fallback="JL" hint-size="28px,28px"></x-import>
+          <span style="font-size:12px; color:var(--muted-foreground);">Jo Lindqvist · edited yesterday</span>
+          <span style="margin-left:auto;">
+            <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Badge" variant="warning" size="sm" pilled="{{ true }}" hint-size="auto,20px">Agent drafting</x-import>
+          </span>
+        </div>
+
+        <div style="background:#faf3e8; border:1px solid #e8d9c3; border-radius:18px; padding:24px 26px; margin-bottom:26px;">
+          <div style="font-family:Georgia, serif; font-size:13px; letter-spacing:.08em; text-transform:uppercase; color:#b8865b; margin-bottom:12px;">Palette</div>
+          <div style="display:flex; gap:10px; margin-bottom:16px;">
+            <span style="width:44px; height:44px; border-radius:14px; background:#f5e6d0;"></span>
+            <span style="width:44px; height:44px; border-radius:14px; background:#e2b887;"></span>
+            <span style="width:44px; height:44px; border-radius:14px; background:#b8865b;"></span>
+            <span style="width:44px; height:44px; border-radius:14px; background:#6b4f3a;"></span>
+            <span style="width:44px; height:44px; border-radius:14px; background:#7d8f69;"></span>
+          </div>
+          <p style="margin:0; font-family:Georgia, serif; font-size:16px; line-height:1.8; color:#4a3a2c;">Nothing is pure white and nothing is pure black. Cards sit on cream at 18px radius with a 1px oat-colored hairline — no drop shadows, because paper doesn't float.</p>
+        </div>
+
+        <h2 style="margin:0 0 10px; font-family:Georgia, serif; font-size:24px; font-weight:400;">Cooking mode</h2>
+        <p style="margin:0 0 20px; font-family:Georgia, serif; font-size:16px; line-height:1.8;">One step at a time, type at 22px minimum, screen stays awake, and a thumb-sized "next" target in the bottom third of the screen. Timers are inline with the step that needs them — never a separate tab.</p>
+
+        <sc-if value="{{ showAttribution }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex; align-items:center; gap:7px; margin-bottom:6px; font-size:11px; color:var(--muted-foreground);">
+            <svg viewBox="0 0 1024 1024" style="width:17px; height:17px; border-radius:5px; display:block; flex:none;"><use href="#w-write"></use></svg>
+            Drafted by {{ agentName }} · 2 min ago · not yet reviewed
+          </div>
+        </sc-if>
+        <p style="margin:0 0 24px; padding-left:12px; border-left:2px solid {{ agentColor }}; font-family:Georgia, serif; font-size:16px; line-height:1.8;">Accessibility note: the cream-on-brown pairing above measures 4.7:1, which clears AA for body text but fails AA-large for the 13px uppercase labels. Suggest darkening the label color to #8a5f38 — I can apply this everywhere it appears.</p>
+
+        <blockquote style="margin:0; padding:16px 20px; border-left:3px solid #e2b887; font-family:Georgia, serif; font-style:italic; font-size:17px; line-height:1.7; color:var(--muted-foreground);">"If the interface makes a sound, it should be the sound of a page turning."</blockquote>
+      </article>
+      </sc-if>
+
+      <!-- ===== NOTE: SLAB (brutalist) ===== -->
+      <sc-if value="{{ isSlab }}" hint-placeholder-val="{{ false }}">
+      <article data-screen-label="Note — SLAB" style="max-width:780px; margin:0 auto; padding:56px 40px 30px; animation:vfade .18s ease both;">
+        <div style="border:3px solid var(--foreground); padding:20px 22px; margin-bottom:26px;">
+          <div style="font-size:11px; font-weight:800; letter-spacing:.22em; text-transform:uppercase; margin-bottom:10px;">Spec / 003 / Marketplace</div>
+          <h1 style="margin:0; font-size:56px; line-height:.92; font-weight:800; letter-spacing:-0.04em; text-transform:uppercase;">SLAB</h1>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:26px;">
+          <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Avatar" size="sm" fallback="RV" shape="square" hint-size="28px,28px"></x-import>
+          <span style="font-size:12px; color:var(--muted-foreground); text-transform:uppercase; letter-spacing:.08em;">Rui Vargas · 6 revisions</span>
+        </div>
+
+        <p style="margin:0 0 24px; font-size:18px; line-height:1.55; font-weight:500;">No radius. No shadow. No gradient. Structure carries all the meaning: hairlines become 2–3px rules, and hierarchy is made with size and weight only.</p>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; border:2px solid var(--foreground); margin-bottom:26px;">
+          <div style="padding:16px; border-right:2px solid var(--foreground);"><div style="font-size:32px; font-weight:800; letter-spacing:-0.03em;">02</div><div style="font-size:11px; text-transform:uppercase; letter-spacing:.12em; color:var(--muted-foreground);">Type sizes</div></div>
+          <div style="padding:16px; border-right:2px solid var(--foreground);"><div style="font-size:32px; font-weight:800; letter-spacing:-0.03em;">01</div><div style="font-size:11px; text-transform:uppercase; letter-spacing:.12em; color:var(--muted-foreground);">Accent color</div></div>
+          <div style="padding:16px;"><div style="font-size:32px; font-weight:800; letter-spacing:-0.03em;">00</div><div style="font-size:11px; text-transform:uppercase; letter-spacing:.12em; color:var(--muted-foreground);">Rounded corners</div></div>
+        </div>
+
+        <h2 style="margin:0 0 12px; font-size:13px; font-weight:800; letter-spacing:.18em; text-transform:uppercase;">Listing grid</h2>
+        <p style="margin:0 0 24px; font-size:16px; line-height:1.7;">Four columns on desktop, two on tablet, one on phone. Images are square, cropped hard, never rounded. Price sits in 800 weight at the same size as the title — the buyer's eye should land on both at once.</p>
+
+        <sc-if value="{{ showAttribution }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex; align-items:center; gap:7px; margin-bottom:6px; font-size:11px; color:var(--muted-foreground);">
+            <svg viewBox="0 0 1024 1024" style="width:17px; height:17px; display:block; flex:none;"><use href="#w-flag"></use></svg>
+            Written by {{ agentName }} · scheduled run, 06:00
+          </div>
+        </sc-if>
+        <p style="margin:0 0 24px; padding-left:12px; border-left:3px solid {{ agentColor }}; font-size:16px; line-height:1.7;">Overnight check: 3 of the 11 components in this spec conflict with the shared token set — Button, Chip and Card all override radius to 0. Recommend forking a <span style="background:var(--muted); border:1px solid var(--border); padding:1px 5px; font-size:14px;">slab-*</span> theme rather than overriding per component.</p>
+
+        <div style="border-top:2px solid var(--foreground); padding-top:14px; font-size:11px; text-transform:uppercase; letter-spacing:.14em; color:var(--muted-foreground);">Linked · <a href="#">Nullbyte terminal</a> · <a href="#">Token audit Q3</a></div>
+      </article>
+      </sc-if>
+
+      <!-- ===== EMPTY / NEW PAGE ===== -->
+      <sc-if value="{{ isUntitled }}" hint-placeholder-val="{{ false }}">
+      <article data-screen-label="Empty note" style="max-width:720px; margin:0 auto; padding:88px 40px 30px; animation:vfade .18s ease both;">
+        <h1 style="margin:0 0 8px; font-size:40px; font-weight:700; letter-spacing:-0.03em; color:var(--muted-foreground); opacity:.45;">Untitled</h1>
+        <p style="margin:0 0 32px; font-size:16px; color:var(--muted-foreground); opacity:.7;">Start writing, or press <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Kbd" hint-size="auto,18px">/</x-import> for blocks.</p>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <button onClick="{{ openSlash }}" style="display:flex; align-items:center; gap:10px; padding:14px; border:1px solid var(--border); border-radius:12px; background:var(--card); color:var(--foreground); font:inherit; text-align:left; cursor:pointer;" style-hover="background:var(--accent)">
+            <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="type" size="{{ s18 }}" hint-size="18px,18px"></x-import>
+            <span><span style="font-weight:500; display:block;">Blank page</span><span style="font-size:12px; color:var(--muted-foreground);">Write it yourself</span></span>
+          </button>
+          <button onClick="{{ askAgentDraft }}" style="display:flex; align-items:center; gap:10px; padding:14px; border:1px solid {{ agentColor }}; border-radius:12px; background:var(--card); color:var(--foreground); font:inherit; text-align:left; cursor:pointer;" style-hover="background:var(--accent)">
+            <svg viewBox="0 0 1024 1024" style="width:20px; height:20px; border-radius:6px; display:block; flex:none;"><use href="#w-suggest"></use></svg>
+            <span><span style="font-weight:500; display:block;">Ask {{ agentName }} to draft</span><span style="font-size:12px; color:var(--muted-foreground);">From your Research folder</span></span>
+          </button>
+        </div>
+      </article>
+      </sc-if>
+
+      <!-- shared "new block" affordance + slash menu -->
+      <sc-if value="{{ isNote }}" hint-placeholder-val="{{ true }}">
+        <div style="max-width:760px; margin:0 auto; padding:10px 40px 80px; position:relative;">
+          <button onClick="{{ openSlash }}" style="display:flex; align-items:center; gap:8px; width:100%; height:34px; padding:0 4px; border:0; background:transparent; color:var(--muted-foreground); font:inherit; font-size:14px; cursor:text; text-align:left; opacity:.55;" style-hover="opacity:1">
+            <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="plus" size="{{ s16 }}" hint-size="16px,16px"></x-import>
+            Type <span style="font-family:ui-monospace, monospace;">/</span> for commands, <span style="font-family:ui-monospace, monospace;">@</span> to call an agent
+          </button>
+          <sc-if value="{{ slashOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute; left:40px; top:44px; width:290px; z-index:40; background:var(--popover); border:1px solid var(--border); border-radius:12px; box-shadow:var(--shadow-md, 0 4px 16px rgba(0,0,0,.12)); padding:6px; animation:vfade .12s ease both;">
+              <div style="padding:6px 8px 4px; font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--muted-foreground);">Blocks</div>
+              <sc-for list="{{ slashItems }}" as="item" hint-placeholder-count="5">
+                <button onClick="{{ closeSlash }}" style="display:flex; align-items:center; gap:10px; width:100%; height:32px; padding:0 8px; border:0; border-radius:8px; background:transparent; color:var(--foreground); font:inherit; font-size:13px; text-align:left; cursor:pointer;" style-hover="background:var(--accent)">
+                  <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="{{ item.icon }}" size="{{ s15 }}" hint-size="15px,15px"></x-import>
+                  {{ item.label }}
+                  <span style="margin-left:auto; font-size:11px; color:var(--muted-foreground);">{{ item.hint }}</span>
+                </button>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <!-- ===== DASHBOARD ===== -->
+      <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="Dashboard" style="max-width:940px; margin:0 auto; padding:44px 40px 60px; animation:vfade .18s ease both;">
+        <h1 style="margin:0 0 4px; font-size:28px; font-weight:600; letter-spacing:-0.02em;">Good morning, Mira</h1>
+        <p style="margin:0 0 28px; color:var(--muted-foreground);">{{ agentName }} made 7 edits across 3 pages while you were away.</p>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:14px; margin-bottom:30px;">
+          <div style="border:1px solid var(--border); border-radius:14px; padding:16px 18px; background:var(--card);">
+            <div style="font-size:12px; color:var(--muted-foreground); margin-bottom:6px;">Pages</div>
+            <div style="font-size:26px; font-weight:600; letter-spacing:-0.02em;">46</div>
+          </div>
+          <div style="border:1px solid var(--border); border-radius:14px; padding:16px 18px; background:var(--card);">
+            <div style="font-size:12px; color:var(--muted-foreground); margin-bottom:6px;">Awaiting review</div>
+            <div style="font-size:26px; font-weight:600; letter-spacing:-0.02em; color:{{ agentColor }};">4</div>
+          </div>
+          <div style="border:1px solid var(--border); border-radius:14px; padding:16px 18px; background:var(--card);">
+            <div style="font-size:12px; color:var(--muted-foreground); margin-bottom:6px;">Written by agents</div>
+            <div style="font-size:26px; font-weight:600; letter-spacing:-0.02em;">31%</div>
+          </div>
+          <div style="border:1px solid var(--border); border-radius:14px; padding:16px 18px; background:var(--card);">
+            <div style="font-size:12px; color:var(--muted-foreground); margin-bottom:6px;">Writing streak</div>
+            <div style="font-size:26px; font-weight:600; letter-spacing:-0.02em;">12<span style="font-size:13px; font-weight:500; color:var(--muted-foreground);"> days</span></div>
+          </div>
+        </div>
+
+        <div style="border:1px solid var(--border); border-radius:14px; background:var(--card); margin-bottom:30px; overflow:hidden;">
+          <div style="display:flex; align-items:center; gap:8px; padding:12px 18px; border-bottom:1px solid var(--border);">
+            <span style="font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--muted-foreground);">Needs your review</span>
+            <span style="display:inline-flex; align-items:center; justify-content:center; min-width:18px; height:18px; padding:0 5px; border-radius:999px; background:{{ agentColor }}; color:#fff; font-size:11px; font-weight:600;">{{ reviewCount }}</span>
+          </div>
+          <sc-for list="{{ reviews }}" as="r" hint-placeholder-count="3">
+            <div style="display:flex; flex-wrap:wrap; align-items:center; gap:10px; padding:11px 18px; border-bottom:1px solid var(--border);">
+              <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="{{ r.icon }}" size="{{ s15 }}" hint-size="15px,15px"></x-import>
+              <span style="flex:1 1 240px; min-width:0;">
+                <span style="display:block; font-size:13px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ r.title }}</span>
+                <span style="display:block; font-size:11.5px; color:var(--muted-foreground);">{{ r.meta }}</span>
+              </span>
+              <span style="flex:none; display:flex; gap:6px;">
+                <button onClick="{{ r.dismiss }}" style="height:26px; padding:0 10px; border-radius:8px; border:1px solid var(--border); background:var(--background); color:var(--foreground); font:inherit; font-size:12px; cursor:pointer;" style-hover="background:var(--accent)">Dismiss</button>
+                <button onClick="{{ r.review }}" style="height:26px; padding:0 10px; border-radius:8px; border:0; background:var(--primary); color:var(--primary-foreground); font:inherit; font-size:12px; font-weight:500; cursor:pointer;" style-hover="opacity:.9">Review</button>
+              </span>
+            </div>
+          </sc-for>
+          <sc-if value="{{ reviewsEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; align-items:center; gap:10px; padding:14px 18px; font-size:13px; color:var(--muted-foreground);">
+              <svg viewBox="0 0 1024 1024" style="width:22px; height:22px; border-radius:7px; display:block;"><use href="#w-done"></use></svg>All caught up — nothing waiting on you.
+            </div>
+          </sc-if>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:26px;">
+          <div>
+            <div style="font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--muted-foreground); margin-bottom:10px;">Recent pages</div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <button onClick="{{ openNullbyte }}" style="display:flex; align-items:center; gap:12px; padding:13px 15px; border:1px solid var(--border); border-radius:12px; background:var(--card); color:var(--foreground); font:inherit; text-align:left; cursor:pointer;" style-hover="background:var(--accent)">
+                <span style="font-family:ui-monospace, monospace; font-size:13px; color:#22c55e;">&gt;_</span>
+                <span style="flex:1; min-width:0;"><span style="display:block; font-weight:500;">Nullbyte terminal</span><span style="font-size:12px; color:var(--muted-foreground);">1 suggestion pending · 4 min ago</span></span>
+                <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Badge" variant="secondary" size="sm" hint-size="auto,20px">Spec</x-import>
+              </button>
+              <button onClick="{{ openHearth }}" style="display:flex; align-items:center; gap:12px; padding:13px 15px; border:1px solid var(--border); border-radius:12px; background:var(--card); color:var(--foreground); font:inherit; text-align:left; cursor:pointer;" style-hover="background:var(--accent)">
+                <span style="font-size:13px; color:#b8865b;">✿</span>
+                <span style="flex:1; min-width:0;"><span style="display:block; font-weight:500;">Hearth recipes</span><span style="font-size:12px; color:var(--muted-foreground);">Agent drafting · yesterday</span></span>
+                <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Badge" variant="secondary" size="sm" hint-size="auto,20px">Spec</x-import>
+              </button>
+              <button onClick="{{ openSlab }}" style="display:flex; align-items:center; gap:12px; padding:13px 15px; border:1px solid var(--border); border-radius:12px; background:var(--card); color:var(--foreground); font:inherit; text-align:left; cursor:pointer;" style-hover="background:var(--accent)">
+                <span style="font-size:12px; font-weight:800;">▮</span>
+                <span style="flex:1; min-width:0;"><span style="display:block; font-weight:500;">SLAB marketplace</span><span style="font-size:12px; color:var(--muted-foreground);">Scheduled run finished · 06:00</span></span>
+                <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Badge" variant="secondary" size="sm" hint-size="auto,20px">Spec</x-import>
+              </button>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--muted-foreground); margin-bottom:10px;">Agent activity</div>
+            <div style="display:flex; flex-direction:column; gap:14px; padding-left:4px;">
+              <sc-for list="{{ activity }}" as="a" hint-placeholder-count="4">
+                <div style="display:flex; gap:10px;">
+                  <span style="width:6px; height:6px; margin-top:6px; border-radius:999px; background:{{ agentColor }}; flex:none;"></span>
+                  <div><div style="font-size:13px; line-height:1.5;">{{ a.text }}</div><div style="font-size:11px; color:var(--muted-foreground);">{{ a.when }}</div></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </section>
+      </sc-if>
+
+      <!-- ===== GRAPH ===== -->
+      <sc-if value="{{ isGraph }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="Graph" style="height:100%; position:relative; animation:vfade .18s ease both;">
+        <div style="position:absolute; inset:0; background-image:radial-gradient(var(--border) 1px, transparent 1px); background-size:22px 22px; opacity:.6;"></div>
+        <div style="position:absolute; left:24px; top:20px; z-index:2; display:flex; gap:8px; align-items:center;">
+          <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Badge" variant="outline" size="sm" hint-size="auto,20px">46 pages</x-import>
+          <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Badge" variant="outline" size="sm" hint-size="auto,20px">118 links</x-import>
+          <span style="display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--muted-foreground); margin-left:6px;"><span style="width:8px; height:8px; border-radius:999px; background:{{ agentColor }};"></span>agent-touched</span>
+        </div>
+        <svg viewBox="0 0 900 520" style="position:absolute; inset:0; width:100%; height:100%;">
+          <g stroke="var(--border)" stroke-width="1.5" fill="none">
+            <path d="M450 260 L300 160"></path><path d="M450 260 L640 170"></path><path d="M450 260 L360 390"></path>
+            <path d="M450 260 L620 380"></path><path d="M300 160 L180 250"></path><path d="M640 170 L760 260"></path>
+            <path d="M360 390 L240 430"></path><path d="M620 380 L700 450"></path><path d="M300 160 L640 170"></path>
+          </g>
+        </svg>
+        <div style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:3; display:flex; flex-direction:column; align-items:center; gap:6px;">
+          <span style="width:20px; height:20px; border-radius:999px; background:var(--foreground);"></span>
+          <span style="font-size:12px; font-weight:600;">Design specs</span>
+        </div>
+        <div style="position:absolute; left:33.3%; top:30.7%; z-index:3; display:flex; flex-direction:column; align-items:center; gap:5px;">
+          <span style="width:14px; height:14px; border-radius:999px; background:{{ agentColor }};"></span>
+          <span style="font-size:11px;">Nullbyte</span>
+        </div>
+        <div style="position:absolute; left:71%; top:32.6%; z-index:3; display:flex; flex-direction:column; align-items:center; gap:5px;">
+          <span style="width:14px; height:14px; border-radius:999px; background:{{ agentColor }};"></span>
+          <span style="font-size:11px;">Hearth</span>
+        </div>
+        <div style="position:absolute; left:40%; top:75%; z-index:3; display:flex; flex-direction:column; align-items:center; gap:5px;">
+          <span style="width:12px; height:12px; border-radius:999px; background:var(--muted-foreground);"></span>
+          <span style="font-size:11px;">SLAB</span>
+        </div>
+        <div style="position:absolute; left:68.8%; top:73%; z-index:3; display:flex; flex-direction:column; align-items:center; gap:5px;">
+          <span style="width:11px; height:11px; border-radius:999px; background:var(--muted-foreground);"></span>
+          <span style="font-size:11px; color:var(--muted-foreground);">Token audit</span>
+        </div>
+        <div style="position:absolute; left:20%; top:48%; z-index:3; display:flex; flex-direction:column; align-items:center; gap:5px;">
+          <span style="width:10px; height:10px; border-radius:999px; background:var(--muted-foreground);"></span>
+          <span style="font-size:11px; color:var(--muted-foreground);">Latency refs</span>
+        </div>
+        <div style="position:absolute; left:84.4%; top:50%; z-index:3; display:flex; flex-direction:column; align-items:center; gap:5px;">
+          <span style="width:10px; height:10px; border-radius:999px; background:var(--muted-foreground);"></span>
+          <span style="font-size:11px; color:var(--muted-foreground);">Research</span>
+        </div>
+        <div style="position:absolute; left:26.6%; top:82.7%; z-index:3; display:flex; flex-direction:column; align-items:center; gap:5px;">
+          <span style="width:9px; height:9px; border-radius:999px; background:var(--muted-foreground);"></span>
+          <span style="font-size:11px; color:var(--muted-foreground);">Kitchen trip</span>
+        </div>
+        <div style="position:absolute; left:77.7%; top:86.5%; z-index:3; display:flex; flex-direction:column; align-items:center; gap:5px;">
+          <span style="width:9px; height:9px; border-radius:999px; background:var(--muted-foreground);"></span>
+          <span style="font-size:11px; color:var(--muted-foreground);">Pricing</span>
+        </div>
+      </section>
+      </sc-if>
+
+      <!-- ===== SETTINGS ===== -->
+      <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="Settings" style="max-width:680px; margin:0 auto; padding:44px 40px 60px; animation:vfade .18s ease both;">
+        <h1 style="margin:0 0 4px; font-size:24px; font-weight:600; letter-spacing:-0.02em;">Settings</h1>
+        <p style="margin:0 0 22px; color:var(--muted-foreground);">{{ setTabDesc }}</p>
+
+        <div style="display:flex; gap:4px; border-bottom:1px solid var(--border); margin-bottom:26px;">
+          <sc-for list="{{ setTabs }}" as="t" hint-placeholder-count="4">
+            <button onClick="{{ t.pick }}" style="display:flex; align-items:center; gap:7px; height:36px; padding:0 12px; border:0; border-bottom:2px solid {{ t.line }}; margin-bottom:-1px; background:transparent; color:{{ t.fg }}; font:inherit; font-size:13px; font-weight:500; cursor:pointer;" style-hover="color:var(--foreground)">
+              <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="{{ t.icon }}" size="{{ s14 }}" hint-size="14px,14px"></x-import>{{ t.label }}
+            </button>
+          </sc-for>
+        </div>
+
+        <!-- General -->
+        <sc-if value="{{ setGeneral }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex; flex-direction:column; gap:22px; animation:vfade .14s ease both;">
+            <div style="border:1px solid var(--border); border-radius:14px; background:var(--card); overflow:hidden;">
+              <div style="display:flex; flex-wrap:wrap; align-items:center; gap:16px; padding:16px 18px; border-bottom:1px solid var(--border);">
+                <div style="flex:1 1 180px;"><div style="font-weight:500;">Theme</div><div style="font-size:12px; color:var(--muted-foreground);">Follows the system by default</div></div>
+                <div style="display:flex; border:1px solid var(--border); border-radius:10px; overflow:hidden;">
+                  <button onClick="{{ setThemeLight }}" style="height:32px; padding:0 12px; border:0; font:inherit; font-size:13px; cursor:pointer; background:{{ themeSegLight.bg }}; color:{{ themeSegLight.fg }};">Light</button>
+                  <button onClick="{{ setThemeDark }}" style="height:32px; padding:0 12px; border:0; border-left:1px solid var(--border); font:inherit; font-size:13px; cursor:pointer; background:{{ themeSegDark.bg }}; color:{{ themeSegDark.fg }};">Dark</button>
+                </div>
+              </div>
+              <div style="display:flex; align-items:center; gap:16px; padding:16px 18px; border-bottom:1px solid var(--border);">
+                <div style="flex:1;"><div style="font-weight:500;">Vault location</div><div style="font-size:12px; color:var(--muted-foreground); font-family:ui-monospace, SFMono-Regular, Menlo, monospace;">~/Washi/personal-vault</div></div>
+                <button style="height:32px; padding:0 12px; border-radius:10px; border:1px solid var(--border); background:var(--background); color:var(--foreground); font:inherit; font-size:13px; cursor:pointer;" style-hover="background:var(--accent)">Move…</button>
+              </div>
+              <div style="display:flex; align-items:center; gap:16px; padding:16px 18px;">
+                <div style="flex:1;"><div style="font-weight:500;">Spellcheck</div><div style="font-size:12px; color:var(--muted-foreground);">Underline unknown words while typing</div></div>
+                <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Switch" checked="{{ true }}" hint-size="36px,20px"></x-import>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- Agents -->
+        <sc-if value="{{ setAgents }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; flex-direction:column; gap:22px; animation:vfade .14s ease both;">
+            <div style="border:1px solid var(--border); border-radius:14px; background:var(--card); overflow:hidden;">
+              <div style="display:flex; align-items:center; gap:16px; padding:16px 18px; border-bottom:1px solid var(--border);">
+                <div style="flex:1;"><div style="font-weight:500;">Show authorship on blocks</div><div style="font-size:12px; color:var(--muted-foreground);">Marks which paragraphs an agent wrote</div></div>
+                <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Switch" checked="{{ showAttribution }}" onCheckedChange="{{ setAttribution }}" hint-size="36px,20px"></x-import>
+              </div>
+              <div style="display:flex; flex-wrap:wrap; align-items:center; gap:16px; padding:16px 18px; border-bottom:1px solid var(--border);">
+                <div style="flex:1 1 180px; min-width:0;"><div style="font-weight:500;">Edit autonomy</div><div style="font-size:12px; color:var(--muted-foreground);">Suggest means nothing lands without your accept</div></div>
+                <div style="display:flex; border:1px solid var(--border); border-radius:10px; overflow:hidden;">
+                  <button onClick="{{ setAutonomySuggest }}" style="height:32px; padding:0 12px; border:0; font:inherit; font-size:13px; cursor:pointer; background:{{ autoSuggest.bg }}; color:{{ autoSuggest.fg }};">Suggest</button>
+                  <button onClick="{{ setAutonomyWrite }}" style="height:32px; padding:0 12px; border:0; border-left:1px solid var(--border); font:inherit; font-size:13px; cursor:pointer; background:{{ autoWrite.bg }}; color:{{ autoWrite.fg }};">Write directly</button>
+                </div>
+              </div>
+              <div style="display:flex; align-items:center; gap:16px; padding:16px 18px;">
+                <div style="flex:1;"><div style="font-weight:500;">Scheduled runs</div><div style="font-size:12px; color:var(--muted-foreground);">Daily at 06:00 · reviews specs for token conflicts</div></div>
+                <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Badge" variant="success" size="sm" pilled="{{ true }}" hint-size="auto,20px">On</x-import>
+              </div>
+            </div>
+            <div style="border:1px solid var(--border); border-radius:14px; background:var(--card); padding:16px 18px; display:flex; align-items:center; gap:16px;">
+              <div style="flex:1;"><div style="font-weight:500;">Revoke agent access</div><div style="font-size:12px; color:var(--muted-foreground);">Agents keep read access to published pages</div></div>
+              <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Button" variant="destructive" size="sm" hint-size="auto,32px">Revoke</x-import>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- Sync -->
+        <sc-if value="{{ setSync }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; flex-direction:column; gap:22px; animation:vfade .14s ease both;">
+            <div style="border:1px solid var(--border); border-radius:14px; background:var(--card); overflow:hidden;">
+              <div style="display:flex; align-items:center; gap:16px; padding:16px 18px; border-bottom:1px solid var(--border);">
+                <div style="flex:1;"><div style="font-weight:500;">Sync server</div><div style="font-size:12px; color:{{ setSyncColor }};">{{ setSyncDesc }}</div></div>
+                <span style="width:8px; height:8px; border-radius:999px; background:{{ syncDot }}; flex:none;"></span>
+                <button style="height:32px; padding:0 12px; border-radius:10px; border:1px solid var(--border); background:var(--background); color:var(--foreground); font:inherit; font-size:13px; cursor:pointer;" style-hover="background:var(--accent)">{{ setSyncAction }}</button>
+              </div>
+              <div style="display:flex; align-items:center; gap:16px; padding:16px 18px; border-bottom:1px solid var(--border);">
+                <div style="flex:1;"><div style="font-weight:500;">End-to-end encryption</div><div style="font-size:12px; color:var(--muted-foreground);">The server stores ciphertext it can't read</div></div>
+                <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Switch" checked="{{ obE2e }}" onCheckedChange="{{ setObE2e }}" hint-size="36px,20px"></x-import>
+              </div>
+              <div style="display:flex; align-items:center; gap:16px; padding:16px 18px;">
+                <div style="flex:1;"><div style="font-weight:500;">Read-only share links</div><div style="font-size:12px; color:var(--muted-foreground);">Publish single pages, no account needed to read</div></div>
+                <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Switch" checked="{{ obLinks }}" onCheckedChange="{{ setObLinks }}" hint-size="36px,20px"></x-import>
+              </div>
+            </div>
+            <div style="border:1px solid var(--border); border-radius:14px; background:var(--card); overflow:hidden;">
+              <div style="display:flex; align-items:center; gap:8px; padding:12px 18px; border-bottom:1px solid var(--border);">
+                <span style="font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--muted-foreground);">Members</span>
+                <button onClick="{{ goSettings }}" style="margin-left:auto; height:26px; padding:0 10px; border-radius:8px; border:1px solid var(--border); background:var(--background); color:var(--foreground); font:inherit; font-size:12px; cursor:pointer;" style-hover="background:var(--accent)">Invite</button>
+              </div>
+              <sc-for list="{{ invitees }}" as="p" hint-placeholder-count="2">
+                <div style="display:flex; align-items:center; gap:10px; padding:11px 18px; border-bottom:1px solid var(--border);">
+                  <span style="display:flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:999px; background:var(--muted); font-size:10.5px; font-weight:600; flex:none;">{{ p.initials }}</span>
+                  <span style="flex:1; min-width:0; font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ p.email }}</span>
+                  <span style="font-size:12px; color:var(--muted-foreground);">{{ p.role }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- Account -->
+        <sc-if value="{{ setAccount }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; flex-direction:column; gap:22px; animation:vfade .14s ease both;">
+            <div style="border:1px solid var(--border); border-radius:14px; background:var(--card); overflow:hidden;">
+              <div style="display:flex; align-items:center; gap:14px; padding:16px 18px; border-bottom:1px solid var(--border);">
+                <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Avatar" size="md" fallback="MK" hint-size="36px,36px"></x-import>
+                <div style="flex:1;"><div style="font-weight:500;">Mira Kaneko</div><div style="font-size:12px; color:var(--muted-foreground);">mira@hollowmoor.net</div></div>
+                <button style="height:32px; padding:0 12px; border-radius:10px; border:1px solid var(--border); background:var(--background); color:var(--foreground); font:inherit; font-size:13px; cursor:pointer;" style-hover="background:var(--accent)">Edit</button>
+              </div>
+              <div style="display:flex; align-items:center; gap:16px; padding:16px 18px; border-bottom:1px solid var(--border);">
+                <div style="flex:1;"><div style="font-weight:500;">Devices</div><div style="font-size:12px; color:var(--muted-foreground);">MacBook (this device) · Studio desk · Pixel 9</div></div>
+                <button style="height:32px; padding:0 12px; border-radius:10px; border:1px solid var(--border); background:var(--background); color:var(--foreground); font:inherit; font-size:13px; cursor:pointer;" style-hover="background:var(--accent)">Manage</button>
+              </div>
+              <div style="display:flex; align-items:center; gap:16px; padding:16px 18px;">
+                <div style="flex:1;"><div style="font-weight:500;">Recovery key</div><div style="font-size:12px; color:var(--muted-foreground);">Last exported March 2026 — keep it off this machine</div></div>
+                <button style="height:32px; padding:0 12px; border-radius:10px; border:1px solid var(--border); background:var(--background); color:var(--foreground); font:inherit; font-size:13px; cursor:pointer;" style-hover="background:var(--accent)">Export</button>
+              </div>
+            </div>
+            <div style="border:1px solid var(--border); border-radius:14px; background:var(--card); padding:16px 18px; display:flex; align-items:center; gap:16px;">
+              <div style="flex:1;"><div style="font-weight:500;">Delete this vault</div><div style="font-size:12px; color:var(--muted-foreground);">Files on disk stay — this only removes it from Washi</div></div>
+              <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Button" variant="destructive" size="sm" hint-size="auto,32px">Delete</x-import>
+            </div>
+          </div>
+        </sc-if>
+      </section>
+      </sc-if>
+
+    </div>
+  </main>
+
+  <!-- AGENT PANEL -->
+  <sc-if value="{{ agentOpen }}" hint-placeholder-val="{{ true }}">
+  <aside data-screen-label="Agent panel" style="width:334px; max-width:100%; flex:none; display:flex; flex-direction:column; border-left:1px solid var(--border); background:var(--card); position:{{ panelPosition }}; right:0; top:{{ panelTop }}; bottom:0; z-index:30; box-shadow:{{ panelShadow }};">
+    <div style="height:48px; flex:none; display:flex; align-items:center; gap:9px; padding:0 12px 0 14px; border-bottom:1px solid var(--border);">
+      <sc-if value="{{ mascotHeader }}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 1024 1024" style="width:26px; height:26px; border-radius:8px; display:block; flex:none;"><use href="{{ mascotHeader }}"></use></svg></sc-if>
+      <div style="min-width:0;"><div style="font-size:13px; font-weight:500;">{{ agentName }}</div><div style="font-size:11px; color:var(--muted-foreground);">editing {{ crumbLeaf }}</div></div>
+      <button onClick="{{ toggleAgent }}" style="margin-left:auto; display:flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:8px; border:0; background:transparent; color:var(--muted-foreground); cursor:pointer;" style-hover="background:var(--accent)">
+        <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="x" size="{{ s15 }}" hint-size="15px,15px"></x-import>
+      </button>
+    </div>
+
+    <div ref="{{ chatRef }}" style="flex:1; overflow-y:auto; padding:18px 16px; display:flex; flex-direction:column; gap:16px;">
+      <sc-for list="{{ messages }}" as="m" hint-placeholder-count="4">
+        <sc-if value="{{ m.isUser }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; justify-content:flex-end;">
+            <div style="max-width:85%; padding:8px 13px; border-radius:16px; border-bottom-right-radius:6px; background:var(--muted); font-size:13px; line-height:1.6;">{{ m.text }}</div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ m.isAgent }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <sc-if value="{{ m.tool }}" hint-placeholder-val="{{ false }}">
+              <div style="align-self:flex-start; display:flex; align-items:center; gap:6px; height:24px; padding:0 9px; border-radius:999px; background:var(--muted); font-size:11px; font-weight:500; color:var(--muted-foreground);">
+                <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="{{ m.toolIcon }}" size="{{ s13 }}" hint-size="13px,13px"></x-import>
+                {{ m.tool }}
+              </div>
+            </sc-if>
+            <div style="font-size:13.5px; line-height:1.7; color:var(--foreground);">{{ m.text }}</div>
+          </div>
+        </sc-if>
+      </sc-for>
+      <sc-if value="{{ agentBusy }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex; align-items:center; gap:8px; font-size:12px; color:var(--muted-foreground);">
+          <svg viewBox="0 0 1024 1024" style="width:20px; height:20px; border-radius:6px; display:block; flex:none;"><use href="#w-write"></use></svg>{{ agentName }} is writing…
+        </div>
+      </sc-if>
+    </div>
+
+    <div style="flex:none; padding:10px 12px 12px; position:relative;">
+      <sc-if value="{{ modelOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute; left:12px; bottom:88px; width:250px; z-index:70; background:var(--popover); border:1px solid var(--border); border-radius:12px; box-shadow:0 8px 28px rgba(0,0,0,.16); padding:5px; animation:vfade .12s ease both;">
+          <sc-for list="{{ models }}" as="mo" hint-placeholder-count="3">
+            <button onClick="{{ mo.pick }}" style="display:flex; align-items:center; gap:9px; width:100%; padding:7px 8px; border:0; border-radius:8px; background:transparent; color:var(--foreground); font:inherit; font-size:13px; text-align:left; cursor:pointer;" style-hover="background:var(--accent)">
+              <span style="flex:1; min-width:0;"><span style="display:block; font-weight:500;">{{ mo.name }}</span><span style="display:block; font-size:11px; color:var(--muted-foreground);">{{ mo.desc }}</span></span>
+              <sc-if value="{{ mo.active }}" hint-placeholder-val="{{ false }}">
+                <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="check" size="{{ s14 }}" hint-size="14px,14px"></x-import>
+              </sc-if>
+            </button>
+          </sc-for>
+        </div>
+      </sc-if>
+      <div style="display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap;">
+        <button onClick="{{ send }}" style="height:26px; padding:0 10px; border-radius:999px; border:0; background:var(--muted); color:var(--muted-foreground); font:inherit; font-size:12px; cursor:pointer;" style-hover="color:var(--foreground)">Summarize this page</button>
+        <button onClick="{{ send }}" style="height:26px; padding:0 10px; border-radius:999px; border:0; background:var(--muted); color:var(--muted-foreground); font:inherit; font-size:12px; cursor:pointer;" style-hover="color:var(--foreground)">Find contradictions</button>
+      </div>
+      <div style="border:1px solid var(--border); border-radius:16px; background:var(--background); box-shadow:0 1px 3px rgba(0,0,0,.05); padding:10px 12px 8px;" style-focus="border-color:var(--muted-foreground)">
+        <input value="{{ draft }}" onChange="{{ setDraft }}" onKeyDown="{{ onKey }}" placeholder="Ask, or tell Washi what to write…" style="display:block; width:100%; box-sizing:border-box; border:0; outline:none; background:transparent; color:var(--foreground); font:inherit; font-size:13px; padding:0 0 10px;">
+        <div style="display:flex; align-items:center; gap:6px;">
+          <button style="display:flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:999px; border:1px solid var(--border); background:transparent; color:var(--muted-foreground); cursor:pointer; flex:none;" style-hover="color:var(--foreground)">
+            <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="plus" size="{{ s14 }}" hint-size="14px,14px"></x-import>
+          </button>
+          <button onClick="{{ toggleModel }}" style="display:flex; align-items:center; gap:5px; height:26px; padding:0 8px; border-radius:999px; border:0; background:transparent; color:var(--muted-foreground); font:inherit; font-size:12px; font-weight:500; cursor:pointer;" style-hover="color:var(--foreground)">
+            {{ modelLabel }}
+            <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="chevron-down" size="{{ s13 }}" hint-size="13px,13px"></x-import>
+          </button>
+          <span style="margin-left:auto; display:flex; align-items:center; gap:7px; font-size:11px; color:var(--muted-foreground);">
+            <span title="{{ ctxLabel }}" style="width:44px; height:4px; border-radius:999px; background:var(--muted); overflow:hidden; display:inline-block;"><span style="display:block; width:{{ ctxPct }}; height:100%; border-radius:999px; background:{{ agentColor }};"></span></span>
+          </span>
+          <button onClick="{{ send }}" style="display:flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:999px; border:0; background:var(--primary); color:var(--primary-foreground); cursor:pointer; flex:none;" style-hover="opacity:.9">
+            <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="arrow-up" size="{{ s15 }}" hint-size="15px,15px"></x-import>
+          </button>
+        </div>
+      </div>
+    </div>
+  </aside>
+  </sc-if>
+
+  <!-- COMMAND PALETTE -->
+  <sc-if value="{{ paletteOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closePalette }}" style="position:fixed; inset:0; z-index:60; background:rgba(0,0,0,.5); display:flex; align-items:flex-start; justify-content:center; padding-top:14vh;">
+      <div style="width:560px; max-width:92vw; background:var(--popover); color:var(--popover-foreground); border:1px solid var(--border); border-radius:14px; box-shadow:0 16px 48px rgba(0,0,0,.28); overflow:hidden; animation:vfade .14s ease both;">
+        <div style="display:flex; align-items:center; gap:10px; padding:13px 15px; border-bottom:1px solid var(--border);">
+          <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="search" size="{{ s16 }}" hint-size="16px,16px"></x-import>
+          <span style="color:var(--muted-foreground); font-size:14px;">Search pages, blocks and agents…</span>
+          <span style="margin-left:auto;"><x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Kbd" hint-size="auto,18px">esc</x-import></span>
+        </div>
+        <div style="padding:6px; max-height:52vh; overflow-y:auto;">
+          <div style="padding:8px 9px 5px; font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--muted-foreground);">Pages</div>
+          <button onClick="{{ openNullbyte }}" style="display:flex; align-items:center; gap:10px; width:100%; height:36px; padding:0 9px; border:0; border-radius:9px; background:var(--accent); color:var(--foreground); font:inherit; font-size:13px; text-align:left; cursor:pointer;">
+            <span style="font-family:ui-monospace, monospace; color:#22c55e;">&gt;_</span>Nullbyte terminal<span style="margin-left:auto; font-size:11px; color:var(--muted-foreground);">Design specs</span></button>
+          <button onClick="{{ openHearth }}" style="display:flex; align-items:center; gap:10px; width:100%; height:36px; padding:0 9px; border:0; border-radius:9px; background:transparent; color:var(--foreground); font:inherit; font-size:13px; text-align:left; cursor:pointer;" style-hover="background:var(--accent)">
+            <span style="color:#b8865b;">✿</span>Hearth recipes<span style="margin-left:auto; font-size:11px; color:var(--muted-foreground);">Design specs</span></button>
+          <button onClick="{{ openSlab }}" style="display:flex; align-items:center; gap:10px; width:100%; height:36px; padding:0 9px; border:0; border-radius:9px; background:transparent; color:var(--foreground); font:inherit; font-size:13px; text-align:left; cursor:pointer;" style-hover="background:var(--accent)">
+            <span style="font-size:11px; font-weight:800;">▮</span>SLAB marketplace<span style="margin-left:auto; font-size:11px; color:var(--muted-foreground);">Design specs</span></button>
+          <div style="padding:10px 9px 5px; font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--muted-foreground);">Agents</div>
+          <button onClick="{{ askAgentDraft }}" style="display:flex; align-items:center; gap:10px; width:100%; height:36px; padding:0 9px; border:0; border-radius:9px; background:transparent; color:var(--foreground); font:inherit; font-size:13px; text-align:left; cursor:pointer;" style-hover="background:var(--accent)">
+            <span style="display:flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:999px; background:{{ agentColor }}; color:#fff; font-size:9px; font-weight:700;">AI</span>Ask {{ agentName }} to draft a page<span style="margin-left:auto;"><x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Kbd" hint-size="auto,18px">⌘⏎</x-import></span></button>
+          <button onClick="{{ goGraph }}" style="display:flex; align-items:center; gap:10px; width:100%; height:36px; padding:0 9px; border:0; border-radius:9px; background:transparent; color:var(--foreground); font:inherit; font-size:13px; text-align:left; cursor:pointer;" style-hover="background:var(--accent)">
+            <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="git-fork" size="{{ s16 }}" hint-size="16px,16px"></x-import>Open graph view</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- CREATE WORKSPACE -->
+  <sc-if value="{{ newWsOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; inset:0; z-index:80; background:rgba(0,0,0,.5); display:flex; align-items:flex-start; justify-content:center; padding-top:12vh;">
+      <div data-screen-label="Create workspace" style="width:460px; max-width:92vw; background:var(--popover); color:var(--popover-foreground); border:1px solid var(--border); border-radius:14px; box-shadow:0 16px 48px rgba(0,0,0,.28); overflow:hidden; animation:vfade .14s ease both;">
+        <div style="padding:18px 20px 14px; border-bottom:1px solid var(--border);">
+          <div style="font-size:15px; font-weight:600; letter-spacing:-0.01em;">Create workspace</div>
+          <div style="font-size:12px; color:var(--muted-foreground); margin-top:2px;">A workspace is one folder of plain files on this device.</div>
+        </div>
+        <div style="padding:16px 20px 18px; display:flex; flex-direction:column; gap:16px;">
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <span style="font-size:12px; font-weight:500;">Name</span>
+            <input value="{{ nwName }}" onChange="{{ setNwName }}" placeholder="Client work" style="height:34px; box-sizing:border-box; padding:0 10px; border:1px solid var(--input); border-radius:10px; background:var(--background); color:var(--foreground); font:inherit; font-size:13px; outline:none;" style-focus="border-color:var(--muted-foreground)">
+          </div>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <span style="font-size:12px; font-weight:500;">Vault icon</span>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <sc-for list="{{ vaultChoices }}" as="v" hint-placeholder-count="6">
+                <button onClick="{{ v.pickNw }}" style="padding:3px; border:2px solid {{ v.nwRing }}; border-radius:12px; background:transparent; cursor:pointer; line-height:0;">
+                  <sc-if value="{{ v.id }}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 1024 1024" style="width:34px; height:34px; border-radius:9px; display:block;"><use href="{{ v.id }}"></use></svg></sc-if>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <span style="font-size:12px; font-weight:500;">Location</span>
+            <div style="display:flex; align-items:center; gap:8px; height:34px; padding:0 10px; border:1px solid var(--input); border-radius:10px; background:var(--muted); font-size:12.5px; color:var(--muted-foreground); font-family:ui-monospace, SFMono-Regular, Menlo, monospace;">
+              <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="folder" size="{{ s14 }}" hint-size="14px,14px"></x-import>
+              <span style="flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ nwPath }}</span>
+              <span style="font-family:Inter, sans-serif; color:var(--foreground); font-weight:500; cursor:pointer;">Change</span>
+            </div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <span style="font-size:12px; font-weight:500;">Sync</span>
+            <div style="display:flex; border:1px solid var(--border); border-radius:10px; overflow:hidden;">
+              <button onClick="{{ setNwLocal }}" style="flex:1; height:34px; border:0; font:inherit; font-size:12.5px; cursor:pointer; background:{{ nwLocalSeg.bg }}; color:{{ nwLocalSeg.fg }};">This device only</button>
+              <button onClick="{{ setNwServer }}" style="flex:1; height:34px; border:0; border-left:1px solid var(--border); font:inherit; font-size:12.5px; cursor:pointer; background:{{ nwServerSeg.bg }}; color:{{ nwServerSeg.fg }};">{{ serverShort }}</button>
+            </div>
+            <span style="font-size:11.5px; color:var(--muted-foreground);">{{ nwSyncNote }}</span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; padding:12px 20px; border-top:1px solid var(--border); background:var(--muted);">
+          <span style="flex:1;"></span>
+          <button onClick="{{ closeNewWs }}" style="height:32px; padding:0 12px; border-radius:10px; border:1px solid var(--border); background:var(--background); color:var(--foreground); font:inherit; font-size:13px; cursor:pointer;" style-hover="background:var(--accent)">Cancel</button>
+          <button onClick="{{ createWs }}" style="height:32px; padding:0 14px; border-radius:10px; border:0; background:var(--primary); color:var(--primary-foreground); font:inherit; font-size:13px; font-weight:500; cursor:pointer;" style-hover="opacity:.9">Create workspace</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ONBOARDING -->
+  <sc-if value="{{ obOpen }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Onboarding" style="position:fixed; inset:0; z-index:90; background:var(--background); color:var(--foreground); display:flex; flex-direction:column; align-items:center; overflow-y:auto;">
+      <div style="width:100%; max-width:560px; padding:56px 32px 40px; box-sizing:border-box; display:flex; flex-direction:column; gap:26px; margin:auto;">
+
+        <sc-if value="{{ obStep1 }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex; flex-direction:column; gap:22px; animation:vfade .2s ease both;">
+            <svg viewBox="-50 -40 340 330" style="width:150px; overflow:visible; display:block;">
+              <g fill="#E8B36A">
+                <path d="M-10 40 Q-4 62 18 68 Q-4 74 -10 96 Q-16 74 -38 68 Q-16 62 -10 40 Z" style="animation:oSparkle 2.8s ease-in-out infinite; transform-box:fill-box; transform-origin:center"></path>
+                <path d="M244 10 Q249 27 266 32 Q249 37 244 54 Q239 37 222 32 Q239 27 244 10 Z" style="animation:oSparkle 2.8s ease-in-out .9s infinite; transform-box:fill-box; transform-origin:center"></path>
+                <circle cx="232" cy="120" r="7" style="animation:oSparkle 2.8s ease-in-out 1.7s infinite; transform-box:fill-box; transform-origin:center"></circle>
+                <circle cx="-24" cy="150" r="6" style="animation:oSparkle 2.8s ease-in-out 2.2s infinite; transform-box:fill-box; transform-origin:center"></circle>
+              </g>
+              <g style="animation:oBob 2.6s ease-in-out infinite">
+                <use href="#oBody"></use><use href="#oHappy"></use>
+                <rect x="206" y="104" width="42" height="34" rx="17" fill="#F7EDD6" stroke="#6B3A1F" stroke-width="8" style="animation:oWave 1.6s ease-in-out infinite; transform-box:fill-box; transform-origin:0% 100%"></rect>
+              </g>
+            </svg>
+            <div>
+              <h1 style="margin:0 0 8px; font-size:30px; line-height:1.15; font-weight:600; letter-spacing:-0.025em;">Everything stays on your machine</h1>
+              <p style="margin:0; font-size:15px; line-height:1.65; color:var(--muted-foreground);">Washi keeps your notes as plain files on disk. Sync, sharing and agents are optional — nothing leaves this device until you say so.</p>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:2px;">
+              <div style="display:flex; gap:12px; align-items:flex-start; padding:12px 0; border-top:1px solid var(--border);">
+                <span style="margin-top:1px; color:var(--muted-foreground); display:flex;"><x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="hard-drive" size="{{ s18 }}" hint-size="18px,18px"></x-import></span>
+                <span><span style="display:block; font-weight:500; font-size:13.5px;">Offline first</span><span style="display:block; font-size:12.5px; color:var(--muted-foreground);">Markdown files in a folder you pick. No account required.</span></span>
+              </div>
+              <div style="display:flex; gap:12px; align-items:flex-start; padding:12px 0; border-top:1px solid var(--border);">
+                <span style="margin-top:1px; color:var(--muted-foreground); display:flex;"><x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="server" size="{{ s18 }}" hint-size="18px,18px"></x-import></span>
+                <span><span style="display:block; font-weight:500; font-size:13.5px;">Self-hosted sync</span><span style="display:block; font-size:12.5px; color:var(--muted-foreground);">Point Washi at your own server to sync devices end-to-end encrypted.</span></span>
+              </div>
+              <div style="display:flex; gap:12px; align-items:flex-start; padding:12px 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+                <span style="margin-top:1px; color:var(--muted-foreground); display:flex;"><x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="users" size="{{ s18 }}" hint-size="18px,18px"></x-import></span>
+                <span><span style="display:block; font-weight:500; font-size:13.5px;">Share on your terms</span><span style="display:block; font-size:12.5px; color:var(--muted-foreground);">Invite people per workspace, or publish a read-only link.</span></span>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ obStep2 }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; flex-direction:column; gap:22px; animation:vfade .2s ease both;">
+            <svg viewBox="-70 -50 380 340" style="width:150px; overflow:visible; display:block;">
+              <use href="#oTile" x="-58" y="-16" style="animation:oPop 5s ease infinite; transform-box:fill-box; transform-origin:center"></use>
+              <g transform="translate(88,-42)"><g style="animation:oPop 5s ease .5s infinite; transform-box:fill-box; transform-origin:center"><rect x="0" y="0" width="64" height="64" rx="18" stroke="#6B3A1F" stroke-width="6" fill="#AEBB9A"></rect></g></g>
+              <g transform="translate(216,10)"><g style="animation:oPop 5s ease 1s infinite; transform-box:fill-box; transform-origin:center"><rect x="0" y="0" width="64" height="64" rx="18" stroke="#6B3A1F" stroke-width="6" fill="#D4713F"></rect></g></g>
+              <use href="#oBody"></use><use href="#oCurious"></use>
+            </svg>
+            <div>
+              <h1 style="margin:0 0 8px; font-size:26px; line-height:1.2; font-weight:600; letter-spacing:-0.02em;">Make your first vault</h1>
+              <p style="margin:0; font-size:14.5px; line-height:1.6; color:var(--muted-foreground);">One vault is one folder. You can add more later — each keeps its own sync settings.</p>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+              <span style="font-size:12px; font-weight:500;">Vault name</span>
+              <input value="{{ obName }}" onChange="{{ setObName }}" placeholder="Personal vault" style="height:38px; box-sizing:border-box; padding:0 12px; border:1px solid var(--input); border-radius:10px; background:var(--card); color:var(--foreground); font:inherit; font-size:14px; outline:none;" style-focus="border-color:var(--muted-foreground)">
+            </div>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+              <span style="font-size:12px; font-weight:500;">Folder on disk</span>
+              <div style="display:flex; align-items:center; gap:8px; height:38px; padding:0 12px; border:1px solid var(--input); border-radius:10px; background:var(--muted); font-size:13px; color:var(--muted-foreground); font-family:ui-monospace, SFMono-Regular, Menlo, monospace;">
+                <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="folder" size="{{ s15 }}" hint-size="15px,15px"></x-import>
+                <span style="flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ obPath }}</span>
+                <span style="font-family:Inter, sans-serif; color:var(--foreground); font-weight:500; cursor:pointer;">Choose…</span>
+              </div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <span style="font-size:12px; font-weight:500;">Vault icon</span>
+              <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <sc-for list="{{ vaultChoices }}" as="v" hint-placeholder-count="6">
+                  <button onClick="{{ v.pickOb }}" style="padding:3px; border:2px solid {{ v.obRing }}; border-radius:14px; background:transparent; cursor:pointer; line-height:0;">
+                    <sc-if value="{{ v.id }}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 1024 1024" style="width:46px; height:46px; border-radius:12px; display:block;"><use href="{{ v.id }}"></use></svg></sc-if>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ obStep3 }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; flex-direction:column; gap:20px; animation:vfade .2s ease both;">
+            <sc-if value="{{ isOffline }}" hint-placeholder-val="{{ true }}">
+              <svg viewBox="-40 -40 340 330" style="width:145px; overflow:visible; display:block;">
+                <use href="#oSheet" x="170" y="30" style="animation:oFly 2.4s ease-in infinite"></use>
+                <use href="#oSheet" x="196" y="90" style="animation:oFly 2.4s ease-in .8s infinite"></use>
+                <use href="#oSheet" x="180" y="150" style="animation:oFly 2.4s ease-in 1.6s infinite"></use>
+                <g style="animation:oBreathe 2.4s ease-in-out infinite; transform-box:fill-box; transform-origin:50% 80%">
+                  <use href="#oBody"></use><use href="#oHappy"></use>
+                </g>
+              </svg>
+            </sc-if>
+            <sc-if value="{{ srvOk }}" hint-placeholder-val="{{ false }}">
+              <svg viewBox="-40 -50 480 350" style="width:220px; overflow:visible; display:block;">
+                <use href="#oSheet" x="180" y="40" style="animation:oShipR 2.8s ease-in-out infinite"></use>
+                <use href="#oSheet" x="330" y="130" style="animation:oShipL 2.8s ease-in-out 1.4s infinite"></use>
+                <g style="animation:oBreathe 2.8s ease-in-out infinite; transform-box:fill-box; transform-origin:50% 80%"><use href="#oBody"></use><use href="#oHappy"></use></g>
+                <g transform="translate(310,96)">
+                  <use href="#oServer"></use>
+                  <circle cx="96" cy="118" r="9" fill="#AEBB9A" style="animation:oLed 1.4s ease-in-out infinite"></circle>
+                </g>
+              </svg>
+            </sc-if>
+            <sc-if value="{{ srvBad }}" hint-placeholder-val="{{ false }}">
+              <svg viewBox="-40 -50 480 350" style="width:220px; overflow:visible; display:block;">
+                <path d="M240 120 H262 M282 120 H304" stroke="#B98A5A" stroke-width="8" stroke-linecap="round" stroke-dasharray="2 22"></path>
+                <path d="M262 106 L282 134 M282 106 L262 134" stroke="#C25B3F" stroke-width="9" stroke-linecap="round" style="animation:oLed 1.8s ease-in-out infinite"></path>
+                <use href="#oBody"></use><use href="#oSad"></use>
+                <g transform="translate(310,96)">
+                  <use href="#oServer"></use>
+                  <circle cx="96" cy="118" r="9" fill="#C25B3F" style="animation:oFlicker 2.2s linear infinite"></circle>
+                  <text x="52" y="-16" font-family="Inter, sans-serif" font-weight="700" font-size="42" fill="#A5744F" style="animation:oSparkle 2.2s ease-in-out infinite; transform-box:fill-box; transform-origin:center">?</text>
+                </g>
+              </svg>
+            </sc-if>
+            <div>
+              <h1 style="margin:0 0 8px; font-size:26px; line-height:1.2; font-weight:600; letter-spacing:-0.02em;">Sync, if you want it</h1>
+              <p style="margin:0; font-size:14.5px; line-height:1.6; color:var(--muted-foreground);">Washi never talks to a cloud we run. Sync goes to a server you host.</p>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <button onClick="{{ pickOffline }}" style="display:flex; gap:12px; align-items:flex-start; text-align:left; padding:14px 16px; border:1px solid {{ offlineCard.border }}; border-radius:12px; background:{{ offlineCard.bg }}; color:var(--foreground); font:inherit; cursor:pointer;">
+                <span style="margin-top:1px; display:flex; color:var(--muted-foreground);"><x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="cloud-off" size="{{ s18 }}" hint-size="18px,18px"></x-import></span>
+                <span style="flex:1;"><span style="display:block; font-weight:500; font-size:14px;">Stay offline</span><span style="display:block; font-size:12.5px; color:var(--muted-foreground); line-height:1.5;">This device only. Agents still run locally against your files.</span></span>
+                <sc-if value="{{ isOffline }}" hint-placeholder-val="{{ true }}"><span style="display:flex; color:var(--foreground);"><x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="check" size="{{ s16 }}" hint-size="16px,16px"></x-import></span></sc-if>
+              </button>
+              <button onClick="{{ pickServer }}" style="display:flex; gap:12px; align-items:flex-start; text-align:left; padding:14px 16px; border:1px solid {{ serverCard.border }}; border-radius:12px; background:{{ serverCard.bg }}; color:var(--foreground); font:inherit; cursor:pointer;">
+                <span style="margin-top:1px; display:flex; color:var(--muted-foreground);"><x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="server" size="{{ s18 }}" hint-size="18px,18px"></x-import></span>
+                <span style="flex:1;"><span style="display:block; font-weight:500; font-size:14px;">Connect a self-hosted server</span><span style="display:block; font-size:12.5px; color:var(--muted-foreground); line-height:1.5;">Sync devices and collaborate with people you invite.</span></span>
+                <sc-if value="{{ isServer }}" hint-placeholder-val="{{ false }}"><span style="display:flex; color:var(--foreground);"><x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="check" size="{{ s16 }}" hint-size="16px,16px"></x-import></span></sc-if>
+              </button>
+            </div>
+            <sc-if value="{{ isServer }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex; flex-direction:column; gap:10px; padding:14px 16px; border:1px solid var(--border); border-radius:12px; background:var(--card); animation:vfade .16s ease both;">
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <span style="font-size:12px; font-weight:500;">Server address</span>
+                  <input value="{{ obServer }}" onChange="{{ setObServer }}" placeholder="https://sync.example.com" style="height:36px; box-sizing:border-box; padding:0 11px; border:1px solid var(--input); border-radius:10px; background:var(--background); color:var(--foreground); font:inherit; font-size:13px; font-family:ui-monospace, SFMono-Regular, Menlo, monospace; outline:none;" style-focus="border-color:var(--muted-foreground)">
+                </div>
+                <div style="display:flex; align-items:center; gap:8px; font-size:12px; color:{{ srvStatusColor }};">
+                  <span style="width:6px; height:6px; border-radius:999px; background:{{ srvDot }};"></span>{{ srvStatus }}
+                </div>
+                <div style="display:flex; align-items:center; gap:10px; padding-top:8px; border-top:1px solid var(--border);">
+                  <span style="flex:1; font-size:12.5px;">End-to-end encrypt vault contents<span style="display:block; font-size:11.5px; color:var(--muted-foreground);">The server stores ciphertext it can't read</span></span>
+                  <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Switch" checked="{{ obE2e }}" onCheckedChange="{{ setObE2e }}" hint-size="36px,20px"></x-import>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ obStep4 }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; flex-direction:column; gap:20px; animation:vfade .2s ease both;">
+            <sc-if value="{{ isServer }}" hint-placeholder-val="{{ false }}">
+              <svg viewBox="-40 -50 480 350" style="width:220px; overflow:visible; display:block;">
+                <use href="#oSheet" x="196" y="80" style="animation:oPass 3.4s ease-in-out infinite"></use>
+                <g style="animation:oBob 2.6s ease-in-out infinite"><use href="#oBody"></use><use href="#oWink"></use></g>
+                <g transform="translate(280,84) scale(0.72)">
+                  <g style="animation:oBob 2.6s ease-in-out 1.3s infinite"><use href="#oBody"></use><use href="#oHappy"></use></g>
+                </g>
+                <path d="M254 -18 Q262 4 284 10 Q262 16 254 38 Q246 16 224 10 Q246 4 254 -18 Z" fill="#E8B36A" style="animation:oSparkle 3.4s ease-in-out 2.4s infinite; transform-box:fill-box; transform-origin:center"></path>
+              </svg>
+            </sc-if>
+            <sc-if value="{{ isOffline }}" hint-placeholder-val="{{ true }}">
+            <svg viewBox="-50 -40 340 330" style="width:145px; overflow:visible; display:block;">
+              <g>
+                <rect x="-20" y="-20" width="12" height="18" rx="3" fill="#D4713F" style="animation:oFall 3s linear infinite"></rect>
+                <rect x="60" y="-30" width="10" height="16" rx="3" fill="#AEBB9A" style="animation:oFall 3s linear .6s infinite"></rect>
+                <circle cx="150" cy="-20" r="7" fill="#E8B36A" style="animation:oFall 3s linear 1.1s infinite"></circle>
+                <rect x="220" y="-26" width="12" height="18" rx="3" fill="#9FB6C4" style="animation:oFall 3s linear 1.6s infinite"></rect>
+                <circle cx="256" cy="-18" r="6" fill="#D4713F" style="animation:oFall 3s linear 2.1s infinite"></circle>
+                <rect x="110" y="-24" width="9" height="14" rx="3" fill="#F0A487" style="animation:oFall 3s linear 2.5s infinite"></rect>
+              </g>
+              <g style="animation:oBob 2.2s ease-in-out infinite"><use href="#oBody"></use><use href="#oWink"></use></g>
+            </svg>
+            </sc-if>
+            <div>
+              <h1 style="margin:0 0 8px; font-size:26px; line-height:1.2; font-weight:600; letter-spacing:-0.02em;">{{ obStep4Title }}</h1>
+              <p style="margin:0; font-size:14.5px; line-height:1.6; color:var(--muted-foreground);">{{ obStep4Sub }}</p>
+            </div>
+            <sc-if value="{{ isServer }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex; flex-direction:column; gap:14px;">
+                <div style="display:flex; gap:8px;">
+                  <input value="{{ obInvite }}" onChange="{{ setObInvite }}" onKeyDown="{{ onInviteKey }}" placeholder="name@studio.com" style="flex:1; height:36px; box-sizing:border-box; padding:0 11px; border:1px solid var(--input); border-radius:10px; background:var(--card); color:var(--foreground); font:inherit; font-size:13px; outline:none;" style-focus="border-color:var(--muted-foreground)">
+                  <button onClick="{{ addInvite }}" style="height:36px; padding:0 14px; border-radius:10px; border:1px solid var(--border); background:var(--background); color:var(--foreground); font:inherit; font-size:13px; cursor:pointer;" style-hover="background:var(--accent)">Invite</button>
+                </div>
+                <div style="display:flex; flex-direction:column;">
+                  <sc-for list="{{ invitees }}" as="p" hint-placeholder-count="2">
+                    <div style="display:flex; align-items:center; gap:10px; padding:10px 0; border-top:1px solid var(--border);">
+                      <span style="display:flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:999px; background:var(--muted); font-size:10.5px; font-weight:600; flex:none;">{{ p.initials }}</span>
+                      <span style="flex:1; min-width:0; font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ p.email }}</span>
+                      <span style="font-size:12px; color:var(--muted-foreground);">{{ p.role }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="display:flex; align-items:center; gap:10px; padding:12px 14px; border:1px solid var(--border); border-radius:12px; background:var(--card);">
+                  <span style="flex:1; font-size:13px;">Read-only share links<span style="display:block; font-size:11.5px; color:var(--muted-foreground);">Publish single pages from your server, no account needed to read</span></span>
+                  <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Switch" checked="{{ obLinks }}" onCheckedChange="{{ setObLinks }}" hint-size="36px,20px"></x-import>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ isOffline }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex; gap:12px; padding:16px; border:1px dashed var(--border); border-radius:12px; background:var(--muted);">
+                <span style="margin-top:1px; display:flex; color:var(--muted-foreground);"><x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="users" size="{{ s18 }}" hint-size="18px,18px"></x-import></span>
+                <span style="font-size:13px; line-height:1.6; color:var(--muted-foreground);">Sharing and multiplayer editing need a sync server. Your vault works fully without one — turn sync on any time in Settings, and everything you've written comes with you.</span>
+              </div>
+            </sc-if>
+            <div style="display:flex; gap:12px; align-items:center; padding:14px 16px; border:1px solid var(--border); border-radius:12px; background:var(--card);">
+              <svg viewBox="-70 -50 380 340" style="width:44px; overflow:visible; display:block; flex:none;">
+                <rect x="-52" y="60" width="120" height="150" rx="12" fill="#FFFDF6" stroke="#6B3A1F" stroke-width="7" transform="rotate(-7 8 135)"></rect>
+                <path d="M-30 100 Q-6 88 12 102 M-34 130 Q-2 116 20 132 M-36 160 Q-8 146 24 162" fill="none" stroke="#B98A5A" stroke-width="7" stroke-linecap="round" stroke-dasharray="340" style="animation:oDraw 3.6s ease-in-out infinite"></path>
+                <use href="#oBody"></use><use href="#oFocus"></use>
+                <g style="animation:oSway 1.1s ease-in-out infinite; transform-box:fill-box; transform-origin:100% 100%">
+                  <rect x="6" y="128" width="16" height="66" rx="7" fill="#D4713F" stroke="#6B3A1F" stroke-width="6" transform="rotate(40 14 194)"></rect>
+                </g>
+              </svg>
+              <span style="flex:1; font-size:13px; line-height:1.55;">Let {{ agentName }} read this vault<span style="display:block; font-size:11.5px; color:var(--muted-foreground);">Runs locally, suggests edits, never writes without your accept</span></span>
+              <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Switch" checked="{{ obAgent }}" onCheckedChange="{{ setObAgent }}" hint-size="36px,20px"></x-import>
+            </div>
+            <div style="display:flex; gap:12px; align-items:center; padding:14px 16px; border:1px solid var(--border); border-radius:12px; background:var(--card);">
+              <svg viewBox="-50 -70 340 360" style="width:44px; overflow:visible; display:block; flex:none;">
+                <g style="animation:oRing 2.8s ease-in-out infinite; transform-box:fill-box; transform-origin:50% 0%">
+                  <path d="M236 -28 C262 -28 276 -8 276 16 L280 38 Q284 46 276 46 H196 Q188 46 192 38 L196 16 C196 -8 210 -28 236 -28 Z" fill="#E8B36A" stroke="#6B3A1F" stroke-width="8" stroke-linejoin="round"></path>
+                  <circle cx="236" cy="56" r="10" fill="#E8B36A" stroke="#6B3A1F" stroke-width="7"></circle>
+                </g>
+                <circle cx="278" cy="-24" r="9" fill="#D4713F" style="animation:oPulse 2.8s ease-in-out infinite; transform-box:fill-box; transform-origin:center"></circle>
+                <use href="#oBody"></use><use href="#oCurious"></use>
+              </svg>
+              <span style="flex:1; font-size:13px; line-height:1.55;">Gentle nudges<span style="display:block; font-size:11.5px; color:var(--muted-foreground);">A tap on the shoulder when notes go stale — weekly at most</span></span>
+              <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Switch" checked="{{ obNudge }}" onCheckedChange="{{ setObNudge }}" hint-size="36px,20px"></x-import>
+            </div>
+          </div>
+        </sc-if>
+
+        <div style="display:flex; align-items:center; gap:12px; padding-top:6px;">
+          <div style="display:flex; gap:6px; flex:1;">
+            <sc-for list="{{ obDots }}" as="d" hint-placeholder-count="4">
+              <span style="width:{{ d.w }}; height:6px; border-radius:999px; background:{{ d.bg }};"></span>
+            </sc-for>
+          </div>
+          <sc-if value="{{ obCanBack }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ obBack }}" style="height:36px; padding:0 14px; border-radius:10px; border:1px solid var(--border); background:var(--background); color:var(--foreground); font:inherit; font-size:13px; cursor:pointer;" style-hover="background:var(--accent)">Back</button>
+          </sc-if>
+          <button onClick="{{ obNext }}" style="height:36px; padding:0 16px; border-radius:10px; border:0; background:var(--primary); color:var(--primary-foreground); font:inherit; font-size:13px; font-weight:500; cursor:pointer;" style-hover="opacity:.9">{{ obNextLabel }}</button>
+        </div>
+        <sc-if value="{{ obCanSkip }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ obSkip }}" style="align-self:flex-start; margin-top:-14px; padding:0; border:0; background:transparent; color:var(--muted-foreground); font:inherit; font-size:12.5px; cursor:pointer; text-decoration:underline; text-underline-offset:3px;" style-hover="color:var(--foreground)">Skip setup — open a vault with sample notes</button>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;agentName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Washi&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;agentColor&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;rgb(43,127,255)&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;rgb(43,127,255)&quot;,&quot;rgb(124,58,237)&quot;,&quot;rgb(22,163,74)&quot;,&quot;rgb(231,0,11)&quot;]},&quot;showAttribution&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;startOnOnboarding&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Flow&quot;}}">
+class Component extends DCLogic {
+  state = {
+    theme: "light", view: "note", note: "nullbyte", agentOpen: true,
+    paletteOpen: false, slashOpen: false, suggestion: "pending",
+    attribution: null, autonomy: "suggest", busy: false, draft: "", narrow: false,
+    wsOpen: false, workspace: "Personal vault", modelOpen: false, model: "Sonnet 4.5", ctx: 32,
+    sidebarOpen: true, userMenuOpen: false, setTab: "general",
+    reviews: [
+      { icon: "file-text", title: "Nullbyte terminal — scrollback claim", meta: "Suggested edit · 4 min ago", target: "nullbyte" },
+      { icon: "file-text", title: "Hearth recipes — contrast fix on labels", meta: "Draft awaiting review · 2 min ago", target: "hearth" },
+      { icon: "file-text", title: "SLAB marketplace — token conflicts", meta: "Scheduled run flagged 3 components · 06:00", target: "slab" }
+    ],
+    wsList: [
+      { name: "Personal vault", vault: "#v-journal", sync: "local", meta: "46 pages · local" },
+      { name: "Studio team", vault: "#v-work", sync: "server", meta: "Shared · 8 members" }
+    ],
+    newWsOpen: false, nwName: "", nwVault: "#v-ideas", nwSync: "local",
+    obDone: false, obStep: 1, obName: "Personal vault", obVault: "#v-journal",
+    obSync: "offline", obServer: "https://sync.hollowmoor.net", obE2e: true,
+    obLinks: false, obAgent: true, obNudge: false, obInvite: "",
+    invitees: [
+      { email: "jo@studio.com", role: "Can edit" },
+      { email: "rui@studio.com", role: "Can comment" }
+    ],
+    messages: [
+      { role: "agent", text: "I read the three specs this morning. Nullbyte and SLAB disagree on radius tokens — SLAB forces 0 everywhere.", tool: "Read 3 pages", toolIcon: "file-text" },
+      { role: "user", text: "Fix the Nullbyte scrollback paragraph, it overpromises." },
+      { role: "agent", text: "Suggested a replacement with the real 200k-line cap. It's waiting inline for your accept.", tool: "1 suggested edit · Nullbyte", toolIcon: "git-pull-request" }
+    ]
+  };
+
+  set = (k, v) => this.setState({ [k]: v });
+  chatRef = React.createRef();
+  _scrollChat() {
+    requestAnimationFrame(() => {
+      const el = this.chatRef.current;
+      if (el) el.scrollTop = el.scrollHeight;
+    });
+  }
+
+  componentDidMount() {
+    this._syncTheme();
+    this._onResize = () => {
+      const narrow = window.innerWidth < 1100;
+      if (narrow !== this.state.narrow) this.setState({ narrow });
+    };
+    window.addEventListener("resize", this._onResize);
+    this._onResize();
+  }
+  componentDidUpdate() { this._syncTheme(); }
+  _syncTheme() {
+    const el = document.documentElement;
+    if (this.state.theme === "dark") { el.setAttribute("data-theme", "dark"); el.classList.add("dark"); }
+    else { el.removeAttribute("data-theme"); el.classList.remove("dark"); }
+  }
+
+  renderVals() {
+    const s = this.state, p = this.props;
+    const agentColor = p.agentColor || "rgb(43,127,255)";
+    const agentName = p.agentName || "Washi";
+    const attribution = s.attribution === null ? (p.showAttribution !== false) : s.attribution;
+    const dark = s.theme === "dark";
+    const isNote = s.view === "note";
+    const titles = { nullbyte: "Nullbyte terminal", hearth: "Hearth recipes", slab: "SLAB marketplace", untitled: "Untitled" };
+    const nav = (v) => s.view === v
+      ? { bg: "var(--accent)", fg: "var(--foreground)", fw: "500" }
+      : { bg: "transparent", fg: "var(--muted-foreground)", fw: "400" };
+    const pg = (n) => (isNote && s.note === n)
+      ? { bg: "var(--accent)", fg: "var(--foreground)", fw: "500" }
+      : { bg: "transparent", fg: "var(--muted-foreground)", fw: "400" };
+    const seg = (v) => s.autonomy === v
+      ? { bg: "var(--primary)", fg: "var(--primary-foreground)" }
+      : { bg: "var(--background)", fg: "var(--muted-foreground)" };
+    const open = (n) => () => this.setState({ view: "note", note: n, paletteOpen: false, slashOpen: false });
+    const cur = s.wsList.find((w) => w.name === s.workspace) || s.wsList[0];
+    const serverShort = (s.obServer || "").replace(/^https?:\/\//, "") || "sync server";
+    const srvValid = /^https?:\/\/[^\s]+\.[^\s]+/.test(s.obServer || "");
+    const nwSeg = (v) => s.nwSync === v
+      ? { bg: "var(--primary)", fg: "var(--primary-foreground)" }
+      : { bg: "var(--background)", fg: "var(--muted-foreground)" };
+    const themeSeg = (v) => s.theme === v
+      ? { bg: "var(--primary)", fg: "var(--primary-foreground)" }
+      : { bg: "var(--background)", fg: "var(--muted-foreground)" };
+    const obCard = (v) => s.obSync === v
+      ? { border: "var(--foreground)", bg: "var(--accent)" }
+      : { border: "var(--border)", bg: "var(--card)" };
+
+    return {
+      s13: 13, s14: 14, s15: 15, s16: 16, s18: 18,
+      isLightTheme: !dark, isDarkTheme: dark,
+      wsOpen: s.wsOpen, wsName: s.workspace,
+      wsMeta: cur.meta || "Local vault",
+      wsBtnBg: s.wsOpen ? "var(--accent)" : "transparent",
+      toggleWs: () => this.setState({ wsOpen: !s.wsOpen, modelOpen: false }),
+      closeWs: () => this.set("wsOpen", false),
+      wsVault: (cur.vault || "#v-journal"),
+      mascotStatus: s.busy ? "#w-write" : "#w-idle",
+      mascotHeader: s.busy ? "#w-write" : (s.suggestion === "pending" ? "#w-suggest" : "#w-idle"),
+      workspaces: s.wsList.map((w) => ({
+        name: w.name, initial: w.name[0], vault: w.vault,
+        active: s.workspace === w.name,
+        pick: () => this.setState({ workspace: w.name, wsOpen: false })
+      })),
+      sidebarOpen: s.sidebarOpen, sidebarClosed: !s.sidebarOpen,
+      toggleSidebar: () => this.setState({ sidebarOpen: !s.sidebarOpen, userMenuOpen: false }),
+      goBack: () => this.setState({ view: "note", note: "nullbyte" }),
+      userMenuOpen: s.userMenuOpen,
+      toggleUserMenu: () => this.set("userMenuOpen", !s.userMenuOpen),
+      goSettingsFromUser: () => this.setState({ view: "settings", userMenuOpen: false }),
+      userSub: cur.sync === "server" ? "Synced · " + serverShort : "Local account",
+      reviewCount: s.reviews.length,
+      reviewsEmpty: s.reviews.length === 0,
+      reviews: s.reviews.map((r, i) => ({
+        ...r,
+        review: () => this.setState((st) => ({ view: "note", note: r.target, reviews: st.reviews.filter((_, j) => j !== i) })),
+        dismiss: () => this.setState((st) => ({ reviews: st.reviews.filter((_, j) => j !== i) }))
+      })),
+      setTabs: [
+        { key: "general", label: "General", icon: "sliders-horizontal" },
+        { key: "agents", label: "Agents", icon: "bot" },
+        { key: "sync", label: "Sync & sharing", icon: "refresh-cw" },
+        { key: "account", label: "Account", icon: "user" }
+      ].map((t) => ({
+        ...t,
+        line: s.setTab === t.key ? "var(--primary)" : "transparent",
+        fg: s.setTab === t.key ? "var(--foreground)" : "var(--muted-foreground)",
+        pick: () => this.set("setTab", t.key)
+      })),
+      setTabDesc: {
+        general: "Theme, files and editor behavior.",
+        agents: "How agents behave inside your vault.",
+        sync: "Your server, encryption and who can see what.",
+        account: "You, your devices and recovery."
+      }[s.setTab],
+      setGeneral: s.setTab === "general", setAgents: s.setTab === "agents",
+      setSync: s.setTab === "sync", setAccount: s.setTab === "account",
+      setSyncDesc: cur.sync === "server" ? "Connected to " + serverShort : "Not connected — this vault is local only",
+      setSyncColor: "var(--muted-foreground)",
+      setSyncAction: cur.sync === "server" ? "Change…" : "Connect…",
+      setThemeLight: () => this.set("theme", "light"),
+      setThemeDark: () => this.set("theme", "dark"),
+      themeSegLight: themeSeg("light"), themeSegDark: themeSeg("dark"),
+      syncIcon: cur.sync === "server" ? "refresh-cw" : "cloud-off",
+      syncLabel: cur.sync === "server" ? "Synced · " + serverShort : "Offline · this device only",
+      syncDot: cur.sync === "server" ? "#16a34a" : "var(--muted-foreground)",
+      serverShort,
+
+      newWsOpen: s.newWsOpen,
+      openNewWs: () => this.setState({ wsOpen: false, newWsOpen: true, nwName: "", nwVault: "#v-ideas", nwSync: "local" }),
+      closeNewWs: () => this.set("newWsOpen", false),
+      nwName: s.nwName,
+      setNwName: (e) => this.set("nwName", e.target.value),
+      nwPath: "~/Washi/" + ((s.nwName || "new-vault").toLowerCase().replace(/[^a-z0-9]+/g, "-")),
+      nwLocalSeg: nwSeg("local"), nwServerSeg: nwSeg("server"),
+      setNwLocal: () => this.set("nwSync", "local"),
+      setNwServer: () => this.set("nwSync", "server"),
+      nwSyncNote: s.nwSync === "server"
+        ? "Members of this server can be invited once the vault exists."
+        : "Files stay in this folder. You can connect it to your server later.",
+      createWs: () => this.setState((st) => {
+        const name = st.nwName.trim() || "New vault";
+        return {
+          newWsOpen: false, workspace: name,
+          wsList: st.wsList.concat([{ name, vault: st.nwVault, sync: st.nwSync, meta: st.nwSync === "server" ? "Shared · just you" : "Empty · local" }])
+        };
+      }),
+
+      vaultChoices: ["#v-journal", "#v-work", "#v-ideas", "#v-study", "#v-reading", "#v-plants"].map((id) => ({
+        id,
+        nwRing: s.nwVault === id ? "var(--foreground)" : "transparent",
+        obRing: s.obVault === id ? "var(--foreground)" : "transparent",
+        pickNw: () => this.set("nwVault", id),
+        pickOb: () => this.set("obVault", id)
+      })),
+
+      obOpen: !s.obDone && p.startOnOnboarding !== false,
+      obStep1: s.obStep === 1, obStep2: s.obStep === 2, obStep3: s.obStep === 3, obStep4: s.obStep === 4,
+      obName: s.obName, setObName: (e) => this.set("obName", e.target.value),
+      obPath: "~/Washi/" + ((s.obName || "vault").toLowerCase().replace(/[^a-z0-9]+/g, "-")),
+      obServer: s.obServer, setObServer: (e) => this.set("obServer", e.target.value),
+      obE2e: s.obE2e, setObE2e: (v) => this.set("obE2e", typeof v === "boolean" ? v : !s.obE2e),
+      obLinks: s.obLinks, setObLinks: (v) => this.set("obLinks", typeof v === "boolean" ? v : !s.obLinks),
+      obAgent: s.obAgent, setObAgent: (v) => this.set("obAgent", typeof v === "boolean" ? v : !s.obAgent),
+      isOffline: s.obSync === "offline", isServer: s.obSync === "server",
+      srvOk: s.obSync === "server" && srvValid,
+      srvBad: s.obSync === "server" && !srvValid,
+      srvDot: srvValid ? "#16a34a" : "var(--destructive)",
+      srvStatusColor: srvValid ? "var(--muted-foreground)" : "var(--destructive)",
+      srvStatus: srvValid ? "Reachable · Washi Sync v1.4 · 2 devices already paired" : "Can't reach that server — check the address or try again",
+      obNudge: s.obNudge, setObNudge: (v) => this.set("obNudge", typeof v === "boolean" ? v : !s.obNudge),
+      pickOffline: () => this.set("obSync", "offline"),
+      pickServer: () => this.set("obSync", "server"),
+      offlineCard: obCard("offline"), serverCard: obCard("server"),
+      obStep4Title: s.obSync === "server" ? "Invite your people" : "You're set up",
+      obStep4Sub: s.obSync === "server"
+        ? "They'll need an account on your server. Roles are per workspace."
+        : "One last choice before your vault opens.",
+      obInvite: s.obInvite, setObInvite: (e) => this.set("obInvite", e.target.value),
+      onInviteKey: (e) => { if (e.key === "Enter") this.addInvite(); },
+      addInvite: () => this.addInvite(),
+      invitees: s.invitees.map((p2) => ({ ...p2, initials: p2.email.slice(0, 2).toUpperCase() })),
+      obDots: [1, 2, 3, 4].map((n) => ({
+        w: n === s.obStep ? "22px" : "6px",
+        bg: n <= s.obStep ? "var(--foreground)" : "var(--border)"
+      })),
+      obCanBack: s.obStep > 1,
+      obCanSkip: s.obStep === 1,
+      obNextLabel: s.obStep === 1 ? "Get started" : (s.obStep === 4 ? "Open " + (s.obName || "vault") : "Continue"),
+      obBack: () => this.set("obStep", Math.max(1, s.obStep - 1)),
+      obNext: () => s.obStep === 4 ? this.finishOnboarding() : this.set("obStep", s.obStep + 1),
+      obSkip: () => this.set("obDone", true),
+      modelOpen: s.modelOpen, modelLabel: s.model,
+      toggleModel: () => this.setState({ modelOpen: !s.modelOpen, wsOpen: false }),
+      models: [
+        { name: "Opus 4.1", desc: "Deepest reasoning · slower" },
+        { name: "Sonnet 4.5", desc: "Best for writing · default" },
+        { name: "Haiku 4.5", desc: "Fastest · quick edits" }
+      ].map((m) => ({ ...m, active: s.model === m.name, pick: () => this.setState({ model: m.name, modelOpen: false }) })),
+      ctxPct: Math.min(s.ctx / 200 * 100, 100) + "%",
+      ctxLabel: s.ctx + "k / 200k",
+      wide: !s.narrow,
+      pillVisible: isNote && !s.narrow,
+      panelPosition: s.narrow ? "absolute" : "relative",
+      panelShadow: s.narrow ? "-8px 0 32px rgba(0,0,0,.18)" : "none",
+      panelTop: s.narrow ? "48px" : "0",
+      themeClass: dark ? "dark" : "", themeIcon: dark ? "sun" : "moon",
+      themeLabel: dark ? "dark" : "light",
+      agentColor, agentName, showAttribution: attribution,
+      agentStatus: s.busy ? "writing…" : "idle · watching 3 pages",
+
+      isNote, isDashboard: s.view === "dashboard", isGraph: s.view === "graph", isSettings: s.view === "settings",
+      isNullbyte: isNote && s.note === "nullbyte", isHearth: isNote && s.note === "hearth",
+      isSlab: isNote && s.note === "slab", isUntitled: isNote && s.note === "untitled",
+      crumbRoot: isNote ? (s.note === "untitled" ? "Workspace" : "Design specs") : "Workspace",
+      crumbLeaf: isNote ? titles[s.note] : s.view.charAt(0).toUpperCase() + s.view.slice(1),
+
+      navDash: nav("dashboard"), navGraph: nav("graph"), navSettings: nav("settings"),
+      pgNullbyte: pg("nullbyte"), pgHearth: pg("hearth"), pgSlab: pg("slab"), pgUntitled: pg("untitled"),
+      autoSuggest: seg("suggest"), autoWrite: seg("write"),
+
+      suggestionPending: s.suggestion === "pending",
+      suggestionAccepted: s.suggestion === "accepted",
+      suggestionRejected: s.suggestion === "rejected",
+      acceptSuggestion: () => this.set("suggestion", "accepted"),
+      rejectSuggestion: () => this.set("suggestion", "rejected"),
+
+      openNullbyte: open("nullbyte"), openHearth: open("hearth"), openSlab: open("slab"), openUntitled: open("untitled"),
+      goDashboard: () => this.setState({ view: "dashboard", paletteOpen: false }),
+      goGraph: () => this.setState({ view: "graph", paletteOpen: false }),
+      goSettings: () => this.setState({ view: "settings", paletteOpen: false }),
+
+      toggleTheme: () => this.set("theme", dark ? "light" : "dark"),
+      toggleAgent: () => this.set("agentOpen", !s.agentOpen),
+      agentOpen: s.agentOpen,
+      openPalette: () => this.set("paletteOpen", true),
+      closePalette: () => this.set("paletteOpen", false),
+      paletteOpen: s.paletteOpen,
+      openSlash: () => this.set("slashOpen", !s.slashOpen),
+      closeSlash: () => this.set("slashOpen", false),
+      slashOpen: s.slashOpen,
+      setAttribution: (v) => this.set("attribution", typeof v === "boolean" ? v : !attribution),
+      setAutonomySuggest: () => this.set("autonomy", "suggest"),
+      setAutonomyWrite: () => this.set("autonomy", "write"),
+
+      slashItems: [
+        { icon: "heading-1", label: "Heading", hint: "#" },
+        { icon: "list", label: "Bulleted list", hint: "-" },
+        { icon: "square-check", label: "To-do", hint: "[]" },
+        { icon: "code", label: "Code block", hint: "```" },
+        { icon: "sparkles", label: "Ask an agent", hint: "@" }
+      ],
+      activity: [
+        { text: "Suggested a scrollback rewrite in Nullbyte", when: "4 min ago" },
+        { text: "Flagged a contrast failure in Hearth labels", when: "2 hours ago" },
+        { text: "Scheduled run: token conflict audit on SLAB", when: "06:00" },
+        { text: "Linked 6 research pages as sources", when: "yesterday" }
+      ],
+      messages: s.messages.map((m) => ({
+        text: m.text, tool: m.tool || "", toolIcon: m.toolIcon || "check",
+        isUser: m.role === "user", isAgent: m.role !== "user"
+      })),
+      agentBusy: s.busy,
+      chatRef: this.chatRef,
+      draft: s.draft,
+      setDraft: (e) => this.set("draft", e.target.value),
+      onKey: (e) => { if (e.key === "Enter") this.send(); },
+      send: () => this.send(),
+      askAgentDraft: () => this.setState({ paletteOpen: false, agentOpen: true, note: "untitled", view: "note" }, () => this.send("Draft a spec page from my Research folder"))
+    };
+  }
+
+  addInvite() {
+    const email = this.state.obInvite.trim();
+    if (!email) return;
+    this.setState((st) => ({ obInvite: "", invitees: st.invitees.concat([{ email, role: "Can edit" }]) }));
+  }
+
+  finishOnboarding() {
+    this.setState((st) => {
+      const name = st.obName.trim() || "Personal vault";
+      const sync = st.obSync === "server" ? "server" : "local";
+      const rest = st.wsList.filter((w) => w.name !== "Personal vault");
+      return {
+        obDone: true, workspace: name, agentOpen: st.obAgent,
+        wsList: [{ name, vault: st.obVault, sync, meta: sync === "server" ? "Synced · " + (st.invitees.length + 1) + " members" : "46 pages · local" }].concat(rest)
+      };
+    });
+  }
+
+  send(forced) {
+    const text = forced || this.state.draft.trim() || "Summarize this page";
+    this.setState((st) => ({
+      draft: "", busy: true, ctx: Math.min(st.ctx + 7, 200),
+      messages: st.messages.concat([{ role: "user", text }])
+    }), () => this._scrollChat());
+    clearTimeout(this._t);
+    this._t = setTimeout(() => {
+      this.setState((st) => ({
+        busy: false,
+        messages: st.messages.concat([{
+          role: "agent",
+          text: "Done — drafted three paragraphs and left them marked as mine so you can review before publishing.",
+          tool: "3 blocks written · attributed",
+          toolIcon: "pencil-line"
+        }])
+      }), () => this._scrollChat());
+    }, 1400);
+  }
+
+  componentWillUnmount() {
+    clearTimeout(this._t);
+    window.removeEventListener("resize", this._onResize);
+    document.documentElement.removeAttribute("data-theme");
+    document.documentElement.classList.remove("dark");
+  }
+}
+
+</script>
+</body>
+</html>

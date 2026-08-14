@@ -7,6 +7,9 @@ interface SheetsState {
   activeId: string | null
   searchTerm: string
   searchHits: SearchHit[]
+  paletteOpen: boolean
+  openPalette: () => void
+  closePalette: () => void
   refresh: () => Promise<void>
   select: (id: string | null) => void
   createSheet: () => Promise<void>
@@ -22,6 +25,9 @@ export const useSheetsStore = create<SheetsState>((set, get) => ({
   activeId: null,
   searchTerm: '',
   searchHits: [],
+  paletteOpen: false,
+  openPalette: () => set({ paletteOpen: true }),
+  closePalette: () => set({ paletteOpen: false, searchTerm: '', searchHits: [] }),
 
   refresh: async () => {
     const sheets = await api.listSheets({})
