@@ -4,6 +4,9 @@ export type SyncChoice = 'offline' | 'server'
 
 export interface OnboardingDraft {
   step: number
+  user: string
+  email: string
+  color: string
   name: string
   vault: string
   sync: SyncChoice

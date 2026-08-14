@@ -30,8 +30,15 @@ export default defineCheck(async (app: CheckDriver) => {
   await app.click('[aria-label="New sheet"]')
   await app.expectText('Ask an agent to fill this in, or start writing.')
 
+  app.step('inbox and daily note open as tabs')
+  await app.click('text=Inbox')
+  await app.expectText('Everything Washi wants you to look at, in one queue.')
+  await app.click('text=Daily note')
+  await app.expectText('12-day streak')
+  await app.screenshot('rev2-daily')
+
   app.step('the command palette searches pages')
-  await app.click('text=Search sheets')
+  await app.click('[aria-label="Search (⌘K)"]')
   await app.waitFor('input[placeholder="Search pages, blocks and agents…"]')
   await app.type('welcome', { selector: 'input[placeholder="Search pages, blocks and agents…"]' })
   await app.waitUntil(async () => {
@@ -45,17 +52,18 @@ export default defineCheck(async (app: CheckDriver) => {
   const exposed = (await app.exposed()) as { store?: { sheets: number } }
   app.assert((exposed.store?.sheets ?? 0) >= 2, `expected ≥2 sheets, saw ${exposed.store?.sheets}`)
 
-  app.step('the agent panel renders with composer and status header')
+  app.step('the agent FAB opens the popover with composer and status header')
+  await app.click('[data-agent-fab]')
   await app.waitFor('[data-agent-panel]')
   await app.expectText('watching this vault')
 
-  app.step('creating an agent session populates the picker and empty transcript')
-  await app.click('[aria-label="New session"]')
+  app.step('clearing the conversation starts a fresh session with the empty chat')
+  await app.click('[aria-label="Clear conversation"]')
   await app.waitUntil(async () => {
     const snapshot = await app.snapshot()
     return snapshot.includes('Session ')
-  }, 'the new session never appeared in the picker')
-  await app.expectText('All caught up')
+  }, 'the new session never appeared in the header')
+  await app.expectText('Ask me anything')
   await app.screenshot('m2-agent-panel')
 
   app.step('no RPC call failed along the way')

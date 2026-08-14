@@ -1,101 +1,91 @@
 import {
-  IconArrowLeft,
-  IconChartDots3,
+  IconCalendar,
   IconCircleDot,
   IconEdit,
   IconFileText,
+  IconInbox,
   IconLayoutDashboard,
   IconLayoutSidebarLeftCollapse,
   IconPlus,
   IconSearch,
-  IconSettings,
   IconTrash,
 } from '@tabler/icons-react'
+import { REVIEWS } from '@/components/dashboard/review-data'
 import { UserRow } from '@/components/workspace/UserRow'
 import { WorkspaceSwitcher } from '@/components/workspace/WorkspaceSwitcher'
 import { useAgentStore } from '@/stores/agent/agent-store'
 import { useSheetsStore } from '@/stores/sheets/sheets-store'
-import { type AppView, useViewStore } from '@/stores/view/view-store'
+import { type TabKey, useViewStore } from '@/stores/view/view-store'
 
-const NAV: { view: AppView; label: string; icon: typeof IconLayoutDashboard }[] = [
-  { view: 'dashboard', label: 'Dashboard', icon: IconLayoutDashboard },
-  { view: 'graph', label: 'Graph', icon: IconChartDots3 },
-  { view: 'settings', label: 'Settings', icon: IconSettings },
+const NAV: { tab: TabKey; label: string; icon: typeof IconLayoutDashboard }[] = [
+  { tab: 'view:dashboard', label: 'Dashboard', icon: IconLayoutDashboard },
+  { tab: 'view:inbox', label: 'Inbox', icon: IconInbox },
+  { tab: 'view:daily', label: 'Daily note', icon: IconCalendar },
 ]
 
-/** 248px sidebar per Washi.dc.html: toolbar, switcher, search, nav, tree, sync, user. */
+/** 248px sidebar per Washi.dc.html rev 2: titlebar search, nav w/ inbox badge, tree. */
 export function Sidebar() {
-  const { sheets, activeId, select, createSheet, deleteSheet, openPalette } = useSheetsStore()
+  const { sheets, activeId, createSheet, deleteSheet, openPalette } = useSheetsStore()
   const running = useAgentStore((state) => state.running)
-  const { view, setView } = useViewStore()
+  const { activeTab, openTab, dismissedReviews } = useViewStore()
+  const inboxCount = REVIEWS.length - dismissedReviews.length
 
   return (
     <aside className="flex w-[248px] shrink-0 flex-col border-border border-r bg-muted">
-      {/* real traffic lights sit top-left (hiddenInset); toolbar rides the drag strip */}
       <div
         className="flex h-9 shrink-0 items-center justify-end gap-0.5 pr-2"
         style={{ appRegion: 'drag' } as never}
       >
         <button
           type="button"
-          aria-label="Back"
-          className="grid size-6 place-items-center rounded-md text-muted-foreground hover:bg-accent"
+          aria-label="Search (⌘K)"
+          title="Search (⌘K)"
+          onClick={openPalette}
+          className="grid size-6 place-items-center rounded-[7px] text-muted-foreground hover:bg-accent"
           style={{ appRegion: 'no-drag' } as never}
         >
-          <IconArrowLeft className="size-4" />
+          <IconSearch className="size-3.5" />
         </button>
         <button
           type="button"
           aria-label="New page"
-          onClick={() => {
-            void createSheet()
-            setView('note')
-          }}
-          className="grid size-6 place-items-center rounded-md text-muted-foreground hover:bg-accent"
+          onClick={() => void createSheet()}
+          className="grid size-6 place-items-center rounded-[7px] text-muted-foreground hover:bg-accent"
           style={{ appRegion: 'no-drag' } as never}
         >
-          <IconEdit className="size-4" />
+          <IconEdit className="size-3.5" />
         </button>
         <button
           type="button"
           aria-label="Collapse sidebar"
-          className="grid size-6 place-items-center rounded-md text-muted-foreground hover:bg-accent"
+          className="grid size-6 place-items-center rounded-[7px] text-muted-foreground hover:bg-accent"
           style={{ appRegion: 'no-drag' } as never}
         >
-          <IconLayoutSidebarLeftCollapse className="size-4" />
+          <IconLayoutSidebarLeftCollapse className="size-3.5" />
         </button>
       </div>
 
       <WorkspaceSwitcher pages={sheets.length} />
 
-      <div className="px-2 pt-2">
-        <button
-          type="button"
-          onClick={openPalette}
-          className="flex h-8 w-full items-center gap-2 rounded-[10px] border border-border bg-background px-2.5 text-[13px] text-muted-foreground hover:text-foreground"
-        >
-          <IconSearch className="size-3.5" />
-          Search sheets
-          <kbd className="ml-auto rounded border border-border bg-muted px-1 font-mono text-[10px]">
-            ⌘K
-          </kbd>
-        </button>
-      </div>
-
       <nav className="space-y-px px-2 pt-2">
-        {NAV.map(({ view: navView, label, icon: Icon }) => (
+        {NAV.map(({ tab, label, icon: Icon }) => (
           <button
-            key={navView}
+            key={tab}
             type="button"
-            onClick={() => setView(navView)}
+            onClick={() => openTab(tab)}
             className={`flex h-[30px] w-full items-center gap-2 rounded-lg px-2 text-[13px] ${
-              view === navView
+              activeTab === tab
                 ? 'bg-accent font-medium text-foreground'
                 : 'text-muted-foreground hover:bg-accent'
             }`}
           >
             <Icon className="size-[15px]" />
-            {label}
+            <span className="flex-1 text-left">{label}</span>
+            {tab === 'view:inbox' && inboxCount > 0 && (
+              <span className="flex h-[17px] min-w-[17px] items-center justify-center rounded-full bg-primary px-[5px] font-semibold text-[10.5px] text-primary-foreground">
+                {inboxCount}
+              </span>
+            )}
           </button>
         ))}
       </nav>
@@ -106,7 +96,7 @@ export function Sidebar() {
 
       <div className="flex-1 space-y-px overflow-y-auto px-2 pb-2">
         {sheets.map((sheet) => {
-          const active = sheet.id === activeId && view === 'note'
+          const active = activeTab === `note:${sheet.id}`
           return (
             <div
               key={sheet.id}
@@ -117,10 +107,7 @@ export function Sidebar() {
               <button
                 type="button"
                 aria-label={`Open ${sheet.title}`}
-                onClick={() => {
-                  select(sheet.id)
-                  setView('note')
-                }}
+                onClick={() => openTab(`note:${sheet.id}`)}
                 className="flex h-full min-w-0 flex-1 items-center gap-2 px-2 text-left text-[13px]"
               >
                 <IconFileText className="size-[15px] shrink-0" />
@@ -128,7 +115,7 @@ export function Sidebar() {
                   {sheet.icon ? `${sheet.icon} ` : ''}
                   {sheet.title}
                 </span>
-                {active && running && (
+                {active && sheet.id === activeId && running && (
                   <span
                     className="ml-auto size-1.5 shrink-0 rounded-full bg-agent"
                     style={{ animation: 'wdot 2s ease-in-out infinite' }}
@@ -149,10 +136,7 @@ export function Sidebar() {
         <button
           type="button"
           aria-label="New sheet"
-          onClick={() => {
-            void createSheet()
-            setView('note')
-          }}
+          onClick={() => void createSheet()}
           className="flex h-[29px] w-full items-center gap-2 rounded-lg px-2 text-[13px] text-muted-foreground hover:bg-accent"
         >
           <IconPlus className="size-3.5" />

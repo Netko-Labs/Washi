@@ -46,6 +46,8 @@ export const useSheetsStore = create<SheetsState>((set, get) => ({
     })
     await get().refresh()
     set({ activeId: sheet.id })
+    const { useViewStore } = await import('@/stores/view/view-store')
+    useViewStore.getState().openTab(`note:${sheet.id}`)
   },
 
   deleteSheet: async (id) => {

@@ -32,19 +32,22 @@ function relativeTime(hlc: string): string {
 }
 
 export function Dashboard() {
-  const { sheets, select } = useSheetsStore()
-  const setView = useViewStore((state) => state.setView)
+  const { sheets } = useSheetsStore()
+  const openTab = useViewStore((state) => state.openTab)
+  const identity = useViewStore((state) => state.identity)
   const recent = sheets.slice(0, 3)
+  const firstName = identity.name.trim().split(/\s+/)[0] || 'there'
 
   const openSheet = (id: string) => {
-    select(id)
-    setView('note')
+    openTab(`note:${id}`)
   }
 
   return (
     <div className="flex-1 overflow-y-auto">
       <section className="mx-auto max-w-[940px] px-10 pt-11 pb-[60px]">
-        <h1 className="mb-1 font-semibold text-[28px] tracking-[-0.02em]">Good morning, Mira</h1>
+        <h1 className="mb-1 font-semibold text-[28px] tracking-[-0.02em]">
+          Good morning, {firstName}
+        </h1>
         <p className="mb-7 text-muted-foreground">
           Washi made 7 edits across 3 pages while you were away.
         </p>

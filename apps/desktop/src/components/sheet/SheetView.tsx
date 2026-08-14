@@ -6,6 +6,7 @@ import { Mascot } from '@/components/mascot/Mascot'
 import { paperHost } from '@/lib/paper-host'
 import { api } from '@/lib/rpc'
 import { useSheetsStore } from '@/stores/sheets/sheets-store'
+import { SheetByline } from './SheetByline'
 
 interface Loaded {
   sheet: SheetDetail
@@ -104,15 +105,7 @@ export function SheetView() {
           ) : (
             loaded.root && (
               <>
-                <div className="flex items-center gap-2.5 border-border border-b bg-card px-8 pt-5 pb-4">
-                  <span className="grid size-7 place-items-center rounded-full bg-accent font-semibold text-[10px] text-muted-foreground">
-                    MK
-                  </span>
-                  <Mascot face="wink" size={26} />
-                  <span className="text-[12px] text-muted-foreground">
-                    Edited {relativeTime(loaded.sheet.hlcUpdated)} · kept tidy by Washi
-                  </span>
-                </div>
+                <SheetByline editedLabel={relativeTime(loaded.sheet.hlcUpdated)} />
                 <PaperProvider host={paperHost}>
                   <WsxView key={loaded.sheet.id} root={loaded.root} />
                 </PaperProvider>

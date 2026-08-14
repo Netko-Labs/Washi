@@ -1,8 +1,7 @@
-import { IconRobot } from '@tabler/icons-react'
 import { AgentMascot } from '@/components/mascot/AgentMascot'
 import { mascotStateFor, useAgentStore } from '@/stores/agent/agent-store'
 import { useSheetsStore } from '@/stores/sheets/sheets-store'
-import { useViewStore } from '@/stores/view/view-store'
+import { useViewStore, viewOf } from '@/stores/view/view-store'
 
 const STATE_LABELS: Record<string, string> = {
   idle: 'Washi watching',
@@ -14,15 +13,22 @@ const STATE_LABELS: Record<string, string> = {
   flagged: 'Washi flagged an issue',
 }
 
-/** 48px main header: breadcrumb + agent status pill + panel toggle (Washi.dc.html). */
+const VIEW_LABELS: Record<string, string> = {
+  dashboard: 'Dashboard',
+  inbox: 'Inbox',
+  daily: 'Daily note',
+  settings: 'Settings',
+}
+
+/** 48px header: breadcrumb + agent status pill (Washi.dc.html rev 2 — no bot button, FAB rules). */
 export function Header() {
   const { sheets, activeId } = useSheetsStore()
   const transcript = useAgentStore((state) => state.transcript)
   const running = useAgentStore((state) => state.running)
   const approvals = useAgentStore((state) => state.approvals)
-  const togglePanel = useAgentStore((state) => state.togglePanel)
-  const view = useViewStore((state) => state.view)
+  const activeTab = useViewStore((state) => state.activeTab)
 
+  const view = viewOf(activeTab)
   const active = sheets.find((sheet) => sheet.id === activeId)
   const mascotState = mascotStateFor(transcript, running, approvals)
   const leaf =
@@ -30,11 +36,7 @@ export function Header() {
       ? active
         ? `${active.icon ?? ''} ${active.title}`.trim()
         : 'All pages'
-      : view === 'dashboard'
-        ? 'Dashboard'
-        : view === 'graph'
-          ? 'Graph'
-          : 'Settings'
+      : (VIEW_LABELS[view] ?? 'Washi')
 
   return (
     <header className="flex h-12 shrink-0 items-center gap-2 border-border border-b px-4">
@@ -54,15 +56,6 @@ export function Header() {
           {STATE_LABELS[mascotState]}
         </div>
       )}
-
-      <button
-        type="button"
-        aria-label="Toggle agent panel"
-        onClick={togglePanel}
-        className="grid size-[30px] place-items-center rounded-[9px] border border-border bg-background text-muted-foreground hover:text-foreground"
-      >
-        <IconRobot className="size-4" />
-      </button>
     </header>
   )
 }

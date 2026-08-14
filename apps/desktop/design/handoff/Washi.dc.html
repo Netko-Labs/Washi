@@ -379,8 +379,8 @@
       <span style="width:12px; height:12px; border-radius:999px; background:#febc2e;"></span>
       <span style="width:12px; height:12px; border-radius:999px; background:#28c840;"></span>
       <span style="flex:1;"></span>
-      <button onClick="{{ goBack }}" title="Back" style="display:flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:7px; border:0; background:transparent; color:var(--muted-foreground); cursor:pointer;" style-hover="background:var(--accent); color:var(--foreground)">
-        <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="arrow-left" size="{{ s14 }}" hint-size="14px,14px"></x-import>
+      <button onClick="{{ openPalette }}" title="Search (⌘K)" style="display:flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:7px; border:0; background:transparent; color:var(--muted-foreground); cursor:pointer;" style-hover="background:var(--accent); color:var(--foreground)">
+        <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="search" size="{{ s14 }}" hint-size="14px,14px"></x-import>
       </button>
       <button onClick="{{ openUntitled }}" title="New page" style="display:flex; align-items:center; justify-content:center; width:24px; height:24px; border-radius:7px; border:0; background:transparent; color:var(--muted-foreground); cursor:pointer;" style-hover="background:var(--accent); color:var(--foreground)">
         <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="square-pen" size="{{ s14 }}" hint-size="14px,14px"></x-import>
@@ -419,23 +419,15 @@
       </sc-if>
     </div>
 
-    <div style="padding:0 10px 10px;">
-      <button onClick="{{ openPalette }}" style="width:100%; display:flex; align-items:center; gap:8px; height:32px; padding:0 8px; border-radius:10px; border:1px solid var(--border); background:var(--background); color:var(--muted-foreground); font:inherit; font-size:13px; cursor:pointer;" style-hover="border-color:var(--muted-foreground)">
-        <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="search" size="{{ s14 }}" hint-size="14px,14px"></x-import>
-        <span>Search…</span>
-        <span style="margin-left:auto;">
-          <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Kbd" hint-size="auto,18px">⌘K</x-import>
-        </span>
-      </button>
-    </div>
 
     <div style="display:flex; flex-direction:column; gap:1px; padding:0 8px;">
       <button onClick="{{ goDashboard }}" style="display:flex; align-items:center; gap:9px; height:30px; padding:0 8px; border:0; border-radius:8px; font:inherit; font-size:13px; cursor:pointer; text-align:left; background:{{ navDash.bg }}; color:{{ navDash.fg }}; font-weight:{{ navDash.fw }};" style-hover="background:var(--accent)">
         <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="layout-dashboard" size="{{ s15 }}" hint-size="15px,15px"></x-import>Dashboard</button>
-      <button onClick="{{ goGraph }}" style="display:flex; align-items:center; gap:9px; height:30px; padding:0 8px; border:0; border-radius:8px; font:inherit; font-size:13px; cursor:pointer; text-align:left; background:{{ navGraph.bg }}; color:{{ navGraph.fg }}; font-weight:{{ navGraph.fw }};" style-hover="background:var(--accent)">
-        <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="git-fork" size="{{ s15 }}" hint-size="15px,15px"></x-import>Graph</button>
-      <button onClick="{{ goSettings }}" style="display:flex; align-items:center; gap:9px; height:30px; padding:0 8px; border:0; border-radius:8px; font:inherit; font-size:13px; cursor:pointer; text-align:left; background:{{ navSettings.bg }}; color:{{ navSettings.fg }}; font-weight:{{ navSettings.fw }};" style-hover="background:var(--accent)">
-        <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="settings" size="{{ s15 }}" hint-size="15px,15px"></x-import>Settings</button>
+      <button onClick="{{ goInbox }}" style="display:flex; align-items:center; gap:9px; height:30px; padding:0 8px; border:0; border-radius:8px; font:inherit; font-size:13px; cursor:pointer; text-align:left; background:{{ navInbox.bg }}; color:{{ navInbox.fg }}; font-weight:{{ navInbox.fw }};" style-hover="background:var(--accent)">
+        <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="inbox" size="{{ s15 }}" hint-size="15px,15px"></x-import><span style="flex:1;">Inbox</span>
+        <sc-if value="{{ inboxCount }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex; align-items:center; justify-content:center; min-width:17px; height:17px; padding:0 5px; border-radius:999px; background:var(--primary); color:var(--primary-foreground); font-size:10.5px; font-weight:600;">{{ inboxCount }}</span></sc-if></button>
+      <button onClick="{{ goDaily }}" style="display:flex; align-items:center; gap:9px; height:30px; padding:0 8px; border:0; border-radius:8px; font:inherit; font-size:13px; cursor:pointer; text-align:left; background:{{ navDaily.bg }}; color:{{ navDaily.fg }}; font-weight:{{ navDaily.fw }};" style-hover="background:var(--accent)">
+        <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="calendar-days" size="{{ s15 }}" hint-size="15px,15px"></x-import>Daily note</button>
     </div>
 
     <div style="display:flex; align-items:center; gap:6px; padding:18px 16px 6px; font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted-foreground);">Workspace</div>
@@ -488,11 +480,11 @@
     <div style="border-top:1px solid var(--border); padding:10px 12px; position:relative; display:flex; align-items:center; gap:9px;" data-comment-anchor="b7f7de1b90-div">
       <button onClick="{{ toggleUserMenu }}" style="flex:1; min-width:0; display:flex; align-items:center; gap:9px; padding:4px; margin:-4px; border:0; border-radius:9px; background:transparent; font:inherit; color:var(--foreground); text-align:left; cursor:pointer;" style-hover="background:var(--accent)">
         <span style="position:relative; flex:none; display:flex;">
-          <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Avatar" size="sm" fallback="MK" hint-size="28px,28px"></x-import>
+          <span style="display:flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:999px; background:{{ userColor }}; color:#fff6e4; font-size:10.5px; font-weight:600;">{{ userInitials }}</span>
           <span style="position:absolute; right:-1px; bottom:-1px; width:9px; height:9px; border-radius:999px; background:{{ syncDot }}; border:2px solid var(--muted);"></span>
         </span>
         <span style="min-width:0;">
-          <span style="display:block; font-size:12.5px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Mira Kaneko</span>
+          <span style="display:block; font-size:12.5px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ userName }}</span>
           <span style="display:block; font-size:11px; color:var(--muted-foreground); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ userSub }}</span>
         </span>
         <span style="margin-left:auto; opacity:.5; display:flex; flex:none;">
@@ -502,8 +494,8 @@
       <sc-if value="{{ userMenuOpen }}" hint-placeholder-val="{{ false }}">
         <div style="position:absolute; left:10px; bottom:52px; width:224px; z-index:70; background:var(--popover); border:1px solid var(--border); border-radius:12px; box-shadow:0 8px 28px rgba(0,0,0,.16); padding:5px; animation:vfade .12s ease both;">
           <div style="display:flex; align-items:center; gap:9px; padding:8px;">
-            <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Avatar" size="sm" fallback="MK" hint-size="28px,28px"></x-import>
-            <span style="min-width:0;"><span style="display:block; font-size:12.5px; font-weight:500;">Mira Kaneko</span><span style="display:block; font-size:11px; color:var(--muted-foreground);">mira@hollowmoor.net</span></span>
+            <span style="display:flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:999px; background:{{ userColor }}; color:#fff6e4; font-size:10.5px; font-weight:600; flex:none;">{{ userInitials }}</span>
+            <span style="min-width:0;"><span style="display:block; font-size:12.5px; font-weight:500;">{{ userName }}</span><span style="display:block; font-size:11px; color:var(--muted-foreground);">mira@hollowmoor.net</span></span>
           </div>
           <div style="height:1px; background:var(--border); margin:2px 4px 4px;"></div>
           <div style="display:flex; align-items:center; gap:9px; height:34px; padding:0 8px; font-size:12.5px; color:var(--foreground);">
@@ -532,17 +524,31 @@
 
   <!-- MAIN -->
   <main style="flex:1; min-width:0; display:flex; flex-direction:column;">
-    <header style="height:48px; flex:none; display:flex; align-items:center; gap:10px; padding:0 16px; border-bottom:1px solid var(--border);">
+    <div style="flex:none; display:flex; align-items:flex-end; gap:2px; padding:6px 8px 0; background:var(--muted); border-bottom:1px solid var(--border); overflow-x:auto;">
       <sc-if value="{{ sidebarClosed }}" hint-placeholder-val="{{ false }}">
-        <div style="display:flex; align-items:center; gap:7px; flex:none;">
+        <div style="display:flex; align-items:center; gap:7px; flex:none; padding:0 8px 5px 4px;">
           <span style="width:12px; height:12px; border-radius:999px; background:#ff5f57;"></span>
           <span style="width:12px; height:12px; border-radius:999px; background:#febc2e;"></span>
           <span style="width:12px; height:12px; border-radius:999px; background:#28c840;"></span>
-          <button onClick="{{ toggleSidebar }}" title="Show sidebar" style="display:flex; align-items:center; justify-content:center; width:26px; height:26px; margin-left:4px; border-radius:8px; border:0; background:transparent; color:var(--muted-foreground); cursor:pointer;" style-hover="background:var(--accent); color:var(--foreground)">
-            <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="panel-left" size="{{ s15 }}" hint-size="15px,15px"></x-import>
+          <button onClick="{{ toggleSidebar }}" title="Show sidebar" style="display:flex; align-items:center; justify-content:center; width:24px; height:24px; margin-left:4px; border-radius:7px; border:0; background:transparent; color:var(--muted-foreground); cursor:pointer;" style-hover="background:var(--accent); color:var(--foreground)">
+            <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="panel-left" size="{{ s14 }}" hint-size="14px,14px"></x-import>
           </button>
         </div>
       </sc-if>
+      <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="2">
+        <div onClick="{{ t.focus }}" title="{{ t.label }}" style="display:flex; align-items:center; gap:6px; height:31px; padding:0 4px 0 10px; border-radius:8px 8px 0 0; background:{{ t.bg }}; border:1px solid {{ t.border }}; border-bottom:0; color:{{ t.fg }}; font-size:12.5px; font-weight:{{ t.fw }}; cursor:pointer; max-width:190px; min-width:0; flex:0 1 auto;">
+          <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="{{ t.icon }}" size="{{ s13 }}" hint-size="13px,13px"></x-import>
+          <span style="min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ t.label }}</span>
+          <button onClick="{{ t.close }}" style="display:flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:5px; border:0; background:transparent; color:var(--muted-foreground); cursor:pointer; flex:none; padding:0;" style-hover="background:var(--accent); color:var(--foreground)">
+            <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="x" size="{{ s12 }}" hint-size="12px,12px"></x-import>
+          </button>
+        </div>
+      </sc-for>
+      <button onClick="{{ newTab }}" title="New tab" style="display:flex; align-items:center; justify-content:center; width:26px; height:26px; margin-bottom:3px; border-radius:7px; border:0; background:transparent; color:var(--muted-foreground); cursor:pointer; flex:none;" style-hover="background:var(--accent); color:var(--foreground)">
+        <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="plus" size="{{ s14 }}" hint-size="14px,14px"></x-import>
+      </button>
+    </div>
+    <header style="height:48px; flex:none; display:flex; align-items:center; gap:10px; padding:0 16px; border-bottom:1px solid var(--border);">
       <div style="display:flex; align-items:center; gap:7px; font-size:13px; color:var(--muted-foreground); flex:1 1 auto; min-width:0; white-space:nowrap;">
         <sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}">
           <span style="flex:0 1 auto; overflow:hidden; text-overflow:ellipsis;">{{ crumbRoot }}</span>
@@ -556,9 +562,6 @@
             <svg viewBox="0 0 1024 1024" style="width:17px; height:17px; border-radius:5px; display:block; margin-left:-3px;"><use href="#w-idle"></use></svg>{{ agentName }} watching
           </span>
         </sc-if>
-        <button onClick="{{ toggleAgent }}" style="display:flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:9px; border:1px solid var(--border); background:var(--background); color:var(--muted-foreground); cursor:pointer;" style-hover="color:var(--foreground)">
-          <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="bot" size="{{ s15 }}" hint-size="15px,15px"></x-import>
-        </button>
         <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Button" size="sm" hint-size="auto,32px">Share</x-import>
       </div>
     </header>
@@ -575,7 +578,7 @@
         <p style="margin:0 0 22px; font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:14px; color:var(--muted-foreground);">A terminal client for people who never leave the keyboard.</p>
 
         <div style="display:flex; align-items:center; gap:8px; padding-bottom:20px; margin-bottom:24px; border-bottom:1px solid var(--border);">
-          <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Avatar" size="sm" fallback="MK" hint-size="28px,28px"></x-import>
+          <span style="display:flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:999px; background:{{ userColor }}; color:#fff6e4; font-size:10.5px; font-weight:600;">{{ userInitials }}</span>
           <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Avatar" size="sm" fallback="AR" hint-size="28px,28px"></x-import>
           <svg viewBox="0 0 1024 1024" style="width:28px; height:28px; border-radius:999px; display:block;"><use href="#w-idle"></use></svg>
           <span style="font-size:12px; color:var(--muted-foreground); margin-left:4px;">Edited 4 min ago · 38% of this page written by {{ agentName }}</span>
@@ -838,59 +841,74 @@
       </section>
       </sc-if>
 
-      <!-- ===== GRAPH ===== -->
-      <sc-if value="{{ isGraph }}" hint-placeholder-val="{{ false }}">
-      <section data-screen-label="Graph" style="height:100%; position:relative; animation:vfade .18s ease both;">
-        <div style="position:absolute; inset:0; background-image:radial-gradient(var(--border) 1px, transparent 1px); background-size:22px 22px; opacity:.6;"></div>
-        <div style="position:absolute; left:24px; top:20px; z-index:2; display:flex; gap:8px; align-items:center;">
-          <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Badge" variant="outline" size="sm" hint-size="auto,20px">46 pages</x-import>
-          <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Badge" variant="outline" size="sm" hint-size="auto,20px">118 links</x-import>
-          <span style="display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--muted-foreground); margin-left:6px;"><span style="width:8px; height:8px; border-radius:999px; background:{{ agentColor }};"></span>agent-touched</span>
+      <!-- ===== INBOX ===== -->
+      <sc-if value="{{ isInbox }}" hint-placeholder-val="{{ false }}">
+      <section data-screen-label="Inbox" style="max-width:680px; margin:0 auto; padding:44px 40px 60px; animation:vfade .18s ease both;">
+        <h1 style="margin:0 0 4px; font-size:24px; font-weight:600; letter-spacing:-0.02em;">Inbox</h1>
+        <p style="margin:0 0 22px; color:var(--muted-foreground);">Everything {{ agentName }} wants you to look at, in one queue.</p>
+        <div style="border:1px solid var(--border); border-radius:14px; background:var(--card); overflow:hidden; margin-bottom:26px;">
+          <sc-for list="{{ reviews }}" as="r" hint-placeholder-count="3">
+            <div style="display:flex; flex-wrap:wrap; align-items:center; gap:10px; padding:12px 16px; border-bottom:1px solid var(--border);">
+              <svg viewBox="0 0 1024 1024" style="width:22px; height:22px; border-radius:7px; display:block; flex:none;"><use href="#w-suggest"></use></svg>
+              <span style="flex:1 1 240px; min-width:0;">
+                <span style="display:block; font-size:13px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ r.title }}</span>
+                <span style="display:block; font-size:11.5px; color:var(--muted-foreground);">{{ r.meta }}</span>
+              </span>
+              <span style="flex:none; display:flex; gap:6px;">
+                <button onClick="{{ r.dismiss }}" style="height:26px; padding:0 10px; border-radius:8px; border:1px solid var(--border); background:var(--background); color:var(--foreground); font:inherit; font-size:12px; cursor:pointer;" style-hover="background:var(--accent)">Dismiss</button>
+                <button onClick="{{ r.review }}" style="height:26px; padding:0 10px; border-radius:8px; border:0; background:var(--primary); color:var(--primary-foreground); font:inherit; font-size:12px; font-weight:500; cursor:pointer;" style-hover="opacity:.9">Review</button>
+              </span>
+            </div>
+          </sc-for>
+          <sc-if value="{{ reviewsEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex; align-items:center; gap:10px; padding:16px; font-size:13px; color:var(--muted-foreground);">
+              <svg viewBox="0 0 1024 1024" style="width:22px; height:22px; border-radius:7px; display:block;"><use href="#w-done"></use></svg>Inbox zero — {{ agentName }} has nothing waiting on you.
+            </div>
+          </sc-if>
         </div>
-        <svg viewBox="0 0 900 520" style="position:absolute; inset:0; width:100%; height:100%;">
-          <g stroke="var(--border)" stroke-width="1.5" fill="none">
-            <path d="M450 260 L300 160"></path><path d="M450 260 L640 170"></path><path d="M450 260 L360 390"></path>
-            <path d="M450 260 L620 380"></path><path d="M300 160 L180 250"></path><path d="M640 170 L760 260"></path>
-            <path d="M360 390 L240 430"></path><path d="M620 380 L700 450"></path><path d="M300 160 L640 170"></path>
-          </g>
-        </svg>
-        <div style="position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); z-index:3; display:flex; flex-direction:column; align-items:center; gap:6px;">
-          <span style="width:20px; height:20px; border-radius:999px; background:var(--foreground);"></span>
-          <span style="font-size:12px; font-weight:600;">Design specs</span>
-        </div>
-        <div style="position:absolute; left:33.3%; top:30.7%; z-index:3; display:flex; flex-direction:column; align-items:center; gap:5px;">
-          <span style="width:14px; height:14px; border-radius:999px; background:{{ agentColor }};"></span>
-          <span style="font-size:11px;">Nullbyte</span>
-        </div>
-        <div style="position:absolute; left:71%; top:32.6%; z-index:3; display:flex; flex-direction:column; align-items:center; gap:5px;">
-          <span style="width:14px; height:14px; border-radius:999px; background:{{ agentColor }};"></span>
-          <span style="font-size:11px;">Hearth</span>
-        </div>
-        <div style="position:absolute; left:40%; top:75%; z-index:3; display:flex; flex-direction:column; align-items:center; gap:5px;">
-          <span style="width:12px; height:12px; border-radius:999px; background:var(--muted-foreground);"></span>
-          <span style="font-size:11px;">SLAB</span>
-        </div>
-        <div style="position:absolute; left:68.8%; top:73%; z-index:3; display:flex; flex-direction:column; align-items:center; gap:5px;">
-          <span style="width:11px; height:11px; border-radius:999px; background:var(--muted-foreground);"></span>
-          <span style="font-size:11px; color:var(--muted-foreground);">Token audit</span>
-        </div>
-        <div style="position:absolute; left:20%; top:48%; z-index:3; display:flex; flex-direction:column; align-items:center; gap:5px;">
-          <span style="width:10px; height:10px; border-radius:999px; background:var(--muted-foreground);"></span>
-          <span style="font-size:11px; color:var(--muted-foreground);">Latency refs</span>
-        </div>
-        <div style="position:absolute; left:84.4%; top:50%; z-index:3; display:flex; flex-direction:column; align-items:center; gap:5px;">
-          <span style="width:10px; height:10px; border-radius:999px; background:var(--muted-foreground);"></span>
-          <span style="font-size:11px; color:var(--muted-foreground);">Research</span>
-        </div>
-        <div style="position:absolute; left:26.6%; top:82.7%; z-index:3; display:flex; flex-direction:column; align-items:center; gap:5px;">
-          <span style="width:9px; height:9px; border-radius:999px; background:var(--muted-foreground);"></span>
-          <span style="font-size:11px; color:var(--muted-foreground);">Kitchen trip</span>
-        </div>
-        <div style="position:absolute; left:77.7%; top:86.5%; z-index:3; display:flex; flex-direction:column; align-items:center; gap:5px;">
-          <span style="width:9px; height:9px; border-radius:999px; background:var(--muted-foreground);"></span>
-          <span style="font-size:11px; color:var(--muted-foreground);">Pricing</span>
+        <div style="font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--muted-foreground); margin-bottom:10px;">Earlier</div>
+        <div style="display:flex; flex-direction:column; gap:14px; padding-left:4px;">
+          <sc-for list="{{ activity }}" as="a" hint-placeholder-count="4">
+            <div style="display:flex; gap:10px;">
+              <span style="width:6px; height:6px; margin-top:6px; border-radius:999px; background:{{ agentColor }}; flex:none;"></span>
+              <div><div style="font-size:13px; line-height:1.5;">{{ a.text }}</div><div style="font-size:11px; color:var(--muted-foreground);">{{ a.when }}</div></div>
+            </div>
+          </sc-for>
         </div>
       </section>
+      </sc-if>
+
+      <!-- ===== DAILY NOTE ===== -->
+      <sc-if value="{{ isDaily }}" hint-placeholder-val="{{ false }}">
+      <article data-screen-label="Daily note" style="max-width:700px; margin:0 auto; padding:56px 40px 80px; animation:vfade .18s ease both;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
+          <h1 style="margin:0; font-size:27px; font-weight:600; letter-spacing:-0.02em;">Thursday, August 14</h1>
+          <span style="display:inline-flex; align-items:center; gap:5px; height:22px; padding:0 9px; border-radius:999px; background:var(--muted); font-size:11.5px; font-weight:500; color:var(--muted-foreground);">12-day streak</span>
+        </div>
+        <div style="font-size:12px; color:var(--muted-foreground); margin-bottom:24px;">Daily note · only you and {{ agentName }} can see this</div>
+        <p style="margin:0 0 16px; line-height:1.75;">Reviewed the scrollback suggestion first thing — accepted with the settings pointer. Need to close the radius token question with SLAB before Friday.</p>
+        <div style="display:flex; gap:12px; align-items:center; border:1px solid var(--border); border-radius:12px; background:var(--card); padding:12px 14px; margin-bottom:16px;">
+          <svg viewBox="0 0 1024 1024" style="width:30px; height:30px; border-radius:10px; display:block; flex:none;"><use href="#w-idle"></use></svg>
+          <span style="flex:1; font-size:13px; line-height:1.55;">Yesterday you met with the Hearth client — want me to pull the action items into today's note?</span>
+          <span style="flex:none; display:flex; gap:6px;">
+            <button onClick="{{ dailyDecline }}" style="height:26px; padding:0 10px; border-radius:8px; border:1px solid var(--border); background:var(--background); color:var(--foreground); font:inherit; font-size:12px; cursor:pointer;" style-hover="background:var(--accent)">No</button>
+            <button onClick="{{ dailyAccept }}" style="height:26px; padding:0 10px; border-radius:8px; border:0; background:var(--primary); color:var(--primary-foreground); font:inherit; font-size:12px; font-weight:500; cursor:pointer;" style-hover="opacity:.9">Yes, pull them in</button>
+          </span>
+        </div>
+        <sc-if value="{{ dailyPulled }}" hint-placeholder-val="{{ false }}">
+          <sc-if value="{{ showAttribution }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex; align-items:center; gap:7px; margin-bottom:6px; font-size:11px; color:var(--muted-foreground);">
+              <svg viewBox="0 0 1024 1024" style="width:15px; height:15px; border-radius:5px;"><use href="#w-write"></use></svg>Pulled by {{ agentName }} from Client sync — Hearth
+            </div>
+          </sc-if>
+          <ul style="margin:0 0 16px; padding-left:20px; line-height:1.8; border-left:2px solid {{ agentColor }}; margin-left:2px; padding-left:26px; animation:vfade .2s ease both;">
+            <li>Send revised label contrast pass by Friday</li>
+            <li>Confirm seasonal menu photography budget</li>
+            <li>Hearth wants the recipe importer in the beta</li>
+          </ul>
+        </sc-if>
+        <p style="margin:0; line-height:1.75; color:var(--muted-foreground);">What else happened today…</p>
+      </article>
       </sc-if>
 
       <!-- ===== SETTINGS ===== -->
@@ -996,8 +1014,8 @@
           <div style="display:flex; flex-direction:column; gap:22px; animation:vfade .14s ease both;">
             <div style="border:1px solid var(--border); border-radius:14px; background:var(--card); overflow:hidden;">
               <div style="display:flex; align-items:center; gap:14px; padding:16px 18px; border-bottom:1px solid var(--border);">
-                <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Avatar" size="md" fallback="MK" hint-size="36px,36px"></x-import>
-                <div style="flex:1;"><div style="font-weight:500;">Mira Kaneko</div><div style="font-size:12px; color:var(--muted-foreground);">mira@hollowmoor.net</div></div>
+                <span style="display:flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:999px; background:{{ userColor }}; color:#fff6e4; font-size:13px; font-weight:600;">{{ userInitials }}</span>
+                <div style="flex:1;"><div style="font-weight:500;">{{ userName }}</div><div style="font-size:12px; color:var(--muted-foreground);">{{ userEmail }}</div></div>
                 <button style="height:32px; padding:0 12px; border-radius:10px; border:1px solid var(--border); background:var(--background); color:var(--foreground); font:inherit; font-size:13px; cursor:pointer;" style-hover="background:var(--accent)">Edit</button>
               </div>
               <div style="display:flex; align-items:center; gap:16px; padding:16px 18px; border-bottom:1px solid var(--border);">
@@ -1021,18 +1039,67 @@
     </div>
   </main>
 
-  <!-- AGENT PANEL -->
+  <!-- AGENT POPOVER -->
+  <sc-if value="{{ chatExpanded }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ collapseChat }}" style="position:fixed; inset:0; z-index:49; background:rgba(0,0,0,.4);"></div>
+  </sc-if>
   <sc-if value="{{ agentOpen }}" hint-placeholder-val="{{ true }}">
-  <aside data-screen-label="Agent panel" style="width:334px; max-width:100%; flex:none; display:flex; flex-direction:column; border-left:1px solid var(--border); background:var(--card); position:{{ panelPosition }}; right:0; top:{{ panelTop }}; bottom:0; z-index:30; box-shadow:{{ panelShadow }};">
-    <div style="height:48px; flex:none; display:flex; align-items:center; gap:9px; padding:0 12px 0 14px; border-bottom:1px solid var(--border);">
+  <aside data-screen-label="Agent popover" style="position:fixed; z-index:50; display:flex; flex-direction:column; border:1px solid var(--border); border-radius:16px; background:var(--card); overflow:hidden; box-shadow:0 24px 64px rgba(0,0,0,.22), 0 4px 16px rgba(0,0,0,.10); animation:vfade .16s ease both; inset:{{ chatInset }}; width:{{ chatW }}; height:{{ chatH }}; margin:{{ chatM }};">
+    <div style="height:50px; flex:none; display:flex; align-items:center; gap:9px; padding:0 8px 0 14px; border-bottom:1px solid var(--border); position:relative;">
       <sc-if value="{{ mascotHeader }}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 1024 1024" style="width:26px; height:26px; border-radius:8px; display:block; flex:none;"><use href="{{ mascotHeader }}"></use></svg></sc-if>
-      <div style="min-width:0;"><div style="font-size:13px; font-weight:500;">{{ agentName }}</div><div style="font-size:11px; color:var(--muted-foreground);">editing {{ crumbLeaf }}</div></div>
-      <button onClick="{{ toggleAgent }}" style="margin-left:auto; display:flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:8px; border:0; background:transparent; color:var(--muted-foreground); cursor:pointer;" style-hover="background:var(--accent)">
-        <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="x" size="{{ s15 }}" hint-size="15px,15px"></x-import>
+      <button onClick="{{ toggleConvos }}" style="display:flex; align-items:center; gap:6px; min-width:0; height:34px; padding:0 8px; margin-left:-4px; border:0; border-radius:9px; background:transparent; font:inherit; color:var(--foreground); text-align:left; cursor:pointer;" style-hover="background:var(--accent)">
+        <span style="min-width:0;">
+          <span style="display:block; font-size:13px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ convoTitle }}</span>
+          <span style="display:block; font-size:11px; color:var(--muted-foreground);">editing {{ crumbLeaf }}</span>
+        </span>
+        <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="chevron-down" size="{{ s13 }}" hint-size="13px,13px"></x-import>
       </button>
+      <span style="margin-left:auto; flex:none; display:flex; align-items:center; gap:2px;">
+        <button onClick="{{ clearChat }}" title="Clear conversation" style="display:flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:8px; border:0; background:transparent; color:var(--muted-foreground); cursor:pointer;" style-hover="background:var(--accent); color:var(--foreground)">
+          <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="eraser" size="{{ s14 }}" hint-size="14px,14px"></x-import>
+        </button>
+        <button onClick="{{ toggleExpand }}" title="{{ expandTitle }}" style="display:flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:8px; border:0; background:transparent; color:var(--muted-foreground); cursor:pointer;" style-hover="background:var(--accent); color:var(--foreground)">
+          <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="{{ expandIcon }}" size="{{ s14 }}" hint-size="14px,14px"></x-import>
+        </button>
+        <button onClick="{{ closeChat }}" style="display:flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:8px; border:0; background:transparent; color:var(--muted-foreground); cursor:pointer;" style-hover="background:var(--accent); color:var(--foreground)">
+          <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="x" size="{{ s15 }}" hint-size="15px,15px"></x-import>
+        </button>
+      </span>
+      <sc-if value="{{ convosOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute; left:12px; top:48px; width:264px; z-index:60; background:var(--popover); border:1px solid var(--border); border-radius:12px; box-shadow:0 8px 28px rgba(0,0,0,.16); padding:5px; animation:vfade .12s ease both;">
+          <div style="font-size:10.5px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--muted-foreground); padding:6px 8px 4px;">Conversations</div>
+          <sc-for list="{{ convos }}" as="c" hint-placeholder-count="3">
+            <button onClick="{{ c.pick }}" style="display:flex; align-items:center; gap:8px; width:100%; padding:7px 8px; border:0; border-radius:8px; background:transparent; color:var(--foreground); font:inherit; font-size:12.5px; text-align:left; cursor:pointer;" style-hover="background:var(--accent)">
+              <span style="flex:1; min-width:0;"><span style="display:block; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ c.title }}</span><span style="display:block; font-size:11px; color:var(--muted-foreground);">{{ c.when }}</span></span>
+              <sc-if value="{{ c.active }}" hint-placeholder-val="{{ false }}"><x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="check" size="{{ s13 }}" hint-size="13px,13px"></x-import></sc-if>
+            </button>
+          </sc-for>
+          <div style="height:1px; background:var(--border); margin:4px;"></div>
+          <button onClick="{{ clearChat }}" style="display:flex; align-items:center; gap:8px; width:100%; padding:7px 8px; border:0; border-radius:8px; background:transparent; color:var(--muted-foreground); font:inherit; font-size:12.5px; text-align:left; cursor:pointer;" style-hover="background:var(--accent)">
+            <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="plus" size="{{ s13 }}" hint-size="13px,13px"></x-import>New conversation
+          </button>
+        </div>
+      </sc-if>
     </div>
 
     <div ref="{{ chatRef }}" style="flex:1; overflow-y:auto; padding:18px 16px; display:flex; flex-direction:column; gap:16px;">
+      <sc-if value="{{ chatEmpty }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex; flex-direction:column; align-items:flex-start; gap:12px; padding:18px 4px 8px; animation:vfade .18s ease both;">
+          <svg viewBox="0 0 1024 1024" style="width:52px; height:52px; border-radius:16px; display:block;"><use href="#w-idle"></use></svg>
+          <div>
+            <div style="font-size:15px; font-weight:600; letter-spacing:-0.01em; margin-bottom:3px;">Hi Mira</div>
+            <div style="font-size:12.5px; color:var(--muted-foreground); line-height:1.6;">I'm watching {{ crumbLeaf }}. Ask me anything, or start from one of these:</div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:6px; width:100%;">
+            <sc-for list="{{ starterPrompts }}" as="q" hint-placeholder-count="3">
+              <button onClick="{{ q.run }}" style="display:flex; align-items:center; gap:8px; width:100%; padding:9px 11px; border:1px solid var(--border); border-radius:11px; background:var(--background); color:var(--foreground); font:inherit; font-size:12.5px; text-align:left; cursor:pointer;" style-hover="background:var(--accent)">
+                <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="{{ q.icon }}" size="{{ s14 }}" hint-size="14px,14px"></x-import>{{ q.label }}
+              </button>
+            </sc-for>
+          </div>
+          <div style="font-size:11px; color:var(--muted-foreground); display:flex; align-items:center; gap:5px;">Toggle anytime with <span style="display:inline-flex; align-items:center; height:18px; padding:0 5px; border:1px solid var(--border); border-radius:5px; background:var(--muted); font-size:10.5px; font-family:ui-monospace, Menlo, monospace;">⌘J</span></div>
+        </div>
+      </sc-if>
       <sc-for list="{{ messages }}" as="m" hint-placeholder-count="4">
         <sc-if value="{{ m.isUser }}" hint-placeholder-val="{{ false }}">
           <div style="display:flex; justify-content:flex-end;">
@@ -1097,6 +1164,10 @@
   </aside>
   </sc-if>
 
+  <button onClick="{{ toggleAgent }}" title="Ask {{ agentName }} (⌘J)" style="position:fixed; right:24px; bottom:24px; z-index:48; display:flex; align-items:center; justify-content:center; width:52px; height:52px; border-radius:999px; border:1px solid var(--border); background:var(--card); box-shadow:0 8px 28px rgba(0,0,0,.18); cursor:pointer;" style-hover="box-shadow:0 12px 34px rgba(0,0,0,.24)">
+    <sc-if value="{{ mascotHeader }}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 1024 1024" style="width:36px; height:36px; border-radius:13px; display:block;"><use href="{{ mascotHeader }}"></use></svg></sc-if>
+  </button>
+
   <!-- COMMAND PALETTE -->
   <sc-if value="{{ paletteOpen }}" hint-placeholder-val="{{ false }}">
     <div onClick="{{ closePalette }}" style="position:fixed; inset:0; z-index:60; background:rgba(0,0,0,.5); display:flex; align-items:flex-start; justify-content:center; padding-top:14vh;">
@@ -1117,8 +1188,6 @@
           <div style="padding:10px 9px 5px; font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--muted-foreground);">Agents</div>
           <button onClick="{{ askAgentDraft }}" style="display:flex; align-items:center; gap:10px; width:100%; height:36px; padding:0 9px; border:0; border-radius:9px; background:transparent; color:var(--foreground); font:inherit; font-size:13px; text-align:left; cursor:pointer;" style-hover="background:var(--accent)">
             <span style="display:flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:999px; background:{{ agentColor }}; color:#fff; font-size:9px; font-weight:700;">AI</span>Ask {{ agentName }} to draft a page<span style="margin-left:auto;"><x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Kbd" hint-size="auto,18px">⌘⏎</x-import></span></button>
-          <button onClick="{{ goGraph }}" style="display:flex; align-items:center; gap:10px; width:100%; height:36px; padding:0 9px; border:0; border-radius:9px; background:transparent; color:var(--foreground); font:inherit; font-size:13px; text-align:left; cursor:pointer;" style-hover="background:var(--accent)">
-            <x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="git-fork" size="{{ s16 }}" hint-size="16px,16px"></x-import>Open graph view</button>
         </div>
       </div>
     </div>
@@ -1209,6 +1278,35 @@
                 <span style="margin-top:1px; color:var(--muted-foreground); display:flex;"><x-import component-from-global-scope="ShadcnUiDesignSystemReUI_ec5e3e.Icon" name="users" size="{{ s18 }}" hint-size="18px,18px"></x-import></span>
                 <span><span style="display:block; font-weight:500; font-size:13.5px;">Share on your terms</span><span style="display:block; font-size:12.5px; color:var(--muted-foreground);">Invite people per workspace, or publish a read-only link.</span></span>
               </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ obStepProfile }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex; flex-direction:column; gap:22px; animation:vfade .2s ease both;">
+            <svg viewBox="-70 -50 380 340" style="width:150px; overflow:visible; display:block;">
+              <path d="M244 10 Q249 27 266 32 Q249 37 244 54 Q239 37 222 32 Q239 27 244 10 Z" fill="#E8B36A" style="animation:oSparkle 2.8s ease-in-out infinite; transform-box:fill-box; transform-origin:center"></path>
+              <g style="animation:oBob 2.6s ease-in-out infinite"><use href="#oBody"></use><use href="#oHappy"></use></g>
+            </svg>
+            <div>
+              <h1 style="margin:0 0 8px; font-size:26px; line-height:1.2; font-weight:600; letter-spacing:-0.02em;">This is you</h1>
+              <p style="margin:0; font-size:14.5px; line-height:1.6; color:var(--muted-foreground);">Shown on your edits and shared pages. Stays on this device unless you turn on sync.</p>
+            </div>
+            <div style="display:flex; align-items:center; gap:16px;">
+              <span style="display:flex; align-items:center; justify-content:center; width:64px; height:64px; border-radius:999px; background:{{ obColor }}; color:#fff6e4; font-size:22px; font-weight:600; flex:none;">{{ obInitials }}</span>
+              <div style="display:flex; gap:8px;">
+                <sc-for list="{{ obColors }}" as="c" hint-placeholder-count="4">
+                  <button onClick="{{ c.pick }}" style="width:30px; height:30px; border-radius:999px; background:{{ c.val }}; border:2px solid {{ c.ring }}; box-sizing:border-box; cursor:pointer; padding:0;"></button>
+                </sc-for>
+              </div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+              <span style="font-size:12px; font-weight:500;">Display name</span>
+              <input value="{{ obUser }}" onChange="{{ setObUser }}" placeholder="Mira Kaneko" style="height:38px; box-sizing:border-box; padding:0 12px; border:1px solid var(--input); border-radius:10px; background:var(--card); color:var(--foreground); font:inherit; font-size:14px; outline:none;" style-focus="border-color:var(--muted-foreground)">
+            </div>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+              <span style="font-size:12px; font-weight:500;">Email <span style="font-weight:400; color:var(--muted-foreground);">— optional, for sync invites</span></span>
+              <input value="{{ obEmail }}" onChange="{{ setObEmail }}" placeholder="mira@hollowmoor.net" style="height:38px; box-sizing:border-box; padding:0 12px; border:1px solid var(--input); border-radius:10px; background:var(--card); color:var(--foreground); font:inherit; font-size:14px; outline:none;" style-focus="border-color:var(--muted-foreground)">
             </div>
           </div>
         </sc-if>
@@ -1422,10 +1520,12 @@
 </div>
 
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;agentName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Washi&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;agentColor&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;rgb(43,127,255)&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;rgb(43,127,255)&quot;,&quot;rgb(124,58,237)&quot;,&quot;rgb(22,163,74)&quot;,&quot;rgb(231,0,11)&quot;]},&quot;showAttribution&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;startOnOnboarding&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Flow&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;agentName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Washi&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;agentColor&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;rgb(43,127,255)&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;rgb(43,127,255)&quot;,&quot;rgb(124,58,237)&quot;,&quot;rgb(22,163,74)&quot;,&quot;rgb(231,0,11)&quot;]},&quot;showAttribution&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;startOnOnboarding&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Flow&quot;}}">
 class Component extends DCLogic {
   state = {
     theme: "light", view: "note", note: "nullbyte", agentOpen: true,
+    tabs: ["note:nullbyte"],
+    chatExpanded: false, convosOpen: false, convoId: "current", dailyPulled: false,
     paletteOpen: false, slashOpen: false, suggestion: "pending",
     attribution: null, autonomy: "suggest", busy: false, draft: "", narrow: false,
     wsOpen: false, workspace: "Personal vault", modelOpen: false, model: "Sonnet 4.5", ctx: 32,
@@ -1441,6 +1541,7 @@ class Component extends DCLogic {
     ],
     newWsOpen: false, nwName: "", nwVault: "#v-ideas", nwSync: "local",
     obDone: false, obStep: 1, obName: "Personal vault", obVault: "#v-journal",
+    obUser: "Mira Kaneko", obEmail: "", obColor: "#cf6b36",
     obSync: "offline", obServer: "https://sync.hollowmoor.net", obE2e: true,
     obLinks: false, obAgent: true, obNudge: false, obInvite: "",
     invitees: [
@@ -1455,6 +1556,35 @@ class Component extends DCLogic {
   };
 
   set = (k, v) => this.setState({ [k]: v });
+
+  openTab(key) {
+    this.setState((st) => {
+      const tabs = st.tabs.includes(key) ? st.tabs : st.tabs.concat([key]);
+      const upd = { tabs, paletteOpen: false, slashOpen: false };
+      if (key.slice(0, 5) === "note:") { upd.view = "note"; upd.note = key.slice(5); }
+      else { upd.view = key.slice(5); }
+      return upd;
+    });
+  }
+
+  closeTab(key) {
+    this.setState((st) => {
+      const i = st.tabs.indexOf(key);
+      const tabs = st.tabs.filter((k) => k !== key);
+      const upd = { tabs };
+      const activeKey = st.view === "note" ? "note:" + st.note : "view:" + st.view;
+      if (activeKey === key) {
+        const next = tabs[Math.max(0, i - 1)];
+        if (next) {
+          if (next.slice(0, 5) === "note:") { upd.view = "note"; upd.note = next.slice(5); }
+          else { upd.view = next.slice(5); }
+        } else {
+          upd.tabs = ["note:untitled"]; upd.view = "note"; upd.note = "untitled";
+        }
+      }
+      return upd;
+    });
+  }
   chatRef = React.createRef();
   _scrollChat() {
     requestAnimationFrame(() => {
@@ -1465,6 +1595,13 @@ class Component extends DCLogic {
 
   componentDidMount() {
     this._syncTheme();
+    this._onKeyJ = (e) => {
+      if ((e.metaKey || e.ctrlKey) && (e.key === "j" || e.key === "J")) {
+        e.preventDefault();
+        this.setState((st) => ({ agentOpen: !st.agentOpen, convosOpen: false }));
+      }
+    };
+    document.addEventListener("keydown", this._onKeyJ);
     this._onResize = () => {
       const narrow = window.innerWidth < 1100;
       if (narrow !== this.state.narrow) this.setState({ narrow });
@@ -1496,7 +1633,10 @@ class Component extends DCLogic {
     const seg = (v) => s.autonomy === v
       ? { bg: "var(--primary)", fg: "var(--primary-foreground)" }
       : { bg: "var(--background)", fg: "var(--muted-foreground)" };
-    const open = (n) => () => this.setState({ view: "note", note: n, paletteOpen: false, slashOpen: false });
+    const open = (n) => () => this.openTab("note:" + n);
+    const viewLabels = { dashboard: "Dashboard", inbox: "Inbox", daily: "Daily note", settings: "Settings" };
+    const viewIcons = { dashboard: "layout-dashboard", inbox: "inbox", daily: "calendar-days", settings: "settings" };
+    const activeKey = s.view === "note" ? "note:" + s.note : "view:" + s.view;
     const cur = s.wsList.find((w) => w.name === s.workspace) || s.wsList[0];
     const serverShort = (s.obServer || "").replace(/^https?:\/\//, "") || "sync server";
     const srvValid = /^https?:\/\/[^\s]+\.[^\s]+/.test(s.obServer || "");
@@ -1528,16 +1668,16 @@ class Component extends DCLogic {
       })),
       sidebarOpen: s.sidebarOpen, sidebarClosed: !s.sidebarOpen,
       toggleSidebar: () => this.setState({ sidebarOpen: !s.sidebarOpen, userMenuOpen: false }),
-      goBack: () => this.setState({ view: "note", note: "nullbyte" }),
+      goBack: () => this.openTab("note:nullbyte"),
       userMenuOpen: s.userMenuOpen,
       toggleUserMenu: () => this.set("userMenuOpen", !s.userMenuOpen),
-      goSettingsFromUser: () => this.setState({ view: "settings", userMenuOpen: false }),
+      goSettingsFromUser: () => { this.set("userMenuOpen", false); this.openTab("view:settings"); },
       userSub: cur.sync === "server" ? "Synced · " + serverShort : "Local account",
       reviewCount: s.reviews.length,
       reviewsEmpty: s.reviews.length === 0,
       reviews: s.reviews.map((r, i) => ({
         ...r,
-        review: () => this.setState((st) => ({ view: "note", note: r.target, reviews: st.reviews.filter((_, j) => j !== i) })),
+        review: () => { this.openTab("note:" + r.target); this.setState((st) => ({ reviews: st.reviews.filter((_, j) => j !== i) })); },
         dismiss: () => this.setState((st) => ({ reviews: st.reviews.filter((_, j) => j !== i) }))
       })),
       setTabs: [
@@ -1599,7 +1739,19 @@ class Component extends DCLogic {
       })),
 
       obOpen: !s.obDone && p.startOnOnboarding !== false,
-      obStep1: s.obStep === 1, obStep2: s.obStep === 2, obStep3: s.obStep === 3, obStep4: s.obStep === 4,
+      obStep1: s.obStep === 1, obStepProfile: s.obStep === 2, obStep2: s.obStep === 3, obStep3: s.obStep === 4, obStep4: s.obStep === 5,
+      obUser: s.obUser, setObUser: (e) => this.set("obUser", e.target.value),
+      obEmail: s.obEmail, setObEmail: (e) => this.set("obEmail", e.target.value),
+      obColor: s.obColor,
+      obInitials: (s.obUser.trim() || "M K").split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase(),
+      userName: s.obUser.trim() || "Mira Kaneko",
+      userEmail: s.obEmail.trim() || "mira@hollowmoor.net",
+      userColor: s.obColor,
+      userInitials: (s.obUser.trim() || "M K").split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase(),
+      obColors: ["#cf6b36", "#6b7f5e", "#5e6b7f", "#a08d77"].map((val) => ({
+        val, ring: s.obColor === val ? "var(--foreground)" : "transparent",
+        pick: () => this.set("obColor", val)
+      })),
       obName: s.obName, setObName: (e) => this.set("obName", e.target.value),
       obPath: "~/Washi/" + ((s.obName || "vault").toLowerCase().replace(/[^a-z0-9]+/g, "-")),
       obServer: s.obServer, setObServer: (e) => this.set("obServer", e.target.value),
@@ -1624,15 +1776,15 @@ class Component extends DCLogic {
       onInviteKey: (e) => { if (e.key === "Enter") this.addInvite(); },
       addInvite: () => this.addInvite(),
       invitees: s.invitees.map((p2) => ({ ...p2, initials: p2.email.slice(0, 2).toUpperCase() })),
-      obDots: [1, 2, 3, 4].map((n) => ({
+      obDots: [1, 2, 3, 4, 5].map((n) => ({
         w: n === s.obStep ? "22px" : "6px",
         bg: n <= s.obStep ? "var(--foreground)" : "var(--border)"
       })),
       obCanBack: s.obStep > 1,
       obCanSkip: s.obStep === 1,
-      obNextLabel: s.obStep === 1 ? "Get started" : (s.obStep === 4 ? "Open " + (s.obName || "vault") : "Continue"),
+      obNextLabel: s.obStep === 1 ? "Get started" : (s.obStep === 5 ? "Open " + (s.obName || "vault") : "Continue"),
       obBack: () => this.set("obStep", Math.max(1, s.obStep - 1)),
-      obNext: () => s.obStep === 4 ? this.finishOnboarding() : this.set("obStep", s.obStep + 1),
+      obNext: () => s.obStep === 5 ? this.finishOnboarding() : this.set("obStep", s.obStep + 1),
       obSkip: () => this.set("obDone", true),
       modelOpen: s.modelOpen, modelLabel: s.model,
       toggleModel: () => this.setState({ modelOpen: !s.modelOpen, wsOpen: false }),
@@ -1653,13 +1805,20 @@ class Component extends DCLogic {
       agentColor, agentName, showAttribution: attribution,
       agentStatus: s.busy ? "writing…" : "idle · watching 3 pages",
 
-      isNote, isDashboard: s.view === "dashboard", isGraph: s.view === "graph", isSettings: s.view === "settings",
+      isNote, isDashboard: s.view === "dashboard", isSettings: s.view === "settings",
       isNullbyte: isNote && s.note === "nullbyte", isHearth: isNote && s.note === "hearth",
       isSlab: isNote && s.note === "slab", isUntitled: isNote && s.note === "untitled",
       crumbRoot: isNote ? (s.note === "untitled" ? "Workspace" : "Design specs") : "Workspace",
       crumbLeaf: isNote ? titles[s.note] : s.view.charAt(0).toUpperCase() + s.view.slice(1),
 
-      navDash: nav("dashboard"), navGraph: nav("graph"), navSettings: nav("settings"),
+      navDash: nav("dashboard"), navSettings: nav("settings"), navInbox: nav("inbox"), navDaily: nav("daily"),
+      isInbox: s.view === "inbox", isDaily: s.view === "daily",
+      goInbox: () => this.openTab("view:inbox"),
+      goDaily: () => this.openTab("view:daily"),
+      inboxCount: s.reviews.length > 0 ? String(s.reviews.length) : "",
+      dailyPulled: s.dailyPulled,
+      dailyAccept: () => this.set("dailyPulled", true),
+      dailyDecline: () => this.set("dailyPulled", false),
       pgNullbyte: pg("nullbyte"), pgHearth: pg("hearth"), pgSlab: pg("slab"), pgUntitled: pg("untitled"),
       autoSuggest: seg("suggest"), autoWrite: seg("write"),
 
@@ -1670,13 +1829,56 @@ class Component extends DCLogic {
       rejectSuggestion: () => this.set("suggestion", "rejected"),
 
       openNullbyte: open("nullbyte"), openHearth: open("hearth"), openSlab: open("slab"), openUntitled: open("untitled"),
-      goDashboard: () => this.setState({ view: "dashboard", paletteOpen: false }),
-      goGraph: () => this.setState({ view: "graph", paletteOpen: false }),
-      goSettings: () => this.setState({ view: "settings", paletteOpen: false }),
+      goDashboard: () => this.openTab("view:dashboard"),
+      goSettings: () => this.openTab("view:settings"),
+      tabs: s.tabs.map((key) => {
+        const isN = key.slice(0, 5) === "note:";
+        const id = key.slice(5);
+        const active = key === activeKey;
+        return {
+          label: isN ? (titles[id] || "Untitled") : (viewLabels[id] || id),
+          icon: isN ? "file-text" : (viewIcons[id] || "file"),
+          bg: active ? "var(--background)" : "transparent",
+          fg: active ? "var(--foreground)" : "var(--muted-foreground)",
+          border: active ? "var(--border)" : "transparent",
+          fw: active ? "500" : "400",
+          focus: () => this.openTab(key),
+          close: (e) => { e.stopPropagation(); this.closeTab(key); }
+        };
+      }),
+      newTab: () => this.openTab("note:untitled"),
 
       toggleTheme: () => this.set("theme", dark ? "light" : "dark"),
-      toggleAgent: () => this.set("agentOpen", !s.agentOpen),
+      toggleAgent: () => this.setState({ agentOpen: !s.agentOpen, convosOpen: false }),
       agentOpen: s.agentOpen,
+      chatExpanded: s.chatExpanded,
+      chatInset: s.chatExpanded ? "0" : "auto 24px 92px auto",
+      chatW: s.chatExpanded ? "min(720px, calc(100vw - 80px))" : "400px",
+      chatH: s.chatExpanded ? "min(680px, calc(100vh - 80px))" : "min(620px, calc(100vh - 130px))",
+      chatM: s.chatExpanded ? "auto" : "0",
+      toggleExpand: () => this.setState({ chatExpanded: !s.chatExpanded, convosOpen: false }),
+      collapseChat: () => this.set("chatExpanded", false),
+      closeChat: () => this.setState({ agentOpen: false, chatExpanded: false, convosOpen: false }),
+      expandIcon: s.chatExpanded ? "minimize-2" : "maximize-2",
+      expandTitle: s.chatExpanded ? "Collapse" : "Expand",
+      convosOpen: s.convosOpen,
+      toggleConvos: () => this.set("convosOpen", !s.convosOpen),
+      convoTitle: s.convoId === "current" ? agentName : (s.convoId === "radius" ? "Radius token conflict" : "Hearth contrast pass"),
+      convos: [
+        { id: "current", title: "Scrollback fix", when: "now" },
+        { id: "radius", title: "Radius token conflict", when: "yesterday" },
+        { id: "hearth", title: "Hearth contrast pass", when: "Tuesday" }
+      ].map((c) => ({
+        ...c, active: s.convoId === c.id,
+        pick: () => this.setState({ convoId: c.id, convosOpen: false })
+      })),
+      clearChat: () => this.setState({ messages: [], convosOpen: false, convoId: "current" }),
+      chatEmpty: s.messages.length === 0 && !s.busy,
+      starterPrompts: [
+        { icon: "list", label: "Summarize " + (isNote ? titles[s.note] : "this page") },
+        { icon: "search-check", label: "Find contradictions with Research" },
+        { icon: "pen-line", label: "Tighten the intro paragraph" }
+      ].map((q) => ({ ...q, run: () => this.send(q.label) })),
       openPalette: () => this.set("paletteOpen", true),
       closePalette: () => this.set("paletteOpen", false),
       paletteOpen: s.paletteOpen,
@@ -1710,7 +1912,7 @@ class Component extends DCLogic {
       setDraft: (e) => this.set("draft", e.target.value),
       onKey: (e) => { if (e.key === "Enter") this.send(); },
       send: () => this.send(),
-      askAgentDraft: () => this.setState({ paletteOpen: false, agentOpen: true, note: "untitled", view: "note" }, () => this.send("Draft a spec page from my Research folder"))
+      askAgentDraft: () => { this.openTab("note:untitled"); this.setState({ agentOpen: true }, () => this.send("Draft a spec page from my Research folder")); }
     };
   }
 

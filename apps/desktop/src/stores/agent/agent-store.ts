@@ -16,6 +16,8 @@ interface AgentState {
   running: boolean
   panelOpen: boolean
   togglePanel: () => void
+  chatExpanded: boolean
+  toggleExpanded: () => void
   init: () => Promise<void>
   createSession: () => Promise<void>
   selectSession: (id: string) => Promise<void>
@@ -56,8 +58,10 @@ export const useAgentStore = create<AgentState>((set, get) => ({
   transcript: [],
   approvals: [],
   running: false,
-  panelOpen: true,
+  panelOpen: false,
   togglePanel: () => set((state) => ({ panelOpen: !state.panelOpen })),
+  chatExpanded: false,
+  toggleExpanded: () => set((state) => ({ chatExpanded: !state.chatExpanded })),
 
   init: async () => {
     if (!subscribed) {
@@ -77,7 +81,9 @@ export const useAgentStore = create<AgentState>((set, get) => ({
         set((state) => ({ approvals: [...state.approvals, request] }))
       })
       api.openSheetRequested.on(({ id }) => {
-        useSheetsStore.getState().select(id)
+        void import('@/stores/view/view-store').then(({ useViewStore }) =>
+          useViewStore.getState().openTab(`note:${id}`),
+        )
         void useSheetsStore.getState().refresh()
       })
     }
