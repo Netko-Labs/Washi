@@ -2,6 +2,7 @@ import { IconRobot } from '@tabler/icons-react'
 import { AgentMascot } from '@/components/mascot/AgentMascot'
 import { mascotStateFor, useAgentStore } from '@/stores/agent/agent-store'
 import { useSheetsStore } from '@/stores/sheets/sheets-store'
+import { useViewStore } from '@/stores/view/view-store'
 
 const STATE_LABELS: Record<string, string> = {
   idle: 'Washi watching',
@@ -20,9 +21,20 @@ export function Header() {
   const running = useAgentStore((state) => state.running)
   const approvals = useAgentStore((state) => state.approvals)
   const togglePanel = useAgentStore((state) => state.togglePanel)
+  const view = useViewStore((state) => state.view)
 
   const active = sheets.find((sheet) => sheet.id === activeId)
   const mascotState = mascotStateFor(transcript, running, approvals)
+  const leaf =
+    view === 'note'
+      ? active
+        ? `${active.icon ?? ''} ${active.title}`.trim()
+        : 'All pages'
+      : view === 'dashboard'
+        ? 'Dashboard'
+        : view === 'graph'
+          ? 'Graph'
+          : 'Settings'
 
   return (
     <header className="flex h-12 shrink-0 items-center gap-2 border-border border-b px-4">
@@ -30,18 +42,18 @@ export function Header() {
         <span className="text-muted-foreground">
           Personal vault <span className="opacity-50">/</span>
         </span>{' '}
-        <span className="font-medium">
-          {active ? `${active.icon ?? ''} ${active.title}`.trim() : 'All pages'}
-        </span>
+        <span className="font-medium">{leaf}</span>
       </div>
 
-      <div
-        className="flex h-[26px] items-center gap-1.5 rounded-full border border-agent border-dashed px-2.5 text-[12px] text-muted-foreground"
-        data-agent-pill
-      >
-        <AgentMascot state={mascotState} size={17} />
-        {STATE_LABELS[mascotState]}
-      </div>
+      {view === 'note' && (
+        <div
+          className="flex h-[26px] items-center gap-1.5 rounded-full border border-agent border-dashed px-2.5 text-[12px] text-muted-foreground"
+          data-agent-pill
+        >
+          <AgentMascot state={mascotState} size={17} />
+          {STATE_LABELS[mascotState]}
+        </div>
+      )}
 
       <button
         type="button"

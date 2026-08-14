@@ -6,15 +6,23 @@
 import { type CheckDriver, defineCheck } from 'mirinjs/check'
 
 export default defineCheck(async (app: CheckDriver) => {
+  app.step('skip onboarding when this profile sees it')
+  try {
+    await app.waitFor('[data-onboarding]', { timeoutMs: 4000 })
+    await app.click('text=Skip setup')
+  } catch {
+    // already onboarded in this dev profile
+  }
+
   app.step('the app boots and renders the welcome sheet')
   await app.expectText('Welcome to Washi', { timeoutMs: 10_000 })
-  await app.click('text=Welcome to Washi')
+  await app.click('[aria-label="Open Welcome to Washi"]')
   await app.expectText('Notes agents can design')
 
   app.step('showcase sheets render their design directions')
-  await app.click('text=Launch Dashboard')
+  await app.click('[aria-label="Open Launch Dashboard"]')
   await app.expectText('sum(points)')
-  await app.click('text=Release Playbook')
+  await app.click('[aria-label="Open Release Playbook"]')
   await app.expectText('Freeze')
   await app.screenshot('showcase-playbook')
 

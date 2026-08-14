@@ -13,6 +13,17 @@ interface Loaded {
   error: string | null
 }
 
+/** HLC stamps lead with zero-padded wall-clock ms. */
+function relativeTime(hlc: string): string {
+  const ms = Number(hlc.slice(0, 14))
+  if (!Number.isFinite(ms) || ms === 0) return 'recently'
+  const minutes = Math.floor((Date.now() - ms) / 60_000)
+  if (minutes < 1) return 'just now'
+  if (minutes < 60) return `${minutes} min ago`
+  if (minutes < 60 * 24) return `${Math.floor(minutes / 60)}h ago`
+  return `${Math.floor(minutes / (60 * 24))}d ago`
+}
+
 const TAPES = [
   'bg-tape-pink',
   'bg-tape-teal',
@@ -92,9 +103,20 @@ export function SheetView() {
             <div className="bg-card px-8 py-6 text-destructive text-sm">{loaded.error}</div>
           ) : (
             loaded.root && (
-              <PaperProvider host={paperHost}>
-                <WsxView key={loaded.sheet.id} root={loaded.root} />
-              </PaperProvider>
+              <>
+                <div className="flex items-center gap-2.5 border-border border-b bg-card px-8 pt-5 pb-4">
+                  <span className="grid size-7 place-items-center rounded-full bg-accent font-semibold text-[10px] text-muted-foreground">
+                    MK
+                  </span>
+                  <Mascot face="wink" size={26} />
+                  <span className="text-[12px] text-muted-foreground">
+                    Edited {relativeTime(loaded.sheet.hlcUpdated)} · kept tidy by Washi
+                  </span>
+                </div>
+                <PaperProvider host={paperHost}>
+                  <WsxView key={loaded.sheet.id} root={loaded.root} />
+                </PaperProvider>
+              </>
             )
           )}
         </div>

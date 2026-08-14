@@ -1,4 +1,4 @@
-import { IconArrowUp, IconPlus, IconX } from '@tabler/icons-react'
+import { IconArrowUp, IconChevronDown, IconPlus, IconX } from '@tabler/icons-react'
 import { useEffect, useRef, useState } from 'react'
 import { AgentMascot } from '@/components/mascot/AgentMascot'
 import { mascotStateFor, useAgentStore } from '@/stores/agent/agent-store'
@@ -173,7 +173,27 @@ export function AgentPanel() {
             rows={2}
             className="w-full resize-none bg-transparent text-[13px] outline-none placeholder:text-muted-foreground"
           />
-          <div className="flex items-center justify-end pt-1">
+          <div className="flex items-center gap-2 pt-1">
+            <button
+              type="button"
+              aria-label="Attach"
+              className="grid size-[26px] place-items-center rounded-full border border-border text-muted-foreground hover:bg-accent"
+            >
+              <IconPlus className="size-3.5" />
+            </button>
+            <button
+              type="button"
+              className="flex h-[26px] items-center gap-1 rounded-lg px-1.5 text-[12px] text-muted-foreground hover:bg-accent"
+            >
+              Sonnet 4.5
+              <IconChevronDown className="size-3" />
+            </button>
+            <div
+              className="ml-auto h-1 w-11 overflow-hidden rounded-full bg-muted"
+              title="32k / 200k"
+            >
+              <div className="h-full w-[16%] rounded-full bg-agent" />
+            </div>
             <button
               type="button"
               aria-label="Send"
