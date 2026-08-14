@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Washi — spec v0.2</title>
+<title>Washi — spec v0.4</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@700;900&family=Karla:ital,wght@0,400;0,600;0,800;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
@@ -206,6 +206,27 @@
   .timeline p { margin: .25rem 0 0; font-size: .92rem; color: var(--ink-soft); }
   .demo-flag { font: 600 .68rem/1 "JetBrains Mono", monospace; color: var(--hanko); }
 
+  /* ── hardening cards ────────────────────────── */
+  .fix {
+    border-left: 4px solid var(--sc, var(--tape-slate));
+    background: var(--paper); border-radius: 0 10px 10px 0;
+    padding: .85rem 1.05rem; margin: 1rem 0;
+  }
+  .fix h3 { font-size: 1rem; display: flex; align-items: center; gap: .55rem; flex-wrap: wrap; }
+  .fix .rank {
+    font: 800 .68rem/1 "JetBrains Mono", monospace; color: #fff;
+    background: var(--sc, var(--tape-slate)); padding: .32rem .48rem; border-radius: 5px;
+    transform: rotate(-2deg);
+  }
+  .fix dl { margin: .6rem 0 0; display: grid; grid-template-columns: 5rem 1fr; gap: .35rem .8rem; font-size: .9rem; }
+  .fix dt {
+    font: 600 .66rem/1.6 "JetBrains Mono", monospace; text-transform: uppercase;
+    letter-spacing: .07em; color: var(--ink-soft);
+  }
+  .fix dd { margin: 0; }
+  .fix dd.reality { color: var(--ink-soft); }
+  @media (max-width: 560px) { .fix dl { grid-template-columns: 1fr; gap: .1rem; } .fix dd { margin-bottom: .45rem; } }
+
   /* ── open questions ─────────────────────────── */
   .qgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr)); gap: 1rem; margin-top: 1.2rem; }
   .q {
@@ -237,7 +258,7 @@
 <body>
 
 <nav aria-label="Sections">
-  <span class="brand">和紙 <em>WASHI</em> · spec v0.2</span>
+  <span class="brand">和紙 <em>WASHI</em> · spec v0.4</span>
   <a class="dot" href="#tldr" style="--c:var(--hanko)">tl;dr</a>
   <a class="dot" href="#status" style="--c:var(--tape-moss)">status</a>
   <a class="dot" href="#concepts" style="--c:var(--tape-pink)">concepts</a>
@@ -248,6 +269,7 @@
   <a class="dot" href="#ui" style="--c:var(--tape-moss)">ui</a>
   <a class="dot" href="#sync" style="--c:var(--tape-slate)">sync</a>
   <a class="dot" href="#milestones" style="--c:var(--ink)">plan</a>
+  <a class="dot" href="#hardening" style="--c:var(--hanko)">hardening</a>
   <a class="dot" href="#questions" style="--c:var(--hanko)">decisions</a>
 </nav>
 
@@ -260,7 +282,7 @@
   into a local database. Local-first, sync-ready, built on mirin.</p>
   <div class="meta-chips">
     <span>mirin desktop</span><span>bun + CEF</span><span>repo shape: Anko 1:1</span>
-    <span>claude-agent-sdk + ACP</span><span>bun:sqlite</span><span>v0.3 · built to M2 + design rev 2</span>
+    <span>claude-agent-sdk + ACP</span><span>bun:sqlite</span><span>v0.4 · built to M2 · hardening next</span>
   </div>
 
   <div class="tldr" id="tldr">
@@ -279,7 +301,7 @@
   <span class="tape" style="--c:var(--tape-moss)">00 · status &amp; handoff</span>
   <div class="card">
     <h2 class="title">Where we are · 2026-08-14</h2>
-    <p class="point">Built and verified through M2, plus a full design implementation (rev 2 of the claude.ai handoff). Everything below is committed on <code>main</code> and green: 46 unit tests, 10-step <code>mirin check</code>, typecheck, biome.</p>
+    <p class="point">Built and verified through M2, plus a full design implementation (rev 2 of the claude.ai handoff). Everything below is committed on <code>main</code> and green: 46 unit tests, 10-step <code>mirin check</code>, typecheck, biome. A code-vs-spec audit on 2026-08-14 found four claims this document makes that the code does not keep — see <a href="#hardening"><strong>§09 hardening</strong></a>. They land before M3.</p>
 
     <h3>Shipped <span class="chip done">M0–M2</span></h3>
     <ul class="tight">
@@ -300,19 +322,23 @@
 
     <h3>Known gaps <span class="chip open">honest list</span></h3>
     <ul class="tight">
+      <li><strong>Correctness debt — the four that matter</strong> live in <a href="#hardening">§09</a>: an SQL hole in the ink executor, binds that aren't live, writes that aren't atomic, and Loro used as a snapshot store rather than a CRDT.</li>
       <li>Inbox reviews/activity, Daily-note streak + pull card, and dashboard cards are <strong>static design copy</strong> — not wired to real agent activity; dismissals reset on reload.</li>
       <li>Tables/records exist in domain + ink but have <strong>no dedicated UI</strong> yet; <code>bind</code> views render but nothing creates tables outside agent tools.</li>
       <li><code>Fetch</code> component + tsuru policy UI unproven end-to-end in sheets.</li>
       <li>Human editing is thin by design — inline edits limited to what Paper components expose.</li>
+      <li>No cancel button: a running turn cannot be interrupted, and two prompts in one session interleave into one transcript.</li>
+      <li>Records are not in the FTS index (sheets only), despite <a href="#data">§04</a>'s table listing.</li>
     </ul>
 
     <h3>Next <span class="chip later">in order</span></h3>
     <ul class="tight">
-      <li><strong>Wire the design to real data</strong> — Inbox rows from agent proposals (approvals/oplog), Daily note as a real per-day sheet, dashboard from actual vault stats.</li>
+      <li><strong>M2.5 hardening</strong> — <a href="#hardening">§09</a> P0–P4. Make the trust model and the "live bindings" pitch true before M3 puts more weight on them.</li>
+      <li><strong>Wire the design to real data</strong> — Inbox rows from the capability ledger, Daily note as a real per-day sheet, dashboard from actual vault stats.</li>
       <li><strong>M3 structured data</strong> — tables/records UI, live <code>bind</code> views with aggregations surfaced, <code>Fetch</code> end-to-end, inline human edits.</li>
-      <li><strong>Q11</strong> — sandboxed expression language over state + binds, if declarative state proves insufficient. Still OPEN; never raw JS.</li>
-      <li><strong>M4 ACP</strong> — external agents over stdio, MCP loopback passthrough.</li>
-      <li><strong>M5 sync</strong> — Bun/Elysia relay, E2EE decision.</li>
+      <li><strong>Q14</strong> — state-parameterized binds (<code>{ $state: 'key' }</code>), the cheap answer that probably retires Q11 without an expression language.</li>
+      <li><strong>M4 ACP</strong> — external agents over stdio, MCP loopback passthrough. Cheap only if the <code>AgentPort</code> extraction (P6) happens first.</li>
+      <li><strong>M5 sync</strong> — Bun/Elysia relay, E2EE decision. Gated on a replayable oplog (P2) and real Loro deltas (P3).</li>
     </ul>
 
     <details style="--c:var(--tape-moss)">
@@ -368,7 +394,7 @@
       <li><strong>Style:</strong> Tailwind is the styling language — every component takes a <code>class</code> prop with the <strong>full utility vocabulary</strong> (arbitrary values, gradients, variants), compiled at runtime by <code>@tailwindcss/browser</code>. Guard: no <code>url()</code>, no quotes/braces — styling is expression, never a network capability. Generic <code>Box</code>/<code>Span</code> primitives make free-form layout possible. <span class="chip decided">REVISED 2026-08-13</span></li>
       <li><strong>Actions:</strong> interactive components carry <code>action</code> props — hanko descriptors from the closed verb registry. No callbacks, no scripts.</li>
       <li><strong>Children:</strong> elements, text, <code>{literal}</code>.</li>
-      <li><strong>Validation:</strong> Zod props schema per component (lives in <code>domain</code>), runs before persist <em>and</em> before render. <code>sheet_check</code> returns diagnostics agents can act on.</li>
+      <li><strong>Validation:</strong> Zod props schema per component (lives in <code>@washi/paper/registry</code>, main-process safe), runs before persist <em>and</em> before render. <code>sheet_check</code> returns diagnostics agents can act on. <span class="chip open">render side missing — P8</span> Today <code>SheetView</code> parses but does not re-validate, so a sheet persisted under an older registry renders unchecked props.</li>
     </ul>
 
     <details style="--c:var(--tape-teal)">
@@ -430,7 +456,7 @@
       <table>
         <tr><th>path</th><th>package</th><th>owns</th></tr>
         <tr><td><code>apps/desktop</code></td><td><code>@washi/desktop</code></td><td>mirin shell — <code>ui/</code> + <code>main/</code></td></tr>
-        <tr><td><code>packages/desktop/domain</code></td><td><code>@washi/desktop-domain</code></td><td>schemas, entities, Paper prop schemas</td></tr>
+        <tr><td><code>packages/desktop/domain</code></td><td><code>@washi/desktop-domain</code></td><td>entity schemas, db tables, HLC clock (Paper's prop schemas live in <code>@washi/paper/registry</code> — the registry owns its own grammar)</td></tr>
         <tr><td><code>packages/desktop/repository</code></td><td><code>@washi/desktop-repository</code></td><td>storage queries/mutations, DDL</td></tr>
         <tr><td><code>packages/desktop/service</code></td><td><code>@washi/desktop-service</code></td><td>agent host, wsx service, search</td></tr>
         <tr><td><code>packages/desktop/api</code></td><td><code>@washi/desktop-api</code></td><td>rpc routes</td></tr>
@@ -461,11 +487,11 @@
     <h2 class="title">One SQLite file, sync-shaped</h2>
     <p class="point">ULIDs + HLC timestamps + tombstones + oplog from day 1. Cheap now, cursed to retrofit.</p>
     <ul class="tight">
-      <li><code>&lt;appDataDir&gt;/washi.db</code>, dev fork via <code>app.isDev</code>. WAL, FKs on.</li>
-      <li>All writes route through repository ops that <strong>also append to <code>oplog</code></strong> — the future sync unit.</li>
-      <li>Table reads/writes travel as <code>@washi/ink</code> descriptors — the same objects whether they come from a <code>bind</code> prop, an agent tool, or the UI.</li>
+      <li><code>&lt;appDataDir&gt;/washi.db</code>, dev fork via <code>app.isDev</code>. WAL, FKs on. One file, one vault — the UI's vault switcher has no data layer under it yet <span class="chip open">Q12</span>.</li>
+      <li>All writes route through repository ops that <strong>also append to <code>oplog</code></strong> — the future sync unit. <span class="chip open">not atomic — P2</span> Row, oplog, FTS and links are four separate statements with no transaction; the oplog stores whole writes rather than patches, is untyped, and nothing reads it.</li>
+      <li>Table reads/writes travel as <code>@washi/ink</code> descriptors — the same objects whether they come from a <code>bind</code> prop, an agent tool, or the UI. <strong>Ink is the SQL boundary:</strong> every identifier in a descriptor must be membership-checked against the table spec before it reaches the executor, and never string-interpolated. <span class="chip open">violated — P0</span></li>
       <li>Sheet writes are whole-source replaces <span class="chip decided">DECIDED</span> — Loro merges them at the text level when devices diverge.</li>
-      <li>Sheet source is a <strong>Loro text doc from day 1</strong> <span class="chip decided">DECIDED</span> — snapshots + update log persisted in SQLite; tables and metadata stay LWW via HLC + oplog.</li>
+      <li>Sheet source is a <strong>Loro text doc from day 1</strong> <span class="chip decided">DECIDED</span> — snapshots + update log persisted in SQLite; tables and metadata stay LWW via HLC + oplog. <span class="chip open">half-built — P3</span> Snapshots exist; the update log, a stable per-device peer id, and delta export do not.</li>
     </ul>
     <details style="--c:var(--tape-mustard)">
       <summary>Tables</summary>
@@ -497,7 +523,8 @@
       <li>Tools via <code>createSdkMcpServer</code> (in-process, zero IPC): <code>sheet_list/get/create/replace/patch</code>, <code>sheet_check</code>, <code>db_define/insert/update/query</code> (thin wrappers over <code>@washi/ink</code> descriptors), <code>fetch_url</code> (tsuru), <code>action_run</code> (hanko), <code>search</code>, <code>link_graph</code>.</li>
       <li>Default tools (Bash, fs, web) <strong>disallowed</strong>; opt-in per session via permission UI.</li>
       <li><code>canUseTool</code> → approvals store → renderer prompts (Anko's approval-manager pattern, generalized).</li>
-      <li>Hooks for audit · <code>maxBudgetUsd</code> per session · sessions persisted/resumable.</li>
+      <li>Hooks for audit · <code>maxBudgetUsd</code> per session · sessions persisted/resumable. <span class="chip open">per turn, not per session</span> The cap is passed to each <code>query()</code> call; the stored <code>cost_usd</code> is never enforced against.</li>
+      <li><strong>Turn control</strong> — one in-flight turn per session, cancellable. <span class="chip open">missing — P6</span> <code>promptAgent</code> is fire-and-forget, so errors vanish and nothing can interrupt a running turn.</li>
     </ul>
 
     <h3>ACP client — external agents <span class="chip later">M4</span></h3>
@@ -512,7 +539,7 @@
         <li>Agent-written WSX is <strong>inert data</strong> — registry-only, no expressions. Worst case: wrong content, never code execution.</li>
         <li>DB access only through Zod-validated tools; no raw SQL surface.</li>
         <li>Network only through tsuru: https-only, domain allowlist + per-domain prompts, size/time caps, loopback and private ranges always blocked — agents can never reach the mirin RPC or MCP loopback servers.</li>
-        <li>Side effects only through hanko verbs — each stamped by the approvals flow, each an auditable row.</li>
+        <li>Side effects only through hanko verbs — each stamped by the approvals flow, each an auditable row. <span class="chip open">sheets bypass this — P4</span> The renderer's <code>runAction</code> route runs a verb with no approval and no row; only the agent path is gated by <code>canUseTool</code>.</li>
         <li>Loopback servers token-gated, off in packaged builds unless explicitly enabled.</li>
         <li>Streaming: agent host normalizes both ports into one update shape → <code>rpc.event</code> broadcast → Zustand agent store → transcript UI.</li>
       </ul>
@@ -544,7 +571,8 @@
     <p class="point">Server pushes/pulls oplog and holds auth. It never merges — which keeps E2E encryption on the table.</p>
     <ul class="tight">
       <li><code>apps/sync</code> — Bun + Elysia + Eden, Better Auth (JWT/jose), Postgres. Docker for self-host, Railway template for one-click.</li>
-      <li>Conflicts: sheet <code>source</code> merges via Loro (already in place since M1); metadata/records = per-entity LWW via HLC.</li>
+      <li>Conflicts: sheet <code>source</code> merges via Loro (storage in place since M1, <strong>merge not yet earned</strong> — P3); metadata/records = per-entity LWW via HLC.</li>
+      <li>Entry condition: the oplog replays into an empty database and reproduces the vault. Until that test is green, "sync-ready" is a claim, not a property.</li>
       <li>E2EE of op payloads: decide before sync ships. Feasible because the server is blind.</li>
     </ul>
   </div>
@@ -562,8 +590,10 @@
         <h3>Sheets core <span class="chip done">DONE</span></h3><p>Schema + DDL, Loro-backed sheet store, <code>@washi/wsx</code> parse/validate/serialize, Paper v0, read-only render, sidebar, FTS search.</p></div></li>
       <li><span class="m" style="--mc:var(--tape-violet)">M2</span><div>
         <h3>Embedded Claude <span class="chip done">DONE</span> <span class="demo-flag">← the demo moment</span></h3><p>Agent host, in-process tools, approvals UI, transcript + diff UI, persisted sessions. Plus off-plan: full design implementation (rev 2), creative-mode WSX, sheet state, presets, mascot + icon.</p></div></li>
+      <li><span class="m" style="--mc:var(--hanko)">M2·5</span><div>
+        <h3>Hardening <span class="chip later">NEXT</span> <span class="demo-flag">← pay the debt before adding surface</span></h3><p>Close the ink SQL boundary, make binds live, make writes atomic, turn Loro into an actual CRDT, put sheet actions through the approvals desk. Detail in <a href="#hardening">§09</a>.</p></div></li>
       <li><span class="m" style="--mc:var(--tape-mustard)">M3</span><div>
-        <h3>Structured data <span class="chip later">NEXT</span></h3><p>Tables/records UI, live <code>bind</code> views with aggregations, <code>Fetch</code> component, inline human edits — plus wiring Inbox/Daily/Dashboard to real agent activity.</p></div></li>
+        <h3>Structured data</h3><p>Tables/records UI, live <code>bind</code> views with aggregations, <code>Fetch</code> component, inline human edits — plus wiring Inbox/Daily/Dashboard to real agent activity.</p></div></li>
       <li><span class="m" style="--mc:var(--tape-blue)">M4</span><div>
         <h3>ACP</h3><p>External agent support, MCP loopback endpoint.</p></div></li>
       <li><span class="m" style="--mc:var(--tape-pink)">M5</span><div>
@@ -572,12 +602,132 @@
   </div>
 </section>
 
+<!-- ═══════════ HARDENING ═══════════ -->
+<section id="hardening" style="--c:var(--hanko)">
+  <span class="tape" style="--c:var(--hanko)">09 · hardening (M2·5)</span>
+  <div class="card">
+    <h2 class="title">Where the document and the code disagree</h2>
+    <p class="point">An audit on 2026-08-14 read every layer against this spec. The architecture holds — the closed grammar, the one-way layering, the three capability packages are all real. What doesn't hold: four load-bearing claims. One is a hole straight through the trust model.</p>
+
+    <h3>P0 · the ink executor is a raw SQL surface <span class="chip open">VERIFIED</span></h3>
+    <div class="fix" style="--sc:var(--hanko)">
+      <h3><span class="rank">P0</span> Column identifiers reach SQLite unchecked</h3>
+      <dl>
+        <dt>claim</dt><dd>"DB access only through Zod-validated tools; no raw SQL surface." (<a href="#agents">§05</a>)</dd>
+        <dt>reality</dt><dd class="reality"><code>runQuery</code> membership-checks <code>where</code>, <code>orderBy</code> and <code>groupBy.column</code> against the table spec — but <strong>not <code>groupBy.aggregates[].column</code></strong>. The executor interpolates it into <code>json_extract(data, '$.…')</code> and into the <code>AS "…"</code> alias. Zod only asks for a non-empty string, so the quote is right there.</dd>
+        <dt>reach</dt><dd>Both capability paths: an agent calling <code>db_query</code>, <em>and</em> any rendered sheet whose <code>&lt;Table bind&gt;</code> / <code>&lt;Board bind&gt;</code> carries the descriptor — so a hallucinated or prompt-injected sheet fires it on render.</dd>
+        <dt>fix</dt><dd>Membership-check <strong>every</strong> identifier in a descriptor (aggregates included), then remove the possibility rather than the instance: <code>columnExpr</code> takes a validated <code>ColumnSpec</code>, and the JSON path binds as a parameter — <code>json_extract(data, ?)</code>. Aliases get generated, never echoed. Regression test per identifier slot.</dd>
+      </dl>
+    </div>
+
+<pre><code><span class="c">// the probe that proved it — nested subquery over sqlite_master, executed</span>
+runQuery({ <span class="a">table</span>: <span class="v">'tasks'</span>, <span class="a">groupBy</span>: { <span class="a">column</span>: <span class="v">'status'</span>,
+  <span class="a">aggregates</span>: [{ <span class="a">fn</span>: <span class="v">'sum'</span>, <span class="a">column</span>: <span class="v">"title') + (SELECT 40 + (SELECT count(*) FROM sqlite_master
+                             WHERE name='approvals') + 1) + json_extract(data, '$.title"</span> }] } })
+
+<span class="c">→ { rows: [{ status: 'open', "sum_title') + …": 42 }], total: 1 }</span></code></pre>
+
+    <h3>P1–P4 · the load-bearing four</h3>
+
+    <div class="fix" style="--sc:var(--tape-mustard)">
+      <h3><span class="rank">P1</span> "Live bindings into a local database" are not live</h3>
+      <dl>
+        <dt>reality</dt><dd class="reality">Binds fetch once per mount and never again — the effect keys on the query, not on the data. There is no data-change event anywhere: the RPC surface broadcasts three events, all agent-transcript. When the agent rewrites the sheet you are reading, <code>SheetView</code> keeps rendering the old tree until you switch tabs; when it inserts a row, every open <code>&lt;Table&gt;</code> lies. The only refresh in the app is <code>turn_done</code> → re-list the sidebar.</dd>
+        <dt>fix</dt><dd>One <code>dataChanged</code> event carrying <code>{ entity, ids }</code>, emitted by repository writes through a service-level emitter (never from the renderer). Renderer subscribes once: sheet ids re-fetch the active tab, table ids invalidate the binds that touch them. Ink descriptors are already canonical JSON — they <em>are</em> the query keys. This is a small reactive cache, not React Query.</dd>
+        <dt>why now</dt><dd>M3 puts tables in front of the user. Stale-by-default data is a bug the demo cannot survive, and every M3 surface inherits it.</dd>
+      </dl>
+    </div>
+
+    <div class="fix" style="--sc:var(--tape-mustard)">
+      <h3><span class="rank">P2</span> Writes aren't atomic; the oplog isn't a sync unit</h3>
+      <dl>
+        <dt>reality</dt><dd class="reality">Zero transactions in the repository. A sheet write is four statements — row, FTS reindex, link rebuild, oplog append — and a crash between them leaves the vault internally inconsistent. The oplog itself stores whole writes (a full copy of every sheet source, forever), is typed as opaque JSON, has no reader, no cursor, and no consumer.</dd>
+        <dt>fix</dt><dd><code>withTransaction()</code> in the repository client; every op function becomes one unit including its oplog append. A typed <code>Op</code> discriminated union in <code>domain</code> (entity · id · patch · HLC · device), ops as patches rather than snapshots, plus <code>readOps(sinceSeq)</code> and compaction.</dd>
+        <dt>proof</dt><dd>A test that replays the oplog into an empty database and asserts vault equality. That one test is what makes M5 credible; without it, "sync-shaped" is decoration.</dd>
+      </dl>
+    </div>
+
+    <div class="fix" style="--sc:var(--tape-blue)">
+      <h3><span class="rank">P3</span> Loro is a snapshot store wearing a CRDT costume</h3>
+      <dl>
+        <dt>reality</dt><dd class="reality">Every save constructs a fresh <code>LoroDoc</code>, imports the blob, calls <code>update(next)</code>, exports a full snapshot. So: a <strong>new random peer id per write</strong> (the history accumulates a new actor every save), no update log despite <a href="#data">§04</a> promising one, no version vector, no delta export. Q4 chose Loro on day 1 precisely to solve multi-device merge before sync exists — that value is currently unbanked.</dd>
+        <dt>fix</dt><dd>Stable peer id derived from <code>device_id</code>; persist incremental <code>export({ mode: 'update' })</code> deltas in a <code>sheet_updates</code> table; snapshot-compact on a threshold; expose <code>exportFrom(versionVector)</code> so M5 ships deltas instead of documents.</dd>
+        <dt>proof</dt><dd>Two docs, divergent edits, merge → both converge and neither loses a paragraph. Currently untestable, which is the tell.</dd>
+      </dl>
+    </div>
+
+    <div class="fix" style="--sc:var(--hanko)">
+      <h3><span class="rank">P4</span> Sheets walk past the approvals desk</h3>
+      <dl>
+        <dt>claim</dt><dd>"Side effects only through hanko verbs — each stamped by the approvals flow, each an auditable row."</dd>
+        <dt>reality</dt><dd class="reality">True on the agent path (<code>canUseTool</code> → approvals table → renderer prompt). False on the sheet path: the <code>runAction</code> route calls the executor directly. Identical verb, identical blast radius, no gate and no row — and the sheet that carries it was written by an agent, so this is the agent path with the desk removed.</dd>
+        <dt>fix</dt><dd>One gate for both callers. A user click is genuine consent for reversible verbs (<code>sheet.open</code>, <code>table.insert</code>) and is not consent for anything that leaves the machine (<code>url.open</code>, fetch) — that split is <strong>Q13</strong>. Either way both paths write to the ledger below.</dd>
+      </dl>
+    </div>
+
+    <h3>P5–P8 · the rest of the queue</h3>
+
+    <div class="fix" style="--sc:var(--tape-slate)">
+      <h3><span class="rank">P5</span> Approval policy lives in a Map</h3>
+      <dl>
+        <dt>reality</dt><dd class="reality"><code>alwaysAllowed</code> is per-process, keyed by session, gone on restart — while allowed fetch hosts persist to <code>app_meta</code>. Two mechanisms, two lifetimes, one concept.</dd>
+        <dt>fix</dt><dd>One persisted <code>policies</code> table: subject (tool / verb / host) × scope (session / vault) × decision. It is also, for free, the "agent autonomy" surface the design already mocks in Settings.</dd>
+      </dl>
+    </div>
+
+    <div class="fix" style="--sc:var(--tape-violet)">
+      <h3><span class="rank">P6</span> "Two ports, one vocabulary" is a claim, not a structure</h3>
+      <dl>
+        <dt>reality</dt><dd class="reality"><code>AgentHost</code> is welded to the Claude SDK and also owns approvals, hanko dispatch, sheet fetch and diff emission. No port interface exists, so M4 is a rewrite rather than an implementation. <code>promptAgent</code> is fire-and-forget: no cancel, no concurrency guard, errors swallowed by <code>void</code>.</dd>
+        <dt>fix</dt><dd>Extract <code>AgentPort</code> — <code>prompt · cancel · resume · setModel</code>, normalizing into the existing <code>AgentUpdate</code> shape. <code>ClaudeSdkPort</code> is the first implementation, ACP the second. Add an <code>AbortController</code> per turn and a per-session queue. Move hanko dispatch out of the host into its own service module.</dd>
+      </dl>
+    </div>
+
+    <div class="fix" style="--sc:var(--tape-slate)">
+      <h3><span class="rank">P7</span> Vaults exist in the UI and nowhere else</h3>
+      <dl>
+        <dt>reality</dt><dd class="reality">A vault switcher and a create-workspace dialog ship in the app. Underneath: one module-singleton database at one fixed path, opened once at boot. Every day this stays true, the retrofit gets worse — the same argument that put HLC and tombstones in on day 1.</dd>
+        <dt>fix</dt><dd>Decide <strong>Q12</strong> now, build it at M3. Recommendation: one SQLite file per vault, database handle becomes a resolved dependency instead of a module singleton, vault = the natural sync and export unit.</dd>
+      </dl>
+    </div>
+
+    <div class="fix" style="--sc:var(--tape-slate)">
+      <h3><span class="rank">P8</span> Render trusts what persist validated</h3>
+      <dl>
+        <dt>reality</dt><dd class="reality"><code>SheetView</code> parses and renders; it never calls <code>validate</code>. Persisted source was checked against <em>the registry of the day it was written</em> — narrow a prop schema or retire a component and old sheets render unchecked, class-token ban included.</dd>
+        <dt>fix</dt><dd>Validate in the render path and render diagnostics as a repairable state ("this sheet predates the registry — ask the agent to fix it"), which is also the honest UX for a closed, additive registry.</dd>
+      </dl>
+    </div>
+
+    <h3>Three additive moves <span class="chip later">architecture, not repair</span></h3>
+    <ul class="tight">
+      <li><strong>State-parameterized binds</strong> — let a bind's filter value reference sheet state: <code>where: [{ column: 'status', op: 'eq', value: { $state: 'filter' } }]</code>. One new node in the ink schema, resolved in the renderer before the descriptor crosses RPC. Still inert data, still no expressions — and a tab strip that filters a live table covers most of what Q11 was ever asked for. See <strong>Q14</strong>.</li>
+      <li><strong>A capability ledger</strong> — one append-only table for every capability call: tool invocations, sheet actions, fetches, with subject, input digest, decision and outcome. Today only agent approvals leave a trace. This is what makes the trust model auditable instead of merely narrated, and it is exactly the data the Inbox is currently faking.</li>
+      <li><strong>Ink descriptors as query keys</strong> — canonical JSON already; make it explicit and the reactive layer (P1), the bind cache, and future sync invalidation all key off one thing. Small, and it stops three ad-hoc caches from being invented later.</li>
+    </ul>
+
+    <details style="--c:var(--hanko)" open>
+      <summary>Order and acceptance</summary>
+      <table>
+        <tr><th>#</th><th>lands</th><th>done when</th></tr>
+        <tr><td>P0</td><td>immediately</td><td>identifier fuzz test over every descriptor slot is green; <code>columnExpr</code> can no longer take a free string</td></tr>
+        <tr><td>P4</td><td>immediately</td><td>sheet and agent verbs share one gate; both leave ledger rows</td></tr>
+        <tr><td>P1</td><td>M2·5</td><td>agent rewrites the open sheet → view updates without a tab switch; row insert → open bind repaints</td></tr>
+        <tr><td>P2</td><td>M2·5</td><td>oplog replays into an empty db and reproduces the vault</td></tr>
+        <tr><td>P3</td><td>M2·5</td><td>two divergent docs merge without loss; deltas export from a version vector</td></tr>
+        <tr><td>P5 · P6</td><td>M2·5 → M4</td><td>policies survive restart; a turn can be cancelled; ACP lands as a second port with no host surgery</td></tr>
+        <tr><td>P7 · P8</td><td>M3</td><td>Q12 called and built; stale sheets surface a repair state instead of rendering unchecked</td></tr>
+      </table>
+    </details>
+  </div>
+</section>
+
 <!-- ═══════════ OPEN QUESTIONS ═══════════ -->
 <section id="questions" style="--c:var(--hanko)">
-  <span class="tape" style="--c:var(--hanko)">09 · decisions</span>
+  <span class="tape" style="--c:var(--hanko)">10 · decisions</span>
   <div class="card">
-    <h2 class="title">Decision log — all ten called</h2>
-    <p class="point">Locked 2026-08-12. Three diverge from the original recommendation — flagged on their cards.</p>
+    <h2 class="title">Decision log — ten called, four open</h2>
+    <p class="point">Q1–Q10 locked 2026-08-12; three diverge from the original recommendation, flagged on their cards. Q11–Q14 are live: the audit opened three of them, and each blocks a milestone rather than a preference.</p>
     <div class="qgrid">
       <div class="q"><span class="qn">Q1</span>
         <h3>WSX expressiveness</h3>
@@ -632,7 +782,33 @@
         <p>Full React hooks in WSX would make agent-written notes executable — the one line the
         trust model forbids. Declarative sheet state (shipped 2026-08-13) covers most needs.</p>
         <p class="rec">if more logic is ever needed: a sandboxed, capability-free expression language
-        (formulas over state + binds), never raw JS. OPEN.</p>
+        (formulas over state + binds), never raw JS. OPEN — but Q14 probably retires it. Re-ask only
+        after state-parameterized binds ship and something real still doesn't fit.</p>
+      </div>
+      <div class="q"><span class="qn">Q12</span>
+        <h3>Vault model</h3>
+        <p>The UI ships a vault switcher over a single-file, single-vault database. One SQLite file
+        per vault, or one file with a <code>workspace_id</code> on every table?</p>
+        <p class="rec">file per vault — isolation is free, the vault becomes the natural sync/export/backup
+        unit, and a leaked query can't cross vaults. Cost: the db handle stops being a module singleton.
+        Blocks M3. OPEN.</p>
+      </div>
+      <div class="q"><span class="qn">Q13</span>
+        <h3>Is a click consent?</h3>
+        <p>A user pressing <code>&lt;Button action&gt;</code> in an agent-written sheet — does that stamp the
+        verb, or does it still stop at the approvals desk?</p>
+        <p class="rec">split by reversibility: a click is consent for in-vault, undoable verbs
+        (<code>sheet.open</code>, <code>table.insert</code>); anything leaving the machine
+        (<code>url.open</code>, fetch) prompts every time. Both write ledger rows regardless.
+        Blocks P4. OPEN.</p>
+      </div>
+      <div class="q"><span class="qn">Q14</span>
+        <h3>State-parameterized binds</h3>
+        <p>Should a bind's filter value be able to read sheet state — <code>{ $state: 'key' }</code> —
+        so a tab or switch filters a live table without any expression language?</p>
+        <p class="rec">yes. One node in the ink schema, resolved renderer-side before the descriptor
+        crosses RPC; the sheet stays inert data. Watch the blast radius: <code>$state</code> values must
+        pass the same column/type check as literals, or Q14 quietly re-opens P0. OPEN.</p>
       </div>
       <div class="q"><span class="qn">Q10</span>
         <h3>Network in sheets</h3>
@@ -645,7 +821,7 @@
 </section>
 
 <footer>
-  <span>washi · spec v0.3 · decisions locked 2026-08-12 · status updated 2026-08-14</span>
+  <span>washi · spec v0.4 · decisions locked 2026-08-12 · code audit + hardening plan 2026-08-14</span>
   <span class="mono">docs/spec.html</span>
 </footer>
 
