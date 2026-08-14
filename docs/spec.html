@@ -270,6 +270,7 @@
   <a class="dot" href="#sync" style="--c:var(--tape-slate)">sync</a>
   <a class="dot" href="#milestones" style="--c:var(--ink)">plan</a>
   <a class="dot" href="#hardening" style="--c:var(--hanko)">hardening</a>
+  <a class="dot" href="#canvas" style="--c:var(--tape-pink)">canvas + mobile</a>
   <a class="dot" href="#questions" style="--c:var(--hanko)">decisions</a>
 </nav>
 
@@ -327,6 +328,8 @@
       <li>Tables/records exist in domain + ink but have <strong>no dedicated UI</strong> yet; <code>bind</code> views render but nothing creates tables outside agent tools.</li>
       <li><code>Fetch</code> component + tsuru policy UI unproven end-to-end in sheets.</li>
       <li>Human editing is thin by design — inline edits limited to what Paper components expose.</li>
+      <li><strong>Every sheet wears this document's clothes</strong> — three layers of imposed styling override the agent's own <code>class</code>. Diagnosed in <a href="#canvas">§10</a>.</li>
+      <li>Nothing in <code>@washi/paper</code> is responsive: zero breakpoint or container-query classes, fixed widths throughout.</li>
       <li>No cancel button: a running turn cannot be interrupted, and two prompts in one session interleave into one transcript.</li>
       <li>Records are not in the FTS index (sheets only), despite <a href="#data">§04</a>'s table listing.</li>
     </ul>
@@ -334,6 +337,7 @@
     <h3>Next <span class="chip later">in order</span></h3>
     <ul class="tight">
       <li><strong>M2.5 hardening</strong> — <a href="#hardening">§09</a> P0–P4. Make the trust model and the "live bindings" pitch true before M3 puts more weight on them.</li>
+      <li><strong>M2.6 blank canvas</strong> — <a href="#canvas">§10</a>. Sheets stop inheriting this document's look; the same sweep makes the registry fluid enough to survive a phone.</li>
       <li><strong>Wire the design to real data</strong> — Inbox rows from the capability ledger, Daily note as a real per-day sheet, dashboard from actual vault stats.</li>
       <li><strong>M3 structured data</strong> — tables/records UI, live <code>bind</code> views with aggregations surfaced, <code>Fetch</code> end-to-end, inline human edits.</li>
       <li><strong>Q14</strong> — state-parameterized binds (<code>{ $state: 'key' }</code>), the cheap answer that probably retires Q11 without an expression language.</li>
@@ -592,6 +596,8 @@
         <h3>Embedded Claude <span class="chip done">DONE</span> <span class="demo-flag">← the demo moment</span></h3><p>Agent host, in-process tools, approvals UI, transcript + diff UI, persisted sessions. Plus off-plan: full design implementation (rev 2), creative-mode WSX, sheet state, presets, mascot + icon.</p></div></li>
       <li><span class="m" style="--mc:var(--hanko)">M2·5</span><div>
         <h3>Hardening <span class="chip later">NEXT</span> <span class="demo-flag">← pay the debt before adding surface</span></h3><p>Close the ink SQL boundary, make binds live, make writes atomic, turn Loro into an actual CRDT, put sheet actions through the approvals desk. Detail in <a href="#hardening">§09</a>.</p></div></li>
+      <li><span class="m" style="--mc:var(--tape-pink)">M2·6</span><div>
+        <h3>Blank canvas <span class="chip later">NEXT</span></h3><p>One sweep over the registry: <code>class</code> becomes the last word, primitives lose their cosmetics, the washi look becomes opt-in, widths go fluid and container-query-shaped. Same pass buys mobile-readiness — <a href="#canvas">§10</a>.</p></div></li>
       <li><span class="m" style="--mc:var(--tape-mustard)">M3</span><div>
         <h3>Structured data</h3><p>Tables/records UI, live <code>bind</code> views with aggregations, <code>Fetch</code> component, inline human edits — plus wiring Inbox/Daily/Dashboard to real agent activity.</p></div></li>
       <li><span class="m" style="--mc:var(--tape-blue)">M4</span><div>
@@ -722,12 +728,129 @@ runQuery({ <span class="a">table</span>: <span class="v">'tasks'</span>, <span c
   </div>
 </section>
 
+<!-- ═══════════ CANVAS + MOBILE ═══════════ -->
+<section id="canvas" style="--c:var(--tape-pink)">
+  <span class="tape" style="--c:var(--tape-pink)">10 · canvas &amp; reach</span>
+  <div class="card">
+    <h2 class="title">Every sheet looks like this document</h2>
+    <p class="point">Q9 gave sheets the full Tailwind vocabulary. It never gave them the last word. Three layers of imposed appearance sit between an agent's <code>class</code> and the pixels — so sheets converge on one look no matter what gets written. A sheet should be a blank canvas assembled from our primitives; today it is a pre-decorated page you may lightly annotate.</p>
+
+    <h3>Why it happens — three layers, each sufficient on its own</h3>
+
+    <div class="fix" style="--sc:var(--tape-pink)">
+      <h3><span class="rank">L1</span> The app chrome declares what a sheet is</h3>
+      <dl>
+        <dt>does</dt><dd><code>SheetView</code> wraps every sheet in a bordered, shadowed, <code>max-w-2xl</code> card with a washi tape strip and a byline.</dd>
+        <dt>costs</dt><dd class="reality">No sheet can be full-bleed, edge-to-edge, wider, or its own background. The frame is the app's opinion, applied before the sheet gets a vote.</dd>
+        <dt>should</dt><dd>A neutral scrolling surface. Tape and byline become app furniture <em>around</em> the canvas, or opt-in per sheet.</dd>
+      </dl>
+    </div>
+
+    <div class="fix" style="--sc:var(--tape-pink)">
+      <h3><span class="rank">L2</span> <code>&lt;Sheet&gt;</code> paints before you do</h3>
+      <dl>
+        <dt>does</dt><dd><code>mx-auto w-full max-w-2xl rounded-xl px-8 py-6</code> plus a face class — and the <code>washi</code> preset applies <strong>even with no <code>theme</code> prop</strong>, as an inline <code>style</code>.</dd>
+        <dt>costs</dt><dd class="reality">Inline style beats every class. That is why the code carries a regex that sniffs <code>class</code> for <code>bg-</code>/<code>from-</code> and retracts the preset background — an escape hatch bolted on precisely because the architecture fights itself here. The second <code>max-w-2xl</code> (L1 already applied one) makes width unwinnable.</dd>
+        <dt>should</dt><dd>A bare container carrying only <code>class</code>. Presets become an opt-in <em>class</em>, never a default inline style. Want a centered column? Write <code>class="mx-auto max-w-2xl px-8 py-6"</code> — explicitly, like any React app.</dd>
+      </dl>
+    </div>
+
+    <div class="fix" style="--sc:var(--hanko)">
+      <h3><span class="rank">L3</span> <code>class</code> is a suggestion, not an override</h3>
+      <dl>
+        <dt>does</dt><dd>Every component merges by naive concatenation — <code>cx(base, extra)</code> is a template string. <code>&lt;H1 class="mt-0"&gt;</code> emits <code>class="mt-6 mb-2 … mt-0"</code>.</dd>
+        <dt>costs</dt><dd class="reality">Two conflicting utilities both land on the element, so the winner is decided by Tailwind's canonical stylesheet order rather than by the author — and for same-family utilities the baked-in default typically outranks the override. <code>tailwind-merge</code> is already a dependency of the app; <code>@washi/paper</code> does not use it. This is the mechanical reason the vocabulary feels decorative.</dd>
+        <dt>should</dt><dd><code>twMerge</code> in every component so exactly one utility per property survives, and the sheet's is the one that does.</dd>
+      </dl>
+    </div>
+
+    <h3>The deeper problem: the registry is a washi kit, not a primitive set</h3>
+    <ul class="tight">
+      <li><code>Hero</code> hardcodes the <code>。</code> — this document's signature, welded into a general-purpose component.</li>
+      <li><code>Tape</code> and <code>Stamp</code> are brand furniture living in the default vocabulary.</li>
+      <li><code>Divider</code> accepts no <code>class</code> at all. <code>Board</code> pins columns at <code>w-64</code>, <code>Dialog</code> at <code>max-w-md</code>.</li>
+      <li>Every block carries cosmetic margins, radii and borders that a sheet must fight rather than compose.</li>
+    </ul>
+
+    <p class="point" style="--c:var(--tape-teal)">Split the registry in two: <strong>primitives carry behavior and semantics only</strong> — bind, state, action, structure — and ship zero cosmetic classes. <strong>Styled kits are opt-in</strong>, one word on <code>&lt;Sheet&gt;</code>. The washi look stops being the floor and becomes one choice among many.</p>
+
+<pre><code><span class="c">// today — the sheet asks politely and the registry declines</span>
+&lt;<span class="t">Sheet</span> <span class="a">title</span>=<span class="v">"Launch"</span> <span class="a">class</span>=<span class="v">"bg-black max-w-none"</span>&gt;
+  &lt;<span class="t">H1</span> <span class="a">class</span>=<span class="v">"mt-0 text-white"</span>&gt;Launch&lt;/<span class="t">H1</span>&gt;   <span class="c">← mt-6 still wins</span>
+
+<span class="c">// after — nothing is painted until the sheet paints it</span>
+&lt;<span class="t">Sheet</span> <span class="a">title</span>=<span class="v">"Launch"</span> <span class="a">class</span>=<span class="v">"min-h-full bg-black text-zinc-100"</span>&gt;
+  &lt;<span class="t">Box</span> <span class="a">class</span>=<span class="v">"mx-auto max-w-3xl px-6 py-16 @md:px-12"</span>&gt;
+    &lt;<span class="t">H1</span> <span class="a">class</span>=<span class="v">"text-6xl font-black tracking-tighter"</span>&gt;Launch&lt;/<span class="t">H1</span>&gt;
+  &lt;/<span class="t">Box</span>&gt;
+&lt;/<span class="t">Sheet</span>&gt;</code></pre>
+
+    <details style="--c:var(--tape-pink)" open>
+      <summary>The tradeoff, stated once</summary>
+      <p>A blank canvas means an unstyled sheet looks like unstyled HTML. The agent has to actually design, every time. Three mitigations, none of which reopen the grammar: the <code>sheet_create</code> scaffold ships a fully-composed layout rather than a bare <code>&lt;H1&gt;</code>; presets survive as one-word opt-ins for when the agent wants a starting palette; the system prompt carries a worked example instead of a component list. Beautiful-by-default is what produced the sameness — this is the trade being made deliberately.</p>
+    </details>
+
+    <h2 class="title" style="margin-top:2.2rem">Mobile — what it costs, and what it doesn't</h2>
+    <p class="point" style="--c:var(--tape-blue)">The layering already splits in the right place. Everything above the RPC boundary is portable; everything below is Bun. Mobile is not an architecture problem — it is a runtime problem plus a layout discipline we have not adopted.</p>
+
+    <details style="--c:var(--tape-blue)" open>
+      <summary>What ports, what doesn't</summary>
+      <table>
+        <tr><th>package</th><th>ports</th><th>why / blocker</th></tr>
+        <tr><td><code>@washi/wsx</code></td><td>✅</td><td>isomorphic, no DOM by design</td></tr>
+        <tr><td><code>@washi/ink</code> · <code>@washi/hanko</code></td><td>✅</td><td>zod descriptors; execution lives elsewhere</td></tr>
+        <tr><td><code>domain</code></td><td>✅</td><td>schemas + HLC clock</td></tr>
+        <tr><td><code>@washi/paper</code></td><td>✅ webview<br>❌ native</td><td>React DOM + Tailwind. A webview runs it verbatim; React Native would need a second renderer for the same registry</td></tr>
+        <tr><td><code>repository</code></td><td>❌</td><td><code>bun:sqlite</code>, the drizzle bun driver, raw <code>getSqlite().query()</code> throughout, <code>Bun.randomUUIDv7</code>, Loro WASM</td></tr>
+        <tr><td><code>service</code></td><td>❌</td><td><code>claude-agent-sdk</code> cannot run on a phone; <code>Bun.spawn</code>; tsuru is a server-side gate by design</td></tr>
+        <tr><td><code>api</code></td><td>partial</td><td>route shapes port; mirin's token-auth loopback WS transport does not</td></tr>
+      </table>
+    </details>
+
+    <h3>The limitations worth holding in your head</h3>
+    <ul class="tight">
+      <li><strong>mirin is desktop.</strong> Bun main process + CEF renderer, no mobile target. Any phone path is a new shell — webview wrapper, Expo, or PWA.</li>
+      <li><strong>The agent cannot run on-device.</strong> This is the load-bearing one: mobile is always relay-backed or paired to a desktop. It makes M5 a prerequisite for mobile rather than a sibling of it.</li>
+      <li><strong>Runtime Tailwind compilation is a desktop luxury.</strong> <code>@tailwindcss/browser</code> ships a compiler to the client and scans the DOM. On a phone that is startup cost and memory per view. Fix once, benefits both: precompile CSS in the main process per sheet — it already holds the source — and cache by source hash.</li>
+      <li><strong>There is not one responsive class in <code>@washi/paper</code>.</strong> Zero <code>sm:</code>, zero <code>@container</code>. Every fixed width — the <code>max-w-2xl</code> sheet, <code>w-64</code> board columns, the <code>max-w-md</code> dialog — breaks at 375px.</li>
+      <li><strong>Breakpoints are the wrong tool here.</strong> One sheet renders in a desktop tab, in a 400px agent popover, and on a phone — three widths, same document, and two of them are not the viewport. Container queries are the correct primitive.</li>
+      <li><strong>Blank canvas makes responsiveness the agent's job.</strong> Either the prompt mandates container-query classes, or primitives stay fluid by default so the naive sheet works everywhere. Probably both.</li>
+      <li><strong>Touch.</strong> Hover variants, <code>Tooltip</code>, <code>Dialog</code> triggers and <code>&lt;details&gt;</code> toggles assume a pointer; <code>size-4</code> checkboxes are well under a 44px tap target.</li>
+      <li><strong>The security boundary changes shape.</strong> Capabilities stay server-side — that part is already right — but loopback + token becomes network + real auth. Better Auth is already on the M5 plan; mobile just makes it non-optional.</li>
+    </ul>
+
+    <h3>Three shapes, in increasing cost</h3>
+    <ul class="tight">
+      <li><strong>Companion</strong> — read, search, and <em>approve</em>. No editing, no local agent. Small, and arguably the honest v1: on a phone this product is mostly "see what the agent wrote and stamp its proposals." The inbox is the mobile killer feature, not the editor.</li>
+      <li><strong>Thin client</strong> — full app over the relay, <code>@washi/paper</code> reused verbatim in a webview. Medium, gated entirely on M5. Online-only unless a read cache gets built.</li>
+      <li><strong>Local-first mobile</strong> — port <code>repository</code> behind an interface (op-sqlite or expo-sqlite, Loro via WASM), agent still remote. Large: every repository function reaches for <code>getSqlite()</code> directly and raw SQL is spread across it.</li>
+    </ul>
+
+    <p class="point" style="--c:var(--tape-moss)">The headline: <strong>the blank-canvas refactor and mobile-readiness are the same refactor.</strong> Both are "stop baking desktop-page assumptions into the primitives." Fluid widths, container queries, no cosmetic defaults, class as the last word — that is one pass over ~35 components. Done together it is nearly free. Done separately it is the same pass, twice, with a fleet of showcase sheets to migrate in between.</p>
+
+    <details style="--c:var(--tape-moss)" open>
+      <summary>Effort and sequencing</summary>
+      <table>
+        <tr><th>move</th><th>size</th><th>when</th></tr>
+        <tr><td><code>twMerge</code> in paper; <code>class</code> on every component</td><td>S</td><td>with the canvas pass — it is the pass</td></tr>
+        <tr><td>Strip L1/L2 chrome; presets become opt-in classes</td><td>S</td><td>same</td></tr>
+        <tr><td>De-cosmetic the primitives; split out the washi kit</td><td>M</td><td>same — ~35 components, one sweep</td></tr>
+        <tr><td>Fluid defaults + container-query authoring rule</td><td>S <em>now</em>, L later</td><td><strong>same sweep.</strong> Cheap at 15 showcase sheets, brutal at 500</td></tr>
+        <tr><td>Precompile sheet CSS in the main process</td><td>M</td><td>M3 — helps desktop immediately</td></tr>
+        <tr><td>Touch targets + pointer-free control paths</td><td>S</td><td>whenever mobile becomes real</td></tr>
+        <tr><td>Companion app over the relay</td><td>M</td><td>post-M5</td></tr>
+        <tr><td><code>repository</code> behind a storage interface</td><td>L</td><td>only if local-first mobile is actually wanted</td></tr>
+      </table>
+    </details>
+  </div>
+</section>
+
 <!-- ═══════════ OPEN QUESTIONS ═══════════ -->
 <section id="questions" style="--c:var(--hanko)">
-  <span class="tape" style="--c:var(--hanko)">10 · decisions</span>
+  <span class="tape" style="--c:var(--hanko)">11 · decisions</span>
   <div class="card">
-    <h2 class="title">Decision log — ten called, four open</h2>
-    <p class="point">Q1–Q10 locked 2026-08-12; three diverge from the original recommendation, flagged on their cards. Q11–Q14 are live: the audit opened three of them, and each blocks a milestone rather than a preference.</p>
+    <h2 class="title">Decision log — ten called, seven open</h2>
+    <p class="point">Q1–Q10 locked 2026-08-12; three diverge from the original recommendation, flagged on their cards. Q11–Q17 are live. None is a preference — each one blocks a milestone, and Q15/Q16 get more expensive with every sheet written before they are called.</p>
     <div class="qgrid">
       <div class="q"><span class="qn">Q1</span>
         <h3>WSX expressiveness</h3>
@@ -809,6 +932,32 @@ runQuery({ <span class="a">table</span>: <span class="v">'tasks'</span>, <span c
         <p class="rec">yes. One node in the ink schema, resolved renderer-side before the descriptor
         crosses RPC; the sheet stays inert data. Watch the blast radius: <code>$state</code> values must
         pass the same column/type check as literals, or Q14 quietly re-opens P0. OPEN.</p>
+      </div>
+      <div class="q"><span class="qn">Q15</span>
+        <h3>How blank is the canvas?</h3>
+        <p>Primitives ship zero cosmetics and an unstyled sheet looks like unstyled HTML — or they keep
+        a thin readable baseline (type scale, rhythm) that <code>class</code> can always beat.</p>
+        <p class="rec">zero cosmetics, with a real scaffold. A "sensible baseline" is exactly how the
+        current sameness happened: every default is a thing the agent must fight, and it will not know
+        it is fighting. Ship a fully-composed <code>sheet_create</code> template instead. Blocks the
+        canvas pass. OPEN.</p>
+      </div>
+      <div class="q"><span class="qn">Q16</span>
+        <h3>Container queries or breakpoints?</h3>
+        <p>Sheets render at three widths that are not the viewport — desktop tab, 400px agent popover,
+        phone. Which vocabulary do agents author in?</p>
+        <p class="rec">container queries only; <code>sm:</code>/<code>md:</code> banned in sheet classes the
+        way <code>url()</code> is. A sheet is a component, not a page, and it never knows the window.
+        Decide during the canvas pass — retrofitting this across a vault of sheets is the expensive
+        version. OPEN.</p>
+      </div>
+      <div class="q"><span class="qn">Q17</span>
+        <h3>Mobile shape</h3>
+        <p>Companion (read · search · approve), thin client over the relay, or local-first with a
+        ported repository?</p>
+        <p class="rec">companion first. On a phone this product is "see what the agent wrote and stamp
+        it" — the inbox, not the editor. It is also the only shape that does not need a storage port.
+        Gated on M5 either way, since the agent can never run on-device. OPEN.</p>
       </div>
       <div class="q"><span class="qn">Q10</span>
         <h3>Network in sheets</h3>
