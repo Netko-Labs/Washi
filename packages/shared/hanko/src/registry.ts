@@ -22,6 +22,17 @@ export const VERBS = {
 
 export type Verb = keyof typeof VERBS
 
+/**
+ * Verbs whose effects stay inside the vault and can be undone. A user clicking
+ * one in a sheet is consent; everything else leaves the machine and needs an
+ * explicit stamp every time (spec Q13).
+ */
+const REVERSIBLE_VERBS = new Set<Verb>(['sheet.open', 'sheet.create', 'table.insert'])
+
+export function isReversibleVerb(verb: Verb): boolean {
+  return REVERSIBLE_VERBS.has(verb)
+}
+
 export type HankoAction = { [K in Verb]: z.infer<(typeof VERBS)[K]> }[Verb]
 
 export interface HankoIssue {

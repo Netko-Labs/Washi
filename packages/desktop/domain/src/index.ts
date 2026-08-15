@@ -9,6 +9,15 @@ export {
   type TranscriptEntry,
 } from './entities/agents'
 export {
+  type CapabilityCall,
+  type CapabilityDecision,
+  type CapabilityOrigin,
+  type CapabilityWrite,
+  capabilityCallSchema,
+  capabilityDecisionSchema,
+  capabilityOriginSchema,
+} from './entities/capabilities'
+export {
   type SearchHit,
   type SheetDetail,
   type SheetSummary,

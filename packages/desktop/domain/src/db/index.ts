@@ -3,6 +3,7 @@ export {
   agentTurnTable,
   appMetaTable,
   approvalTable,
+  capabilityCallTable,
   oplogTable,
   recordTable,
   sheetLinkTable,

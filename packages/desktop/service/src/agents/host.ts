@@ -3,6 +3,7 @@ import type {
   AgentUpdate,
   ApprovalDecision,
   ApprovalRequest,
+  CapabilityOrigin,
   TranscriptEntry,
 } from '@washi/desktop-domain'
 import {
@@ -10,11 +11,12 @@ import {
   createApproval,
   getSdkSessionId,
   getSheet,
+  recordCapability,
   resolveApproval,
   setAppMeta,
   updateSession,
 } from '@washi/desktop-repository'
-import { type HankoHandlers, runAction } from '@washi/hanko'
+import { checkAction, type HankoHandlers, isReversibleVerb, runAction } from '@washi/hanko'
 import { checkUrl, guardedFetch, isPrivateAddress } from '@washi/tsuru'
 import { createSheetFromSource } from '../sheets/service'
 import { runMutation } from '../tables/service'
@@ -72,13 +74,52 @@ export class AgentHost {
     this.pendingApprovals.delete(id)
   }
 
-  async executeAction(input: unknown): Promise<void> {
-    await runAction(input, this.hankoHandlers())
+  /**
+   * The single gate both callers pass through (spec §09 P4). Agent-origin calls
+   * were already stamped by `canUseTool`; sheet-origin calls are a user click,
+   * which is consent for reversible in-vault verbs and never for anything that
+   * leaves the machine (Q13). Every outcome lands in the ledger.
+   */
+  async executeAction(input: unknown, origin: CapabilityOrigin = 'agent'): Promise<void> {
+    const checked = checkAction(input)
+    if (!checked.ok) {
+      const detail = checked.issues.map((issue) => issue.message).join('; ')
+      recordCapability({ origin, subject: 'action.invalid', input, decision: 'denied', detail })
+      throw new Error(detail)
+    }
+
+    const { verb } = checked.action
+    if (origin === 'sheet' && !isReversibleVerb(verb)) {
+      const detail = `"${verb}" leaves this machine — a sheet cannot run it without a stamp`
+      recordCapability({ origin, subject: verb, input, decision: 'denied', detail })
+      throw new Error(detail)
+    }
+
+    recordCapability({
+      origin,
+      subject: verb,
+      input,
+      decision: origin === 'sheet' ? 'auto' : 'allowed',
+    })
+    await runAction(checked.action, this.hankoHandlers())
   }
 
   /** The sheet <Fetch> component's path — same policy, no approval loop. */
-  fetchForSheet(url: string): Promise<string> {
-    return guardedFetch(url, currentFetchPolicy())
+  async fetchForSheet(url: string): Promise<string> {
+    try {
+      const body = await guardedFetch(url, currentFetchPolicy())
+      recordCapability({ origin: 'sheet', subject: 'fetch_url', input: { url }, decision: 'auto' })
+      return body
+    } catch (error) {
+      recordCapability({
+        origin: 'sheet',
+        subject: 'fetch_url',
+        input: { url },
+        decision: 'denied',
+        detail: String(error),
+      })
+      throw error
+    }
   }
 
   /** One user turn: persist, stream the SDK, emit + persist every update. */

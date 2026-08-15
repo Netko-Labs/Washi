@@ -71,6 +71,17 @@ export const approvalTable = sqliteTable('approvals', {
   resolvedAt: text('resolved_at'),
 })
 
+export const capabilityCallTable = sqliteTable('capability_calls', {
+  id: text('id').primaryKey(),
+  /** 'agent' or 'sheet' — which side of the desk the call came from. */
+  origin: text('origin').notNull(),
+  subject: text('subject').notNull(),
+  input: text('input', { mode: 'json' }),
+  decision: text('decision').notNull(),
+  detail: text('detail'),
+  createdAt: text('created_at').notNull(),
+})
+
 export const oplogTable = sqliteTable('oplog', {
   seq: integer('seq').primaryKey({ autoIncrement: true }),
   opId: text('op_id').notNull(),

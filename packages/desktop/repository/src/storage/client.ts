@@ -147,6 +147,21 @@ function createTables(sqlite: Database) {
   `)
 
   sqlite.exec(`
+    CREATE TABLE IF NOT EXISTS capability_calls (
+      id TEXT PRIMARY KEY,
+      origin TEXT NOT NULL,
+      subject TEXT NOT NULL,
+      input TEXT,
+      decision TEXT NOT NULL,
+      detail TEXT,
+      created_at TEXT NOT NULL
+    )
+  `)
+  sqlite.exec(
+    'CREATE INDEX IF NOT EXISTS idx_capability_calls_created ON capability_calls(created_at DESC)',
+  )
+
+  sqlite.exec(`
     CREATE TABLE IF NOT EXISTS oplog (
       seq INTEGER PRIMARY KEY AUTOINCREMENT,
       op_id TEXT NOT NULL,

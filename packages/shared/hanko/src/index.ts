@@ -4,6 +4,7 @@ export {
   type HankoHandlers,
   type HankoIssue,
   type HankoResult,
+  isReversibleVerb,
   runAction,
   VERBS,
   type Verb,
