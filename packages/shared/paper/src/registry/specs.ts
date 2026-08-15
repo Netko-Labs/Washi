@@ -170,9 +170,11 @@ export const paperRegistry: WsxRegistry = {
       .strict(),
     children: 'nodes',
   },
-  H1: { props: styled.strict(), children: 'text' },
-  H2: { props: styled.strict(), children: 'text' },
-  H3: { props: styled.strict(), children: 'text' },
+  // Headings take inline nodes: styling one word inside a heading is basic
+  // typographic design, and a <Span> is as inert as the text beside it.
+  H1: { props: styled.strict(), children: 'nodes' },
+  H2: { props: styled.strict(), children: 'nodes' },
+  H3: { props: styled.strict(), children: 'nodes' },
   P: { props: styled.strict(), children: 'nodes' },
   Quote: { props: styled.strict(), children: 'nodes' },
   Callout: {
@@ -185,7 +187,7 @@ export const paperRegistry: WsxRegistry = {
     props: styled.extend({ lang: z.string().max(32).optional() }).strict(),
     children: 'text',
   },
-  Divider: { props: z.object({}).strict(), children: 'none' },
+  Divider: { props: styled.strict(), children: 'none' },
   Img: {
     props: styled
       .extend({ src: z.url({ protocol: /^https$/ }), alt: z.string().max(300).optional() })

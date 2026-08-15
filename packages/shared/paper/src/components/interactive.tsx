@@ -1,13 +1,10 @@
 import { useEffect, useState } from 'react'
+import { cn } from '../lib'
 import { type ActionRef, usePaperHost } from '../provider'
 import type { BlockProps } from './typography'
 
-function cx(base: string, extra?: string): string {
-  return extra ? `${base} ${extra}` : base
-}
-
 export function Img({ src, alt, className }: { src: string; alt?: string; className?: string }) {
-  return <img src={src} alt={alt ?? ''} className={cx('my-3 max-w-full rounded-lg', className)} />
+  return <img src={src} alt={alt ?? ''} className={cn('max-w-full', className)} />
 }
 
 export function Ref({ sheet, className, children }: BlockProps & { sheet: string }) {
@@ -28,10 +25,7 @@ export function Ref({ sheet, className, children }: BlockProps & { sheet: string
     <button
       type="button"
       onClick={() => host.openSheet(sheet)}
-      className={cx(
-        'inline text-primary underline decoration-primary/40 underline-offset-2',
-        className,
-      )}
+      className={cn('inline underline underline-offset-2', className)}
     >
       {children ?? title ?? sheet}
     </button>
@@ -54,10 +48,7 @@ export function Button({ action, className, children }: BlockProps & { action: A
           setBusy(false)
         }
       }}
-      className={cx(
-        'my-1 inline-flex items-center rounded-md bg-primary px-3 py-1.5 font-medium text-primary-foreground text-sm disabled:opacity-50',
-        className,
-      )}
+      className={cn('inline-flex items-center disabled:opacity-50', className)}
     >
       {children}
     </button>
@@ -66,19 +57,19 @@ export function Button({ action, className, children }: BlockProps & { action: A
 
 export function Toggle({ label, className, children }: BlockProps & { label: string }) {
   return (
-    <details className={cx('my-2 rounded-md border border-border px-3 py-2', className)}>
-      <summary className="cursor-pointer font-medium text-sm">{label}</summary>
-      <div className="pt-2">{children}</div>
+    <details className={className}>
+      <summary className="cursor-pointer">{label}</summary>
+      <div>{children}</div>
     </details>
   )
 }
 
 export function Columns({ className, children }: BlockProps) {
-  return <div className={cx('my-3 flex gap-4', className)}>{children}</div>
+  return <div className={cn('flex flex-wrap gap-4', className)}>{children}</div>
 }
 
 export function Column({ className, children }: BlockProps) {
-  return <div className={cx('min-w-0 flex-1', className)}>{children}</div>
+  return <div className={cn('min-w-0 flex-1 basis-64', className)}>{children}</div>
 }
 
 export function Fetch({
@@ -117,9 +108,9 @@ export function Fetch({
   }, [host, url, as])
 
   return (
-    <div className={cx('my-3 rounded-lg border border-border bg-muted/50 p-3 text-sm', className)}>
-      <div className="mb-1 truncate font-mono text-muted-foreground text-xs">{url}</div>
-      {state.status === 'loading' && <div className="text-muted-foreground">fetching…</div>}
+    <div className={className}>
+      <div className="truncate">{url}</div>
+      {state.status === 'loading' && <div>fetching…</div>}
       {state.status === 'error' && <div className="text-destructive">{state.body}</div>}
       {state.status === 'done' && (
         <pre className="overflow-x-auto whitespace-pre-wrap">{state.body}</pre>

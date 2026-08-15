@@ -1,42 +1,35 @@
 import type { ReactNode } from 'react'
+import { cn } from '../lib'
 
 export interface BlockProps {
   className?: string
   children?: ReactNode
 }
 
-function cx(base: string, extra?: string): string {
-  return extra ? `${base} ${extra}` : base
-}
+/**
+ * Primitives carry semantics, not appearance (spec Q15). Everything here is a
+ * bare tag plus whatever the sheet asked for — no margins, no radii, no colour.
+ * Blocks that need structure to function keep only that.
+ */
 
 export function H1({ className, children }: BlockProps) {
-  return (
-    <h1 className={cx('mt-6 mb-2 font-bold font-display text-3xl tracking-tight', className)}>
-      {children}
-    </h1>
-  )
+  return <h1 className={className}>{children}</h1>
 }
 
 export function H2({ className, children }: BlockProps) {
-  return <h2 className={cx('mt-5 mb-2 font-bold font-display text-2xl', className)}>{children}</h2>
+  return <h2 className={className}>{children}</h2>
 }
 
 export function H3({ className, children }: BlockProps) {
-  return <h3 className={cx('mt-4 mb-1 font-bold font-display text-lg', className)}>{children}</h3>
+  return <h3 className={className}>{children}</h3>
 }
 
 export function P({ className, children }: BlockProps) {
-  return <p className={cx('my-2 leading-relaxed', className)}>{children}</p>
+  return <p className={className}>{children}</p>
 }
 
 export function Quote({ className, children }: BlockProps) {
-  return (
-    <blockquote
-      className={cx('my-3 border-border border-l-4 pl-4 text-muted-foreground italic', className)}
-    >
-      {children}
-    </blockquote>
-  )
+  return <blockquote className={className}>{children}</blockquote>
 }
 
 const TONE_CLASSES = {
@@ -46,43 +39,27 @@ const TONE_CLASSES = {
   danger: 'border-destructive/40 bg-destructive/10',
 } as const
 
+/** `tone` is a semantic default the sheet can override like any other class. */
 export function Callout({
   tone = 'info',
   className,
   children,
 }: BlockProps & { tone?: keyof typeof TONE_CLASSES }) {
-  return (
-    <div
-      className={cx(`my-3 rounded-lg border px-4 py-3 text-sm ${TONE_CLASSES[tone]}`, className)}
-    >
-      {children}
-    </div>
-  )
+  return <div className={cn('border', TONE_CLASSES[tone], className)}>{children}</div>
 }
 
 export function Code({ className, children }: BlockProps & { lang?: string }) {
   return (
-    <pre
-      className={cx('my-3 overflow-x-auto rounded-lg bg-muted p-4 font-mono text-sm', className)}
-    >
+    <pre className={cn('overflow-x-auto whitespace-pre-wrap font-mono', className)}>
       <code>{children}</code>
     </pre>
   )
 }
 
-export function Divider() {
-  return <hr className="my-6 border-border" />
+export function Divider({ className }: { className?: string }) {
+  return <hr className={className} />
 }
 
 export function Tag({ className, children }: BlockProps) {
-  return (
-    <span
-      className={cx(
-        'mx-0.5 inline-block rounded bg-accent px-1.5 py-0.5 font-medium text-xs',
-        className,
-      )}
-    >
-      {children}
-    </span>
-  )
+  return <span className={className}>{children}</span>
 }

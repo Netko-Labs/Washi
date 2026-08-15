@@ -1,10 +1,7 @@
 import type { InkQuery, QueryRow } from '@washi/ink'
 import { type ReactNode, useEffect, useState } from 'react'
+import { cn } from '../lib'
 import { usePaperHost } from '../provider'
-
-function cx(base: string, extra?: string): string {
-  return extra ? `${base} ${extra}` : base
-}
 
 function useBind(query: InkQuery | undefined): { rows: QueryRow[]; error: string | null } {
   const host = usePaperHost()
@@ -41,7 +38,7 @@ export function Task({
   const [checked, setChecked] = useState(done)
 
   return (
-    <label className={cx('my-1 flex items-center gap-2 text-sm', className)}>
+    <label className={cn('flex items-center gap-2', className)}>
       <input
         type="checkbox"
         checked={checked}
@@ -51,7 +48,7 @@ export function Task({
           setChecked(next)
           if (record) await host.toggleTask(record, next)
         }}
-        className="size-4 accent-primary"
+        className="size-4 shrink-0 accent-primary"
       />
       <span className={checked ? 'text-muted-foreground line-through' : ''}>{children}</span>
     </label>
@@ -70,9 +67,9 @@ export function TaskList({
   const { rows, error } = useBind(bind)
 
   return (
-    <div className={cx('my-3', className)}>
+    <div className={className}>
       {children}
-      {error && <div className="text-destructive text-sm">{error}</div>}
+      {error && <div className="text-destructive">{error}</div>}
       {bind &&
         rows.map((row) => (
           <Task key={String(row.id)} record={String(row.id)} done={row.done === true}>
@@ -93,20 +90,17 @@ export function Table({
   className?: string
 }) {
   const { rows, error } = useBind(bind)
-  if (error) return <div className="my-3 text-destructive text-sm">{error}</div>
+  if (error) return <div className="text-destructive">{error}</div>
 
   const keys = columns ?? Object.keys(rows[0] ?? {}).filter((key) => key !== 'id')
 
   return (
-    <div className={cx('my-3 overflow-x-auto rounded-lg border border-border', className)}>
-      <table className="w-full text-sm">
+    <div className={cn('overflow-x-auto', className)}>
+      <table className="w-full">
         <thead>
-          <tr className="border-border border-b bg-muted/60">
+          <tr>
             {keys.map((key) => (
-              <th
-                key={key}
-                className="px-3 py-2 text-left font-medium text-muted-foreground text-xs"
-              >
+              <th key={key} className="text-left">
                 {key}
               </th>
             ))}
@@ -114,9 +108,9 @@ export function Table({
         </thead>
         <tbody>
           {rows.map((row, index) => (
-            <tr key={String(row.id ?? index)} className="border-border border-b last:border-0">
+            <tr key={String(row.id ?? index)}>
               {keys.map((key) => (
-                <td key={key} className="px-3 py-2">
+                <td key={key}>
                   {row[key] === null || row[key] === undefined ? '' : String(row[key])}
                 </td>
               ))}
@@ -124,12 +118,7 @@ export function Table({
           ))}
           {rows.length === 0 && (
             <tr>
-              <td
-                colSpan={Math.max(keys.length, 1)}
-                className="px-3 py-4 text-center text-muted-foreground"
-              >
-                no rows
-              </td>
+              <td colSpan={Math.max(keys.length, 1)}>no rows</td>
             </tr>
           )}
         </tbody>
@@ -148,7 +137,7 @@ export function Board({
   className?: string
 }) {
   const { rows, error } = useBind(bind)
-  if (error) return <div className="my-3 text-destructive text-sm">{error}</div>
+  if (error) return <div className="text-destructive">{error}</div>
 
   const groups = new Map<string, QueryRow[]>()
   for (const row of rows) {
@@ -159,23 +148,18 @@ export function Board({
   }
 
   return (
-    <div className={cx('my-3 flex gap-3 overflow-x-auto', className)}>
+    <div className={cn('flex gap-3 overflow-x-auto', className)}>
       {[...groups.entries()].map(([group, items]) => (
-        <div key={group} className="w-64 shrink-0 rounded-lg border border-border bg-muted/40 p-2">
-          <div className="mb-2 px-1 font-medium text-muted-foreground text-xs uppercase">
+        <div key={group} className="min-w-40 flex-1 basis-56">
+          <div>
             {group} · {items.length}
           </div>
           {items.map((row) => (
-            <div
-              key={String(row.id)}
-              className="mb-2 rounded-md border border-border bg-card p-2 text-sm"
-            >
-              {String(row.title ?? row.id)}
-            </div>
+            <div key={String(row.id)}>{String(row.title ?? row.id)}</div>
           ))}
         </div>
       ))}
-      {groups.size === 0 && <div className="text-muted-foreground text-sm">no rows</div>}
+      {groups.size === 0 && <div>no rows</div>}
     </div>
   )
 }

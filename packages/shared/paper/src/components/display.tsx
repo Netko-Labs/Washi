@@ -1,9 +1,6 @@
 import type { CSSProperties } from 'react'
+import { cn } from '../lib'
 import type { BlockProps } from './typography'
-
-function cx(base: string, extra?: string): string {
-  return extra ? `${base} ${extra}` : base
-}
 
 export type TapeColor = 'pink' | 'teal' | 'blue' | 'mustard' | 'violet' | 'moss' | 'slate'
 
@@ -22,6 +19,13 @@ function fillStyle(color?: TapeColor): CSSProperties | undefined {
   return color ? undefined : { backgroundColor: 'var(--sheet-accent, var(--primary))' }
 }
 
+/**
+ * Structural blocks. They compose child slots the sheet cannot express with
+ * Box alone; they no longer decide how those slots look (spec Q15). Tape and
+ * Stamp keep their shapes, because the shape is the component — the washi look
+ * is now something a sheet reaches for rather than something it inherits.
+ */
+
 export function Hero({
   title,
   subtitle,
@@ -36,16 +40,9 @@ export function Hero({
   className?: string
 }) {
   return (
-    <header className={cx(`mt-2 mb-6 ${align === 'center' ? 'text-center' : ''}`, className)}>
-      <h1
-        className={`font-bold tracking-tight ${size === 'lg' ? 'text-5xl leading-none' : 'text-4xl'}`}
-      >
-        {title}
-        <span style={{ color: 'var(--sheet-accent, var(--primary))' }}>。</span>
-      </h1>
-      {subtitle && (
-        <p className="mt-3 max-w-xl text-lg text-muted-foreground leading-snug">{subtitle}</p>
-      )}
+    <header className={cn(align === 'center' && 'text-center', className)}>
+      <h1 className={size === 'lg' ? 'text-5xl leading-none' : 'text-4xl'}>{title}</h1>
+      {subtitle && <p>{subtitle}</p>}
     </header>
   )
 }
@@ -53,8 +50,9 @@ export function Hero({
 export function Tape({ color, className, children }: BlockProps & { color?: TapeColor }) {
   return (
     <span
-      className={cx(
-        `-rotate-1 my-2 inline-block px-4 py-1.5 font-bold text-white text-xs uppercase tracking-widest shadow-sm ${color ? TAPE_BG[color] : ''}`,
+      className={cn(
+        '-rotate-1 inline-block px-4 py-1.5 text-white',
+        color ? TAPE_BG[color] : '',
         className,
       )}
       style={{
@@ -80,8 +78,8 @@ export function Stamp({
 }) {
   return (
     <span
-      className={cx(
-        '-rotate-3 mx-1 inline-grid size-10 place-items-center rounded-full border-2 font-bold font-display text-xs',
+      className={cn(
+        '-rotate-3 inline-grid size-10 place-items-center rounded-full border-2 text-xs',
         className,
       )}
       style={
@@ -100,14 +98,9 @@ export function Stamp({
 
 export function Chip({ color, className, children }: BlockProps & { color?: TapeColor }) {
   return (
-    <span
-      className={cx(
-        'mx-0.5 my-0.5 inline-flex items-center gap-1 rounded-full border border-border bg-card px-2.5 py-0.5 font-mono text-xs',
-        className,
-      )}
-    >
+    <span className={cn('inline-flex items-center gap-1', className)}>
       <span
-        className={`size-1.5 rounded-full ${color ? TAPE_BG[color] : ''}`}
+        className={cn('size-1.5 shrink-0 rounded-full', color ? TAPE_BG[color] : '')}
         style={fillStyle(color)}
       />
       {children}
@@ -127,10 +120,10 @@ export function Stat({
   className?: string
 }) {
   return (
-    <div className={cx('my-2 rounded-lg border border-border bg-card p-4 shadow-sm', className)}>
-      <div className="font-bold font-display text-3xl tracking-tight">{value}</div>
-      <div className="mt-0.5 text-muted-foreground text-xs uppercase tracking-wide">{label}</div>
-      {hint && <div className="mt-1 font-mono text-[10px] text-muted-foreground">{hint}</div>}
+    <div className={className}>
+      <div>{value}</div>
+      <div>{label}</div>
+      {hint && <div>{hint}</div>}
     </div>
   )
 }
@@ -142,21 +135,16 @@ export function Card({
   children,
 }: BlockProps & { title?: string; accent?: TapeColor }) {
   return (
-    <div
-      className={cx(
-        'relative my-2 rounded-lg border border-border bg-card p-4 shadow-sm',
-        className,
-      )}
-    >
-      {accent && <span className={`absolute top-0 left-4 h-1 w-10 rounded-b ${TAPE_BG[accent]}`} />}
-      {title && <div className="mb-1.5 font-bold font-display text-sm">{title}</div>}
+    <div className={cn(accent && 'relative', className)}>
+      {accent && <span className={cn('absolute top-0 left-4 h-1 w-10', TAPE_BG[accent])} />}
+      {title && <div>{title}</div>}
       {children}
     </div>
   )
 }
 
 export function Timeline({ className, children }: BlockProps) {
-  return <ol className={cx('my-4 list-none space-y-0 p-0', className)}>{children}</ol>
+  return <ol className={cn('list-none p-0', className)}>{children}</ol>
 }
 
 export function Step({
@@ -167,17 +155,19 @@ export function Step({
   children,
 }: BlockProps & { marker: string; title?: string; color?: TapeColor }) {
   return (
-    <li className={cx('relative grid grid-cols-[3rem_1fr] gap-3 pb-5', className)}>
-      <span className="absolute top-8 bottom-0 left-5.5 w-0.5 bg-border [li:last-child>&]:hidden" />
+    <li className={cn('grid grid-cols-[3rem_1fr] gap-3', className)}>
       <span
-        className={`-rotate-2 grid h-7 w-11 place-items-center rounded-md font-bold font-mono text-white text-xs shadow-sm ${color ? TAPE_BG[color] : ''}`}
+        className={cn(
+          '-rotate-2 grid h-7 w-11 place-items-center text-white',
+          color ? TAPE_BG[color] : '',
+        )}
         style={fillStyle(color)}
       >
         {marker}
       </span>
-      <div className="min-w-0 pt-0.5">
-        {title && <div className="font-bold font-display text-sm">{title}</div>}
-        <div className="text-muted-foreground text-sm">{children}</div>
+      <div className="min-w-0">
+        {title && <div>{title}</div>}
+        <div>{children}</div>
       </div>
     </li>
   )
