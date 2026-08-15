@@ -13,17 +13,31 @@ const FILTER_SQL: Record<Filter['op'], string> = {
   in: 'IN', // expanded per-value below
 }
 
-function columnExpr(column: string): string {
-  // Column names are validated against the table spec before we get here;
-  // the spec regex ([a-z][a-z0-9_]*) makes interpolation into '$.…' safe.
-  return `json_extract(data, '$.${column}')`
+const IDENTIFIER = /^[a-z][a-z0-9_]*$/
+
+/**
+ * SAFETY: the ink executor is the only place descriptors become SQL. Column
+ * names arrive from agent- and sheet-authored descriptors, so they are bound as
+ * json paths rather than interpolated, and the shape is asserted regardless —
+ * the service's membership check against the table spec is the first gate, this
+ * is the one that holds when a future caller forgets it (spec §09 P0).
+ */
+function assertIdentifier(column: string): string {
+  if (!IDENTIFIER.test(column)) throw new Error(`invalid column identifier "${column}"`)
+  return column
+}
+
+/** Appends the bound json path and returns the expression referencing it. */
+function columnExpr(column: string, params: Scalar[]): string {
+  params.push(`$.${assertIdentifier(column)}`)
+  return 'json_extract(data, ?)'
 }
 
 function buildWhere(filters: Filter[]): { sql: string; params: Scalar[] } {
   const clauses: string[] = []
   const params: Scalar[] = []
   for (const filter of filters) {
-    const expr = columnExpr(filter.column)
+    const expr = columnExpr(filter.column, params)
     if (filter.op === 'in') {
       const values = Array.isArray(filter.value) ? filter.value : [filter.value]
       clauses.push(`${expr} IN (${values.map(() => '?').join(', ')})`)
@@ -36,42 +50,61 @@ function buildWhere(filters: Filter[]): { sql: string; params: Scalar[] } {
   return { sql: clauses.length ? ` AND ${clauses.join(' AND ')}` : '', params }
 }
 
+function groupQuery(
+  tableId: string,
+  query: InkQuery & { groupBy: NonNullable<InkQuery['groupBy']> },
+  limit: number,
+): QueryResult {
+  // Params accumulate in SQL text order: projection, table id, filters, limit.
+  const selectParams: Scalar[] = []
+  const groupColumn = assertIdentifier(query.groupBy.column)
+  const groupExpr = columnExpr(groupColumn, selectParams)
+
+  const aggregates = query.groupBy.aggregates
+    .map((aggregate) => {
+      if (aggregate.fn === 'count') return `COUNT(*) AS "${aggregate.fn}"`
+      if (!aggregate.column) throw new Error(`aggregate "${aggregate.fn}" needs a column`)
+      const column = assertIdentifier(aggregate.column)
+      return `${aggregate.fn.toUpperCase()}(${columnExpr(column, selectParams)}) AS "${aggregate.fn}_${column}"`
+    })
+    .join(', ')
+
+  const where = buildWhere(query.where ?? [])
+  // GROUP BY 1 targets the first result column, so the expression is not repeated.
+  const sql = `
+    SELECT ${groupExpr} AS "${groupColumn}", ${aggregates}
+    FROM records WHERE table_id = ? AND deleted_at IS NULL${where.sql}
+    GROUP BY 1 LIMIT ?`
+  const rows = getSqlite()
+    .query(sql)
+    .all(...selectParams, tableId, ...where.params, limit) as QueryResult['rows']
+  return { rows, total: rows.length }
+}
+
 /** Run an ink query over a table's JSON records. Descriptor → parametrized SQL. */
 export function executeQuery(tableId: string, spec: TableSpec, query: InkQuery): QueryResult {
-  const where = buildWhere(query.where ?? [])
   const limit = query.limit ?? 200
+  if (query.groupBy) return groupQuery(tableId, { ...query, groupBy: query.groupBy }, limit)
 
-  if (query.groupBy) {
-    const aggregates = query.groupBy.aggregates
-      .map((aggregate, index) => {
-        const alias = aggregate.column ? `${aggregate.fn}_${aggregate.column}` : aggregate.fn
-        return aggregate.fn === 'count'
-          ? `COUNT(*) AS "${alias}"`
-          : `${aggregate.fn.toUpperCase()}(${columnExpr(aggregate.column ?? `agg${index}`)}) AS "${alias}"`
-      })
-      .join(', ')
-    const sql = `
-      SELECT ${columnExpr(query.groupBy.column)} AS "${query.groupBy.column}", ${aggregates}
-      FROM records WHERE table_id = ? AND deleted_at IS NULL${where.sql}
-      GROUP BY ${columnExpr(query.groupBy.column)} LIMIT ?`
-    const rows = getSqlite()
-      .query(sql)
-      .all(tableId, ...where.params, limit) as QueryResult['rows']
-    return { rows, total: rows.length }
-  }
-
+  const selectParams: Scalar[] = []
   const projection = spec.columns
-    .map((column) => `${columnExpr(column.name)} AS "${column.name}"`)
+    .map((column) => {
+      const name = assertIdentifier(column.name)
+      return `${columnExpr(name, selectParams)} AS "${name}"`
+    })
     .join(', ')
+
+  const where = buildWhere(query.where ?? [])
+  // Ordering targets the projected alias, so the json path is bound once.
   const orderSql = query.orderBy
-    ? ` ORDER BY ${columnExpr(query.orderBy.column)} ${query.orderBy.direction === 'desc' ? 'DESC' : 'ASC'}`
+    ? ` ORDER BY "${assertIdentifier(query.orderBy.column)}" ${query.orderBy.direction === 'desc' ? 'DESC' : 'ASC'}`
     : ' ORDER BY hlc_created ASC'
   const sql = `
     SELECT id, ${projection}
     FROM records WHERE table_id = ? AND deleted_at IS NULL${where.sql}${orderSql} LIMIT ?`
   const rows = getSqlite()
     .query(sql)
-    .all(tableId, ...where.params, limit) as QueryResult['rows']
+    .all(...selectParams, tableId, ...where.params, limit) as QueryResult['rows']
 
   // sqlite stores booleans as 0/1 inside json_extract results — restore them.
   for (const row of rows) {

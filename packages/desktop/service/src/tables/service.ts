@@ -39,10 +39,15 @@ export function defineUserTable(input: unknown): UserTable {
 
 export function runQuery(query: InkQuery): QueryResult {
   const table = requireTable(query.table)
+  // Every slot that names a column, aggregates included — a descriptor column
+  // that reaches the executor unchecked is a SQL surface (spec §09 P0).
   const referenced = [
     ...(query.where ?? []),
     ...(query.orderBy ? [query.orderBy] : []),
     ...(query.groupBy ? [query.groupBy] : []),
+    ...(query.groupBy?.aggregates ?? []).flatMap((aggregate) =>
+      aggregate.column ? [{ column: aggregate.column }] : [],
+    ),
   ]
   const issues = unknownQueryColumns(table.spec, referenced)
   if (issues.length > 0) throw new InkError(issues.map((issue) => issue.message).join('; '))
@@ -51,6 +56,11 @@ export function runQuery(query: InkQuery): QueryResult {
 
 export function runMutation(mutation: InkMutation): { affected: number; id?: string } {
   const table = requireTable(mutation.table)
+
+  if (mutation.kind !== 'insert') {
+    const issues = unknownQueryColumns(table.spec, mutation.where)
+    if (issues.length > 0) throw new InkError(issues.map((issue) => issue.message).join('; '))
+  }
 
   if (mutation.kind === 'insert' || mutation.kind === 'update') {
     const issues = validateRecord(table.spec, mutation.data)
