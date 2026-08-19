@@ -1,188 +1,196 @@
 # Washi — feature scope
 
-A design brief. `docs/spec.html` is the canonical architecture spec; this file is the surface
-inventory a designer needs: what exists, what is a lie, what is coming, and the constraints that
-cannot be designed around.
-
-Last audited against the running app: **2026-08-19**.
+A design brief: every feature Washi should and will have, described as capability rather than
+construction. Architecture lives in `docs/spec.html`; nothing here should require reading it.
 
 ---
 
 ## 1. What Washi is
 
-A local-first knowledge base where **the primary author is an agent**. You direct, it writes. Notes
-are not markdown — they are **WSX**, JSX-shaped data rendered by a closed component registry, so an
-agent can compose a page the way a developer composes a React screen, and nothing it writes can
-execute.
+A local-first knowledge base where **the primary author is an agent**. You direct, it writes. Pages
+are composed the way a designer composes a screen — layout, type, colour, live data — not typed as
+markdown.
 
 The product bet, stated so it can be designed against:
 
-> **Edit by asking.** Human inline editing is cut, not deferred. If a screen's answer to "how do I
-> change this?" is a cursor, the design is fighting the product.
-
-Three consequences a designer should hold onto:
-
-- **Pages have no house style.** Each sheet is a blank canvas the agent designs. The app chrome must
-  never look like it is framing a document, because two different sheets may be a neon brutalist
-  poster and a broadsheet essay.
-- **Review is the primary human verb.** Approving, rejecting and auditing what the agent did is the
-  main interaction loop — not typing.
-- **Everything is local.** No account, no cloud, no network by default. Sync is later and
-  self-hosted.
+> **Edit by asking.** There is no cursor in a page. If a screen's answer to "how do I change this?"
+> is "type here", it is fighting the product.
 
 ---
 
-## 2. Non-negotiable constraints
+## 2. Design rules
 
-These come from the trust model and the architecture. Designs that violate them cannot be built.
+Non-negotiable. A design that breaks one of these cannot ship.
 
-| Constraint | Why | Design impact |
-|---|---|---|
-| Sheets are inert data | A hallucinating or prompt-injected agent must never produce executable content | No custom JS in a page, no handlers, no formulas. Interactivity is declarative state + a closed verb registry |
-| Closed component registry | The only vocabulary an agent may use | New page capability = a new component, designed and specified. There is no escape hatch |
-| **Container queries only** | A sheet renders in a tab, a 400px agent panel, and eventually a phone — two of those are not the window | Never spec a page layout in viewport breakpoints. Think component, not page |
-| No `url()` in styles | Styling must never become a network capability | No remote background images in sheets. Local asset story is still owed |
-| Capabilities are gated | Data, network and side effects go through ink / tsuru / hanko | Any "just do it" button that leaves the machine needs a consent design |
-| Blank canvas | Components ship zero cosmetics; the sheet styles everything | An unstyled page looks like unstyled HTML. Scaffolds and templates are product surfaces, not filler |
-
----
-
-## 3. Surface inventory
-
-Status legend: **live** = wired to real data · **faked** = static design copy, looks real, is not ·
-**planned** = not built.
-
-### 3.1 Sidebar — live
-Vault switcher, nav (Dashboard · Inbox · Daily note), page tree, New page, sync row, user row.
-
-- Page tree is flat. **Folders/grouping are planned** and unspecified.
-- Sync row reads "Local · this device only" — honest today, needs states for syncing/offline/error
-  once M5 lands.
-- Vault switcher is **UI over nothing** — one vault exists; per-vault databases are M3.
-
-### 3.2 Tab strip — live
-Browser-style tabs for sheets and views. No overflow design, no reordering, no pinning.
-
-### 3.3 Sheet canvas — live, newly rebuilt
-A bare scrolling surface. No tape, no card, no byline, no width. The sheet owns everything.
-
-- **This is the product's core screen and it is the one with the least design.** What does a
-  well-made Washi page look like at 5 pages? At 500?
-- Needs: how authorship is shown without chrome, how a stale/invalid page surfaces a repair state,
-  how a page announces it is bound to live data.
-
-### 3.4 Agent panel — live
-Mascot FAB (⌘J) opens a 400px popover: transcript, tool cards, WSX diffs, permission prompts,
-conversation switcher, expand-to-centre.
-
-- **No cancel button.** A running turn cannot be interrupted. Highest-value missing control.
-- Model picker is decorative — it says "Sonnet 4.5" and does nothing.
-- No context/cost meter, though cost is tracked per session.
-
-### 3.5 Dashboard — **faked**
-Greeting, four stat tiles, review queue, recent pages, agent activity.
-
-Everything except *Recent pages* is invented. In a vault with 2 pages and 1 agent session it claims
-7 edits across 3 pages, 4 awaiting review, 31% written by agents, a 12-day streak, and a review
-queue of three pages that do not exist.
-
-Needs a real design once the capability ledger backs it — including **empty and near-empty states**,
-which is what a real vault looks like on day one.
-
-### 3.6 Inbox — **faked**
-Contradicts itself in one viewport: "Inbox zero — Washi has nothing waiting on you" sits directly
-above four items.
-
-This is the **most important unbuilt surface**. Review is the primary human verb, the capability
-ledger now records every agent and sheet action, and approvals are already persisted. Needs:
-queue grouping, a diff review flow, bulk accept/reject, and an audit view of what was already
-stamped.
-
-### 3.7 Daily note — **faked**
-Date is real. The streak, the diary prose, and the "pull in yesterday's action items" card are not.
-`What else happened today...` looks like a text input but nothing can be typed — a direct collision
-with "editing is cut". Needs rethinking as a page the agent maintains and you approve.
-
-### 3.8 Settings — partial
-Four tabs. **Agent autonomy is the design-heavy one**: the persisted policy store (per tool, per
-verb, per host, scoped to session or vault) is planned and needs a model a human can reason about.
-Also owed: tsuru host allowlist management, dark-mode toggle (tokens ship, no control), scheduled
-runs.
-
-### 3.9 Onboarding — live
-Five steps including identity (name/email/accent). Does not yet explain the two things that
-actually matter: that the agent writes your pages, and what it is allowed to touch.
-
-### 3.10 Command palette — live
-⌘K over sheets. Search is title+body FTS; **records are not indexed**.
-
-### 3.11 Mascot — live
-Shared SVG rig, state faces, app icon. Carries most of the product's warmth. Underused: it appears
-in empty states and the FAB but has no role in the review loop, which is where reassurance matters
-most.
+- **Pages have no house style.** Every page is a blank canvas the agent designs. Two pages in the
+  same vault may be a neon poster and a broadsheet essay. App chrome must never look like it is
+  framing a document, and must never impose margin, width or background on a page.
+- **Review is the primary human verb.** Approving, rejecting, and auditing what the agent did is the
+  main loop. Design for reviewing, not for authoring.
+- **Pages are inert.** A page can hold declared state — switches, sliders, tabs, conditional
+  sections — and can trigger a fixed set of safe actions. It cannot hold custom logic, formulas, or
+  anything that runs.
+- **The page vocabulary is closed.** Agents compose from a fixed component set. A new page capability
+  means a new component, designed and specified — there is no escape hatch.
+- **Pages size to their container, not the window.** The same page renders in a full tab, in a 400px
+  agent panel, and eventually on a phone. Never spec a page layout against screen size.
+- **Local by default.** No account, no cloud, no network unless explicitly allowed per site.
+- **Nothing on screen may be invented.** In a product whose promise is "see what the agent did",
+  placeholder history is a broken promise. Empty states are the honest default and need real design.
 
 ---
 
-## 4. Feature scope, by milestone
+## 3. Surfaces
 
-### Shipped
-- Sheets core: Loro-backed store, WSX parse/validate/serialize, FTS search, oplog, HLC stamps
-- Paper registry: ~35 components, declarative sheet state, opt-in theme presets
-- Embedded Claude agent host: in-process tools, approvals flow, resumable sessions
-- Capability packages: ink (typed data DSL), tsuru (scoped fetch), hanko (safe verbs)
-- Blank canvas: primitives carry no cosmetics, `class` always wins, container-query-only
-- Capability ledger: every sheet and agent action recorded
-- Develop menu: reset onboarding, clear history, erase vault, reseed showcase
+### Sidebar
+Navigation and vault identity.
 
-### Next — hardening (M2.5)
-- **Live binds.** Data changes emit no events today, so an open page goes stale when the agent
-  rewrites it. Design impact: pages need a "just changed" affordance
-- Atomic writes + a replayable oplog
-- Loro as a real CRDT (stable peer id, update log, delta export)
-- Persisted approval policies → the Settings autonomy surface
-- Turn cancel, records in FTS, dark-mode toggle, tsuru allowlist UI
+- Vault switcher with create / rename / switch
+- Nav: Dashboard · Inbox (with pending count) · Daily note
+- Page tree with folders, nesting, drag to reorder
+- New page
+- Sync status: local-only, syncing, offline, conflict, error
+- Account row
 
-### M3 — structured data
-- **Tables/records UI, generated as WSX** rather than app chrome — the table view is a sheet the app
-  writes, so it inherits the same design system as everything else
-- Live `bind` views with aggregations surfaced
-- **`$state` binds**: a tab or switch filters a live table with no expression language
-- `Fetch` component end-to-end, with a policy prompt design
-- Per-vault databases → the vault switcher becomes real
+### Tab strip
+Browser-style tabs for pages and views.
 
-### M4 — external agents
-ACP over stdio (Gemini, Codex). The transcript UI already speaks ACP vocabulary. Design impact: an
-agent identity/provider concept in the panel.
+- Close, reorder, pin
+- Overflow behaviour at many tabs
+- Restore tabs across restarts
 
-### M5 — sync
-Self-hosted Bun/Elysia relay. Design impact: sync states, device list, conflict surfacing, and an
-account concept that does not exist anywhere today.
+### Page canvas
+The core screen: one agent-composed page, edge to edge, no chrome.
+
+- **Authorship**: show whether a page — or a section — was written by you or by the agent, without
+  framing the page
+- **Live data**: a page bound to a table must be able to say it is live, and show when it updates
+- **Fetched content**: show freshness, cached-last-good, and failure
+- **Repair state** for a page that can no longer render
+- Per-page history and restore
+- Backlinks
+
+### Agent panel
+A popover from the mascot (⌘J), expandable to centre.
+
+- Transcript: messages, tool activity, page diffs
+- **Cancel a running turn**
+- Permission prompts inline
+- Conversation switcher and history
+- Model picker
+- Cost and context usage
+- Attachments
+- Suggested starting prompts
+
+### Dashboard
+The "what happened while I was away" screen.
+
+- Greeting and real activity summary
+- Vault stats
+- What needs review, with a route into reviewing it
+- Recent pages
+- Agent activity timeline
+- **Empty and near-empty states** — a one-page vault is the common first experience
+
+### Inbox
+Everything the agent wants a decision on, in one queue. The most important unbuilt surface.
+
+- Queue grouped by kind: suggested edits, drafts, flagged issues, scheduled run results
+- Diff review — accept, reject, ask for changes
+- Bulk actions
+- Audit view of what was already approved or denied, and by whom
+- Empty state that is a reward, not a placeholder
+
+### Daily note
+A page for today that the agent maintains.
+
+- Today's page, with navigation to previous days
+- Agent-proposed additions you approve rather than type
+- Continuity across days
+- Resolve the current contradiction: it must not offer a typing affordance
+
+### Settings
+- **Agent autonomy**: what the agent may do unattended, per capability, scoped to a session or the
+  whole vault — a model a person can reason about without reading a spec
+- Allowed sites for fetching
+- Appearance: light / dark / system
+- Scheduled agent runs
+- Account and identity
+- Vault management, export, erase
+
+### Onboarding
+First run. Must explain the two things that matter: **the agent writes your pages**, and **what it
+is allowed to touch**.
+
+- Local-first promise
+- Vault creation
+- Agent consent and initial autonomy level
+- Identity: name, accent
+- A first page that demonstrates what a designed page looks like
+
+### Command palette
+⌘K over everything.
+
+- Pages, views, actions, and agent commands in one surface
+- Full-text search across pages and structured records
+- Recent and suggested entries
+
+### Mascot
+The product's warmth and its status indicator.
+
+- States: idle, thinking, writing, waiting on you, error
+- Presence in empty states, the panel header, and the review loop
+- Should reassure during approval, which is where it matters most
 
 ---
 
-## 5. Deliberately out of scope
+## 4. Coming later
 
-Do not design these; they are cut, not backlogged.
+### Structured data
+Agent-defined tables that pages read from and write to.
 
-- **Inline/block editing and a rich text editor.** The bet is edit-by-asking
-- **Expression language / formulas in pages.** Power grows by adding components
+- Table and record views, presented as pages rather than app chrome
+- Filters, sorting, grouping, aggregate summaries
+- A page control — a tab or switch — that filters a live table on the page
+- Adding and editing records from inside a page
+
+### External agents
+Support for agents other than the built-in one.
+
+- Choose a provider per conversation
+- Show which agent is speaking
+
+### Sync and multi-device
+Self-hosted, opt-in.
+
+- Device list and pairing
+- Sync state and conflict surfacing
+- Account creation and recovery
+- Sharing a vault or a page
+
+---
+
+## 5. Out of scope
+
+Do not design these. They are cut, not backlogged.
+
+- **Inline and block editing, rich-text toolbars, slash menus.** The bet is edit-by-asking
+- **Formulas or scripting inside pages.** Capability grows by adding components
 - **Graph view.** Backlinks stay a list
-- **Mobile.** Parked — but sheets stay fluid and container-query-shaped so the door stays open
+- **Mobile.** Parked, though pages stay fluid so the door stays open
 
-Still owed and unresolved: **an asset story**. Cover images and file drop survived the cut, but
-`Img` is https-only and there is nowhere for a local file to live.
+**Unresolved:** page cover images and file attachments are wanted, but there is no story yet for
+where a local file lives. Needs a design and a decision before either can be specified.
 
 ---
 
 ## 6. Open design questions
 
-1. **What does a Washi page look like when nobody designed it?** The scaffold is the most-seen page
+1. **What does a page look like when nobody designed it?** The new-page state is the most-seen page
    in the product and currently does the least work.
-2. **How is agent authorship shown now that pages have no chrome?** The byline was deleted with the
-   card it lived in.
-3. **What is the review loop?** Inbox, dashboard queue, and in-page diffs are three entry points to
-   one job with no shared model.
-4. **How does a page say it is alive?** Bound tables, cached fetches and stale content all need a
-   vocabulary.
-5. **What does agent autonomy look like as a control** a person can set without reading the spec?
-6. **What are empty states across the app** for a vault with one page and no history?
+2. **How is agent authorship shown on a page that has no chrome?**
+3. **What is the single review model?** Inbox, dashboard queue, and in-page diffs are three doors
+   into one job.
+4. **How does a page say it is alive** — bound, updating, cached, or stale?
+5. **What does agent autonomy look like as a control** a person can set confidently?
+6. **What are the empty states** for a vault with one page and no history?
