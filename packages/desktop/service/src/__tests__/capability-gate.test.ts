@@ -23,7 +23,10 @@ describe('sheet actions pass the same desk as agent actions', () => {
     const { host } = makeHost()
     defineUserTable({ name: 'tasks', columns: [{ name: 'title', type: 'text' }] })
 
-    await host.executeAction({ verb: 'table.insert', table: 'tasks', data: { title: 'a' } }, 'sheet')
+    await host.executeAction(
+      { verb: 'table.insert', table: 'tasks', data: { title: 'a' } },
+      'sheet',
+    )
 
     expect(runQuery({ table: 'tasks' }).rows).toHaveLength(1)
     const [call] = listCapabilityCalls()

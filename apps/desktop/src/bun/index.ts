@@ -9,7 +9,8 @@ import {
   saveWindowState,
 } from '@washi/desktop-repository'
 import { AgentHost } from '@washi/desktop-service'
-import { app, devtools, menu } from 'mirinjs'
+import { app, devtools, type MenuItemTemplate, menu } from 'mirinjs'
+import { developMenu } from './dev-menu'
 import { seedShowcase } from './showcase'
 
 // App data dir keyed on the bundle id. `mirin dev` gets a `-dev` suffix so
@@ -89,7 +90,7 @@ app.on('ready', async () => {
 })
 
 app.on('ready', () => {
-  menu.setApplicationMenu([
+  const appMenu: MenuItemTemplate[] = [
     {
       label: 'Washi',
       submenu: [
@@ -118,7 +119,19 @@ app.on('ready', () => {
       label: 'Window',
       submenu: [{ role: 'minimize' }, { role: 'zoom' }, { type: 'separator' }, { role: 'front' }],
     },
-  ])
+  ]
+
+  // Every Develop item destroys data without touching the oplog — dev only.
+  if (app.isDev) {
+    appMenu.push(
+      developMenu({
+        appDataDir,
+        send: (command) => served.rpc.devCommand.broadcast({ command }),
+      }),
+    )
+  }
+
+  menu.setApplicationMenu(appMenu)
 })
 
 app.on('window-all-closed', () => {

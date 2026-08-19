@@ -11,6 +11,7 @@ import { SettingsView } from '@/components/settings/SettingsView'
 import { SheetView } from '@/components/sheet/SheetView'
 import { Sidebar } from '@/components/sidebar/Sidebar'
 import { TabStrip } from '@/components/tabs/TabStrip'
+import { subscribeDevCommands } from '@/lib/dev-commands'
 import { useAgentStore } from '@/stores/agent/agent-store'
 import { useSheetsStore } from '@/stores/sheets/sheets-store'
 import { useViewStore, viewOf } from '@/stores/view/view-store'
@@ -24,6 +25,7 @@ export function App() {
 
   useEffect(() => {
     void refresh()
+    subscribeDevCommands()
   }, [refresh])
 
   return (

@@ -23,8 +23,8 @@ interface ViewState {
   dismissReview: (id: string) => void
 }
 
-const ONBOARDED_KEY = 'washi.onboarded'
-const IDENTITY_KEY = 'washi.identity'
+export const ONBOARDED_KEY = 'washi.onboarded'
+export const IDENTITY_KEY = 'washi.identity'
 
 function loadIdentity(): Identity {
   try {

@@ -2,6 +2,7 @@ import type { AgentHost } from '@washi/desktop-service'
 import { rpc } from 'mirinjs/rpc'
 import { agentRoutes } from './routes/agents'
 import { capabilityRoutes } from './routes/capabilities'
+import { devRoutes } from './routes/dev'
 import { sheetRoutes } from './routes/sheets'
 import { systemRoutes } from './routes/system'
 import { tableRoutes } from './routes/tables'
@@ -18,6 +19,7 @@ export function createRouter(host: AgentHost) {
     ...tableRoutes(),
     ...capabilityRoutes(host),
     ...agentRoutes(host),
+    ...devRoutes(),
   })
 }
 
