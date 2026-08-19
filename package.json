@@ -29,7 +29,7 @@
     "@biomejs/biome": "^2.5.3",
     "@commitlint/cli": "^21.2.1",
     "@commitlint/config-conventional": "^21.2.0",
-    "@mirinjs/cli": "0.1.0-alpha.19",
+    "@mirinjs/cli": "0.1.0-alpha.25",
     "@typescript/native-preview": "^7.0.0-dev.20260707.2",
     "husky": "^9.1.7",
     "turbo": "^2.10.4",
@@ -42,10 +42,10 @@
     "@anthropic-ai/claude-agent-sdk-linux-x64": "0.3.228",
     "@anthropic-ai/claude-agent-sdk-win32-arm64": "0.3.228",
     "@anthropic-ai/claude-agent-sdk-win32-x64": "0.3.228",
-    "@mirinjs/darwin-arm64": "0.1.0-alpha.19",
-    "@mirinjs/linux-arm64": "0.1.0-alpha.19",
-    "@mirinjs/linux-x64": "0.1.0-alpha.19",
-    "@mirinjs/win32-arm64": "0.1.0-alpha.19",
-    "@mirinjs/win32-x64": "0.1.0-alpha.19"
+    "@mirinjs/darwin-arm64": "0.1.0-alpha.25",
+    "@mirinjs/linux-arm64": "0.1.0-alpha.25",
+    "@mirinjs/linux-x64": "0.1.0-alpha.25",
+    "@mirinjs/win32-arm64": "0.1.0-alpha.25",
+    "@mirinjs/win32-x64": "0.1.0-alpha.25"
   }
 }

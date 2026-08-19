@@ -5,7 +5,13 @@ export default defineConfig({
   name: 'Washi',
   publisher: 'Netko Labs',
   main: 'src/bun/index.ts',
-  icon: 'icon.iconset',
+  // Icon Composer document at the repo root: macOS 26 resolves its light/dark
+  // appearance variants from the compiled Assets.car. Linux and Windows cannot
+  // read a .icon, so they keep the rendered iconset.
+  icon: {
+    default: 'icon.iconset',
+    macos: '../../icon.icon',
+  },
 
   cef: {
     locales: ['en-US'],

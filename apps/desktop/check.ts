@@ -28,7 +28,7 @@ export default defineCheck(async (app: CheckDriver) => {
 
   app.step('creating a sheet adds it to the sidebar and opens it')
   await app.click('[aria-label="New sheet"]')
-  await app.expectText('Ask an agent to fill this in, or start writing.')
+  await app.expectText('Blank canvas. Ask the agent to design this page, or describe what it should hold.')
 
   app.step('inbox and daily note open as tabs')
   await app.click('text=Inbox')
