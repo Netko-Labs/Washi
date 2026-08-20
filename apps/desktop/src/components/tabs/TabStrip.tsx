@@ -34,7 +34,7 @@ export function TabStrip() {
   }
 
   return (
-    <div className="flex items-end gap-0.5 overflow-x-auto border-border border-b bg-muted px-2 pt-1.5">
+    <div className="app-drag flex items-end gap-0.5 overflow-x-auto border-border border-b bg-muted px-2 pt-1.5">
       {tabs.map((key) => {
         const info = labelFor(key)
         if (!info) return null
@@ -42,7 +42,7 @@ export function TabStrip() {
         return (
           <div
             key={key}
-            className={`flex h-[31px] max-w-[190px] min-w-0 flex-initial cursor-pointer items-center gap-1.5 rounded-t-lg border border-b-0 pr-1 pl-2.5 text-[12.5px] ${
+            className={`app-no-drag flex h-[31px] max-w-[190px] min-w-0 flex-initial cursor-pointer items-center gap-1.5 rounded-t-lg border border-b-0 pr-1 pl-2.5 text-[12.5px] ${
               active
                 ? 'border-border bg-background font-medium text-foreground'
                 : 'border-transparent text-muted-foreground'
@@ -71,7 +71,7 @@ export function TabStrip() {
         type="button"
         aria-label="New tab"
         onClick={() => void createSheet()}
-        className="mb-[3px] grid size-[26px] shrink-0 place-items-center rounded-[7px] text-muted-foreground hover:bg-accent hover:text-foreground"
+        className="app-no-drag mb-[3px] grid size-[26px] shrink-0 place-items-center rounded-[7px] text-muted-foreground hover:bg-accent hover:text-foreground"
       >
         <IconPlus className="size-3.5" />
       </button>

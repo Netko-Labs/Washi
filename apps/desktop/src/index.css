@@ -417,6 +417,20 @@ body {
 }
 
 /* the dotted paper canvas from the spec */
+/*
+ * titleBarStyle: hiddenInset hides the native title bar, so the chrome that sits
+ * in its place is ordinary web content and the OS has no idea it is a drag
+ * handle. CEF reads -webkit-app-region, so the band opts in and every control
+ * inside it opts back out — a drag region swallows clicks from its children.
+ */
+.app-drag {
+  -webkit-app-region: drag;
+}
+
+.app-no-drag {
+  -webkit-app-region: no-drag;
+}
+
 .paper-canvas {
   background-image: radial-gradient(
     color-mix(in oklab, var(--foreground) 5%, transparent) 1px,
