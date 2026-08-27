@@ -7,3 +7,6 @@ build/
 *.tsbuildinfo
 .DS_Store
 *.local
+
+# 60MB compiled binaries from `bun build --compile`
+*.bun-build
