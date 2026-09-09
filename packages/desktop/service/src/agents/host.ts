@@ -19,7 +19,7 @@ import {
 import { checkAction, type HankoHandlers, isReversibleVerb, runAction } from '@washi/hanko'
 import { checkUrl, guardedFetch, isPrivateAddress } from '@washi/tsuru'
 import { createSheetFromSource } from '../sheets/service'
-import { runMutation } from '../tables/service'
+import { runMutation, updateRecord } from '../tables/service'
 import { normalizeMessage, shortToolName } from './normalize'
 import { createWashiTools, currentFetchPolicy, type ToolContext, TSURU_HOSTS_KEY } from './tools'
 
@@ -315,12 +315,7 @@ export class AgentHost {
         runMutation({ kind: 'insert', table: action.table, data: action.data })
       },
       'table.update': (action) => {
-        runMutation({
-          kind: 'update',
-          table: action.table,
-          where: [{ column: 'id', op: 'eq', value: action.row }],
-          data: action.set,
-        })
+        updateRecord(action.table, action.row, action.set)
       },
       'url.open': (action) => {
         const url = new URL(action.url)

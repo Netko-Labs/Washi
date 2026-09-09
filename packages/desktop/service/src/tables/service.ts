@@ -13,6 +13,7 @@ import {
   type InkMutation,
   type InkQuery,
   type QueryResult,
+  type RecordData,
   type TableSpec,
   tableSpecSchema,
   unknownQueryColumns,
@@ -80,6 +81,18 @@ export function runMutation(mutation: InkMutation): { affected: number; id?: str
       const ids = matchRecordIds(table.id, mutation.where)
       return { affected: deleteRecords(table.id, ids) }
     }
+  }
+}
+
+/** Patch one record by id — the `table.update` verb. Columns must exist and typecheck. */
+export function updateRecord(tableName: string, recordId: string, patch: RecordData): void {
+  const table = requireTable(tableName)
+  const issues = validateRecord(table.spec, patch)
+  if (issues.length > 0) {
+    throw new InkError(issues.map((issue) => `${issue.path}: ${issue.message}`).join('; '))
+  }
+  if (updateRecords(table.id, [recordId], patch) === 0) {
+    throw new InkError(`unknown record "${recordId}" on table "${tableName}"`)
   }
 }
 

@@ -14,4 +14,5 @@ export {
   runMutation,
   runQuery,
   toggleTaskRecord,
+  updateRecord,
 } from './tables/service'

@@ -81,7 +81,32 @@ describe('hanko actions through the host', () => {
 
     defineUserTable({ name: 'tasks', columns: [{ name: 'title', type: 'text' }] })
     await host.executeAction({ verb: 'table.insert', table: 'tasks', data: { title: 'stamped' } })
-    expect(runQuery({ table: 'tasks' }).rows[0]?.title).toBe('stamped')
+    const row = runQuery({ table: 'tasks' }).rows[0]
+    expect(row?.title).toBe('stamped')
+
+    await host.executeAction({
+      verb: 'table.update',
+      table: 'tasks',
+      row: String(row?.id),
+      set: { title: 'patched' },
+    })
+    expect(runQuery({ table: 'tasks' }).rows[0]?.title).toBe('patched')
+    await expect(
+      host.executeAction({
+        verb: 'table.update',
+        table: 'tasks',
+        row: 'nope',
+        set: { title: 'x' },
+      }),
+    ).rejects.toThrow('unknown record')
+    await expect(
+      host.executeAction({
+        verb: 'table.update',
+        table: 'tasks',
+        row: String(row?.id),
+        set: { ghost: 1 },
+      }),
+    ).rejects.toThrow('ghost')
   })
 
   test('unknown verbs and private url.open are refused', async () => {
