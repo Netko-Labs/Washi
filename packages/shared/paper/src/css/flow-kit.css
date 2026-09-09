@@ -137,6 +137,12 @@
 .wsx-board-card:hover {
   border-color: var(--accent);
 }
+.wsx-board-card[data-openable] {
+  cursor: pointer;
+}
+.wsx-board-card[data-openable]:active {
+  cursor: grabbing;
+}
 .wsx-board-card[data-dragging] {
   opacity: 0.4;
   box-shadow: var(--shadow-drag);

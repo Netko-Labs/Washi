@@ -199,6 +199,7 @@ const dataOut: Record<string, ComponentSpec> = {
   ),
   Badge: p({ expr: exprSchema.optional() }, 'text'),
   Avatar: p({ label: z.string().min(1).max(80) }, 'none'),
+  Schema: p({ table: z.string().min(1).max(64) }, 'none'),
 }
 
 const dataIn: Record<string, ComponentSpec> = {
@@ -225,12 +226,22 @@ const dataIn: Record<string, ComponentSpec> = {
       meta: columnName.optional(),
       avatar: columnName.optional(),
       onAdd: actionRefSchema.optional(),
+      onOpen: actionRefSchema.optional(),
       empty: z.string().max(160).optional(),
     },
     'none',
     { hints: { onMove: 'drag writes table.reorder on its own — set rank and groupBy' } },
   ),
   Button: p({ action: actionRefSchema }, 'text'),
+  Compose: p(
+    {
+      action: actionRefSchema,
+      label: z.string().max(40).optional(),
+      placeholder: z.string().max(120).optional(),
+      multiline: z.boolean().optional(),
+    },
+    'none',
+  ),
   Task: p({ row: rowRef.optional(), done: z.boolean().optional() }, 'text'),
   Switch: p({ state: stateKey, label: z.string().max(120).optional() }, 'none'),
   Slider: p(
@@ -257,6 +268,11 @@ const flow: Record<string, ComponentSpec> = {
   ),
   Tab: p({}, 'nodes', { within: ['Tabs'] }),
   Reveal: p({ label: z.string().min(1).max(120), state: stateKey.optional() }, 'nodes'),
+  Drawer: p(
+    { state: stateKey, bind: querySchema.optional(), title: z.string().max(120).optional() },
+    'nodes',
+    { noNest: true },
+  ),
 }
 
 const kit: Record<string, ComponentSpec> = {

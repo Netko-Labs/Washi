@@ -1,4 +1,4 @@
-import { type ExprAst, parseExpr, type WsxElement, type WsxNode, type WsxValue } from '@washi/wsx'
+import { type ExprAst, parseExpr, type WsxElement, type WsxNode } from '@washi/wsx'
 import { type ComponentType, createElement, type ReactNode, useMemo } from 'react'
 import { Board } from './components/board'
 import {
@@ -12,9 +12,10 @@ import {
   Table,
   Timeline,
 } from './components/data'
+import { Drawer, Schema } from './components/drawer'
 import { Reveal, Show, Tab, Tabs } from './components/flow'
 import { Divider, Grid, Row, Section, SheetFrame, Stack } from './components/frame'
-import { Button, Field, Slider, Switch, Task } from './components/input'
+import { Button, Compose, Field, Slider, Switch, Task } from './components/input'
 import { Chip, Mascot, Missing, Stamp, Tape } from './components/kit'
 import { Callout, Card, Figure, Hero } from './components/surface'
 import {
@@ -34,7 +35,7 @@ import {
   Title,
 } from './components/text'
 import { DataProvider } from './data'
-import { NowContext } from './lib'
+import { NowContext, resolveRow, resolveRowDeep } from './lib'
 import type { Row as DataRow } from './lib/types'
 import { SheetStateProvider, type SheetStateValue } from './state'
 
@@ -43,30 +44,11 @@ interface Ctx {
   row?: DataRow
 }
 
-const ROW_REF = /\$row\.([a-z_][a-z0-9_]*)/gi
-
-/** `$row.column` in text and string props resolves against the Repeat row in scope. */
-function resolve(value: string, row: DataRow | undefined): string {
-  if (!row || !value.includes('$row.')) return value
-  return value.replace(ROW_REF, (_, column: string) => String(row[column] ?? ''))
-}
-
-function resolveDeep(value: WsxValue, row: DataRow): WsxValue {
-  if (typeof value === 'string') return resolve(value, row)
-  if (Array.isArray(value)) return value.map((item) => resolveDeep(item, row))
-  if (value && typeof value === 'object') {
-    return Object.fromEntries(
-      Object.entries(value).map(([key, item]) => [key, resolveDeep(item, row)]),
-    )
-  }
-  return value
-}
-
 function resolveProps(node: WsxElement, row: DataRow | undefined): Record<string, never> {
   if (!row) return node.props as Record<string, never>
   const out: Record<string, unknown> = {}
   for (const [key, value] of Object.entries(node.props)) {
-    out[key] = key === 'expr' ? value : resolveDeep(value, row)
+    out[key] = key === 'expr' ? value : resolveRowDeep(value, row)
   }
   return out as Record<string, never>
 }
@@ -125,7 +107,7 @@ function exprTables(root: WsxElement): string[] {
 function renderChildren(nodes: WsxNode[], ctx: Ctx): ReactNode[] {
   return nodes.map((node, index) =>
     node.kind === 'text' ? (
-      resolve(node.value, ctx.row)
+      resolveRow(node.value, ctx.row)
     ) : (
       <Element key={index} node={node} ctx={ctx} />
     ),
@@ -177,6 +159,8 @@ const COMPONENTS: Record<string, ComponentType<never>> = {
   Chip,
   Mascot,
   Missing,
+  Compose,
+  Schema,
 }
 
 function renderElement(node: WsxElement, ctx: Ctx): ReactNode {
@@ -189,6 +173,12 @@ function renderElement(node: WsxElement, ctx: Ctx): ReactNode {
           {kids}
         </SheetFrame>
       )
+    case 'Drawer':
+      return createElement(Drawer, {
+        ...p,
+        children: (row: DataRow | null) =>
+          renderChildren(node.children, row ? { ...ctx, row } : ctx),
+      } as never)
     case 'Repeat':
       return createElement(Repeat, {
         ...p,

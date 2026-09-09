@@ -10,9 +10,10 @@ export {
   Table,
   Timeline,
 } from './components/data'
+export { Drawer, Schema } from './components/drawer'
 export { Reveal, Show, Tab, Tabs } from './components/flow'
 export { Divider, Grid, Row, Section, SheetFrame, Stack } from './components/frame'
-export { Button, Field, Slider, Switch, Task } from './components/input'
+export { Button, Compose, Field, Slider, Switch, Task } from './components/input'
 export { Chip, Mascot, Missing, Stamp, Tape } from './components/kit'
 export { Callout, Card, Figure, Hero } from './components/surface'
 export {

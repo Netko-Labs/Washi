@@ -32,6 +32,7 @@ describe('hanko', () => {
         'table.insert': () => {},
         'table.update': () => {},
         'table.reorder': () => {},
+        'table.delete': () => {},
         'url.open': () => {},
       },
     )
@@ -45,6 +46,7 @@ describe('hanko', () => {
           'table.insert': () => {},
           'table.update': () => {},
           'table.reorder': () => {},
+          'table.delete': () => {},
           'url.open': () => {},
         },
       ),

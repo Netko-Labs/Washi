@@ -107,7 +107,7 @@ gap"; `md:flex` → "use @sm: @md: @lg: (the page measures itself)". No arbitrar
 
 ---
 
-## 5. Primitives — 46 in seven groups
+## 5. Primitives — 49 in seven groups
 
 `children` is **none** (self-closing), **text** (text only), or **nodes** (elements and text). Every
 primitive accepts the four enums and `class`; the table lists its own props.
@@ -151,7 +151,7 @@ primitive accepts the four enums and `class`; the table lists its own props.
 | `Hero` | `title` `subtitle?` `align?` `left\|center` | none | Page opener. `size="md"` for a working page, default lg |
 | `Figure` | `src` (**https only**) `alt` `caption?` `ratio?` `16:9\|4:3\|3:2\|1:1` | none | Aspect held so text never jumps |
 
-### Data out — 9 · reads
+### Data out — 10 · reads
 
 | Primitive | Props | Children | Notes |
 |---|---|---|---|
@@ -164,22 +164,24 @@ primitive accepts the four enums and `class`; the table lists its own props.
 | `Progress` | `value?` (0–1) `expr?` `label?` | none | |
 | `Badge` | `expr?` | text | `expr` replaces the text |
 | `Avatar` | `label` | none | Initials |
+| `Schema` | `table` | none | The table's columns from the spec — field, type, options |
 
 Empty, loading and error states ship with every bound primitive, designed once. A page may override
 the empty *sentence* (`empty="…"`) and nothing else.
 
-### Data in — 6 · writes
+### Data in — 7 · writes
 
 | Primitive | Props | Children | Notes |
 |---|---|---|---|
 | `Field` | `field` `kind` `text\|number\|date\|select\|boolean` `label?` `help?` `table?` `row?` | none | One primitive over all column types. Writes `table.update` on blur (select and boolean on change). `select` offers the column's options from the table spec — a page never enumerates them. Inside `Repeat`, `row` defaults to `$row.id` |
-| `Board` | `bind` `groupBy` `groups?` `rank?` `kicker?` `title?` `badge?` `meta?` `avatar?` `onAdd?` `empty?` | none | Grouped, draggable records. A drop writes `table.reorder` with the group column and a fractional `rank`. `groups` fixes column order; a numeric `meta` totals per column; badge values that carry meaning (`highest high bug` → danger, `medium` → warning, `story` → success, `task` → info) take that tone; `onAdd` runs per column with `$group` substituted |
+| `Board` | `bind` `groupBy` `groups?` `rank?` `kicker?` `title?` `badge?` `meta?` `avatar?` `onAdd?` `empty?` | none | Grouped, draggable records. A drop writes `table.reorder` with the group column and a fractional `rank`. `groups` fixes column order; a numeric `meta` totals per column; `onOpen` runs on click with `$row` in scope; badge values that carry meaning (`highest high bug` → danger, `medium` → warning, `story` → success, `task` → info) take that tone; `onAdd` runs per column with `$group` substituted |
 | `Button` | `action` | text | |
+| `Compose` | `action` `label?` `placeholder?` `multiline?` | none | A text box that runs one verb with `$value` (the text) and `$now` (ISO timestamp) filled in — the comment box |
 | `Task` | `row?` `done?` | text | Checkbox bound to a row's `done` column. Inside `Repeat`, `row` defaults to `$row.id` |
 | `Switch` | `state` `label?` | none | Writes a boolean |
 | `Slider` | `state` `min?` `max?` `step?` `label?` | none | Writes a number |
 
-### Flow — 4 · no cosmetics
+### Flow — 5 · no cosmetics
 
 | Primitive | Props | Children | Notes |
 |---|---|---|---|
@@ -187,6 +189,7 @@ the empty *sentence* (`empty="…"`) and nothing else.
 | `Tabs` | `labels` (1–12) `state?` | nodes | One `Tab` per label |
 | `Tab` | — | nodes | Only inside `Tabs` |
 | `Reveal` | `label` `state?` | nodes | Disclosure |
+| `Drawer` | `state` `bind?` `title?` | nodes | A side panel whose openness is a state key. With `bind`, the key holds a row id and children get `$row` (string props and text included, `title` too). Scrim, × and Escape set the key to `null` |
 
 ### Washi kit — 4 + `Missing`
 
@@ -271,7 +274,7 @@ bind={{
 | Field | Notes |
 |---|---|
 | `table` | Required. snake_case |
-| `where` | ≤16 filters, ANDed. `op`: `eq ne gt gte lt lte contains in` |
+| `where` | ≤16 filters, ANDed. `op`: `eq ne gt gte lt lte contains in`. `id` is always filterable |
 | `orderBy` | `{ column, direction }` |
 | `limit` | 1–1000, default 200 |
 | `groupBy` | `{ column, aggregates: [{ fn, column? }] }` — `fn`: `count sum avg min max`. Feeds `Chart` directly |
@@ -287,11 +290,13 @@ The only side-effect channel. Interaction is a prop, not a handler.
 
 | Verb | Shape | Notes |
 |---|---|---|
+| `state.set` | `{ verb, key, value }` | Page state only — never reaches the vault. Selecting a row for a `Drawer` is `value: '$row.id'` from a Board `onOpen` or a Button inside `Repeat` |
 | `sheet.open` | `{ verb, sheet }` | |
 | `sheet.create` | `{ verb, title }` | |
 | `table.insert` | `{ verb, table, data }` | |
 | `table.update` | `{ verb, table, row, set }` | Patch by id. `Field` writes this |
 | `table.reorder` | `{ verb, table, row, set }` | Same shape; `Board` writes the group column and a fractional rank so concurrent drags converge |
+| `table.delete` | `{ verb, table, row }` | Soft — the row keeps its history |
 | `url.open` | `{ verb, url }` | **Denied from a page** until its consent UI ships |
 
 Reversible in-vault verbs run on click. Every action, allowed or refused, is recorded.

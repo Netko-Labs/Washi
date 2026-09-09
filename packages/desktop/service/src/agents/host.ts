@@ -19,7 +19,7 @@ import {
 import { checkAction, type HankoHandlers, isReversibleVerb, runAction } from '@washi/hanko'
 import { checkUrl, guardedFetch, isPrivateAddress } from '@washi/tsuru'
 import { createSheetFromSource } from '../sheets/service'
-import { runMutation, updateRecord } from '../tables/service'
+import { deleteRecord, runMutation, updateRecord } from '../tables/service'
 import { normalizeMessage, shortToolName } from './normalize'
 import { createWashiTools, currentFetchPolicy, type ToolContext, TSURU_HOSTS_KEY } from './tools'
 
@@ -62,9 +62,11 @@ Primitives — Frame: Section Row Stack Grid Divider · Text: Title(level) Text(
 Quote Code Pair(term) Note Source Money(value|expr, currency) + inline Mark Kbd Ref(sheet) Tag ·
 Surface: Card(title) Callout(title) Hero(title subtitle align) Figure(https src, alt) · Data out:
 Repeat(bind) Table(bind columns) Stat(value|expr label hint trend) Chart(bind kind) Timeline/Step
-Progress(value|expr) Badge Avatar · Data in: Field(field kind table row) Board(bind groupBy)
-Button(action) Task(row) Switch(state) Slider(state) · Flow: Show(expr) Tabs(labels state)/Tab
-Reveal(label) · Kit: Tape Stamp Chip Mascot(mood) · Missing(kind reason) for anything the registry
+Progress(value|expr) Badge Avatar Schema(table) · Data in: Field(field kind table row) Board(bind
+groupBy groups rank kicker badge meta avatar onAdd onOpen) Button(action) Compose(action label —
+$value and $now supplied) Task(row) Switch(state) Slider(state) · Flow: Show(expr) Tabs(labels
+state)/Tab Reveal(label) Drawer(state bind title — opens when the key is truthy; with bind the key is
+a row id and children get $row) · Kit: Tape Stamp Chip Mascot(mood) · Missing(kind reason) for anything the registry
 lacks — it renders as a labelled placeholder and files a request; never fake a capability.
 
 State: <Sheet state={{ local: { tab: 'a' }, stored: { mine: false } }}>. Controls write keys;
@@ -76,7 +78,8 @@ and string props ("$row.title", row="$row.id").
 
 Actions are objects, never functions: <Button action={{ verb: 'table.insert', table, data }}>.
 Verbs: sheet.open sheet.create table.insert table.update (Field uses it) table.reorder (Board drag
-writes the group column and a fractional rank). url.open is denied from a page. bind is an ink query descriptor { table, where, orderBy, limit, groupBy }.
+writes the group column and a fractional rank) table.delete (soft) state.set (page state, key + value —
+never reaches the vault). url.open is denied from a page. bind is an ink query descriptor { table, where, orderBy, limit, groupBy }.
 
 Budget: ~400 nodes, 8 binds, 24 expressions per sheet — over it, split into linked sheets (<Ref>).
 Always run sheet_check before sheet_create or sheet_replace and fix every diagnostic. Structured
@@ -319,6 +322,9 @@ export class AgentHost {
       },
       'table.reorder': (action) => {
         updateRecord(action.table, action.row, action.set)
+      },
+      'table.delete': (action) => {
+        deleteRecord(action.table, action.row)
       },
       'url.open': (action) => {
         const url = new URL(action.url)

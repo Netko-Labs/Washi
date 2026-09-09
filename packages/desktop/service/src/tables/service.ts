@@ -96,6 +96,14 @@ export function updateRecord(tableName: string, recordId: string, patch: RecordD
   }
 }
 
+/** Soft-delete one record by id — the `table.delete` verb. The row keeps its history. */
+export function deleteRecord(tableName: string, recordId: string): void {
+  const table = requireTable(tableName)
+  if (deleteRecords(table.id, [recordId]) === 0) {
+    throw new InkError(`unknown record "${recordId}" on table "${tableName}"`)
+  }
+}
+
 /** Task checkbox write-back: flip `done` on one record by id. */
 export function toggleTaskRecord(recordId: string, done: boolean): void {
   const tableId = findRecordTableId(recordId)

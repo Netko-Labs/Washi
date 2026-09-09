@@ -29,6 +29,7 @@ function assertIdentifier(column: string): string {
 
 /** Appends the bound json path and returns the expression referencing it. */
 function columnExpr(column: string, params: Scalar[]): string {
+  if (column === 'id') return 'id'
   params.push(`$.${assertIdentifier(column)}`)
   return 'json_extract(data, ?)'
 }

@@ -1,7 +1,7 @@
 import type { InkQuery } from '@washi/ink'
 import { type CSSProperties, type DragEvent, useState } from 'react'
 import { useData } from '../data'
-import { styled, useBind } from '../lib'
+import { resolveRowDeep, styled, useBind, useRunAction } from '../lib'
 import type { ActionRef, BlockProps, Row, Tone } from '../lib/types'
 import { usePaperHost } from '../provider'
 import { Avatar, Badge } from './data'
@@ -71,6 +71,7 @@ export function Board({
   meta,
   avatar,
   onAdd,
+  onOpen,
   empty,
   ...rest
 }: BlockProps & {
@@ -84,10 +85,12 @@ export function Board({
   meta?: string
   avatar?: string
   onAdd?: ActionRef
+  onOpen?: ActionRef
   empty?: string
 }) {
   const host = usePaperHost()
   const { refresh } = useData()
+  const run = useRunAction()
   const state = useBind(bind)
   const [moves, setMoves] = useState<Record<string, Move>>({})
   const [dragging, setDragging] = useState<string | null>(null)
@@ -133,6 +136,10 @@ export function Board({
       })
       refresh()
     }
+  }
+
+  const open = (row: Row) => {
+    if (onOpen) void run(resolveRowDeep(onOpen as never, row) as never)
   }
 
   const over = (event: DragEvent, next: DropTarget) => {
@@ -187,6 +194,10 @@ export function Board({
                       event.stopPropagation()
                       void drop(rows, { group: name, before: id })
                     }}
+                    onClick={() => open(row)}
+                    onKeyDown={(event) => event.key === 'Enter' && open(row)}
+                    tabIndex={onOpen ? 0 : undefined}
+                    data-openable={onOpen ? '' : undefined}
                   >
                     {kicker && <div className="wsx-board-card-kicker">{cell(row[kicker])}</div>}
                     <div className="wsx-board-card-title">{cell(row[title] ?? row.id)}</div>
@@ -211,10 +222,7 @@ export function Board({
                 <button
                   type="button"
                   className="wsx-board-add"
-                  onClick={async () => {
-                    await host.runAction(substitute(onAdd, name))
-                    refresh()
-                  }}
+                  onClick={() => void run(substitute(onAdd, name))}
                 >
                   + Add card
                 </button>
