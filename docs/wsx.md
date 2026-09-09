@@ -173,7 +173,7 @@ the empty *sentence* (`empty="…"`) and nothing else.
 | Primitive | Props | Children | Notes |
 |---|---|---|---|
 | `Field` | `field` `kind` `text\|number\|date\|select\|boolean` `label?` `help?` `table?` `row?` | none | One primitive over all column types. Writes `table.update` on blur. Inside `Repeat`, `row` defaults to `$row.id` |
-| `Board` | `bind` `groupBy` `title?` `onAdd?` `empty?` | none | Grouped records. Drag lands with `table.reorder` (not yet) |
+| `Board` | `bind` `groupBy` `groups?` `rank?` `title?` `badge?` `meta?` `avatar?` `onAdd?` `empty?` | none | Grouped, draggable records. A drop writes `table.reorder` with the group column and a fractional `rank`. `groups` fixes column order; `onAdd` runs per column with `$group` substituted |
 | `Button` | `action` | text | |
 | `Task` | `row?` `done?` | text | Checkbox bound to a row's `done` column. Inside `Repeat`, `row` defaults to `$row.id` |
 | `Switch` | `state` `label?` | none | Writes a boolean |
@@ -291,6 +291,7 @@ The only side-effect channel. Interaction is a prop, not a handler.
 | `sheet.create` | `{ verb, title }` | |
 | `table.insert` | `{ verb, table, data }` | |
 | `table.update` | `{ verb, table, row, set }` | Patch by id. `Field` writes this |
+| `table.reorder` | `{ verb, table, row, set }` | Same shape; `Board` writes the group column and a fractional rank so concurrent drags converge |
 | `url.open` | `{ verb, url }` | **Denied from a page** until its consent UI ships |
 
 Reversible in-vault verbs run on click. Every action, allowed or refused, is recorded.

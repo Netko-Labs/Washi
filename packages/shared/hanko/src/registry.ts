@@ -25,6 +25,14 @@ export const VERBS = {
       .record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.null()]))
       .refine((patch) => Object.keys(patch).length > 0, 'set must patch at least one column'),
   }),
+  'table.reorder': z.object({
+    verb: z.literal('table.reorder'),
+    table: z.string().min(1),
+    row: z.string().min(1),
+    set: z
+      .record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.null()]))
+      .refine((patch) => Object.keys(patch).length > 0, 'set must patch at least one column'),
+  }),
   'url.open': z.object({ verb: z.literal('url.open'), url: z.url({ protocol: /^https$/ }) }),
 } as const
 
@@ -40,6 +48,7 @@ const REVERSIBLE_VERBS = new Set<Verb>([
   'sheet.create',
   'table.insert',
   'table.update',
+  'table.reorder',
 ])
 
 export function isReversibleVerb(verb: Verb): boolean {
@@ -90,6 +99,8 @@ export async function runAction(input: unknown, handlers: HankoHandlers): Promis
       return handlers['table.insert'](result.action)
     case 'table.update':
       return handlers['table.update'](result.action)
+    case 'table.reorder':
+      return handlers['table.reorder'](result.action)
     case 'url.open':
       return handlers['url.open'](result.action)
   }

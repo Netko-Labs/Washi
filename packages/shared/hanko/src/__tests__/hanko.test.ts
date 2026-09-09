@@ -31,6 +31,7 @@ describe('hanko', () => {
         'sheet.create': () => {},
         'table.insert': () => {},
         'table.update': () => {},
+        'table.reorder': () => {},
         'url.open': () => {},
       },
     )
@@ -43,6 +44,7 @@ describe('hanko', () => {
           'sheet.create': () => {},
           'table.insert': () => {},
           'table.update': () => {},
+          'table.reorder': () => {},
           'url.open': () => {},
         },
       ),

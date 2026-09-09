@@ -8,7 +8,7 @@ export const BOARD = `<Sheet title="Registry build" icon="kanban" feel="board" t
     <Text emphasis="quiet" size="sm" class="grow">Board · bind tasks · visibility shared</Text>
     <Avatar label="Mira Kaneko" size="sm" tone="info" /><Avatar label="Peje" size="sm" tone="accent" /><Avatar label="Awa" size="sm" tone="success" />
   </Row>
-  <Hero title="Registry build" subtitle="Every card is a live row. Drag lands with table.reorder; until then the board groups by status and the cards below edit in place." size="md" />
+  <Hero title="Registry build" subtitle="Every card is a live row. Drag a card between columns or within one — each drop is one table.reorder — and the cards below edit in place." size="md" />
   <Row>
     <Stat label="cards" expr="count(tasks)" />
     <Stat label="points in scope" expr="sum(tasks.points)" />
@@ -16,7 +16,7 @@ export const BOARD = `<Sheet title="Registry build" icon="kanban" feel="board" t
     <Stat label="blocked" expr="count(tasks where blocked = true)" tone="danger" />
   </Row>
   <Missing kind="Filter" reason="priority facets and search with a live shown-of-total — one scope the board and the stats inherit" />
-  <Board bind={{ table: 'tasks' }} groupBy="status" />
+  <Board bind={{ table: 'tasks' }} groupBy="status" groups={['todo', 'doing', 'review', 'done']} badge="priority" meta="points" avatar="assignee" />
   <Section title="Cards · sorted by due">
     <Repeat bind={{ table: 'tasks', orderBy: { column: 'due', direction: 'asc' } }} empty="No cards yet — add one below.">
       <Card title="$row.title">
@@ -168,5 +168,48 @@ export const LIBRARY = `<Sheet title="Reading room" icon="book" theme="sumi" tag
     <Card span={6} title="By topic"><Chart bind={{ table: 'books', groupBy: { column: 'topic', aggregates: [{ fn: 'count' }] } }} kind="donut" /></Card>
     <Card span={6} title="Finished per month"><Chart bind={{ table: 'books', where: [{ column: 'finished_month', op: 'ne', value: '' }], groupBy: { column: 'finished_month', aggregates: [{ fn: 'count' }] } }} kind="bar" /></Card>
   </Grid>
+</Sheet>
+`
+
+export const TRELLO = `<Sheet title="Sprint board" icon="kanban" feel="board" tags={['board', 'cards']} wsx="1">
+  <Row align="center">
+    <Text emphasis="quiet" size="sm" class="grow">Board · bind cards · drag between lists, or within one</Text>
+    <Avatar label="Mira Kaneko" size="sm" tone="info" /><Avatar label="Peje" size="sm" tone="accent" /><Avatar label="Awa" size="sm" tone="success" />
+  </Row>
+  <Hero title="Sprint board" subtitle="Four lists, one table. A drop is one table.reorder: the list column plus a fractional rank, so two people dragging at once converge instead of clobbering." size="md" />
+  <Row>
+    <Stat label="cards" expr="count(cards)" />
+    <Stat label="in flight" expr="sum(cards.points where list = 'Doing')" hint="points" />
+    <Stat label="done" expr="sum(cards.points where list = 'Done')" hint="points" tone="success" />
+    <Stat label="backlog" expr="count(cards where list = 'Backlog')" />
+  </Row>
+  <Progress expr="sum(cards.points where list = 'Done') / sum(cards.points)" label="points done" />
+  <Board
+    bind={{ table: 'cards' }}
+    groupBy="list"
+    groups={['Backlog', 'To do', 'Doing', 'Done']}
+    rank="rank"
+    title="title"
+    badge="label"
+    meta="points"
+    avatar="owner"
+    onAdd={{ verb: 'table.insert', table: 'cards', data: { title: 'New card', list: '$group', rank: 99, label: 'spec', points: 1, owner: 'Peje', done: false } }}
+  />
+  <Section title="Card details">
+    <Text size="sm" emphasis="quiet">Every card is a row. Edit any field here and the board above follows.</Text>
+    <Repeat bind={{ table: 'cards', orderBy: { column: 'rank', direction: 'asc' } }}>
+      <Card size="sm">
+        <Row align="center">
+          <Text emphasis="strong" class="grow">$row.title</Text>
+          <Badge tone="info">$row.list</Badge><Badge>$row.label</Badge>
+        </Row>
+        <Grid gap="tight">
+          <Field span={6} field="title" kind="text" label="Title" table="cards" size="sm" />
+          <Field span={3} field="points" kind="number" label="Points" table="cards" size="sm" />
+          <Field span={3} field="owner" kind="text" label="Owner" table="cards" size="sm" />
+        </Grid>
+      </Card>
+    </Repeat>
+  </Section>
 </Sheet>
 `

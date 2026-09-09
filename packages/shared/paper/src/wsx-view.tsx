@@ -1,5 +1,6 @@
 import { type ExprAst, parseExpr, type WsxElement, type WsxNode, type WsxValue } from '@washi/wsx'
 import { type ComponentType, createElement, type ReactNode, useMemo } from 'react'
+import { Board } from './components/board'
 import {
   Avatar,
   Badge,
@@ -13,7 +14,7 @@ import {
 } from './components/data'
 import { Reveal, Show, Tab, Tabs } from './components/flow'
 import { Divider, Grid, Row, Section, SheetFrame, Stack } from './components/frame'
-import { Board, Button, Field, Slider, Switch, Task } from './components/input'
+import { Button, Field, Slider, Switch, Task } from './components/input'
 import { Chip, Mascot, Missing, Stamp, Tape } from './components/kit'
 import { Callout, Card, Figure, Hero } from './components/surface'
 import {

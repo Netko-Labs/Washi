@@ -1,11 +1,9 @@
-import type { InkQuery } from '@washi/ink'
 import { useState } from 'react'
 import { useData } from '../data'
-import { styled, useBind } from '../lib'
-import type { ActionRef, BlockProps, Row } from '../lib/types'
+import { styled } from '../lib'
+import type { ActionRef, BlockProps } from '../lib/types'
 import { usePaperHost } from '../provider'
 import { useRow, useSheetState } from '../state'
-import { Bound, cell } from './states'
 
 type FieldKind = 'text' | 'number' | 'date' | 'select' | 'boolean'
 
@@ -79,50 +77,6 @@ export function Field({
       {help && !error && <div className="wsx-field-help">{help}</div>}
       {error && <div className="wsx-field-error">{error}</div>}
     </div>
-  )
-}
-
-export function Board({
-  bind,
-  groupBy,
-  title = 'title',
-  empty,
-  ...rest
-}: BlockProps & {
-  bind: InkQuery
-  groupBy: string
-  title?: string
-  onAdd?: ActionRef
-  empty?: string
-}) {
-  const state = useBind(bind)
-  return (
-    <Bound state={state} empty={empty}>
-      {(rows) => {
-        const groups = new Map<string, Row[]>()
-        for (const row of rows) {
-          const key = String(row[groupBy] ?? '—')
-          groups.set(key, [...(groups.get(key) ?? []), row])
-        }
-        return (
-          <div {...styled(rest, 'wsx-board')}>
-            {[...groups.entries()].map(([group, items]) => (
-              <div key={group} className="wsx-board-col">
-                <div className="wsx-board-head">
-                  <span>{group}</span>
-                  <span>{items.length}</span>
-                </div>
-                {items.map((row) => (
-                  <div key={String(row.id)} className="wsx-board-card">
-                    {cell(row[title] ?? row.id)}
-                  </div>
-                ))}
-              </div>
-            ))}
-          </div>
-        )
-      }}
-    </Bound>
   )
 }
 

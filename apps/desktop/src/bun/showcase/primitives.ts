@@ -122,7 +122,7 @@ export const primitivesSheet = (
       <Task>$row.title</Task>
     </Repeat>
     <Text emphasis="quiet" size="sm">Board · bind + groupBy — drag lands with table.reorder</Text>
-    <Board bind={{ table: 'tasks' }} groupBy="status" />
+    <Board bind={{ table: 'tasks' }} groupBy="status" groups={['todo', 'doing', 'review', 'done']} badge="priority" meta="points" avatar="assignee" />
   </Section>
 
   <Section title="06 · Flow — Show · Tabs · Tab · Reveal · Switch · Slider">

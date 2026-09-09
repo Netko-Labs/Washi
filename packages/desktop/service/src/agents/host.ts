@@ -75,8 +75,8 @@ computes a number, Money and Text format it. Inside <Repeat bind>, $row.column i
 and string props ("$row.title", row="$row.id").
 
 Actions are objects, never functions: <Button action={{ verb: 'table.insert', table, data }}>.
-Verbs: sheet.open sheet.create table.insert table.update (Field uses it). url.open is denied
-from a page. bind is an ink query descriptor { table, where, orderBy, limit, groupBy }.
+Verbs: sheet.open sheet.create table.insert table.update (Field uses it) table.reorder (Board drag
+writes the group column and a fractional rank). url.open is denied from a page. bind is an ink query descriptor { table, where, orderBy, limit, groupBy }.
 
 Budget: ~400 nodes, 8 binds, 24 expressions per sheet — over it, split into linked sheets (<Ref>).
 Always run sheet_check before sheet_create or sheet_replace and fix every diagnostic. Structured
@@ -315,6 +315,9 @@ export class AgentHost {
         runMutation({ kind: 'insert', table: action.table, data: action.data })
       },
       'table.update': (action) => {
+        updateRecord(action.table, action.row, action.set)
+      },
+      'table.reorder': (action) => {
         updateRecord(action.table, action.row, action.set)
       },
       'url.open': (action) => {

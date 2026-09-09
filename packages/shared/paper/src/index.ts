@@ -1,3 +1,4 @@
+export { Board } from './components/board'
 export {
   Avatar,
   Badge,
@@ -11,7 +12,7 @@ export {
 } from './components/data'
 export { Reveal, Show, Tab, Tabs } from './components/flow'
 export { Divider, Grid, Row, Section, SheetFrame, Stack } from './components/frame'
-export { Board, Button, Field, Slider, Switch, Task } from './components/input'
+export { Button, Field, Slider, Switch, Task } from './components/input'
 export { Chip, Mascot, Missing, Stamp, Tape } from './components/kit'
 export { Callout, Card, Figure, Hero } from './components/surface'
 export {

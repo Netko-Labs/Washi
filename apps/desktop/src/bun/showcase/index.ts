@@ -1,6 +1,6 @@
 import { getSheet, listSheets } from '@washi/desktop-repository'
 import { createSheetFromSource, removeSheet, updateSheetFromSource } from '@washi/desktop-service'
-import { BOARD, HABITS, LIBRARY, SPLIT, WORKOUT } from './apps'
+import { BOARD, HABITS, LIBRARY, SPLIT, TRELLO, WORKOUT } from './apps'
 import { DASHBOARD, ESSAY, POSTMORTEM, RECIPE, TRIP, WELCOME } from './notes'
 import { primitivesSheet } from './primitives'
 import { seedTables } from './tables'
@@ -44,6 +44,7 @@ export function seedShowcase(): void {
     { title: 'Country loaf', icon: 'leaf', source: RECIPE },
     { title: 'WSX Primitives', icon: 'sparkles', source: primitivesSheet(welcome) },
     { title: 'Registry build', icon: 'kanban', source: BOARD },
+    { title: 'Sprint board', icon: 'kanban', source: TRELLO },
     { title: 'Daily practice', icon: 'sun', source: HABITS },
     { title: 'Hakone trip', icon: 'money', source: SPLIT },
     { title: 'Session 34 · Pull', icon: 'target', source: WORKOUT },
