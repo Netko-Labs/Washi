@@ -225,10 +225,7 @@ const dataIn: Record<string, ComponentSpec> = {
     { hints: { onMove: 'drag lands with table.reorder — not in this registry yet' } },
   ),
   Button: p({ action: actionRefSchema }, 'text'),
-  Task: p(
-    { row: rowRef.optional(), field: columnName.optional(), done: z.boolean().optional() },
-    'text',
-  ),
+  Task: p({ row: rowRef.optional(), done: z.boolean().optional() }, 'text'),
   Switch: p({ state: stateKey, label: z.string().max(120).optional() }, 'none'),
   Slider: p(
     {

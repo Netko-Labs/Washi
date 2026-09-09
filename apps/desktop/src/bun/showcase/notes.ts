@@ -1,18 +1,6 @@
-import { getSheet, getTableByName, listSheets } from '@washi/desktop-repository'
-import {
-  createSheetFromSource,
-  defineUserTable,
-  removeSheet,
-  runMutation,
-  updateSheetFromSource,
-} from '@washi/desktop-service'
+/** The six notes: one per feel, several themes, every primitive group. */
 
-/**
- * Seeded showcase sheets — one per feel, several themes, every primitive group.
- * Idempotent by title; they track the build so the registry is always on show.
- */
-
-const WELCOME = `<Sheet title="Welcome to Washi" icon="sparkles" wsx="1">
+export const WELCOME = `<Sheet title="Welcome to Washi" icon="sparkles" wsx="1">
   <Row align="center"><Tape>washi</Tape><Mascot mood="happy" size="sm" /></Row>
   <Hero title="Notes agents can design." subtitle="Sheets are WSX — a closed component format an agent writes and Washi renders. Components own appearance; pages own content and meaning. Nothing in a page executes." />
   <Row>
@@ -30,7 +18,7 @@ const WELCOME = `<Sheet title="Welcome to Washi" icon="sparkles" wsx="1">
 </Sheet>
 `
 
-const DASHBOARD = `<Sheet title="Launch Dashboard" icon="rocket" feel="board" theme="aizome" wsx="1">
+export const DASHBOARD = `<Sheet title="Launch Dashboard" icon="rocket" feel="board" theme="aizome" wsx="1">
   <Hero title="Launch Dashboard" subtitle="Bound to the launch_tasks table. Edit the data and the sheet follows." size="md" />
   <Grid>
     <Card span={4}><Stat label="open tasks" expr="count(launch_tasks where done = false)" hint="count · not done" /></Card>
@@ -54,7 +42,7 @@ const DASHBOARD = `<Sheet title="Launch Dashboard" icon="rocket" feel="board" th
 </Sheet>
 `
 
-const TRIP = `<Sheet title="Kyoto in October" icon="plane" theme="kraft" state={{ local: { budget: 150000 } }} wsx="1">
+export const TRIP = `<Sheet title="Kyoto in October" icon="plane" theme="kraft" state={{ local: { budget: 150000 } }} wsx="1">
   <Hero title="Kyoto in October" subtitle="Three nights, one ryokan, no plans before ten." />
   <Grid>
     <Card span={5} title="Budget">
@@ -92,7 +80,7 @@ const TRIP = `<Sheet title="Kyoto in October" icon="plane" theme="kraft" state={
 </Sheet>
 `
 
-const ESSAY = `<Sheet title="On Paper" icon="pen" feel="editorial" theme="sumi" wsx="1">
+export const ESSAY = `<Sheet title="On Paper" icon="pen" feel="editorial" theme="sumi" wsx="1">
   <Row align="center"><Tag>essay</Tag><Tag>004</Tag></Row>
   <Title>On Paper</Title>
   <Text lead>Handmade paper survives because it holds exactly what is placed on it — no more, no less. A sheet does not interpret. It does not execute. It carries.</Text>
@@ -111,7 +99,7 @@ const ESSAY = `<Sheet title="On Paper" icon="pen" feel="editorial" theme="sumi" 
 </Sheet>
 `
 
-const POSTMORTEM = `<Sheet title="Postmortem: stored keys" icon="flag" feel="editorial" theme="kobai" wsx="1">
+export const POSTMORTEM = `<Sheet title="Postmortem: stored keys" icon="flag" feel="editorial" theme="kobai" wsx="1">
   <Row align="center"><Stamp label="済" /><Tape tone="danger">incident</Tape></Row>
   <Title>A rename garbage-collected stored state on 41 sheets</Title>
   <Text lead>No data was lost for good — the action log had every write — but 41 readers opened a page that had forgotten their filters.</Text>
@@ -140,7 +128,7 @@ const POSTMORTEM = `<Sheet title="Postmortem: stored keys" icon="flag" feel="edi
 </Sheet>
 `
 
-const RECIPE = `<Sheet title="Country loaf" icon="leaf" theme="matcha" state={{ local: { dough: 900, hydration: 74 } }} wsx="1">
+export const RECIPE = `<Sheet title="Country loaf" icon="leaf" theme="matcha" state={{ local: { dough: 900, hydration: 74 } }} wsx="1">
   <Hero title="Country loaf" subtitle="Two sliders, five derived numbers, one honest timeline." size="md" />
   <Grid>
     <Card span={6} title="Dial it in">
@@ -171,59 +159,3 @@ const RECIPE = `<Sheet title="Country loaf" icon="leaf" theme="matcha" state={{ 
 water = flour × hydration</Code>
 </Sheet>
 `
-
-/** Pre-0.4 showcase titles: their source is the old vocabulary and would render as Missing. */
-const RETIRED = ['Release Playbook', 'Ops Log', 'System Map', 'Neon Moodboard', 'Interactive Kit']
-
-const LAUNCH_TASKS = [
-  { title: 'Cut release branch', status: 'shipped', points: 2 },
-  { title: 'Bundle CEF locales', status: 'shipped', points: 3 },
-  { title: 'Wire updater feed', status: 'shipped', points: 5 },
-  { title: 'Notarize macOS build', status: 'doing', points: 5 },
-  { title: 'Windows installer pass', status: 'doing', points: 3 },
-  { title: 'Write release notes', status: 'todo', points: 1 },
-  { title: 'Smoke test on Linux', status: 'todo', points: 2 },
-]
-
-export function seedShowcase(): void {
-  if (!getTableByName('launch_tasks')) {
-    defineUserTable({
-      name: 'launch_tasks',
-      columns: [
-        { name: 'title', type: 'text' },
-        { name: 'status', type: 'select', options: ['todo', 'doing', 'shipped'] },
-        { name: 'points', type: 'number' },
-        { name: 'done', type: 'boolean' },
-      ],
-    })
-    for (const task of LAUNCH_TASKS) {
-      runMutation({
-        kind: 'insert',
-        table: 'launch_tasks',
-        data: { ...task, done: task.status === 'shipped' },
-      })
-    }
-  }
-
-  const byTitle = new Map(listSheets().map((sheet) => [sheet.title, sheet.id]))
-  for (const title of RETIRED) {
-    const id = byTitle.get(title)
-    if (id) removeSheet(id)
-  }
-  const seeds = [
-    { title: 'Welcome to Washi', icon: 'sparkles', source: WELCOME },
-    { title: 'Launch Dashboard', icon: 'rocket', source: DASHBOARD },
-    { title: 'Kyoto in October', icon: 'plane', source: TRIP },
-    { title: 'On Paper', icon: 'pen', source: ESSAY },
-    { title: 'Postmortem: stored keys', icon: 'flag', source: POSTMORTEM },
-    { title: 'Country loaf', icon: 'leaf', source: RECIPE },
-  ]
-  for (const seed of seeds) {
-    const existingId = byTitle.get(seed.title)
-    if (!existingId) {
-      createSheetFromSource(seed)
-    } else if (getSheet(existingId)?.source !== seed.source) {
-      updateSheetFromSource(existingId, seed)
-    }
-  }
-}

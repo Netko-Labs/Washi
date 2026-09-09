@@ -69,14 +69,15 @@ export function Section({
   )
 }
 
-function flowStyle(rest: BlockProps, align: string | undefined): CSSProperties | undefined {
+/** `--align` is always written, so a nested flow never inherits its parent's alignment. */
+function flowStyle(rest: BlockProps, align: string | undefined, fallback: string): CSSProperties {
   const base = styled(rest).style ?? {}
-  return align ? ({ ...base, '--align': ALIGN[align] } as CSSProperties) : (base as CSSProperties)
+  return { ...base, '--align': (align && ALIGN[align]) || fallback } as CSSProperties
 }
 
 export function Row({ gap, align, children, ...rest }: BlockProps & { gap?: Gap; align?: string }) {
   return (
-    <div {...styled(rest, 'wsx-row')} data-gap={gap} style={flowStyle(rest, align)}>
+    <div {...styled(rest, 'wsx-row')} data-gap={gap} style={flowStyle(rest, align, 'flex-start')}>
       {children}
     </div>
   )
@@ -89,7 +90,7 @@ export function Stack({
   ...rest
 }: BlockProps & { gap?: Gap; align?: string }) {
   return (
-    <div {...styled(rest, 'wsx-stack')} data-gap={gap} style={flowStyle(rest, align)}>
+    <div {...styled(rest, 'wsx-stack')} data-gap={gap} style={flowStyle(rest, align, 'stretch')}>
       {children}
     </div>
   )

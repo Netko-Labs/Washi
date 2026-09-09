@@ -152,15 +152,14 @@ export function Button({ action, children, ...rest }: BlockProps & { action: Act
 
 export function Task({
   row,
-  field = 'done',
   done,
   children,
   ...rest
-}: BlockProps & { row?: string; field?: string; done?: boolean }) {
+}: BlockProps & { row?: string; done?: boolean }) {
   const host = usePaperHost()
   const scoped = useRow()
   const rowId = row ?? (scoped?.id as string | undefined)
-  const [checked, setChecked] = useState(done ?? scoped?.[field] === true)
+  const [checked, setChecked] = useState(done ?? scoped?.done === true)
   return (
     <label {...styled(rest, 'wsx-task')} data-done={checked || undefined}>
       <input

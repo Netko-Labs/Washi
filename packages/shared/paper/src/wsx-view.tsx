@@ -1,4 +1,4 @@
-import { type ExprAst, parseExpr, type WsxElement, type WsxNode } from '@washi/wsx'
+import { type ExprAst, parseExpr, type WsxElement, type WsxNode, type WsxValue } from '@washi/wsx'
 import { type ComponentType, createElement, type ReactNode, useMemo } from 'react'
 import {
   Avatar,
@@ -50,11 +50,22 @@ function resolve(value: string, row: DataRow | undefined): string {
   return value.replace(ROW_REF, (_, column: string) => String(row[column] ?? ''))
 }
 
+function resolveDeep(value: WsxValue, row: DataRow): WsxValue {
+  if (typeof value === 'string') return resolve(value, row)
+  if (Array.isArray(value)) return value.map((item) => resolveDeep(item, row))
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, item]) => [key, resolveDeep(item, row)]),
+    )
+  }
+  return value
+}
+
 function resolveProps(node: WsxElement, row: DataRow | undefined): Record<string, never> {
   if (!row) return node.props as Record<string, never>
   const out: Record<string, unknown> = {}
   for (const [key, value] of Object.entries(node.props)) {
-    out[key] = typeof value === 'string' && key !== 'expr' ? resolve(value, row) : value
+    out[key] = key === 'expr' ? value : resolveDeep(value, row)
   }
   return out as Record<string, never>
 }

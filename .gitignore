@@ -7,3 +7,6 @@ build/
 *.tsbuildinfo
 .DS_Store
 *.local
+
+# mirin bundler scratch
+*.bun-build

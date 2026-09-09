@@ -155,7 +155,7 @@ primitive accepts the four enums and `class`; the table lists its own props.
 
 | Primitive | Props | Children | Notes |
 |---|---|---|---|
-| `Repeat` | `bind` `as?` `empty?` | nodes | Renders children per row with `$row.column` in scope (text and string props). **Cannot recurse** |
+| `Repeat` | `bind` `as?` `empty?` | nodes | Renders children per row with `$row.column` in scope (text, string props, and strings inside `action`/`bind` objects). **Cannot recurse** |
 | `Table` | `bind` `columns?` `empty?` | none | |
 | `Stat` | `value?` `expr?` `label` `hint?` `trend?` `up\|down\|flat` | none | |
 | `Chart` | `bind` `kind` `bar\|line\|area\|donut` `label?` `value?` `empty?` | none | Palette from the chart ramp; series colours not settable |
@@ -175,7 +175,7 @@ the empty *sentence* (`empty="…"`) and nothing else.
 | `Field` | `field` `kind` `text\|number\|date\|select\|boolean` `label?` `help?` `table?` `row?` | none | One primitive over all column types. Writes `table.update` on blur. Inside `Repeat`, `row` defaults to `$row.id` |
 | `Board` | `bind` `groupBy` `title?` `onAdd?` `empty?` | none | Grouped records. Drag lands with `table.reorder` (not yet) |
 | `Button` | `action` | text | |
-| `Task` | `row?` `field?` `done?` | text | Checkbox bound to a row. Inside `Repeat`, `row` defaults to `$row.id` |
+| `Task` | `row?` `done?` | text | Checkbox bound to a row's `done` column. Inside `Repeat`, `row` defaults to `$row.id` |
 | `Switch` | `state` `label?` | none | Writes a boolean |
 | `Slider` | `state` `min?` `max?` `step?` `label?` | none | Writes a number |
 
