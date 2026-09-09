@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useData } from '../data'
-import { styled } from '../lib'
+import { styled, useSelectOptions } from '../lib'
 import type { ActionRef, BlockProps } from '../lib/types'
 import { usePaperHost } from '../provider'
 import { useRow, useSheetState } from '../state'
@@ -44,8 +44,27 @@ export function Field({
     }
   }
 
+  const options = useSelectOptions(kind === 'select' ? table : undefined, field)
+
   const input =
-    kind === 'boolean' ? (
+    kind === 'select' ? (
+      <select
+        id={id}
+        className="wsx-field-input"
+        value={value}
+        onChange={(event) => {
+          setValue(event.target.value)
+          void commit(event.target.value)
+        }}
+      >
+        {!options.includes(value) && <option value={value}>{value || '—'}</option>}
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
+    ) : kind === 'boolean' ? (
       <input
         id={id}
         type="checkbox"

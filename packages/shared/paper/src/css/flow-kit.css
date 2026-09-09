@@ -66,40 +66,68 @@
 
 .wsx-board {
   display: flex;
-  gap: var(--gap);
+  gap: 14px;
+  align-items: flex-start;
   overflow-x: auto;
-  padding-bottom: 6px;
+  padding-bottom: 8px;
 }
 .wsx-board-col {
-  flex: 1 0 200px;
-  max-width: 300px;
+  flex: none;
+  width: 262px;
+  background: var(--muted-bg);
+  border: 1.5px solid transparent;
+  border-radius: var(--r-card);
+  padding: 11px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 9px;
+  transition:
+    background var(--ease),
+    border-color var(--ease);
+}
+.wsx-board-col[data-hot] {
+  background: color-mix(in srgb, var(--accent) 10%, var(--muted-bg));
+  border-color: var(--accent);
 }
 .wsx-board-head {
   display: flex;
   justify-content: space-between;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--muted);
-  padding: 0 2px 4px;
+  align-items: center;
+  padding: 2px 3px;
 }
-.wsx-board-col[data-hot] {
-  background: var(--muted-bg);
-  border-radius: var(--r-card);
-  outline: 1.5px dashed var(--accent);
-  outline-offset: -1.5px;
+.wsx-board-head-name {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.wsx-board-head-name i {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--col, var(--accent));
+}
+.wsx-board-head-count {
+  font-size: 11px;
+  color: var(--muted);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 1px 7px;
+  white-space: nowrap;
 }
 .wsx-board-card {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--r-input);
-  padding: 10px 12px;
-  font-size: 13.5px;
-  box-shadow: var(--shadow-card);
+  padding: 11px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   cursor: grab;
   transition:
     box-shadow var(--ease),
@@ -116,20 +144,32 @@
 .wsx-board-card[data-before] {
   box-shadow: 0 -3px 0 0 var(--accent);
 }
+.wsx-board-card-kicker {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
 .wsx-board-card-title {
-  line-height: 1.45;
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.4;
 }
 .wsx-board-card-meta {
-  margin-top: 8px;
   display: flex;
   align-items: center;
   gap: 7px;
   flex-wrap: wrap;
 }
 .wsx-board-card-note {
-  margin-left: auto;
-  font-size: 11px;
+  font-size: 10.5px;
   color: var(--muted);
+}
+.wsx-board-card-meta .wsx-avatar {
+  margin-left: auto;
+  width: 19px;
+  height: 19px;
+  font-size: 8.5px;
 }
 .wsx-board-drop {
   border: 1px dashed var(--border);
@@ -151,7 +191,7 @@
   cursor: pointer;
 }
 .wsx-board-add:hover {
-  background: var(--muted-bg);
+  background: var(--card);
   color: var(--ink);
 }
 

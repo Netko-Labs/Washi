@@ -1,8 +1,8 @@
 import type { InkQuery } from '@washi/ink'
-import { type DragEvent, useState } from 'react'
+import { type CSSProperties, type DragEvent, useState } from 'react'
 import { useData } from '../data'
 import { styled, useBind } from '../lib'
-import type { ActionRef, BlockProps, Row } from '../lib/types'
+import type { ActionRef, BlockProps, Row, Tone } from '../lib/types'
 import { usePaperHost } from '../provider'
 import { Avatar, Badge } from './data'
 import { Bound, cell } from './states'
@@ -32,6 +32,29 @@ function rankBetween(items: Row[], before: string | null, rank: string): number 
   return (rankOf(prev, rank) + rankOf(next, rank)) / 2
 }
 
+/** Badge values that carry meaning get the tone for it; anything else stays neutral. */
+const BADGE_TONES: Record<string, Tone> = {
+  highest: 'danger',
+  high: 'danger',
+  medium: 'warning',
+  low: 'neutral',
+  bug: 'danger',
+  story: 'success',
+  task: 'info',
+  epic: 'accent',
+  blocked: 'danger',
+}
+
+/** Count, plus the column total when `meta` is numeric — the Jira points-per-column read. */
+function headCount(items: Row[], meta: string | undefined): string {
+  if (!meta || !items.some((row) => typeof row[meta] === 'number')) return String(items.length)
+  const total = items.reduce(
+    (sum, row) => sum + (typeof row[meta] === 'number' ? (row[meta] as number) : 0),
+    0,
+  )
+  return `${items.length} · ${total} pts`
+}
+
 function substitute(action: ActionRef, group: string): ActionRef {
   return JSON.parse(JSON.stringify(action).replaceAll('$group', group)) as ActionRef
 }
@@ -43,6 +66,7 @@ export function Board({
   groups,
   rank = 'rank',
   title = 'title',
+  kicker,
   badge,
   meta,
   avatar,
@@ -55,6 +79,7 @@ export function Board({
   groups?: string[]
   rank?: string
   title?: string
+  kicker?: string
   badge?: string
   meta?: string
   avatar?: string
@@ -120,18 +145,22 @@ export function Board({
     <Bound state={state} empty={empty}>
       {(rows) => (
         <div {...styled(rest, 'wsx-board')}>
-          {columns(rows).map(({ name, items }) => (
+          {columns(rows).map(({ name, items }, index) => (
             <section
               key={name}
               aria-label={name}
               className="wsx-board-col"
               data-hot={target?.group === name || undefined}
+              style={{ '--col': `var(--chart-${(index % 5) + 1})` } as CSSProperties}
               onDragOver={(event) => over(event, { group: name, before: null })}
               onDrop={() => void drop(rows, { group: name, before: null })}
             >
               <div className="wsx-board-head">
-                <span>{name}</span>
-                <span>{items.length}</span>
+                <span className="wsx-board-head-name">
+                  <i />
+                  {name}
+                </span>
+                <span className="wsx-board-head-count">{headCount(items, meta)}</span>
               </div>
               {items.map((row) => {
                 const id = String(row.id)
@@ -159,11 +188,14 @@ export function Board({
                       void drop(rows, { group: name, before: id })
                     }}
                   >
+                    {kicker && <div className="wsx-board-card-kicker">{cell(row[kicker])}</div>}
                     <div className="wsx-board-card-title">{cell(row[title] ?? row.id)}</div>
                     {(badge || meta || avatar) && (
                       <div className="wsx-board-card-meta">
                         {badge && row[badge] !== null && row[badge] !== undefined && (
-                          <Badge size="sm">{cell(row[badge])}</Badge>
+                          <Badge size="sm" tone={BADGE_TONES[String(row[badge]).toLowerCase()]}>
+                            {cell(row[badge])}
+                          </Badge>
                         )}
                         {meta && <span className="wsx-board-card-note">{cell(row[meta])}</span>}
                         {avatar && typeof row[avatar] === 'string' && row[avatar] && (

@@ -29,5 +29,10 @@ export const paperHost: PaperHost = {
     await api.toggleTask({ recordId, done })
   },
 
+  describeTable: async (name) => {
+    const tables = await api.listTables({})
+    return tables.find((table) => table.spec.name === name)?.spec ?? null
+  },
+
   locale: navigator.language,
 }

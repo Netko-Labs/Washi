@@ -1,4 +1,4 @@
-import type { InkQuery, QueryResult } from '@washi/ink'
+import type { InkQuery, QueryResult, TableSpec } from '@washi/ink'
 import { createContext, type ReactNode, useContext } from 'react'
 import type { ActionRef } from './lib/types'
 
@@ -12,6 +12,8 @@ export interface PaperHost {
   resolveSheet(id: string): Promise<{ title: string; icon: string | null } | null>
   openSheet(id: string): void
   toggleTask(recordId: string, done: boolean): Promise<void>
+  /** Column specs, so a select Field offers the column's options — never the page's. */
+  describeTable(name: string): Promise<TableSpec | null>
   /** BCP-47; dates and money format from the vault locale at render, never in a page. */
   locale?: string
 }

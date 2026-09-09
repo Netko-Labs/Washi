@@ -65,7 +65,7 @@ function Bars({ points }: { points: Point[] }) {
               fill="var(--muted)"
               fontFamily="var(--font-sans)"
             >
-              {point.label.slice(0, 10)}
+              {point.label.length > 14 ? `${point.label.slice(0, 13)}…` : point.label}
             </text>
           </g>
         )

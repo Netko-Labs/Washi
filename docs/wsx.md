@@ -172,8 +172,8 @@ the empty *sentence* (`empty="…"`) and nothing else.
 
 | Primitive | Props | Children | Notes |
 |---|---|---|---|
-| `Field` | `field` `kind` `text\|number\|date\|select\|boolean` `label?` `help?` `table?` `row?` | none | One primitive over all column types. Writes `table.update` on blur. Inside `Repeat`, `row` defaults to `$row.id` |
-| `Board` | `bind` `groupBy` `groups?` `rank?` `title?` `badge?` `meta?` `avatar?` `onAdd?` `empty?` | none | Grouped, draggable records. A drop writes `table.reorder` with the group column and a fractional `rank`. `groups` fixes column order; `onAdd` runs per column with `$group` substituted |
+| `Field` | `field` `kind` `text\|number\|date\|select\|boolean` `label?` `help?` `table?` `row?` | none | One primitive over all column types. Writes `table.update` on blur (select and boolean on change). `select` offers the column's options from the table spec — a page never enumerates them. Inside `Repeat`, `row` defaults to `$row.id` |
+| `Board` | `bind` `groupBy` `groups?` `rank?` `kicker?` `title?` `badge?` `meta?` `avatar?` `onAdd?` `empty?` | none | Grouped, draggable records. A drop writes `table.reorder` with the group column and a fractional `rank`. `groups` fixes column order; a numeric `meta` totals per column; badge values that carry meaning (`highest high bug` → danger, `medium` → warning, `story` → success, `task` → info) take that tone; `onAdd` runs per column with `$group` substituted |
 | `Button` | `action` | text | |
 | `Task` | `row?` `done?` | text | Checkbox bound to a row's `done` column. Inside `Repeat`, `row` defaults to `$row.id` |
 | `Switch` | `state` `label?` | none | Writes a boolean |

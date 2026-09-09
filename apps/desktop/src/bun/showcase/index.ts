@@ -1,12 +1,20 @@
 import { getSheet, listSheets } from '@washi/desktop-repository'
 import { createSheetFromSource, removeSheet, updateSheetFromSource } from '@washi/desktop-service'
-import { BOARD, HABITS, LIBRARY, SPLIT, TRELLO, WORKOUT } from './apps'
+import { BOARD, HABITS, LIBRARY, SPLIT, WORKOUT } from './apps'
+import { JIRA } from './jira'
 import { DASHBOARD, ESSAY, POSTMORTEM, RECIPE, TRIP, WELCOME } from './notes'
 import { primitivesSheet } from './primitives'
 import { seedTables } from './tables'
 
 /** Pre-0.4 showcase titles: their source is the old vocabulary and would render as Missing. */
-const RETIRED = ['Release Playbook', 'Ops Log', 'System Map', 'Neon Moodboard', 'Interactive Kit']
+const RETIRED = [
+  'Release Playbook',
+  'Ops Log',
+  'System Map',
+  'Neon Moodboard',
+  'Interactive Kit',
+  'Sprint board',
+]
 
 interface Seed {
   title: string
@@ -44,7 +52,7 @@ export function seedShowcase(): void {
     { title: 'Country loaf', icon: 'leaf', source: RECIPE },
     { title: 'WSX Primitives', icon: 'sparkles', source: primitivesSheet(welcome) },
     { title: 'Registry build', icon: 'kanban', source: BOARD },
-    { title: 'Sprint board', icon: 'kanban', source: TRELLO },
+    { title: 'WSX · Sprint 12', icon: 'kanban', source: JIRA },
     { title: 'Daily practice', icon: 'sun', source: HABITS },
     { title: 'Hakone trip', icon: 'money', source: SPLIT },
     { title: 'Session 34 · Pull', icon: 'target', source: WORKOUT },

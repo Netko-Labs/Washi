@@ -220,6 +220,7 @@ const dataIn: Record<string, ComponentSpec> = {
       groups: z.array(z.string().min(1).max(40)).min(1).max(12).optional(),
       rank: columnName.optional(),
       title: columnName.optional(),
+      kicker: columnName.optional(),
       badge: columnName.optional(),
       meta: columnName.optional(),
       avatar: columnName.optional(),
