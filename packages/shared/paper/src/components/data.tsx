@@ -124,7 +124,7 @@ export function Step({
   ...rest
 }: BlockProps & { marker: string; title?: string }) {
   return (
-    <li {...styled({ tone: 'accent', ...rest }, 'wsx-step')}>
+    <li {...styled(rest, 'wsx-step')}>
       <span className="wsx-step-marker">{marker}</span>
       <div>
         {title && <div className="wsx-step-title">{title}</div>}

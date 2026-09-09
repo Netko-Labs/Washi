@@ -173,7 +173,7 @@
 .wsx-quote {
   margin: 0;
   padding: 4px 0 4px 18px;
-  border-left: 2px solid var(--t-fill, var(--accent));
+  border-left: 2px solid var(--t-fill);
   font-family: var(--font-serif);
   font-size: calc(var(--body) * 1.25);
   line-height: 1.4;

@@ -113,6 +113,46 @@
   --t-line: color-mix(in srgb, var(--t-fill) 40%, var(--border));
 }
 
+/* the kit takes its tone from the sheet accent, so a page cannot assemble a rainbow */
+.wsx,
+.wsx[data-accent="accent"] {
+  --k-fill: var(--accent);
+  --k-text: var(--tone-accent-text);
+  --k-on: var(--accent-ink);
+}
+.wsx[data-accent="info"] {
+  --k-fill: var(--tone-info);
+  --k-text: var(--tone-info-text);
+  --k-on: var(--tone-info-on);
+}
+.wsx[data-accent="success"] {
+  --k-fill: var(--tone-success);
+  --k-text: var(--tone-success-text);
+  --k-on: var(--tone-success-on);
+}
+.wsx[data-accent="warning"] {
+  --k-fill: var(--tone-warning);
+  --k-text: var(--tone-warning-text);
+  --k-on: var(--tone-warning-on);
+}
+.wsx[data-accent="danger"] {
+  --k-fill: var(--tone-danger);
+  --k-text: var(--tone-danger-text);
+  --k-on: var(--tone-danger-on);
+}
+.wsx .wsx-tape:not([data-tone]),
+.wsx .wsx-stamp:not([data-tone]),
+.wsx .wsx-chip:not([data-tone]),
+.wsx .wsx-quote:not([data-tone]),
+.wsx .wsx-progress:not([data-tone]),
+.wsx .wsx-step:not([data-tone]) {
+  --t-fill: var(--k-fill);
+  --t-text: var(--k-text);
+  --t-on: var(--k-on);
+  --t-tint: color-mix(in srgb, var(--k-fill) 14%, transparent);
+  --t-line: color-mix(in srgb, var(--k-fill) 40%, var(--border));
+}
+
 /* size scales type and space together */
 .wsx,
 .wsx [data-size="md"] {

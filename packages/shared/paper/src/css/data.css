@@ -88,7 +88,7 @@
 .wsx-chart svg {
   display: block;
   width: 100%;
-  height: auto;
+  height: clamp(150px, 30cqw, 240px);
 }
 .wsx-chart-legend {
   display: flex;
@@ -156,12 +156,9 @@
 }
 .wsx-progress-fill {
   height: 100%;
-  background: var(--t-fill, var(--accent));
+  background: var(--t-fill);
   border-radius: inherit;
   transition: width var(--ease-size);
-}
-.wsx-progress[data-tone="neutral"] .wsx-progress-fill {
-  background: var(--accent);
 }
 .wsx-progress-label {
   display: flex;
