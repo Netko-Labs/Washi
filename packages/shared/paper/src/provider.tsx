@@ -1,10 +1,6 @@
 import type { InkQuery, QueryResult } from '@washi/ink'
 import { createContext, type ReactNode, useContext } from 'react'
-
-export interface ActionRef {
-  verb: string
-  [key: string]: unknown
-}
+import type { ActionRef } from './lib/types'
 
 /**
  * The capability surface a rendered sheet may touch. The host app wires these
@@ -13,10 +9,11 @@ export interface ActionRef {
 export interface PaperHost {
   runQuery(query: InkQuery): Promise<QueryResult>
   runAction(action: ActionRef): Promise<void>
-  runFetch(url: string): Promise<string>
   resolveSheet(id: string): Promise<{ title: string; icon: string | null } | null>
   openSheet(id: string): void
   toggleTask(recordId: string, done: boolean): Promise<void>
+  /** BCP-47; dates and money format from the vault locale at render, never in a page. */
+  locale?: string
 }
 
 const PaperContext = createContext<PaperHost | null>(null)

@@ -17,6 +17,14 @@ export const VERBS = {
       .record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.null()]))
       .default({}),
   }),
+  'table.update': z.object({
+    verb: z.literal('table.update'),
+    table: z.string().min(1),
+    row: z.string().min(1),
+    set: z
+      .record(z.string(), z.union([z.string(), z.number(), z.boolean(), z.null()]))
+      .refine((patch) => Object.keys(patch).length > 0, 'set must patch at least one column'),
+  }),
   'url.open': z.object({ verb: z.literal('url.open'), url: z.url({ protocol: /^https$/ }) }),
 } as const
 
@@ -27,7 +35,12 @@ export type Verb = keyof typeof VERBS
  * one in a sheet is consent; everything else leaves the machine and needs an
  * explicit stamp every time (spec Q13).
  */
-const REVERSIBLE_VERBS = new Set<Verb>(['sheet.open', 'sheet.create', 'table.insert'])
+const REVERSIBLE_VERBS = new Set<Verb>([
+  'sheet.open',
+  'sheet.create',
+  'table.insert',
+  'table.update',
+])
 
 export function isReversibleVerb(verb: Verb): boolean {
   return REVERSIBLE_VERBS.has(verb)
@@ -75,6 +88,8 @@ export async function runAction(input: unknown, handlers: HankoHandlers): Promis
       return handlers['sheet.create'](result.action)
     case 'table.insert':
       return handlers['table.insert'](result.action)
+    case 'table.update':
+      return handlers['table.update'](result.action)
     case 'url.open':
       return handlers['url.open'](result.action)
   }

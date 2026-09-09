@@ -30,6 +30,7 @@ describe('hanko', () => {
         },
         'sheet.create': () => {},
         'table.insert': () => {},
+        'table.update': () => {},
         'url.open': () => {},
       },
     )
@@ -41,6 +42,7 @@ describe('hanko', () => {
           'sheet.open': () => {},
           'sheet.create': () => {},
           'table.insert': () => {},
+          'table.update': () => {},
           'url.open': () => {},
         },
       ),

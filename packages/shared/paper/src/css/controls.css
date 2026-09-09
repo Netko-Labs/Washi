@@ -1,0 +1,196 @@
+/* Data-in primitives. */
+
+.wsx-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: calc(34px * var(--sz));
+  padding: 0 calc(14px * var(--sz));
+  border-radius: var(--r-input);
+  font-family: var(--font-sans);
+  font-size: calc(13.5px * var(--sz));
+  font-weight: 700;
+  border: 1.5px solid transparent;
+  background: var(--t-fill);
+  color: var(--t-on);
+  cursor: pointer;
+  transition:
+    background var(--ease),
+    border-color var(--ease),
+    box-shadow var(--ease);
+}
+.wsx-button[data-tone="neutral"] {
+  background: var(--ink);
+  color: var(--bg);
+}
+.wsx-button[data-variant="outline"] {
+  background: transparent;
+  border-color: var(--t-line);
+  color: var(--t-text);
+}
+.wsx-button[data-variant="outline"][data-tone="neutral"] {
+  border-color: var(--border);
+  color: var(--ink);
+}
+.wsx-button[data-variant="plain"] {
+  background: transparent;
+  color: var(--t-text);
+}
+.wsx-button[data-variant="plain"][data-tone="neutral"] {
+  color: var(--ink);
+}
+.wsx-button[data-variant="filled"] {
+  background: var(--t-tint);
+  color: var(--t-text);
+}
+.wsx-button:hover:not(:disabled) {
+  filter: brightness(0.96);
+}
+.wsx-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.wsx-button:focus-visible,
+.wsx-switch:focus-visible,
+.wsx-tabs-tab:focus-visible,
+.wsx-ref:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.wsx-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.wsx-field-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.wsx-field-input {
+  height: 34px;
+  padding: 0 11px;
+  border-radius: var(--r-input);
+  border: 1.5px solid var(--border);
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  transition: border-color var(--ease);
+}
+.wsx-field-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.wsx-field-help,
+.wsx-field-error {
+  font-size: 12px;
+  color: var(--muted);
+}
+.wsx-field-error {
+  color: var(--tone-danger-text);
+}
+.wsx-field[data-kind="boolean"] {
+  flex-direction: row;
+  align-items: center;
+  gap: 9px;
+}
+
+.wsx-task {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  cursor: pointer;
+  line-height: 1.5;
+}
+.wsx-task input {
+  appearance: none;
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-top: 4px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-cell);
+  background: var(--card);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition:
+    background var(--ease),
+    border-color var(--ease);
+}
+.wsx-task input:checked {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.wsx-task input:checked::after {
+  content: "";
+  width: 8px;
+  height: 5px;
+  border: 2px solid var(--accent-ink);
+  border-top: 0;
+  border-right: 0;
+  transform: translateY(-1px) rotate(-45deg);
+}
+.wsx-task[data-done] > span {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+.wsx-task input:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.wsx-switch-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.wsx-switch {
+  width: 36px;
+  height: 20px;
+  padding: 2px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--border);
+  cursor: pointer;
+  transition: background var(--ease);
+}
+.wsx-switch[aria-checked="true"] {
+  background: var(--accent);
+}
+.wsx-switch i {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: var(--card);
+  transition: transform var(--ease);
+}
+.wsx-switch[aria-checked="true"] i {
+  transform: translateX(16px);
+}
+
+.wsx-slider {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.wsx-slider-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.wsx-slider input {
+  width: 100%;
+  accent-color: var(--accent);
+}

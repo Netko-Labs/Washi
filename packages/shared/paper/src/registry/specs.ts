@@ -1,231 +1,295 @@
 import { querySchema, scalarSchema } from '@washi/ink'
-import type { WsxRegistry } from '@washi/wsx'
+import type { ComponentSpec, WsxRegistry } from '@washi/wsx'
 import { z } from 'zod'
-import { zClass } from './tw'
+import {
+  feelSchema,
+  gapSchema,
+  STYLE_PROP_HINTS,
+  sizeSchema,
+  styledSchema,
+  themeIdSchema,
+  toneSchema,
+} from './surface'
 
 /** Hanko action descriptor as sheets carry it; the verb registry validates server-side. */
 export const actionRefSchema = z
   .object({ verb: z.string().min(1) })
-  .catchall(z.union([scalarSchema, z.array(scalarSchema)]))
+  .catchall(z.union([scalarSchema, z.array(scalarSchema), z.record(z.string(), scalarSchema)]))
 
-const styled = z.object({ class: zClass })
+const exprSchema = z.string().min(1).max(512)
+const stateKey = z.string().min(1).max(64)
+const stateBag = z.record(stateKey, scalarSchema)
+const columnName = z.string().min(1).max(64)
+const rowRef = z.string().min(1).max(80)
 
-export const tapeColorSchema = z.enum([
-  'pink',
-  'teal',
-  'blue',
-  'mustard',
-  'violet',
-  'moss',
-  'slate',
-])
+export const SHEET_ICONS = [
+  'notebook',
+  'book',
+  'bookmark',
+  'calendar',
+  'chart',
+  'checklist',
+  'clock',
+  'compass',
+  'flag',
+  'flask',
+  'heart',
+  'home',
+  'inbox',
+  'kanban',
+  'leaf',
+  'map',
+  'money',
+  'music',
+  'pen',
+  'plane',
+  'rocket',
+  'sparkles',
+  'star',
+  'sun',
+  'tag',
+  'target',
+  'tools',
+  'user',
+] as const
 
-/** Per-sheet design direction — closed presets, no arbitrary CSS (spec Q9). */
-export const sheetThemeSchema = z
-  .object({
-    preset: z
-      .enum(['washi', 'midnight', 'broadsheet', 'sticker', 'terminal', 'blueprint'])
-      .optional(),
-    accent: tapeColorSchema.optional(),
-    face: z.enum(['gothic', 'serif', 'rounded', 'mono']).optional(),
-    paper: z.enum(['plain', 'dots', 'lines']).optional(),
-  })
+export const sheetStateSchema = z
+  .object({ local: stateBag.optional(), stored: stateBag.optional() })
   .strict()
 
-export const paperRegistry: WsxRegistry = {
+const p = (
+  shape: z.ZodRawShape,
+  children: ComponentSpec['children'],
+  rest?: Omit<ComponentSpec, 'props' | 'children'>,
+): ComponentSpec => ({
+  props: styledSchema.extend(shape).strict(),
+  children,
+  ...rest,
+})
+
+const frame: Record<string, ComponentSpec> = {
   Sheet: {
-    props: styled
-      .extend({
-        title: z.string().min(1).max(200),
-        icon: z.string().max(16).optional(),
-        tags: z.array(z.string().min(1).max(64)).max(32).optional(),
-        theme: sheetThemeSchema.optional(),
-        state: z.record(z.string().max(64), scalarSchema).optional(),
-      })
-      .strict(),
-    children: 'nodes',
-  },
-  Show: {
     props: z
       .object({
-        when: z.string().min(1).max(64),
-        equals: scalarSchema.optional(),
-        not: z.boolean().optional(),
-      })
-      .strict(),
-    children: 'nodes',
-  },
-  Switch: {
-    props: styled
-      .extend({ state: z.string().min(1).max(64), label: z.string().max(120).optional() })
-      .strict(),
-    children: 'none',
-  },
-  Slider: {
-    props: styled
-      .extend({
-        state: z.string().min(1).max(64),
-        min: z.number().optional(),
-        max: z.number().optional(),
-        step: z.number().positive().optional(),
-        label: z.string().max(120).optional(),
-      })
-      .strict(),
-    children: 'none',
-  },
-  Tabs: {
-    props: styled
-      .extend({
-        labels: z.array(z.string().min(1).max(60)).min(1).max(12),
-        state: z.string().max(64).optional(),
-      })
-      .strict(),
-    children: 'nodes',
-  },
-  Tab: { props: styled.strict(), children: 'nodes' },
-  Accordion: { props: styled.strict(), children: 'nodes' },
-  AccordionItem: {
-    props: styled.extend({ title: z.string().min(1).max(160) }).strict(),
-    children: 'nodes',
-  },
-  Dialog: {
-    props: styled
-      .extend({ trigger: z.string().min(1).max(80), title: z.string().max(160).optional() })
-      .strict(),
-    children: 'nodes',
-  },
-  Tooltip: {
-    props: styled.extend({ label: z.string().min(1).max(200) }).strict(),
-    children: 'nodes',
-  },
-  Badge: {
-    props: styled
-      .extend({ tone: z.enum(['default', 'outline', 'muted', 'destructive']).default('default') })
-      .strict(),
-    children: 'text',
-  },
-  Avatar: { props: styled.extend({ label: z.string().min(1).max(80) }).strict(), children: 'none' },
-  Progress: {
-    props: styled
-      .extend({ value: z.number().min(0), max: z.number().positive().optional() })
-      .strict(),
-    children: 'none',
-  },
-  Skeleton: { props: styled.strict(), children: 'none' },
-  Kbd: { props: styled.strict(), children: 'text' },
-  Box: { props: styled.strict(), children: 'nodes' },
-  Span: { props: styled.strict(), children: 'nodes' },
-  Hero: {
-    props: styled
-      .extend({
         title: z.string().min(1).max(200),
-        subtitle: z.string().max(500).optional(),
-        align: z.enum(['left', 'center']).default('left'),
-        size: z.enum(['md', 'lg']).default('md'),
-      })
-      .strict(),
-    children: 'none',
-  },
-  Tape: {
-    props: styled.extend({ color: tapeColorSchema.optional() }).strict(),
-    children: 'text',
-  },
-  Stamp: {
-    props: styled
-      .extend({
-        label: z.string().min(1).max(8),
-        tone: z.enum(['accent', 'ink']).default('accent'),
-      })
-      .strict(),
-    children: 'none',
-  },
-  Chip: {
-    props: styled.extend({ color: tapeColorSchema.optional() }).strict(),
-    children: 'text',
-  },
-  Stat: {
-    props: styled
-      .extend({
-        value: z.string().min(1).max(32),
-        label: z.string().min(1).max(80),
-        hint: z.string().max(80).optional(),
-      })
-      .strict(),
-    children: 'none',
-  },
-  Card: {
-    props: styled
-      .extend({ title: z.string().max(120).optional(), accent: tapeColorSchema.optional() })
-      .strict(),
-    children: 'nodes',
-  },
-  Timeline: { props: styled.strict(), children: 'nodes' },
-  Step: {
-    props: styled
-      .extend({
-        marker: z.string().min(1).max(8),
-        title: z.string().max(120).optional(),
-        color: tapeColorSchema.optional(),
+        icon: z.enum(SHEET_ICONS).optional(),
+        tags: z.array(z.string().min(1).max(64)).max(32).optional(),
+        feel: feelSchema.optional(),
+        accent: toneSchema.exclude(['neutral']).optional(),
+        theme: themeIdSchema.optional(),
+        state: sheetStateSchema.optional(),
+        visibility: z.enum(['private', 'shared', 'public']).optional(),
+        wsx: z.literal('1').optional(),
       })
       .strict(),
     children: 'nodes',
+    hints: {
+      class: 'the Sheet owns measure and padding — pick a feel',
+      mood: 'light/dark is the reader’s — never pinned by a page',
+      preset: 'use theme',
+    },
   },
-  // Headings take inline nodes: styling one word inside a heading is basic
-  // typographic design, and a <Span> is as inert as the text beside it.
-  H1: { props: styled.strict(), children: 'nodes' },
-  H2: { props: styled.strict(), children: 'nodes' },
-  H3: { props: styled.strict(), children: 'nodes' },
-  P: { props: styled.strict(), children: 'nodes' },
-  Quote: { props: styled.strict(), children: 'nodes' },
-  Callout: {
-    props: styled
-      .extend({ tone: z.enum(['info', 'warning', 'success', 'danger']).default('info') })
-      .strict(),
+  Section: p({ title: z.string().max(120).optional(), gap: gapSchema.optional() }, 'nodes'),
+  Row: p(
+    {
+      gap: gapSchema.optional(),
+      align: z.enum(['start', 'center', 'end', 'baseline', 'stretch']).optional(),
+    },
+    'nodes',
+  ),
+  Stack: p(
+    { gap: gapSchema.optional(), align: z.enum(['start', 'center', 'end', 'stretch']).optional() },
+    'nodes',
+  ),
+  Grid: p({ gap: gapSchema.optional() }, 'nodes'),
+  Divider: p({}, 'none'),
+}
+
+const text: Record<string, ComponentSpec> = {
+  Title: p({ level: z.union([z.literal(1), z.literal(2), z.literal(3)]).optional() }, 'nodes'),
+  Text: p({ lead: z.boolean().optional() }, 'nodes'),
+  List: p({ marker: z.enum(['bullet', 'number', 'check']).optional() }, 'nodes'),
+  Item: p({ done: z.boolean().optional() }, 'nodes', { within: ['List'] }),
+  Quote: p({}, 'nodes'),
+  Code: p({ lang: z.string().max(32).optional() }, 'text'),
+  Pair: p({ term: z.string().min(1).max(120) }, 'nodes'),
+  Note: p({}, 'nodes'),
+  Source: p({}, 'nodes'),
+  Money: p(
+    {
+      value: z.number().optional(),
+      expr: exprSchema.optional(),
+      currency: z.string().regex(/^[A-Z]{3}$/),
+    },
+    'none',
+  ),
+  Mark: p({}, 'text'),
+  Kbd: p({}, 'text'),
+  Ref: p({ sheet: z.string().min(1) }, 'text'),
+  Tag: p({}, 'text'),
+}
+
+const surface: Record<string, ComponentSpec> = {
+  Card: p({ title: z.string().max(120).optional() }, 'nodes'),
+  Callout: p({ title: z.string().max(120).optional() }, 'nodes'),
+  Hero: p(
+    {
+      title: z.string().min(1).max(200),
+      subtitle: z.string().max(500).optional(),
+      align: z.enum(['left', 'center']).optional(),
+    },
+    'none',
+  ),
+  Figure: p(
+    {
+      src: z.url({ protocol: /^https$/ }),
+      alt: z.string().min(1).max(300),
+      caption: z.string().max(300).optional(),
+      ratio: z.enum(['16:9', '4:3', '3:2', '1:1']).optional(),
+    },
+    'none',
+  ),
+}
+
+const dataOut: Record<string, ComponentSpec> = {
+  Repeat: p(
+    { bind: querySchema, as: z.string().max(32).optional(), empty: z.string().max(160).optional() },
+    'nodes',
+    { noNest: true },
+  ),
+  Table: p(
+    {
+      bind: querySchema,
+      columns: z.array(columnName).max(16).optional(),
+      empty: z.string().max(160).optional(),
+    },
+    'none',
+  ),
+  Stat: p(
+    {
+      value: z.union([z.string().max(32), z.number()]).optional(),
+      expr: exprSchema.optional(),
+      label: z.string().min(1).max(80),
+      hint: z.string().max(80).optional(),
+      trend: z.enum(['up', 'down', 'flat']).optional(),
+    },
+    'none',
+  ),
+  Chart: p(
+    {
+      bind: querySchema,
+      kind: z.enum(['bar', 'line', 'area', 'donut']),
+      label: columnName.optional(),
+      value: columnName.optional(),
+      empty: z.string().max(160).optional(),
+    },
+    'none',
+  ),
+  Timeline: p({}, 'nodes'),
+  Step: p({ marker: z.string().min(1).max(8), title: z.string().max(120).optional() }, 'nodes', {
+    within: ['Timeline'],
+  }),
+  Progress: p(
+    {
+      value: z.number().min(0).max(1).optional(),
+      expr: exprSchema.optional(),
+      label: z.string().max(80).optional(),
+    },
+    'none',
+  ),
+  Badge: p({ expr: exprSchema.optional() }, 'text'),
+  Avatar: p({ label: z.string().min(1).max(80) }, 'none'),
+}
+
+const dataIn: Record<string, ComponentSpec> = {
+  Field: p(
+    {
+      field: columnName,
+      kind: z.enum(['text', 'number', 'date', 'select', 'boolean']),
+      label: z.string().max(120).optional(),
+      help: z.string().max(200).optional(),
+      table: z.string().min(1).max(64).optional(),
+      row: rowRef.optional(),
+    },
+    'none',
+  ),
+  Board: p(
+    {
+      bind: querySchema,
+      groupBy: columnName,
+      title: columnName.optional(),
+      onAdd: actionRefSchema.optional(),
+      empty: z.string().max(160).optional(),
+    },
+    'none',
+    { hints: { onMove: 'drag lands with table.reorder — not in this registry yet' } },
+  ),
+  Button: p({ action: actionRefSchema }, 'text'),
+  Task: p(
+    { row: rowRef.optional(), field: columnName.optional(), done: z.boolean().optional() },
+    'text',
+  ),
+  Switch: p({ state: stateKey, label: z.string().max(120).optional() }, 'none'),
+  Slider: p(
+    {
+      state: stateKey,
+      min: z.number().optional(),
+      max: z.number().optional(),
+      step: z.number().positive().optional(),
+      label: z.string().max(120).optional(),
+    },
+    'none',
+  ),
+}
+
+const flow: Record<string, ComponentSpec> = {
+  Show: {
+    props: z.object({ expr: exprSchema }).strict(),
     children: 'nodes',
+    hints: { when: 'use expr', equals: 'use expr', not: 'use expr' },
   },
-  Code: {
-    props: styled.extend({ lang: z.string().max(32).optional() }).strict(),
-    children: 'text',
-  },
-  Divider: { props: styled.strict(), children: 'none' },
-  Img: {
-    props: styled
-      .extend({ src: z.url({ protocol: /^https$/ }), alt: z.string().max(300).optional() })
-      .strict(),
-    children: 'none',
-  },
-  Ref: { props: styled.extend({ sheet: z.string().min(1) }).strict(), children: 'text' },
-  Tag: { props: styled.strict(), children: 'text' },
-  TaskList: { props: styled.extend({ bind: querySchema.optional() }).strict(), children: 'nodes' },
-  Task: {
-    props: styled
-      .extend({ done: z.boolean().default(false), record: z.string().optional() })
-      .strict(),
-    children: 'text',
-  },
-  Table: {
-    props: styled
-      .extend({ bind: querySchema, columns: z.array(z.string().min(1)).max(16).optional() })
-      .strict(),
-    children: 'none',
-  },
-  Board: {
-    props: styled.extend({ bind: querySchema, groupBy: z.string().min(1) }).strict(),
-    children: 'none',
-  },
-  Toggle: {
-    props: styled.extend({ label: z.string().min(1).max(200) }).strict(),
-    children: 'nodes',
-  },
-  Columns: { props: styled.strict(), children: 'nodes' },
-  Column: { props: styled.strict(), children: 'nodes' },
-  Button: { props: styled.extend({ action: actionRefSchema }).strict(), children: 'text' },
-  Fetch: {
-    props: styled
-      .extend({ url: z.url({ protocol: /^https$/ }), as: z.enum(['text', 'json']).default('text') })
+  Tabs: p(
+    { labels: z.array(z.string().min(1).max(60)).min(1).max(12), state: stateKey.optional() },
+    'nodes',
+  ),
+  Tab: p({}, 'nodes', { within: ['Tabs'] }),
+  Reveal: p({ label: z.string().min(1).max(120), state: stateKey.optional() }, 'nodes'),
+}
+
+const kit: Record<string, ComponentSpec> = {
+  Tape: p({}, 'text'),
+  Stamp: p({ label: z.string().min(1).max(8) }, 'none'),
+  Chip: p({}, 'text'),
+  Mascot: p(
+    {
+      mood: z.enum(['happy', 'sleep', 'curious', 'sad', 'dizzy', 'wink']).optional(),
+      size: sizeSchema.optional(),
+    },
+    'none',
+    { unique: true },
+  ),
+  Missing: {
+    props: z
+      .object({ kind: z.string().min(1).max(40), reason: z.string().min(1).max(200) })
       .strict(),
     children: 'none',
   },
 }
 
-export type PaperComponentName = keyof typeof paperRegistry
+export const paperRegistry: WsxRegistry = {
+  components: { ...frame, ...text, ...surface, ...dataOut, ...dataIn, ...flow, ...kit },
+  hints: STYLE_PROP_HINTS,
+  budget: { nodes: 400, binds: 8, exprs: 24 },
+}
+
+export const PRIMITIVE_GROUPS = {
+  frame: Object.keys(frame),
+  text: Object.keys(text),
+  surface: Object.keys(surface),
+  dataOut: Object.keys(dataOut),
+  dataIn: Object.keys(dataIn),
+  flow: Object.keys(flow),
+  kit: Object.keys(kit),
+} as const
+
+export type PaperComponentName = keyof typeof paperRegistry.components

@@ -1,24 +1,43 @@
 export {
-  Accordion,
-  AccordionItem,
   Avatar,
   Badge,
-  Dialog,
-  Kbd,
+  Chart,
   Progress,
-  Show,
-  Skeleton,
-  Slider,
-  Switch,
-  Tab,
-  Tabs,
-  Tooltip,
-} from './components/controls'
-export { Board, Table, Task, TaskList } from './components/data'
-export { Card, Chip, Hero, Stamp, Stat, Step, Tape, Timeline } from './components/display'
-export { Button, Column, Columns, Fetch, Img, Ref, Toggle } from './components/interactive'
-export { SHEET_PRESETS, type SheetPreset } from './components/themes'
-export { Callout, Code, Divider, H1, H2, H3, P, Quote, Tag } from './components/typography'
-export { type ActionRef, type PaperHost, PaperProvider, usePaperHost } from './provider'
-export { SheetStateProvider, type SheetStateValue, useSheetState } from './state'
+  Repeat,
+  Stat,
+  Step,
+  Table,
+  Timeline,
+} from './components/data'
+export { Reveal, Show, Tab, Tabs } from './components/flow'
+export { Divider, Grid, Row, Section, SheetFrame, Stack } from './components/frame'
+export { Board, Button, Field, Slider, Switch, Task } from './components/input'
+export { Chip, Mascot, Missing, Stamp, Tape } from './components/kit'
+export { Callout, Card, Figure, Hero } from './components/surface'
+export {
+  Code,
+  Item,
+  Kbd,
+  List,
+  Mark,
+  Money,
+  Note,
+  Pair,
+  Quote,
+  Ref,
+  Source,
+  Tag,
+  Text,
+  Title,
+} from './components/text'
+export { DataProvider, useData } from './data'
+export type { ActionRef, Row as PaperRow } from './lib/types'
+export { type PaperHost, PaperProvider, usePaperHost } from './provider'
+export {
+  RowProvider,
+  SheetStateProvider,
+  type SheetStateValue,
+  useRow,
+  useSheetState,
+} from './state'
 export { WsxView } from './wsx-view'
