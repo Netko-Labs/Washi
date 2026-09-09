@@ -12,7 +12,9 @@
   user-select: text;
 }
 .wsx-page {
+  width: 100%;
   max-width: var(--measure);
+  min-width: min(100%, 320px);
   margin: 0 auto;
   padding: var(--pad);
 }

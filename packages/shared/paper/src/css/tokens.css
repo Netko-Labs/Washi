@@ -197,10 +197,10 @@
   --gap: var(--gap-loose);
 }
 
-/* feel reproportions every primitive at once */
+/* feel reproportions every primitive at once — measures are the design's page frames */
 .wsx,
 .wsx[data-feel="note"] {
-  --measure: 68ch;
+  --measure: 760px;
   --pad: 40px 32px;
   --rhythm: 18px;
   --body: 15px;
@@ -211,7 +211,7 @@
   --card-border: 1.5px;
 }
 .wsx[data-feel="editorial"] {
-  --measure: 60ch;
+  --measure: 700px;
   --pad: 56px 40px;
   --rhythm: 22px;
   --body: 16px;
@@ -222,7 +222,7 @@
   --card-border: 0px;
 }
 .wsx[data-feel="board"] {
-  --measure: 100%;
+  --measure: 1180px;
   --pad: 26px;
   --rhythm: 16px;
   --body: 14px;
@@ -233,7 +233,7 @@
   --card-border: 1.5px;
 }
 .wsx[data-feel="deck"] {
-  --measure: 80ch;
+  --measure: 960px;
   --pad: 56px 48px;
   --rhythm: 32px;
   --body: 17px;
