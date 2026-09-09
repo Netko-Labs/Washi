@@ -32,11 +32,7 @@ export function Header() {
   const active = sheets.find((sheet) => sheet.id === activeId)
   const mascotState = mascotStateFor(transcript, running, approvals)
   const leaf =
-    view === 'note'
-      ? active
-        ? `${active.icon ?? ''} ${active.title}`.trim()
-        : 'All pages'
-      : (VIEW_LABELS[view] ?? 'Washi')
+    view === 'note' ? (active ? active.title : 'All pages') : (VIEW_LABELS[view] ?? 'Washi')
 
   return (
     <header className="flex h-12 shrink-0 items-center gap-2 border-border border-b px-4">

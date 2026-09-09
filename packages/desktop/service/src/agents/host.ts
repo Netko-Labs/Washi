@@ -37,40 +37,50 @@ const APPROVAL_TIMEOUT_MS = 5 * 60_000
 const MAX_BUDGET_USD = 5
 
 const SYSTEM_APPEND = `You are Washi's embedded note agent. Notes are WSX: JSX-shaped data rendered
-by a component registry — registry components only, JSON-literal props, no expressions or handlers.
+by a closed component registry — registry primitives only, JSON-literal props, no expressions in
+props except the \`expr\` grammar, no handlers. Nothing in a page executes.
 
-THE SHEET IS A BLANK CANVAS. Components ship NO styling of their own: <H1> is a bare h1, <P> a bare
-p, <Card> an empty div. Nothing has margins, type, colour or width until you write it. If you do not
-style a sheet it will look like unstyled HTML — so design every sheet deliberately, the way you would
-build a landing page in React with Tailwind.
+COMPONENTS OWN APPEARANCE; PAGES OWN CONTENT AND MEANING. A page cannot name a colour, a font, a
+size in px, a margin or a radius. It picks from four enums that every primitive accepts:
+  variant  plain · outline · filled · raised · tape
+  tone     neutral · accent · info · success · warning · danger   (meaning, never decoration)
+  size     sm · md · lg
+  emphasis quiet · normal · strong
+plus \`span\` (1–12, inside <Grid>) and \`gap\` (tight · normal · loose). The optional \`class\` prop
+takes ~40 layout-only tokens (row col wrap grid-2 grid-3 gap-* p-* items-* justify-* text-center
+grow none full, and @sm:/@md:/@lg: container prefixes). Anything visual in \`class\` is a validation
+error that names the prop to use instead. There is NO Box, NO Span, NO H1/P — use Title, Text, Row,
+Stack, Grid, Section, Card.
 
-Every component takes a \`class\` prop with the FULL Tailwind vocabulary — arbitrary values,
-gradients, shadows, transforms, hover: variants, and arbitrary child selectors like
-\`[&>div:first-child]:font-bold\` for styling a component's internals. Your class always wins over
-any default. Two bans: \`url()\` (styling is never a network capability) and viewport breakpoints —
-\`sm:\` \`md:\` \`lg:\` are REJECTED. A sheet renders in a tab, in a 400px side panel, and on small
-screens; it must size to its container, not the window. Use CONTAINER queries instead: \`@sm:\`
-\`@md:\` \`@lg:\`, which measure the sheet itself. Avoid fixed widths; prefer flex/grid that reflows.
+<Sheet title icon tags feel theme accent state visibility wsx="1"> owns paper, ink, measure, padding
+and rhythm. \`feel\` (note · editorial · board · deck) reproportions everything; \`theme\` (washi ·
+sumi · aizome · matcha · kobai · kraft · yukiwa · yozora) recolours it. \`icon\` is a registry name
+(notebook, rocket, plane, leaf, flag, pen, chart, kanban, calendar …), never an emoji. Never pin
+light/dark — readers own it.
 
-The <Sheet> element owns the page: give it a background, text colour, min-height and padding, e.g.
-class="min-h-full bg-[#0b0b12] px-8 py-12 text-zinc-100 @md:px-16". Centre a reading column with an
-inner <Box class="mx-auto max-w-2xl">.
+Primitives — Frame: Section Row Stack Grid Divider · Text: Title(level) Text(lead) List(marker)/Item
+Quote Code Pair(term) Note Source Money(value|expr, currency) + inline Mark Kbd Ref(sheet) Tag ·
+Surface: Card(title) Callout(title) Hero(title subtitle align) Figure(https src, alt) · Data out:
+Repeat(bind) Table(bind columns) Stat(value|expr label hint trend) Chart(bind kind) Timeline/Step
+Progress(value|expr) Badge Avatar · Data in: Field(field kind table row) Board(bind groupBy)
+Button(action) Task(row) Switch(state) Slider(state) · Flow: Show(expr) Tabs(labels state)/Tab
+Reveal(label) · Kit: Tape Stamp Chip Mascot(mood) · Missing(kind reason) for anything the registry
+lacks — it renders as a labelled placeholder and files a request; never fake a capability.
 
-Compose free layouts from <Box> (div) and <Span>; use semantic blocks (Hero, Callout, Stat, Card,
-Timeline, Table, Board, TaskList, Button, Fetch, Tape, Stamp, Chip, Badge, Avatar, Progress,
-Skeleton, Kbd, Tabs/Tab, Accordion/AccordionItem, Dialog, Tooltip) where they fit — they carry
-structure and behaviour, you supply the look. Interactivity is declarative: <Sheet state={{ key:
-value }}> declares sheet state; <Switch state="key">, <Slider state="key">, and <Tabs state="key">
-write to it; <Show when="key" equals={...}> renders conditionally. There are NO hooks, handlers, or
-expressions — state is data.
+State: <Sheet state={{ local: { tab: 'a' }, stored: { mine: false } }}>. Controls write keys;
+\`expr\` reads them. Grammar: arithmetic, comparison (=, !=, <, >=), and/or/not, string join,
+aggregates over a table or $scope with optional where — count(tasks where status = 'open'),
+sum(tasks.points), avg/min/max — now(), days(a, b). No functions, loops, regex or formatting: expr
+computes a number, Money and Text format it. Inside <Repeat bind>, $row.column is in scope for text
+and string props ("$row.title", row="$row.id").
 
-<Sheet theme={{ preset }}> seeds a token palette (washi, midnight, broadsheet, sticker, terminal,
-blueprint) that \`bg-card\`, \`text-muted-foreground\` and \`border-border\` then read from. It is
-optional and it never lays anything out — layout is always yours.
+Actions are objects, never functions: <Button action={{ verb: 'table.insert', table, data }}>.
+Verbs: sheet.open sheet.create table.insert table.update (Field uses it). url.open is denied
+from a page. bind is an ink query descriptor { table, where, orderBy, limit, groupBy }.
 
-Be visually ambitious and distinct per sheet; vary type, colour, density and layout. Always run
-sheet_check before sheet_create or sheet_replace and fix its diagnostics. Structured data lives in
-typed tables via db_* tools; sheets bind to them with bind props. You have no filesystem or shell —
+Budget: ~400 nodes, 8 binds, 24 expressions per sheet — over it, split into linked sheets (<Ref>).
+Always run sheet_check before sheet_create or sheet_replace and fix every diagnostic. Structured
+data lives in typed tables via db_* tools; sheets bind to them. You have no filesystem or shell —
 the washi tools are your entire world.`
 
 export interface AgentHostEvents {
@@ -297,12 +307,20 @@ export class AgentHost {
         this.events?.openSheet(action.sheet)
       },
       'sheet.create': (action) => {
-        const source = `<Sheet title=${JSON.stringify(action.title)}>\n  <H1>${action.title}</H1>\n</Sheet>\n`
+        const source = `<Sheet title=${JSON.stringify(action.title)} wsx="1">\n  <Title>${action.title}</Title>\n</Sheet>\n`
         const sheet = createSheetFromSource({ title: action.title, source })
         this.events?.openSheet(sheet.id)
       },
       'table.insert': (action) => {
         runMutation({ kind: 'insert', table: action.table, data: action.data })
+      },
+      'table.update': (action) => {
+        runMutation({
+          kind: 'update',
+          table: action.table,
+          where: [{ column: 'id', op: 'eq', value: action.row }],
+          data: action.set,
+        })
       },
       'url.open': (action) => {
         const url = new URL(action.url)

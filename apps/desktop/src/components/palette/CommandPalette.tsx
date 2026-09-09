@@ -1,6 +1,7 @@
-import { IconFileText, IconSearch, IconSparkles } from '@tabler/icons-react'
+import { IconSearch, IconSparkles } from '@tabler/icons-react'
 import { Command } from 'cmdk'
 import { useEffect } from 'react'
+import { SheetIcon } from '@/components/shared/sheet-icon'
 import { useSheetsStore } from '@/stores/sheets/sheets-store'
 
 /** ⌘K palette per Washi.dc.html: scrim, 560px panel at 14vh, pages + agent actions. */
@@ -74,11 +75,8 @@ export function CommandPalette() {
                 }}
                 className="flex h-9 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-[13px] data-[selected=true]:bg-accent"
               >
-                <IconFileText className="size-4 text-muted-foreground" />
-                <span className="truncate">
-                  {sheet.icon ? `${sheet.icon} ` : ''}
-                  {sheet.title}
-                </span>
+                <SheetIcon name={sheet.icon} className="size-4 text-muted-foreground" />
+                <span className="truncate">{sheet.title}</span>
               </Command.Item>
             ))}
           </Command.Group>

@@ -15,8 +15,6 @@ export const paperHost: PaperHost = {
     await api.runAction({ action })
   },
 
-  runFetch: (url) => api.fetchUrl({ url }),
-
   resolveSheet: async (id) => {
     const sheet = await api.getSheet({ id })
     return sheet ? { title: sheet.title, icon: sheet.icon } : null
@@ -30,4 +28,6 @@ export const paperHost: PaperHost = {
   toggleTask: async (recordId, done) => {
     await api.toggleTask({ recordId, done })
   },
+
+  locale: navigator.language,
 }

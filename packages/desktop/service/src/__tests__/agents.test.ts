@@ -150,10 +150,10 @@ describe('transcript persistence', () => {
 describe('wsx guardrails stay closed for agents', () => {
   test('sheet_check catches executable smuggling; valid sheets save', () => {
     expect(checkSource('<Sheet title={window.location} />').ok).toBe(false)
-    expect(checkSource('<Sheet title="ok"><P>fine</P></Sheet>').ok).toBe(true)
+    expect(checkSource('<Sheet title="ok"><Text>fine</Text></Sheet>').ok).toBe(true)
     const sheet = createSheetFromSource({
       title: 'ok',
-      source: '<Sheet title="ok"><P>fine</P></Sheet>',
+      source: '<Sheet title="ok"><Text>fine</Text></Sheet>',
     })
     expect(sheet.id).toBeTruthy()
   })

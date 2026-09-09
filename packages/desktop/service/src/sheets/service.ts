@@ -3,26 +3,33 @@ import { createSheet, deleteSheet, getSheet, updateSheet } from '@washi/desktop-
 import { paperRegistry } from '@washi/paper/registry'
 import {
   type Diagnostic,
+  extractMissing,
   extractRefs,
   extractText,
+  hasErrors,
   parse,
   validate,
+  type WsxMissing,
   WsxParseError,
 } from '@washi/wsx'
 
 export interface WsxCheck {
   ok: boolean
   diagnostics: Diagnostic[]
+  /** Registry requests the sheet carries as <Missing kind reason />. */
+  missing: WsxMissing[]
 }
 
-/** Parse + registry-validate WSX source. The agent-facing `sheet_check` runs this too. */
+/** Parse + registry-validate WSX source. Warnings (the complexity budget) never block a save. */
 export function checkSource(source: string): WsxCheck {
   try {
     const root = parse(source)
     const diagnostics = validate(root, paperRegistry)
-    return { ok: diagnostics.length === 0, diagnostics }
+    return { ok: !hasErrors(diagnostics), diagnostics, missing: extractMissing(root) }
   } catch (error) {
-    if (error instanceof WsxParseError) return { ok: false, diagnostics: error.diagnostics }
+    if (error instanceof WsxParseError) {
+      return { ok: false, diagnostics: error.diagnostics, missing: [] }
+    }
     throw error
   }
 }
