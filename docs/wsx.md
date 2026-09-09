@@ -1,35 +1,36 @@
 # WSX — the page format
 
-The format an agent writes and Washi renders. This is the complete vocabulary: if a design needs
-something that is not here, it needs a **new component**, specified and built — there is no escape
-hatch.
+The format an agent writes and Washi renders. Draft 0.4. This is the complete vocabulary: if a
+design needs something that is not here, it writes `<Missing kind reason />` and the registry hears
+about it — there is no escape hatch.
 
-Generated against the live registry (`@washi/paper`) on 2026-08-20.
+Generated against the live registry (`@washi/paper`) on 2026-09-08.
+
+> **Components own appearance; pages own content and meaning.**
+> A page cannot express a colour, a font size, a margin or a radius. It picks from four enums. That
+> is what makes agent-written pages look consistent without prompting.
 
 ---
 
 ## 1. What a page is
 
-A page is a single JSX-shaped element tree stored as text. It looks like React and is **not React**:
-it is data. It is parsed, schema-validated, and rendered. Nothing in it executes.
+A single JSX-shaped element tree stored as text. It looks like React and is **not React**: it is
+data. Parsed, schema-validated, rendered. Nothing in it executes.
 
 ```jsx
-<Sheet title="Q3 Roadmap" icon="🗺️" class="min-h-full bg-[#0f1115] px-8 py-12 text-zinc-100 @md:px-16">
-  <Box class="mx-auto max-w-2xl">
-    <Span class="font-mono text-[11px] uppercase tracking-[0.3em] text-emerald-400">planning</Span>
-    <H1 class="mt-3 text-5xl font-bold tracking-tight">Q3 Roadmap<Span class="text-emerald-400">.</Span></H1>
-    <P class="mt-4 text-zinc-400 leading-relaxed">Dates aspirational.</P>
-
-    <Table
-      bind={{ table: 'tasks', where: [{ column: 'quarter', op: 'eq', value: 'q3' }] }}
-      columns={['title', 'status', 'owner']}
-      class="mt-8 rounded-xl border border-white/10 [&_th]:px-4 [&_th]:py-2 [&_th]:text-left [&_td]:px-4 [&_td]:py-2"
-    />
-
-    <Button action={{ verb: 'table.insert', table: 'tasks' }} class="mt-6 rounded-lg bg-emerald-500 px-4 py-2 font-medium text-black">
-      Add task
-    </Button>
-  </Box>
+<Sheet title="Sprint 12" icon="kanban" feel="board" theme="aizome" wsx="1">
+  <Hero title="Sprint 12" subtitle="Two weeks, one demo." size="md" />
+  <Grid>
+    <Card span={4}><Stat label="open" expr="count(tasks where status = 'open')" /></Card>
+    <Card span={4}><Stat label="points" expr="sum(tasks.points)" trend="up" /></Card>
+    <Card span={4}><Stat label="done" expr="count(tasks where done = true) / count(tasks) * 100" /></Card>
+  </Grid>
+  <Section title="By status">
+    <Board bind={{ table: 'tasks' }} groupBy="status" />
+  </Section>
+  <Button action={{ verb: 'table.insert', table: 'tasks', data: { title: 'New task', status: 'todo' } }}>
+    Add task
+  </Button>
 </Sheet>
 ```
 
@@ -42,199 +43,221 @@ Hard rules. Violating any of them is a validation error, not a warning.
 | Rule | Detail |
 |---|---|
 | One root | Exactly one `<Sheet>`. No fragments |
-| Registry components only | Capitalised names from §5. No `<div>`, `<span>`, or any HTML tag |
+| Registry primitives only | Capitalised names from §5. No `<div>`, no `<Box>`, no `<Span>`, no `<H1>` |
 | Props are JSON literals | Strings, numbers, booleans, `null`, arrays, objects. `{-1}` is allowed |
-| No expressions | No arithmetic, no template strings, no identifiers, no function calls, no spreads |
-| No handlers | There is no `onClick`. Side effects are `action` props (§8) |
+| No expressions in props | Except the `expr` prop, which takes the closed grammar in §7 as a string |
+| No handlers | There is no `onClick`. Side effects are `action` objects (§9) |
 | Children | Elements, text, or a `{literal}` that renders as text |
-
-For layout, `<Box>` is the div and `<Span>` is the span. Everything else carries meaning.
 
 ---
 
-## 3. The Sheet element
+## 3. The Sheet
 
 | Prop | Type | Notes |
 |---|---|---|
-| `title` | string, 1–200 | Required. Shown in the sidebar, tabs, breadcrumb |
-| `icon` | string, ≤16 | Optional emoji |
-| `tags` | string[], ≤32 | Optional |
-| `class` | string | The page's entire appearance (§4) |
-| `theme` | object | Optional palette seed (§9) |
-| `state` | object | Declared state keys (§6) |
+| `title` | string, 1–200 | Required. Sidebar, tabs, breadcrumb |
+| `icon` | registry name | `notebook book bookmark calendar chart checklist clock compass flag flask heart home inbox kanban leaf map money music pen plane rocket sparkles star sun tag target tools user`. **Never an emoji** |
+| `tags` | string[] ≤32 | |
+| `feel` | `note` `editorial` `board` `deck` | Reproportions every primitive at once: measure, density, title scale, card borders. **The only way to a materially different look** |
+| `theme` | `washi` `sumi` `aizome` `matcha` `kobai` `kraft` `yukiwa` `yozora` | Eight designed pairs. 8 tokens × 2 modes each, nothing else |
+| `accent` | `accent` `info` `success` `warning` `danger` | Which tone the washi kit (Tape, Stamp, Chip) takes |
+| `state` | `{ local?, stored? }` | Declared state keys (§6) |
+| `visibility` | `private` `shared` `public` | |
+| `wsx` | `"1"` | Format version. Always write it |
 
-**The Sheet owns the page.** App chrome draws nothing around it — no card, no margin, no background,
-no width. A page that sets no `class` renders as unstyled HTML on the app's background. Give it at
-minimum a background, text colour, min-height and padding:
-
-```jsx
-<Sheet title="…" class="min-h-full bg-background px-8 py-12 text-foreground @md:px-16">
-```
-
-Centre a reading column with an inner `<Box class="mx-auto max-w-2xl">`.
+The Sheet owns paper, ink, measure, padding and rhythm. It has **no `class`** and can never pin
+light/dark — readers own the mode.
 
 ---
 
-## 4. Styling contract
+## 4. The styling surface
 
-**Every component takes `class`** (the one exception is `<Show>`, which is logic). The full Tailwind
-vocabulary is available — arbitrary values, gradients, shadows, transforms, `hover:`/`group-hover:`
-variants, and arbitrary child selectors.
+Four enums. Every primitive accepts all four; CSS decides what each means per primitive.
 
-**The class always wins.** Component defaults and the page's class are merged so exactly one utility
-survives per property, and it is the page's. `<H1 class="mt-0">` beats any built-in margin.
+| Prop | Values | Effect |
+|---|---|---|
+| `variant` | `plain` `outline` `filled` `raised` `tape` | Surface and border treatment. Never padding or radius |
+| `tone` | `neutral` `accent` `info` `success` `warning` `danger` | Meaning. Each is a pre-checked fg/bg/border triplet — contrast cannot fail |
+| `size` | `sm` `md` `lg` | Type and space scale together |
+| `emphasis` | `quiet` `normal` `strong` | Hierarchy within the current tone |
 
-### Components ship no cosmetics
+Two layout tokens: `span` (1–12, inside `Grid`) and `gap` (`tight` `normal` `loose`, on `Section`
+`Row` `Stack` `Grid`).
 
-`<H1>` is a bare `h1`. `<Card>` is an empty `div`. `<Stat>` is three stacked `div`s with no type,
-colour, spacing or border. Components carry **structure and behaviour only** — the parts a page
-cannot express on its own. Anything visual is the page's job.
+**Locked — not addressable by a page:** vertical rhythm (the parent's), measure and page frame (the
+Sheet's), the type scale (six roles, selected by `Title level` / `Text size`), colour, radius,
+shadow, borders (reachable only through `tone` / `variant` / `theme`). **There is no hex in a page,
+ever.**
 
-### Styling a component's internals
+### `class`
 
-Because components are bare, style their parts with child selectors:
+Optional, layout-only, ~40 tokens:
 
-```jsx
-<Stat value="21" label="story points" hint="sum(points)"
-  class="rounded-2xl border border-white/10 p-5
-         [&>div:first-child]:text-4xl [&>div:first-child]:font-bold
-         [&>div:nth-child(2)]:text-xs [&>div:nth-child(2)]:uppercase
-         [&>div:last-child]:font-mono [&>div:last-child]:text-[10px]" />
-```
-
-§5 lists what each component renders so these selectors are predictable.
-
-### Two bans
-
-| Banned | Why |
+| Group | Tokens |
 |---|---|
-| `url()`, `image-set()`, `@import` | Styling must never become a network capability |
-| `sm:` `md:` `lg:` `xl:` `2xl:` | A page renders in a tab, in a 400px agent panel, and on small screens — two of those are not the window |
+| flow | `row col wrap nowrap grid-2 grid-3 grid-4` |
+| spacing | `gap-0 gap-tight gap-normal gap-loose p-0 p-1 p-2 p-3 p-4 p-6 p-8` |
+| alignment | `items-start items-center items-end items-stretch items-baseline justify-start justify-center justify-end justify-between text-left text-center text-right` |
+| sizing | `grow none full` |
+| container | `@sm:row @sm:col @sm:grid-2 @sm:grid-3 @md:row @md:col @md:grid-2 @md:grid-3 @md:grid-4 @lg:row @lg:grid-3 @lg:grid-4` |
 
-**Use container queries instead.** `<Sheet>` is a container, so `@sm:` `@md:` `@lg:` measure the
-page itself. Prefer layouts that reflow (`flex-wrap`, `grid` with `auto-fit`, `min-w-*` + `basis-*`)
-over fixed widths.
-
----
-
-## 5. Component reference
-
-`children` is **none** (self-closing), **text** (text only), or **nodes** (elements and text).
-All components accept `class`.
-
-### Layout
-
-| Component | Props | Children | Renders |
-|---|---|---|---|
-| `Box` | — | nodes | `div` |
-| `Span` | — | nodes | `span` |
-| `Columns` | — | nodes | `div` — flex, wraps |
-| `Column` | — | nodes | `div` — flex-1, `basis-64`, wraps under narrow containers |
-| `Divider` | — | none | `hr` |
-
-### Typography
-
-| Component | Props | Children | Renders |
-|---|---|---|---|
-| `H1` `H2` `H3` | — | nodes | `h1`/`h2`/`h3` — inline `Span` allowed for accenting a word |
-| `P` | — | nodes | `p` |
-| `Quote` | — | nodes | `blockquote` |
-| `Code` | `lang?` | text | `pre > code`, wraps, scrolls |
-| `Tag` | — | text | `span` |
-| `Kbd` | — | text | `kbd` |
-
-### Display
-
-| Component | Props | Children | Renders |
-|---|---|---|---|
-| `Hero` | `title`, `subtitle?`, `align?` `left\|center`, `size?` `md\|lg` | none | `header > h1 + p` |
-| `Stat` | `value`, `label`, `hint?` | none | `div > div(value) + div(label) + div(hint)` |
-| `Card` | `title?`, `accent?` | nodes | `div > [accent bar] + div(title) + children` |
-| `Timeline` | — | nodes | `ol` |
-| `Step` | `marker`, `title?`, `color?` | nodes | `li` — grid `[3rem 1fr]`, `span(marker)` + `div > div(title) + div(body)` |
-| `Callout` | `tone?` `info\|warning\|success\|danger` | nodes | `div` with a bordered tone default |
-| `Badge` | `tone?` `default\|outline\|muted\|destructive` | text | `span` |
-| `Avatar` | `label` | none | `span` with derived initials |
-| `Progress` | `value`, `max?` | none | `div > div(fill)` |
-| `Skeleton` | — | none | `div`, pulsing |
-| `Img` | `src` (https only), `alt?` | none | `img` |
-
-### Washi kit
-
-Signature pieces. Opt-in, not the house style.
-
-| Component | Props | Children | Renders |
-|---|---|---|---|
-| `Tape` | `color?` | text | `span` — torn-tape clip-path, striped |
-| `Stamp` | `label` (≤8), `tone?` `accent\|ink` | none | `span` — round, bordered, rotated |
-| `Chip` | `color?` | text | `span > span(dot) + children` |
-
-`color` is one of `pink teal blue mustard violet moss slate`; omitted, they use the sheet accent.
-
-### Interactive
-
-| Component | Props | Children | Renders |
-|---|---|---|---|
-| `Button` | `action` (§8) | text | `button` |
-| `Ref` | `sheet` (id) | text | `button` that opens another page |
-| `Toggle` | `label` | nodes | `details > summary + div` |
-| `Accordion` | — | nodes | `div` |
-| `AccordionItem` | `title` | nodes | `details.group > summary + div` |
-| `Dialog` | `trigger`, `title?` | nodes | `button` + native `dialog` |
-| `Tooltip` | `label` | nodes | `span.group` + `span[role=tooltip]`, shown on hover |
-| `Fetch` | `url` (https only), `as?` `text\|json` | none | `div > div(url) + body`; async, caches last good |
-
-### Data-bound
-
-| Component | Props | Children | Renders |
-|---|---|---|---|
-| `Table` | `bind` (§7), `columns?` | none | `div > table > thead/tbody` |
-| `Board` | `bind`, `groupBy` | none | `div` flex row; per group `div > div(header) + div(card)…` |
-| `TaskList` | `bind?` | nodes | `div` + a `Task` per row |
-| `Task` | `done?`, `record?` | text | `label > input[checkbox] + span`; writes back when `record` is set |
-
-### Logic
-
-| Component | Props | Children | Notes |
-|---|---|---|---|
-| `Show` | `when`, `equals?`, `not?` | nodes | **No `class`** — renders children or nothing |
-| `Switch` | `state`, `label?` | none | Writes a boolean |
-| `Slider` | `state`, `min?`, `max?`, `step?`, `label?` | none | Writes a number |
-| `Tabs` | `labels` (1–12), `state?` | nodes | Buttons carry `data-active`; one `Tab` child per label |
-| `Tab` | — | nodes | One panel |
+Anything else is a validation error that names the prop to use instead: `bg-red-500` → "colour is
+not addressable in class — use tone"; `mt-6` → "rhythm belongs to the parent — use Section, Stack or
+gap"; `md:flex` → "use @sm: @md: @lg: (the page measures itself)". No arbitrary values.
 
 ---
 
-## 6. Interactivity is state, not code
+## 5. Primitives — 46 in seven groups
 
-Declare keys on `<Sheet state={…}>`, write them with controls, read them with `<Show>`.
+`children` is **none** (self-closing), **text** (text only), or **nodes** (elements and text). Every
+primitive accepts the four enums and `class`; the table lists its own props.
+
+### Frame — 6 · owns rhythm
+
+| Primitive | Props | Children | Notes |
+|---|---|---|---|
+| `Sheet` | §3 | nodes | The page |
+| `Section` | `title?` `gap?` | nodes | A band with a label; supplies the rhythm children cannot set |
+| `Row` | `gap?` `align?` `start\|center\|end\|baseline\|stretch` | nodes | Horizontal flow, wraps |
+| `Stack` | `gap?` `align?` | nodes | Vertical flow |
+| `Grid` | `gap?` | nodes | 12-column field; children take `span`. **Always** one column under 400px |
+| `Divider` | — | none | `emphasis="strong"` for a rule in ink |
+
+### Text — 10 block + 4 inline
+
+| Primitive | Props | Children | Notes |
+|---|---|---|---|
+| `Title` | `level?` `1\|2\|3` | nodes | Young Serif at 1–2, Karla bold at 3. Scale owned by `feel` |
+| `Text` | `lead?` | nodes | The paragraph. `emphasis="quiet"` is muted; `lead` is the opener |
+| `List` | `marker?` `bullet\|number\|check` | nodes | Holds `Item`s |
+| `Item` | `done?` | nodes | Only inside `List`. `done` renders the check |
+| `Quote` | — | nodes | Serif, tone rule on the left |
+| `Code` | `lang?` | text | Wraps and scrolls |
+| `Pair` | `term` | nodes | Term / definition — the spec-table workhorse |
+| `Note` | — | nodes | Footnote, auto-numbered in document order |
+| `Source` | — | nodes | Attribution, auto-numbered |
+| `Money` | `value?` `expr?` `currency` (ISO 4217) | none | Symbol, grouping and negative form from the **vault locale at render**. `expr` may compute the number, never build the string |
+| `Mark` | — | text | Accent a phrase |
+| `Kbd` | — | text | |
+| `Ref` | `sheet` | text | Link to a sheet; empty children show its title |
+| `Tag` | — | text | |
+
+### Surface — 4
+
+| Primitive | Props | Children | Notes |
+|---|---|---|---|
+| `Card` | `title?` | nodes | `variant` picks plain / outline / filled / raised / tape |
+| `Callout` | `title?` | nodes | An aside that means something. Carries an icon per tone — tone is never the only signal |
+| `Hero` | `title` `subtitle?` `align?` `left\|center` | none | Page opener. `size="md"` for a working page, default lg |
+| `Figure` | `src` (**https only**) `alt` `caption?` `ratio?` `16:9\|4:3\|3:2\|1:1` | none | Aspect held so text never jumps |
+
+### Data out — 9 · reads
+
+| Primitive | Props | Children | Notes |
+|---|---|---|---|
+| `Repeat` | `bind` `as?` `empty?` | nodes | Renders children per row with `$row.column` in scope (text and string props). **Cannot recurse** |
+| `Table` | `bind` `columns?` `empty?` | none | |
+| `Stat` | `value?` `expr?` `label` `hint?` `trend?` `up\|down\|flat` | none | |
+| `Chart` | `bind` `kind` `bar\|line\|area\|donut` `label?` `value?` `empty?` | none | Palette from the chart ramp; series colours not settable |
+| `Timeline` | — | nodes | Holds `Step`s |
+| `Step` | `marker` (≤8) `title?` | nodes | Only inside `Timeline` |
+| `Progress` | `value?` (0–1) `expr?` `label?` | none | |
+| `Badge` | `expr?` | text | `expr` replaces the text |
+| `Avatar` | `label` | none | Initials |
+
+Empty, loading and error states ship with every bound primitive, designed once. A page may override
+the empty *sentence* (`empty="…"`) and nothing else.
+
+### Data in — 6 · writes
+
+| Primitive | Props | Children | Notes |
+|---|---|---|---|
+| `Field` | `field` `kind` `text\|number\|date\|select\|boolean` `label?` `help?` `table?` `row?` | none | One primitive over all column types. Writes `table.update` on blur. Inside `Repeat`, `row` defaults to `$row.id` |
+| `Board` | `bind` `groupBy` `title?` `onAdd?` `empty?` | none | Grouped records. Drag lands with `table.reorder` (not yet) |
+| `Button` | `action` | text | |
+| `Task` | `row?` `field?` `done?` | text | Checkbox bound to a row. Inside `Repeat`, `row` defaults to `$row.id` |
+| `Switch` | `state` `label?` | none | Writes a boolean |
+| `Slider` | `state` `min?` `max?` `step?` `label?` | none | Writes a number |
+
+### Flow — 4 · no cosmetics
+
+| Primitive | Props | Children | Notes |
+|---|---|---|---|
+| `Show` | `expr` | nodes | Renders children when the expression is truthy. **No `class`** |
+| `Tabs` | `labels` (1–12) `state?` | nodes | One `Tab` per label |
+| `Tab` | — | nodes | Only inside `Tabs` |
+| `Reveal` | `label` `state?` | nodes | Disclosure |
+
+### Washi kit — 4 + `Missing`
+
+| Primitive | Props | Children | Notes |
+|---|---|---|---|
+| `Tape` | — | text | Torn washi-tape label |
+| `Stamp` | `label` (≤8) | none | Hanko mark |
+| `Chip` | — | text | Dotted status pill |
+| `Mascot` | `mood?` `happy\|sleep\|curious\|sad\|dizzy\|wink` `size?` | none | Washi-chan. **One per page** |
+| `Missing` | `kind` `reason` | none | A capability the registry lacks: renders a labelled placeholder, leaves the page valid, files a registry request |
+
+The kit takes `tone` from the sheet `accent` so a page cannot assemble a rainbow.
+
+### Not in this registry yet
+
+`Matrix` · `Calendar` · `Timer` · `Scene` / `Beat` / `Stepper` · `Filter` / `Facet` / `Search` /
+`Sort` / `Segment`. Write them as `<Missing kind="Matrix" reason="…" />` — the validator says so
+when it meets an unknown name.
+
+---
+
+## 6. State
 
 ```jsx
-<Sheet title="Kit" state={{ view: 'controls', details: false, budget: 40 }} class="…">
-  <Switch state="details" label="Show the fine print" />
-  <Show when="details">
-    <Callout class="…">Appears because a switch flipped a key.</Callout>
-  </Show>
-
-  <Tabs labels={['controls', 'preview']} state="view" class="…">
-    <Tab>…</Tab>
-    <Tab>…</Tab>
-  </Tabs>
-
-  <Show when="view" equals="preview">…</Show>
+<Sheet title="Kit" state={{ local: { tab: 'board' }, stored: { mine: false, budget: 40 } }}>
+  <Switch state="mine" label="Only mine" />
+  <Slider state="budget" min={0} max={100} step={5} label="Budget" />
+  <Show expr="mine = true and budget > 20">…</Show>
+  <Tabs labels={['board', 'list']} state="tab">…</Tabs>
 </Sheet>
 ```
 
-Values are scalars only — string, number, boolean, `null`. `<Show>` compares with `equals` (default
-`true`) and can invert with `not`. There is **no** arithmetic, no derived values, no formulas.
+| Scope | Lifetime | Use |
+|---|---|---|
+| `local` | The tab | Tab selection, open disclosure. Never syncs |
+| `stored` | Persistent per reader | Filters, toggles. *Today behaves as `local` — persistence is a later milestone* |
+| records | Persistent, shared | Table rows, through binds and verbs |
 
-State is per-render and resets when the page is reopened.
+Values are scalars: string, number, boolean, `null`. Controls write keys; `expr` reads them.
 
 ---
 
-## 7. Live data — `bind`
+## 7. Expressions — `expr`
 
-`bind` is a query descriptor against an agent-defined table. Same grammar everywhere.
+A closed grammar, parsed to an AST, validated against declared state and bound columns, evaluated
+by the renderer with a depth cap (24) and a step budget (2000). Source ≤ 512 characters.
+
+**In:** numbers, quoted strings, `true false null` · arithmetic `+ - * /` · comparison
+`= != < <= > >=` · `and or not` · string `+` string · state keys · `$row.column` inside `Repeat` ·
+aggregates `count sum avg min max` over a table or `$scope`, with optional `where` ·
+`now()` · `days(a, b)`.
+
+**Out:** functions, lambdas, loops, recursion, regex, template strings, `%`, ternaries, arrays,
+objects, method calls, property chains. Joining a number or date into a string is refused: *expr
+computes a value, never formats it — use Money / Text.*
+
+```
+<Stat label="remaining" expr="budget - sum(tasks.points)" />
+<Show expr="count(tasks where status = 'open') = 0">…</Show>
+<Progress expr="count(tasks where done = true) / count(tasks)" />
+<Money expr="sum(expenses.amount where paid_by = 'me')" currency="EUR" />
+```
+
+Division by zero is `null`. `now()` is frozen per render pass — two reads in one page always agree.
+Tables an expression aggregates over are fetched once per sheet and again after every verb.
+
+---
+
+## 8. Live data — `bind`
+
+A query descriptor against an agent-defined table. Same grammar everywhere.
 
 ```jsx
 bind={{
@@ -247,85 +270,78 @@ bind={{
 
 | Field | Notes |
 |---|---|
-| `table` | Required. snake_case table name |
+| `table` | Required. snake_case |
 | `where` | ≤16 filters, ANDed. `op`: `eq ne gt gte lt lte contains in` |
-| `orderBy` | `{ column, direction: 'asc' \| 'desc' }` |
+| `orderBy` | `{ column, direction }` |
 | `limit` | 1–1000, default 200 |
-| `groupBy` | `{ column, aggregates: [{ fn, column? }] }` — `fn`: `count sum avg min max` |
+| `groupBy` | `{ column, aggregates: [{ fn, column? }] }` — `fn`: `count sum avg min max`. Feeds `Chart` directly |
 
-Every column named must exist on the table. Column types are `text number boolean date select`.
-
-**Today a bind reads once per render.** Live updating is planned; design for a page that can
-announce it is bound and that it refreshed.
+Every column named must exist. Column types: `text number boolean date select`. Bound primitives
+refetch after any verb runs on the page.
 
 ---
 
-## 8. Actions
+## 9. Actions
 
-The only side-effect channel. A closed verb registry, validated server-side.
+The only side-effect channel. Interaction is a prop, not a handler.
 
-| Verb | Shape | Consent |
+| Verb | Shape | Notes |
 |---|---|---|
-| `sheet.open` | `{ verb, sheet }` | Click is consent |
-| `sheet.create` | `{ verb, title }` | Click is consent |
-| `table.insert` | `{ verb, table, data }` | Click is consent |
-| `url.open` | `{ verb, url }` (https) | **Leaves the machine — needs an explicit stamp** |
+| `sheet.open` | `{ verb, sheet }` | |
+| `sheet.create` | `{ verb, title }` | |
+| `table.insert` | `{ verb, table, data }` | |
+| `table.update` | `{ verb, table, row, set }` | Patch by id. `Field` writes this |
+| `url.open` | `{ verb, url }` | **Denied from a page** until its consent UI ships |
 
-```jsx
-<Button action={{ verb: 'table.insert', table: 'tasks', data: { title: 'New task', status: 'todo' } }}>
-  Add task
-</Button>
-```
-
-Reversible, in-vault verbs run on click. Anything that leaves the machine is refused from a page
-until it is confirmed — that confirmation UI is unbuilt, so today `url.open` from a page is denied.
-Every action, allowed or refused, is recorded.
-
----
-
-## 9. Themes
-
-`theme` seeds a token palette. It **never lays anything out**.
-
-```jsx
-<Sheet theme={{ preset: 'midnight', accent: 'violet' }} class="…">
-```
-
-| Field | Values |
-|---|---|
-| `preset` | `washi midnight broadsheet sticker terminal blueprint` |
-| `accent` | a tape colour — drives `Tape`/`Stamp`/`Chip`/`Card` accents |
-| `face` | `gothic serif rounded mono` |
-| `paper` | `plain dots lines` |
-
-With a preset set, `bg-card`, `text-muted-foreground` and `border-border` resolve to that palette.
-Omit `theme` entirely and nothing is applied — the page is bare.
+Reversible in-vault verbs run on click. Every action, allowed or refused, is recorded.
 
 ---
 
 ## 10. Validation
 
-Pages are validated before saving and before rendering. Errors name the element path and the prop:
+Pages are validated before saving and before rendering. Errors name the **element path, the prop,
+and the legal alternatives**:
 
 ```
-prop class: class contains forbidden tokens: md:flex — sheets size to their
-container (@sm:, @md:), never the viewport
-Sheet > Box > Table
+Sheet > Card: prop tone: "purple" is not one of neutral · accent · info · success · warning · danger
+Sheet > Text: prop color is not addressable on <Text> — use tone
+Sheet > Box: <Box> is not a registry primitive — write <Missing kind="Box" reason="…" />
+Sheet > Repeat > Repeat: <Repeat> cannot contain another <Repeat> — a second view is a second sheet
 ```
 
-Common failures: an unknown component, an unknown prop (schemas are strict), an expression in a
-prop, a `bind` naming a column that does not exist, `sm:`/`md:` in a class, `url()` in a class,
-a non-https `Img`/`Fetch` URL, or the wrong children kind (text inside a `none`, elements inside a
-`text`).
+**Complexity budget:** ~400 nodes, 8 binds, 24 expressions per sheet. Over budget is a *warning*
+(a prompt to split into linked sheets via `Ref`), never an error.
+
+**Panel contract:** the same tree renders at 320, 400, 720 and full width. Under 400px every `Grid`
+is one column and padding tightens. Pages never see the window.
 
 ---
 
-## 11. What WSX cannot express
+## 11. Themes
 
-Do not design around these; they are constraints, not gaps to fill.
+Eight pairs, each exactly 8 tokens × 2 modes (`bg card ink muted border mutedBg accent
+accentInk`). Fonts, radii and spacing belong to `feel`. Values live in `@washi/paper/registry`
+(`THEMES`) and are checked by test for ink ≥ 7:1 and muted ≥ 4.5:1 on card.
 
-- **Custom components.** New capability is a new registry component, designed and built
-- **Scripts, handlers, formulas, computed values.** State is stored and compared, never derived
-- **Local images or file attachments.** `Img` is https-only and there is no asset story yet
-- **Free-form text editing inside a page.** Pages are authored by asking, not typing
-- **Viewport-relative layout.** Container queries only
+| id | Character |
+|---|---|
+| `washi` | House pair, warm paper, one stamp of persimmon |
+| `sumi` | Ink on stock; the accent is the ink |
+| `aizome` | Indigo, cool and technical |
+| `matcha` | Tea-green and stone, the quietest |
+| `kobai` | Red-plum, warm and slightly formal |
+| `kraft` | Parcel paper |
+| `yukiwa` | Highest contrast |
+| `yozora` | Night-first |
+
+---
+
+## 12. What WSX cannot express
+
+Constraints, not gaps to fill.
+
+- **Custom components, custom colours, custom type.** New capability is a new registry primitive
+- **Scripts and handlers.** `expr` computes; it cannot define, loop or format
+- **Network.** `Figure` is https-only; there is no fetch and no embed primitive
+- **Light/dark.** Readers own the mode
+- **Viewport-relative layout.** Container prefixes only

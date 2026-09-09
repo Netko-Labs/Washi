@@ -19,8 +19,8 @@ this one for project facts.
 - `packages/desktop/{domain,repository,service,api}` — one-way layering: domain → repository →
   service → api → ui. DB access only in repository; business logic in service; routes in api.
 - `packages/shared/wsx` — WSX parse/validate/serialize (isomorphic, no DOM)
-- `packages/shared/paper` — note component registry; `./registry` subpath is zod-only (main
-  process safe), root export is React (renderer only)
+- `packages/shared/paper` — note primitive registry; `./registry` subpath is zod-only (main
+  process safe), root export is React (renderer only), `./css` is the styling surface
 - `packages/shared/ink` — typed table DSL (descriptors; executed in repository)
 - `packages/shared/tsuru` — scoped fetch policy + guarded client
 - `packages/shared/hanko` — safe action verb registry
@@ -33,8 +33,9 @@ this one for project facts.
 - Ids: `Bun.randomUUIDv7()`. Timestamps: HLC strings from domain.
 - Agent tools are the ONLY capability surface: ink (data), tsuru (network), hanko (actions).
   Never hand agents fs/shell/raw SQL.
-- WSX is inert data: registry components, literal props, no expressions. Validation before
-  persist and before render.
+- WSX is inert data: registry primitives, literal props, the closed `expr` grammar only. Components
+  own appearance (four enums: `variant tone size emphasis`); pages own content. Validation before
+  persist and before render. Format reference: `docs/wsx.md`.
 - The RPC router is global; route files live in `packages/desktop/api/src/routes/`.
 - `mirin.config.ts` is pure data. Mirin commands run with `apps/desktop` as cwd.
 
