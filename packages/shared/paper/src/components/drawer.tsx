@@ -1,6 +1,6 @@
 import type { InkQuery, TableSpec } from '@washi/ink'
 import { type ReactNode, useEffect, useState } from 'react'
-import { styled, useBind } from '../lib'
+import { resolveRow, styled, useBind } from '../lib'
 import type { BlockProps, Row } from '../lib/types'
 import { usePaperHost } from '../provider'
 import { RowProvider, useSheetState } from '../state'
@@ -25,6 +25,12 @@ export function Drawer({
   const sheet = useSheetState()
   const value = sheet.values[state]
   const open = value !== null && value !== undefined && value !== false && value !== ''
+  const query =
+    open && bind && typeof value === 'string'
+      ? { ...bind, where: [{ column: 'id', op: 'eq' as const, value }], limit: 1 }
+      : undefined
+  const bound = useBind(query)
+  const row = query ? bound.rows[0] : undefined
   const close = () => sheet.set(state, null)
 
   useEffect(() => {
@@ -41,42 +47,25 @@ export function Drawer({
       <button type="button" className="wsx-drawer-scrim" aria-label="Close" onClick={close} />
       <aside {...styled(rest, 'wsx-drawer')} role="dialog" aria-label={title ?? state}>
         <div className="wsx-drawer-head">
-          <span className="wsx-drawer-title">{title}</span>
+          <span className="wsx-drawer-title">{resolveRow(title ?? '', row)}</span>
           <button type="button" className="wsx-drawer-close" aria-label="Close" onClick={close}>
             ×
           </button>
         </div>
         <div className="wsx-drawer-body">
-          {bind && typeof value === 'string' ? (
-            <DrawerRow bind={bind} id={value}>
-              {children}
-            </DrawerRow>
+          {query ? (
+            <Bound state={bound} empty="That row is gone.">
+              {(rows) => {
+                const current = rows[0]
+                return current ? <RowProvider row={current}>{children(current)}</RowProvider> : null
+              }}
+            </Bound>
           ) : (
             children(null)
           )}
         </div>
       </aside>
     </div>
-  )
-}
-
-function DrawerRow({
-  bind,
-  id,
-  children,
-}: {
-  bind: InkQuery
-  id: string
-  children: (row: Row | null) => ReactNode
-}) {
-  const state = useBind({ ...bind, where: [{ column: 'id', op: 'eq', value: id }], limit: 1 })
-  return (
-    <Bound state={state} empty="That row is gone.">
-      {(rows) => {
-        const row = rows[0]
-        return row ? <RowProvider row={row}>{children(row)}</RowProvider> : null
-      }}
-    </Bound>
   )
 }
 
