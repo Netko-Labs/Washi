@@ -1,6 +1,6 @@
 import {
   IconCalendar,
-  IconCircleDot,
+  IconCloudOff,
   IconEdit,
   IconInbox,
   IconLayoutDashboard,
@@ -141,10 +141,15 @@ export function Sidebar() {
         </button>
       </div>
 
-      <div className="flex items-center gap-2 border-border border-t px-3 py-2 text-[11.5px] text-muted-foreground">
-        <IconCircleDot className="size-3.5 text-[#16a34a]" />
-        Local · this device only
-      </div>
+      <button
+        type="button"
+        onClick={() => openTab('view:settings')}
+        className="flex w-full items-center gap-2 border-border border-t px-3 py-2 text-left text-[11.5px] text-muted-foreground hover:bg-accent"
+      >
+        <IconCloudOff className="size-3.5" />
+        <span className="min-w-0 flex-1 truncate">Offline · this device only</span>
+        <span className="size-1.5 flex-none rounded-full bg-muted-foreground" />
+      </button>
       <UserRow />
     </aside>
   )
