@@ -1,5 +1,6 @@
 import { homedir } from 'node:os'
 import { join } from 'node:path'
+import { listSheets, listTables } from '@washi/repository'
 import { DEFAULT_WORKSPACE_ID, startServer } from '@washi/server'
 import { app, devtools, type MenuItemTemplate, menu } from 'mirinjs'
 import { developMenu } from './dev-menu'
@@ -29,11 +30,15 @@ console.log(`[Washi] storage at ${appDataDir} · server at ${server.url}`)
 seedShowcase(workspace)
 
 const windowStore = createWindowStore(appDataDir)
-const uiUrl = `app://ui/index.html?server=${encodeURIComponent(server.url)}`
+const uiUrl =
+  `app://ui/index.html?server=${encodeURIComponent(server.url)}` +
+  `&token=${encodeURIComponent(server.token)}`
 
 devtools.expose('store', () => ({
   server: server.url,
   workspace: workspace.id,
+  sheets: listSheets(workspace).length,
+  tables: listTables(workspace).length,
 }))
 
 app.on('ready', async () => {

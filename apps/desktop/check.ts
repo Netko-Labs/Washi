@@ -68,10 +68,19 @@ export default defineCheck(async (app: CheckDriver) => {
   await app.expectText('Ask me anything')
   await app.screenshot('m2-agent-panel')
 
-  app.step('no RPC call failed along the way')
-  const failed = await app.logs({ type: ['rpc.error'] })
+  app.step('the transport carried every call without an error')
+  // mirin's rpc.error no longer exists — the renderer is an http client now, so a
+  // failed procedure surfaces as a renderer exception or a console error instead.
+  const failed = await app.logs({ type: ['renderer.error', 'renderer.exception'] })
   app.assert(
     failed.length === 0,
-    `${failed.length} RPC call(s) failed: ${failed.map((event) => event.msg).join('; ')}`,
+    `${failed.length} renderer error(s): ${failed.map((event) => event.msg).join('; ')}`,
+  )
+
+  const exposedAfter = (await app.exposed()) as { store?: { server?: string } }
+  app.assert(
+    typeof exposedAfter.store?.server === 'string' &&
+      exposedAfter.store.server.startsWith('http://127.0.0.1:'),
+    `expected a loopback server origin, saw ${exposedAfter.store?.server}`,
   )
 })

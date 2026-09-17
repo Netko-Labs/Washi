@@ -6,13 +6,14 @@ import type { AppRouter } from '@washi/trpc'
  * (C4). The main process passes the loopback origin on the window URL; a hosted
  * build will hand over a real one and nothing else here changes.
  */
-function serverUrl(): string {
-  const fromUrl = new URLSearchParams(window.location.search).get('server')
-  if (fromUrl) return fromUrl
-  throw new Error('no ?server= origin on the window URL — the main process did not pass one')
+function param(name: string): string {
+  const value = new URLSearchParams(window.location.search).get(name)
+  if (value) return value
+  throw new Error(`no ?${name}= on the window URL — the main process did not pass one`)
 }
 
-const url = `${serverUrl()}/trpc`
+const url = `${param('server')}/trpc`
+const token = param('token')
 
 export const api = createTRPCClient<AppRouter>({
   links: [
@@ -20,8 +21,9 @@ export const api = createTRPCClient<AppRouter>({
       condition: (op) => op.type === 'subscription',
       // SSE, so a dropped connection resumes from lastEventId instead of
       // losing the middle of a turn.
-      true: httpSubscriptionLink({ url }),
-      false: httpBatchLink({ url }),
+      // EventSource cannot set headers, so the token rides connectionParams.
+      true: httpSubscriptionLink({ url, connectionParams: () => ({ token }) }),
+      false: httpBatchLink({ url, headers: () => ({ authorization: `Bearer ${token}` }) }),
     }),
   ],
 })

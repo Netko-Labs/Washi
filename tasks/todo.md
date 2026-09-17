@@ -1,6 +1,7 @@
-# Phase 1 — server + transport
+# Phase 1 — server + transport — COMPLETE (2026-09-17)
 
-Spec: `docs/server.html` §07. Acceptance for the whole phase:
+81 tests green, `turbo check-types` green, `biome check` green, `mirin check --scenario`
+10 steps green. Spec: `docs/server.html` §07. Acceptance was:
 
 - `bun test` green, `bun run typecheck` green, `bun run check` green
 - `apps/server` boots in both modes; `embedded` serves the desktop app end to end
@@ -24,6 +25,15 @@ Spec: `docs/server.html` §07. Acceptance for the whole phase:
       over `127.0.0.1:port`. mirin keeps window, menu, icon, sidecar spawn.
 - [x] **6 · `actor_id` on `capability_calls`** — "who approved this" is the team audit story;
       brutal to retrofit against a populated ledger.
+
+## Landed beyond the plan
+
+- **CORS + a per-boot token.** Two origins is a consequence of the pivot, not an oversight.
+  Permissive CORS on a loopback server holding notes means any page you visit can read them,
+  so the token from C2 had to land in the same change. Header on calls, `connectionParams`
+  on subscriptions — EventSource cannot set headers.
+- **`bun run check` unbroken.** It had been dead, not green: a stale worktree's biome.jsonc
+  made biome bail on config before checking anything.
 
 ## Deferred out of phase 1 (deliberately)
 
@@ -71,3 +81,12 @@ dashboard are rewritten in phase 3 rather than patched.
 - babel parser pairs with @babel/types@^7 — v8 types mismatch v7 AST.
 - `mirin check` and `mirin dev` can't run simultaneously — CDP port 9222 collides and the
   check dies with "never published an inspector endpoint". Stop dev first.
+- zsh does not word-split unquoted `$VAR`. `for f in $FILES` passes the whole newline-joined
+  list as one argument; use `... | while IFS= read -r f`.
+- Parameter properties (`constructor(private readonly x: T) {}`) are not erasable syntax. The
+  renderer's tsconfig sets `erasableSyntaxOnly`, and its program pulls in service sources for
+  types — so they fail there even though the file never runs in the renderer.
+- `z.unknown()` in an object infers a required key, but tRPC's wire type makes it optional,
+  because JSON drops `undefined`. The wire type is the honest one — model it optional.
+- A green check can verify nothing. The scenario's last step watched for `rpc.error` events
+  that mirin no longer emits after the transport swap; it would have passed forever.
