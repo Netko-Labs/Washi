@@ -2,9 +2,11 @@ import { afterAll, beforeAll, describe, expect, test } from 'bun:test'
 import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { createEmbeddedControlPlane } from '@washi/control/embedded'
 import { startServer } from '../index'
+import { DEFAULT_WORKSPACE_ID } from '../lib/constants'
 import { tokenFrom } from '../lib/http'
-import { assertMode } from '../lib/mode'
+import { assertHostedSecrets, assertMode } from '../lib/mode'
 import type { RunningServer } from '../lib/types'
 
 let server: RunningServer
@@ -12,7 +14,11 @@ let dataDir: string
 
 beforeAll(() => {
   dataDir = mkdtempSync(join(tmpdir(), 'washi-test-'))
-  server = startServer({ mode: 'embedded', dataDir })
+  server = startServer({
+    mode: 'embedded',
+    dataDir,
+    control: createEmbeddedControlPlane({ workspaceId: DEFAULT_WORKSPACE_ID }),
+  })
 })
 
 afterAll(async () => {
@@ -46,12 +52,36 @@ describe('mode is asserted at boot, not per request', () => {
     expect(() => assertMode('staging')).toThrow(/must be "hosted" or "embedded"/)
   })
 
-  test('hosted refuses to boot unauthenticated without an explicit acknowledgement', () => {
-    const previous = process.env.WASHI_ALLOW_UNAUTHENTICATED
-    process.env.WASHI_ALLOW_UNAUTHENTICATED = undefined as unknown as string
-    delete process.env.WASHI_ALLOW_UNAUTHENTICATED
-    expect(() => assertMode('hosted')).toThrow(/no authentication until phase 2/)
-    if (previous !== undefined) process.env.WASHI_ALLOW_UNAUTHENTICATED = previous
+  test('hosted is a valid mode now that it has auth', () => {
+    expect(assertMode('hosted')).toBe('hosted')
+  })
+})
+
+describe('hosted refuses to boot without its secrets', () => {
+  test('a missing database url is fatal', () => {
+    expect(() => assertHostedSecrets({ WASHI_SECRET_KEY: 'x'.repeat(32) })).toThrow(
+      /WASHI_DATABASE_URL/,
+    )
+  })
+
+  test('a missing master key is fatal', () => {
+    expect(() => assertHostedSecrets({ WASHI_DATABASE_URL: 'postgres://x' })).toThrow(
+      /WASHI_SECRET_KEY/,
+    )
+  })
+
+  test('a short master key is fatal, because every stored API key derives from it', () => {
+    expect(() =>
+      assertHostedSecrets({ WASHI_DATABASE_URL: 'postgres://x', WASHI_SECRET_KEY: 'short' }),
+    ).toThrow(/at least 32 characters/)
+  })
+
+  test('both present is accepted', () => {
+    const secrets = assertHostedSecrets({
+      WASHI_DATABASE_URL: 'postgres://x',
+      WASHI_SECRET_KEY: 'k'.repeat(32),
+    })
+    expect(secrets.databaseUrl).toBe('postgres://x')
   })
 })
 

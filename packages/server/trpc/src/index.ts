@@ -5,6 +5,7 @@ import { devRouter } from './routers/dev'
 import { sheetsRouter } from './routers/sheets'
 import { systemRouter } from './routers/system'
 import { tablesRouter } from './routers/tables'
+import { workspacesRouter } from './routers/workspaces'
 
 /**
  * Washi's whole API surface. Composition only — every handler lives in its
@@ -16,18 +17,23 @@ export const appRouter = router({
   tables: tablesRouter,
   agents: agentsRouter,
   capabilities: capabilitiesRouter,
+  workspaces: workspacesRouter,
   dev: devRouter,
 })
 
 export type AppRouter = typeof appRouter
 
 export {
+  type Actor,
   type Context,
   type ContextInput,
+  type ControlPlane,
   createContext,
   type ResolvedWorkspace,
+  type SecretStore,
   type ServerMode,
   type ServerRuntime,
+  type WorkspaceRef,
 } from './init'
 export {
   createEventBus,

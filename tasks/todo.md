@@ -1,3 +1,45 @@
+# Phase 2 — auth + control plane — COMPLETE (2026-09-17)
+
+104 tests green, `turbo check-types` green, `biome check` green, `mirin check --scenario`
+10 steps green. Spec: `docs/server.html` §03 · §04 · §07. Acceptance was:
+
+- `bun test` green, `bun run typecheck` green, `bun run check` green
+- **`mirin check --scenario` still green** — the desktop must not notice that hosted mode grew auth
+- hosted mode boots only with its secrets, and refuses every unauthenticated call
+- a workspace is an organization: a member can open it, a non-member gets NOT_FOUND
+- the BYOK key round-trips through encryption and is never readable back to a client
+
+## Steps
+
+- [x] **1 · `packages/server/control`** — Postgres via `drizzle-orm/bun-sql` (Bun 1.4 has
+      `Bun.SQL`, so no `pg`). Better Auth core tables + organization plugin + invitations.
+      **Zero workspace content — C1.**
+- [x] **2 · crypto** — AES-256-GCM, per-org key derived from `WASHI_SECRET_KEY` via HKDF.
+      Write-only: clients see `last4`, never the key.
+- [x] **3 · `ControlPlane` interface** — declared in `trpc` (the consumer), implemented twice.
+      Hosted = Postgres + Better Auth. Embedded = a stub: one actor, one workspace, no auth.
+      **This pair is what makes phase 7 cheap (C2).**
+- [x] **4 · wire `apps/server`** — mount `/api/auth/*`, authenticate → `actorId`,
+      authorize in `workspaceProcedure`. Drop `WASHI_ALLOW_UNAUTHENTICATED`: hosted now
+      has real auth, so the escape hatch retires.
+- [x] **5 · deployment** — `docker-compose.yml` + `.env.example`. This is an OSS self-hosted
+      product; the compose file is the install story, not an afterthought.
+
+## Landed beyond the plan
+
+- **`.env` was not gitignored.** The README tells people to put a master key in one.
+  `.env` / `.env.*` ignored, `.env.example` excepted.
+- **`@washi/control/embedded` subpath.** The barrel re-exports the hosted plane, so importing
+  the *stub* dragged Better Auth and a Postgres driver into the desktop main process. The
+  desktop should ship neither.
+
+## Deferred out of phase 2 (deliberately)
+
+`apps/web` + new onboarding (phase 3) · agent server-side + circuit breaker (phase 4) ·
+P2 transactions (phase 5) · canvas sweep (phase 6) · embedded mode proper (phase 7).
+
+---
+
 # Phase 1 — server + transport — COMPLETE (2026-09-17)
 
 81 tests green, `turbo check-types` green, `biome check` green, `mirin check --scenario`
@@ -90,3 +132,9 @@ dashboard are rewritten in phase 3 rather than patched.
   because JSON drops `undefined`. The wire type is the honest one — model it optional.
 - A green check can verify nothing. The scenario's last step watched for `rpc.error` events
   that mirin no longer emits after the transport swap; it would have passed forever.
+- "never published an inspector endpoint" has two causes and they look identical: a stale
+  `mirin dev` holding CDP 9222, *or* the app dying at boot. Check `pgrep -fl mirin` before
+  blaming the code — diagnosing from `session.json` alone pointed at the wrong one.
+- A package barrel is a bundling decision, not just an export list. One barrel covering both
+  a heavy hosted path and a light embedded one pulls the heavy one into every consumer;
+  split it at the subpath.

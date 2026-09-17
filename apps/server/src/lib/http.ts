@@ -5,9 +5,10 @@ const ALLOW_HEADERS = 'content-type, authorization, x-washi-workspace, last-even
  * token is (a browser page on this machine can reach 127.0.0.1 too). It exists
  * so the renderer's own origin is permitted and nothing else is reflected.
  */
-export function isAllowedOrigin(origin: string | null): boolean {
+export function isAllowedOrigin(origin: string | null, trusted: string[] = []): boolean {
   if (!origin) return true
   if (origin.startsWith('app://')) return true
+  if (trusted.includes(origin)) return true
   try {
     const { hostname, protocol } = new URL(origin)
     return protocol === 'http:' && (hostname === '127.0.0.1' || hostname === 'localhost')

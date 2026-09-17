@@ -27,7 +27,8 @@ export function createRuntime(options: ServerOptions): ServerRuntime & { close()
   return {
     mode: options.mode,
     events,
-    defaultWorkspaceId: DEFAULT_WORKSPACE_ID,
+    control: options.control,
+    defaultWorkspaceId: options.defaultWorkspaceId ?? DEFAULT_WORKSPACE_ID,
 
     resolve(workspaceId) {
       const existing = hosts.get(workspaceId)

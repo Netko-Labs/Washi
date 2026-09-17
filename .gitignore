@@ -10,3 +10,8 @@ build/
 
 # 60MB compiled binaries from `bun build --compile`
 *.bun-build
+
+# secrets — .env.example is the committed template, .env never is
+.env
+.env.*
+!.env.example

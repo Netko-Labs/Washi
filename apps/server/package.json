@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@trpc/server": "^11.19.0",
+    "@washi/control": "workspace:*",
     "@washi/repository": "workspace:*",
     "@washi/service": "workspace:*",
     "@washi/trpc": "workspace:*"

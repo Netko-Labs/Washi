@@ -1,14 +1,39 @@
 import { homedir } from 'node:os'
 import { join } from 'node:path'
+import {
+  createEmbeddedControlPlane,
+  createHostedControlPlane,
+  ensureControlSchema,
+} from '@washi/control'
+import type { ControlPlane } from '@washi/trpc'
 import { startServer } from './index'
-import { assertMode } from './lib/mode'
+import { DEFAULT_WORKSPACE_ID } from './lib/constants'
+import { assertHostedSecrets, assertMode } from './lib/mode'
 
 const mode = assertMode(process.env.WASHI_MODE)
 const dataDir = process.env.WASHI_DATA_DIR ?? join(homedir(), '.washi', 'workspaces')
+const baseUrl = process.env.WASHI_BASE_URL ?? 'http://localhost:3000'
+const trustedOrigins = (process.env.WASHI_TRUSTED_ORIGINS ?? '')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean)
+
+let control: ControlPlane
+
+if (mode === 'hosted') {
+  const { databaseUrl, masterKey } = assertHostedSecrets(process.env)
+  const hosted = createHostedControlPlane({ databaseUrl, masterKey, baseUrl, trustedOrigins })
+  await ensureControlSchema(hosted.db)
+  control = hosted
+} else {
+  control = createEmbeddedControlPlane({ workspaceId: DEFAULT_WORKSPACE_ID })
+}
 
 const server = startServer({
   mode,
+  control,
   dataDir,
+  trustedOrigins,
   hostname: process.env.WASHI_HOSTNAME,
   port: process.env.WASHI_PORT ? Number(process.env.WASHI_PORT) : undefined,
 })

@@ -1,5 +1,6 @@
 import { homedir } from 'node:os'
 import { join } from 'node:path'
+import { createEmbeddedControlPlane } from '@washi/control/embedded'
 import { listSheets, listTables } from '@washi/repository'
 import { DEFAULT_WORKSPACE_ID, startServer } from '@washi/server'
 import { app, devtools, type MenuItemTemplate, menu } from 'mirinjs'
@@ -22,7 +23,11 @@ const appDataDir = join(
 // The desktop app is a client of its own server (C4). Embedded mode binds
 // loopback on an OS-assigned port; the renderer is handed the origin and does
 // not otherwise know it is local.
-const server = startServer({ mode: 'embedded', dataDir: join(appDataDir, 'workspaces') })
+const server = startServer({
+  mode: 'embedded',
+  dataDir: join(appDataDir, 'workspaces'),
+  control: createEmbeddedControlPlane({ workspaceId: DEFAULT_WORKSPACE_ID }),
+})
 const runtime = server.runtime
 const { workspace } = runtime.resolve(DEFAULT_WORKSPACE_ID)
 

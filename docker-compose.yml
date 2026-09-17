@@ -1,0 +1,41 @@
+# Self-hosting Washi. `cp .env.example .env`, fill in WASHI_SECRET_KEY, `docker compose up`.
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: washi
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-washi}
+      POSTGRES_DB: washi
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U washi']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  server:
+    build:
+      context: .
+      dockerfile: apps/server/Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      WASHI_MODE: hosted
+      WASHI_DATABASE_URL: postgres://washi:${POSTGRES_PASSWORD:-washi}@postgres:5432/washi
+      WASHI_SECRET_KEY: ${WASHI_SECRET_KEY:?set WASHI_SECRET_KEY in .env — 32+ chars}
+      WASHI_BASE_URL: ${WASHI_BASE_URL:-http://localhost:3000}
+      WASHI_TRUSTED_ORIGINS: ${WASHI_TRUSTED_ORIGINS:-}
+      WASHI_DATA_DIR: /data/workspaces
+      WASHI_HOSTNAME: 0.0.0.0
+      WASHI_PORT: 3000
+    ports:
+      - '${WASHI_PORT:-3000}:3000'
+    volumes:
+      # The workspaces. One SQLite file each — this is what a backup must cover.
+      - workspaces:/data/workspaces
+
+volumes:
+  postgres:
+  workspaces:

@@ -11,8 +11,9 @@ const WORKSPACE_HEADER = 'x-washi-workspace'
 export function startServer(options: ServerOptions): RunningServer {
   const runtime = createRuntime(options)
   const token = options.token ?? crypto.randomUUID()
-  const hostname = options.hostname ?? (options.mode === 'embedded' ? EMBEDDED_HOSTNAME : '0.0.0.0')
-  const requestedPort = options.port ?? (options.mode === 'embedded' ? 0 : DEFAULT_HOSTED_PORT)
+  const embedded = options.mode === 'embedded'
+  const hostname = options.hostname ?? (embedded ? EMBEDDED_HOSTNAME : '0.0.0.0')
+  const requestedPort = options.port ?? (embedded ? 0 : DEFAULT_HOSTED_PORT)
 
   const server = Bun.serve({
     hostname,
@@ -22,7 +23,9 @@ export function startServer(options: ServerOptions): RunningServer {
       const url = new URL(request.url)
       const origin = request.headers.get('origin')
 
-      if (!isAllowedOrigin(origin)) return new Response('forbidden origin', { status: 403 })
+      if (!isAllowedOrigin(origin, options.trustedOrigins)) {
+        return new Response('forbidden origin', { status: 403 })
+      }
       if (request.method === 'OPTIONS') return preflight(origin)
 
       const cors = corsHeaders(origin)
@@ -31,12 +34,28 @@ export function startServer(options: ServerOptions): RunningServer {
         return Response.json({ ok: true, mode: options.mode }, { headers: cors })
       }
 
+      // Sign-in, sign-up, organizations and invitations. Hosted only — the
+      // embedded control plane answers null and this falls through to a 404.
+      const auth = await options.control.handle(request)
+      if (auth) {
+        const headers = new Headers(auth.headers)
+        for (const [key, value] of Object.entries(cors)) headers.set(key, value)
+        return new Response(auth.body, {
+          status: auth.status,
+          statusText: auth.statusText,
+          headers,
+        })
+      }
+
       if (url.pathname === TRPC_PREFIX || url.pathname.startsWith(`${TRPC_PREFIX}/`)) {
-        // A page in any browser on this machine can reach loopback, so the token
-        // is what actually separates the renderer from everything else.
-        if (tokenFrom(request, url) !== token) {
+        // Embedded has no accounts, so a per-boot token is what separates the
+        // renderer from any other page that can reach loopback. Hosted has real
+        // sessions and does not use one.
+        if (embedded && tokenFrom(request, url) !== token) {
           return new Response('unauthorized', { status: 401, headers: cors })
         }
+
+        const actor = embedded ? null : await options.control.authenticate(request)
 
         const response = await fetchRequestHandler({
           endpoint: TRPC_PREFIX,
@@ -45,9 +64,7 @@ export function startServer(options: ServerOptions): RunningServer {
           createContext: () =>
             createContext(runtime, {
               workspaceId: request.headers.get(WORKSPACE_HEADER),
-              // Phase 2 reads a verified JWT here. Until then there is no actor,
-              // and embedded mode never has one anyway.
-              actorId: null,
+              actor,
             }),
         })
         const headers = new Headers(response.headers)
@@ -75,10 +92,11 @@ export function startServer(options: ServerOptions): RunningServer {
     async stop() {
       await server.stop(true)
       runtime.close()
+      await options.control.close()
     },
   }
 }
 
 export { DEFAULT_WORKSPACE_ID, EMBEDDED_HOSTNAME } from './lib/constants'
-export { assertMode } from './lib/mode'
+export { assertHostedSecrets, assertMode } from './lib/mode'
 export type { RunningServer, ServerOptions } from './lib/types'
