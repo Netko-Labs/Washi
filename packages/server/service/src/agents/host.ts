@@ -6,6 +6,7 @@ import type {
   CapabilityOrigin,
   TranscriptEntry,
 } from '@washi/domain'
+import { checkAction, type HankoHandlers, isReversibleVerb, runAction } from '@washi/hanko'
 import {
   appendTurn,
   createApproval,
@@ -16,7 +17,6 @@ import {
   setAppMeta,
   updateSession,
 } from '@washi/repository'
-import { checkAction, type HankoHandlers, isReversibleVerb, runAction } from '@washi/hanko'
 import { checkUrl, guardedFetch, isPrivateAddress } from '@washi/tsuru'
 import { createSheetFromSource } from '../sheets/service'
 import { runMutation } from '../tables/service'

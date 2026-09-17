@@ -1,6 +1,4 @@
 import type { UserTable } from '@washi/domain'
-import { listTables } from '@washi/repository'
-import { defineUserTable, runMutation, runQuery, toggleTaskRecord } from '@washi/service'
 import {
   type InkMutation,
   type InkQuery,
@@ -8,6 +6,8 @@ import {
   type QueryResult,
   querySchema,
 } from '@washi/ink'
+import { listTables } from '@washi/repository'
+import { defineUserTable, runMutation, runQuery, toggleTaskRecord } from '@washi/service'
 import { rpc } from 'mirinjs/rpc'
 
 export function tableRoutes() {

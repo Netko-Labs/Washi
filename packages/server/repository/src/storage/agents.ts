@@ -1,9 +1,4 @@
-import type {
-  AgentSession,
-  AgentUpdate,
-  ApprovalRequest,
-  TranscriptEntry,
-} from '@washi/domain'
+import type { AgentSession, AgentUpdate, ApprovalRequest, TranscriptEntry } from '@washi/domain'
 import { agentSessionTable, agentTurnTable, approvalTable } from '@washi/domain/db'
 import { asc, desc, eq } from 'drizzle-orm'
 import { getDb, getSqlite, hlcNow, newId } from './client'

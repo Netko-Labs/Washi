@@ -31,17 +31,18 @@ export function CommandPalette() {
   if (!paletteOpen) return null
 
   return (
-    <div
-      className="fixed inset-0 z-50 bg-black/50"
-      onClick={closePalette}
-      onKeyDown={() => {}}
-      role="presentation"
-    >
+    <div className="fixed inset-0 z-50">
+      <button
+        type="button"
+        aria-label="Close command palette"
+        tabIndex={-1}
+        className="absolute inset-0 h-full w-full cursor-default bg-black/50"
+        onClick={closePalette}
+      />
       <Command
         label="Command palette"
         shouldFilter
-        className="mx-auto mt-[14vh] w-[560px] overflow-hidden rounded-[14px] border border-border bg-popover text-popover-foreground shadow-[0_16px_48px_rgb(0_0_0/0.28)]"
-        onClick={(event) => event.stopPropagation()}
+        className="relative mx-auto mt-[14vh] w-[560px] overflow-hidden rounded-[14px] border border-border bg-popover text-popover-foreground shadow-[0_16px_48px_rgb(0_0_0/0.28)]"
       >
         <div className="flex items-center gap-2.5 border-border border-b px-4">
           <IconSearch className="size-4 text-muted-foreground" />

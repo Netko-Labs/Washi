@@ -1,6 +1,5 @@
 import { homedir } from 'node:os'
 import { join } from 'node:path'
-import { createRouter } from '@washi/trpc'
 import {
   getWindowState,
   initializeDb,
@@ -9,6 +8,7 @@ import {
   saveWindowState,
 } from '@washi/repository'
 import { AgentHost } from '@washi/service'
+import { createRouter } from '@washi/trpc'
 import { app, devtools, type MenuItemTemplate, menu } from 'mirinjs'
 import { developMenu } from './dev-menu'
 import { seedShowcase } from './showcase'

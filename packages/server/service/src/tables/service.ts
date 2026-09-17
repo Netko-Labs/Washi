@@ -1,5 +1,14 @@
 import type { UserTable } from '@washi/domain'
 import {
+  type InkMutation,
+  type InkQuery,
+  type QueryResult,
+  type TableSpec,
+  tableSpecSchema,
+  unknownQueryColumns,
+  validateRecord,
+} from '@washi/ink'
+import {
   defineTable,
   deleteRecords,
   executeQuery,
@@ -9,15 +18,6 @@ import {
   matchRecordIds,
   updateRecords,
 } from '@washi/repository'
-import {
-  type InkMutation,
-  type InkQuery,
-  type QueryResult,
-  type TableSpec,
-  tableSpecSchema,
-  unknownQueryColumns,
-  validateRecord,
-} from '@washi/ink'
 
 export class InkError extends Error {
   constructor(message: string) {
