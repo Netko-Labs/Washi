@@ -26,10 +26,5 @@ export {
   sheetSummarySchema,
   sheetWriteSchema,
 } from './entities/sheets'
-export {
-  DEFAULT_WINDOW_STATE,
-  type UserTable,
-  userTableSchema,
-  type WindowState,
-} from './entities/tables'
+export { type UserTable, userTableSchema } from './entities/tables'
 export { compareHlc, createHlcClock, type HlcClock } from './hlc'

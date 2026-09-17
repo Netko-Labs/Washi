@@ -1,4 +1,4 @@
-export { AgentHost, type AgentHostEvents } from './agents/host'
+export { AgentHost, type AgentHostEvents, type Caller } from './agents/host'
 export {
   checkSource,
   createSheetFromSource,

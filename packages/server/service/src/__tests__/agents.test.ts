@@ -1,19 +1,22 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import type { ApprovalRequest, TranscriptEntry } from '@washi/domain'
-import { closeDb, createSession, getTranscript, initializeDb, listSheets } from '@washi/repository'
+import { createSession, getTranscript, listSheets, openWorkspace, type Workspace } from '@washi/repository'
 import { AgentHost } from '../agents/host'
 import { normalizeMessage } from '../agents/normalize'
 import { checkSource, createSheetFromSource } from '../sheets/service'
 import { defineUserTable, runQuery } from '../tables/service'
 
-beforeEach(() => initializeDb(':memory:'))
-afterEach(() => closeDb())
+let ws: Workspace
+beforeEach(() => {
+  ws = openWorkspace({ id: 'test', path: ':memory:' })
+})
+afterEach(() => ws.close())
 
 function makeHost() {
   const updates: TranscriptEntry[] = []
   const approvals: ApprovalRequest[] = []
   const opened: string[] = []
-  const host = new AgentHost()
+  const host = new AgentHost(ws)
   host.setEvents({
     update: (_sessionId, entry) => updates.push(entry),
     approval: (request) => approvals.push(request),
@@ -70,12 +73,12 @@ describe('hanko actions through the host', () => {
   test('sheet.create creates and opens; table.insert writes', async () => {
     const { host, opened } = makeHost()
     await host.executeAction({ verb: 'sheet.create', title: 'From an action' })
-    expect(listSheets().some((sheet) => sheet.title === 'From an action')).toBe(true)
+    expect(listSheets(ws).some((sheet) => sheet.title === 'From an action')).toBe(true)
     expect(opened).toHaveLength(1)
 
-    defineUserTable({ name: 'tasks', columns: [{ name: 'title', type: 'text' }] })
+    defineUserTable(ws, { name: 'tasks', columns: [{ name: 'title', type: 'text' }] })
     await host.executeAction({ verb: 'table.insert', table: 'tasks', data: { title: 'stamped' } })
-    expect(runQuery({ table: 'tasks' }).rows[0]?.title).toBe('stamped')
+    expect(runQuery(ws, { table: 'tasks' }).rows[0]?.title).toBe('stamped')
   })
 
   test('unknown verbs and private url.open are refused', async () => {
@@ -90,7 +93,7 @@ describe('hanko actions through the host', () => {
 describe('approval flow', () => {
   test('pending approval resolves the gate; denial and audit rows work', async () => {
     const { host, approvals } = makeHost()
-    const session = createSession('test')
+    const session = createSession(ws, 'test')
 
     // biome-ignore lint/complexity/useLiteralKeys: reaching into a private member for the test
     const gate = host['gateTool'].bind(host) as (
@@ -113,7 +116,7 @@ describe('approval flow', () => {
 
   test('reads pass without approval; non-washi tools always denied', async () => {
     const { host, approvals } = makeHost()
-    const session = createSession('test')
+    const session = createSession(ws, 'test')
     // biome-ignore lint/complexity/useLiteralKeys: reaching into a private member for the test
     const gate = host['gateTool'].bind(host) as (
       sessionId: string,
@@ -130,12 +133,12 @@ describe('approval flow', () => {
 describe('transcript persistence', () => {
   test('user prompts and updates land in agent_turns in order', () => {
     const { host } = makeHost()
-    const session = createSession('t')
+    const session = createSession(ws, 't')
     // biome-ignore lint/complexity/useLiteralKeys: reaching into a private member for the test
     const record = host['record'].bind(host) as (sessionId: string, update: unknown) => void
     record(session.id, { kind: 'user_message', text: 'hello' })
     record(session.id, { kind: 'message_chunk', text: 'hi' })
-    const transcript = getTranscript(session.id)
+    const transcript = getTranscript(ws, session.id)
     expect(transcript.map((entry) => entry.seq)).toEqual([1, 2])
     expect(transcript[0]?.update).toMatchObject({ kind: 'user_message' })
   })
@@ -145,7 +148,7 @@ describe('wsx guardrails stay closed for agents', () => {
   test('sheet_check catches executable smuggling; valid sheets save', () => {
     expect(checkSource('<Sheet title={window.location} />').ok).toBe(false)
     expect(checkSource('<Sheet title="ok"><P>fine</P></Sheet>').ok).toBe(true)
-    const sheet = createSheetFromSource({
+    const sheet = createSheetFromSource(ws, {
       title: 'ok',
       source: '<Sheet title="ok"><P>fine</P></Sheet>',
     })

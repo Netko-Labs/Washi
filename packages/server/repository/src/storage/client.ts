@@ -1,53 +1,51 @@
 import { Database } from 'bun:sqlite'
 import { mkdirSync } from 'node:fs'
 import { dirname } from 'node:path'
-import { createHlcClock, type HlcClock } from '@washi/domain'
+import { createHlcClock } from '@washi/domain'
 import * as schema from '@washi/domain/db'
 import { type BunSQLiteDatabase, drizzle } from 'drizzle-orm/bun-sqlite'
 
 export type DrizzleDB = BunSQLiteDatabase<typeof schema>
 
-let _db: DrizzleDB | null = null
-let _sqlite: Database | null = null
-let _hlc: HlcClock | null = null
-
-export function initializeDb(dbPath: string): void {
-  if (dbPath !== ':memory:') mkdirSync(dirname(dbPath), { recursive: true })
-
-  _sqlite = new Database(dbPath, { create: true })
-  _sqlite.exec('PRAGMA journal_mode = WAL')
-  _sqlite.exec('PRAGMA foreign_keys = ON')
-
-  _db = drizzle(_sqlite, { schema })
-  createTables(_sqlite)
-  _hlc = createHlcClock(ensureDeviceId(_sqlite))
+/**
+ * One open workspace: a SQLite file plus the clock stamping its writes. Every
+ * repository op takes one. There is no ambient handle — a server holds many of
+ * these at once, and a leaked query must not be able to cross workspaces.
+ */
+export interface Workspace {
+  readonly id: string
+  readonly db: DrizzleDB
+  readonly sqlite: Database
+  readonly deviceId: string
+  now(): string
+  close(): void
 }
 
-export function closeDb(): void {
-  _sqlite?.close()
-  _db = null
-  _sqlite = null
-  _hlc = null
+export interface OpenWorkspaceOptions {
+  id: string
+  /** Filesystem path, or ':memory:' for tests. */
+  path: string
 }
 
-export function getDb(): DrizzleDB {
-  if (!_db) throw new Error('database not initialized — call initializeDb() first')
-  return _db
-}
+export function openWorkspace({ id, path }: OpenWorkspaceOptions): Workspace {
+  if (path !== ':memory:') mkdirSync(dirname(path), { recursive: true })
 
-export function getSqlite(): Database {
-  if (!_sqlite) throw new Error('database not initialized — call initializeDb() first')
-  return _sqlite
-}
+  const sqlite = new Database(path, { create: true })
+  sqlite.exec('PRAGMA journal_mode = WAL')
+  sqlite.exec('PRAGMA foreign_keys = ON')
 
-export function hlcNow(): string {
-  if (!_hlc) throw new Error('database not initialized — call initializeDb() first')
-  return _hlc.now()
-}
+  const db = drizzle(sqlite, { schema })
+  createTables(sqlite)
+  const hlc = createHlcClock(ensureDeviceId(sqlite))
 
-export function deviceId(): string {
-  if (!_hlc) throw new Error('database not initialized — call initializeDb() first')
-  return _hlc.deviceId
+  return {
+    id,
+    db,
+    sqlite,
+    deviceId: hlc.deviceId,
+    now: () => hlc.now(),
+    close: () => sqlite.close(),
+  }
 }
 
 export function newId(): string {
@@ -150,6 +148,7 @@ function createTables(sqlite: Database) {
     CREATE TABLE IF NOT EXISTS capability_calls (
       id TEXT PRIMARY KEY,
       origin TEXT NOT NULL,
+      actor_id TEXT,
       subject TEXT NOT NULL,
       input TEXT,
       decision TEXT NOT NULL,
@@ -157,6 +156,7 @@ function createTables(sqlite: Database) {
       created_at TEXT NOT NULL
     )
   `)
+  ensureColumn(sqlite, 'capability_calls', 'actor_id', 'TEXT')
   sqlite.exec(
     'CREATE INDEX IF NOT EXISTS idx_capability_calls_created ON capability_calls(created_at DESC)',
   )
@@ -180,17 +180,17 @@ function createTables(sqlite: Database) {
   `)
 
   sqlite.exec(`
-    CREATE TABLE IF NOT EXISTS window_state (
-      id INTEGER PRIMARY KEY CHECK (id = 1),
-      x INTEGER NOT NULL,
-      y INTEGER NOT NULL,
-      width INTEGER NOT NULL,
-      height INTEGER NOT NULL,
-      is_maximized INTEGER NOT NULL DEFAULT 0
-    )
-  `)
-
-  sqlite.exec(`
     CREATE VIRTUAL TABLE IF NOT EXISTS sheets_fts USING fts5(id UNINDEXED, title, body)
   `)
+
+  // window_state used to live here. A server has no windows — it moved to the
+  // desktop client's own store.
+  sqlite.exec('DROP TABLE IF EXISTS window_state')
+}
+
+/** Additive DDL for an existing file; no drizzle-kit migrations by design. */
+function ensureColumn(sqlite: Database, table: string, column: string, type: string) {
+  const columns = sqlite.query(`PRAGMA table_info(${table})`).all() as { name: string }[]
+  if (columns.some((entry) => entry.name === column)) return
+  sqlite.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${type}`)
 }

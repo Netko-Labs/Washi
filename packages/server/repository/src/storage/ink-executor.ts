@@ -1,6 +1,6 @@
 import type { Filter, InkQuery, QueryResult, Scalar, TableSpec } from '@washi/ink'
 
-import { getSqlite } from './client'
+import type { Workspace } from './client'
 
 const FILTER_SQL: Record<Filter['op'], string> = {
   eq: '= ?',
@@ -51,6 +51,7 @@ function buildWhere(filters: Filter[]): { sql: string; params: Scalar[] } {
 }
 
 function groupQuery(
+  ws: Workspace,
   tableId: string,
   query: InkQuery & { groupBy: NonNullable<InkQuery['groupBy']> },
   limit: number,
@@ -75,16 +76,21 @@ function groupQuery(
     SELECT ${groupExpr} AS "${groupColumn}", ${aggregates}
     FROM records WHERE table_id = ? AND deleted_at IS NULL${where.sql}
     GROUP BY 1 LIMIT ?`
-  const rows = getSqlite()
+  const rows = ws.sqlite
     .query(sql)
     .all(...selectParams, tableId, ...where.params, limit) as QueryResult['rows']
   return { rows, total: rows.length }
 }
 
 /** Run an ink query over a table's JSON records. Descriptor → parametrized SQL. */
-export function executeQuery(tableId: string, spec: TableSpec, query: InkQuery): QueryResult {
+export function executeQuery(
+  ws: Workspace,
+  tableId: string,
+  spec: TableSpec,
+  query: InkQuery,
+): QueryResult {
   const limit = query.limit ?? 200
-  if (query.groupBy) return groupQuery(tableId, { ...query, groupBy: query.groupBy }, limit)
+  if (query.groupBy) return groupQuery(ws, tableId, { ...query, groupBy: query.groupBy }, limit)
 
   const selectParams: Scalar[] = []
   const projection = spec.columns
@@ -102,7 +108,7 @@ export function executeQuery(tableId: string, spec: TableSpec, query: InkQuery):
   const sql = `
     SELECT id, ${projection}
     FROM records WHERE table_id = ? AND deleted_at IS NULL${where.sql}${orderSql} LIMIT ?`
-  const rows = getSqlite()
+  const rows = ws.sqlite
     .query(sql)
     .all(...selectParams, tableId, ...where.params, limit) as QueryResult['rows']
 
@@ -118,9 +124,9 @@ export function executeQuery(tableId: string, spec: TableSpec, query: InkQuery):
 }
 
 /** Ids matched by a filter set, for update/delete mutations. */
-export function matchRecordIds(tableId: string, filters: Filter[]): string[] {
+export function matchRecordIds(ws: Workspace, tableId: string, filters: Filter[]): string[] {
   const where = buildWhere(filters)
-  return getSqlite()
+  return ws.sqlite
     .query(`SELECT id FROM records WHERE table_id = ? AND deleted_at IS NULL${where.sql}`)
     .all(tableId, ...where.params)
     .map((row) => (row as { id: string }).id)

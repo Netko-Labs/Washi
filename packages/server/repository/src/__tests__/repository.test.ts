@@ -1,6 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import {
-  closeDb,
   createSheet,
   defineTable,
   deleteRecords,
@@ -8,19 +7,22 @@ import {
   executeQuery,
   getBacklinks,
   getSheet,
-  getSqlite,
-  initializeDb,
   insertRecord,
   listSheets,
   matchRecordIds,
+  openWorkspace,
   searchSheets,
   updateRecords,
   updateSheet,
+  type Workspace,
 } from '../index'
 import { createSnapshot, readSnapshot, updateSnapshot } from '../storage/loro'
 
-beforeEach(() => initializeDb(':memory:'))
-afterEach(() => closeDb())
+let ws: Workspace
+beforeEach(() => {
+  ws = openWorkspace({ id: 'test', path: ':memory:' })
+})
+afterEach(() => ws.close())
 
 const write = (source: string, title = 'Test sheet') => ({ title, source })
 const index = (body: string, refs: string[] = []) => ({ body, refs })
@@ -36,42 +38,42 @@ describe('loro store', () => {
 
 describe('sheets', () => {
   test('create → list → get → update → delete lifecycle', () => {
-    const sheet = createSheet(
+    const sheet = createSheet(ws, 
       write('<Sheet title="t"><P>hello washi</P></Sheet>'),
       index('hello washi'),
     )
-    expect(listSheets().map((row) => row.id)).toContain(sheet.id)
+    expect(listSheets(ws).map((row) => row.id)).toContain(sheet.id)
 
-    const updated = updateSheet(
+    const updated = updateSheet(ws, 
       sheet.id,
       write('<Sheet title="t"><P>changed</P></Sheet>'),
       index('changed'),
     )
     expect(updated?.source).toContain('changed')
 
-    expect(deleteSheet(sheet.id)).toBe(true)
-    expect(getSheet(sheet.id)).toBeNull()
-    expect(listSheets()).toHaveLength(0)
+    expect(deleteSheet(ws, sheet.id)).toBe(true)
+    expect(getSheet(ws, sheet.id)).toBeNull()
+    expect(listSheets(ws)).toHaveLength(0)
   })
 
   test('fts search + snippet, updated on rewrite', () => {
-    const sheet = createSheet(write('...', 'Roadmap'), index('quarterly goblin objectives'))
-    expect(searchSheets('goblin')[0]?.id).toBe(sheet.id)
+    const sheet = createSheet(ws, write('...', 'Roadmap'), index('quarterly goblin objectives'))
+    expect(searchSheets(ws, 'goblin')[0]?.id).toBe(sheet.id)
 
-    updateSheet(sheet.id, write('...', 'Roadmap'), index('now something else entirely'))
-    expect(searchSheets('goblin')).toHaveLength(0)
-    expect(searchSheets('entirely')[0]?.id).toBe(sheet.id)
+    updateSheet(ws, sheet.id, write('...', 'Roadmap'), index('now something else entirely'))
+    expect(searchSheets(ws, 'goblin')).toHaveLength(0)
+    expect(searchSheets(ws, 'entirely')[0]?.id).toBe(sheet.id)
   })
 
   test('backlinks come from extracted refs', () => {
-    const target = createSheet(write('...', 'Target'), index('target'))
-    const linker = createSheet(write('...', 'Linker'), index('linker', [target.id]))
-    expect(getBacklinks(target.id).map((row) => row.id)).toEqual([linker.id])
+    const target = createSheet(ws, write('...', 'Target'), index('target'))
+    const linker = createSheet(ws, write('...', 'Linker'), index('linker', [target.id]))
+    expect(getBacklinks(ws, target.id).map((row) => row.id)).toEqual([linker.id])
   })
 
   test('oplog grows with every mutation', () => {
-    createSheet(write('...'), index('x'))
-    const count = getSqlite().query('SELECT COUNT(*) AS n FROM oplog').get() as { n: number }
+    createSheet(ws, write('...'), index('x'))
+    const count = ws.sqlite.query('SELECT COUNT(*) AS n FROM oplog').get() as { n: number }
     expect(count.n).toBeGreaterThan(0)
   })
 })
@@ -88,16 +90,16 @@ describe('ink executor', () => {
   }
 
   const seed = () => {
-    const table = defineTable(spec)
-    insertRecord(table.id, { title: 'a', done: false, points: 3, status: 'todo' })
-    insertRecord(table.id, { title: 'b', done: true, points: 5, status: 'shipped' })
-    insertRecord(table.id, { title: 'c', done: false, points: 2, status: 'todo' })
+    const table = defineTable(ws, spec)
+    insertRecord(ws, table.id, { title: 'a', done: false, points: 3, status: 'todo' })
+    insertRecord(ws, table.id, { title: 'b', done: true, points: 5, status: 'shipped' })
+    insertRecord(ws, table.id, { title: 'c', done: false, points: 2, status: 'todo' })
     return table
   }
 
   test('filters, order, limit, boolean revival', () => {
     const table = seed()
-    const result = executeQuery(table.id, spec, {
+    const result = executeQuery(ws, table.id, spec, {
       table: 'tasks',
       where: [{ column: 'status', op: 'eq', value: 'todo' }],
       orderBy: { column: 'points', direction: 'desc' },
@@ -108,7 +110,7 @@ describe('ink executor', () => {
 
   test('group-by aggregations: count and sum', () => {
     const table = seed()
-    const result = executeQuery(table.id, spec, {
+    const result = executeQuery(ws, table.id, spec, {
       table: 'tasks',
       groupBy: { column: 'status', aggregates: [{ fn: 'count' }, { fn: 'sum', column: 'points' }] },
     })
@@ -120,22 +122,22 @@ describe('ink executor', () => {
   test('contains + in filters, update and tombstone delete', () => {
     const table = seed()
     expect(
-      executeQuery(table.id, spec, {
+      executeQuery(ws, table.id, spec, {
         table: 'tasks',
         where: [{ column: 'status', op: 'in', value: ['todo', 'doing'] }],
       }).rows,
     ).toHaveLength(2)
 
-    const ids = matchRecordIds(table.id, [{ column: 'title', op: 'contains', value: 'a' }])
-    expect(updateRecords(table.id, ids, { done: true })).toBe(1)
+    const ids = matchRecordIds(ws, table.id, [{ column: 'title', op: 'contains', value: 'a' }])
+    expect(updateRecords(ws, table.id, ids, { done: true })).toBe(1)
     expect(
-      executeQuery(table.id, spec, {
+      executeQuery(ws, table.id, spec, {
         table: 'tasks',
         where: [{ column: 'done', op: 'eq', value: true }],
       }).rows,
     ).toHaveLength(2)
 
-    deleteRecords(table.id, ids)
-    expect(executeQuery(table.id, spec, { table: 'tasks' }).rows).toHaveLength(2)
+    deleteRecords(ws, table.id, ids)
+    expect(executeQuery(ws, table.id, spec, { table: 'tasks' }).rows).toHaveLength(2)
   })
 })

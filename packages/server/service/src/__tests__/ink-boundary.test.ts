@@ -1,10 +1,11 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
-import { closeDb, initializeDb } from '@washi/repository'
+import { openWorkspace, type Workspace } from '@washi/repository'
 import { defineUserTable, runMutation, runQuery } from '../tables/service'
 
+let ws: Workspace
 beforeEach(() => {
-  initializeDb(':memory:')
-  defineUserTable({
+  ws = openWorkspace({ id: 'test', path: ':memory:' })
+  defineUserTable(ws, {
     name: 'tasks',
     columns: [
       { name: 'title', type: 'text' },
@@ -13,18 +14,18 @@ beforeEach(() => {
       { name: 'done', type: 'boolean' },
     ],
   })
-  runMutation({
+  runMutation(ws, {
     kind: 'insert',
     table: 'tasks',
     data: { title: 'a', status: 'open', points: 3, done: false },
   })
-  runMutation({
+  runMutation(ws, {
     kind: 'insert',
     table: 'tasks',
     data: { title: 'b', status: 'open', points: 4, done: true },
   })
 })
-afterEach(() => closeDb())
+afterEach(() => ws.close())
 
 /**
  * Every descriptor slot that names a column is a SQL boundary. These cover the
@@ -36,14 +37,14 @@ describe('ink column identifiers never reach SQL as text', () => {
 
   test('groupBy aggregate columns are membership-checked', () => {
     expect(() =>
-      runQuery({
+      runQuery(ws, {
         table: 'tasks',
         groupBy: { column: 'status', aggregates: [{ fn: 'sum', column: injection }] },
       }),
     ).toThrow(/unknown column/)
 
     expect(() =>
-      runQuery({
+      runQuery(ws, {
         table: 'tasks',
         groupBy: { column: 'status', aggregates: [{ fn: 'sum', column: 'not_a_column' }] },
       }),
@@ -52,19 +53,19 @@ describe('ink column identifiers never reach SQL as text', () => {
 
   test('groupBy, where and orderBy columns are membership-checked', () => {
     expect(() =>
-      runQuery({ table: 'tasks', groupBy: { column: injection, aggregates: [{ fn: 'count' }] } }),
+      runQuery(ws, { table: 'tasks', groupBy: { column: injection, aggregates: [{ fn: 'count' }] } }),
     ).toThrow(/unknown column/)
     expect(() =>
-      runQuery({ table: 'tasks', where: [{ column: injection, op: 'eq', value: 'x' }] }),
+      runQuery(ws, { table: 'tasks', where: [{ column: injection, op: 'eq', value: 'x' }] }),
     ).toThrow(/unknown column/)
     expect(() =>
-      runQuery({ table: 'tasks', orderBy: { column: injection, direction: 'asc' } }),
+      runQuery(ws, { table: 'tasks', orderBy: { column: injection, direction: 'asc' } }),
     ).toThrow(/unknown column/)
   })
 
   test('mutation filter columns are membership-checked', () => {
     expect(() =>
-      runMutation({
+      runMutation(ws, {
         kind: 'delete',
         table: 'tasks',
         where: [{ column: injection, op: 'eq', value: 'x' }],
@@ -73,7 +74,7 @@ describe('ink column identifiers never reach SQL as text', () => {
   })
 
   test('legitimate queries still work through the bound-path executor', () => {
-    const grouped = runQuery({
+    const grouped = runQuery(ws, {
       table: 'tasks',
       groupBy: {
         column: 'status',
@@ -82,7 +83,7 @@ describe('ink column identifiers never reach SQL as text', () => {
     })
     expect(grouped.rows).toEqual([{ status: 'open', count: 2, sum_points: 7 }])
 
-    const filtered = runQuery({
+    const filtered = runQuery(ws, {
       table: 'tasks',
       where: [{ column: 'points', op: 'gte', value: 4 }],
       orderBy: { column: 'title', direction: 'desc' },
@@ -90,13 +91,13 @@ describe('ink column identifiers never reach SQL as text', () => {
     expect(filtered.rows.map((row) => row.title)).toEqual(['b'])
     expect(filtered.rows[0]?.done).toBe(true)
 
-    const ordered = runQuery({
+    const ordered = runQuery(ws, {
       table: 'tasks',
       orderBy: { column: 'points', direction: 'desc' },
     })
     expect(ordered.rows.map((row) => row.title)).toEqual(['b', 'a'])
 
-    const matched = runQuery({
+    const matched = runQuery(ws, {
       table: 'tasks',
       where: [{ column: 'status', op: 'in', value: ['open', 'closed'] }],
     })

@@ -9,5 +9,4 @@ export {
   sheetLinkTable,
   sheetTable,
   userTableTable,
-  windowStateTable,
 } from './schema'

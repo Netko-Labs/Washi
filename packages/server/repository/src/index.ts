@@ -8,17 +8,24 @@ export {
   resolveApproval,
   updateSession,
 } from './storage/agents'
-export { closeDb, deviceId, getDb, getSqlite, hlcNow, initializeDb, newId } from './storage/client'
+export {
+  type DrizzleDB,
+  newId,
+  openWorkspace,
+  type OpenWorkspaceOptions,
+  type Workspace,
+} from './storage/client'
 export { executeQuery, matchRecordIds } from './storage/ink-executor'
 export { listCapabilityCalls, recordCapability } from './storage/ledger'
 export {
   clearAgentHistory,
   clearCapabilityLedger,
-  eraseVault,
-  type VaultStats,
-  vaultStats,
+  eraseWorkspace,
+  type WorkspaceStats,
+  workspaceStats,
 } from './storage/maintenance'
-export { getAppMeta, getWindowState, saveWindowState, setAppMeta } from './storage/meta'
+export { getAppMeta, setAppMeta } from './storage/meta'
+export { createWorkspaceRegistry, type WorkspaceRegistry } from './storage/registry'
 export {
   createSheet,
   deleteSheet,

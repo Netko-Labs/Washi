@@ -16,6 +16,7 @@ import {
   resolveApproval,
   setAppMeta,
   updateSession,
+  type Workspace,
 } from '@washi/repository'
 import { checkUrl, guardedFetch, isPrivateAddress } from '@washi/tsuru'
 import { createSheetFromSource } from '../sheets/service'
@@ -73,6 +74,12 @@ sheet_check before sheet_create or sheet_replace and fix its diagnostics. Struct
 typed tables via db_* tools; sheets bind to them with bind props. You have no filesystem or shell —
 the washi tools are your entire world.`
 
+/** Who is asking. The route stamps this; a caller never supplies its own origin. */
+export interface Caller {
+  origin: CapabilityOrigin
+  actorId?: string | null
+}
+
 export interface AgentHostEvents {
   update: (sessionId: string, entry: TranscriptEntry) => void
   approval: (request: ApprovalRequest) => void
@@ -84,12 +91,14 @@ export class AgentHost {
   private pendingApprovals = new Map<string, (decision: ApprovalDecision) => void>()
   private alwaysAllowed = new Map<string, Set<string>>()
 
+  constructor(private readonly ws: Workspace) {}
+
   setEvents(events: AgentHostEvents): void {
     this.events = events
   }
 
   resolveApprovalRequest(id: string, decision: ApprovalDecision): void {
-    resolveApproval(id, decision === 'reject_once' ? 'denied' : 'allowed')
+    resolveApproval(this.ws, id, decision === 'reject_once' ? 'denied' : 'allowed')
     this.pendingApprovals.get(id)?.(decision)
     this.pendingApprovals.delete(id)
   }
@@ -100,23 +109,32 @@ export class AgentHost {
    * which is consent for reversible in-vault verbs and never for anything that
    * leaves the machine (Q13). Every outcome lands in the ledger.
    */
-  async executeAction(input: unknown, origin: CapabilityOrigin = 'agent'): Promise<void> {
+  async executeAction(input: unknown, caller: Caller = { origin: 'agent' }): Promise<void> {
+    const { origin, actorId = null } = caller
     const checked = checkAction(input)
     if (!checked.ok) {
       const detail = checked.issues.map((issue) => issue.message).join('; ')
-      recordCapability({ origin, subject: 'action.invalid', input, decision: 'denied', detail })
+      recordCapability(this.ws, {
+        origin,
+        actorId,
+        subject: 'action.invalid',
+        input,
+        decision: 'denied',
+        detail,
+      })
       throw new Error(detail)
     }
 
     const { verb } = checked.action
     if (origin === 'sheet' && !isReversibleVerb(verb)) {
       const detail = `"${verb}" leaves this machine — a sheet cannot run it without a stamp`
-      recordCapability({ origin, subject: verb, input, decision: 'denied', detail })
+      recordCapability(this.ws, { origin, actorId, subject: verb, input, decision: 'denied', detail })
       throw new Error(detail)
     }
 
-    recordCapability({
+    recordCapability(this.ws, {
       origin,
+      actorId,
       subject: verb,
       input,
       decision: origin === 'sheet' ? 'auto' : 'allowed',
@@ -125,14 +143,21 @@ export class AgentHost {
   }
 
   /** The sheet <Fetch> component's path — same policy, no approval loop. */
-  async fetchForSheet(url: string): Promise<string> {
+  async fetchForSheet(url: string, actorId: string | null = null): Promise<string> {
     try {
-      const body = await guardedFetch(url, currentFetchPolicy())
-      recordCapability({ origin: 'sheet', subject: 'fetch_url', input: { url }, decision: 'auto' })
+      const body = await guardedFetch(url, currentFetchPolicy(this.ws))
+      recordCapability(this.ws, {
+        origin: 'sheet',
+        actorId,
+        subject: 'fetch_url',
+        input: { url },
+        decision: 'auto',
+      })
       return body
     } catch (error) {
-      recordCapability({
+      recordCapability(this.ws, {
         origin: 'sheet',
+        actorId,
         subject: 'fetch_url',
         input: { url },
         decision: 'denied',
@@ -145,7 +170,7 @@ export class AgentHost {
   /** One user turn: persist, stream the SDK, emit + persist every update. */
   async prompt(sessionId: string, text: string): Promise<void> {
     this.record(sessionId, { kind: 'user_message', text })
-    updateSession(sessionId, { status: 'running' })
+    updateSession(this.ws, sessionId, { status: 'running' })
 
     const context: ToolContext = { runHankoAction: (action) => this.executeAction(action) }
 
@@ -153,8 +178,8 @@ export class AgentHost {
       const stream = query({
         prompt: text,
         options: {
-          resume: getSdkSessionId(sessionId) ?? undefined,
-          mcpServers: { washi: createWashiTools(context) },
+          resume: getSdkSessionId(this.ws, sessionId) ?? undefined,
+          mcpServers: { washi: createWashiTools(this.ws, context) },
           disallowedTools: [
             'Bash',
             'BashOutput',
@@ -178,14 +203,14 @@ export class AgentHost {
 
       for await (const message of stream) {
         if (message.type === 'system' && message.subtype === 'init') {
-          updateSession(sessionId, { sdkSessionId: message.session_id })
+          updateSession(this.ws, sessionId, { sdkSessionId: message.session_id })
           continue
         }
         for (const update of normalizeMessage(message)) {
           this.record(sessionId, update)
           if (update.kind === 'tool_call') this.emitProposedDiff(sessionId, update)
           if (update.kind === 'turn_done') {
-            updateSession(sessionId, {
+            updateSession(this.ws, sessionId, {
               status: update.stopReason === 'error' ? 'error' : 'idle',
               ...(update.costUsd != null ? { costUsd: update.costUsd } : {}),
             })
@@ -194,7 +219,7 @@ export class AgentHost {
       }
     } catch (error) {
       this.record(sessionId, { kind: 'turn_done', stopReason: 'error', error: String(error) })
-      updateSession(sessionId, { status: 'error' })
+      updateSession(this.ws, sessionId, { status: 'error' })
     }
   }
 
@@ -214,7 +239,7 @@ export class AgentHost {
     if (READ_TOOLS.has(name)) return { behavior: 'allow', updatedInput: input }
 
     if (name === 'fetch_url' && typeof input.url === 'string') {
-      const verdict = checkUrl(input.url, currentFetchPolicy())
+      const verdict = checkUrl(input.url, currentFetchPolicy(this.ws))
       if (verdict.ok) return { behavior: 'allow', updatedInput: input }
       if (!verdict.needsApproval) return { behavior: 'deny', message: verdict.reason }
     }
@@ -244,12 +269,12 @@ export class AgentHost {
     toolName: string,
     input: unknown,
   ): Promise<ApprovalDecision> {
-    const request = createApproval(sessionId, toolName, input)
+    const request = createApproval(this.ws, sessionId, toolName, input)
     this.events?.approval(request)
     return new Promise((resolve) => {
       const timeout = setTimeout(() => {
         this.pendingApprovals.delete(request.id)
-        resolveApproval(request.id, 'denied')
+        resolveApproval(this.ws, request.id, 'denied')
         resolve('reject_once')
       }, APPROVAL_TIMEOUT_MS)
       this.pendingApprovals.set(request.id, (decision) => {
@@ -264,7 +289,7 @@ export class AgentHost {
     if (call.title !== 'sheet_replace') return
     const input = call.input as { id?: string; source?: string } | undefined
     if (!input?.id || typeof input.source !== 'string') return
-    const existing = getSheet(input.id)
+    const existing = getSheet(this.ws, input.id)
     if (!existing) return
     this.record(sessionId, {
       kind: 'tool_call_update',
@@ -277,9 +302,9 @@ export class AgentHost {
   private persistFetchHost(rawUrl: string) {
     try {
       const host = new URL(rawUrl).hostname
-      const policy = currentFetchPolicy()
+      const policy = currentFetchPolicy(this.ws)
       if (!policy.allowedHosts.includes(host)) {
-        setAppMeta(TSURU_HOSTS_KEY, JSON.stringify([...policy.allowedHosts, host]))
+        setAppMeta(this.ws, TSURU_HOSTS_KEY, JSON.stringify([...policy.allowedHosts, host]))
       }
     } catch {
       // unparseable url — the fetch itself will fail loudly
@@ -287,7 +312,7 @@ export class AgentHost {
   }
 
   private record(sessionId: string, update: AgentUpdate) {
-    const entry = appendTurn(sessionId, update)
+    const entry = appendTurn(this.ws, sessionId, update)
     this.events?.update(sessionId, entry)
   }
 
@@ -298,11 +323,11 @@ export class AgentHost {
       },
       'sheet.create': (action) => {
         const source = `<Sheet title=${JSON.stringify(action.title)}>\n  <H1>${action.title}</H1>\n</Sheet>\n`
-        const sheet = createSheetFromSource({ title: action.title, source })
+        const sheet = createSheetFromSource(this.ws, { title: action.title, source })
         this.events?.openSheet(sheet.id)
       },
       'table.insert': (action) => {
-        runMutation({ kind: 'insert', table: action.table, data: action.data })
+        runMutation(this.ws, { kind: 'insert', table: action.table, data: action.data })
       },
       'url.open': (action) => {
         const url = new URL(action.url)

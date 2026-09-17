@@ -2,7 +2,7 @@ import type { UserTable } from '@washi/domain'
 import { recordTable, userTableTable } from '@washi/domain/db'
 import { type RecordData, type TableSpec, tableSpecSchema } from '@washi/ink'
 import { and, eq, inArray, isNull } from 'drizzle-orm'
-import { getDb, getSqlite, hlcNow, newId } from './client'
+import { newId, type Workspace } from './client'
 import { appendOp } from './oplog'
 
 function toUserTable(row: typeof userTableTable.$inferSelect): UserTable {
@@ -14,8 +14,8 @@ function toUserTable(row: typeof userTableTable.$inferSelect): UserTable {
   }
 }
 
-export function listTables(): UserTable[] {
-  return getDb()
+export function listTables(ws: Workspace): UserTable[] {
+  return ws.db
     .select()
     .from(userTableTable)
     .where(isNull(userTableTable.deletedAt))
@@ -23,8 +23,8 @@ export function listTables(): UserTable[] {
     .map(toUserTable)
 }
 
-export function getTableByName(name: string): UserTable | null {
-  const [row] = getDb()
+export function getTableByName(ws: Workspace, name: string): UserTable | null {
+  const [row] = ws.db
     .select()
     .from(userTableTable)
     .where(and(eq(userTableTable.name, name), isNull(userTableTable.deletedAt)))
@@ -32,37 +32,37 @@ export function getTableByName(name: string): UserTable | null {
   return row ? toUserTable(row) : null
 }
 
-export function defineTable(spec: TableSpec): UserTable {
-  const existing = getTableByName(spec.name)
-  const now = hlcNow()
+export function defineTable(ws: Workspace, spec: TableSpec): UserTable {
+  const existing = getTableByName(ws, spec.name)
+  const now = ws.now()
   if (existing) {
-    getDb()
+    ws.db
       .update(userTableTable)
       .set({ spec, hlcUpdated: now })
       .where(eq(userTableTable.id, existing.id))
       .run()
-    appendOp('table', existing.id, { kind: 'define', spec })
+    appendOp(ws, 'table', existing.id, { kind: 'define', spec })
     return { ...existing, spec, hlcUpdated: now }
   }
   const id = newId()
-  getDb()
+  ws.db
     .insert(userTableTable)
     .values({ id, name: spec.name, spec, hlcCreated: now, hlcUpdated: now })
     .run()
-  appendOp('table', id, { kind: 'define', spec })
+  appendOp(ws, 'table', id, { kind: 'define', spec })
   return { id, name: spec.name, spec, hlcUpdated: now }
 }
 
-export function insertRecord(tableId: string, data: RecordData): string {
-  const now = hlcNow()
+export function insertRecord(ws: Workspace, tableId: string, data: RecordData): string {
+  const now = ws.now()
   const id = newId()
-  getDb().insert(recordTable).values({ id, tableId, data, hlcCreated: now, hlcUpdated: now }).run()
-  appendOp('record', id, { kind: 'insert', tableId, data })
+  ws.db.insert(recordTable).values({ id, tableId, data, hlcCreated: now, hlcUpdated: now }).run()
+  appendOp(ws, 'record', id, { kind: 'insert', tableId, data })
   return id
 }
 
-export function findRecordTableId(recordId: string): string | null {
-  const [row] = getDb()
+export function findRecordTableId(ws: Workspace, recordId: string): string | null {
+  const [row] = ws.db
     .select({ tableId: recordTable.tableId })
     .from(recordTable)
     .where(and(eq(recordTable.id, recordId), isNull(recordTable.deletedAt)))
@@ -70,32 +70,37 @@ export function findRecordTableId(recordId: string): string | null {
   return row?.tableId ?? null
 }
 
-export function updateRecords(tableId: string, ids: string[], patch: RecordData): number {
+export function updateRecords(
+  ws: Workspace,
+  tableId: string,
+  ids: string[],
+  patch: RecordData,
+): number {
   if (ids.length === 0) return 0
-  const db = getDb()
-  const rows = db
+  const rows = ws.db
     .select()
     .from(recordTable)
     .where(and(eq(recordTable.tableId, tableId), inArray(recordTable.id, ids)))
     .all()
-  const now = hlcNow()
+  const now = ws.now()
   for (const row of rows) {
     const merged = { ...(row.data as RecordData), ...patch }
-    db.update(recordTable)
+    ws.db
+      .update(recordTable)
       .set({ data: merged, hlcUpdated: now })
       .where(eq(recordTable.id, row.id))
       .run()
-    appendOp('record', row.id, { kind: 'update', tableId, patch })
+    appendOp(ws, 'record', row.id, { kind: 'update', tableId, patch })
   }
   return rows.length
 }
 
-export function deleteRecords(tableId: string, ids: string[]): number {
+export function deleteRecords(ws: Workspace, tableId: string, ids: string[]): number {
   if (ids.length === 0) return 0
   const placeholders = ids.map(() => '?').join(', ')
-  const result = getSqlite()
+  const result = ws.sqlite
     .query(`UPDATE records SET deleted_at = ? WHERE table_id = ? AND id IN (${placeholders})`)
-    .run(hlcNow(), tableId, ...ids)
-  for (const id of ids) appendOp('record', id, { kind: 'delete', tableId })
+    .run(ws.now(), tableId, ...ids)
+  for (const id of ids) appendOp(ws, 'record', id, { kind: 'delete', tableId })
   return result.changes
 }

@@ -1,6 +1,12 @@
 import type { SheetDetail, SheetWrite } from '@washi/domain'
 import { paperRegistry } from '@washi/paper/registry'
-import { createSheet, deleteSheet, getSheet, updateSheet } from '@washi/repository'
+import {
+  createSheet,
+  deleteSheet,
+  getSheet,
+  updateSheet,
+  type Workspace,
+} from '@washi/repository'
 import {
   type Diagnostic,
   extractRefs,
@@ -43,24 +49,31 @@ function parseValidated(source: string) {
   return parse(source)
 }
 
-export function createSheetFromSource(write: SheetWrite): SheetDetail {
+export function createSheetFromSource(ws: Workspace, write: SheetWrite): SheetDetail {
   const root = parseValidated(write.source)
-  return createSheet(write, { body: extractText(root), refs: extractRefs(root) })
+  return createSheet(ws, write, { body: extractText(root), refs: extractRefs(root) })
 }
 
-export function updateSheetFromSource(id: string, write: SheetWrite): SheetDetail {
+export function updateSheetFromSource(
+  ws: Workspace,
+  id: string,
+  write: SheetWrite,
+): SheetDetail {
   const root = parseValidated(write.source)
-  const updated = updateSheet(id, write, { body: extractText(root), refs: extractRefs(root) })
+  const updated = updateSheet(ws, id, write, {
+    body: extractText(root),
+    refs: extractRefs(root),
+  })
   if (!updated) throw new Error(`sheet not found: ${id}`)
   return updated
 }
 
-export function removeSheet(id: string): void {
-  if (!deleteSheet(id)) throw new Error(`sheet not found: ${id}`)
+export function removeSheet(ws: Workspace, id: string): void {
+  if (!deleteSheet(ws, id)) throw new Error(`sheet not found: ${id}`)
 }
 
-export function requireSheet(id: string): SheetDetail {
-  const sheet = getSheet(id)
+export function requireSheet(ws: Workspace, id: string): SheetDetail {
+  const sheet = getSheet(ws, id)
   if (!sheet) throw new Error(`sheet not found: ${id}`)
   return sheet
 }

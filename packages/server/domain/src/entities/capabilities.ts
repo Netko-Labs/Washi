@@ -15,6 +15,8 @@ export type CapabilityDecision = z.infer<typeof capabilityDecisionSchema>
 export const capabilityCallSchema = z.object({
   id: z.string(),
   origin: capabilityOriginSchema,
+  /** Which human, once a workspace has more than one. Null in embedded mode. */
+  actorId: z.string().nullable(),
   subject: z.string(),
   input: z.unknown(),
   decision: capabilityDecisionSchema,
@@ -25,6 +27,7 @@ export type CapabilityCall = z.infer<typeof capabilityCallSchema>
 
 export interface CapabilityWrite {
   origin: CapabilityOrigin
+  actorId?: string | null
   subject: string
   input?: unknown
   decision: CapabilityDecision

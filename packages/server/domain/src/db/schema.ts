@@ -75,6 +75,8 @@ export const capabilityCallTable = sqliteTable('capability_calls', {
   id: text('id').primaryKey(),
   /** 'agent' or 'sheet' — which side of the desk the call came from. */
   origin: text('origin').notNull(),
+  /** Who, once a workspace has more than one human. Null in embedded mode. */
+  actorId: text('actor_id'),
   subject: text('subject').notNull(),
   input: text('input', { mode: 'json' }),
   decision: text('decision').notNull(),
@@ -96,11 +98,3 @@ export const appMetaTable = sqliteTable('app_meta', {
   value: text('value').notNull(),
 })
 
-export const windowStateTable = sqliteTable('window_state', {
-  id: integer('id').primaryKey(),
-  x: integer('x').notNull(),
-  y: integer('y').notNull(),
-  width: integer('width').notNull(),
-  height: integer('height').notNull(),
-  isMaximized: integer('is_maximized', { mode: 'boolean' }).notNull().default(false),
-})

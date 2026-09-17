@@ -17,6 +17,7 @@ import {
   insertRecord,
   matchRecordIds,
   updateRecords,
+  type Workspace,
 } from '@washi/repository'
 
 export class InkError extends Error {
@@ -26,19 +27,19 @@ export class InkError extends Error {
   }
 }
 
-function requireTable(name: string): UserTable {
-  const table = getTableByName(name)
+function requireTable(ws: Workspace, name: string): UserTable {
+  const table = getTableByName(ws, name)
   if (!table) throw new InkError(`unknown table "${name}"`)
   return table
 }
 
-export function defineUserTable(input: unknown): UserTable {
+export function defineUserTable(ws: Workspace, input: unknown): UserTable {
   const spec: TableSpec = tableSpecSchema.parse(input)
-  return defineTable(spec)
+  return defineTable(ws, spec)
 }
 
-export function runQuery(query: InkQuery): QueryResult {
-  const table = requireTable(query.table)
+export function runQuery(ws: Workspace, query: InkQuery): QueryResult {
+  const table = requireTable(ws, query.table)
   // Every slot that names a column, aggregates included — a descriptor column
   // that reaches the executor unchecked is a SQL surface (spec §09 P0).
   const referenced = [
@@ -51,11 +52,14 @@ export function runQuery(query: InkQuery): QueryResult {
   ]
   const issues = unknownQueryColumns(table.spec, referenced)
   if (issues.length > 0) throw new InkError(issues.map((issue) => issue.message).join('; '))
-  return executeQuery(table.id, table.spec, query)
+  return executeQuery(ws, table.id, table.spec, query)
 }
 
-export function runMutation(mutation: InkMutation): { affected: number; id?: string } {
-  const table = requireTable(mutation.table)
+export function runMutation(
+  ws: Workspace,
+  mutation: InkMutation,
+): { affected: number; id?: string } {
+  const table = requireTable(ws, mutation.table)
 
   if (mutation.kind !== 'insert') {
     const issues = unknownQueryColumns(table.spec, mutation.where)
@@ -71,21 +75,21 @@ export function runMutation(mutation: InkMutation): { affected: number; id?: str
 
   switch (mutation.kind) {
     case 'insert':
-      return { affected: 1, id: insertRecord(table.id, mutation.data) }
+      return { affected: 1, id: insertRecord(ws, table.id, mutation.data) }
     case 'update': {
-      const ids = matchRecordIds(table.id, mutation.where)
-      return { affected: updateRecords(table.id, ids, mutation.data) }
+      const ids = matchRecordIds(ws, table.id, mutation.where)
+      return { affected: updateRecords(ws, table.id, ids, mutation.data) }
     }
     case 'delete': {
-      const ids = matchRecordIds(table.id, mutation.where)
-      return { affected: deleteRecords(table.id, ids) }
+      const ids = matchRecordIds(ws, table.id, mutation.where)
+      return { affected: deleteRecords(ws, table.id, ids) }
     }
   }
 }
 
 /** Task checkbox write-back: flip `done` on one record by id. */
-export function toggleTaskRecord(recordId: string, done: boolean): void {
-  const tableId = findRecordTableId(recordId)
+export function toggleTaskRecord(ws: Workspace, recordId: string, done: boolean): void {
+  const tableId = findRecordTableId(ws, recordId)
   if (!tableId) throw new InkError(`unknown record "${recordId}"`)
-  updateRecords(tableId, [recordId], { done })
+  updateRecords(ws, tableId, [recordId], { done })
 }

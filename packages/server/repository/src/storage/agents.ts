@@ -1,7 +1,7 @@
 import type { AgentSession, AgentUpdate, ApprovalRequest, TranscriptEntry } from '@washi/domain'
 import { agentSessionTable, agentTurnTable, approvalTable } from '@washi/domain/db'
 import { asc, desc, eq } from 'drizzle-orm'
-import { getDb, getSqlite, hlcNow, newId } from './client'
+import { newId, type Workspace } from './client'
 
 function toSession(row: typeof agentSessionTable.$inferSelect): AgentSession {
   return {
@@ -15,8 +15,8 @@ function toSession(row: typeof agentSessionTable.$inferSelect): AgentSession {
   }
 }
 
-export function listSessions(): AgentSession[] {
-  return getDb()
+export function listSessions(ws: Workspace): AgentSession[] {
+  return ws.db
     .select()
     .from(agentSessionTable)
     .orderBy(desc(agentSessionTable.updatedAt))
@@ -24,34 +24,38 @@ export function listSessions(): AgentSession[] {
     .map(toSession)
 }
 
-export function createSession(title: string): AgentSession {
-  const now = hlcNow()
+export function createSession(ws: Workspace, title: string): AgentSession {
+  const now = ws.now()
   const id = newId()
-  getDb().insert(agentSessionTable).values({ id, title, createdAt: now, updatedAt: now }).run()
+  ws.db.insert(agentSessionTable).values({ id, title, createdAt: now, updatedAt: now }).run()
   return toSession(
-    getDb().select().from(agentSessionTable).where(eq(agentSessionTable.id, id)).all()[0]!,
+    ws.db.select().from(agentSessionTable).where(eq(agentSessionTable.id, id)).all()[0]!,
   )
 }
 
 export function updateSession(
+  ws: Workspace,
   id: string,
   patch: Partial<{ status: string; costUsd: number; sdkSessionId: string; title: string }>,
 ): void {
-  getDb()
+  ws.db
     .update(agentSessionTable)
-    .set({ ...patch, updatedAt: hlcNow() })
+    .set({ ...patch, updatedAt: ws.now() })
     .where(eq(agentSessionTable.id, id))
     .run()
 }
 
-export function getSdkSessionId(id: string): string | null {
-  const [row] = getDb().select().from(agentSessionTable).where(eq(agentSessionTable.id, id)).all()
+export function getSdkSessionId(ws: Workspace, id: string): string | null {
+  const [row] = ws.db.select().from(agentSessionTable).where(eq(agentSessionTable.id, id)).all()
   return row?.sdkSessionId ?? null
 }
 
-export function appendTurn(sessionId: string, update: AgentUpdate): TranscriptEntry {
-  const db = getDb()
-  const [last] = db
+export function appendTurn(
+  ws: Workspace,
+  sessionId: string,
+  update: AgentUpdate,
+): TranscriptEntry {
+  const [last] = ws.db
     .select({ seq: agentTurnTable.seq })
     .from(agentTurnTable)
     .where(eq(agentTurnTable.sessionId, sessionId))
@@ -62,9 +66,10 @@ export function appendTurn(sessionId: string, update: AgentUpdate): TranscriptEn
     id: newId(),
     seq: (last?.seq ?? 0) + 1,
     update,
-    createdAt: hlcNow(),
+    createdAt: ws.now(),
   }
-  db.insert(agentTurnTable)
+  ws.db
+    .insert(agentTurnTable)
     .values({
       id: entry.id,
       sessionId,
@@ -76,8 +81,8 @@ export function appendTurn(sessionId: string, update: AgentUpdate): TranscriptEn
   return entry
 }
 
-export function getTranscript(sessionId: string): TranscriptEntry[] {
-  return getDb()
+export function getTranscript(ws: Workspace, sessionId: string): TranscriptEntry[] {
+  return ws.db
     .select()
     .from(agentTurnTable)
     .where(eq(agentTurnTable.sessionId, sessionId))
@@ -92,6 +97,7 @@ export function getTranscript(sessionId: string): TranscriptEntry[] {
 }
 
 export function createApproval(
+  ws: Workspace,
   sessionId: string,
   toolName: string,
   input: unknown,
@@ -101,18 +107,22 @@ export function createApproval(
     sessionId,
     toolName,
     input,
-    createdAt: hlcNow(),
+    createdAt: ws.now(),
   }
-  getDb()
+  ws.db
     .insert(approvalTable)
     .values({ ...request, input: request.input ?? null })
     .run()
   return request
 }
 
-export function resolveApproval(id: string, status: 'allowed' | 'denied'): boolean {
-  const result = getSqlite()
+export function resolveApproval(
+  ws: Workspace,
+  id: string,
+  status: 'allowed' | 'denied',
+): boolean {
+  const result = ws.sqlite
     .query("UPDATE approvals SET status = ?, resolved_at = ? WHERE id = ? AND status = 'pending'")
-    .run(status, hlcNow(), id)
+    .run(status, ws.now(), id)
   return result.changes > 0
 }
