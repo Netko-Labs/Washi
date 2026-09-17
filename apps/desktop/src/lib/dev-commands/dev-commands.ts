@@ -1,4 +1,4 @@
-import type { DevCommand } from '@washi/desktop-api'
+import type { DevCommand } from '@washi/trpc'
 import { api } from '@/lib/rpc'
 import { IDENTITY_KEY, ONBOARDED_KEY } from '@/stores/view/view-store'
 

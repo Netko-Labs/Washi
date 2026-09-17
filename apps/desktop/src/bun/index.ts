@@ -1,14 +1,14 @@
 import { homedir } from 'node:os'
 import { join } from 'node:path'
-import { createRouter } from '@washi/desktop-api'
+import { createRouter } from '@washi/trpc'
 import {
   getWindowState,
   initializeDb,
   listSheets,
   listTables,
   saveWindowState,
-} from '@washi/desktop-repository'
-import { AgentHost } from '@washi/desktop-service'
+} from '@washi/repository'
+import { AgentHost } from '@washi/service'
 import { app, devtools, type MenuItemTemplate, menu } from 'mirinjs'
 import { developMenu } from './dev-menu'
 import { seedShowcase } from './showcase'

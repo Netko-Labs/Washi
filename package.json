@@ -5,7 +5,7 @@
   "type": "module",
   "workspaces": [
     "apps/*",
-    "packages/desktop/*",
+    "packages/server/*",
     "packages/shared/*"
   ],
   "scripts": {

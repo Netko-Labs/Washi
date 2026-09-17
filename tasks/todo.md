@@ -1,90 +1,71 @@
-# Build to M2 — COMPLETE (2026-08-12)
+# Phase 1 — server + transport
 
-Acceptance met: `bun test` 42 green, `turbo check-types` green, `biome check` green,
-`mirin check --scenario` 7 steps green (M1 + M2 flows), commits at each milestone.
+Spec: `docs/server.html` §07. Acceptance for the whole phase:
 
-## M0 — scaffold ✅
+- `bun test` green, `bun run typecheck` green, `bun run check` green
+- `apps/server` boots in both modes; `embedded` serves the desktop app end to end
+- no `getDb()` module singleton anywhere — every repository op takes a resolved workspace
+- `mirin check --scenario` still passes against the new transport
 
-- [x] repo shape (Anko 1:1), configs, conventions fork, CI
-- [x] booting shell: rpc ping round-trip, check.ts passes
+## Steps
 
-## M1 — sheets core ✅
+- [x] **1 · restructure** — `packages/desktop/*` → `packages/server/*`; `api` → `trpc`;
+      `@washi/desktop-{domain,repository,service}` → `@washi/{domain,repository,service}`
+- [ ] **2 · workspace handle (C1 · C3 · kills P7)** — `initializeDb()` singleton →
+      `openWorkspace(path): Workspace`; every op takes it as first arg; registry opens by id.
+      `window_state` leaves the workspace db — a server has no windows.
+- [ ] **3 · tRPC layer** — `init.ts` (createContext + procedure builders), routers in
+      conventions §3 shape (`routers/{entity}/{queries,mutations,subscriptions}.ts` + mergeRouters).
+      Events become `tracked()` subscriptions.
+- [ ] **4 · apps/server** — Bun binary, `Bun.serve` with `/trpc` (http+ws) + `/health`.
+      `mode: 'hosted' | 'embedded'` asserted once at boot (C2); hosted branch runs, unauthenticated,
+      **local only — no public URL until phase 2 puts Better Auth in front of it.**
+- [ ] **5 · desktop as thin client (C4)** — `lib/rpc.ts` swaps `mirinjs/client` for a tRPC client
+      over `127.0.0.1:port`. mirin keeps window, menu, icon, sidecar spawn.
+- [ ] **6 · `actor_id` on `capability_calls`** — "who approved this" is the team audit story;
+      brutal to retrofit against a populated ledger.
 
-- [x] domain: schema (sheets, tables/records, sessions/turns, approvals, oplog), HLC
-- [x] @washi/ink: specs + query/mutation descriptors (+aggregations) + tests
-- [x] @washi/wsx: parse/validate/serialize/extract + diagnostics + tests
-- [x] @washi/paper: registry (zod, class allowlist) + React components + WsxView
-- [x] repository: DDL, Loro sheet store, ops folders, FTS5, ink executor + tests
-- [x] service: sheet service (validate-on-save, link extraction), search
-- [x] api routes + events; ui: sidebar, sheet view, search
-- [x] check.ts: create sheet → renders → search finds it
+## Deferred out of phase 1 (deliberately)
 
-## M2 — embedded Claude ✅
+Better Auth + Postgres control plane (phase 2) · `apps/web` + new onboarding (phase 3) ·
+agent server-side + circuit breaker (phase 4) · P2 transactions (phase 5) · canvas sweep (phase 6).
 
-- [x] @washi/tsuru: policy + guarded fetch + SSRF tests
-- [x] @washi/hanko: verb registry + executor + tests
-- [x] agent host: SDK query loop, in-process MCP tools, canUseTool → approvals,
-      session/turn persistence, budget, ACP-shaped updates
-- [x] api agent routes + events
-- [x] ui: right panel — transcript, tool cards, wsx diff, permission prompts
-- [x] check.ts: agent panel renders; session creation drivable without API key
+---
 
-## Design feature gaps (from the spec-parity pass, 2026-08-12)
+# M2 — COMPLETE (2026-08-12)
 
-Elements of docs/spec.html's language that the current model cannot express — features, not hacks:
+42 unit tests green, typecheck green, biome green, `mirin check --scenario` 7 steps green.
+M0 scaffold · M1 sheets core · M2 embedded Claude — all shipped. Full record in git history;
+the milestone plan itself is superseded by `docs/server.html` §07.
 
-- [x] **Sheet accent color** — `theme.accent` tape preset on <Sheet> (2026-08-12).
-- [x] **`Tape` Paper primitive** — plus Stamp/Chip/Hero/Stat/Card/Timeline/Step (2026-08-12).
-- [x] **Page-level typography/texture** — `theme.face` (gothic/serif/rounded) + `theme.paper`
-      (plain/dots/lines). Cover images still open.
-- [ ] **Cover images for sheets** — needs an asset story (https-only Img exists; local assets don't).
-- [x] **Styling freedom in WSX** — Q9 revised 2026-08-13: full Tailwind vocabulary (arbitrary
-      values, variants, gradients) via `@tailwindcss/browser`; `url()` banned. Box/Span primitives
-      added; six presets remain as starting palettes.
-- [ ] **Dark mode toggle** — tokens exist for `.dark`, no UI or persistence wired.
-- [ ] **Sheet page-card tape** still hash-derived in app chrome — should read `theme.accent`
-      when the sheet has one (small SheetView follow-up).
+## Design scope still open
 
-## Design-handoff implementation (2026-08-13) — shipped vs remaining
+Carried forward — none of it is blocked by the server pivot, but onboarding and the
+dashboard are rewritten in phase 3 rather than patched.
 
-Shipped from the claude.ai design projects: handoff tokens (light + pure-black dark), Inter,
-248px sidebar (vault switcher w/ VaultIcon, ⌘K search button, page tree, sync row), 48px
-breadcrumb header + "Washi watching" pill (AgentMascot state-driven), 334px agent panel
-(un-bubbled messages, tool pills, suggestion chips, pill composer, mascot header), command
-palette (cmdk), mascot system (MascotDefs + Mascot 7 faces + AgentMascot 8 states + VaultIcon
-12 topics + design keyframes), UI-state empty states, suggested-edit diff styling.
-
-Remaining from the handoffs (each is real scope, not styling):
-
-- [ ] **Onboarding flow** — 4-step first-run (local-first pitch, vault creation, sync choice,
-      agent consent) + server path variants. Needs first-run detection + vault naming.
-- [ ] **Dashboard view** — greeting, stat cards, review queue, recent pages, activity timeline.
-- [ ] **Graph view** — backlink graph on dotted canvas (sheet_links data exists).
-- [ ] **Settings view** — 4 tabs incl. agent autonomy segmented control + scheduled runs.
-- [ ] **Multi-workspace/vault backend** — switcher popover, create-workspace dialog, per-vault db.
-- [ ] **Model picker + context meter** in composer (SDK setModel / usage_update plumbing).
-- [ ] **In-note agent affordances** — authorship captions, agentColor block borders, inline
-      accept/reject on suggested edits (needs block-level anchors → spec Q2/Q3 territory).
-- [ ] **Dark mode toggle** (tokens shipped), theme segmented control.
-- [ ] **Toast faces + thinking bar + dropzone** from UI states (components exist, not wired).
-- [ ] Sidebar folders (tree grouping), user/account row, Share.
+- [ ] **Dashboard view** — greeting, stat cards, review queue, recent pages, activity timeline
+- [ ] **Inbox** — wire rows to the real capability ledger; dismissals currently reset on reload
+- [ ] **Settings view** — 4 tabs incl. agent autonomy segmented control + scheduled runs
+- [ ] **Daily note** — real per-day sheet, not static design copy
+- [ ] **Model picker + context meter** in composer (SDK setModel / usage_update plumbing)
+- [ ] **In-note agent affordances** — authorship captions, inline accept/reject on suggested edits
+- [ ] **Dark mode toggle** (tokens shipped), theme segmented control
+- [ ] **Cover images / attachments** — still owed an asset story; `Img` is https-only
+- [ ] Sidebar folders, Share, toast faces + thinking bar + dropzone
 
 ## Known gaps (post-M2)
 
-- Live SDK loop not covered by automated tests (would bill + need auth); unit tests
-  cover normalization/gating/actions/persistence, check covers UI. Exercise manually
-  with `bun dev` and a prompt.
-- cmdk installed but unused (simple search input shipped instead).
-- Fetch component + tsuru allowlist UI: agents can allow-always hosts; no settings
-  surface to edit the list yet.
+- Live SDK loop not covered by automated tests (would bill + need auth); unit tests cover
+  normalization/gating/actions/persistence, `check` covers UI.
+- Fetch component + tsuru allowlist UI unproven end-to-end; no settings surface for the host list.
+- No turn cancel: a running turn cannot be interrupted (P6).
 
 ## Lessons
 
 - drizzle `.run()` types as void on bun-sqlite — use raw `getSqlite().query().run()`
   when you need `changes`.
 - Renderer typecheck needs `types: ["vite/client", "bun"]` — Router type resolution
-  pulls repository sources into the renderer program (Anko does the same via
-  transitive bun-types inclusion).
+  pulls repository sources into the renderer program.
 - `mirin check` runs against the persistent dev db — scenarios must be state-robust
   (click the target sheet, don't assume first-boot state).
 - babel parser pairs with @babel/types@^7 — v8 types mismatch v7 AST.

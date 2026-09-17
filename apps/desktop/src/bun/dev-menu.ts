@@ -1,10 +1,10 @@
-import type { DevCommand } from '@washi/desktop-api'
+import type { DevCommand } from '@washi/trpc'
 import {
   clearAgentHistory,
   clearCapabilityLedger,
   eraseVault,
   vaultStats,
-} from '@washi/desktop-repository'
+} from '@washi/repository'
 import { dialog, type MenuItemTemplate } from 'mirinjs'
 import { seedShowcase } from './showcase'
 

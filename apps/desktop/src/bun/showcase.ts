@@ -1,10 +1,10 @@
-import { getSheet, getTableByName, listSheets } from '@washi/desktop-repository'
+import { getSheet, getTableByName, listSheets } from '@washi/repository'
 import {
   createSheetFromSource,
   defineUserTable,
   runMutation,
   updateSheetFromSource,
-} from '@washi/desktop-service'
+} from '@washi/service'
 
 /**
  * Seeded showcase sheets — one per design direction, proving WSX carries a

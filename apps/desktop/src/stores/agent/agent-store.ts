@@ -3,7 +3,7 @@ import type {
   ApprovalDecision,
   ApprovalRequest,
   TranscriptEntry,
-} from '@washi/desktop-domain'
+} from '@washi/domain'
 import { create } from 'zustand'
 import { api } from '@/lib/rpc'
 import { useSheetsStore } from '@/stores/sheets/sheets-store'

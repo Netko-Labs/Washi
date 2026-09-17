@@ -1,4 +1,4 @@
-import type { SearchHit, SheetSummary } from '@washi/desktop-domain'
+import type { SearchHit, SheetSummary } from '@washi/domain'
 import { create } from 'zustand'
 import { api } from '@/lib/rpc'
 

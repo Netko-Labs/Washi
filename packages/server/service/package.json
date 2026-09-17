@@ -1,0 +1,28 @@
+{
+  "name": "@washi/service",
+  "version": "0.1.0",
+  "dependencies": {
+    "@anthropic-ai/claude-agent-sdk": "^0.3.228",
+    "@washi/domain": "workspace:*",
+    "@washi/repository": "workspace:*",
+    "@washi/hanko": "workspace:*",
+    "@washi/ink": "workspace:*",
+    "@washi/paper": "workspace:*",
+    "@washi/tsuru": "workspace:*",
+    "@washi/wsx": "workspace:*",
+    "mirinjs": "0.1.0-alpha.19",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@washi/typescript-config": "workspace:*",
+    "@types/bun": "latest"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "private": true,
+  "scripts": {
+    "check-types": "tsgo -p tsconfig.json --noEmit"
+  },
+  "type": "module"
+}

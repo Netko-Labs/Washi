@@ -6,7 +6,7 @@ import {
   IconSearch,
   IconWorld,
 } from '@tabler/icons-react'
-import type { AgentUpdate, TranscriptEntry } from '@washi/desktop-domain'
+import type { AgentUpdate, TranscriptEntry } from '@washi/domain'
 import type { ReactNode } from 'react'
 import { Mascot } from '@/components/mascot/Mascot'
 
