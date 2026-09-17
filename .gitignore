@@ -11,6 +11,9 @@ build/
 # 60MB compiled binaries from `bun build --compile`
 *.bun-build
 
+# local hosted-mode workspace files
+.washi/
+
 # secrets — .env.example is the committed template, .env never is
 .env
 .env.*

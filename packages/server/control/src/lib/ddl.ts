@@ -91,8 +91,13 @@ export async function ensureControlSchema(db: ControlDB): Promise<void> {
       role TEXT DEFAULT 'member',
       status TEXT NOT NULL DEFAULT 'pending',
       expires_at TIMESTAMP NOT NULL,
-      inviter_id TEXT NOT NULL REFERENCES "user"(id) ON DELETE CASCADE
+      inviter_id TEXT NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+      created_at TIMESTAMP NOT NULL DEFAULT NOW()
     )`)
+  // Additive, for a database created before this column existed.
+  await db.execute(
+    sql`ALTER TABLE "invitation" ADD COLUMN IF NOT EXISTS created_at TIMESTAMP NOT NULL DEFAULT NOW()`,
+  )
   await db.execute(
     sql`CREATE INDEX IF NOT EXISTS invitation_org_idx ON "invitation"(organization_id)`,
   )

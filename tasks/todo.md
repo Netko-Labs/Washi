@@ -32,6 +32,14 @@
 - **`@washi/control/embedded` subpath.** The barrel re-exports the hosted plane, so importing
   the *stub* dragged Better Auth and a Postgres driver into the desktop main process. The
   desktop should ship neither.
+- **Hosted mode verified against real Postgres** (2026-09-17). sign-up → session → create
+  organization → `workspaces.list` → member reads `sheets.list` → non-member gets NOT_FOUND →
+  BYOK stored and read back as `last4` only. `SELECT` on `organization_secret` confirms no
+  plaintext key anywhere in the control plane.
+- **`invitation.createdAt`** — Better Auth's organization plugin wants it; only a real boot
+  said so. Added to the schema and as an `ADD COLUMN IF NOT EXISTS` in the DDL.
+- **Root `dev:server` script.** Bun auto-loads `.env` from the cwd, so `--cwd apps/server`
+  silently started *embedded* mode. Running from the repo root is also what the Dockerfile does.
 
 ## Deferred out of phase 2 (deliberately)
 
@@ -138,3 +146,10 @@ dashboard are rewritten in phase 3 rather than patched.
 - A package barrel is a bundling decision, not just an export list. One barrel covering both
   a heavy hosted path and a light embedded one pulls the heavy one into every consumer;
   split it at the subpath.
+- Bun auto-loads `.env` from the **cwd**. `bun run --cwd apps/server dev` therefore loads
+  nothing and falls back to embedded mode without complaining. Run the server from the root.
+- Better Auth's CSRF check treats `http://localhost:3000` and `http://127.0.0.1:3000` as
+  different origins. Hit the host named in `WASHI_BASE_URL`, or add the other to
+  `WASHI_TRUSTED_ORIGINS`.
+- OrbStack forwards ports for every container it manages, so 5432/5433 can be taken even with
+  no postgres running. `POSTGRES_PORT` in `.env` moves it.

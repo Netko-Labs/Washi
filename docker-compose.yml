@@ -6,6 +6,10 @@ services:
       POSTGRES_USER: washi
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-washi}
       POSTGRES_DB: washi
+    ports:
+      # Published so the server can also run from source (`bun run --cwd apps/server dev`)
+      # against this database. The containerised server talks to postgres:5432 instead.
+      - '${POSTGRES_PORT:-5432}:5432'
     volumes:
       - postgres:/var/lib/postgresql/data
     healthcheck:
