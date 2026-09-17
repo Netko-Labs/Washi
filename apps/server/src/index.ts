@@ -49,6 +49,7 @@ export function startServer(options: ServerOptions): RunningServer {
     url: `http://${displayHost}:${port}`,
     port,
     mode: options.mode,
+    runtime,
     async stop() {
       await server.stop(true)
       runtime.close()

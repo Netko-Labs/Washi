@@ -14,8 +14,10 @@ const HANDLERS: Record<DevCommand, () => void> = {
 }
 
 export function subscribeDevCommands(): void {
-  api.devCommand.on(({ command }) => {
-    HANDLERS[command]?.()
-    window.location.reload()
+  api.dev.onDevCommand.subscribe(undefined, {
+    onData: ({ data: { command } }) => {
+      HANDLERS[command]?.()
+      window.location.reload()
+    },
   })
 }

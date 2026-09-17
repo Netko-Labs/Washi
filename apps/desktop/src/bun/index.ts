@@ -1,17 +1,10 @@
 import { homedir } from 'node:os'
 import { join } from 'node:path'
-import {
-  getWindowState,
-  initializeDb,
-  listSheets,
-  listTables,
-  saveWindowState,
-} from '@washi/repository'
-import { AgentHost } from '@washi/service'
-import { createRouter } from '@washi/trpc'
+import { DEFAULT_WORKSPACE_ID, startServer } from '@washi/server'
 import { app, devtools, type MenuItemTemplate, menu } from 'mirinjs'
 import { developMenu } from './dev-menu'
 import { seedShowcase } from './showcase'
+import { createWindowStore } from './window-store'
 
 // App data dir keyed on the bundle id. `mirin dev` gets a `-dev` suffix so
 // development never reads or writes the installed app's database.
@@ -25,29 +18,29 @@ const appDataDir = join(
   app.isDev ? `${appId}-dev` : appId,
 )
 
-initializeDb(join(appDataDir, 'washi.db'))
-console.log(`[Washi] storage at ${appDataDir}`)
+// The desktop app is a client of its own server (C4). Embedded mode binds
+// loopback on an OS-assigned port; the renderer is handed the origin and does
+// not otherwise know it is local.
+const server = startServer({ mode: 'embedded', dataDir: join(appDataDir, 'workspaces') })
+const runtime = server.runtime
+const { workspace } = runtime.resolve(DEFAULT_WORKSPACE_ID)
 
-seedShowcase()
+console.log(`[Washi] storage at ${appDataDir} · server at ${server.url}`)
+seedShowcase(workspace)
 
-const agents = new AgentHost()
-const served = app.serve(createRouter(agents))
-agents.setEvents({
-  update: (sessionId, entry) => served.rpc.agentUpdate.broadcast({ sessionId, entry }),
-  approval: (request) => served.rpc.approvalRequested.broadcast(request),
-  openSheet: (id) => served.rpc.openSheetRequested.broadcast({ id }),
-})
+const windowStore = createWindowStore(appDataDir)
+const uiUrl = `app://ui/index.html?server=${encodeURIComponent(server.url)}`
 
 devtools.expose('store', () => ({
-  sheets: listSheets().length,
-  tables: listTables().length,
+  server: server.url,
+  workspace: workspace.id,
 }))
 
 app.on('ready', async () => {
-  const saved = getWindowState()
+  const saved = windowStore.read()
   const win = await app.windows.open({
     name: 'main',
-    url: 'app://ui/index.html',
+    url: uiUrl,
     title: 'Washi',
     titleBarStyle: 'hiddenInset',
     trafficLightPosition: { x: 13, y: 13 },
@@ -67,13 +60,13 @@ app.on('ready', async () => {
   const saveInterval = setInterval(() => {
     try {
       if (win.isMaximized()) {
-        const current = getWindowState()
-        if (!current.isMaximized) saveWindowState({ ...current, isMaximized: true })
+        const current = windowStore.read()
+        if (!current.isMaximized) windowStore.write({ ...current, isMaximized: true })
         return
       }
       const frame = win.getFrame()
       if (frame.width > 0 && frame.height > 0) {
-        saveWindowState({
+        windowStore.write({
           x: Math.round(frame.x),
           y: Math.round(frame.y),
           width: Math.round(frame.width),
@@ -126,7 +119,8 @@ app.on('ready', () => {
     appMenu.push(
       developMenu({
         appDataDir,
-        send: (command) => served.rpc.devCommand.broadcast({ command }),
+        ws: workspace,
+        send: (command) => runtime.events.emit('devCommand', { command }),
       }),
     )
   }
@@ -135,5 +129,5 @@ app.on('ready', () => {
 })
 
 app.on('window-all-closed', () => {
-  app.quit()
+  void server.stop().then(() => app.quit())
 })

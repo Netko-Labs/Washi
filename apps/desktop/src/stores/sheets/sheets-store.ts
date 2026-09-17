@@ -47,7 +47,7 @@ export const useSheetsStore = create<SheetsState>((set, get) => ({
   closePalette: () => set({ paletteOpen: false, searchTerm: '', searchHits: [] }),
 
   refresh: async () => {
-    const sheets = await api.listSheets({})
+    const sheets = await api.sheets.list.query()
     set((state) => ({
       sheets,
       activeId: state.activeId ?? sheets[0]?.id ?? null,
@@ -58,7 +58,7 @@ export const useSheetsStore = create<SheetsState>((set, get) => ({
 
   createSheet: async () => {
     const title = 'Untitled'
-    const sheet = await api.createSheet({
+    const sheet = await api.sheets.create.mutate({
       write: { title, source: NEW_SHEET_SOURCE(title) },
     })
     await get().refresh()
@@ -68,7 +68,7 @@ export const useSheetsStore = create<SheetsState>((set, get) => ({
   },
 
   deleteSheet: async (id) => {
-    await api.deleteSheet({ id })
+    await api.sheets.remove.mutate({ id })
     const { activeId } = get()
     await get().refresh()
     if (activeId === id) set({ activeId: get().sheets[0]?.id ?? null })
@@ -80,7 +80,7 @@ export const useSheetsStore = create<SheetsState>((set, get) => ({
       set({ searchHits: [] })
       return
     }
-    const searchHits = await api.searchSheets({ term })
+    const searchHits = await api.sheets.search.query({ term })
     set({ searchHits })
   },
 }))

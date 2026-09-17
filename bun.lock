@@ -48,6 +48,7 @@
         "@washi/ink": "workspace:*",
         "@washi/paper": "workspace:*",
         "@washi/repository": "workspace:*",
+        "@washi/server": "workspace:*",
         "@washi/service": "workspace:*",
         "@washi/trpc": "workspace:*",
         "@washi/wsx": "workspace:*",

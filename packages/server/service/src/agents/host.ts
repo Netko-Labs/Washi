@@ -91,7 +91,11 @@ export class AgentHost {
   private pendingApprovals = new Map<string, (decision: ApprovalDecision) => void>()
   private alwaysAllowed = new Map<string, Set<string>>()
 
-  constructor(private readonly ws: Workspace) {}
+  private readonly ws: Workspace
+
+  constructor(ws: Workspace) {
+    this.ws = ws
+  }
 
   setEvents(events: AgentHostEvents): void {
     this.events = events

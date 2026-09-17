@@ -53,7 +53,8 @@ export const approvalRequestSchema = z.object({
   id: z.string(),
   sessionId: z.string(),
   toolName: z.string(),
-  input: z.unknown(),
+  /** Optional because JSON drops undefined — the wire type is the honest one. */
+  input: z.unknown().optional(),
   createdAt: z.string(),
 })
 export type ApprovalRequest = z.infer<typeof approvalRequestSchema>

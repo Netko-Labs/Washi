@@ -66,40 +66,48 @@ export const useAgentStore = create<AgentState>((set, get) => ({
   init: async () => {
     if (!subscribed) {
       subscribed = true
-      api.agentUpdate.on(({ sessionId, entry }) => {
-        const { activeSessionId } = get()
-        if (sessionId !== activeSessionId) return
-        set((state) => ({
-          transcript: [...state.transcript, entry],
-          running: entry.update.kind !== 'turn_done' && state.running,
-        }))
-        if (entry.update.kind === 'turn_done') {
+      api.agents.onAgentUpdate.subscribe(undefined, {
+        onData: ({ data: { sessionId, entry } }) => {
+          const { activeSessionId } = get()
+          if (sessionId !== activeSessionId) return
+          set((state) => ({
+            transcript: [...state.transcript, entry],
+            running: entry.update.kind !== 'turn_done' && state.running,
+          }))
+          if (entry.update.kind === 'turn_done') {
+            void useSheetsStore.getState().refresh()
+          }
+        },
+      })
+      api.agents.onApprovalRequested.subscribe(undefined, {
+        onData: ({ data: request }) => {
+          set((state) => ({ approvals: [...state.approvals, request] }))
+        },
+      })
+      api.agents.onOpenSheetRequested.subscribe(undefined, {
+        onData: ({ data: { id } }) => {
+          void import('@/stores/view/view-store').then(({ useViewStore }) =>
+            useViewStore.getState().openTab(`note:${id}`),
+          )
           void useSheetsStore.getState().refresh()
-        }
-      })
-      api.approvalRequested.on((request) => {
-        set((state) => ({ approvals: [...state.approvals, request] }))
-      })
-      api.openSheetRequested.on(({ id }) => {
-        void import('@/stores/view/view-store').then(({ useViewStore }) =>
-          useViewStore.getState().openTab(`note:${id}`),
-        )
-        void useSheetsStore.getState().refresh()
+        },
       })
     }
-    const sessions = await api.listSessions({})
+    const sessions = await api.agents.listSessions.query()
     set({ sessions })
     if (!get().activeSessionId && sessions[0]) await get().selectSession(sessions[0].id)
   },
 
   createSession: async () => {
-    const session = await api.createSession({ title: `Session ${get().sessions.length + 1}` })
+    const session = await api.agents.createSession.mutate({
+      title: `Session ${get().sessions.length + 1}`,
+    })
     set((state) => ({ sessions: [session, ...state.sessions] }))
     await get().selectSession(session.id)
   },
 
   selectSession: async (id) => {
-    const transcript = await api.getTranscript({ sessionId: id })
+    const transcript = await api.agents.transcript.query({ sessionId: id })
     set({ activeSessionId: id, transcript })
   },
 
@@ -111,11 +119,11 @@ export const useAgentStore = create<AgentState>((set, get) => ({
     }
     if (!sessionId || !text.trim()) return
     set({ running: true })
-    await api.promptAgent({ sessionId, text })
+    await api.agents.prompt.mutate({ sessionId, text })
   },
 
   resolveApproval: async (id, decision) => {
-    await api.resolveApproval({ id, decision })
+    await api.agents.resolveApproval.mutate({ id, decision })
     set((state) => ({ approvals: state.approvals.filter((approval) => approval.id !== id) }))
   },
 }))

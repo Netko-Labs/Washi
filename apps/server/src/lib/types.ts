@@ -1,4 +1,4 @@
-import type { ServerMode } from '@washi/trpc'
+import type { ServerMode, ServerRuntime } from '@washi/trpc'
 
 export interface ServerOptions {
   mode: ServerMode
@@ -13,5 +13,7 @@ export interface RunningServer {
   url: string
   port: number
   mode: ServerMode
+  /** The embedded host reaches through this for the Develop menu and seeding. */
+  runtime: ServerRuntime
   stop(): Promise<void>
 }

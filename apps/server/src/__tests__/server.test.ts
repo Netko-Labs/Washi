@@ -73,7 +73,7 @@ describe('the server serves the whole surface over http', () => {
       },
     })) as { result?: { data: { id: string } } }
     const id = created.result?.data.id
-    expect(id).toBeString()
+    if (!id) throw new Error(`create returned no id: ${JSON.stringify(created)}`)
 
     const list = (await query('sheets.list')).result?.data as { id: string }[]
     expect(list.map((sheet) => sheet.id)).toContain(id)

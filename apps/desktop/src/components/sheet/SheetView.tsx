@@ -23,7 +23,7 @@ export function SheetView() {
       return
     }
     let alive = true
-    api.getSheet({ id: activeId }).then((sheet) => {
+    api.sheets.get.query({ id: activeId }).then((sheet) => {
       if (!alive || !sheet) return
       try {
         setLoaded({ sheet, root: parse(sheet.source), error: null })
