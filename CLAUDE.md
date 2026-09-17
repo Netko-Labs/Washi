@@ -1,9 +1,14 @@
 # Washi
 
 Agent-first knowledge base on the mirin framework (Bun main process + CEF renderer). Notes are
-WSX — JSX as a serialization format, rendered by the closed `@washi/paper` registry. Spec (visual,
-canonical): `docs/spec.html`. Structure rules: @docs/conventions.md — that file wins for structure,
-this one for project facts.
+WSX — JSX as a serialization format, rendered by the closed `@washi/paper` registry. Structure rules:
+@docs/conventions.md — that file wins for structure, this one for project facts.
+
+Specs (visual, canonical):
+
+- `docs/spec.html` (v0.5) — WSX, Paper, ink/tsuru/hanko, the P0–P8 audit. Still current.
+- `docs/server.html` (v0.6) — **the server pivot.** Supersedes v0.5 §03 · §04 · §07 · §08 and
+  Q12 · Q17 · Q19. Read it for anything about processes, storage topology, identity, or the road.
 
 ## Commands
 
