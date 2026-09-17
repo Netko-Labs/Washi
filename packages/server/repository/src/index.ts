@@ -11,8 +11,8 @@ export {
 export {
   type DrizzleDB,
   newId,
-  openWorkspace,
   type OpenWorkspaceOptions,
+  openWorkspace,
   type Workspace,
 } from './storage/client'
 export { executeQuery, matchRecordIds } from './storage/ink-executor'

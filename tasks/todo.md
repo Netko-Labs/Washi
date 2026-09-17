@@ -11,7 +11,7 @@ Spec: `docs/server.html` §07. Acceptance for the whole phase:
 
 - [x] **1 · restructure** — `packages/desktop/*` → `packages/server/*`; `api` → `trpc`;
       `@washi/desktop-{domain,repository,service}` → `@washi/{domain,repository,service}`
-- [ ] **2 · workspace handle (C1 · C3 · kills P7)** — `initializeDb()` singleton →
+- [x] **2 · workspace handle (C1 · C3 · kills P7)** — `initializeDb()` singleton →
       `openWorkspace(path): Workspace`; every op takes it as first arg; registry opens by id.
       `window_state` leaves the workspace db — a server has no windows.
 - [ ] **3 · tRPC layer** — `init.ts` (createContext + procedure builders), routers in
@@ -22,7 +22,7 @@ Spec: `docs/server.html` §07. Acceptance for the whole phase:
       **local only — no public URL until phase 2 puts Better Auth in front of it.**
 - [ ] **5 · desktop as thin client (C4)** — `lib/rpc.ts` swaps `mirinjs/client` for a tRPC client
       over `127.0.0.1:port`. mirin keeps window, menu, icon, sidecar spawn.
-- [ ] **6 · `actor_id` on `capability_calls`** — "who approved this" is the team audit story;
+- [x] **6 · `actor_id` on `capability_calls`** — "who approved this" is the team audit story;
       brutal to retrofit against a populated ledger.
 
 ## Deferred out of phase 1 (deliberately)

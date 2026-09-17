@@ -1,12 +1,6 @@
 import type { SheetDetail, SheetWrite } from '@washi/domain'
 import { paperRegistry } from '@washi/paper/registry'
-import {
-  createSheet,
-  deleteSheet,
-  getSheet,
-  updateSheet,
-  type Workspace,
-} from '@washi/repository'
+import { createSheet, deleteSheet, getSheet, updateSheet, type Workspace } from '@washi/repository'
 import {
   type Diagnostic,
   extractRefs,
@@ -54,11 +48,7 @@ export function createSheetFromSource(ws: Workspace, write: SheetWrite): SheetDe
   return createSheet(ws, write, { body: extractText(root), refs: extractRefs(root) })
 }
 
-export function updateSheetFromSource(
-  ws: Workspace,
-  id: string,
-  write: SheetWrite,
-): SheetDetail {
+export function updateSheetFromSource(ws: Workspace, id: string, write: SheetWrite): SheetDetail {
   const root = parseValidated(write.source)
   const updated = updateSheet(ws, id, write, {
     body: extractText(root),

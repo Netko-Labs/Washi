@@ -53,7 +53,10 @@ describe('ink column identifiers never reach SQL as text', () => {
 
   test('groupBy, where and orderBy columns are membership-checked', () => {
     expect(() =>
-      runQuery(ws, { table: 'tasks', groupBy: { column: injection, aggregates: [{ fn: 'count' }] } }),
+      runQuery(ws, {
+        table: 'tasks',
+        groupBy: { column: injection, aggregates: [{ fn: 'count' }] },
+      }),
     ).toThrow(/unknown column/)
     expect(() =>
       runQuery(ws, { table: 'tasks', where: [{ column: injection, op: 'eq', value: 'x' }] }),

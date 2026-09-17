@@ -8,4 +8,3 @@ export const userTableSchema = z.object({
   hlcUpdated: z.string(),
 })
 export type UserTable = z.infer<typeof userTableSchema>
-

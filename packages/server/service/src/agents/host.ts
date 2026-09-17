@@ -128,7 +128,14 @@ export class AgentHost {
     const { verb } = checked.action
     if (origin === 'sheet' && !isReversibleVerb(verb)) {
       const detail = `"${verb}" leaves this machine — a sheet cannot run it without a stamp`
-      recordCapability(this.ws, { origin, actorId, subject: verb, input, decision: 'denied', detail })
+      recordCapability(this.ws, {
+        origin,
+        actorId,
+        subject: verb,
+        input,
+        decision: 'denied',
+        detail,
+      })
       throw new Error(detail)
     }
 

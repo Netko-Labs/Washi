@@ -41,6 +41,8 @@
         "@tabler/icons-react": "^3.44.0",
         "@tailwindcss/browser": "^4.3.3",
         "@tailwindcss/vite": "^4.3.2",
+        "@trpc/client": "^11",
+        "@trpc/server": "^11",
         "@washi/domain": "workspace:*",
         "@washi/hanko": "workspace:*",
         "@washi/ink": "workspace:*",
@@ -71,6 +73,20 @@
         "sharp": "^0.35.3",
         "tw-animate-css": "^1.4.0",
         "vite": "^7.3.6",
+      },
+    },
+    "apps/server": {
+      "name": "@washi/server",
+      "version": "0.1.0",
+      "dependencies": {
+        "@trpc/server": "^11.19.0",
+        "@washi/repository": "workspace:*",
+        "@washi/service": "workspace:*",
+        "@washi/trpc": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+        "@washi/typescript-config": "workspace:*",
       },
     },
     "packages/server/domain": {
@@ -126,12 +142,13 @@
       "name": "@washi/trpc",
       "version": "0.1.0",
       "dependencies": {
+        "@trpc/server": "^11.19.0",
         "@washi/domain": "workspace:*",
         "@washi/hanko": "workspace:*",
         "@washi/ink": "workspace:*",
         "@washi/repository": "workspace:*",
         "@washi/service": "workspace:*",
-        "mirinjs": "0.1.0-alpha.19",
+        "zod": "^4.4.3",
       },
       "devDependencies": {
         "@types/bun": "latest",
@@ -599,6 +616,10 @@
 
     "@tailwindcss/vite": ["@tailwindcss/vite@4.3.3", "", { "dependencies": { "@tailwindcss/node": "4.3.3", "@tailwindcss/oxide": "4.3.3", "tailwindcss": "4.3.3" }, "peerDependencies": { "vite": "^5.2.0 || ^6 || ^7 || ^8" } }, "sha512-yYU8cogLeSh/ms2jh8Fj7jaba/EWa7Ja6GoUqYZaraEuCI5YS6ms6ObZgjjedm+jm6XZjdNRWBpPP6Z86oOxcw=="],
 
+    "@trpc/client": ["@trpc/client@11.19.0", "", { "peerDependencies": { "@trpc/server": "11.19.0", "typescript": ">=5.7.2" }, "bin": { "intent": "bin/intent.js" } }, "sha512-0MKkPq6MejsKB5Opca1Rl22KVIaqo2+A1EiXyZ8EGUsl9TLrPdpGn+Usux20TZKFwnSC2+wI/WilqNJaP4ODfw=="],
+
+    "@trpc/server": ["@trpc/server@11.19.0", "", { "peerDependencies": { "typescript": ">=5.7.2" }, "bin": { "intent": "bin/intent.js" } }, "sha512-7C1goiDurz82yFKtZUbEzjXd0Rg/jyisaIZQhdvus+1l7E6mwcEYZXjZ1US/HF8kOyz1LERL8UN3bcboJtjcyQ=="],
+
     "@turbo/darwin-64": ["@turbo/darwin-64@2.10.9", "", { "os": "darwin", "cpu": "x64" }, "sha512-Jh+pTGXLNz8+1tkUU13TI/f+ZOI+OvC4YbHi1H+57iSpLt5DR3xgptd+4sA07RdjdRR/RX/01uQQu2OkbzIefA=="],
 
     "@turbo/darwin-arm64": ["@turbo/darwin-arm64@2.10.9", "", { "os": "darwin", "cpu": "arm64" }, "sha512-aqtpPkiIC4IUas8Vv27oJ3aDfTuP1d5wofd01dZ7gfhHRrIKuFdqQb4imvNnVFahcOViF9Jh8Oi7feDoz8/ciA=="],
@@ -658,6 +679,8 @@
     "@washi/paper": ["@washi/paper@workspace:packages/shared/paper"],
 
     "@washi/repository": ["@washi/repository@workspace:packages/server/repository"],
+
+    "@washi/server": ["@washi/server@workspace:apps/server"],
 
     "@washi/service": ["@washi/service@workspace:packages/server/service"],
 
@@ -1096,8 +1119,6 @@
     "@tailwindcss/oxide-wasm32-wasi/tslib": ["tslib@2.8.1", "", { "bundled": true }, "sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w=="],
 
     "@washi/service/mirinjs": ["mirinjs@0.1.0-alpha.19", "", {}, "sha512-QGBOvZfKW7uv/PV9p4222mXxI4Dx2H8xPLgJ2xLyEAHebpNvyLKW35tkiMPIDCj1GQFYpJjG6DIvZ95beNPzlg=="],
-
-    "@washi/trpc/mirinjs": ["mirinjs@0.1.0-alpha.19", "", {}, "sha512-QGBOvZfKW7uv/PV9p4222mXxI4Dx2H8xPLgJ2xLyEAHebpNvyLKW35tkiMPIDCj1GQFYpJjG6DIvZ95beNPzlg=="],
 
     "body-parser/content-type": ["content-type@2.0.0", "", {}, "sha512-j/O/d7GcZCyNl7/hwZAb606rzqkyvaDctLmckbxLzHvFBzTJHuGEdodATcP3yIRoDrLHkIATJuvzbFlp/ki2cQ=="],
 

@@ -10,12 +10,13 @@
     "check-types": "tsgo -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@trpc/server": "^11.19.0",
     "@washi/domain": "workspace:*",
-    "@washi/repository": "workspace:*",
-    "@washi/service": "workspace:*",
     "@washi/hanko": "workspace:*",
     "@washi/ink": "workspace:*",
-    "mirinjs": "0.1.0-alpha.19"
+    "@washi/repository": "workspace:*",
+    "@washi/service": "workspace:*",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@washi/typescript-config": "workspace:*",

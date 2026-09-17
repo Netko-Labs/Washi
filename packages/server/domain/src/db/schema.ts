@@ -97,4 +97,3 @@ export const appMetaTable = sqliteTable('app_meta', {
   key: text('key').primaryKey(),
   value: text('value').notNull(),
 })
-

@@ -50,11 +50,7 @@ export function getSdkSessionId(ws: Workspace, id: string): string | null {
   return row?.sdkSessionId ?? null
 }
 
-export function appendTurn(
-  ws: Workspace,
-  sessionId: string,
-  update: AgentUpdate,
-): TranscriptEntry {
+export function appendTurn(ws: Workspace, sessionId: string, update: AgentUpdate): TranscriptEntry {
   const [last] = ws.db
     .select({ seq: agentTurnTable.seq })
     .from(agentTurnTable)
@@ -116,11 +112,7 @@ export function createApproval(
   return request
 }
 
-export function resolveApproval(
-  ws: Workspace,
-  id: string,
-  status: 'allowed' | 'denied',
-): boolean {
+export function resolveApproval(ws: Workspace, id: string, status: 'allowed' | 'denied'): boolean {
   const result = ws.sqlite
     .query("UPDATE approvals SET status = ?, resolved_at = ? WHERE id = ? AND status = 'pending'")
     .run(status, ws.now(), id)

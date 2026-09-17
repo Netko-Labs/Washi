@@ -38,13 +38,15 @@ describe('loro store', () => {
 
 describe('sheets', () => {
   test('create → list → get → update → delete lifecycle', () => {
-    const sheet = createSheet(ws, 
+    const sheet = createSheet(
+      ws,
       write('<Sheet title="t"><P>hello washi</P></Sheet>'),
       index('hello washi'),
     )
     expect(listSheets(ws).map((row) => row.id)).toContain(sheet.id)
 
-    const updated = updateSheet(ws, 
+    const updated = updateSheet(
+      ws,
       sheet.id,
       write('<Sheet title="t"><P>changed</P></Sheet>'),
       index('changed'),

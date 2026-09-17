@@ -62,7 +62,9 @@ describe('sheet actions pass the same desk as agent actions', () => {
   test('invalid verbs are refused and still leave a row', async () => {
     const { host } = makeHost()
 
-    await expect(host.executeAction({ verb: 'rm.rf', path: '/' }, { origin: 'sheet' })).rejects.toThrow()
+    await expect(
+      host.executeAction({ verb: 'rm.rf', path: '/' }, { origin: 'sheet' }),
+    ).rejects.toThrow()
 
     const [call] = listCapabilityCalls(ws)
     expect(call?.subject).toBe('action.invalid')

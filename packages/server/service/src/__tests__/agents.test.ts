@@ -1,6 +1,12 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import type { ApprovalRequest, TranscriptEntry } from '@washi/domain'
-import { createSession, getTranscript, listSheets, openWorkspace, type Workspace } from '@washi/repository'
+import {
+  createSession,
+  getTranscript,
+  listSheets,
+  openWorkspace,
+  type Workspace,
+} from '@washi/repository'
 import { AgentHost } from '../agents/host'
 import { normalizeMessage } from '../agents/normalize'
 import { checkSource, createSheetFromSource } from '../sheets/service'

@@ -37,11 +37,7 @@ export function getSheet(ws: Workspace, id: string): SheetDetail | null {
   return detail
 }
 
-export function createSheet(
-  ws: Workspace,
-  write: SheetWrite,
-  index: SheetIndexInput,
-): SheetDetail {
+export function createSheet(ws: Workspace, write: SheetWrite, index: SheetIndexInput): SheetDetail {
   const now = ws.now()
   const id = newId()
   ws.db
