@@ -1,7 +1,17 @@
-import { IconChevronLeft, IconMenu2, IconX } from '@tabler/icons-react'
+import {
+  IconChevronLeft,
+  IconMenu2,
+  IconPlus,
+  IconSettings,
+  IconSparkles,
+  IconX,
+} from '@tabler/icons-react'
 import { useMemo, useState } from 'react'
+import { AgentPanel } from '@/components/agent'
+import { SettingsScreen } from '@/components/settings'
 import { SheetView } from '@/components/sheet'
 import { createPaperHost } from '@/lib/paper-host'
+import { api } from '@/lib/rpc'
 import type { WorkspaceSummary } from '@/lib/types'
 import { useWorkspaceSheets } from './lib'
 import { SheetList } from './sheet-list'
@@ -19,8 +29,12 @@ export function WorkspaceShell({
   workspace: WorkspaceSummary
   onLeave: () => void
 }) {
-  const { sheets, activeId, setActiveId, error, loading } = useWorkspaceSheets(workspace.id)
+  const { sheets, activeId, setActiveId, error, loading, refresh } = useWorkspaceSheets(
+    workspace.id,
+  )
   const [navOpen, setNavOpen] = useState(false)
+  const [agentOpen, setAgentOpen] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
   const host = useMemo(
     () =>
@@ -36,6 +50,20 @@ export function WorkspaceShell({
     setNavOpen(false)
   }
 
+  // A blank page for the agent to design into. The bet is edit-by-asking, so
+  // this creates the canvas and the asking happens in the panel.
+  const newPage = async () => {
+    const sheet = await api.sheets.create.mutate({
+      write: {
+        title: 'Untitled',
+        source: '<Sheet title="Untitled" class="min-h-full px-6 py-12" />\n',
+      },
+    })
+    await refresh()
+    select(sheet.id)
+    setAgentOpen(true)
+  }
+
   return (
     <div className="flex h-dvh flex-col md:flex-row">
       <header className="flex h-14 shrink-0 items-center gap-2 border-border border-b px-3 md:hidden">
@@ -48,6 +76,14 @@ export function WorkspaceShell({
           <IconMenu2 className="size-5" />
         </button>
         <span className="min-w-0 flex-1 truncate font-bold text-[14px]">{workspace.name}</span>
+        <button
+          type="button"
+          onClick={() => setAgentOpen(true)}
+          aria-label="Ask Washi"
+          className="grid size-11 place-items-center rounded-lg hover:bg-accent"
+        >
+          <IconSparkles className="size-5" />
+        </button>
       </header>
 
       {navOpen && (
@@ -87,7 +123,7 @@ export function WorkspaceShell({
           </button>
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-4">
+        <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-2">
           <p className="px-2.5 py-2 font-bold text-[11px] text-muted-foreground tracking-[0.12em] uppercase">
             Pages
           </p>
@@ -100,11 +136,56 @@ export function WorkspaceShell({
           )}
           <SheetList sheets={sheets} activeId={activeId} onSelect={select} />
         </div>
+
+        <div className="shrink-0 border-border border-t p-2">
+          <button
+            type="button"
+            onClick={() => void newPage()}
+            className="flex h-11 w-full items-center gap-2 rounded-lg px-2.5 text-left text-[13.5px] hover:bg-accent"
+          >
+            <IconPlus className="size-4" />
+            New page
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setSettingsOpen(true)
+              setNavOpen(false)
+            }}
+            className="flex h-11 w-full items-center gap-2 rounded-lg px-2.5 text-left text-[13.5px] hover:bg-accent"
+          >
+            <IconSettings className="size-4" />
+            Settings
+          </button>
+        </div>
       </nav>
 
       <main className="min-h-0 min-w-0 flex-1 overflow-y-auto">
-        <SheetView id={activeId} host={host} />
+        {settingsOpen ? (
+          <SettingsScreen onClose={() => setSettingsOpen(false)} />
+        ) : (
+          <SheetView id={activeId} host={host} />
+        )}
       </main>
+
+      {!agentOpen && (
+        <button
+          type="button"
+          onClick={() => setAgentOpen(true)}
+          aria-label="Ask Washi"
+          className="fixed right-5 bottom-5 hidden size-12 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg md:grid"
+        >
+          <IconSparkles className="size-5" />
+        </button>
+      )}
+
+      {agentOpen && (
+        <AgentPanel
+          workspaceId={workspace.id}
+          onClose={() => setAgentOpen(false)}
+          onSheetsChanged={() => void refresh()}
+        />
+      )}
     </div>
   )
 }

@@ -1,3 +1,51 @@
+# Phase 6 — the web client can actually ask — COMPLETE (2026-09-21)
+
+137 tests green, 14/14 typecheck, biome green, web build clean. Driven in a real browser:
+settings → model picker over 317 live models → prompt → the turn's failure arrives over SSE.
+
+Web is a viewer today: sign in, read a page. "Edit by asking" is the product bet and the
+web has no way to ask. Every route exists — `agents.*`, `models.list`,
+`workspaces.setAgentKey`, `agents.spend` — and nothing renders them.
+
+Acceptance:
+
+- sign in → set a key and model → ask for a page → approve the write → watch it render
+- approvals are inline and blocking; nothing writes without a person
+- the breaker's state is visible, and Resume is a button rather than a curl
+- works at 375px and 1440px
+
+## Steps
+
+- [x] **1 · settings** — BYOK with a real provider/model picker off `models.list` (317 models,
+      not a text field), plus spend and the Resume button.
+- [x] **2 · agent panel** — session, transcript, composer, streaming over the SSE subscription
+      that already resumes from `lastEventId`.
+- [x] **3 · approvals inline** — the desk, in the panel. Review is the primary human verb;
+      this is the screen that verb happens on.
+- [x] **4 · new page** — something for the agent to write into.
+
+## Verified in the browser
+
+- The picker shows real prices from models.dev, and flags `openrouter/auto` as **unpriced** in
+  amber — the exact case that was escaping the breaker before yesterday's fix, now visible
+  before anyone picks it.
+- A prompt with no key stored fails loudly in the transcript with phase 4's own message,
+  delivered over the SSE subscription. That is web → tRPC → AgentHost → key resolution →
+  failure → stream, end to end.
+
+## Not verified
+
+**No successful turn.** Everything up to the model call is proven; the model call itself needs
+a real key and bills real money. The approval prompt has therefore never rendered against a
+live tool call — it is written and typed, not exercised.
+
+## Then
+
+Desktop revamp, once the web shape is known. Building it second means the desktop copies a
+design that has already survived a small screen, rather than the reverse.
+
+---
+
 # Phase 5 — two ports, one vocabulary (P6) — COMPLETE (2026-09-20)
 
 122 tests green, 13/13 typecheck, biome green, `mirin check` 10/10.
