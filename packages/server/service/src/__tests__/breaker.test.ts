@@ -7,7 +7,7 @@ import {
   type Workspace,
 } from '@washi/repository'
 import { AgentHost } from '../agents/host'
-import { DAILY_CAP_USD_KEY } from '../agents/lib'
+import { DAILY_CAP_USD_KEY, DAILY_TURN_CAP_KEY } from '../agents/lib'
 
 let ws: Workspace
 beforeEach(() => {
@@ -77,6 +77,23 @@ describe('the daily circuit breaker', () => {
 
     recordSpend(ws, 1.2)
     expect(agent.breaker().kind).toBe('tripped')
+  })
+
+  test('an unpriced turn still counts — openrouter/auto publishes no price', () => {
+    recordSpend(ws, null)
+    recordSpend(ws, null)
+    const spend = spendForDay(ws)
+    // A turn nobody can price must not also be a turn nobody counts; that is
+    // exactly the one the breaker would never see.
+    expect(spend.turns).toBe(2)
+    expect(spend.costUsd).toBe(0)
+  })
+
+  test('turns bound a workspace whose model has no price at all', () => {
+    setAppMeta(ws, DAILY_TURN_CAP_KEY, '3')
+    for (let i = 0; i < 3; i += 1) recordSpend(ws, null)
+    // $0 spent, forever, so only the turn count can trip this.
+    expect(host().breaker().kind).toBe('tripped')
   })
 
   test('spend reports the cap alongside the total, so a client can show both', () => {

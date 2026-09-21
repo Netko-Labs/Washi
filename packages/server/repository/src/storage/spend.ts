@@ -26,12 +26,16 @@ export function spendForDay(ws: Workspace, day = today()): DaySpend {
  * Accumulate what a turn cost. The SDK reports a total per turn, so this is a
  * sum of turns rather than a running meter — close enough to stop a loop, which
  * is the only thing it is for.
+ *
+ * A null cost still counts the turn. Some models publish no price at all
+ * (`openrouter/auto` routes to anything), and a turn nobody can price must not
+ * also be a turn nobody counts — that is the one the breaker would never see.
  */
-export function recordSpend(ws: Workspace, costUsd: number, day = today()): DaySpend {
+export function recordSpend(ws: Workspace, costUsd: number | null, day = today()): DaySpend {
   const current = spendForDay(ws, day)
   const next = {
     day,
-    costUsd: current.costUsd + Math.max(0, costUsd),
+    costUsd: current.costUsd + Math.max(0, costUsd ?? 0),
     turns: current.turns + 1,
     updatedAt: ws.now(),
   }

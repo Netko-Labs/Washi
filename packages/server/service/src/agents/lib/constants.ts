@@ -8,3 +8,10 @@ export const MAX_TURN_BUDGET_USD = 5
  */
 export const DAILY_CAP_USD_KEY = 'agent_daily_cap_usd'
 export const DEFAULT_DAILY_CAP_USD = 25
+
+/**
+ * A backstop for models with no published price — `openrouter/auto` routes to
+ * anything and publishes nothing, so a dollar cap cannot see it. Turns can.
+ */
+export const DAILY_TURN_CAP_KEY = 'agent_daily_turn_cap'
+export const DEFAULT_DAILY_TURN_CAP = 200

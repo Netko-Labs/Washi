@@ -32,7 +32,14 @@ import { checkUrl, guardedFetch, isPrivateAddress } from '@washi/tsuru'
 import { createSheetFromSource } from '../sheets/service'
 import { runMutation } from '../tables/service'
 import type { AgentCredential, AgentKeySource, AgentSpendReport, BreakerState } from './lib'
-import { agentEnv, DAILY_CAP_USD_KEY, DEFAULT_DAILY_CAP_USD, MAX_TURN_BUDGET_USD } from './lib'
+import {
+  agentEnv,
+  DAILY_CAP_USD_KEY,
+  DAILY_TURN_CAP_KEY,
+  DEFAULT_DAILY_CAP_USD,
+  DEFAULT_DAILY_TURN_CAP,
+  MAX_TURN_BUDGET_USD,
+} from './lib'
 import { normalizeMessage, shortToolName } from './normalize'
 import { createAiSdkPort } from './ports'
 import { createWashiTools, currentFetchPolicy, type ToolContext, TSURU_HOSTS_KEY } from './tools'
@@ -122,9 +129,18 @@ export class AgentHost {
 
   /** The cap is per workspace and settable, because a sane default is not a universal one. */
   private dailyCap(): number {
-    const stored = getAppMeta(this.ws, DAILY_CAP_USD_KEY)
+    return this.setting(DAILY_CAP_USD_KEY, DEFAULT_DAILY_CAP_USD)
+  }
+
+  /** The bound that still holds when a model publishes no price at all. */
+  private dailyTurnCap(): number {
+    return this.setting(DAILY_TURN_CAP_KEY, DEFAULT_DAILY_TURN_CAP)
+  }
+
+  private setting(key: string, fallback: number): number {
+    const stored = getAppMeta(this.ws, key)
     const parsed = stored ? Number(stored) : Number.NaN
-    return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_DAILY_CAP_USD
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback
   }
 
   /**
@@ -135,12 +151,15 @@ export class AgentHost {
     const day = today()
     const paused = pausedOn(this.ws)
     if (paused) return { kind: 'paused', day: paused }
-    const { costUsd } = spendForDay(this.ws, day)
+    const { costUsd, turns } = spendForDay(this.ws, day)
     const capUsd = this.dailyCap()
     // Measured from the last acknowledgement, so Resume grants real headroom.
     if (costUsd - acknowledgedSpend(this.ws, day) >= capUsd) {
       return { kind: 'tripped', day, costUsd, capUsd }
     }
+    // An unpriced model (openrouter/auto routes to anything) contributes $0 to
+    // the line above forever, so turns are the bound that still applies.
+    if (turns >= this.dailyTurnCap()) return { kind: 'tripped', day, costUsd, capUsd }
     return { kind: 'open' }
   }
 
@@ -378,10 +397,9 @@ export class AgentHost {
         status: 'idle',
         ...(result.costUsd != null ? { costUsd: result.costUsd } : {}),
       })
-      if (result.costUsd != null) {
-        const total = recordSpend(this.ws, result.costUsd)
-        if (total.costUsd >= this.dailyCap() + acknowledgedSpend(this.ws)) pauseAgent(this.ws)
-      }
+      const total = recordSpend(this.ws, result.costUsd)
+      const overSpend = total.costUsd >= this.dailyCap() + acknowledgedSpend(this.ws)
+      if (overSpend || total.turns >= this.dailyTurnCap()) pauseAgent(this.ws)
     } catch (error) {
       this.record(sessionId, { kind: 'turn_done', stopReason: 'error', error: String(error) })
       updateSession(this.ws, sessionId, { status: 'error' })
