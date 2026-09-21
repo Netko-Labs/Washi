@@ -1,5 +1,6 @@
 export {
   agentSessionTable,
+  agentSpendTable,
   agentTurnTable,
   appMetaTable,
   approvalTable,

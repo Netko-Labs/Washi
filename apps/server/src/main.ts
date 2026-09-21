@@ -19,12 +19,14 @@ const trustedOrigins = (process.env.WASHI_TRUSTED_ORIGINS ?? '')
   .filter(Boolean)
 
 let control: ControlPlane
+let resolveAgentKey: ((workspaceId: string) => Promise<string | null>) | undefined
 
 if (mode === 'hosted') {
   const { databaseUrl, masterKey } = assertHostedSecrets(process.env)
   const hosted = createHostedControlPlane({ databaseUrl, masterKey, baseUrl, trustedOrigins })
   await ensureControlSchema(hosted.db)
   control = hosted
+  resolveAgentKey = (workspaceId) => hosted.agentKey(workspaceId)
 } else {
   control = createEmbeddedControlPlane({ workspaceId: DEFAULT_WORKSPACE_ID })
 }
@@ -32,6 +34,7 @@ if (mode === 'hosted') {
 const server = startServer({
   mode,
   control,
+  resolveAgentKey,
   dataDir,
   trustedOrigins,
   hostname: process.env.WASHI_HOSTNAME,

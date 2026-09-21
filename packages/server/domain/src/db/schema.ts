@@ -93,6 +93,19 @@ export const oplogTable = sqliteTable('oplog', {
   op: text('op', { mode: 'json' }).notNull(),
 })
 
+/**
+ * What the agent spent, per day, in this workspace. Activity rather than
+ * identity, so it belongs beside the content (C1) and works in embedded mode
+ * where there is no control plane at all.
+ */
+export const agentSpendTable = sqliteTable('agent_spend', {
+  /** YYYY-MM-DD in UTC. One row per day; the cap is a day's worth. */
+  day: text('day').primaryKey(),
+  costUsd: real('cost_usd').notNull().default(0),
+  turns: integer('turns').notNull().default(0),
+  updatedAt: text('updated_at').notNull(),
+})
+
 export const appMetaTable = sqliteTable('app_meta', {
   key: text('key').primaryKey(),
   value: text('value').notNull(),

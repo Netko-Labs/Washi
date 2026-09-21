@@ -8,19 +8,29 @@ import type {
 } from '@washi/domain'
 import { checkAction, type HankoHandlers, isReversibleVerb, runAction } from '@washi/hanko'
 import {
+  acknowledgedSpend,
   appendTurn,
   createApproval,
+  getAppMeta,
   getSdkSessionId,
   getSheet,
+  pauseAgent,
+  pausedOn,
   recordCapability,
+  recordSpend,
   resolveApproval,
+  resumeAgent,
   setAppMeta,
+  spendForDay,
+  today,
   updateSession,
   type Workspace,
 } from '@washi/repository'
 import { checkUrl, guardedFetch, isPrivateAddress } from '@washi/tsuru'
 import { createSheetFromSource } from '../sheets/service'
 import { runMutation } from '../tables/service'
+import type { AgentKeySource, AgentSpendReport, BreakerState } from './lib'
+import { agentEnv, DAILY_CAP_USD_KEY, DEFAULT_DAILY_CAP_USD, MAX_TURN_BUDGET_USD } from './lib'
 import { normalizeMessage, shortToolName } from './normalize'
 import { createWashiTools, currentFetchPolicy, type ToolContext, TSURU_HOSTS_KEY } from './tools'
 
@@ -35,7 +45,6 @@ const READ_TOOLS = new Set([
 ])
 
 const APPROVAL_TIMEOUT_MS = 5 * 60_000
-const MAX_BUDGET_USD = 5
 
 const SYSTEM_APPEND = `You are Washi's embedded note agent. Notes are WSX: JSX-shaped data rendered
 by a component registry — registry components only, JSON-literal props, no expressions or handlers.
@@ -92,9 +101,46 @@ export class AgentHost {
   private alwaysAllowed = new Map<string, Set<string>>()
 
   private readonly ws: Workspace
+  private readonly keys: AgentKeySource
 
-  constructor(ws: Workspace) {
+  constructor(ws: Workspace, keys?: AgentKeySource) {
     this.ws = ws
+    // No resolver means this deployment has no key store — embedded mode, where
+    // the machine's own ANTHROPIC_API_KEY is the right and only answer.
+    this.keys = keys ?? { resolve: async () => process.env.ANTHROPIC_API_KEY ?? null }
+  }
+
+  /** The cap is per workspace and settable, because a sane default is not a universal one. */
+  private dailyCap(): number {
+    const stored = getAppMeta(this.ws, DAILY_CAP_USD_KEY)
+    const parsed = stored ? Number(stored) : Number.NaN
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_DAILY_CAP_USD
+  }
+
+  /**
+   * A safety stop, not a quota (Q25). It answers one question — may another
+   * turn start — and only a person answers it back.
+   */
+  breaker(): BreakerState {
+    const day = today()
+    const paused = pausedOn(this.ws)
+    if (paused) return { kind: 'paused', day: paused }
+    const { costUsd } = spendForDay(this.ws, day)
+    const capUsd = this.dailyCap()
+    // Measured from the last acknowledgement, so Resume grants real headroom.
+    if (costUsd - acknowledgedSpend(this.ws, day) >= capUsd) {
+      return { kind: 'tripped', day, costUsd, capUsd }
+    }
+    return { kind: 'open' }
+  }
+
+  spend(): AgentSpendReport {
+    const { day, costUsd, turns } = spendForDay(this.ws)
+    return { day, costUsd, turns, capUsd: this.dailyCap(), paused: Boolean(pausedOn(this.ws)) }
+  }
+
+  resume(): void {
+    resumeAgent(this.ws)
   }
 
   setEvents(events: AgentHostEvents): void {
@@ -181,6 +227,26 @@ export class AgentHost {
   /** One user turn: persist, stream the SDK, emit + persist every update. */
   async prompt(sessionId: string, text: string): Promise<void> {
     this.record(sessionId, { kind: 'user_message', text })
+
+    const state = this.breaker()
+    if (state.kind !== 'open') {
+      const detail =
+        state.kind === 'paused'
+          ? 'The agent is paused for this workspace. Resume it in settings.'
+          : `This workspace has spent ${state.costUsd.toFixed(2)} of its ${state.capUsd} daily cap. Raise the cap or resume tomorrow.`
+      this.record(sessionId, { kind: 'turn_done', stopReason: 'error', error: detail })
+      updateSession(this.ws, sessionId, { status: 'error' })
+      return
+    }
+
+    const apiKey = await this.keys.resolve()
+    if (!apiKey) {
+      const detail = 'No API key for this workspace. Add one in settings before asking Washi.'
+      this.record(sessionId, { kind: 'turn_done', stopReason: 'error', error: detail })
+      updateSession(this.ws, sessionId, { status: 'error' })
+      return
+    }
+
     updateSession(this.ws, sessionId, { status: 'running' })
 
     const context: ToolContext = { runHankoAction: (action) => this.executeAction(action) }
@@ -206,7 +272,9 @@ export class AgentHost {
             'Write',
           ],
           settingSources: [],
-          maxBudgetUsd: MAX_BUDGET_USD,
+          maxBudgetUsd: MAX_TURN_BUDGET_USD,
+          // Replaces the subprocess env rather than merging — see agentEnv.
+          env: agentEnv(apiKey),
           systemPrompt: SYSTEM_APPEND,
           canUseTool: async (toolName, input) => this.gateTool(sessionId, toolName, input),
         },
@@ -225,6 +293,12 @@ export class AgentHost {
               status: update.stopReason === 'error' ? 'error' : 'idle',
               ...(update.costUsd != null ? { costUsd: update.costUsd } : {}),
             })
+            // The stored cost used to be written and never read. It is the cap now.
+            if (update.costUsd != null) {
+              const total = recordSpend(this.ws, update.costUsd)
+              const budget = this.dailyCap() + acknowledgedSpend(this.ws)
+              if (total.costUsd >= budget) pauseAgent(this.ws)
+            }
           }
         }
       }

@@ -37,6 +37,16 @@ export {
   updateSheet,
 } from './storage/sheets'
 export {
+  acknowledgedSpend,
+  type DaySpend,
+  pauseAgent,
+  pausedOn,
+  recordSpend,
+  resumeAgent,
+  spendForDay,
+  today,
+} from './storage/spend'
+export {
   defineTable,
   deleteRecords,
   findRecordTableId,

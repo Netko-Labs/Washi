@@ -1,5 +1,13 @@
 export { AgentHost, type AgentHostEvents, type Caller } from './agents/host'
 export {
+  type AgentKeySource,
+  type AgentSpendReport,
+  agentEnv,
+  type BreakerState,
+  DAILY_CAP_USD_KEY,
+  DEFAULT_DAILY_CAP_USD,
+} from './agents/lib'
+export {
   checkSource,
   createSheetFromSource,
   removeSheet,

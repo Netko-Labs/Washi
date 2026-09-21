@@ -1,3 +1,58 @@
+# Phase 4 — the agent, server-side and on a leash — COMPLETE (2026-09-20)
+
+117 tests green, `turbo check-types` 13/13, `biome check` green, `mirin check` 10/10.
+
+The host already runs in the server; what does not is its key or its limits.
+Two gaps found by reading rather than assuming:
+
+- **Nothing passes an API key to the SDK.** It relies entirely on ambient
+  `ANTHROPIC_API_KEY`, so a hosted workspace's stored BYOK key is decrypted by nobody.
+- **`MAX_BUDGET_USD` is a per-`query()` constant.** `cost_usd` is written and never read
+  back, so a loop can spend it once per turn, forever. Spec §05 flagged this; hosted mode
+  with someone else's key turns it into an incident.
+
+Acceptance:
+
+- `bun test` green, `bun run typecheck` green, `bun run check` green, `mirin check` green
+- a hosted turn uses the workspace's own key, and a workspace with no key says so
+- the subprocess env is built, not inherited — `WASHI_SECRET_KEY` must not reach the agent
+- spend accumulates across turns, and the breaker stops the next one
+
+## Steps
+
+- [x] **1 · key resolution** — `AgentHost` takes a resolver. Hosted decrypts the org's key;
+      embedded uses the machine's own env. A workspace with neither fails loudly, not silently.
+- [x] **2 · a built subprocess env** — `env` on `query()` REPLACES the environment rather than
+      merging. Inheriting `process.env` would hand a multi-tenant agent the master key and the
+      Postgres url, so the env is constructed from an allowlist.
+- [x] **3 · spend + circuit breaker** — per-workspace daily accumulation in the workspace db
+      (works in both modes, and it is activity rather than identity so C1 holds). A cap with a
+      Resume button. Not a quota: OSS, no pricing, ever.
+- [x] **4 · surface it** — `agents.spend` / `agents.resume`, so a client can show the state
+      instead of a turn silently doing nothing.
+
+## Caught while building
+
+**Resume did nothing.** Clearing the pause flag left the cap comparison tripping on the same
+spend, so the button cleared a flag and the next check set it again. The cap is measured from
+the last acknowledgement now: Resume grants exactly one more cap of headroom, not amnesty for
+the day. The first version of the test passed while the bug was live — it asserted
+`paused === false` instead of asserting the breaker was open.
+
+## Not verified
+
+The live SDK loop still is not exercised — it bills real usage and needs a key. What is tested
+is everything around it: the env allowlist, the breaker arithmetic, key resolution. A real turn
+through a hosted workspace's own key has not been run.
+
+## Out of phase 4 (deliberately)
+
+- **Scheduled runs.** They are the payoff, and they are exactly what should not ship before the
+  breaker has been watched working. Next phase, with the breaker as a precondition.
+- **Agent panel on the web client** — the desktop one works; the web needs BYOK entry first.
+
+---
+
 # Phase 3 — the web client (MVP) — COMPLETE (2026-09-20)
 
 104 tests green, `turbo check-types` 13/13, `biome check` green, `mirin check --scenario`

@@ -1,6 +1,6 @@
 import { join } from 'node:path'
 import { createWorkspaceRegistry, type Workspace } from '@washi/repository'
-import { AgentHost } from '@washi/service'
+import { AgentHost, type AgentKeySource } from '@washi/service'
 import { createEventBus, type ResolvedWorkspace, type ServerRuntime } from '@washi/trpc'
 import { DEFAULT_WORKSPACE_ID } from './constants'
 import type { ServerOptions } from './types'
@@ -15,7 +15,12 @@ export function createRuntime(options: ServerOptions): ServerRuntime & { close()
   const hosts = new Map<string, ResolvedWorkspace>()
 
   const attachHost = (workspace: Workspace): ResolvedWorkspace => {
-    const host = new AgentHost(workspace)
+    // Hosted decrypts the organization's own key; embedded has no key store, so
+    // the host falls back to this machine's ANTHROPIC_API_KEY.
+    const keys: AgentKeySource | undefined = options.resolveAgentKey
+      ? { resolve: () => options.resolveAgentKey!(workspace.id) }
+      : undefined
+    const host = new AgentHost(workspace, keys)
     host.setEvents({
       update: (sessionId, entry) => events.emit('agentUpdate', { sessionId, entry }),
       approval: (request) => events.emit('approvalRequested', request),

@@ -15,6 +15,8 @@ export interface ServerOptions {
   token?: string
   /** Extra origins the hosted web client is served from. */
   trustedOrigins?: string[]
+  /** Hosted only: the organization's decrypted key, for the agent subprocess. */
+  resolveAgentKey?: (workspaceId: string) => Promise<string | null>
 }
 
 export interface RunningServer {

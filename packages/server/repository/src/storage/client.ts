@@ -173,6 +173,15 @@ function createTables(sqlite: Database) {
   `)
 
   sqlite.exec(`
+    CREATE TABLE IF NOT EXISTS agent_spend (
+      day TEXT PRIMARY KEY,
+      cost_usd REAL NOT NULL DEFAULT 0,
+      turns INTEGER NOT NULL DEFAULT 0,
+      updated_at TEXT NOT NULL
+    )
+  `)
+
+  sqlite.exec(`
     CREATE TABLE IF NOT EXISTS app_meta (
       key TEXT PRIMARY KEY,
       value TEXT NOT NULL

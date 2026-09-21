@@ -14,6 +14,11 @@ export const agentMutations = router({
     .mutation(({ ctx, input }) => {
       void ctx.host.prompt(input.sessionId, input.text)
     }),
+  /** Clearing the breaker is a person's decision — nothing clears it on a timer. */
+  resume: workspaceProcedure.mutation(({ ctx }) => {
+    ctx.host.resume()
+    return ctx.host.spend()
+  }),
   resolveApproval: workspaceProcedure
     .input(z.object({ id: z.string(), decision: decisionSchema }))
     .mutation(({ ctx, input }) => {
