@@ -1,4 +1,17 @@
-import type { Actor, ControlPlane, SecretStore, WorkspaceRef } from '@washi/trpc'
+import type {
+  Actor,
+  AgentCredentialInput,
+  ControlPlane,
+  SecretStore,
+  WorkspaceRef,
+} from '@washi/trpc'
+
+export interface AgentCredentialOut {
+  apiKey: string
+  provider: string
+  model: string | null
+}
+
 import { and, eq } from 'drizzle-orm'
 import { member, organization, organizationSecret } from '../db/schema'
 import { createAuth } from './auth'
@@ -12,9 +25,15 @@ export interface HostedControlPlane extends ControlPlane {
   db: ControlDB
   secrets: SecretStore
   /** Decrypted, for the agent host only — never for a route. */
-  agentKey(workspaceId: string): Promise<string | null>
-  setAgentKey(workspaceId: string, actorId: string, key: string): Promise<{ last4: string }>
-  agentKeyInfo(workspaceId: string): Promise<{ last4: string; updatedAt: Date } | null>
+  agentKey(workspaceId: string): Promise<AgentCredentialOut | null>
+  setAgentKey(
+    workspaceId: string,
+    actorId: string,
+    credential: AgentCredentialInput,
+  ): Promise<{ last4: string }>
+  agentKeyInfo(
+    workspaceId: string,
+  ): Promise<{ last4: string; provider: string; model: string | null; updatedAt: Date } | null>
 }
 
 export function createHostedControlPlane(options: ControlPlaneOptions): HostedControlPlane {
@@ -25,7 +44,8 @@ export function createHostedControlPlane(options: ControlPlaneOptions): HostedCo
     db,
     secrets: {
       info: (workspaceId) => plane.agentKeyInfo(workspaceId),
-      set: (workspaceId, actorId, key) => plane.setAgentKey(workspaceId, actorId, key),
+      set: (workspaceId, actorId, credential) =>
+        plane.setAgentKey(workspaceId, actorId, credential),
     },
 
     async authenticate(request) {
@@ -72,37 +92,39 @@ export function createHostedControlPlane(options: ControlPlaneOptions): HostedCo
         .where(eq(organizationSecret.organizationId, workspaceId))
         .limit(1)
       if (!row) return null
-      return open(options.masterKey, workspaceId, row)
+      return {
+        apiKey: await open(options.masterKey, workspaceId, row),
+        provider: row.provider,
+        model: row.model,
+      }
     },
 
-    async setAgentKey(workspaceId, actorId, key) {
-      const sealed = await seal(options.masterKey, workspaceId, key)
+    async setAgentKey(workspaceId, actorId, credential) {
+      const sealed = await seal(options.masterKey, workspaceId, credential.key)
+      const row = {
+        provider: credential.provider,
+        model: credential.model ?? null,
+        ciphertext: sealed.ciphertext,
+        iv: sealed.iv,
+        last4: sealed.last4,
+        updatedBy: actorId,
+        updatedAt: new Date(),
+      }
       await db
         .insert(organizationSecret)
-        .values({
-          organizationId: workspaceId,
-          ciphertext: sealed.ciphertext,
-          iv: sealed.iv,
-          last4: sealed.last4,
-          updatedBy: actorId,
-          updatedAt: new Date(),
-        })
-        .onConflictDoUpdate({
-          target: organizationSecret.organizationId,
-          set: {
-            ciphertext: sealed.ciphertext,
-            iv: sealed.iv,
-            last4: sealed.last4,
-            updatedBy: actorId,
-            updatedAt: new Date(),
-          },
-        })
+        .values({ organizationId: workspaceId, ...row })
+        .onConflictDoUpdate({ target: organizationSecret.organizationId, set: row })
       return { last4: sealed.last4 }
     },
 
     async agentKeyInfo(workspaceId) {
       const [row] = await db
-        .select({ last4: organizationSecret.last4, updatedAt: organizationSecret.updatedAt })
+        .select({
+          last4: organizationSecret.last4,
+          provider: organizationSecret.provider,
+          model: organizationSecret.model,
+          updatedAt: organizationSecret.updatedAt,
+        })
         .from(organizationSecret)
         .where(eq(organizationSecret.organizationId, workspaceId))
         .limit(1)

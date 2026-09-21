@@ -33,9 +33,21 @@ export interface WorkspaceRef {
  * Having both behind this interface is what makes phase 7 a redeployment
  * rather than a rewrite (C2).
  */
+export interface AgentCredentialInput {
+  key: string
+  provider: string
+  model?: string | null
+}
+
 export interface SecretStore {
-  info(workspaceId: string): Promise<{ last4: string; updatedAt: Date } | null>
-  set(workspaceId: string, actorId: string, key: string): Promise<{ last4: string }>
+  info(
+    workspaceId: string,
+  ): Promise<{ last4: string; provider: string; model: string | null; updatedAt: Date } | null>
+  set(
+    workspaceId: string,
+    actorId: string,
+    credential: AgentCredentialInput,
+  ): Promise<{ last4: string }>
 }
 
 export interface ControlPlane {

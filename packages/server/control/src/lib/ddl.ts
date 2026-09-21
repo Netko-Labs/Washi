@@ -106,12 +106,14 @@ export async function ensureControlSchema(db: ControlDB): Promise<void> {
     CREATE TABLE IF NOT EXISTS "organization_secret" (
       organization_id TEXT PRIMARY KEY REFERENCES "organization"(id) ON DELETE CASCADE,
       provider TEXT NOT NULL DEFAULT 'anthropic',
+      model TEXT,
       ciphertext TEXT NOT NULL,
       iv TEXT NOT NULL,
       last4 TEXT NOT NULL,
       updated_by TEXT REFERENCES "user"(id) ON DELETE SET NULL,
       updated_at TIMESTAMP NOT NULL DEFAULT NOW()
     )`)
+  await db.execute(sql`ALTER TABLE "organization_secret" ADD COLUMN IF NOT EXISTS model TEXT`)
   await db.execute(
     sql`CREATE INDEX IF NOT EXISTS organization_secret_provider_idx ON "organization_secret"(provider)`,
   )

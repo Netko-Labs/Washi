@@ -129,6 +129,8 @@ export const organizationSecret = pgTable(
       .primaryKey()
       .references(() => organization.id, { onDelete: 'cascade' }),
     provider: text('provider').notNull().default('anthropic'),
+    /** Provider-native model id. Null takes the provider's default. */
+    model: text('model'),
     ciphertext: text('ciphertext').notNull(),
     iv: text('iv').notNull(),
     last4: text('last4').notNull(),

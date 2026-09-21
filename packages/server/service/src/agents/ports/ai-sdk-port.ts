@@ -1,0 +1,100 @@
+import { createAnthropic } from '@ai-sdk/anthropic'
+import { createOpenRouter } from '@openrouter/ai-sdk-provider'
+import type { AgentUpdate } from '@washi/domain'
+import type { Workspace } from '@washi/repository'
+import { type LanguageModel, stepCountIs, ToolLoopAgent } from 'ai'
+import { createAiTools, isReadTool } from './ai-sdk-tools'
+import { DEFAULT_MODELS, MAX_STEPS } from './constants'
+import type { AgentPort, PromptRequest, ToolGate, TurnResult } from './types'
+
+export interface AiSdkPortDeps {
+  ws: Workspace
+  gate: ToolGate
+  runHankoAction: (input: unknown) => Promise<void>
+  instructions: string
+}
+
+function resolveModel(provider: string, model: string, apiKey: string): LanguageModel {
+  if (provider === 'openrouter') return createOpenRouter({ apiKey })(model)
+  return createAnthropic({ apiKey })(model)
+}
+
+/**
+ * The provider-agnostic port. Everything Washi cares about — which tools exist,
+ * which of them stop at the approvals desk, what a turn looks like in the
+ * transcript — is decided here; the model is a string and a key.
+ */
+export function createAiSdkPort({
+  ws,
+  gate,
+  runHankoAction,
+  instructions,
+}: AiSdkPortDeps): AgentPort {
+  return {
+    id: 'openrouter',
+
+    async prompt(request: PromptRequest, emit: (update: AgentUpdate) => void): Promise<TurnResult> {
+      const tools = createAiTools({ ws, runHankoAction })
+      const model = request.model.model ?? DEFAULT_MODELS[request.model.provider]
+
+      const agent = new ToolLoopAgent({
+        model: resolveModel(request.model.provider, model, request.apiKey),
+        instructions,
+        tools,
+        stopWhen: stepCountIs(MAX_STEPS),
+        // One gate, both ports. Reads pass; everything else waits for a person,
+        // through the same desk a sheet's action goes through (spec §09 P4).
+        toolApproval: async ({ toolCall }) => {
+          if (gate.isRead(toolCall.toolName)) return 'not-applicable'
+          const allowed = await gate.approve(request.sessionId, toolCall.toolName, toolCall.input)
+          return allowed ? 'approved' : 'denied'
+        },
+      })
+
+      const stream = await agent.stream({
+        messages: [
+          ...request.history.map((entry) => ({ role: entry.role, content: entry.text })),
+          { role: 'user' as const, content: request.text },
+        ],
+        abortSignal: request.signal,
+      })
+
+      const seen = new Set<string>()
+
+      for await (const part of stream.fullStream) {
+        if (part.type === 'text-delta' && part.text) {
+          emit({ kind: 'message_chunk', text: part.text })
+          continue
+        }
+        if (part.type === 'tool-call') {
+          seen.add(part.toolCallId)
+          emit({
+            kind: 'tool_call',
+            toolCallId: part.toolCallId,
+            title: part.toolName,
+            toolKind: isReadTool(part.toolName) ? 'read' : 'edit',
+            status: 'in_progress',
+            input: part.input,
+          })
+          continue
+        }
+        if (part.type === 'tool-result' && seen.has(part.toolCallId)) {
+          emit({
+            kind: 'tool_call_update',
+            toolCallId: part.toolCallId,
+            status: 'completed',
+          })
+          continue
+        }
+        if (part.type === 'tool-error' && seen.has(part.toolCallId)) {
+          emit({ kind: 'tool_call_update', toolCallId: part.toolCallId, status: 'failed' })
+        }
+      }
+
+      // Usage is tokens, not dollars, and every provider prices differently —
+      // so the breaker learns nothing here. It is the turn count that bounds an
+      // OpenRouter workspace until per-model pricing is wired.
+      return { costUsd: null }
+    },
+  }
+}

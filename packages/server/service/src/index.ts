@@ -1,5 +1,6 @@
 export { AgentHost, type AgentHostEvents, type Caller } from './agents/host'
 export {
+  type AgentCredential,
   type AgentKeySource,
   type AgentSpendReport,
   agentEnv,
@@ -7,6 +8,8 @@ export {
   DAILY_CAP_USD_KEY,
   DEFAULT_DAILY_CAP_USD,
 } from './agents/lib'
+export type { AgentPort, ModelChoice, ProviderId, ToolGate } from './agents/ports'
+export { DEFAULT_MODELS } from './agents/ports'
 export {
   checkSource,
   createSheetFromSource,

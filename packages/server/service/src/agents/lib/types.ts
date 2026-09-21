@@ -1,6 +1,15 @@
+import type { ProviderId } from '../ports/types'
+
+export interface AgentCredential {
+  apiKey: string
+  provider: ProviderId
+  /** Provider-native model id. Falls back to the provider's default. */
+  model?: string
+}
+
 export interface AgentKeySource {
   /** Null when this deployment has no stored key and no ambient one. */
-  resolve(): Promise<string | null>
+  resolve(): Promise<AgentCredential | null>
 }
 
 export type BreakerState =

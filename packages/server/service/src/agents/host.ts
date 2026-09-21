@@ -14,6 +14,7 @@ import {
   getAppMeta,
   getSdkSessionId,
   getSheet,
+  getTranscript,
   pauseAgent,
   pausedOn,
   recordCapability,
@@ -29,9 +30,10 @@ import {
 import { checkUrl, guardedFetch, isPrivateAddress } from '@washi/tsuru'
 import { createSheetFromSource } from '../sheets/service'
 import { runMutation } from '../tables/service'
-import type { AgentKeySource, AgentSpendReport, BreakerState } from './lib'
+import type { AgentCredential, AgentKeySource, AgentSpendReport, BreakerState } from './lib'
 import { agentEnv, DAILY_CAP_USD_KEY, DEFAULT_DAILY_CAP_USD, MAX_TURN_BUDGET_USD } from './lib'
 import { normalizeMessage, shortToolName } from './normalize'
+import { createAiSdkPort } from './ports'
 import { createWashiTools, currentFetchPolicy, type ToolContext, TSURU_HOSTS_KEY } from './tools'
 
 const READ_TOOLS = new Set([
@@ -107,7 +109,12 @@ export class AgentHost {
     this.ws = ws
     // No resolver means this deployment has no key store — embedded mode, where
     // the machine's own ANTHROPIC_API_KEY is the right and only answer.
-    this.keys = keys ?? { resolve: async () => process.env.ANTHROPIC_API_KEY ?? null }
+    this.keys = keys ?? {
+      resolve: async () => {
+        const apiKey = process.env.ANTHROPIC_API_KEY
+        return apiKey ? ({ apiKey, provider: 'anthropic' } as AgentCredential) : null
+      },
+    }
   }
 
   /** The cap is per workspace and settable, because a sane default is not a universal one. */
@@ -239,8 +246,8 @@ export class AgentHost {
       return
     }
 
-    const apiKey = await this.keys.resolve()
-    if (!apiKey) {
+    const credential = await this.keys.resolve()
+    if (!credential) {
       const detail = 'No API key for this workspace. Add one in settings before asking Washi.'
       this.record(sessionId, { kind: 'turn_done', stopReason: 'error', error: detail })
       updateSession(this.ws, sessionId, { status: 'error' })
@@ -248,6 +255,16 @@ export class AgentHost {
     }
 
     updateSession(this.ws, sessionId, { status: 'running' })
+
+    // Two ports, one vocabulary (§05). Anthropic keeps the native Claude Agent
+    // SDK path, which resumes sessions server-side; anything else goes through
+    // the AI SDK, where Washi owns the history itself.
+    if (credential.provider !== 'anthropic') {
+      await this.promptViaPort(sessionId, text, credential)
+      return
+    }
+
+    const apiKey = credential.apiKey
 
     const context: ToolContext = { runHankoAction: (action) => this.executeAction(action) }
 
@@ -301,6 +318,65 @@ export class AgentHost {
             }
           }
         }
+      }
+    } catch (error) {
+      this.record(sessionId, { kind: 'turn_done', stopReason: 'error', error: String(error) })
+      updateSession(this.ws, sessionId, { status: 'error' })
+    }
+  }
+
+  /** The provider-agnostic path. Same tools, same desk, different vendor. */
+  private async promptViaPort(
+    sessionId: string,
+    text: string,
+    credential: AgentCredential,
+  ): Promise<void> {
+    const port = createAiSdkPort({
+      ws: this.ws,
+      instructions: SYSTEM_APPEND,
+      runHankoAction: (action) => this.executeAction(action),
+      gate: {
+        isRead: (name) => READ_TOOLS.has(name),
+        approve: async (session, toolName, input) => {
+          if (this.alwaysAllowed.get(session)?.has(toolName)) return true
+          const decision = await this.requestApproval(session, toolName, input)
+          if (decision === 'allow_always') {
+            const set = this.alwaysAllowed.get(session) ?? new Set()
+            set.add(toolName)
+            this.alwaysAllowed.set(session, set)
+          }
+          return decision !== 'reject_once'
+        },
+      },
+    })
+
+    try {
+      const history = getTranscript(this.ws, sessionId)
+        .flatMap((entry) =>
+          entry.update.kind === 'user_message'
+            ? [{ role: 'user' as const, text: entry.update.text }]
+            : [],
+        )
+        .slice(0, -1)
+
+      const result = await port.prompt(
+        {
+          sessionId,
+          text,
+          apiKey: credential.apiKey,
+          model: { provider: credential.provider, model: credential.model },
+          history,
+        },
+        (update) => this.record(sessionId, update),
+      )
+      this.record(sessionId, { kind: 'turn_done', stopReason: 'end_turn' })
+      updateSession(this.ws, sessionId, {
+        status: 'idle',
+        ...(result.costUsd != null ? { costUsd: result.costUsd } : {}),
+      })
+      if (result.costUsd != null) {
+        const total = recordSpend(this.ws, result.costUsd)
+        if (total.costUsd >= this.dailyCap() + acknowledgedSpend(this.ws)) pauseAgent(this.ws)
       }
     } catch (error) {
       this.record(sessionId, { kind: 'turn_done', stopReason: 'error', error: String(error) })

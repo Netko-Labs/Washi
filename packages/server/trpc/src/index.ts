@@ -25,6 +25,7 @@ export type AppRouter = typeof appRouter
 
 export {
   type Actor,
+  type AgentCredentialInput,
   type Context,
   type ContextInput,
   type ControlPlane,

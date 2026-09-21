@@ -1,3 +1,62 @@
+# Phase 5 — two ports, one vocabulary (P6) — COMPLETE (2026-09-20)
+
+122 tests green, 13/13 typecheck, biome green, `mirin check` 10/10.
+
+Model-agnostic agents, with OpenRouter as the first BYOK provider. This is the P6 the
+audit has been asking for since August: §05 promises "two ports, one vocabulary" and the
+code has one port welded to one vendor.
+
+## The call: AI SDK, not Eve
+
+Both were checked. **Eve** (Vercel, June 2026) is a framework that wants to own the agent's
+shape — agents as directories of files, sandboxed code execution, subagents, scheduling.
+Washi's most load-bearing rule is the opposite: ink/tsuru/hanko are the only capability
+surface, never fs or shell, and Q1/Q11 are closed — power grows by adding components, never
+a scripting hatch. Washi already owns the approvals desk, the capability ledger, the
+transcript and the session model; adopting Eve means bypassing most of it or rewriting the
+trust model around it.
+
+**AI SDK 7** (`ai@7.0.107`) is a library, and it maps 1:1 onto what is missing.
+`ToolLoopAgent` takes `model` + `instructions` + `tools`; `needsApproval` on a tool — boolean
+or async function — *is* `canUseTool`. OpenRouter is one provider package.
+
+## Steps
+
+- [x] **1 · `AgentPort`** — prompt · cancel · resume, normalizing into the existing
+      `AgentUpdate` shape. The transcript UI already speaks it; neither port gets to invent one.
+- [x] **2 · `ClaudeSdkPort`** — the current host, behind the interface. No behaviour change.
+- [x] **3 · `AiSdkPort`** — `ToolLoopAgent`, ink/tsuru/hanko as AI SDK tools, `needsApproval`
+      wired to the same approvals desk both origins already pass through (P4).
+- [x] **4 · provider config** — `organization_secret.provider` already exists and defaults to
+      'anthropic'. Add the model id, and pick the port from the provider.
+
+## What the docs got wrong
+
+Every blog and the AI SDK 6 release notes say tool approval is `needsApproval: true` on the
+tool. In `ai@7` that field is **deprecated** — "Tool approval is handled on a `generateText` /
+`streamText` level now" — and the live API is `toolApproval` on the agent, a function returning
+`'approved' | 'denied' | 'not-applicable'`. It can await, so Washi's desk plugs straight in.
+Reading the installed `.d.ts` found this; the research would have shipped the deprecated path.
+
+## Still owed
+
+- **Cost is null on the AI SDK port.** Usage arrives as tokens and every provider prices
+  differently, so the breaker learns nothing from an OpenRouter turn. Until per-model pricing
+  is wired, only the turn count bounds those workspaces — the daily dollar cap does not.
+- **The BYOK UI still assumes Anthropic.** The route takes a provider and model; no screen
+  offers them yet.
+- **No live turn through either port.** Still unbilled and unproven.
+
+## Known cost, stated up front
+
+The Claude Agent SDK gives Washi things the AI SDK does not: session resumption via
+`sdkSessionId`, and built-in context compaction. Under the AI SDK port, Washi owns the
+message history itself — it already persists every turn, so the data is there, but
+compaction becomes its own problem rather than a freebie. **Both ports stay.** That is what
+§05 always said.
+
+---
+
 # Phase 4 — the agent, server-side and on a leash — COMPLETE (2026-09-20)
 
 117 tests green, `turbo check-types` 13/13, `biome check` green, `mirin check` 10/10.

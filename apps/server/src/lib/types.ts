@@ -1,3 +1,4 @@
+import type { AgentCredential } from '@washi/service'
 import type { ControlPlane, ServerMode, ServerRuntime } from '@washi/trpc'
 
 export interface ServerOptions {
@@ -15,8 +16,8 @@ export interface ServerOptions {
   token?: string
   /** Extra origins the hosted web client is served from. */
   trustedOrigins?: string[]
-  /** Hosted only: the organization's decrypted key, for the agent subprocess. */
-  resolveAgentKey?: (workspaceId: string) => Promise<string | null>
+  /** Hosted only: the organization's decrypted credential, for the agent. */
+  resolveAgentKey?: (workspaceId: string) => Promise<AgentCredential | null>
 }
 
 export interface RunningServer {
