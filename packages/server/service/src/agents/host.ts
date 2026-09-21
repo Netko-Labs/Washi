@@ -7,6 +7,7 @@ import type {
   TranscriptEntry,
 } from '@washi/domain'
 import { checkAction, type HankoHandlers, isReversibleVerb, runAction } from '@washi/hanko'
+import { createModelCatalogue, type ModelCatalogue } from '@washi/models'
 import {
   acknowledgedSpend,
   appendTurn,
@@ -104,9 +105,11 @@ export class AgentHost {
 
   private readonly ws: Workspace
   private readonly keys: AgentKeySource
+  private readonly catalogue: ModelCatalogue
 
-  constructor(ws: Workspace, keys?: AgentKeySource) {
+  constructor(ws: Workspace, keys?: AgentKeySource, catalogue?: ModelCatalogue) {
     this.ws = ws
+    this.catalogue = catalogue ?? createModelCatalogue()
     // No resolver means this deployment has no key store — embedded mode, where
     // the machine's own ANTHROPIC_API_KEY is the right and only answer.
     this.keys = keys ?? {
@@ -333,6 +336,7 @@ export class AgentHost {
   ): Promise<void> {
     const port = createAiSdkPort({
       ws: this.ws,
+      catalogue: this.catalogue,
       instructions: SYSTEM_APPEND,
       runHankoAction: (action) => this.executeAction(action),
       gate: {

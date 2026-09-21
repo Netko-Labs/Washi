@@ -9,7 +9,7 @@ export {
   DEFAULT_DAILY_CAP_USD,
 } from './agents/lib'
 export type { AgentPort, ModelChoice, ProviderId, ToolGate } from './agents/ports'
-export { DEFAULT_MODELS } from './agents/ports'
+export { defaultModelFor, LAST_RESORT_MODELS, PREFERRED_MODELS } from './agents/ports'
 export {
   checkSource,
   createSheetFromSource,

@@ -172,6 +172,7 @@
         "@washi/domain": "workspace:*",
         "@washi/hanko": "workspace:*",
         "@washi/ink": "workspace:*",
+        "@washi/models": "workspace:*",
         "@washi/paper": "workspace:*",
         "@washi/repository": "workspace:*",
         "@washi/tsuru": "workspace:*",
@@ -193,6 +194,7 @@
         "@washi/domain": "workspace:*",
         "@washi/hanko": "workspace:*",
         "@washi/ink": "workspace:*",
+        "@washi/models": "workspace:*",
         "@washi/repository": "workspace:*",
         "@washi/service": "workspace:*",
         "zod": "^4.4.3",
@@ -215,6 +217,17 @@
     },
     "packages/shared/ink": {
       "name": "@washi/ink",
+      "version": "0.1.0",
+      "dependencies": {
+        "zod": "^4.4.3",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+        "@washi/typescript-config": "workspace:*",
+      },
+    },
+    "packages/shared/models": {
+      "name": "@washi/models",
       "version": "0.1.0",
       "dependencies": {
         "zod": "^4.4.3",
@@ -762,6 +775,8 @@
     "@washi/hanko": ["@washi/hanko@workspace:packages/shared/hanko"],
 
     "@washi/ink": ["@washi/ink@workspace:packages/shared/ink"],
+
+    "@washi/models": ["@washi/models@workspace:packages/shared/models"],
 
     "@washi/paper": ["@washi/paper@workspace:packages/shared/paper"],
 

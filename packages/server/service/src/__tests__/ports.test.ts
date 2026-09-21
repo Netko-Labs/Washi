@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'bun:test'
-import { DEFAULT_MODELS, isReadTool } from '../agents/ports'
+import { createModelCatalogue } from '@washi/models'
+import { defaultModelFor, isReadTool } from '../agents/ports'
 
 /**
  * "Two ports, one vocabulary" (§05) is only true if both ports gate the same
@@ -29,9 +30,51 @@ describe('both ports agree on what a read is', () => {
   })
 })
 
-describe('providers', () => {
-  test('each has a default model, so a key alone is enough to start', () => {
-    expect(DEFAULT_MODELS.anthropic).toBeString()
-    expect(DEFAULT_MODELS.openrouter).toContain('/')
+describe('a workspace that names no model still gets one', () => {
+  const offline = createModelCatalogue({
+    fetchImpl: (async () => {
+      throw new Error('offline')
+    }) as unknown as typeof fetch,
+  })
+
+  const serving = (models: Record<string, unknown>) =>
+    createModelCatalogue({
+      fetchImpl: (async () =>
+        new Response(JSON.stringify({ anthropic: { id: 'anthropic', models } }), {
+          status: 200,
+        })) as unknown as typeof fetch,
+    })
+
+  test('a preferred model wins when the catalogue has it', async () => {
+    const catalogue = serving({
+      'claude-sonnet-5': { id: 'claude-sonnet-5', tool_call: true, cost: { input: 2, output: 10 } },
+      cheapo: { id: 'cheapo', tool_call: true, cost: { input: 0.01, output: 0.02 } },
+    })
+    expect(await defaultModelFor(catalogue, 'anthropic')).toBe('claude-sonnet-5')
+  })
+
+  test('a $0 preview is never the default — cheapest-wins picks a disappointment', async () => {
+    const catalogue = serving({
+      'free-preview': { id: 'free-preview', tool_call: true, cost: { input: 0, output: 0 } },
+      'real-model': { id: 'real-model', tool_call: true, cost: { input: 3, output: 9 } },
+    })
+    expect(await defaultModelFor(catalogue, 'anthropic')).toBe('real-model')
+  })
+
+  test('with nothing preferred available, the cheapest paid model is taken', async () => {
+    const catalogue = serving({
+      pricey: { id: 'pricey', tool_call: true, cost: { input: 90, output: 1 } },
+      thrifty: { id: 'thrifty', tool_call: true, cost: { input: 1, output: 1 } },
+    })
+    expect(await defaultModelFor(catalogue, 'anthropic')).toBe('thrifty')
+  })
+
+  test('an unreachable catalogue still answers', async () => {
+    expect(await defaultModelFor(offline, 'anthropic')).toBeString()
+    expect(await defaultModelFor(offline, 'openrouter')).toContain('/')
+  })
+
+  test('an unknown provider does not throw', async () => {
+    expect(await defaultModelFor(offline, 'nonesuch')).toBeString()
   })
 })

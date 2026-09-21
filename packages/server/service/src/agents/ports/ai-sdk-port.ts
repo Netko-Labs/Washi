@@ -1,10 +1,12 @@
 import { createAnthropic } from '@ai-sdk/anthropic'
 import { createOpenRouter } from '@openrouter/ai-sdk-provider'
 import type { AgentUpdate } from '@washi/domain'
+import { type ModelCatalogue, priceTurn } from '@washi/models'
 import type { Workspace } from '@washi/repository'
 import { type LanguageModel, stepCountIs, ToolLoopAgent } from 'ai'
 import { createAiTools, isReadTool } from './ai-sdk-tools'
-import { DEFAULT_MODELS, MAX_STEPS } from './constants'
+import { MAX_STEPS } from './constants'
+import { defaultModelFor } from './defaults'
 import type { AgentPort, PromptRequest, ToolGate, TurnResult } from './types'
 
 export interface AiSdkPortDeps {
@@ -12,6 +14,8 @@ export interface AiSdkPortDeps {
   gate: ToolGate
   runHankoAction: (input: unknown) => Promise<void>
   instructions: string
+  /** Prices the turn, so the daily breaker works on a provider that bills tokens. */
+  catalogue: ModelCatalogue
 }
 
 function resolveModel(provider: string, model: string, apiKey: string): LanguageModel {
@@ -29,13 +33,15 @@ export function createAiSdkPort({
   gate,
   runHankoAction,
   instructions,
+  catalogue,
 }: AiSdkPortDeps): AgentPort {
   return {
     id: 'openrouter',
 
     async prompt(request: PromptRequest, emit: (update: AgentUpdate) => void): Promise<TurnResult> {
       const tools = createAiTools({ ws, runHankoAction })
-      const model = request.model.model ?? DEFAULT_MODELS[request.model.provider]
+      const model =
+        request.model.model ?? (await defaultModelFor(catalogue, request.model.provider))
 
       const agent = new ToolLoopAgent({
         model: resolveModel(request.model.provider, model, request.apiKey),
@@ -91,10 +97,19 @@ export function createAiSdkPort({
         }
       }
 
-      // Usage is tokens, not dollars, and every provider prices differently —
-      // so the breaker learns nothing here. It is the turn count that bounds an
-      // OpenRouter workspace until per-model pricing is wired.
-      return { costUsd: null }
+      // models.dev publishes per-MTok prices, so a provider that bills in
+      // tokens still produces a dollar figure the daily breaker can act on.
+      // An unpriced model yields null rather than zero — a free-looking turn
+      // would wave an unknown model straight past the cap.
+      const usage = await stream.usage
+      const entry = await catalogue.model(request.model.provider, model)
+      return {
+        costUsd: priceTurn(entry, {
+          inputTokens: usage?.inputTokens,
+          outputTokens: usage?.outputTokens,
+          cachedInputTokens: usage?.inputTokenDetails?.cacheReadTokens,
+        }),
+      }
     },
   }
 }

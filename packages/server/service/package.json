@@ -8,6 +8,7 @@
     "@washi/domain": "workspace:*",
     "@washi/hanko": "workspace:*",
     "@washi/ink": "workspace:*",
+    "@washi/models": "workspace:*",
     "@washi/paper": "workspace:*",
     "@washi/repository": "workspace:*",
     "@washi/tsuru": "workspace:*",

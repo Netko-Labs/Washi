@@ -38,13 +38,34 @@ tool. In `ai@7` that field is **deprecated** — "Tool approval is handled on a 
 `'approved' | 'denied' | 'not-applicable'`. It can await, so Washi's desk plugs straight in.
 Reading the installed `.d.ts` found this; the research would have shipped the deprecated path.
 
-## Still owed
+## Closed by models.dev (2026-09-20)
 
-- **Cost is null on the AI SDK port.** Usage arrives as tokens and every provider prices
-  differently, so the breaker learns nothing from an OpenRouter turn. Until per-model pricing
-  is wired, only the turn count bounds those workspaces — the daily dollar cap does not.
-- **The BYOK UI still assumes Anthropic.** The route takes a provider and model; no screen
-  offers them yet.
+`packages/shared/models` reads `https://models.dev/api.json` — 222 providers, every model
+carrying `tool_call`, context limits and per-MTok pricing.
+
+- **Cost is no longer null on the AI SDK port.** A turn reports tokens; the catalogue supplies
+  the price; the daily breaker works on every provider, not just Anthropic. An *unpriced*
+  model yields null rather than zero — a free-looking turn would wave an unknown model past
+  the cap.
+- **`DEFAULT_MODELS` is gone.** `models.list` feeds a picker, and the default is a preference
+  list validated against the catalogue.
+- Cached in-process, refreshed daily, pruned to providers with an installed SDK and models
+  that can call a tool — 317 of them, down from thousands.
+- **Never a dependency.** Unreachable models.dev falls back to a bundled floor, and the route
+  reports which was used.
+
+### "Cheapest" was the wrong default, and the live data proved it
+
+The first cut picked the cheapest tool-capable model. Against real models.dev that is
+`dots-studio/dots-3-note-preview:free` at $0/MTok. Defaulting someone's workspace to a free
+preview would produce terrible pages, and the product *is* that the agent designs the page.
+A default model is a product decision, not an arithmetic one — so the catalogue decides what
+exists and what it costs, and an ordered preference list decides what is good enough to hand
+to someone who did not choose.
+
+## Still owed
+- **The BYOK UI still assumes Anthropic.** `models.list` exists and returns 317 models; no
+  screen offers them yet.
 - **No live turn through either port.** Still unbilled and unproven.
 
 ## Known cost, stated up front
