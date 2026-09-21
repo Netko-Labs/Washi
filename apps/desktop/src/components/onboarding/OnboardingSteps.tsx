@@ -25,12 +25,12 @@ const PITCH_ROWS = [
   {
     icon: IconDatabase,
     title: 'Offline first',
-    desc: 'Markdown files in a folder you pick. No account required.',
+    desc: 'One workspace, one database on this machine. No account required.',
   },
   {
     icon: IconServer,
     title: 'Self-hosted sync',
-    desc: 'Point Washi at your own server to sync devices end-to-end encrypted.',
+    desc: 'Point Washi at a server you run to sync devices and invite people.',
   },
   {
     icon: IconUsers,
@@ -78,8 +78,8 @@ export function StepLocalFirst() {
           Everything stays on your machine
         </h1>
         <p className="text-[15px] text-muted-foreground leading-[1.65]">
-          Washi keeps your notes as plain files on disk. Sync, sharing and agents are optional —
-          nothing leaves this device until you say so.
+          Washi keeps your pages in a database on this machine. Sync, sharing and agents are
+          optional — nothing leaves this device until you say so.
         </p>
       </div>
       <div className="flex flex-col gap-0.5">
@@ -107,10 +107,10 @@ export function StepVault({ draft, patch }: StepProps) {
       <HeroVaults />
       <div>
         <h1 className="mb-2 font-semibold text-[26px] leading-[1.2] tracking-[-0.02em]">
-          Make your first vault
+          Make your first workspace
         </h1>
         <p className="text-[14.5px] text-muted-foreground leading-[1.6]">
-          One vault is one folder. You can add more later — each keeps its own sync settings.
+          One workspace is one database. You can add more later — each keeps its own settings.
         </p>
       </div>
       <div className="flex flex-col gap-1.5">

@@ -1,0 +1,103 @@
+import { useState } from 'react'
+import { signOut, useSession } from '@/lib/auth'
+import { useWorkspaces } from './lib'
+
+/**
+ * The rest of onboarding. A workspace is one SQLite file and one organization,
+ * so "create a workspace" and "start a team" are the same action — which is
+ * why there is no separate team step.
+ */
+export function WorkspacePicker({ onOpen }: { onOpen: (id: string) => void }) {
+  const { workspaces, loading, error, create, open } = useWorkspaces()
+  const { data: session } = useSession()
+  const [name, setName] = useState('')
+  const [busy, setBusy] = useState(false)
+
+  const submit = async () => {
+    if (!name.trim()) return
+    setBusy(true)
+    const id = await create(name.trim())
+    setBusy(false)
+    if (id) {
+      setName('')
+      open(id)
+      onOpen(id)
+    }
+  }
+
+  return (
+    <main className="mx-auto flex min-h-dvh max-w-lg flex-col justify-center px-6 py-12">
+      <p className="font-black text-[15px] tracking-[0.18em] uppercase">和紙 washi</p>
+      <h1 className="mt-6 font-black text-3xl tracking-tight">
+        {workspaces.length ? 'Your workspaces' : 'Make your first workspace'}
+      </h1>
+      <p className="mt-2 text-[14px] text-muted-foreground leading-relaxed">
+        {workspaces.length
+          ? 'Each one is its own set of pages, and its own set of people.'
+          : 'A workspace holds your pages and the people you invite to review them.'}
+      </p>
+
+      {loading && <p className="mt-8 text-[14px] text-muted-foreground">Loading…</p>}
+
+      {workspaces.length > 0 && (
+        <ul className="mt-8 grid gap-2">
+          {workspaces.map((workspace) => (
+            <li key={workspace.id}>
+              <button
+                type="button"
+                onClick={() => {
+                  open(workspace.id)
+                  onOpen(workspace.id)
+                }}
+                className="flex h-14 w-full items-center gap-3 rounded-xl border border-border bg-card px-4 text-left hover:border-primary"
+              >
+                <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-primary/12 font-black text-[13px]">
+                  {workspace.name.slice(0, 1).toUpperCase()}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate font-bold text-[14px]">{workspace.name}</span>
+                  <span className="block text-[12px] text-muted-foreground">{workspace.role}</span>
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <form
+        className="mt-8 flex gap-2"
+        onSubmit={(event) => {
+          event.preventDefault()
+          void submit()
+        }}
+      >
+        <input
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+          placeholder={workspaces.length ? 'Another workspace…' : 'Netko Labs'}
+          className="h-11 min-w-0 flex-1 rounded-xl border border-border bg-card px-3 text-[14px] outline-none focus-visible:border-primary"
+        />
+        <button
+          type="submit"
+          disabled={busy || !name.trim()}
+          className="h-11 shrink-0 rounded-xl bg-primary px-5 font-bold text-[14px] text-primary-foreground disabled:opacity-50"
+        >
+          Create
+        </button>
+      </form>
+
+      {error && <p className="mt-3 text-[13px] text-destructive">{error}</p>}
+
+      <p className="mt-10 text-[13px] text-muted-foreground">
+        Signed in as {session?.user.email}{' '}
+        <button
+          type="button"
+          onClick={() => void signOut().then(() => window.location.reload())}
+          className="underline underline-offset-4"
+        >
+          Sign out
+        </button>
+      </p>
+    </main>
+  )
+}

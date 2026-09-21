@@ -1,5 +1,5 @@
 import { type ReactNode, useId, useRef, useState } from 'react'
-import { cn } from '../lib'
+import { cn, TOUCH_RANGE, TOUCH_TARGET } from '../lib'
 import { type SheetStateValue, useSheetState } from '../state'
 import type { BlockProps } from './typography'
 
@@ -44,7 +44,11 @@ export function Switch({
         role="switch"
         aria-checked={on}
         onClick={() => set(state, !on)}
-        className={cn('h-5 w-9 shrink-0 rounded-full p-0.5', on ? 'bg-primary' : 'bg-border')}
+        className={cn(
+          'h-5 w-9 shrink-0 rounded-full p-0.5',
+          on ? 'bg-primary' : 'bg-border',
+          TOUCH_TARGET,
+        )}
       >
         <span className={cn('block size-4 rounded-full bg-card', on && 'translate-x-4')} />
       </button>
@@ -85,7 +89,7 @@ export function Slider({
         step={step}
         value={value}
         onChange={(event) => set(state, Number(event.target.value))}
-        className="w-full accent-primary"
+        className={cn('w-full accent-primary', TOUCH_RANGE)}
       />
     </label>
   )

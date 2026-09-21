@@ -1,6 +1,6 @@
 import type { InkQuery, QueryRow } from '@washi/ink'
 import { type ReactNode, useEffect, useState } from 'react'
-import { cn } from '../lib'
+import { cn, TOUCH_TARGET } from '../lib'
 import { usePaperHost } from '../provider'
 
 function useBind(query: InkQuery | undefined): { rows: QueryRow[]; error: string | null } {
@@ -48,7 +48,7 @@ export function Task({
           setChecked(next)
           if (record) await host.toggleTask(record, next)
         }}
-        className="size-4 shrink-0 accent-primary"
+        className={cn('size-4 shrink-0 accent-primary', TOUCH_TARGET)}
       />
       <span className={checked ? 'text-muted-foreground line-through' : ''}>{children}</span>
     </label>

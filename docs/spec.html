@@ -755,6 +755,24 @@ runQuery({ <span class="a">table</span>: <span class="v">'tasks'</span>, <span c
   <span class="tape" style="--c:var(--tape-pink)">10 · canvas &amp; reach</span>
   <div class="card">
     <h2 class="title">Every sheet looks like this document</h2>
+
+    <div style="border-left:4px solid var(--tape-moss);background:color-mix(in oklab, var(--tape-moss) 9%, var(--paper-2));border-radius:0 10px 10px 0;padding:.9rem 1.1rem;margin:0 0 1.2rem;">
+      <strong style="color:#3e5c3a">SHIPPED — this section describes a problem that no longer exists.</strong>
+      The canvas sweep landed after 2026-08-14. <code>twMerge</code> wraps every component
+      (<code>paper/src/lib/cn.ts</code>), <code>SheetView</code> renders a bare surface,
+      <code>&lt;Sheet&gt;</code> paints nothing but its own <code>class</code>, and the sheet root
+      carries <code>@container</code> so <code>@sm:</code>/<code>@md:</code> measure the sheet.
+      Q16 is enforced mechanically, not hoped for: <code>registry/tw.ts</code> puts
+      <code>sm:</code> <code>md:</code> <code>lg:</code> in the ban list beside <code>url()</code>,
+      and <code>canvas.test.ts</code> asserts it.
+      <br /><br />
+      <strong>The claim below that "there is not one responsive class in @washi/paper" is false</strong>,
+      and reading it as current cost real time on 2026-09-20 — it was quoted three times as a reason
+      the web client was blocked. Still genuinely open from this section: <strong>touch targets</strong>
+      (<code>size-4</code> controls are under 44px) and <strong>precompiled sheet CSS</strong>
+      (<code>@tailwindcss/browser</code> ships a compiler to every client). Everything else here is history.
+    </div>
+
     <p class="point">Q9 gave sheets the full Tailwind vocabulary. It never gave them the last word. Three layers of imposed appearance sit between an agent's <code>class</code> and the pixels — so sheets converge on one look no matter what gets written. A sheet should be a blank canvas assembled from our primitives; today it is a pre-decorated page you may lightly annotate.</p>
 
     <h3>Why it happens — three layers, each sufficient on its own</h3>

@@ -92,6 +92,33 @@
         "@washi/typescript-config": "workspace:*",
       },
     },
+    "apps/web": {
+      "name": "@washi/web",
+      "version": "0.1.0",
+      "dependencies": {
+        "@fontsource-variable/inter": "^5.3.0",
+        "@tabler/icons-react": "^3.44.0",
+        "@tailwindcss/browser": "^4.3.3",
+        "@trpc/client": "^11.19.0",
+        "@washi/paper": "workspace:*",
+        "@washi/trpc": "workspace:*",
+        "@washi/wsx": "workspace:*",
+        "better-auth": "^1.7.5",
+        "react": "^19.2.7",
+        "react-dom": "^19.2.7",
+        "tw-animate-css": "^1.4.0",
+      },
+      "devDependencies": {
+        "@tailwindcss/vite": "^4.3.2",
+        "@types/bun": "latest",
+        "@types/react": "^19.2.17",
+        "@types/react-dom": "^19.2.3",
+        "@vitejs/plugin-react": "^5.2.0",
+        "@washi/typescript-config": "workspace:*",
+        "tailwindcss": "^4.3.2",
+        "vite": "^7.3.6",
+      },
+    },
     "packages/server/control": {
       "name": "@washi/control",
       "version": "0.1.0",
@@ -734,6 +761,8 @@
     "@washi/tsuru": ["@washi/tsuru@workspace:packages/shared/tsuru"],
 
     "@washi/typescript-config": ["@washi/typescript-config@workspace:packages/shared/typescript-config"],
+
+    "@washi/web": ["@washi/web@workspace:apps/web"],
 
     "@washi/wsx": ["@washi/wsx@workspace:packages/shared/wsx"],
 

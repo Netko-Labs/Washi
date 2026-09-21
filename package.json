@@ -23,7 +23,8 @@
     "check": "biome check .",
     "test": "bun test",
     "prepare": "husky",
-    "dev:server": "bun run apps/server/src/main.ts"
+    "dev:server": "bun run apps/server/src/main.ts",
+    "dev:web": "bun run --cwd apps/web dev"
   },
   "packageManager": "bun@1.3.14",
   "devDependencies": {

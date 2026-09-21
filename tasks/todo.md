@@ -1,3 +1,54 @@
+# Phase 3 — the web client (MVP) — COMPLETE (2026-09-20)
+
+104 tests green, `turbo check-types` 13/13, `biome check` green, `mirin check --scenario`
+10 steps green, and the flow verified in a real browser: sign up → create workspace →
+sheet renders at 1024px and 375px. Goal was: **a URL you can open, sign in to, and read your workspace from.** Spec:
+`docs/server.html` §07. Acceptance:
+
+- `bun test` green, `bun run typecheck` green, `bun run check` green
+- `mirin check --scenario` still green — the desktop must not regress
+- sign up → create a workspace → see its sheets → open one, rendered by `@washi/paper`
+- the shell works at 375px and at 1440px
+
+## Steps
+
+- [x] **1 · retire spec §10** — the canvas sweep shipped; §10 still says "not one responsive
+      class in @washi/paper", which is false and cost real time this week. Banner it like §07.
+- [x] **2 · touch targets** — `size-4` checkboxes and friends are under the 44px floor.
+      The last §10 item that is actually still open.
+- [x] **3 · `apps/web`** — Vite + TanStack Router/Query + React 19, sharing `@washi/paper`
+      verbatim. Better Auth client → sign in/up → workspace picker → sheet list → sheet view.
+      Responsive shell: the desktop chrome (248px sidebar, 334px panel) is not shared.
+- [x] **4 · onboarding, rewritten** — the old flow promises "No account required" and "Washi
+      never talks to a cloud we run". On the web that flow *is* sign-up → workspace → invite.
+
+## Measured, not guessed
+
+Web bundle is **258 KB gzipped**, dominated by `@tailwindcss/browser`. That is the real
+number behind the §10 "precompile sheet CSS" item — it can now be decided rather than
+argued about.
+
+## Still open after the MVP
+
+- **No router.** Three screens with nothing to link to, so TanStack Router is not in yet —
+  a deviation from the house stack, taken deliberately. It has to land before sheet
+  permalinks, which is the point of having a web client at all.
+- **`vault` survives as an identifier** in the desktop (`draft.vault`, `VAULT_TOPIC_ORDER`,
+  a placeholder). Renaming touches a persisted localStorage shape, so it is its own change.
+- **Desktop onboarding**: the storage claims were corrected (it was never "markdown files in
+  a folder"), and the E2EE promise removed per Q26. "No account required" stays, because in
+  embedded mode it is true.
+
+## Out of the MVP (deliberately, say it rather than fake it)
+
+- **Agent panel on web** — needs BYOK wired to a server-side agent, which is phase 4.
+- **Inbox · Dashboard · Daily note** — still static design copy even on desktop; putting them
+  on the web would be inventing history, which features.md §2 forbids.
+- **Precompiled sheet CSS** — `@tailwindcss/browser` ships a compiler to the client. Works,
+  costs startup. A §10 item, deferred with a measurement rather than a guess.
+
+---
+
 # Phase 2 — auth + control plane — COMPLETE (2026-09-17)
 
 104 tests green, `turbo check-types` green, `biome check` green, `mirin check --scenario`
