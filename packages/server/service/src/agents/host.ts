@@ -23,6 +23,7 @@ import type {
   Caller,
   InferencePreference,
   InferenceStatus,
+  LocalModel,
 } from './lib'
 import { SYSTEM_INSTRUCTIONS } from './lib'
 import { proposedDiff } from './normalize'
@@ -117,6 +118,13 @@ export class AgentHost {
       throw new Error('this server runs every workspace on its own key — there is nothing to pick')
     }
     return this.keys.setPreference(preference)
+  }
+
+  async setLocalModel(model: LocalModel): Promise<InferenceStatus> {
+    if (!this.keys.setLocalModel) {
+      throw new Error('a hosted workspace has no local Claude Code to pick a model for')
+    }
+    return this.keys.setLocalModel(model)
   }
 
   setEvents(events: AgentHostEvents): void {

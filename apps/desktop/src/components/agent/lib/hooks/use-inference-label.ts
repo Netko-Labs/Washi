@@ -10,8 +10,8 @@ export function useInferenceLabel(): string | null {
       .query()
       .then((status) => {
         if (status.active === 'local_cli') {
-          const plan = status.localCli?.plan
-          setLabel(plan ? `Claude Code · ${plan}` : 'Claude Code')
+          const parts = ['Claude Code', status.localCli?.plan, status.localModel]
+          setLabel(parts.filter((part) => part && part !== 'default').join(' · '))
         } else if (status.active === 'api_key') {
           setLabel('API key')
         } else {

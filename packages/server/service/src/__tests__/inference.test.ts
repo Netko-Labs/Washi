@@ -11,6 +11,7 @@ import {
   createEmbeddedKeySource,
   createStoredKeySource,
   INFERENCE_PREFERENCE_KEY,
+  LOCAL_MODEL_KEY,
   parseAuthStatus,
   parseVersion,
   probeLocalCli,
@@ -120,6 +121,15 @@ describe('embedded: who pays for the next turn', () => {
     expect((await source.setPreference?.('api_key'))?.preference).toBe('api_key')
     setAppMeta(ws, INFERENCE_PREFERENCE_KEY, 'rm -rf')
     expect((await source.status()).preference).toBe('auto')
+  })
+
+  test('a chosen model rides the local credential; default leaves it to the CLI', async () => {
+    const source = createEmbeddedKeySource(ws, probing(signedIn), {})
+    expect((await source.resolve())?.model).toBeUndefined()
+    expect((await source.setLocalModel?.('sonnet'))?.localModel).toBe('sonnet')
+    expect(await source.resolve()).toMatchObject({ kind: 'local_cli', model: 'sonnet' })
+    setAppMeta(ws, LOCAL_MODEL_KEY, 'gpt-9000')
+    expect((await source.status()).localModel).toBe('default')
   })
 
   test('status never carries a key', async () => {

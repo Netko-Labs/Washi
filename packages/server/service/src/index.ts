@@ -4,6 +4,7 @@ export {
   createEmbeddedKeySource,
   createStoredKeySource,
   INFERENCE_PREFERENCES,
+  LOCAL_MODELS,
   type StoredKey,
   type StoredKeyLookup,
 } from './agents/inference'
@@ -21,6 +22,7 @@ export {
   type InferencePreference,
   type InferenceStatus,
   type LocalCliStatus,
+  type LocalModel,
 } from './agents/lib'
 export type { AgentPort, ModelChoice, ProviderId, ToolGate } from './agents/ports'
 export { defaultModelFor, LAST_RESORT_MODELS, PREFERRED_MODELS } from './agents/ports'

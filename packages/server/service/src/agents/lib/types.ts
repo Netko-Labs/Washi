@@ -23,6 +23,8 @@ export type AgentCredential =
 
 export type InferencePreference = 'auto' | 'local_cli' | 'api_key'
 
+export type LocalModel = 'default' | 'opus' | 'sonnet' | 'haiku'
+
 export interface LocalCliStatus {
   executable: string
   version: string | null
@@ -39,6 +41,8 @@ export interface InferenceStatus {
   active: AgentCredential['kind'] | null
   /** Null on a hosted server — a team server never runs someone's local login. */
   localCli: LocalCliStatus | null
+  /** Which model the local CLI runs; null on a hosted server. */
+  localModel: LocalModel | null
   apiKey: { provider: string; source: 'environment' | 'workspace' } | null
   /** Why nothing is active, in words a person can act on. */
   missing: string | null
@@ -50,6 +54,7 @@ export interface AgentKeySource {
   status(): Promise<InferenceStatus>
   /** Embedded only. A hosted server has one answer: the workspace's key. */
   setPreference?(preference: InferencePreference): Promise<InferenceStatus>
+  setLocalModel?(model: LocalModel): Promise<InferenceStatus>
 }
 
 export type BreakerState =

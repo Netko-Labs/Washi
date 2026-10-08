@@ -76,6 +76,9 @@ are gone — none of them did anything, and features.md §2 forbids a control th
       subscribed when they fired. Close the panel mid-turn (or be the teammate who opens it later)
       and the turn sat until the 5-minute timeout denied it. `agents.pendingApprovals` lists the
       live ones; boot expires rows a dead process left pending.
+- [x] **Claude Code model** — Default · Opus · Sonnet · Haiku per workspace. The CLI's default
+      on Max is Opus, which spends plan limits fastest; aliases verified live
+      (`sonnet` → claude-sonnet-5-5, `haiku` → claude-haiku-5-5). The composer names it.
 - `host.ts` is 249 lines: the daily stop moved to `budget.ts`.
 
 ## Caught while building

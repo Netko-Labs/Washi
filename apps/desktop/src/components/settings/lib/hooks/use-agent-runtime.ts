@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '@/lib/rpc'
-import type { InferencePreference, InferenceWire, SpendWire } from '../types'
+import type { InferencePreference, InferenceWire, LocalModel, SpendWire } from '../types'
 
 /** What the next turn runs on and what today cost — the two things the Agents tab is for. */
 export function useAgentRuntime() {
@@ -42,6 +42,8 @@ export function useAgentRuntime() {
     refresh,
     prefer: (preference: InferencePreference) =>
       guard(async () => setInference(await api.agents.setInference.mutate({ preference }))),
+    pickLocalModel: (model: LocalModel) =>
+      guard(async () => setInference(await api.agents.setLocalModel.mutate({ model }))),
     setDailyCap: (capUsd: number) =>
       guard(async () => setSpend(await api.agents.setDailyCap.mutate({ capUsd }))),
     resume: () => guard(async () => setSpend(await api.agents.resume.mutate())),

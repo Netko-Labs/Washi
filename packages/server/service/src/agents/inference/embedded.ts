@@ -1,12 +1,27 @@
 import { getAppMeta, setAppMeta, type Workspace } from '@washi/repository'
-import type { AgentCredential, AgentKeySource, InferencePreference, InferenceStatus } from '../lib'
-import { INFERENCE_PREFERENCE_KEY, INFERENCE_PREFERENCES } from './constants'
+import type {
+  AgentCredential,
+  AgentKeySource,
+  InferencePreference,
+  InferenceStatus,
+  LocalModel,
+} from '../lib'
+import {
+  INFERENCE_PREFERENCE_KEY,
+  INFERENCE_PREFERENCES,
+  LOCAL_MODEL_KEY,
+  LOCAL_MODELS,
+} from './constants'
 import { cachedProbe } from './local-cli'
 import type { ApiKeyCredential, LocalCliProbe } from './types'
 import { MISSING } from './values'
 
 export function parsePreference(raw: string | null | undefined): InferencePreference {
   return INFERENCE_PREFERENCES.find((preference) => preference === raw) ?? 'auto'
+}
+
+export function parseLocalModel(raw: string | null | undefined): LocalModel {
+  return LOCAL_MODELS.find((model) => model === raw) ?? 'default'
 }
 
 /**
@@ -26,12 +41,18 @@ export function createEmbeddedKeySource(
 
   const decide = async (): Promise<InferenceStatus & { credential: AgentCredential | null }> => {
     const preference = parsePreference(getAppMeta(ws, INFERENCE_PREFERENCE_KEY))
+    const localModel = parseLocalModel(getAppMeta(ws, LOCAL_MODEL_KEY))
     const cli = await probe()
     const key = envKey()
 
     let credential: AgentCredential | null = null
     if (preference !== 'api_key' && cli?.loggedIn) {
-      credential = { kind: 'local_cli', executable: cli.executable, provider: 'anthropic' }
+      credential = {
+        kind: 'local_cli',
+        executable: cli.executable,
+        provider: 'anthropic',
+        ...(localModel === 'default' ? {} : { model: localModel }),
+      }
     } else if (preference !== 'local_cli') {
       credential = key
     }
@@ -47,6 +68,7 @@ export function createEmbeddedKeySource(
       preference,
       active: credential?.kind ?? null,
       localCli: cli,
+      localModel,
       apiKey: key ? { provider: 'anthropic', source: 'environment' } : null,
       missing,
       credential,
@@ -63,6 +85,10 @@ export function createEmbeddedKeySource(
     status,
     async setPreference(preference) {
       setAppMeta(ws, INFERENCE_PREFERENCE_KEY, preference)
+      return status()
+    },
+    async setLocalModel(model) {
+      setAppMeta(ws, LOCAL_MODEL_KEY, model)
       return status()
     },
   }

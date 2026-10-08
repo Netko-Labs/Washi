@@ -1,6 +1,6 @@
 import { usd } from '@/components/agent/lib'
 import { DailyStopInput } from './DailyStopInput'
-import { type InferenceWire, PREFERENCE_LABELS, useAgentRuntime } from './lib'
+import { type InferenceWire, LOCAL_MODEL_LABELS, PREFERENCE_LABELS, useAgentRuntime } from './lib'
 import { RowButton, SegmentedControl, SettingsCard, SettingsRow } from './SettingsControls'
 
 function cliLine(cli: InferenceWire['localCli']): string {
@@ -26,12 +26,13 @@ function InUse({ on }: { on: boolean }) {
  * beats a key that bills per token.
  */
 export function SettingsAgentsTab() {
-  const { inference, spend, error, prefer, setDailyCap, resume } = useAgentRuntime()
+  const { inference, spend, error, prefer, pickLocalModel, setDailyCap, resume } = useAgentRuntime()
   if (!inference || !spend) {
     return <p className="text-muted-foreground">{error ?? 'Checking this computer…'}</p>
   }
 
   const active = PREFERENCE_LABELS.find((entry) => entry.value === inference.preference)
+  const localModel = LOCAL_MODEL_LABELS.find((entry) => entry.value === inference.localModel)
   return (
     <div className="flex flex-col gap-[22px]">
       <SettingsCard>
@@ -48,6 +49,20 @@ export function SettingsAgentsTab() {
           mono
         >
           <InUse on={inference.active === 'api_key'} />
+        </SettingsRow>
+        <SettingsRow
+          title="Claude Code model"
+          sub="Default lets Claude Code choose. Sonnet or Haiku stretch your plan's limits further."
+          wrap
+        >
+          <SegmentedControl
+            options={LOCAL_MODEL_LABELS.map((entry) => entry.label)}
+            active={localModel?.label ?? 'Default'}
+            onSelect={(label) => {
+              const choice = LOCAL_MODEL_LABELS.find((entry) => entry.label === label)
+              if (choice) void pickLocalModel(choice.value)
+            }}
+          />
         </SettingsRow>
         <SettingsRow title="Think with" sub="Auto uses Claude Code when it is signed in" wrap last>
           <SegmentedControl

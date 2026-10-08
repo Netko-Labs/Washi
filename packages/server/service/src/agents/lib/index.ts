@@ -20,5 +20,6 @@ export type {
   InferencePreference,
   InferenceStatus,
   LocalCliStatus,
+  LocalModel,
 } from './types'
 export { SYSTEM_INSTRUCTIONS } from './values'

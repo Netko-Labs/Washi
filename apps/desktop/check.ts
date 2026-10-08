@@ -75,6 +75,7 @@ export default defineCheck(async (app: CheckDriver) => {
   await app.click('text=Agents')
   await app.expectText('Claude Code on this computer', { timeoutMs: 10_000 })
   await app.expectText('Saved by your Claude plan')
+  await app.expectText('Claude Code model')
   await app.screenshot('mlp-agents-tab')
 
   app.step('the transport carried every call without an error')

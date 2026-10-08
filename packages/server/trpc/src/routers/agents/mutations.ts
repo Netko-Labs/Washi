@@ -1,6 +1,6 @@
 import { TRPCError } from '@trpc/server'
 import { createSession } from '@washi/repository'
-import { INFERENCE_PREFERENCES } from '@washi/service'
+import { INFERENCE_PREFERENCES, LOCAL_MODELS } from '@washi/service'
 import { z } from 'zod'
 import { router, workspaceProcedure } from '../../init'
 
@@ -40,6 +40,18 @@ export const agentMutations = router({
         })
       }
       return ctx.host.setInference(input.preference)
+    }),
+  /** Embedded only: which model the local Claude Code runs. Opus spends plan limits fastest. */
+  setLocalModel: workspaceProcedure
+    .input(z.object({ model: z.enum(LOCAL_MODELS) }))
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.mode !== 'embedded') {
+        throw new TRPCError({
+          code: 'PRECONDITION_FAILED',
+          message: 'a hosted workspace has no local Claude Code',
+        })
+      }
+      return ctx.host.setLocalModel(input.model)
     }),
   resolveApproval: workspaceProcedure
     .input(z.object({ id: z.string(), decision: decisionSchema }))
