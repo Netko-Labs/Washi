@@ -4,7 +4,7 @@ import type { Workspace } from '@washi/repository'
 import { agentEnv, MAX_TURN_BUDGET_USD } from '../lib'
 import { normalizeMessage } from '../normalize'
 import { createWashiTools } from '../tools'
-import { DISALLOWED_BUILTINS, KEYED_SOURCES, REJECTED_PATTERN } from './constants'
+import { DISALLOWED_BUILTINS, PLAN_SOURCES, REJECTED_PATTERN } from './constants'
 import type { AgentPort, PromptRequest, ToolVerdict, TurnResult } from './types'
 
 export interface ClaudeSdkPortDeps {
@@ -38,6 +38,7 @@ export function createClaudeSdkPort(deps: ClaudeSdkPortDeps): AgentPort {
     async prompt(request: PromptRequest, emit: (update: AgentUpdate) => void): Promise<TurnResult> {
       const { credential } = request
       const local = credential.kind === 'local_cli'
+      const onPlan = local && credential.plan
       const abort = new AbortController()
       request.signal?.addEventListener('abort', () => abort.abort(), { once: true })
 
@@ -64,7 +65,8 @@ export function createClaudeSdkPort(deps: ClaudeSdkPortDeps): AgentPort {
           tools: [],
           disallowedTools: DISALLOWED_BUILTINS,
           settingSources: [],
-          maxBudgetUsd: MAX_TURN_BUDGET_USD,
+          // A per-turn dollar ceiling only means something when dollars are spent.
+          maxBudgetUsd: onPlan ? undefined : MAX_TURN_BUDGET_USD,
           // Replaces the subprocess env rather than merging — see agentEnv. A
           // local CLI gets no key at all, so it authenticates as its own login.
           env: agentEnv(local ? null : credential.apiKey),
@@ -79,8 +81,8 @@ export function createClaudeSdkPort(deps: ClaudeSdkPortDeps): AgentPort {
           if (message.type === 'system' && message.subtype === 'init') {
             resumeToken = message.session_id
             model = message.model
-            // A claude.ai login reports `none` or `oauth`; a console key still bills per token.
-            if (local && !KEYED_SOURCES.has(message.apiKeySource)) billing = 'plan'
+            // Both must agree: the probe saw a subscription, and no key is in play.
+            if (onPlan && PLAN_SOURCES.has(message.apiKeySource)) billing = 'plan'
             continue
           }
           for (const update of normalizeMessage(message)) {

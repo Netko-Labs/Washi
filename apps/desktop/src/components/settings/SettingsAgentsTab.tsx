@@ -7,6 +7,7 @@ function cliLine(cli: InferenceWire['localCli']): string {
   if (!cli) return 'Not installed · claude.com/code'
   const version = cli.version ? `v${cli.version}` : 'installed'
   if (!cli.loggedIn) return `${version} · signed out — run \`claude\` and sign in`
+  if (cli.authMethod !== 'claude.ai') return `${version} · Console login · billed per token`
   const plan = cli.plan ? `${cli.plan[0]?.toUpperCase()}${cli.plan.slice(1)} plan` : 'signed in'
   return `${version} · ${plan} · turns ride the plan you already pay for`
 }

@@ -89,6 +89,17 @@ describe('embedded: who pays for the next turn', () => {
     })
   })
 
+  test('a claude.ai login is a plan; a Console login is a key in disguise', async () => {
+    const plan = createEmbeddedKeySource(ws, probing(signedIn), {})
+    expect(await plan.resolve()).toMatchObject({ kind: 'local_cli', plan: true })
+    const consoleLogin = createEmbeddedKeySource(
+      ws,
+      probing({ ...signedIn, authMethod: 'console', plan: null }),
+      {},
+    )
+    expect(await consoleLogin.resolve()).toMatchObject({ kind: 'local_cli', plan: false })
+  })
+
   test('auto falls back to the env key when the CLI is signed out', async () => {
     const source = createEmbeddedKeySource(ws, probing({ ...signedIn, loggedIn: false }), {
       ANTHROPIC_API_KEY: 'sk-ant-x',

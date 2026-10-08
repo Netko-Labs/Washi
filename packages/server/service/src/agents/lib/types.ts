@@ -19,6 +19,8 @@ export type AgentCredential =
       executable: string
       provider: 'anthropic'
       model?: string
+      /** Signed in to a claude.ai subscription. A Console login is a key in disguise. */
+      plan: boolean
     }
 
 export type InferencePreference = 'auto' | 'local_cli' | 'api_key'

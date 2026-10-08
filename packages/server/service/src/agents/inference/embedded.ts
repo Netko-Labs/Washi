@@ -11,6 +11,7 @@ import {
   INFERENCE_PREFERENCES,
   LOCAL_MODEL_KEY,
   LOCAL_MODELS,
+  PLAN_AUTH_METHOD,
 } from './constants'
 import { cachedProbe } from './local-cli'
 import type { ApiKeyCredential, LocalCliProbe } from './types'
@@ -51,6 +52,7 @@ export function createEmbeddedKeySource(
         kind: 'local_cli',
         executable: cli.executable,
         provider: 'anthropic',
+        plan: cli.authMethod === PLAN_AUTH_METHOD,
         ...(localModel === 'default' ? {} : { model: localModel }),
       }
     } else if (preference !== 'local_cli') {

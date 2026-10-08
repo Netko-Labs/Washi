@@ -54,5 +54,8 @@ export const DISALLOWED_BUILTINS = [
 export const REJECTED_PATTERN =
   /invalid api key|api key is invalid|please run \/login|not logged in|oauth token|failed to authenticate|\b401\b/i
 
-/** `apiKeySource` values that mean a key, not a plan, is paying for the turn. */
-export const KEYED_SOURCES: ReadonlySet<string> = new Set(['user', 'project', 'org', 'temporary'])
+/**
+ * `apiKeySource` values that mean no key is in play. A claude.ai login reports
+ * `none`; a Console login reports `/login managed key` and bills per token.
+ */
+export const PLAN_SOURCES: ReadonlySet<string> = new Set(['none', 'oauth'])

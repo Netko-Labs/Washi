@@ -16,3 +16,6 @@ export const LOCAL_MODEL_KEY = 'agent_local_model'
 
 /** CLI aliases. `default` leaves the choice to the CLI — Opus on Max, which spends limits fastest. */
 export const LOCAL_MODELS = ['default', 'opus', 'sonnet', 'haiku'] as const
+
+/** `auth status` names a subscription login this way; anything else bills per token. */
+export const PLAN_AUTH_METHOD = 'claude.ai'
