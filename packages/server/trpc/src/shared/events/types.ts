@@ -6,10 +6,14 @@ import type { ApprovalRequest, TranscriptEntry } from '@washi/domain'
  */
 export type DevCommand = 'reload' | 'reset-onboarding' | 'reset-identity' | 'clear-local-state'
 
+/**
+ * One bus serves every workspace on the server, so every workspace-scoped event
+ * names its workspace and a subscription only ever yields its own.
+ */
 export interface WashiEvents {
-  agentUpdate: { sessionId: string; entry: TranscriptEntry }
-  approvalRequested: ApprovalRequest
-  openSheetRequested: { id: string }
+  agentUpdate: { workspaceId: string; sessionId: string; entry: TranscriptEntry }
+  approvalRequested: ApprovalRequest & { workspaceId: string }
+  openSheetRequested: { workspaceId: string; id: string }
   devCommand: { command: DevCommand }
 }
 

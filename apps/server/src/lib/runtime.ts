@@ -24,10 +24,11 @@ export function createRuntime(options: ServerOptions): ServerRuntime & { close()
         ? createStoredKeySource(async () => (stored ? stored(workspace.id) : null))
         : undefined
     const host = new AgentHost(workspace, keys)
+    const workspaceId = workspace.id
     host.setEvents({
-      update: (sessionId, entry) => events.emit('agentUpdate', { sessionId, entry }),
-      approval: (request) => events.emit('approvalRequested', request),
-      openSheet: (id) => events.emit('openSheetRequested', { id }),
+      update: (sessionId, entry) => events.emit('agentUpdate', { workspaceId, sessionId, entry }),
+      approval: (request) => events.emit('approvalRequested', { ...request, workspaceId }),
+      openSheet: (id) => events.emit('openSheetRequested', { workspaceId, id }),
     })
     return { workspace, host }
   }

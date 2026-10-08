@@ -61,9 +61,12 @@ export function startServer(options: ServerOptions): RunningServer {
           endpoint: TRPC_PREFIX,
           req: request,
           router: appRouter,
-          createContext: () =>
+          // EventSource cannot set headers, so a subscription names its
+          // workspace in connectionParams instead.
+          createContext: ({ info }) =>
             createContext(runtime, {
-              workspaceId: request.headers.get(WORKSPACE_HEADER),
+              workspaceId:
+                request.headers.get(WORKSPACE_HEADER) ?? info.connectionParams?.workspace ?? null,
               actor,
             }),
         })

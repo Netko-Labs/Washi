@@ -1,15 +1,18 @@
 import { tracked } from '@trpc/server'
 import { z } from 'zod'
-import { publicProcedure, router } from '../../init'
+import { router, workspaceProcedure } from '../../init'
 
 /**
  * `tracked` + `lastEventId` is why these survive a dropped socket: a laptop lid
  * closing mid-turn resumes the transcript instead of losing its middle.
+ *
+ * Every one is a workspaceProcedure and filters on its workspace: the bus is
+ * shared by the whole server, and a transcript is the workspace's content.
  */
 const resumable = z.object({ lastEventId: z.string().nullish() }).optional()
 
 export const agentSubscriptions = router({
-  onAgentUpdate: publicProcedure.input(resumable).subscription(async function* ({
+  onAgentUpdate: workspaceProcedure.input(resumable).subscription(async function* ({
     ctx,
     input,
     signal,
@@ -18,11 +21,11 @@ export const agentSubscriptions = router({
       lastEventId: input?.lastEventId,
       signal,
     })) {
-      yield tracked(event.id, event.data)
+      if (event.data.workspaceId === ctx.workspaceId) yield tracked(event.id, event.data)
     }
   }),
 
-  onApprovalRequested: publicProcedure.input(resumable).subscription(async function* ({
+  onApprovalRequested: workspaceProcedure.input(resumable).subscription(async function* ({
     ctx,
     input,
     signal,
@@ -31,11 +34,11 @@ export const agentSubscriptions = router({
       lastEventId: input?.lastEventId,
       signal,
     })) {
-      yield tracked(event.id, event.data)
+      if (event.data.workspaceId === ctx.workspaceId) yield tracked(event.id, event.data)
     }
   }),
 
-  onOpenSheetRequested: publicProcedure.input(resumable).subscription(async function* ({
+  onOpenSheetRequested: workspaceProcedure.input(resumable).subscription(async function* ({
     ctx,
     input,
     signal,
@@ -44,7 +47,7 @@ export const agentSubscriptions = router({
       lastEventId: input?.lastEventId,
       signal,
     })) {
-      yield tracked(event.id, event.data)
+      if (event.data.workspaceId === ctx.workspaceId) yield tracked(event.id, event.data)
     }
   }),
 })

@@ -29,7 +29,16 @@ export const api = createTRPCClient<AppRouter>({
   links: [
     splitLink({
       condition: (op) => op.type === 'subscription',
-      true: httpSubscriptionLink({ url }),
+      // EventSource cannot set headers: the cookie rides withCredentials and
+      // the workspace rides connectionParams.
+      true: httpSubscriptionLink({
+        url,
+        eventSourceOptions: () => ({ withCredentials: true }),
+        connectionParams: () => {
+          const workspace = activeWorkspace()
+          return workspace ? { workspace } : {}
+        },
+      }),
       false: httpBatchLink({
         url,
         fetch: (input, init) => fetch(input, { ...init, credentials: 'include' }),

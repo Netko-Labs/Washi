@@ -108,3 +108,48 @@ describe('a workspace is an organization you belong to', () => {
     expect(errorCode((await res.json()) as Record<string, unknown>)).toBe('PRECONDITION_FAILED')
   })
 })
+
+/**
+ * One event bus serves every workspace on the server. Before these were
+ * workspaceProcedures, anyone who could reach the server — signed in or not —
+ * could stream every workspace's transcript and approval requests.
+ */
+describe("a transcript stream is the workspace's content", () => {
+  const subscribe = async (init: { signedIn?: boolean; workspace?: string }) => {
+    const params = init.workspace
+      ? `&connectionParams=${encodeURIComponent(JSON.stringify({ workspace: init.workspace }))}`
+      : ''
+    const abort = new AbortController()
+    const res = await fetch(`${server.url}/trpc/agents.onAgentUpdate?input=%7B%7D${params}`, {
+      headers: {
+        accept: 'text/event-stream',
+        ...(init.signedIn ? { authorization: 'Bearer alice-session' } : {}),
+      },
+      signal: abort.signal,
+    })
+    const reader = res.body?.getReader()
+    let text = ''
+    const deadline = Date.now() + 1_000
+    while (reader && Date.now() < deadline && !/UNAUTHORIZED|NOT_FOUND|connected/.test(text)) {
+      const chunk = await Promise.race([reader.read(), Bun.sleep(200).then(() => null)])
+      if (chunk?.value) text += new TextDecoder().decode(chunk.value)
+      if (chunk?.done) break
+    }
+    abort.abort()
+    return text
+  }
+
+  test('signed out, the stream is refused', async () => {
+    expect(await subscribe({ workspace: HERS })).toContain('UNAUTHORIZED')
+  })
+
+  test("a member cannot stream someone else's workspace", async () => {
+    expect(await subscribe({ signedIn: true, workspace: THEIRS })).toContain('NOT_FOUND')
+  })
+
+  test('a member streams her own, named in connectionParams', async () => {
+    const text = await subscribe({ signedIn: true, workspace: HERS })
+    expect(text).not.toContain('UNAUTHORIZED')
+    expect(text).not.toContain('NOT_FOUND')
+  })
+})
