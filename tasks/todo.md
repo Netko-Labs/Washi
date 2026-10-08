@@ -110,7 +110,12 @@ are gone — none of them did anything, and features.md §2 forbids a control th
       the control plane knows *and* that have a file); Run now got the 12h wait (now only
       scheduled runs, cleared when the turn ends); resuming after the minute fired at once
       (now waits for tomorrow); UTC minutes drifted an hour across DST (now wall-clock minute
-      + IANA zone).
+      + IANA zone). A third review found the "one working routine" rule still beatable —
+      parked runs approved together in the morning, and Run now with no guard — so it is
+      strict now: one routine in flight, parked or not; Run now obeys it; at the daily stop
+      nothing is marked and the day catches up after Resume; zones are stored canonical.
+      Known and accepted: a person's own turns run concurrently with a routine, as two
+      people's turns already do — the stop is checked per turn, not reserved.
 - `host.ts` is 293 lines: the daily stop moved to `budget.ts`.
 
 ## Reviewed twice, by agents that did not write it

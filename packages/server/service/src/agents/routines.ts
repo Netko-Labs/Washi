@@ -43,12 +43,14 @@ function alreadyPassed(minuteOfDay: number, timeZone: string, now: Date): string
   return minute >= minuteOfDay ? day : null
 }
 
+export type RunOutcome = 'started' | 'busy' | 'stopped' | 'missing'
+
 export interface RoutineRunner {
   prompt(sessionId: string, text: string): Promise<void>
   isRunning(sessionId: string): boolean
-  /** Running but parked on a person's answer — not spending anything. */
-  isWaiting(sessionId: string): boolean
   waitLonger(sessionId: string): void
+  /** Whether the daily stop would let a turn start right now. */
+  canStart(): boolean
 }
 
 /**
@@ -92,25 +94,29 @@ export class RoutineBook {
   }
 
   /**
-   * Called by the server's clock, never by a request. One routine at a time: the
-   * daily stop is checked when a turn starts and charged when it ends, so routines
-   * started together would all pass it. A run parked on a person spends nothing,
-   * so it does not hold the others back.
+   * Called by the server's clock, never by a request. One routine at a time,
+   * parked ones included: the daily stop is checked when a turn starts and
+   * charged when it ends, so runs approved together in the morning would all
+   * pass it at once. A parked run holds the rest until someone answers it.
    */
   tick(now = new Date()): string[] {
+    const due = this.list().find((routine) => isDue(routine, now))
+    return due && this.run(due.id, now, { scheduled: true }) === 'started' ? [due.id] : []
+  }
+
+  /**
+   * Marked before it runs, so a crash mid-turn never makes it run twice. Not
+   * marked when it cannot start: a paused workspace catches up after Resume
+   * instead of burning every routine's day on a refusal.
+   */
+  run(id: string, now = new Date(), { scheduled = false } = {}): RunOutcome {
+    const routine = getRoutine(this.ws, id)
+    if (!routine) return 'missing'
     for (const sessionId of this.inFlight) {
       if (!this.runner.isRunning(sessionId)) this.inFlight.delete(sessionId)
     }
-    const working = [...this.inFlight].some((sessionId) => !this.runner.isWaiting(sessionId))
-    if (working) return []
-    const due = this.list().find((routine) => isDue(routine, now))
-    return due && this.run(due.id, now, { scheduled: true }) ? [due.id] : []
-  }
-
-  /** Marked before it runs, so a crash mid-turn never makes it run twice. */
-  run(id: string, now = new Date(), { scheduled = false } = {}): boolean {
-    const routine = getRoutine(this.ws, id)
-    if (!routine) return false
+    if (this.inFlight.size > 0) return 'busy'
+    if (!this.runner.canStart()) return 'stopped'
     const sessionId = createSession(this.ws, `Routine · ${routine.title}`).id
     updateRoutine(this.ws, id, {
       lastRunDay: zonedNow(now, routine.timeZone).day,
@@ -122,6 +128,6 @@ export class RoutineBook {
     void this.runner.prompt(sessionId, routine.prompt).catch((error) => {
       console.error(`[washi] routine "${routine.title}" failed to start`, error)
     })
-    return true
+    return 'started'
   }
 }

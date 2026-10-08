@@ -18,11 +18,17 @@ export const routineMutations = router({
   }),
   /** Run it now, in its own conversation — and that counts as today's run. */
   runNow: workspaceProcedure.input(byId).mutation(({ ctx, input }) => {
-    if (!ctx.host.routines.run(input.id)) {
-      throw new TRPCError({
-        code: 'CONFLICT',
-        message: 'That routine is already running, or it no longer exists.',
-      })
-    }
+    const outcome = ctx.host.routines.run(input.id)
+    if (outcome === 'started') return
+    throw new TRPCError(
+      outcome === 'missing'
+        ? { code: 'NOT_FOUND', message: 'That routine no longer exists.' }
+        : outcome === 'busy'
+          ? { code: 'CONFLICT', message: 'A routine is already running. Try again when it ends.' }
+          : {
+              code: 'PRECONDITION_FAILED',
+              message: 'Washi is at its daily stop. Resume it first.',
+            },
+    )
   }),
 })

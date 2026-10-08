@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
-import type { RoutineCreate } from '@washi/domain'
+import { type RoutineCreate, routineCreateSchema } from '@washi/domain'
 import { getRoutine, openWorkspace, type Workspace } from '@washi/repository'
 import { isDue, RoutineBook, type RoutineRunner, zonedNow } from '../agents/routines'
 
@@ -23,19 +23,19 @@ function fakeRunner() {
   const prompts: { sessionId: string; text: string }[] = []
   const patient: string[] = []
   const running = new Set<string>()
-  const waiting = new Set<string>()
+  const budget = { open: true }
   const runner: RoutineRunner = {
     prompt: async (sessionId, text) => {
       prompts.push({ sessionId, text })
       running.add(sessionId)
     },
     isRunning: (sessionId) => running.has(sessionId),
-    isWaiting: (sessionId) => waiting.has(sessionId),
     waitLonger: (sessionId) => {
       patient.push(sessionId)
     },
+    canStart: () => budget.open,
   }
-  return { runner, prompts, patient, running, waiting }
+  return { runner, prompts, patient, running, budget }
 }
 
 describe('a routine runs once a day, at or after its minute, in its own zone', () => {
@@ -94,14 +94,35 @@ describe('routines can not outrun the daily stop', () => {
     expect(prompts.map((prompt) => prompt.text)).toHaveLength(3)
   })
 
-  test('a run parked on a person spends nothing, so it does not hold the next back', () => {
-    const { runner, prompts, waiting } = fakeRunner()
+  test('a parked run holds the rest — approved together, they would all pass the stop', () => {
+    const { runner } = fakeRunner()
     const book = new RoutineBook(ws, runner)
     for (const title of ['a', 'b']) book.create(make({ title }), null, at('2026-10-07T00:00:00Z'))
     const seven = at('2026-10-08T07:00:00Z')
-    book.tick(seven)
-    waiting.add(prompts[0]!.sessionId)
     expect(book.tick(seven)).toHaveLength(1)
+    // still running (parked on a person, as far as the book knows) — nothing else starts
+    expect(book.tick(at('2026-10-08T08:00:00Z'))).toEqual([])
+  })
+
+  test('Run now waits its turn too, and a double click starts one run', () => {
+    const { runner, prompts } = fakeRunner()
+    const book = new RoutineBook(ws, runner)
+    const routine = book.create(make(), null, at('2026-10-07T00:00:00Z'))
+    expect(book.run(routine.id)).toBe('started')
+    expect(book.run(routine.id)).toBe('busy')
+    expect(prompts).toHaveLength(1)
+  })
+
+  test('at the daily stop nothing is marked, and the day catches up after Resume', () => {
+    const { runner, prompts, budget } = fakeRunner()
+    const book = new RoutineBook(ws, runner)
+    const routine = book.create(make(), null, at('2026-10-07T00:00:00Z'))
+    budget.open = false
+    expect(book.tick(at('2026-10-08T07:00:00Z'))).toEqual([])
+    expect(getRoutine(ws, routine.id)?.lastRunDay).toBeNull()
+    budget.open = true
+    expect(book.tick(at('2026-10-08T09:00:00Z'))).toEqual([routine.id])
+    expect(prompts).toHaveLength(1)
   })
 })
 
@@ -138,5 +159,15 @@ describe('each run is its own conversation', () => {
     book.tick(at('2026-10-08T00:00:00Z'))
     expect(getRoutine(ws, routine.id)?.lastRunDay).toBe('2026-10-08')
     expect(book.tick(at('2026-10-08T00:05:00Z'))).toEqual([])
+  })
+})
+
+describe('a zone is stored the way every client will spell it', () => {
+  test('aliases and case collapse to the canonical IANA name; nonsense is refused', () => {
+    const parse = (timeZone: string) =>
+      routineCreateSchema.safeParse({ title: 't', prompt: 'p', minuteOfDay: 0, timeZone })
+    const utc = parse('utc')
+    expect(utc.success && utc.data.timeZone).toBe('UTC')
+    expect(parse('Mars/Olympus_Mons').success).toBe(false)
   })
 })

@@ -81,8 +81,9 @@ plan or the key, first run, receipts, Stop, invites) is the current block.
 - **Routines** run on the server's minute clock (`apps/server/src/lib/clock.ts`), over the
   workspaces `ControlPlane.workspaceIds()` knows that already have a file — never a stray or
   deleted one, never a conjured `default`. A run is an ordinary `host.prompt` in a fresh session:
-  daily stop, desk and receipt all apply. One *working* routine at a time per workspace (the stop
-  is checked at start and charged at end). Marked run before it runs; a scheduled run's
+  daily stop, desk and receipt all apply. One routine in flight per workspace, parked or not —
+  the stop is checked at start and charged at end, so concurrency would outrun it. At the stop
+  nothing is marked; the day catches up after Resume. Marked run before it runs; a scheduled run's
   questions wait 12h. Times are wall-clock minute + IANA zone. `routines` is the only
   caller-free path into a turn — keep it that way.
 - Agent tools are the ONLY capability surface: ink (data), tsuru (network), hanko (actions).

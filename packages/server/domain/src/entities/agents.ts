@@ -87,12 +87,12 @@ export const routineSchema = z.object({
 })
 export type Routine = z.infer<typeof routineSchema>
 
-function isTimeZone(zone: string): boolean {
+/** The canonical IANA name ('utc' → 'UTC'), or null when the zone does not exist. */
+function canonicalZone(zone: string): string | null {
   try {
-    new Intl.DateTimeFormat('en-US', { timeZone: zone })
-    return true
+    return new Intl.DateTimeFormat('en-US', { timeZone: zone }).resolvedOptions().timeZone
   } catch {
-    return false
+    return null
   }
 }
 
@@ -100,6 +100,11 @@ export const routineCreateSchema = z.object({
   title: z.string().trim().min(1).max(120),
   prompt: z.string().trim().min(1).max(4000),
   minuteOfDay: z.number().int().min(0).max(1439),
-  timeZone: z.string().min(1).max(64).refine(isTimeZone, 'not an IANA time zone'),
+  timeZone: z
+    .string()
+    .min(1)
+    .max(64)
+    .refine((zone) => canonicalZone(zone) !== null, 'not an IANA time zone')
+    .transform((zone) => canonicalZone(zone) ?? zone),
 })
 export type RoutineCreate = z.infer<typeof routineCreateSchema>

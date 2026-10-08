@@ -62,10 +62,6 @@ export class ApprovalDesk implements ToolGate {
     }
   }
 
-  isWaiting(sessionId: string): boolean {
-    return [...this.pending.values()].some((entry) => entry.request.sessionId === sessionId)
-  }
-
   async approve(sessionId: string, toolName: string, input: unknown): Promise<boolean> {
     if (this.alwaysAllowed.get(sessionId)?.has(toolName)) return true
     const decision = await this.request(sessionId, toolName, input)
