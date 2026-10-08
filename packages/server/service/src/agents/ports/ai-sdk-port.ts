@@ -39,12 +39,16 @@ export function createAiSdkPort({
     id: 'openrouter',
 
     async prompt(request: PromptRequest, emit: (update: AgentUpdate) => void): Promise<TurnResult> {
+      const { credential } = request
+      if (credential.kind !== 'api_key') {
+        throw new Error('the AI SDK port runs on an API key, never a local CLI login')
+      }
       const tools = createAiTools({ ws, runHankoAction })
       const model =
         request.model.model ?? (await defaultModelFor(catalogue, request.model.provider))
 
       const agent = new ToolLoopAgent({
-        model: resolveModel(request.model.provider, model, request.apiKey),
+        model: resolveModel(request.model.provider, model, credential.apiKey),
         instructions,
         tools,
         stopWhen: stepCountIs(MAX_STEPS),
@@ -104,6 +108,8 @@ export function createAiSdkPort({
       const usage = await stream.usage
       const entry = await catalogue.model(request.model.provider, model)
       return {
+        billing: 'metered',
+        model,
         costUsd: priceTurn(entry, {
           inputTokens: usage?.inputTokens,
           outputTokens: usage?.outputTokens,

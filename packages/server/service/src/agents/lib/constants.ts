@@ -15,3 +15,17 @@ export const DEFAULT_DAILY_CAP_USD = 25
  */
 export const DAILY_TURN_CAP_KEY = 'agent_daily_turn_cap'
 export const DEFAULT_DAILY_TURN_CAP = 200
+
+/** Tools that never stop at the desk. Everything else asks a person first. */
+export const READ_TOOLS: ReadonlySet<string> = new Set([
+  'sheet_list',
+  'sheet_get',
+  'sheet_check',
+  'sheet_backlinks',
+  'search',
+  'db_list_tables',
+  'db_query',
+])
+
+/** An unanswered approval is a denial, not a hang. */
+export const APPROVAL_TIMEOUT_MS = 5 * 60_000

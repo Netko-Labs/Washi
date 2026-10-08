@@ -80,15 +80,39 @@ export function normalizeMessage(message: SDKMessage): AgentUpdate[] {
 
   if (message.type === 'result') {
     const costUsd = 'total_cost_usd' in message ? message.total_cost_usd : undefined
+    // A signed-out CLI ends in `success` with is_error set and the reason in `result`.
+    const failed = message.subtype !== 'success' || message.is_error
+    const reason =
+      message.subtype === 'success'
+        ? message.result
+        : [message.subtype, ...(message.errors ?? [])].join(': ')
     return [
       {
         kind: 'turn_done',
-        stopReason: message.subtype === 'success' ? 'end_turn' : 'error',
+        stopReason: failed ? 'error' : 'end_turn',
         costUsd,
-        error: message.subtype === 'success' ? undefined : message.subtype,
+        error: failed ? reason || message.subtype : undefined,
       },
     ]
   }
 
   return []
+}
+
+/** A sheet_replace call, restated as the diff a person reviews before approving it. */
+export function proposedDiff(
+  update: AgentUpdate,
+  sheet: (id: string) => { title: string; source: string } | null | undefined,
+): AgentUpdate | null {
+  if (update.kind !== 'tool_call' || update.title !== 'sheet_replace') return null
+  const input = update.input as { id?: string; source?: string } | undefined
+  if (!input?.id || typeof input.source !== 'string') return null
+  const existing = sheet(input.id)
+  if (!existing) return null
+  return {
+    kind: 'tool_call_update',
+    toolCallId: update.toolCallId,
+    status: 'in_progress',
+    diff: { path: existing.title, oldText: existing.source, newText: input.source },
+  }
 }

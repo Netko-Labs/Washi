@@ -176,10 +176,12 @@ function createTables(sqlite: Database) {
     CREATE TABLE IF NOT EXISTS agent_spend (
       day TEXT PRIMARY KEY,
       cost_usd REAL NOT NULL DEFAULT 0,
+      saved_usd REAL NOT NULL DEFAULT 0,
       turns INTEGER NOT NULL DEFAULT 0,
       updated_at TEXT NOT NULL
     )
   `)
+  ensureColumn(sqlite, 'agent_spend', 'saved_usd', 'REAL NOT NULL DEFAULT 0')
 
   sqlite.exec(`
     CREATE TABLE IF NOT EXISTS app_meta (

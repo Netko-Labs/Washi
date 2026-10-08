@@ -1,15 +1,55 @@
+import type { ApprovalRequest, CapabilityOrigin, TranscriptEntry } from '@washi/domain'
 import type { ProviderId } from '../ports/types'
 
-export interface AgentCredential {
-  apiKey: string
-  provider: ProviderId
-  /** Provider-native model id. Falls back to the provider's default. */
-  model?: string
+/**
+ * Where a turn's inference comes from. `api_key` bills a key — the workspace's
+ * own on a hosted server, the machine's env when embedded. `local_cli` runs the
+ * person's installed Claude Code, whose own login pays; embedded only.
+ */
+export type AgentCredential =
+  | {
+      kind: 'api_key'
+      apiKey: string
+      provider: ProviderId
+      /** Provider-native model id. Falls back to the provider's default. */
+      model?: string
+    }
+  | {
+      kind: 'local_cli'
+      executable: string
+      provider: 'anthropic'
+      model?: string
+    }
+
+export type InferencePreference = 'auto' | 'local_cli' | 'api_key'
+
+export interface LocalCliStatus {
+  executable: string
+  version: string | null
+  loggedIn: boolean
+  /** `claude.ai` for a subscription login, `console` and friends for a metered one. */
+  authMethod: string | null
+  /** pro · max · team — what the person's plan is, never who they are. */
+  plan: string | null
+}
+
+export interface InferenceStatus {
+  preference: InferencePreference
+  /** What the next turn will run on, or null when nothing can run it. */
+  active: AgentCredential['kind'] | null
+  /** Null on a hosted server — a team server never runs someone's local login. */
+  localCli: LocalCliStatus | null
+  apiKey: { provider: string; source: 'environment' | 'workspace' } | null
+  /** Why nothing is active, in words a person can act on. */
+  missing: string | null
 }
 
 export interface AgentKeySource {
-  /** Null when this deployment has no stored key and no ambient one. */
+  /** Null when nothing this deployment knows about can run a turn. */
   resolve(): Promise<AgentCredential | null>
+  status(): Promise<InferenceStatus>
+  /** Embedded only. A hosted server has one answer: the workspace's key. */
+  setPreference?(preference: InferencePreference): Promise<InferenceStatus>
 }
 
 export type BreakerState =
@@ -20,7 +60,29 @@ export type BreakerState =
 export interface AgentSpendReport {
   day: string
   costUsd: number
+  /** Notional cost a local Claude plan absorbed today. */
+  savedUsd: number
   turns: number
   capUsd: number
+  turnCap: number
   paused: boolean
 }
+
+export interface AgentActivity extends AgentSpendReport {
+  /** `needs_you` wins over `working`: a turn waiting on a person is not busy, it is stuck. */
+  state: 'idle' | 'working' | 'needs_you' | 'paused'
+}
+
+/** Who is asking. The route stamps this; a caller never supplies its own origin. */
+export interface Caller {
+  origin: CapabilityOrigin
+  actorId?: string | null
+}
+
+export interface AgentHostEvents {
+  update: (sessionId: string, entry: TranscriptEntry) => void
+  approval: (request: ApprovalRequest) => void
+  openSheet: (id: string) => void
+}
+
+export type EventsRef = () => AgentHostEvents | null

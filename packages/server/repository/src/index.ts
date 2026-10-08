@@ -43,6 +43,7 @@ export {
   pausedOn,
   recordSpend,
   resumeAgent,
+  type SpendOptions,
   spendForDay,
   today,
 } from './storage/spend'

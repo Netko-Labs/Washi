@@ -7,6 +7,8 @@ export {
   agentUpdateSchema,
   approvalRequestSchema,
   type TranscriptEntry,
+  type TurnBilling,
+  turnBillingSchema,
 } from './entities/agents'
 export {
   type CapabilityCall,

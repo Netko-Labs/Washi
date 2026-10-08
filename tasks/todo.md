@@ -1,3 +1,51 @@
+# MLP+1 — the agent runs where it is cheapest — IN PROGRESS (2026-10-08)
+
+Overnight, unattended. Design source: "Washi — product design" (12 boards; First run · Today ·
+Review · Sprint · Accounts · Research). Scope cut to the agent, because the agent is the product.
+
+- **Web (hosted, self-hosted instance):** the workspace's API key is the inference source. The
+  key is asked for in first run, not buried in settings, with the daily stop beside it.
+- **Desktop (embedded):** the installed `claude` CLI is the inference source. The person's own
+  Claude login pays for turns their plan already covers; the API key path stays as fallback.
+- **+1:** every turn ends in a receipt — where it ran, how long, what it cost or what the plan
+  saved — and the agent's state is visible without opening settings.
+
+Acceptance:
+
+- `bun test`, `bun run typecheck`, `bun run check` green; `mirin check` green
+- embedded with no `ANTHROPIC_API_KEY` but a logged-in `claude` → a real turn completes
+- a plan-covered turn never counts toward the dollar cap; it still counts as a turn
+- hosted never runs a local CLI, whatever the machine has installed
+- the web asks for a key in first run, and the daily stop is settable there
+
+## Steps
+
+- [x] **1 · `ClaudeSdkPort` for real** — phase 5 ticked it, but the SDK loop still lives inline
+      in `host.ts` (524 lines). Extract it behind `AgentPort`; host shrinks to orchestration.
+- [x] **2 · local CLI discovery** — find `claude` (PATH is empty for a GUI app, so known install
+      paths too), read `--version` and `auth status`. Never store the account email.
+- [x] **3 · credential kinds** — `api_key` | `local_cli`. Embedded: preference `auto` picks the CLI
+      when logged in, else `ANTHROPIC_API_KEY`. Hosted: api_key only, asserted at construction.
+- [x] **4 · plan vs metered spend** — `init.apiKeySource === 'oauth'` means the plan paid;
+      record it as `saved_usd`, not `cost_usd`. Turn cap still applies.
+- [x] **5 · routes** — `agents.inference`, `agents.setInference`, `agents.setDailyCap`.
+- [ ] **6 · receipts** — `turn_done` carries model, duration, billing; transcripts render it in mono.
+- [ ] **7 · web first run** — "Give Washi a key" after workspace creation; skip leaves it asleep.
+- [ ] **8 · agent status** — Idle / Working / Needs you · today $x of $cap, in the shell.
+- [ ] **9 · desktop settings** — Agents tab stops being design copy: inference source, spend,
+      saved, Resume.
+
+## Verified live (embedded, no ANTHROPIC_API_KEY, `claude` 2.1.293 signed in to Max)
+
+- `pong` turn: `billing: plan`, $0 against the cap, $0.001 recorded as saved, 2.4s.
+- Tool round-trip: sheet_list + sheet_check pass, sheet_create stops at the desk exactly once,
+  the sheet lands. 17.8s, $0.027 saved.
+- `init.apiKeySource` is `none` — not `oauth` — for a claude.ai login. The docs suggest
+  `oauth`; the binary says otherwise. Billing is `plan` unless the source names a key.
+- `tools: []` really does leave the agent with zero built-ins (init lists `tools: []`).
+
+---
+
 # Phase 6 — the web client can actually ask — COMPLETE (2026-09-21)
 
 137 tests green, 14/14 typecheck, biome green, web build clean. Driven in a real browser:

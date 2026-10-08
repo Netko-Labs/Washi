@@ -1,6 +1,6 @@
 import { join } from 'node:path'
 import { createWorkspaceRegistry, type Workspace } from '@washi/repository'
-import { AgentHost, type AgentKeySource } from '@washi/service'
+import { AgentHost, createStoredKeySource } from '@washi/service'
 import { createEventBus, type ResolvedWorkspace, type ServerRuntime } from '@washi/trpc'
 import { DEFAULT_WORKSPACE_ID } from './constants'
 import type { ServerOptions } from './types'
@@ -15,11 +15,14 @@ export function createRuntime(options: ServerOptions): ServerRuntime & { close()
   const hosts = new Map<string, ResolvedWorkspace>()
 
   const attachHost = (workspace: Workspace): ResolvedWorkspace => {
-    // Hosted decrypts the organization's own key; embedded has no key store, so
-    // the host falls back to this machine's ANTHROPIC_API_KEY.
-    const keys: AgentKeySource | undefined = options.resolveAgentKey
-      ? { resolve: () => options.resolveAgentKey!(workspace.id) }
-      : undefined
+    // Hosted runs on the organization's own key and nothing else — never a
+    // local Claude login, whatever this machine has installed. Embedded leaves
+    // the choice to the host: the person's Claude Code, then the env key.
+    const stored = options.storedAgentKey
+    const keys =
+      options.mode === 'hosted'
+        ? createStoredKeySource(async () => (stored ? stored(workspace.id) : null))
+        : undefined
     const host = new AgentHost(workspace, keys)
     host.setEvents({
       update: (sessionId, entry) => events.emit('agentUpdate', { sessionId, entry }),

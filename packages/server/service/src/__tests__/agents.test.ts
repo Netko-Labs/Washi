@@ -102,7 +102,7 @@ describe('approval flow', () => {
     const session = createSession(ws, 'test')
 
     // biome-ignore lint/complexity/useLiteralKeys: reaching into a private member for the test
-    const gate = host['gateTool'].bind(host) as (
+    const gate = host['approvals'].gateSdkTool.bind(host['approvals']) as (
       sessionId: string,
       tool: string,
       input: Record<string, unknown>,
@@ -124,7 +124,7 @@ describe('approval flow', () => {
     const { host, approvals } = makeHost()
     const session = createSession(ws, 'test')
     // biome-ignore lint/complexity/useLiteralKeys: reaching into a private member for the test
-    const gate = host['gateTool'].bind(host) as (
+    const gate = host['approvals'].gateSdkTool.bind(host['approvals']) as (
       sessionId: string,
       tool: string,
       input: Record<string, unknown>,

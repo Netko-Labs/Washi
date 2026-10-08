@@ -16,6 +16,8 @@ const INHERITED = [
   'NODE_OPTIONS',
   'SSL_CERT_FILE',
   'SSL_CERT_DIR',
+  // Where a local Claude login lives, when it is not ~/.claude.
+  'CLAUDE_CONFIG_DIR',
 ] as const
 
 export function agentEnv(apiKey: string | null): Record<string, string> {

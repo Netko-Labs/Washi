@@ -102,6 +102,8 @@ export const agentSpendTable = sqliteTable('agent_spend', {
   /** YYYY-MM-DD in UTC. One row per day; the cap is a day's worth. */
   day: text('day').primaryKey(),
   costUsd: real('cost_usd').notNull().default(0),
+  /** Notional cost of turns a local Claude plan covered. Never counted against the cap. */
+  savedUsd: real('saved_usd').notNull().default(0),
   turns: integer('turns').notNull().default(0),
   updatedAt: text('updated_at').notNull(),
 })

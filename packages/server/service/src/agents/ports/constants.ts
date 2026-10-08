@@ -28,3 +28,30 @@ export const LAST_RESORT_MODELS: Record<string, string> = {
 
 /** A $0 model is a rate-limited preview, never a sane default for a workspace. */
 export const MIN_SERIOUS_PRICE = 0
+
+/**
+ * `tools: []` already removes every built-in; this list is the belt to that
+ * pair of braces, for a newer CLI that might treat an empty list differently.
+ */
+export const DISALLOWED_BUILTINS = [
+  'Agent',
+  'Bash',
+  'BashOutput',
+  'Edit',
+  'Glob',
+  'Grep',
+  'KillShell',
+  'NotebookEdit',
+  'Read',
+  'Skill',
+  'Task',
+  'WebFetch',
+  'WebSearch',
+  'Write',
+]
+
+/** What a signed-out CLI says, and what a person should be told instead. */
+export const SIGNED_OUT_PATTERN = /invalid api key|please run \/login|not logged in|oauth token/i
+
+/** `apiKeySource` values that mean a key, not a plan, is paying for the turn. */
+export const KEYED_SOURCES: ReadonlySet<string> = new Set(['user', 'project', 'org', 'temporary'])

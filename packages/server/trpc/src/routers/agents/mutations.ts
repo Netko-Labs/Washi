@@ -1,4 +1,6 @@
+import { TRPCError } from '@trpc/server'
 import { createSession } from '@washi/repository'
+import { INFERENCE_PREFERENCES } from '@washi/service'
 import { z } from 'zod'
 import { router, workspaceProcedure } from '../../init'
 
@@ -19,6 +21,22 @@ export const agentMutations = router({
     ctx.host.resume()
     return ctx.host.spend()
   }),
+  /** The daily stop. A person sets it; the breaker reads it before every turn. */
+  setDailyCap: workspaceProcedure
+    .input(z.object({ capUsd: z.number().positive().max(10_000) }))
+    .mutation(({ ctx, input }) => ctx.host.setDailyCap(input.capUsd)),
+  /** Embedded only: Claude Code on this computer, the env key, or whichever is there. */
+  setInference: workspaceProcedure
+    .input(z.object({ preference: z.enum(INFERENCE_PREFERENCES) }))
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.mode !== 'embedded') {
+        throw new TRPCError({
+          code: 'PRECONDITION_FAILED',
+          message: 'a hosted workspace runs on its own key — there is nothing to pick',
+        })
+      }
+      return ctx.host.setInference(input.preference)
+    }),
   resolveApproval: workspaceProcedure
     .input(z.object({ id: z.string(), decision: decisionSchema }))
     .mutation(({ ctx, input }) => {

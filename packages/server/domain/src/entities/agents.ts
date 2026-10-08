@@ -12,6 +12,13 @@ export const agentSessionSchema = z.object({
 export type AgentSession = z.infer<typeof agentSessionSchema>
 
 /**
+ * Who paid for a turn. `metered` bills an API key; `plan` ran through a local
+ * Claude login whose subscription already covers it.
+ */
+export const turnBillingSchema = z.enum(['metered', 'plan'])
+export type TurnBilling = z.infer<typeof turnBillingSchema>
+
+/**
  * ACP-shaped transcript events. One vocabulary for every provider: the UI
  * renders these, the repository persists them, the agent host emits them.
  */
@@ -36,8 +43,12 @@ export const agentUpdateSchema = z.discriminatedUnion('kind', [
   z.object({
     kind: z.literal('turn_done'),
     stopReason: z.enum(['end_turn', 'max_tokens', 'refusal', 'cancelled', 'error']),
+    /** What the turn cost — or, under `plan`, what it would have cost on a key. */
     costUsd: z.number().optional(),
     error: z.string().optional(),
+    billing: turnBillingSchema.optional(),
+    model: z.string().optional(),
+    durationMs: z.number().optional(),
   }),
 ])
 export type AgentUpdate = z.infer<typeof agentUpdateSchema>

@@ -5,7 +5,7 @@ import {
   createHostedControlPlane,
   ensureControlSchema,
 } from '@washi/control'
-import type { AgentCredential } from '@washi/service'
+import type { StoredKey } from '@washi/service'
 import type { ControlPlane } from '@washi/trpc'
 import { startServer } from './index'
 import { DEFAULT_WORKSPACE_ID } from './lib/constants'
@@ -20,22 +20,14 @@ const trustedOrigins = (process.env.WASHI_TRUSTED_ORIGINS ?? '')
   .filter(Boolean)
 
 let control: ControlPlane
-let resolveAgentKey: ((workspaceId: string) => Promise<AgentCredential | null>) | undefined
+let storedAgentKey: ((workspaceId: string) => Promise<StoredKey | null>) | undefined
 
 if (mode === 'hosted') {
   const { databaseUrl, masterKey } = assertHostedSecrets(process.env)
   const hosted = createHostedControlPlane({ databaseUrl, masterKey, baseUrl, trustedOrigins })
   await ensureControlSchema(hosted.db)
   control = hosted
-  resolveAgentKey = async (workspaceId) => {
-    const stored = await hosted.agentKey(workspaceId)
-    if (!stored) return null
-    return {
-      apiKey: stored.apiKey,
-      provider: stored.provider === 'openrouter' ? 'openrouter' : 'anthropic',
-      model: stored.model ?? undefined,
-    }
-  }
+  storedAgentKey = (workspaceId) => hosted.agentKey(workspaceId)
 } else {
   control = createEmbeddedControlPlane({ workspaceId: DEFAULT_WORKSPACE_ID })
 }
@@ -43,7 +35,7 @@ if (mode === 'hosted') {
 const server = startServer({
   mode,
   control,
-  resolveAgentKey,
+  storedAgentKey,
   dataDir,
   trustedOrigins,
   hostname: process.env.WASHI_HOSTNAME,

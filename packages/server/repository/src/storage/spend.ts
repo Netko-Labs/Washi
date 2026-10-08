@@ -1,3 +1,4 @@
+import type { TurnBilling } from '@washi/domain'
 import { agentSpendTable } from '@washi/domain/db'
 import { eq } from 'drizzle-orm'
 import type { Workspace } from './client'
@@ -9,7 +10,13 @@ const ACKNOWLEDGED_KEY = 'agent_spend_acknowledged'
 export interface DaySpend {
   day: string
   costUsd: number
+  savedUsd: number
   turns: number
+}
+
+export interface SpendOptions {
+  day?: string
+  billing?: TurnBilling
 }
 
 /** UTC, so a cap is the same length of day wherever the server is. */
@@ -19,7 +26,12 @@ export function today(): string {
 
 export function spendForDay(ws: Workspace, day = today()): DaySpend {
   const [row] = ws.db.select().from(agentSpendTable).where(eq(agentSpendTable.day, day)).all()
-  return { day, costUsd: row?.costUsd ?? 0, turns: row?.turns ?? 0 }
+  return {
+    day,
+    costUsd: row?.costUsd ?? 0,
+    savedUsd: row?.savedUsd ?? 0,
+    turns: row?.turns ?? 0,
+  }
 }
 
 /**
@@ -27,15 +39,24 @@ export function spendForDay(ws: Workspace, day = today()): DaySpend {
  * sum of turns rather than a running meter — close enough to stop a loop, which
  * is the only thing it is for.
  *
+ * A `plan` turn ran on a local Claude login: its cost is notional, so it lands
+ * in `savedUsd` and never moves the dollar cap. It still counts as a turn.
+ *
  * A null cost still counts the turn. Some models publish no price at all
  * (`openrouter/auto` routes to anything), and a turn nobody can price must not
  * also be a turn nobody counts — that is the one the breaker would never see.
  */
-export function recordSpend(ws: Workspace, costUsd: number | null, day = today()): DaySpend {
+export function recordSpend(
+  ws: Workspace,
+  costUsd: number | null,
+  { day = today(), billing = 'metered' }: SpendOptions = {},
+): DaySpend {
   const current = spendForDay(ws, day)
+  const amount = Math.max(0, costUsd ?? 0)
   const next = {
     day,
-    costUsd: current.costUsd + Math.max(0, costUsd ?? 0),
+    costUsd: current.costUsd + (billing === 'metered' ? amount : 0),
+    savedUsd: current.savedUsd + (billing === 'plan' ? amount : 0),
     turns: current.turns + 1,
     updatedAt: ws.now(),
   }
@@ -44,10 +65,15 @@ export function recordSpend(ws: Workspace, costUsd: number | null, day = today()
     .values(next)
     .onConflictDoUpdate({
       target: agentSpendTable.day,
-      set: { costUsd: next.costUsd, turns: next.turns, updatedAt: next.updatedAt },
+      set: {
+        costUsd: next.costUsd,
+        savedUsd: next.savedUsd,
+        turns: next.turns,
+        updatedAt: next.updatedAt,
+      },
     })
     .run()
-  return { day, costUsd: next.costUsd, turns: next.turns }
+  return { day, costUsd: next.costUsd, savedUsd: next.savedUsd, turns: next.turns }
 }
 
 /** The day the breaker tripped, or null. A person clears it; nothing clears it for them. */
