@@ -78,10 +78,13 @@ plan or the key, first run, receipts, Stop, invites) is the current block.
   for a claude.ai login — the binary, not the docs, set that rule.
 - Agent SSE subscriptions are workspaceProcedures and filter on `workspaceId`: one bus serves
   every workspace. EventSource can't set headers, so the workspace rides `connectionParams`.
-- **Routines** run on the server's minute clock (`apps/server/src/lib/clock.ts`), over every
-  `*.db` in the data dir — opened or not. A run is an ordinary `host.prompt`: daily stop, desk
-  and receipt all apply. Marked run *before* it runs; its questions wait 12h, not 5min.
-  `routines` is the only caller-free path into a turn — keep it that way.
+- **Routines** run on the server's minute clock (`apps/server/src/lib/clock.ts`), over the
+  workspaces `ControlPlane.workspaceIds()` knows that already have a file — never a stray or
+  deleted one, never a conjured `default`. A run is an ordinary `host.prompt` in a fresh session:
+  daily stop, desk and receipt all apply. One *working* routine at a time per workspace (the stop
+  is checked at start and charged at end). Marked run before it runs; a scheduled run's
+  questions wait 12h. Times are wall-clock minute + IANA zone. `routines` is the only
+  caller-free path into a turn — keep it that way.
 - Agent tools are the ONLY capability surface: ink (data), tsuru (network), hanko (actions).
   Never hand agents fs/shell/raw SQL.
 - WSX is inert data: registry components, literal props, no expressions. Validation before
