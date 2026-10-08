@@ -67,7 +67,9 @@ export function ModelPicker({
           </li>
         ))}
         {shown.length === 0 && (
-          <li className="px-3 py-4 text-[13px] text-muted-foreground">Nothing matches that.</li>
+          <li className="px-3 py-4 text-[13px] text-muted-foreground">
+            {models.length === 0 ? 'Loading models…' : 'Nothing matches that.'}
+          </li>
         )}
       </ul>
     </div>
