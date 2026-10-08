@@ -1,6 +1,7 @@
 import { usd } from '@/components/agent/lib'
 import { DailyStopInput } from './DailyStopInput'
 import { type InferenceWire, LOCAL_MODEL_LABELS, PREFERENCE_LABELS, useAgentRuntime } from './lib'
+import { RoutinesCard } from './RoutinesCard'
 import { RowButton, SegmentedControl, SettingsCard, SettingsRow } from './SettingsControls'
 
 function cliLine(cli: InferenceWire['localCli']): string {
@@ -112,6 +113,8 @@ export function SettingsAgentsTab() {
           </SettingsRow>
         )}
       </SettingsCard>
+
+      <RoutinesCard />
 
       {error && <p className="text-[13px] text-destructive">{error}</p>}
     </div>
