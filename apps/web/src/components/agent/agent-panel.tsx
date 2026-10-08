@@ -19,7 +19,7 @@ export function AgentPanel({
   onSheetsChanged: () => void
   onOpenSheet: (id: string) => void
 }) {
-  const { transcript, approvals, running, error, send, stop, decide, reset } = useAgent(
+  const { sessionId, transcript, approvals, running, error, send, stop, decide, reset } = useAgent(
     workspaceId,
     onSheetsChanged,
     onOpenSheet,
@@ -28,7 +28,7 @@ export function AgentPanel({
 
   const submit = () => {
     const text = draft.trim()
-    if (!text) return
+    if (!text || !sessionId) return
     setDraft('')
     void send(text)
   }
@@ -97,7 +97,7 @@ export function AgentPanel({
         ) : (
           <button
             type="submit"
-            disabled={!draft.trim()}
+            disabled={!draft.trim() || !sessionId}
             aria-label="Send"
             className="grid size-11 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground disabled:opacity-40"
           >

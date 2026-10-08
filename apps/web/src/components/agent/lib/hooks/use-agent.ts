@@ -17,8 +17,10 @@ export function useAgent(
   const [running, setRunning] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const active = useRef<string | null>(null)
-  const openSheet = useRef(onOpenSheet)
-  openSheet.current = onOpenSheet
+  // Callbacks ride refs so the subscriptions live as long as the panel: a fresh
+  // arrow from the shell must not tear down and reopen three SSE streams.
+  const callbacks = useRef({ onSheetsChanged, onOpenSheet })
+  callbacks.current = { onSheetsChanged, onOpenSheet }
 
   useEffect(() => {
     active.current = sessionId
@@ -51,7 +53,7 @@ export function useAgent(
         setTranscript((prev) => [...prev, data.entry as TranscriptEntryView])
         if (data.entry.update.kind === 'turn_done') {
           setRunning(false)
-          onSheetsChanged()
+          callbacks.current.onSheetsChanged()
         }
       },
       onError: (cause) => setError(String(cause)),
@@ -64,8 +66,8 @@ export function useAgent(
     })
     const opens = api.agents.onOpenSheetRequested.subscribe(undefined, {
       onData: ({ data }) => {
-        onSheetsChanged()
-        openSheet.current(data.id)
+        callbacks.current.onSheetsChanged()
+        callbacks.current.onOpenSheet(data.id)
       },
     })
     return () => {
@@ -73,7 +75,7 @@ export function useAgent(
       requests.unsubscribe()
       opens.unsubscribe()
     }
-  }, [onSheetsChanged])
+  }, [])
 
   const send = async (text: string) => {
     if (!sessionId || !text.trim()) return
