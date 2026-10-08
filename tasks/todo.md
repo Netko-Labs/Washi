@@ -116,6 +116,9 @@ are gone — none of them did anything, and features.md §2 forbids a control th
       nothing is marked and the day catches up after Resume; zones are stored canonical.
       Known and accepted: a person's own turns run concurrently with a routine, as two
       people's turns already do — the stop is checked per turn, not reserved.
+      Fourth check: sound. Open, not regressions: a scheduled run with no credential is
+      still marked and lost for the day (`canStart` covers the budget only); a turn whose
+      port hangs without asking holds the next routine until someone presses Stop.
 - `host.ts` is 293 lines: the daily stop moved to `budget.ts`.
 
 ## Reviewed twice, by agents that did not write it
