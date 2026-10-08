@@ -68,6 +68,10 @@ are gone — none of them did anything, and features.md §2 forbids a control th
 - [x] **`check:live`** — the golden path in the real desktop app, opt-in because it spends plan
       usage: ask → the write stops at the desk → Accept → the page lands → receipt
       `on your Claude plan · 19.4s · saved $0.03 · claude-opus-5-5`. 5/5 in 31s.
+- [x] **The page Washi made opens** — `sheet_create` (both ports) emits openSheet; the web now
+      subscribes to it too. `check:live` asserts the new page's H1 is on screen.
+- [x] **`<Sheet>` takes a title** — said in the instructions now. Every live run's first
+      sheet_check failed on it; with one sentence, it passes first time (2 checks → 1).
 - `host.ts` is 249 lines: the daily stop moved to `budget.ts`.
 
 ## Caught while building

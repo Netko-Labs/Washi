@@ -13,6 +13,7 @@ export interface AiSdkPortDeps {
   ws: Workspace
   gate: ToolGate
   runHankoAction: (input: unknown) => Promise<void>
+  openSheet?: (id: string) => void
   instructions: string
   /** Prices the turn, so the daily breaker works on a provider that bills tokens. */
   catalogue: ModelCatalogue
@@ -32,6 +33,7 @@ export function createAiSdkPort({
   ws,
   gate,
   runHankoAction,
+  openSheet,
   instructions,
   catalogue,
 }: AiSdkPortDeps): AgentPort {
@@ -43,7 +45,7 @@ export function createAiSdkPort({
       if (credential.kind !== 'api_key') {
         throw new Error('the AI SDK port runs on an API key, never a local CLI login')
       }
-      const tools = createAiTools({ ws, runHankoAction })
+      const tools = createAiTools({ ws, runHankoAction, openSheet })
       const model =
         request.model.model ?? (await defaultModelFor(catalogue, request.model.provider))
 

@@ -50,16 +50,19 @@ export class AgentHost {
     this.budget = new DailyBudget(ws)
 
     const runHankoAction = (action: unknown) => this.desk.execute(action)
+    const openSheet = (id: string) => this.events?.openSheet(id)
     this.claudePort = createClaudeSdkPort({
       ws,
       instructions: SYSTEM_INSTRUCTIONS,
       runHankoAction,
+      openSheet,
       canUseTool: (sessionId, name, input) => this.approvals.gateSdkTool(sessionId, name, input),
     })
     this.aiSdkPort = createAiSdkPort({
       ws,
       instructions: SYSTEM_INSTRUCTIONS,
       runHankoAction,
+      openSheet,
       gate: this.approvals,
       catalogue: catalogue ?? createModelCatalogue(),
     })

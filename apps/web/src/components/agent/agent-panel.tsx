@@ -12,14 +12,17 @@ export function AgentPanel({
   workspaceId,
   onClose,
   onSheetsChanged,
+  onOpenSheet,
 }: {
   workspaceId: string
   onClose: () => void
   onSheetsChanged: () => void
+  onOpenSheet: (id: string) => void
 }) {
   const { transcript, approvals, running, error, send, stop, decide, reset } = useAgent(
     workspaceId,
     onSheetsChanged,
+    onOpenSheet,
   )
   const [draft, setDraft] = useState('')
 

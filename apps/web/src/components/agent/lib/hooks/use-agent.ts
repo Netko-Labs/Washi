@@ -6,13 +6,19 @@ import type { ApprovalDecision, ApprovalView, TranscriptEntryView } from '../typ
  * One conversation, streamed. The subscription resumes from `lastEventId`, so a
  * closed laptop rejoins mid-turn instead of losing the middle of it.
  */
-export function useAgent(workspaceId: string, onSheetsChanged: () => void) {
+export function useAgent(
+  workspaceId: string,
+  onSheetsChanged: () => void,
+  onOpenSheet: (id: string) => void,
+) {
   const [sessionId, setSessionId] = useState<string | null>(null)
   const [transcript, setTranscript] = useState<TranscriptEntryView[]>([])
   const [approvals, setApprovals] = useState<ApprovalView[]>([])
   const [running, setRunning] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const active = useRef<string | null>(null)
+  const openSheet = useRef(onOpenSheet)
+  openSheet.current = onOpenSheet
 
   useEffect(() => {
     active.current = sessionId
@@ -50,9 +56,16 @@ export function useAgent(workspaceId: string, onSheetsChanged: () => void) {
     const requests = api.agents.onApprovalRequested.subscribe(undefined, {
       onData: ({ data }) => setApprovals((prev) => [...prev, data as ApprovalView]),
     })
+    const opens = api.agents.onOpenSheetRequested.subscribe(undefined, {
+      onData: ({ data }) => {
+        onSheetsChanged()
+        openSheet.current(data.id)
+      },
+    })
     return () => {
       updates.unsubscribe()
       requests.unsubscribe()
+      opens.unsubscribe()
     }
   }, [onSheetsChanged])
 

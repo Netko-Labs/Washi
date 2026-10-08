@@ -26,6 +26,8 @@ function text(value: unknown) {
 
 export interface ToolContext {
   runHankoAction: (input: unknown) => Promise<void>
+  /** A page the agent just made is the page the person wants to look at. */
+  openSheet?: (id: string) => void
 }
 
 /**
@@ -60,7 +62,11 @@ export function createWashiTools(ws: Workspace, context: ToolContext) {
           icon: z.string().max(16).optional(),
           source: z.string(),
         },
-        async (input) => text(createSheetFromSource(ws, input)),
+        async (input) => {
+          const sheet = createSheetFromSource(ws, input)
+          context.openSheet?.(sheet.id)
+          return text(sheet)
+        },
       ),
       tool(
         'sheet_replace',

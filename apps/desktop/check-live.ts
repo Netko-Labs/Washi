@@ -23,6 +23,9 @@ export default defineCheck(async (app: CheckDriver) => {
   await app.waitFor('[data-agent-panel]')
   await app.waitFor('[data-inference]', { timeoutMs: 10_000 })
   await app.expectText('Claude Code')
+  // A fresh conversation, so the receipt below is this run's and not the last one's.
+  await app.click('[aria-label="Clear conversation"]')
+  await app.expectText('Ask me anything')
 
   app.step('ask for a page')
   const composer = 'textarea[placeholder="Ask, or tell Washi what to write…"]'
@@ -43,6 +46,18 @@ export default defineCheck(async (app: CheckDriver) => {
     'no plan receipt arrived',
     { timeoutMs: 180_000 },
   )
-  await app.expectText(TITLE)
   await app.screenshot('live-receipt')
+
+  app.step('the page Washi made is the page that opens')
+  await app.waitUntil(
+    async () =>
+      [
+        ...((await app.evaluate<string[]>(
+          "[...document.querySelectorAll('h1')].map((h) => h.textContent ?? '')",
+        )) ?? []),
+      ].some((text) => text.includes(TITLE)),
+    'the new page never opened',
+    { timeoutMs: 10_000 },
+  )
+  await app.screenshot('live-opened')
 })

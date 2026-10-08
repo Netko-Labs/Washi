@@ -32,6 +32,7 @@ export function isReadTool(name: string): boolean {
 export interface AiToolDeps {
   ws: Workspace
   runHankoAction: (input: unknown) => Promise<void>
+  openSheet?: (id: string) => void
 }
 
 /**
@@ -39,7 +40,7 @@ export interface AiToolDeps {
  * flag is deprecated. The port passes one `toolApproval` function and decides
  * there, using `isReadTool` below, so both ports gate on the same list.
  */
-export function createAiTools({ ws, runHankoAction }: AiToolDeps) {
+export function createAiTools({ ws, runHankoAction, openSheet }: AiToolDeps) {
   return {
     sheet_list: tool({
       description: 'List all sheets (id, title, icon, tags).',
@@ -84,7 +85,11 @@ export function createAiTools({ ws, runHankoAction }: AiToolDeps) {
         icon: z.string().max(16).optional(),
         source: z.string(),
       }),
-      execute: async (input) => createSheetFromSource(ws, input),
+      execute: async (input) => {
+        const sheet = createSheetFromSource(ws, input)
+        openSheet?.(sheet.id)
+        return sheet
+      },
     }),
     sheet_replace: tool({
       description: "Replace a sheet's WSX source (whole-document write).",

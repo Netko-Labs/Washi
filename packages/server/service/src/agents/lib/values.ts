@@ -18,7 +18,7 @@ any default. Two bans: \`url()\` (styling is never a network capability) and vie
 screens; it must size to its container, not the window. Use CONTAINER queries instead: \`@sm:\`
 \`@md:\` \`@lg:\`, which measure the sheet itself. Avoid fixed widths; prefer flex/grid that reflows.
 
-The <Sheet> element owns the page: give it a background, text colour, min-height and padding, e.g.
+The <Sheet> element owns the page and always takes a title prop. Give it a background, text colour, min-height and padding, e.g.
 class="min-h-full bg-[#0b0b12] px-8 py-12 text-zinc-100 @md:px-16". Centre a reading column with an
 inner <Box class="mx-auto max-w-2xl">.
 

@@ -198,6 +198,10 @@ export function WorkspaceShell({
           workspaceId={workspace.id}
           onClose={() => setAgentOpen(false)}
           onSheetsChanged={() => void refresh()}
+          onOpenSheet={(id) => {
+            setSettingsOpen(false)
+            setActiveId(id)
+          }}
         />
       )}
     </div>

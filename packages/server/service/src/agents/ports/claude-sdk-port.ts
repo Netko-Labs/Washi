@@ -11,6 +11,7 @@ export interface ClaudeSdkPortDeps {
   ws: Workspace
   instructions: string
   runHankoAction: (input: unknown) => Promise<void>
+  openSheet?: (id: string) => void
   canUseTool: (
     sessionId: string,
     toolName: string,
@@ -54,7 +55,10 @@ export function createClaudeSdkPort(deps: ClaudeSdkPortDeps): AgentPort {
           model: request.model.model,
           pathToClaudeCodeExecutable: local ? credential.executable : undefined,
           mcpServers: {
-            washi: createWashiTools(deps.ws, { runHankoAction: deps.runHankoAction }),
+            washi: createWashiTools(deps.ws, {
+              runHankoAction: deps.runHankoAction,
+              openSheet: deps.openSheet,
+            }),
           },
           strictMcpConfig: true,
           tools: [],
