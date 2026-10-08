@@ -68,6 +68,14 @@ export default defineCheck(async (app: CheckDriver) => {
   await app.expectText('Ask me anything')
   await app.screenshot('m2-agent-panel')
 
+  app.step('the Agents tab says who Washi thinks with')
+  await app.click('text=Local account')
+  await app.click('text=Settings')
+  await app.click('text=Agents')
+  await app.expectText('Claude Code on this computer', { timeoutMs: 10_000 })
+  await app.expectText('Saved by your Claude plan')
+  await app.screenshot('mlp-agents-tab')
+
   app.step('the transport carried every call without an error')
   // mirin's rpc.error no longer exists — the renderer is an http client now, so a
   // failed procedure surfaces as a renderer exception or a console error instead.

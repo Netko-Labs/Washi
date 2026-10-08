@@ -48,13 +48,22 @@ export function StaticToggle({ on }: { on: boolean }) {
   )
 }
 
-export function SegmentedControl({ options, active }: { options: string[]; active: string }) {
+export function SegmentedControl({
+  options,
+  active,
+  onSelect,
+}: {
+  options: string[]
+  active: string
+  onSelect?: (option: string) => void
+}) {
   return (
     <span className="flex flex-none overflow-hidden rounded-[10px] border border-border">
       {options.map((option, index) => (
         <button
           type="button"
           key={option}
+          onClick={() => onSelect?.(option)}
           className={`h-8 px-3 text-[13px] ${index > 0 ? 'border-border border-l' : ''} ${
             option === active
               ? 'bg-primary text-primary-foreground'
@@ -68,10 +77,11 @@ export function SegmentedControl({ options, active }: { options: string[]; activ
   )
 }
 
-export function RowButton({ children }: { children: ReactNode }) {
+export function RowButton({ children, onClick }: { children: ReactNode; onClick?: () => void }) {
   return (
     <button
       type="button"
+      onClick={onClick}
       className="h-8 flex-none rounded-[10px] border border-border bg-background px-3 text-[13px] text-foreground hover:bg-accent"
     >
       {children}

@@ -32,7 +32,7 @@ Acceptance:
 - [x] **6 · receipts** — `turn_done` carries model, duration, billing; transcripts render it in mono.
 - [x] **7 · web first run** — "Give Washi a key" after workspace creation; skip leaves it asleep.
 - [x] **8 · agent status** — Idle / Working / Needs you · today $x of $cap, in the shell.
-- [ ] **9 · desktop settings** — Agents tab stops being design copy: inference source, spend,
+- [x] **9 · desktop settings** — Agents tab stops being design copy: inference source, spend,
       saved, Resume.
 
 ## Verified live (embedded, no ANTHROPIC_API_KEY, `claude` 2.1.293 signed in to Max)
@@ -50,6 +50,13 @@ sign up → create workspace → first run shows "Give Washi a key", chip reads 
 save a key with a $10 stop → first run closes, chip reads `Idle · today $0.00 of $10` → prompt
 → events stream over the now-scoped SSE (`connectionParams.workspace`) → a rejected key reads
 "The model provider rejected this API key. Replace it in settings" instead of SDK internals.
+
+## Verified in the desktop app (`mirin check`, 11/11)
+
+The Agents tab, inside the real app with launchd's PATH (no shell), finds
+`~/.local/bin/claude`, reads `v2.1.293 · Max plan`, and marks Claude Code **In use** with no
+ANTHROPIC_API_KEY set. Its static design rows (authorship, autonomy, scheduled runs, revoke)
+are gone — none of them did anything, and features.md §2 forbids a control that lies.
 
 ## Caught while building
 
