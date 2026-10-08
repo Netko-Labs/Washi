@@ -118,3 +118,14 @@ export function resolveApproval(ws: Workspace, id: string, status: 'allowed' | '
     .run(status, ws.now(), id)
   return result.changes > 0
 }
+
+/**
+ * Nobody is waiting on a pending row from a previous process — its turn died with
+ * that process. Expire them at boot so a stale question never looks answerable.
+ */
+export function expirePendingApprovals(ws: Workspace): number {
+  const result = ws.sqlite
+    .query("UPDATE approvals SET status = 'denied', resolved_at = ? WHERE status = 'pending'")
+    .run(ws.now())
+  return result.changes
+}

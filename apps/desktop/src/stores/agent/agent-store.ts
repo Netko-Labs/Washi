@@ -82,7 +82,11 @@ export const useAgentStore = create<AgentState>((set, get) => ({
       })
       api.agents.onApprovalRequested.subscribe(undefined, {
         onData: ({ data: request }) => {
-          set((state) => ({ approvals: [...state.approvals, request] }))
+          set((state) =>
+            state.approvals.some((approval) => approval.id === request.id)
+              ? state
+              : { approvals: [...state.approvals, request] },
+          )
         },
       })
       api.agents.onOpenSheetRequested.subscribe(undefined, {
@@ -94,8 +98,17 @@ export const useAgentStore = create<AgentState>((set, get) => ({
         },
       })
     }
-    const sessions = await api.agents.listSessions.query()
-    set({ sessions })
+    const [sessions, pending] = await Promise.all([
+      api.agents.listSessions.query(),
+      api.agents.pendingApprovals.query(),
+    ])
+    set((state) => ({
+      sessions,
+      approvals: [
+        ...state.approvals,
+        ...pending.filter((request) => !state.approvals.some((a) => a.id === request.id)),
+      ],
+    }))
     if (!get().activeSessionId && sessions[0]) await get().selectSession(sessions[0].id)
   },
 

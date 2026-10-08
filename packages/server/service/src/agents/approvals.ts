@@ -1,4 +1,4 @@
-import type { ApprovalDecision } from '@washi/domain'
+import type { ApprovalDecision, ApprovalRequest } from '@washi/domain'
 import { createApproval, resolveApproval, type Workspace } from '@washi/repository'
 import { checkUrl } from '@washi/tsuru'
 import type { CapabilityDesk } from './desk'
@@ -18,7 +18,7 @@ export class ApprovalDesk implements ToolGate {
   private readonly desk: CapabilityDesk
   private readonly pending = new Map<
     string,
-    { sessionId: string; settle: (decision: ApprovalDecision) => void }
+    { request: ApprovalRequest; settle: (decision: ApprovalDecision) => void }
   >()
   private readonly alwaysAllowed = new Map<string, Set<string>>()
 
@@ -36,6 +36,11 @@ export class ApprovalDesk implements ToolGate {
     return this.pending.size > 0
   }
 
+  /** Live questions only: a client that opens late still sees what Washi is waiting on. */
+  list(): ApprovalRequest[] {
+    return [...this.pending.values()].map((entry) => entry.request)
+  }
+
   resolve(id: string, decision: ApprovalDecision): void {
     resolveApproval(this.ws, id, decision === 'reject_once' ? 'denied' : 'allowed')
     this.pending.get(id)?.settle(decision)
@@ -45,7 +50,7 @@ export class ApprovalDesk implements ToolGate {
   /** A stopped turn takes its open questions with it: each one reads as a denial. */
   dropSession(sessionId: string): void {
     for (const [id, entry] of this.pending) {
-      if (entry.sessionId === sessionId) this.resolve(id, 'reject_once')
+      if (entry.request.sessionId === sessionId) this.resolve(id, 'reject_once')
     }
   }
 
@@ -100,7 +105,7 @@ export class ApprovalDesk implements ToolGate {
         resolve('reject_once')
       }, APPROVAL_TIMEOUT_MS)
       this.pending.set(request.id, {
-        sessionId,
+        request,
         settle: (decision) => {
           clearTimeout(timeout)
           resolve(decision)

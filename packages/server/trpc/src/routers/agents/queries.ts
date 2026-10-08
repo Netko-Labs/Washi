@@ -10,6 +10,8 @@ export const agentQueries = router({
   status: workspaceProcedure.query(({ ctx }) => ctx.host.activity()),
   /** What the next turn will run on. Embedded probes the local Claude CLI, so not free. */
   inference: workspaceProcedure.query(({ ctx }) => ctx.host.inference()),
+  /** What Washi is waiting on right now — so a panel opened late can still answer. */
+  pendingApprovals: workspaceProcedure.query(({ ctx }) => ctx.host.pendingApprovals()),
   transcript: workspaceProcedure
     .input(z.object({ sessionId: z.string() }))
     .query(({ ctx, input }) => getTranscript(ctx.ws, input.sessionId)),

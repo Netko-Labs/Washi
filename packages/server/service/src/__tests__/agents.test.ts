@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import type { ApprovalRequest, TranscriptEntry } from '@washi/domain'
 import {
+  createApproval,
   createSession,
   getTranscript,
   listSheets,
@@ -185,5 +186,31 @@ describe('stop', () => {
 
     host.resolveApprovalRequest(approvals[1]!.id, 'allow_once')
     expect((await pendingTheirs).behavior).toBe('allow')
+  })
+})
+
+describe('a client that opens late', () => {
+  test('still sees what Washi is waiting on, and stops seeing it once answered', async () => {
+    const { host, approvals } = makeHost()
+    const session = createSession(ws, 'late')
+    // biome-ignore lint/complexity/useLiteralKeys: reaching into a private member for the test
+    const pending = host['approvals'].gateSdkTool(session.id, 'mcp__washi__sheet_create', {
+      title: 'x',
+    })
+    await Bun.sleep(5)
+    expect(host.pendingApprovals().map((request) => request.id)).toEqual([approvals[0]!.id])
+    host.resolveApprovalRequest(approvals[0]!.id, 'allow_once')
+    await pending
+    expect(host.pendingApprovals()).toEqual([])
+  })
+
+  test('a question left pending by a dead process is expired at boot, not left answerable', () => {
+    const session = createSession(ws, 'stale')
+    createApproval(ws, session.id, 'sheet_create', { title: 'ghost' })
+    const row = () =>
+      ws.sqlite.query('SELECT status FROM approvals').get() as { status: string } | null
+    expect(row()?.status).toBe('pending')
+    makeHost()
+    expect(row()?.status).toBe('denied')
   })
 })

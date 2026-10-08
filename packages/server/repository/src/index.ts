@@ -2,6 +2,7 @@ export {
   appendTurn,
   createApproval,
   createSession,
+  expirePendingApprovals,
   getSdkSessionId,
   getTranscript,
   listSessions,

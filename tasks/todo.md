@@ -72,6 +72,10 @@ are gone — none of them did anything, and features.md §2 forbids a control th
       subscribes to it too. `check:live` asserts the new page's H1 is on screen.
 - [x] **`<Sheet>` takes a title** — said in the instructions now. Every live run's first
       sheet_check failed on it; with one sentence, it passes first time (2 checks → 1).
+- [x] **A panel opened late can still answer** — approvals lived only in whichever client was
+      subscribed when they fired. Close the panel mid-turn (or be the teammate who opens it later)
+      and the turn sat until the 5-minute timeout denied it. `agents.pendingApprovals` lists the
+      live ones; boot expires rows a dead process left pending.
 - `host.ts` is 249 lines: the daily stop moved to `budget.ts`.
 
 ## Caught while building

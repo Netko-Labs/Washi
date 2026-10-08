@@ -31,6 +31,9 @@ export function useAgent(
     setTranscript(
       (await api.agents.transcript.query({ sessionId: session.id })) as TranscriptEntryView[],
     )
+    // A panel opened mid-turn still owes an answer to whatever Washi is waiting on.
+    const pending = (await api.agents.pendingApprovals.query()) as ApprovalView[]
+    setApprovals((prev) => [...prev, ...pending.filter((p) => !prev.some((a) => a.id === p.id))])
   }, [])
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: workspaceId switches the header
@@ -54,7 +57,10 @@ export function useAgent(
       onError: (cause) => setError(String(cause)),
     })
     const requests = api.agents.onApprovalRequested.subscribe(undefined, {
-      onData: ({ data }) => setApprovals((prev) => [...prev, data as ApprovalView]),
+      onData: ({ data }) =>
+        setApprovals((prev) =>
+          prev.some((approval) => approval.id === data.id) ? prev : [...prev, data as ApprovalView],
+        ),
     })
     const opens = api.agents.onOpenSheetRequested.subscribe(undefined, {
       onData: ({ data }) => {

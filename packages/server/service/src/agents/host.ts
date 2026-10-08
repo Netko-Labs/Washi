@@ -1,7 +1,8 @@
-import type { AgentUpdate, ApprovalDecision } from '@washi/domain'
+import type { AgentUpdate, ApprovalDecision, ApprovalRequest } from '@washi/domain'
 import { createModelCatalogue, type ModelCatalogue } from '@washi/models'
 import {
   appendTurn,
+  expirePendingApprovals,
   getSdkSessionId,
   getSheet,
   getTranscript,
@@ -48,6 +49,7 @@ export class AgentHost {
     this.desk = new CapabilityDesk(ws, events)
     this.approvals = new ApprovalDesk(ws, events, this.desk)
     this.budget = new DailyBudget(ws)
+    expirePendingApprovals(ws)
 
     const runHankoAction = (action: unknown) => this.desk.execute(action)
     const openSheet = (id: string) => this.events?.openSheet(id)
@@ -119,6 +121,10 @@ export class AgentHost {
 
   setEvents(events: AgentHostEvents): void {
     this.events = events
+  }
+
+  pendingApprovals(): ApprovalRequest[] {
+    return this.approvals.list()
   }
 
   resolveApprovalRequest(id: string, decision: ApprovalDecision): void {
