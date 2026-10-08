@@ -17,7 +17,8 @@ Specs (visual, canonical):
   Its constraints **C1–C4** are law, not guidance — they are what keep phase 7 a redeployment
   rather than a second implementation.
 
-Progress lives in `tasks/todo.md`. Phases 1–2 are done; phase 3 is `apps/web` + new onboarding.
+Progress lives in `tasks/todo.md`. Phases 1–6 are done; the MLP+1 (agent inference on the
+plan or the key, first run, receipts, Stop, invites) is the current block.
 
 ## Commands
 
@@ -30,6 +31,9 @@ Progress lives in `tasks/todo.md`. Phases 1–2 are done; phase 3 is `apps/web` 
 - `bun run --cwd apps/desktop check` — mirin check scenario (e2e; boots the real app).
   **Stop `bun dev` first** — both want CDP port 9222, and the collision reports as
   "never published an inspector endpoint", which looks identical to a crash at boot.
+- `bun run --cwd apps/desktop check:live` — the golden path through a **real** turn on this
+  machine's Claude Code login (ask → accept at the desk → page opens → plan receipt). Opt-in:
+  it spends plan usage, so it is never part of `check`.
 - `docker compose up` — hosted mode + Postgres. Needs `.env` (see `.env.example`).
 
 ## Topology
@@ -64,6 +68,16 @@ Progress lives in `tasks/todo.md`. Phases 1–2 are done; phase 3 is `apps/web` 
 - Sheet source of truth: Loro text doc (snapshot blob in sqlite); `source` column is a cache.
   Loro is a storage format today — delta export and merge arrive with sync at phase 8.
 - Ids: `Bun.randomUUIDv7()`. Timestamps: HLC strings from domain.
+- **Who pays for a turn.** A credential is `api_key` or `local_cli`. Embedded finds the
+  person's installed `claude` (PATH is empty for a GUI app — known install paths too) and runs
+  it via the Agent SDK's `pathToClaudeCodeExecutable` with **no** key in the env, so their own
+  login pays. `auto` prefers it over `ANTHROPIC_API_KEY`. Hosted runs on the workspace's stored
+  key and has no local branch at all — a team server must never bill one person's plan.
+- A `plan` turn lands in `saved_usd`, never `cost_usd`: the daily stop counts metered dollars
+  only, and every turn counts toward the turn cap. `init.apiKeySource` is `none` (not `oauth`)
+  for a claude.ai login — the binary, not the docs, set that rule.
+- Agent SSE subscriptions are workspaceProcedures and filter on `workspaceId`: one bus serves
+  every workspace. EventSource can't set headers, so the workspace rides `connectionParams`.
 - Agent tools are the ONLY capability surface: ink (data), tsuru (network), hanko (actions).
   Never hand agents fs/shell/raw SQL.
 - WSX is inert data: registry components, literal props, no expressions. Validation before
