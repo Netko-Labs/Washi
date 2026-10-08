@@ -1,5 +1,6 @@
 import { IconTool, IconX } from '@tabler/icons-react'
 import type { TranscriptEntryView } from './lib'
+import { ProposedEdit } from './proposed-edit'
 import { TurnReceipt } from './turn-receipt'
 
 /**
@@ -53,6 +54,10 @@ function Entry({ entry }: { entry: TranscriptEntryView }) {
         {update.title}
       </p>
     )
+  }
+
+  if (update.kind === 'tool_call_update' && update.diff) {
+    return <ProposedEdit diff={update.diff} />
   }
 
   if (update.kind === 'turn_done') {

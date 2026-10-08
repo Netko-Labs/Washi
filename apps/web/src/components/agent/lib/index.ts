@@ -3,6 +3,8 @@ export type {
   AgentUpdateView,
   ApprovalDecision,
   ApprovalView,
+  DiffView,
+  ProposedEditProps,
   TranscriptEntryView,
   TurnDoneView,
   TurnReceiptProps,

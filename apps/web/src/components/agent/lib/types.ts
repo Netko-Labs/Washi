@@ -16,7 +16,7 @@ export type AgentUpdateView =
       status: string
       input?: unknown
     }
-  | { kind: 'tool_call_update'; toolCallId: string; status: string; diff?: unknown }
+  | { kind: 'tool_call_update'; toolCallId: string; status: string; diff?: DiffView }
   | TurnDoneView
 
 export interface TurnDoneView {
@@ -42,3 +42,13 @@ export interface ApprovalView {
 }
 
 export type ApprovalDecision = 'allow_once' | 'allow_always' | 'reject_once'
+
+export interface DiffView {
+  path: string
+  oldText: string
+  newText: string
+}
+
+export interface ProposedEditProps {
+  diff: DiffView
+}
