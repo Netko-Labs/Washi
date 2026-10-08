@@ -79,6 +79,11 @@ export function createHostedControlPlane(options: ControlPlaneOptions): HostedCo
       return rows satisfies WorkspaceRef[]
     },
 
+    async workspaceIds() {
+      const rows = await db.select({ id: organization.id }).from(organization)
+      return rows.map((row) => row.id)
+    },
+
     async handle(request) {
       const url = new URL(request.url)
       if (!url.pathname.startsWith(AUTH_PREFIX)) return null

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '@/lib/rpc'
-import type { RoutineWire } from '../types'
+import type { RoutineInput, RoutineWire } from '../types'
 
 export function useRoutines() {
   const [routines, setRoutines] = useState<RoutineWire[]>([])
@@ -33,8 +33,7 @@ export function useRoutines() {
   return {
     routines,
     error,
-    create: (input: { title: string; prompt: string; minuteUtc: number }) =>
-      act(() => api.routines.create.mutate(input)),
+    create: (input: RoutineInput) => act(() => api.routines.create.mutate(input)),
     toggle: (id: string, enabled: boolean) =>
       void act(() => api.routines.setEnabled.mutate({ id, enabled })),
     runNow: (id: string) => void act(() => api.routines.runNow.mutate({ id })),

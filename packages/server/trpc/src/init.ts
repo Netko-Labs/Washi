@@ -56,6 +56,8 @@ export interface ControlPlane {
   /** Embedded always says yes; hosted checks organization membership. */
   authorize(actorId: string | null, workspaceId: string): Promise<boolean>
   listWorkspaces(actorId: string | null): Promise<WorkspaceRef[]>
+  /** Every workspace that exists, for the server's own clock — never for a request. */
+  workspaceIds(): Promise<string[]>
   /** Auth and organization routes, or null when this request is not one. */
   handle(request: Request): Promise<Response | null>
   /** Absent in embedded mode: there is no BYOK, the machine's own env supplies the key. */

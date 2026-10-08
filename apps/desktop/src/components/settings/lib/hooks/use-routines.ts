@@ -29,7 +29,7 @@ export function useRoutines() {
   return {
     routines,
     error,
-    create: (input: { title: string; prompt: string; minuteUtc: number }) =>
+    create: (input: { title: string; prompt: string; minuteOfDay: number; timeZone: string }) =>
       act(() => api.routines.create.mutate(input)),
     toggle: (id: string, enabled: boolean) =>
       void act(() => api.routines.setEnabled.mutate({ id, enabled })),

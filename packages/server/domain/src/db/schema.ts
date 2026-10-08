@@ -114,10 +114,12 @@ export const routineTable = sqliteTable('routines', {
   id: text('id').primaryKey(),
   title: text('title').notNull(),
   prompt: text('prompt').notNull(),
-  /** Minutes after UTC midnight. Clients convert to and from their own clock. */
-  minuteUtc: integer('minute_utc').notNull(),
+  /** Minutes after local midnight, on the wall clock of `timeZone`. */
+  minuteOfDay: integer('minute_of_day').notNull(),
+  /** IANA zone the person meant, so 07:00 stays 07:00 across daylight saving. */
+  timeZone: text('time_zone').notNull(),
   enabled: integer('enabled', { mode: 'boolean' }).notNull().default(true),
-  /** YYYY-MM-DD (UTC) of the last run, so a day runs at most once. */
+  /** YYYY-MM-DD in `timeZone` of the last run, so a day runs at most once. */
   lastRunDay: text('last_run_day'),
   /** The conversation every run of this routine appends to. */
   sessionId: text('session_id'),

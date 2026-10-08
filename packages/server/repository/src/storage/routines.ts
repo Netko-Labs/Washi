@@ -4,7 +4,7 @@ import { asc, eq } from 'drizzle-orm'
 import { newId, type Workspace } from './client'
 
 export function listRoutines(ws: Workspace): Routine[] {
-  return ws.db.select().from(routineTable).orderBy(asc(routineTable.minuteUtc)).all()
+  return ws.db.select().from(routineTable).orderBy(asc(routineTable.minuteOfDay)).all()
 }
 
 export function getRoutine(ws: Workspace, id: string): Routine | null {
@@ -19,7 +19,8 @@ export function createRoutine(
     id: newId(),
     title: input.title,
     prompt: input.prompt,
-    minuteUtc: input.minuteUtc,
+    minuteOfDay: input.minuteOfDay,
+    timeZone: input.timeZone,
     enabled: true,
     lastRunDay: input.lastRunDay,
     sessionId: null,

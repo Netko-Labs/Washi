@@ -1,15 +1,16 @@
-/** "07:30" on this computer's clock → minutes after UTC midnight. */
-export function localToMinuteUtc(hhmm: string, today = new Date()): number {
+/** "07:30" → minutes after midnight. The zone travels separately. */
+export function toMinuteOfDay(hhmm: string): number {
   const [hours = 0, minutes = 0] = hhmm.split(':').map(Number)
-  const local = new Date(today)
-  local.setHours(hours, minutes, 0, 0)
-  return local.getUTCHours() * 60 + local.getUTCMinutes()
+  return hours * 60 + minutes
 }
 
-/** Minutes after UTC midnight → this computer's "07:30". */
-export function minuteUtcToLocal(minuteUtc: number, today = new Date()): string {
-  const utc = new Date(
-    Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), 0, minuteUtc),
-  )
-  return utc.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+/** The zone this device lives in — what "07:00" means to the person typing it. */
+export function deviceTimeZone(): string {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone
+}
+
+/** "07:00", plus the zone when it is not this device's: a routine keeps its own clock. */
+export function routineTime(minuteOfDay: number, timeZone: string): string {
+  const hhmm = `${String(Math.floor(minuteOfDay / 60)).padStart(2, '0')}:${String(minuteOfDay % 60).padStart(2, '0')}`
+  return timeZone === deviceTimeZone() ? hhmm : `${hhmm} ${timeZone}`
 }

@@ -54,11 +54,16 @@ export class ApprovalDesk implements ToolGate {
     this.pending.delete(id)
   }
 
-  /** A stopped turn takes its open questions with it: each one reads as a denial. */
+  /** A finished or stopped turn takes its open questions — and its patience — with it. */
   dropSession(sessionId: string): void {
+    this.patient.delete(sessionId)
     for (const [id, entry] of this.pending) {
       if (entry.request.sessionId === sessionId) this.resolve(id, 'reject_once')
     }
+  }
+
+  isWaiting(sessionId: string): boolean {
+    return [...this.pending.values()].some((entry) => entry.request.sessionId === sessionId)
   }
 
   async approve(sessionId: string, toolName: string, input: unknown): Promise<boolean> {

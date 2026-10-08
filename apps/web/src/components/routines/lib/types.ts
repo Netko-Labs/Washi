@@ -10,7 +10,7 @@ export interface RoutineRowProps {
 }
 
 export interface RoutineFormProps {
-  onCreate: (input: { title: string; prompt: string; minuteUtc: number }) => Promise<boolean>
+  onCreate: (input: RoutineInput) => Promise<boolean>
 }
 
 export interface RoutineDraft {
@@ -18,4 +18,11 @@ export interface RoutineDraft {
   prompt: string
   /** HH:MM on this device's clock. */
   time: string
+}
+
+export interface RoutineInput {
+  title: string
+  prompt: string
+  minuteOfDay: number
+  timeZone: string
 }

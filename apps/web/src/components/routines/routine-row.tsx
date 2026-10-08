@@ -1,11 +1,11 @@
 import { IconPlayerPlay, IconTrash } from '@tabler/icons-react'
-import { minuteUtcToLocal, type RoutineRowProps } from './lib'
+import { type RoutineRowProps, routineTime } from './lib'
 
 export function RoutineRow({ routine, onToggle, onRunNow, onRemove }: RoutineRowProps) {
   return (
     <li className="flex flex-wrap items-center gap-3 py-3">
       <span className="w-14 shrink-0 font-mono text-[12px] text-muted-foreground">
-        {minuteUtcToLocal(routine.minuteUtc)}
+        {routineTime(routine.minuteOfDay, routine.timeZone)}
       </span>
       <span className="min-w-0 flex-[1_1_200px]">
         <span className={`block text-[14px] ${routine.enabled ? '' : 'text-muted-foreground'}`}>

@@ -24,6 +24,9 @@ const control: ControlPlane = {
   async listWorkspaces(actorId) {
     return actorId === ALICE.id ? [{ id: HERS, name: 'Alice', role: 'owner' }] : []
   },
+  async workspaceIds() {
+    return [HERS, THEIRS]
+  },
   async handle() {
     return null
   },

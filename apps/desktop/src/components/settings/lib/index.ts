@@ -8,5 +8,5 @@ export type {
   RoutineWire,
   SpendWire,
 } from './types'
-export { localToMinuteUtc, minuteUtcToLocal } from './utils'
+export { deviceTimeZone, routineTime, toMinuteOfDay } from './utils'
 export { LOCAL_MODEL_LABELS, PREFERENCE_LABELS } from './values'

@@ -1,6 +1,6 @@
 import { IconPlayerPlay, IconTrash } from '@tabler/icons-react'
 import { useState } from 'react'
-import { localToMinuteUtc, minuteUtcToLocal, type RoutineDraft, useRoutines } from './lib'
+import { deviceTimeZone, type RoutineDraft, routineTime, toMinuteOfDay, useRoutines } from './lib'
 import { SettingsCard, SettingsRow, StaticToggle } from './SettingsControls'
 
 const EMPTY: RoutineDraft = { title: '', prompt: '', time: '07:00' }
@@ -16,7 +16,7 @@ export function RoutinesCard() {
       {routines.map((routine) => (
         <SettingsRow
           key={routine.id}
-          title={`${minuteUtcToLocal(routine.minuteUtc)} · ${routine.title}`}
+          title={`${routineTime(routine.minuteOfDay, routine.timeZone)} · ${routine.title}`}
           sub={routine.prompt}
           wrap
         >
@@ -55,7 +55,8 @@ export function RoutinesCard() {
           void create({
             title: draft.title.trim(),
             prompt: draft.prompt.trim(),
-            minuteUtc: localToMinuteUtc(draft.time),
+            minuteOfDay: toMinuteOfDay(draft.time),
+            timeZone: deviceTimeZone(),
           }).then((ok) => ok && setDraft(EMPTY))
         }}
       >

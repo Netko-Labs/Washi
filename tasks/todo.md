@@ -103,6 +103,14 @@ are gone — none of them did anything, and features.md §2 forbids a control th
       twice; a routine made after its minute starts tomorrow. Times are stored as UTC minutes
       and shown on the client's clock. Runs on the desktop too, while the app is open.
       Driven in the browser: add → Run now → the turn lands in What happened.
+      Reviewed, then reworked: routines due together started together and slipped past the
+      daily stop (now one *working* run at a time — one parked on a person doesn't block);
+      a routine resumed one conversation forever (now a fresh session per run); the clock
+      opened every `*.db` incl. deleted orgs and conjured `default.db` on hosted (now only ids
+      the control plane knows *and* that have a file); Run now got the 12h wait (now only
+      scheduled runs, cleared when the turn ends); resuming after the minute fired at once
+      (now waits for tomorrow); UTC minutes drifted an hour across DST (now wall-clock minute
+      + IANA zone).
 - `host.ts` is 293 lines: the daily stop moved to `budget.ts`.
 
 ## Reviewed twice, by agents that did not write it

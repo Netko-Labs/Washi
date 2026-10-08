@@ -1,5 +1,11 @@
 import { useState } from 'react'
-import { localToMinuteUtc, ROUTINE_EXAMPLE, type RoutineDraft, type RoutineFormProps } from './lib'
+import {
+  deviceTimeZone,
+  ROUTINE_EXAMPLE,
+  type RoutineDraft,
+  type RoutineFormProps,
+  toMinuteOfDay,
+} from './lib'
 
 export function RoutineForm({ onCreate }: RoutineFormProps) {
   const [draft, setDraft] = useState<RoutineDraft>({
@@ -18,7 +24,8 @@ export function RoutineForm({ onCreate }: RoutineFormProps) {
         void onCreate({
           title: draft.title.trim(),
           prompt: draft.prompt.trim(),
-          minuteUtc: localToMinuteUtc(draft.time),
+          minuteOfDay: toMinuteOfDay(draft.time),
+          timeZone: deviceTimeZone(),
         }).then((ok) => ok && setDraft({ title: '', prompt: '', time: ROUTINE_EXAMPLE.time }))
       }}
     >

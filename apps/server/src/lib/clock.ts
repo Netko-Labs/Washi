@@ -1,17 +1,19 @@
-import { readdirSync } from 'node:fs'
+import { existsSync } from 'node:fs'
+import { join } from 'node:path'
 import type { ServerRuntime } from '@washi/trpc'
 import { ROUTINE_TICK_MS } from './constants'
 
-/** Every workspace this server holds, opened or not — a routine must not wait for a visitor. */
-export function workspaceIds(dataDir: string, fallback: string): string[] {
-  try {
-    const ids = readdirSync(dataDir)
-      .filter((file) => file.endsWith('.db'))
-      .map((file) => file.slice(0, -'.db'.length))
-    return ids.includes(fallback) ? ids : [...ids, fallback]
-  } catch {
-    return [fallback]
-  }
+/**
+ * Workspaces the control plane says exist *and* that have a file. A deleted
+ * organization's leftover file, a stray .db, or an id with no file yet is never
+ * opened — opening creates.
+ */
+export async function liveWorkspaceIds(
+  runtime: Pick<ServerRuntime, 'control'>,
+  dataDir: string,
+): Promise<string[]> {
+  const ids = await runtime.control.workspaceIds()
+  return ids.filter((id) => existsSync(join(dataDir, `${id}.db`)))
 }
 
 /**
@@ -19,15 +21,24 @@ export function workspaceIds(dataDir: string, fallback: string): string[] {
  * stop every other workspace's morning.
  */
 export function startRoutineClock(runtime: ServerRuntime, dataDir: string): () => void {
-  const tick = () => {
-    for (const id of workspaceIds(dataDir, runtime.defaultWorkspaceId)) {
-      try {
-        runtime.resolve(id).host.routines.tick()
-      } catch (error) {
-        console.error(`[washi] routines in workspace ${id} failed to tick`, error)
+  let ticking = false
+  const tick = async () => {
+    if (ticking) return
+    ticking = true
+    try {
+      for (const id of await liveWorkspaceIds(runtime, dataDir)) {
+        try {
+          runtime.resolve(id).host.routines.tick()
+        } catch (error) {
+          console.error(`[washi] routines in workspace ${id} failed to tick`, error)
+        }
       }
+    } catch (error) {
+      console.error('[washi] the routine clock could not list workspaces', error)
+    } finally {
+      ticking = false
     }
   }
-  const timer = setInterval(tick, ROUTINE_TICK_MS)
+  const timer = setInterval(() => void tick(), ROUTINE_TICK_MS)
   return () => clearInterval(timer)
 }

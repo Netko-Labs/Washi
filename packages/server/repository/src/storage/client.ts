@@ -185,12 +185,16 @@ function createTables(sqlite: Database) {
   `)
   ensureColumn(sqlite, 'agent_spend', 'saved_usd', 'REAL NOT NULL DEFAULT 0')
 
+  // The first routines shape (UTC minutes) never shipped; a dev file that has it
+  // is rebuilt rather than migrated.
+  if (hasColumn(sqlite, 'routines', 'minute_utc')) sqlite.exec('DROP TABLE routines')
   sqlite.exec(`
     CREATE TABLE IF NOT EXISTS routines (
       id TEXT PRIMARY KEY,
       title TEXT NOT NULL,
       prompt TEXT NOT NULL,
-      minute_utc INTEGER NOT NULL,
+      minute_of_day INTEGER NOT NULL,
+      time_zone TEXT NOT NULL,
       enabled INTEGER NOT NULL DEFAULT 1,
       last_run_day TEXT,
       session_id TEXT,
@@ -216,8 +220,12 @@ function createTables(sqlite: Database) {
 }
 
 /** Additive DDL for an existing file; no drizzle-kit migrations by design. */
-function ensureColumn(sqlite: Database, table: string, column: string, type: string) {
+function hasColumn(sqlite: Database, table: string, column: string): boolean {
   const columns = sqlite.query(`PRAGMA table_info(${table})`).all() as { name: string }[]
-  if (columns.some((entry) => entry.name === column)) return
+  return columns.some((entry) => entry.name === column)
+}
+
+function ensureColumn(sqlite: Database, table: string, column: string, type: string) {
+  if (hasColumn(sqlite, table, column)) return
   sqlite.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${type}`)
 }

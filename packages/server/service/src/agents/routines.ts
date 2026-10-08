@@ -5,40 +5,62 @@ import {
   deleteRoutine,
   getRoutine,
   listRoutines,
-  listSessions,
   updateRoutine,
   type Workspace,
 } from '@washi/repository'
 
-export function utcDay(now: Date): string {
-  return now.toISOString().slice(0, 10)
-}
-
-export function utcMinute(now: Date): number {
-  return now.getUTCHours() * 60 + now.getUTCMinutes()
-}
-
-/** Once a day, at or after its minute, and never twice on the same UTC day. */
-export function isDue(routine: Routine, now: Date): boolean {
-  return (
-    routine.enabled && routine.lastRunDay !== utcDay(now) && utcMinute(now) >= routine.minuteUtc
+/** The wall clock in a zone: which day it is there, and how far into it. */
+export function zonedNow(now: Date, timeZone: string): { day: string; minute: number } {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat('en-CA', {
+      timeZone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hourCycle: 'h23',
+    })
+      .formatToParts(now)
+      .map((part) => [part.type, part.value]),
   )
+  return {
+    day: `${parts.year}-${parts.month}-${parts.day}`,
+    minute: Number(parts.hour) * 60 + Number(parts.minute),
+  }
+}
+
+/** Once a day in its own zone, at or after its minute. */
+export function isDue(routine: Routine, now: Date): boolean {
+  if (!routine.enabled) return false
+  const { day, minute } = zonedNow(now, routine.timeZone)
+  return routine.lastRunDay !== day && minute >= routine.minuteOfDay
+}
+
+/** Today counts as run when its minute has already passed: nothing fires on save or resume. */
+function alreadyPassed(minuteOfDay: number, timeZone: string, now: Date): string | null {
+  const { day, minute } = zonedNow(now, timeZone)
+  return minute >= minuteOfDay ? day : null
 }
 
 export interface RoutineRunner {
   prompt(sessionId: string, text: string): Promise<void>
   isRunning(sessionId: string): boolean
+  /** Running but parked on a person's answer — not spending anything. */
+  isWaiting(sessionId: string): boolean
   waitLonger(sessionId: string): void
 }
 
 /**
  * Prompts Washi runs on its own. A run is an ordinary turn — the daily stop, the
- * desk and the receipt all apply — in the routine's own conversation, so Today
- * retells it like any other.
+ * desk and the receipt all apply — in a fresh conversation, so day N never pays
+ * to re-read days 1 to N-1. Today retells it by its title.
  */
 export class RoutineBook {
   private readonly ws: Workspace
   private readonly runner: RoutineRunner
+  /** Sessions of runs this book started that may still be going. */
+  private readonly inFlight = new Set<string>()
 
   constructor(ws: Workspace, runner: RoutineRunner) {
     this.ws = ws
@@ -49,49 +71,57 @@ export class RoutineBook {
     return listRoutines(this.ws)
   }
 
-  /** A routine made after today's minute starts tomorrow, not the moment it is saved. */
   create(input: RoutineCreate, actorId: string | null, now = new Date()): Routine {
-    const passed = utcMinute(now) >= input.minuteUtc
     return createRoutine(this.ws, {
       ...input,
       createdBy: actorId,
-      lastRunDay: passed ? utcDay(now) : null,
+      lastRunDay: alreadyPassed(input.minuteOfDay, input.timeZone, now),
     })
   }
 
-  setEnabled(id: string, enabled: boolean): Routine | null {
-    return updateRoutine(this.ws, id, { enabled })
+  setEnabled(id: string, enabled: boolean, now = new Date()): Routine | null {
+    const routine = getRoutine(this.ws, id)
+    if (!routine) return null
+    const resumedLate = enabled && !routine.enabled
+    const skip = resumedLate ? alreadyPassed(routine.minuteOfDay, routine.timeZone, now) : null
+    return updateRoutine(this.ws, id, { enabled, ...(skip ? { lastRunDay: skip } : {}) })
   }
 
   remove(id: string): void {
     deleteRoutine(this.ws, id)
   }
 
-  /** Every due routine, once. Called by the server's clock; never by a request. */
+  /**
+   * Called by the server's clock, never by a request. One routine at a time: the
+   * daily stop is checked when a turn starts and charged when it ends, so routines
+   * started together would all pass it. A run parked on a person spends nothing,
+   * so it does not hold the others back.
+   */
   tick(now = new Date()): string[] {
-    return this.list()
-      .filter((routine) => isDue(routine, now))
-      .flatMap((routine) => (this.run(routine.id, now) ? [routine.id] : []))
+    for (const sessionId of this.inFlight) {
+      if (!this.runner.isRunning(sessionId)) this.inFlight.delete(sessionId)
+    }
+    const working = [...this.inFlight].some((sessionId) => !this.runner.isWaiting(sessionId))
+    if (working) return []
+    const due = this.list().find((routine) => isDue(routine, now))
+    return due && this.run(due.id, now, { scheduled: true }) ? [due.id] : []
   }
 
   /** Marked before it runs, so a crash mid-turn never makes it run twice. */
-  run(id: string, now = new Date()): boolean {
+  run(id: string, now = new Date(), { scheduled = false } = {}): boolean {
     const routine = getRoutine(this.ws, id)
     if (!routine) return false
-    const sessionId = this.sessionFor(routine)
-    if (this.runner.isRunning(sessionId)) return false
-    updateRoutine(this.ws, id, { lastRunDay: utcDay(now), sessionId })
-    this.runner.waitLonger(sessionId)
+    const sessionId = createSession(this.ws, `Routine · ${routine.title}`).id
+    updateRoutine(this.ws, id, {
+      lastRunDay: zonedNow(now, routine.timeZone).day,
+      sessionId,
+    })
+    // Only an unattended run waits for the morning; Run now has a person watching.
+    if (scheduled) this.runner.waitLonger(sessionId)
+    this.inFlight.add(sessionId)
     void this.runner.prompt(sessionId, routine.prompt).catch((error) => {
       console.error(`[washi] routine "${routine.title}" failed to start`, error)
     })
     return true
-  }
-
-  private sessionFor(routine: Routine): string {
-    const known = routine.sessionId
-      ? listSessions(this.ws).find((session) => session.id === routine.sessionId)
-      : undefined
-    return known?.id ?? createSession(this.ws, `Routine · ${routine.title}`).id
   }
 }

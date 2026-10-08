@@ -57,6 +57,7 @@ export class AgentHost {
     this.routines = new RoutineBook(ws, {
       prompt: (sessionId, text) => this.prompt(sessionId, text),
       isRunning: (sessionId) => this.isRunning(sessionId),
+      isWaiting: (sessionId) => this.approvals.isWaiting(sessionId),
       waitLonger: (sessionId) => this.approvals.waitLonger(sessionId),
     })
     expirePendingApprovals(ws)

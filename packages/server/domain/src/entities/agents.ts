@@ -77,7 +77,8 @@ export const routineSchema = z.object({
   id: z.string(),
   title: z.string(),
   prompt: z.string(),
-  minuteUtc: z.number().int().min(0).max(1439),
+  minuteOfDay: z.number().int().min(0).max(1439),
+  timeZone: z.string(),
   enabled: z.boolean(),
   lastRunDay: z.string().nullable(),
   sessionId: z.string().nullable(),
@@ -86,9 +87,19 @@ export const routineSchema = z.object({
 })
 export type Routine = z.infer<typeof routineSchema>
 
+function isTimeZone(zone: string): boolean {
+  try {
+    new Intl.DateTimeFormat('en-US', { timeZone: zone })
+    return true
+  } catch {
+    return false
+  }
+}
+
 export const routineCreateSchema = z.object({
   title: z.string().trim().min(1).max(120),
   prompt: z.string().trim().min(1).max(4000),
-  minuteUtc: z.number().int().min(0).max(1439),
+  minuteOfDay: z.number().int().min(0).max(1439),
+  timeZone: z.string().min(1).max(64).refine(isTimeZone, 'not an IANA time zone'),
 })
 export type RoutineCreate = z.infer<typeof routineCreateSchema>
