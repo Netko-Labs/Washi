@@ -37,3 +37,6 @@ export const APPROVAL_TIMEOUT_MS = 5 * 60_000
 export const TODAY_WINDOW_MS = 24 * 60 * 60_000
 export const TODAY_TURN_LIMIT = 20
 export const PROMPT_PREVIEW_CHARS = 140
+
+/** A routine runs unattended: its questions wait for the morning, not five minutes. */
+export const ROUTINE_APPROVAL_TIMEOUT_MS = 12 * 60 * 60_000

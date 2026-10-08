@@ -28,6 +28,13 @@ export {
 export { getAppMeta, setAppMeta } from './storage/meta'
 export { createWorkspaceRegistry, type WorkspaceRegistry } from './storage/registry'
 export {
+  createRoutine,
+  deleteRoutine,
+  getRoutine,
+  listRoutines,
+  updateRoutine,
+} from './storage/routines'
+export {
   createSheet,
   deleteSheet,
   getBacklinks,

@@ -2,7 +2,7 @@ import type { ApprovalDecision, ApprovalRequest } from '@washi/domain'
 import { createApproval, resolveApproval, type Workspace } from '@washi/repository'
 import { checkUrl } from '@washi/tsuru'
 import type { CapabilityDesk } from './desk'
-import { APPROVAL_TIMEOUT_MS, type EventsRef, READ_TOOLS } from './lib'
+import { APPROVAL_TIMEOUT_MS, type EventsRef, READ_TOOLS, ROUTINE_APPROVAL_TIMEOUT_MS } from './lib'
 import { shortToolName } from './normalize'
 import type { ToolGate, ToolVerdict } from './ports'
 import { currentFetchPolicy } from './tools'
@@ -21,11 +21,17 @@ export class ApprovalDesk implements ToolGate {
     { request: ApprovalRequest; settle: (decision: ApprovalDecision) => void }
   >()
   private readonly alwaysAllowed = new Map<string, Set<string>>()
+  /** Sessions nobody is watching live — a routine's questions wait for the morning. */
+  private readonly patient = new Set<string>()
 
   constructor(ws: Workspace, events: EventsRef, desk: CapabilityDesk) {
     this.ws = ws
     this.events = events
     this.desk = desk
+  }
+
+  waitLonger(sessionId: string): void {
+    this.patient.add(sessionId)
   }
 
   isRead(toolName: string): boolean {
@@ -100,11 +106,14 @@ export class ApprovalDesk implements ToolGate {
     const request = createApproval(this.ws, sessionId, toolName, input)
     this.events()?.approval(request)
     return new Promise((resolve) => {
-      const timeout = setTimeout(() => {
-        this.pending.delete(request.id)
-        resolveApproval(this.ws, request.id, 'denied')
-        resolve('reject_once')
-      }, APPROVAL_TIMEOUT_MS)
+      const timeout = setTimeout(
+        () => {
+          this.pending.delete(request.id)
+          resolveApproval(this.ws, request.id, 'denied')
+          resolve('reject_once')
+        },
+        this.patient.has(sessionId) ? ROUTINE_APPROVAL_TIMEOUT_MS : APPROVAL_TIMEOUT_MS,
+      )
       this.pending.set(request.id, {
         request,
         settle: (decision) => {

@@ -1,4 +1,5 @@
 import { formatUsd } from '@/components/agent'
+import { RoutinesSection } from '@/components/routines'
 import { useSession } from '@/lib/auth'
 import { greeting, longDate, type TodayViewProps, useToday } from './lib'
 import { NeedsYou } from './needs-you'
@@ -59,6 +60,8 @@ export function TodayView({ workspace, onOpenAgent }: TodayViewProps) {
               </button>
             )}
           </section>
+
+          <RoutinesSection />
         </div>
       )}
     </div>

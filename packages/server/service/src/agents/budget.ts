@@ -57,6 +57,16 @@ export class DailyBudget {
     return { kind: 'open' }
   }
 
+  /** Why the next turn may not start, in words a person can act on — or null. */
+  refusal(): string | null {
+    const state = this.breaker()
+    if (state.kind === 'open') return null
+    if (state.kind === 'paused') return 'Washi is paused for this workspace. Resume it in settings.'
+    return state.reason === 'turns'
+      ? `Washi has run ${state.turns} turns today, its limit of ${state.turnCap}. Resume it in settings, or wait until tomorrow.`
+      : `This workspace has spent $${state.costUsd.toFixed(2)} of its $${state.capUsd} daily stop. Resume or raise it in settings.`
+  }
+
   report(): AgentSpendReport {
     const { day, costUsd, savedUsd, turns } = spendForDay(this.ws)
     return {

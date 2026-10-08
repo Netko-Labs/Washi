@@ -7,6 +7,7 @@ export {
   capabilityCallTable,
   oplogTable,
   recordTable,
+  routineTable,
   sheetLinkTable,
   sheetTable,
   userTableTable,

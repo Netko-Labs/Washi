@@ -16,6 +16,8 @@ export interface ServerOptions {
   token?: string
   /** Extra origins the hosted web client is served from. */
   trustedOrigins?: string[]
+  /** Run routines on the minute. On unless a test says otherwise. */
+  routines?: boolean
   /** Hosted only: the organization's decrypted key, for the agent and nothing else. */
   storedAgentKey?: (workspaceId: string) => Promise<StoredKey | null>
 }

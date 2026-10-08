@@ -1,4 +1,5 @@
 import { receiptParts } from '@/components/agent'
+import { ROUTINE_SESSION_PREFIX } from '@/components/routines'
 import { clock, type TodayTurnProps } from './lib'
 
 export function TodayTurn({ turn }: TodayTurnProps) {
@@ -7,7 +8,14 @@ export function TodayTurn({ turn }: TodayTurnProps) {
     <li className="grid grid-cols-[3.5rem_1fr] gap-3 py-3">
       <span className="pt-0.5 font-mono text-[11.5px] text-muted-foreground">{clock(turn.at)}</span>
       <span className="min-w-0">
-        <span className="block text-[14px] leading-snug">{turn.prompt || turn.sessionTitle}</span>
+        <span className="block text-[14px] leading-snug">
+          {turn.sessionTitle.startsWith(ROUTINE_SESSION_PREFIX) && (
+            <span className="mr-1.5 rounded-full bg-accent px-2 py-0.5 font-mono text-[10.5px]">
+              {turn.sessionTitle.slice(ROUTINE_SESSION_PREFIX.length)}
+            </span>
+          )}
+          {turn.prompt || turn.sessionTitle}
+        </span>
         {turn.tools.length > 0 && (
           <span className="mt-1 flex flex-wrap gap-1">
             {turn.tools.map((tool) => (

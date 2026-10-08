@@ -71,3 +71,24 @@ export const approvalRequestSchema = z.object({
 export type ApprovalRequest = z.infer<typeof approvalRequestSchema>
 
 export type ApprovalDecision = 'allow_once' | 'allow_always' | 'reject_once'
+
+/** A prompt Washi runs on its own once a day. Writes still wait for a person. */
+export const routineSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  prompt: z.string(),
+  minuteUtc: z.number().int().min(0).max(1439),
+  enabled: z.boolean(),
+  lastRunDay: z.string().nullable(),
+  sessionId: z.string().nullable(),
+  createdBy: z.string().nullable(),
+  createdAt: z.string(),
+})
+export type Routine = z.infer<typeof routineSchema>
+
+export const routineCreateSchema = z.object({
+  title: z.string().trim().min(1).max(120),
+  prompt: z.string().trim().min(1).max(4000),
+  minuteUtc: z.number().int().min(0).max(1439),
+})
+export type RoutineCreate = z.infer<typeof routineCreateSchema>

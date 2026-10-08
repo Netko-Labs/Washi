@@ -1,5 +1,6 @@
 import { fetchRequestHandler } from '@trpc/server/adapters/fetch'
 import { appRouter, createContext } from '@washi/trpc'
+import { startRoutineClock } from './lib/clock'
 import { DEFAULT_HOSTED_PORT, EMBEDDED_HOSTNAME } from './lib/constants'
 import { corsHeaders, isAllowedOrigin, preflight, tokenFrom } from './lib/http'
 import { createRuntime } from './lib/runtime'
@@ -83,6 +84,8 @@ export function startServer(options: ServerOptions): RunningServer {
     },
   })
 
+  const stopClock =
+    options.routines === false ? () => {} : startRoutineClock(runtime, options.dataDir)
   const port = server.port ?? 0
   const displayHost = hostname === '0.0.0.0' ? 'localhost' : hostname
 
@@ -93,6 +96,7 @@ export function startServer(options: ServerOptions): RunningServer {
     mode: options.mode,
     runtime,
     async stop() {
+      stopClock()
       await server.stop(true)
       runtime.close()
       await options.control.close()

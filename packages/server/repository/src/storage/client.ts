@@ -186,6 +186,20 @@ function createTables(sqlite: Database) {
   ensureColumn(sqlite, 'agent_spend', 'saved_usd', 'REAL NOT NULL DEFAULT 0')
 
   sqlite.exec(`
+    CREATE TABLE IF NOT EXISTS routines (
+      id TEXT PRIMARY KEY,
+      title TEXT NOT NULL,
+      prompt TEXT NOT NULL,
+      minute_utc INTEGER NOT NULL,
+      enabled INTEGER NOT NULL DEFAULT 1,
+      last_run_day TEXT,
+      session_id TEXT,
+      created_by TEXT,
+      created_at TEXT NOT NULL
+    )
+  `)
+
+  sqlite.exec(`
     CREATE TABLE IF NOT EXISTS app_meta (
       key TEXT PRIMARY KEY,
       value TEXT NOT NULL

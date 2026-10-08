@@ -3,6 +3,7 @@ import { agentsRouter } from './routers/agents'
 import { capabilitiesRouter } from './routers/capabilities'
 import { devRouter } from './routers/dev'
 import { modelsRouter } from './routers/models'
+import { routinesRouter } from './routers/routines'
 import { sheetsRouter } from './routers/sheets'
 import { systemRouter } from './routers/system'
 import { tablesRouter } from './routers/tables'
@@ -20,6 +21,7 @@ export const appRouter = router({
   capabilities: capabilitiesRouter,
   workspaces: workspacesRouter,
   models: modelsRouter,
+  routines: routinesRouter,
   dev: devRouter,
 })
 

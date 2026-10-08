@@ -29,6 +29,7 @@ import type {
 import { SYSTEM_INSTRUCTIONS } from './lib'
 import { proposedDiff } from './normalize'
 import { type AgentPort, createAiSdkPort, createClaudeSdkPort, type TurnResult } from './ports'
+import { RoutineBook } from './routines'
 import { recentTurns } from './today'
 
 export class AgentHost {
@@ -41,6 +42,7 @@ export class AgentHost {
   private readonly desk: CapabilityDesk
   private readonly approvals: ApprovalDesk
   private readonly budget: DailyBudget
+  readonly routines: RoutineBook
   private readonly claudePort: AgentPort
   private readonly aiSdkPort: AgentPort
 
@@ -52,6 +54,11 @@ export class AgentHost {
     this.desk = new CapabilityDesk(ws, events)
     this.approvals = new ApprovalDesk(ws, events, this.desk)
     this.budget = new DailyBudget(ws)
+    this.routines = new RoutineBook(ws, {
+      prompt: (sessionId, text) => this.prompt(sessionId, text),
+      isRunning: (sessionId) => this.isRunning(sessionId),
+      waitLonger: (sessionId) => this.approvals.waitLonger(sessionId),
+    })
     expirePendingApprovals(ws)
 
     const runHankoAction = (action: unknown) => this.desk.execute(action)
@@ -179,7 +186,7 @@ export class AgentHost {
 
     try {
       this.record(sessionId, { kind: 'user_message', text })
-      const refusal = this.refusal()
+      const refusal = this.budget.refusal()
       if (refusal) {
         this.fail(sessionId, refusal)
         return
@@ -228,15 +235,6 @@ export class AgentHost {
       // A turn that ended — however — has nobody left to hear its questions.
       this.approvals.dropSession(sessionId)
     }
-  }
-
-  private refusal(): string | null {
-    const state = this.breaker()
-    if (state.kind === 'open') return null
-    if (state.kind === 'paused') return 'Washi is paused for this workspace. Resume it in settings.'
-    return state.reason === 'turns'
-      ? `Washi has run ${state.turns} turns today, its limit of ${state.turnCap}. Resume it in settings, or wait until tomorrow.`
-      : `This workspace has spent $${state.costUsd.toFixed(2)} of its $${state.capUsd} daily stop. Resume or raise it in settings.`
   }
 
   private close(

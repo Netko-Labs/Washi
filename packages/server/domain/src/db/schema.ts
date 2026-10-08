@@ -110,6 +110,21 @@ export const agentSpendTable = sqliteTable('agent_spend', {
   updatedAt: text('updated_at').notNull(),
 })
 
+export const routineTable = sqliteTable('routines', {
+  id: text('id').primaryKey(),
+  title: text('title').notNull(),
+  prompt: text('prompt').notNull(),
+  /** Minutes after UTC midnight. Clients convert to and from their own clock. */
+  minuteUtc: integer('minute_utc').notNull(),
+  enabled: integer('enabled', { mode: 'boolean' }).notNull().default(true),
+  /** YYYY-MM-DD (UTC) of the last run, so a day runs at most once. */
+  lastRunDay: text('last_run_day'),
+  /** The conversation every run of this routine appends to. */
+  sessionId: text('session_id'),
+  createdBy: text('created_by'),
+  createdAt: text('created_at').notNull(),
+})
+
 export const appMetaTable = sqliteTable('app_meta', {
   key: text('key').primaryKey(),
   value: text('value').notNull(),

@@ -90,6 +90,14 @@ are gone — none of them did anything, and features.md §2 forbids a control th
       inline), today's money. Read from the transcript and the desk; nothing new stored, nothing
       invented. "While you slept" waits on scheduled runs, which do not exist yet.
 - [x] **Who said yes** — `approvals.resolved_by`, stamped from the session.
+- [x] **Routines** (the design's "while you slept") — a prompt + a daily time, created by a
+      person, run by the server's minute clock over every workspace file (opened or not). A run
+      is an ordinary turn: the daily stop, the desk and the receipt all apply, in the routine's
+      own conversation, so Today retells it with a badge. Writes wait for a person — 12h, not
+      5min, for a routine session. Marked as run *before* it runs, so a crash can't run it
+      twice; a routine made after its minute starts tomorrow. Times are stored as UTC minutes
+      and shown on the client's clock. Runs on the desktop too, while the app is open.
+      Driven in the browser: add → Run now → the turn lands in What happened.
 - `host.ts` is 293 lines: the daily stop moved to `budget.ts`.
 
 ## Reviewed twice, by agents that did not write it
