@@ -90,7 +90,23 @@ are gone — none of them did anything, and features.md §2 forbids a control th
       inline), today's money. Read from the transcript and the desk; nothing new stored, nothing
       invented. "While you slept" waits on scheduled runs, which do not exist yet.
 - [x] **Who said yes** — `approvals.resolved_by`, stamped from the session.
-- `host.ts` is 249 lines: the daily stop moved to `budget.ts`.
+- `host.ts` is 293 lines: the daily stop moved to `budget.ts`.
+
+## Reviewed twice, by agents that did not write it
+
+Round 1 found 8 defects; all fixed, each in its own commit with a test that reproduces it
+(event bus deaf after 256 events · turn-cap trip unresumable · Console login billed as plan ·
+Stop ignored during the probe · concurrent prompt corrupting a turn · approvals outliving their
+turn · web streams resubscribing on re-render · Stop as a way around the daily stop).
+Round 2 found that **my bus fix introduced a lost wake-up** — and `check:live` caught the same
+thing independently: transcript silent, page opened. Rewritten; three new bus tests reproduce
+the lost wake-up, a post-restart `lastEventId`, and an orphaned waiter set.
+
+Still open from round 2 (stated, not fixed):
+- Stopping *mid-generation* is still priced low: a response never completed has no usage to
+  count. The common Stop-while-writing case undercounts.
+- A stale 60s probe cache can drop the $5 per-turn ceiling on a metered turn if someone
+  switches a claude.ai login to a Console login inside that minute. Billing stays correct.
 
 ## Caught while building
 
@@ -459,6 +475,10 @@ dashboard are rewritten in phase 3 rather than patched.
 - No turn cancel: a running turn cannot be interrupted (P6).
 
 ## Lessons
+
+- A fix to a concurrency primitive needs a slow-consumer test. Iterating a snapshot of the
+  buffer looked equivalent and lost every event emitted while the consumer was mid-write.
+- `check:live` caught a bug 175 unit tests did not. Run it after touching the bus or the host.
 
 - drizzle `.run()` types as void on bun-sqlite — use raw `getSqlite().query().run()`
   when you need `changes`.
