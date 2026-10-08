@@ -102,11 +102,13 @@ Round 2 found that **my bus fix introduced a lost wake-up** — and `check:live`
 thing independently: transcript silent, page opened. Rewritten; three new bus tests reproduce
 the lost wake-up, a post-restart `lastEventId`, and an orphaned waiter set.
 
-Still open from round 2 (stated, not fixed):
-- Stopping *mid-generation* is still priced low: a response never completed has no usage to
-  count. The common Stop-while-writing case undercounts.
-- A stale 60s probe cache can drop the $5 per-turn ceiling on a metered turn if someone
-  switches a claude.ai login to a Console login inside that minute. Billing stays correct.
+Round 2's leftovers, closed: the Claude port counts a response from its first stream event
+(`includePartialMessages`), so a Stop before anything completed is priced (live: $0.0047, not
+$0); plan turns keep a $25 notional ceiling rather than none, so a stale probe can't remove the
+guard; a crashed fire-and-forget turn is logged, not swallowed.
+
+Still open: the **AI SDK port** prices only finished steps — an OpenRouter turn stopped
+mid-step undercounts that step.
 
 ## Caught while building
 

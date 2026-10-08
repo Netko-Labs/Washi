@@ -1,6 +1,9 @@
 /** One turn's ceiling, handed to the SDK. */
 export const MAX_TURN_BUDGET_USD = 5
 
+/** The same ceiling for a plan turn, whose cost is notional — high, but never absent. */
+export const MAX_PLAN_TURN_BUDGET_USD = 25
+
 /**
  * A day's ceiling for the whole workspace — a safety stop, not a quota. This is
  * OSS with no pricing; the cap exists so an agent loop on someone else's key

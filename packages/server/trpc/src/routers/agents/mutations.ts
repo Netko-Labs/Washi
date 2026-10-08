@@ -22,7 +22,9 @@ export const agentMutations = router({
           message: 'A turn is already running in this conversation. Stop it first.',
         })
       }
-      void ctx.host.prompt(input.sessionId, input.text).catch(() => {})
+      void ctx.host.prompt(input.sessionId, input.text).catch((error) => {
+        console.error('[washi] a turn crashed outside its own error handling', error)
+      })
     }),
   /** Stop the running turn. Its open approvals are answered "no" on the way out. */
   cancel: workspaceProcedure

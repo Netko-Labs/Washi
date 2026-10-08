@@ -2,11 +2,12 @@ import { query } from '@anthropic-ai/claude-agent-sdk'
 import type { AgentUpdate, TurnBilling } from '@washi/domain'
 import { type ModelCatalogue, priceTurn } from '@washi/models'
 import type { Workspace } from '@washi/repository'
-import { agentEnv, MAX_TURN_BUDGET_USD } from '../lib'
+import { agentEnv, MAX_PLAN_TURN_BUDGET_USD, MAX_TURN_BUDGET_USD } from '../lib'
 import { normalizeMessage } from '../normalize'
 import { createWashiTools } from '../tools'
 import { DISALLOWED_BUILTINS, PLAN_SOURCES, REJECTED_PATTERN } from './constants'
 import type { AgentPort, PromptRequest, ToolVerdict, TurnResult } from './types'
+import { createUsageTally } from './usage'
 
 export interface ClaudeSdkPortDeps {
   ws: Workspace
@@ -50,10 +51,7 @@ export function createClaudeSdkPort(deps: ClaudeSdkPortDeps): AgentPort {
       let model: string | undefined
       let costUsd: number | null = null
       let error: string | undefined
-      // One API response arrives as several assistant messages sharing an id
-      // and its usage; count each response once.
-      const counted = new Set<string>()
-      const spent = { inputTokens: 0, outputTokens: 0, cachedInputTokens: 0 }
+      const usage = createUsageTally()
 
       const stream = query({
         prompt: request.text,
@@ -69,11 +67,15 @@ export function createClaudeSdkPort(deps: ClaudeSdkPortDeps): AgentPort {
             }),
           },
           strictMcpConfig: true,
+          // Stream events carry usage from a response's first byte, which is what
+          // prices a turn stopped mid-generation.
+          includePartialMessages: true,
           tools: [],
           disallowedTools: DISALLOWED_BUILTINS,
           settingSources: [],
-          // A per-turn dollar ceiling only means something when dollars are spent.
-          maxBudgetUsd: onPlan ? undefined : MAX_TURN_BUDGET_USD,
+          // Notional on a plan, so a far higher ceiling — but never none: the probe
+          // that said "plan" can be a minute stale.
+          maxBudgetUsd: onPlan ? MAX_PLAN_TURN_BUDGET_USD : MAX_TURN_BUDGET_USD,
           // Replaces the subprocess env rather than merging — see agentEnv. A
           // local CLI gets no key at all, so it authenticates as its own login.
           env: agentEnv(local ? null : credential.apiKey),
@@ -92,14 +94,16 @@ export function createClaudeSdkPort(deps: ClaudeSdkPortDeps): AgentPort {
             if (onPlan && PLAN_SOURCES.has(message.apiKeySource)) billing = 'plan'
             continue
           }
-          if (message.type === 'assistant' && !counted.has(message.message.id)) {
-            counted.add(message.message.id)
-            const usage = message.message.usage
-            const cached = usage.cache_read_input_tokens ?? 0
-            spent.inputTokens +=
-              usage.input_tokens + cached + (usage.cache_creation_input_tokens ?? 0)
-            spent.outputTokens += usage.output_tokens
-            spent.cachedInputTokens += cached
+          if (message.type === 'stream_event') {
+            if (message.event.type === 'message_start') {
+              usage.started(message.event.message.id, message.event.message.usage)
+            } else if (message.event.type === 'message_delta') {
+              usage.delta(message.event.usage)
+            }
+            continue
+          }
+          if (message.type === 'assistant') {
+            usage.completed(message.message.id, message.message.usage)
           }
           for (const update of normalizeMessage(message)) {
             if (update.kind === 'turn_done') {
@@ -119,7 +123,7 @@ export function createClaudeSdkPort(deps: ClaudeSdkPortDeps): AgentPort {
         // The SDK reports no total for a stopped turn. Price what was spent, so a
         // Stop is never a way around the daily stop.
         if (costUsd == null && model) {
-          costUsd = priceTurn(await deps.catalogue.model('anthropic', model), spent)
+          costUsd = priceTurn(await deps.catalogue.model('anthropic', model), usage.total())
         }
         return { costUsd, billing, model, resumeToken, cancelled: true }
       }
