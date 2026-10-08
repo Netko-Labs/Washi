@@ -56,8 +56,10 @@ export class AgentHost {
 
     const runHankoAction = (action: unknown) => this.desk.execute(action)
     const openSheet = (id: string) => this.events?.openSheet(id)
+    const models = catalogue ?? createModelCatalogue()
     this.claudePort = createClaudeSdkPort({
       ws,
+      catalogue: models,
       instructions: SYSTEM_INSTRUCTIONS,
       runHankoAction,
       openSheet,
@@ -69,7 +71,7 @@ export class AgentHost {
       runHankoAction,
       openSheet,
       gate: this.approvals,
-      catalogue: catalogue ?? createModelCatalogue(),
+      catalogue: models,
     })
   }
 

@@ -72,6 +72,8 @@ export function createAiSdkPort({
       })
 
       const seen = new Set<string>()
+      // Per-step usage, so a Stop still knows what it spent.
+      const spent = { inputTokens: 0, outputTokens: 0, cachedInputTokens: 0 }
 
       try {
         for await (const part of stream.fullStream) {
@@ -99,6 +101,12 @@ export function createAiSdkPort({
             })
             continue
           }
+          if (part.type === 'finish-step') {
+            spent.inputTokens += part.usage.inputTokens ?? 0
+            spent.outputTokens += part.usage.outputTokens ?? 0
+            spent.cachedInputTokens += part.usage.inputTokenDetails?.cacheReadTokens ?? 0
+            continue
+          }
           if (part.type === 'tool-error' && seen.has(part.toolCallId)) {
             emit({ kind: 'tool_call_update', toolCallId: part.toolCallId, status: 'failed' })
           }
@@ -107,7 +115,10 @@ export function createAiSdkPort({
         if (!request.signal?.aborted) throw cause
       }
       if (request.signal?.aborted) {
-        return { costUsd: null, billing: 'metered', model, cancelled: true }
+        const entry = await catalogue.model(request.model.provider, model)
+        // A stopped turn still spent tokens; pricing them keeps Stop from
+        // being a way around the daily stop.
+        return { costUsd: priceTurn(entry, spent), billing: 'metered', model, cancelled: true }
       }
 
       // models.dev publishes per-MTok prices, so a provider that bills in

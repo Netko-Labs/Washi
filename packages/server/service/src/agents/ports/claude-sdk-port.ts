@@ -1,5 +1,6 @@
 import { query } from '@anthropic-ai/claude-agent-sdk'
 import type { AgentUpdate, TurnBilling } from '@washi/domain'
+import { type ModelCatalogue, priceTurn } from '@washi/models'
 import type { Workspace } from '@washi/repository'
 import { agentEnv, MAX_TURN_BUDGET_USD } from '../lib'
 import { normalizeMessage } from '../normalize'
@@ -9,6 +10,8 @@ import type { AgentPort, PromptRequest, ToolVerdict, TurnResult } from './types'
 
 export interface ClaudeSdkPortDeps {
   ws: Workspace
+  /** Prices a stopped turn, which the SDK never reports a total for. */
+  catalogue: ModelCatalogue
   instructions: string
   runHankoAction: (input: unknown) => Promise<void>
   openSheet?: (id: string) => void
@@ -47,6 +50,10 @@ export function createClaudeSdkPort(deps: ClaudeSdkPortDeps): AgentPort {
       let model: string | undefined
       let costUsd: number | null = null
       let error: string | undefined
+      // One API response arrives as several assistant messages sharing an id
+      // and its usage; count each response once.
+      const counted = new Set<string>()
+      const spent = { inputTokens: 0, outputTokens: 0, cachedInputTokens: 0 }
 
       const stream = query({
         prompt: request.text,
@@ -85,6 +92,15 @@ export function createClaudeSdkPort(deps: ClaudeSdkPortDeps): AgentPort {
             if (onPlan && PLAN_SOURCES.has(message.apiKeySource)) billing = 'plan'
             continue
           }
+          if (message.type === 'assistant' && !counted.has(message.message.id)) {
+            counted.add(message.message.id)
+            const usage = message.message.usage
+            const cached = usage.cache_read_input_tokens ?? 0
+            spent.inputTokens +=
+              usage.input_tokens + cached + (usage.cache_creation_input_tokens ?? 0)
+            spent.outputTokens += usage.output_tokens
+            spent.cachedInputTokens += cached
+          }
           for (const update of normalizeMessage(message)) {
             if (update.kind === 'turn_done') {
               costUsd = update.costUsd ?? null
@@ -99,7 +115,14 @@ export function createClaudeSdkPort(deps: ClaudeSdkPortDeps): AgentPort {
         error = cause instanceof Error ? cause.message : String(cause)
       }
 
-      if (abort.signal.aborted) return { costUsd, billing, model, resumeToken, cancelled: true }
+      if (abort.signal.aborted) {
+        // The SDK reports no total for a stopped turn. Price what was spent, so a
+        // Stop is never a way around the daily stop.
+        if (costUsd == null && model) {
+          costUsd = priceTurn(await deps.catalogue.model('anthropic', model), spent)
+        }
+        return { costUsd, billing, model, resumeToken, cancelled: true }
+      }
       if (error && REJECTED_PATTERN.test(error)) error = REJECTED[credential.kind]
 
       return { costUsd, billing, model, resumeToken, error }
