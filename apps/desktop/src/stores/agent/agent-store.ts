@@ -22,6 +22,7 @@ interface AgentState {
   createSession: () => Promise<void>
   selectSession: (id: string) => Promise<void>
   sendPrompt: (text: string) => Promise<void>
+  stopTurn: () => Promise<void>
   resolveApproval: (id: string, decision: ApprovalDecision) => Promise<void>
 }
 
@@ -120,6 +121,11 @@ export const useAgentStore = create<AgentState>((set, get) => ({
     if (!sessionId || !text.trim()) return
     set({ running: true })
     await api.agents.prompt.mutate({ sessionId, text })
+  },
+
+  stopTurn: async () => {
+    const sessionId = get().activeSessionId
+    if (sessionId) await api.agents.cancel.mutate({ sessionId })
   },
 
   resolveApproval: async (id, decision) => {

@@ -58,6 +58,18 @@ The Agents tab, inside the real app with launchd's PATH (no shell), finds
 ANTHROPIC_API_KEY set. Its static design rows (authorship, autonomy, scheduled runs, revoke)
 are gone — none of them did anything, and features.md §2 forbids a control that lies.
 
+## +1 · Stop, and an honest composer (2026-10-08)
+
+- [x] **Stop** — `agents.cancel`; one AbortController per running turn; a stopped turn answers
+      its open approvals "no" and ends `cancelled`, not `error`. Send becomes Stop on both clients.
+      Live: cancelled while blocked on the desk → `stopReason: cancelled`, session idle.
+- [x] **Composer** — the desktop's fake "Sonnet 4.5" picker and "32k / 200k" meter are gone;
+      it shows what it actually thinks with (`Claude Code · max`).
+- [x] **`check:live`** — the golden path in the real desktop app, opt-in because it spends plan
+      usage: ask → the write stops at the desk → Accept → the page lands → receipt
+      `on your Claude plan · 19.4s · saved $0.03 · claude-opus-5-5`. 5/5 in 31s.
+- `host.ts` is 249 lines: the daily stop moved to `budget.ts`.
+
 ## Caught while building
 
 - **Every transcript on a hosted server was public.** `onAgentUpdate` / `onApprovalRequested`

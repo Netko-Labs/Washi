@@ -93,6 +93,7 @@ export function createClaudeSdkPort(deps: ClaudeSdkPortDeps): AgentPort {
         error = cause instanceof Error ? cause.message : String(cause)
       }
 
+      if (abort.signal.aborted) return { costUsd, billing, model, resumeToken, cancelled: true }
       if (error && REJECTED_PATTERN.test(error)) error = REJECTED[credential.kind]
 
       return { costUsd, billing, model, resumeToken, error }

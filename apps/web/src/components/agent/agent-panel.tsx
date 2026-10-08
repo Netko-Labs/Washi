@@ -1,4 +1,4 @@
-import { IconRefresh, IconSend, IconX } from '@tabler/icons-react'
+import { IconPlayerStopFilled, IconRefresh, IconSend, IconX } from '@tabler/icons-react'
 import { useState } from 'react'
 import { ApprovalPrompt } from './approval-prompt'
 import { useAgent } from './lib'
@@ -17,7 +17,7 @@ export function AgentPanel({
   onClose: () => void
   onSheetsChanged: () => void
 }) {
-  const { transcript, approvals, running, error, send, decide, reset } = useAgent(
+  const { transcript, approvals, running, error, send, stop, decide, reset } = useAgent(
     workspaceId,
     onSheetsChanged,
   )
@@ -82,14 +82,25 @@ export function AgentPanel({
           placeholder="Ask for a page…"
           className="max-h-32 min-h-11 flex-1 resize-none rounded-xl border border-border bg-background px-3 py-2.5 text-[13.5px] outline-none focus-visible:border-primary"
         />
-        <button
-          type="submit"
-          disabled={running || !draft.trim()}
-          aria-label="Send"
-          className="grid size-11 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground disabled:opacity-40"
-        >
-          <IconSend className="size-4" />
-        </button>
+        {running ? (
+          <button
+            type="button"
+            onClick={() => void stop()}
+            aria-label="Stop"
+            className="grid size-11 shrink-0 place-items-center rounded-xl bg-foreground text-background"
+          >
+            <IconPlayerStopFilled className="size-4" />
+          </button>
+        ) : (
+          <button
+            type="submit"
+            disabled={!draft.trim()}
+            aria-label="Send"
+            className="grid size-11 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground disabled:opacity-40"
+          >
+            <IconSend className="size-4" />
+          </button>
+        )}
       </form>
     </aside>
   )

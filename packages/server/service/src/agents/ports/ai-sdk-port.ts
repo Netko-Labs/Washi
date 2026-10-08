@@ -71,34 +71,41 @@ export function createAiSdkPort({
 
       const seen = new Set<string>()
 
-      for await (const part of stream.fullStream) {
-        if (part.type === 'text-delta' && part.text) {
-          emit({ kind: 'message_chunk', text: part.text })
-          continue
+      try {
+        for await (const part of stream.fullStream) {
+          if (part.type === 'text-delta' && part.text) {
+            emit({ kind: 'message_chunk', text: part.text })
+            continue
+          }
+          if (part.type === 'tool-call') {
+            seen.add(part.toolCallId)
+            emit({
+              kind: 'tool_call',
+              toolCallId: part.toolCallId,
+              title: part.toolName,
+              toolKind: isReadTool(part.toolName) ? 'read' : 'edit',
+              status: 'in_progress',
+              input: part.input,
+            })
+            continue
+          }
+          if (part.type === 'tool-result' && seen.has(part.toolCallId)) {
+            emit({
+              kind: 'tool_call_update',
+              toolCallId: part.toolCallId,
+              status: 'completed',
+            })
+            continue
+          }
+          if (part.type === 'tool-error' && seen.has(part.toolCallId)) {
+            emit({ kind: 'tool_call_update', toolCallId: part.toolCallId, status: 'failed' })
+          }
         }
-        if (part.type === 'tool-call') {
-          seen.add(part.toolCallId)
-          emit({
-            kind: 'tool_call',
-            toolCallId: part.toolCallId,
-            title: part.toolName,
-            toolKind: isReadTool(part.toolName) ? 'read' : 'edit',
-            status: 'in_progress',
-            input: part.input,
-          })
-          continue
-        }
-        if (part.type === 'tool-result' && seen.has(part.toolCallId)) {
-          emit({
-            kind: 'tool_call_update',
-            toolCallId: part.toolCallId,
-            status: 'completed',
-          })
-          continue
-        }
-        if (part.type === 'tool-error' && seen.has(part.toolCallId)) {
-          emit({ kind: 'tool_call_update', toolCallId: part.toolCallId, status: 'failed' })
-        }
+      } catch (cause) {
+        if (!request.signal?.aborted) throw cause
+      }
+      if (request.signal?.aborted) {
+        return { costUsd: null, billing: 'metered', model, cancelled: true }
       }
 
       // models.dev publishes per-MTok prices, so a provider that bills in

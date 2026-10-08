@@ -15,6 +15,7 @@ export function usd(amount: number): string {
 export function receiptLine(update: TurnDone): string {
   const plan = update.billing === 'plan'
   const parts = [plan ? 'on your Claude plan' : 'ran on this computer']
+  if (update.stopReason === 'cancelled') parts.unshift('stopped')
   if (update.durationMs != null) parts.push(duration(update.durationMs))
   if (update.costUsd != null)
     parts.push(plan ? `saved ${usd(update.costUsd)}` : usd(update.costUsd))

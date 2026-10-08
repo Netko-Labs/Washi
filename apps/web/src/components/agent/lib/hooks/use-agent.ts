@@ -68,6 +68,10 @@ export function useAgent(workspaceId: string, onSheetsChanged: () => void) {
     }
   }
 
+  const stop = async () => {
+    if (sessionId) await api.agents.cancel.mutate({ sessionId })
+  }
+
   const decide = async (id: string, decision: ApprovalDecision) => {
     setApprovals((prev) => prev.filter((approval) => approval.id !== id))
     await api.agents.resolveApproval.mutate({ id, decision })
@@ -82,5 +86,5 @@ export function useAgent(workspaceId: string, onSheetsChanged: () => void) {
     setApprovals([])
   }
 
-  return { sessionId, transcript, approvals, running, error, send, decide, reset }
+  return { sessionId, transcript, approvals, running, error, send, stop, decide, reset }
 }

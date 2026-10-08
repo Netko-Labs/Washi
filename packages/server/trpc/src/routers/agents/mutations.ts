@@ -16,6 +16,10 @@ export const agentMutations = router({
     .mutation(({ ctx, input }) => {
       void ctx.host.prompt(input.sessionId, input.text)
     }),
+  /** Stop the running turn. Its open approvals are answered "no" on the way out. */
+  cancel: workspaceProcedure
+    .input(z.object({ sessionId: z.string() }))
+    .mutation(({ ctx, input }) => ({ cancelled: ctx.host.cancel(input.sessionId) })),
   /** Clearing the breaker is a person's decision — nothing clears it on a timer. */
   resume: workspaceProcedure.mutation(({ ctx }) => {
     ctx.host.resume()

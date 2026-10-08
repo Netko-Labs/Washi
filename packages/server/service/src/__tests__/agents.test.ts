@@ -161,3 +161,29 @@ describe('wsx guardrails stay closed for agents', () => {
     expect(sheet.id).toBeTruthy()
   })
 })
+
+describe('stop', () => {
+  test('nothing running means nothing to stop', () => {
+    const { host } = makeHost()
+    expect(host.cancel('no-such-session')).toBe(false)
+  })
+
+  test('a stopped turn answers its open approvals with no, and only its own', async () => {
+    const { host, approvals } = makeHost()
+    const mine = createSession(ws, 'mine')
+    const theirs = createSession(ws, 'theirs')
+    // biome-ignore lint/complexity/useLiteralKeys: reaching into a private member for the test
+    const desk = host['approvals']
+    const pendingMine = desk.gateSdkTool(mine.id, 'mcp__washi__sheet_create', { title: 'x' })
+    const pendingTheirs = desk.gateSdkTool(theirs.id, 'mcp__washi__sheet_create', { title: 'y' })
+    await Bun.sleep(5)
+    expect(approvals).toHaveLength(2)
+
+    desk.dropSession(mine.id)
+    expect((await pendingMine).behavior).toBe('deny')
+    expect(desk.hasPending()).toBe(true)
+
+    host.resolveApprovalRequest(approvals[1]!.id, 'allow_once')
+    expect((await pendingTheirs).behavior).toBe('allow')
+  })
+})

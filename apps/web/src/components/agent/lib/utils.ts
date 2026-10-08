@@ -14,6 +14,7 @@ export function formatUsd(amount: number): string {
 export function receiptParts(update: TurnDoneView): string[] {
   const plan = update.billing === 'plan'
   const parts = [plan ? 'on your Claude plan' : 'ran on your server']
+  if (update.stopReason === 'cancelled') parts.unshift('stopped')
   if (update.durationMs != null) parts.push(formatDuration(update.durationMs))
   if (update.costUsd != null) {
     parts.push(plan ? `saved ${formatUsd(update.costUsd)}` : formatUsd(update.costUsd))

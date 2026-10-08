@@ -1,23 +1,15 @@
 import type { AgentUpdate, ApprovalDecision } from '@washi/domain'
 import { createModelCatalogue, type ModelCatalogue } from '@washi/models'
 import {
-  acknowledgedSpend,
   appendTurn,
-  getAppMeta,
   getSdkSessionId,
   getSheet,
   getTranscript,
-  pauseAgent,
-  pausedOn,
-  recordSpend,
-  resumeAgent,
-  setAppMeta,
-  spendForDay,
-  today,
   updateSession,
   type Workspace,
 } from '@washi/repository'
 import { ApprovalDesk } from './approvals'
+import { DailyBudget } from './budget'
 import { CapabilityDesk } from './desk'
 import { createEmbeddedKeySource } from './inference'
 import type {
@@ -31,24 +23,20 @@ import type {
   InferencePreference,
   InferenceStatus,
 } from './lib'
-import {
-  DAILY_CAP_USD_KEY,
-  DAILY_TURN_CAP_KEY,
-  DEFAULT_DAILY_CAP_USD,
-  DEFAULT_DAILY_TURN_CAP,
-  SYSTEM_INSTRUCTIONS,
-} from './lib'
+import { SYSTEM_INSTRUCTIONS } from './lib'
 import { proposedDiff } from './normalize'
 import { type AgentPort, createAiSdkPort, createClaudeSdkPort, type TurnResult } from './ports'
 
 export class AgentHost {
   private events: AgentHostEvents | null = null
-  private running = 0
+  /** One per running turn, keyed by session — Stop aborts exactly that turn. */
+  private readonly turns = new Map<string, AbortController>()
 
   private readonly ws: Workspace
   private readonly keys: AgentKeySource
   private readonly desk: CapabilityDesk
   private readonly approvals: ApprovalDesk
+  private readonly budget: DailyBudget
   private readonly claudePort: AgentPort
   private readonly aiSdkPort: AgentPort
 
@@ -59,6 +47,7 @@ export class AgentHost {
     const events = () => this.events
     this.desk = new CapabilityDesk(ws, events)
     this.approvals = new ApprovalDesk(ws, events, this.desk)
+    this.budget = new DailyBudget(ws)
 
     const runHankoAction = (action: unknown) => this.desk.execute(action)
     this.claudePort = createClaudeSdkPort({
@@ -76,53 +65,12 @@ export class AgentHost {
     })
   }
 
-  /** The cap is per workspace and settable, because a sane default is not a universal one. */
-  private dailyCap(): number {
-    return this.setting(DAILY_CAP_USD_KEY, DEFAULT_DAILY_CAP_USD)
-  }
-
-  /** The bound that still holds when a model publishes no price at all. */
-  private dailyTurnCap(): number {
-    return this.setting(DAILY_TURN_CAP_KEY, DEFAULT_DAILY_TURN_CAP)
-  }
-
-  private setting(key: string, fallback: number): number {
-    const stored = getAppMeta(this.ws, key)
-    const parsed = stored ? Number(stored) : Number.NaN
-    return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback
-  }
-
-  /**
-   * A safety stop, not a quota (Q25). It answers one question — may another
-   * turn start — and only a person answers it back.
-   */
   breaker(): BreakerState {
-    const day = today()
-    const paused = pausedOn(this.ws)
-    if (paused) return { kind: 'paused', day: paused }
-    const { costUsd, turns } = spendForDay(this.ws, day)
-    const capUsd = this.dailyCap()
-    // Measured from the last acknowledgement, so Resume grants real headroom.
-    if (costUsd - acknowledgedSpend(this.ws, day) >= capUsd) {
-      return { kind: 'tripped', day, costUsd, capUsd }
-    }
-    // An unpriced model (openrouter/auto routes to anything) contributes $0 to
-    // the line above forever, so turns are the bound that still applies.
-    if (turns >= this.dailyTurnCap()) return { kind: 'tripped', day, costUsd, capUsd }
-    return { kind: 'open' }
+    return this.budget.breaker()
   }
 
   spend(): AgentSpendReport {
-    const { day, costUsd, savedUsd, turns } = spendForDay(this.ws)
-    return {
-      day,
-      costUsd,
-      savedUsd,
-      turns,
-      capUsd: this.dailyCap(),
-      turnCap: this.dailyTurnCap(),
-      paused: Boolean(pausedOn(this.ws)),
-    }
+    return this.budget.report()
   }
 
   /** What the shell shows without opening settings: is Washi idle, busy, or waiting on someone. */
@@ -130,7 +78,7 @@ export class AgentHost {
     const breaker = this.breaker()
     const state = this.approvals.hasPending()
       ? 'needs_you'
-      : this.running > 0
+      : this.turns.size > 0
         ? 'working'
         : breaker.kind === 'open'
           ? 'idle'
@@ -139,13 +87,20 @@ export class AgentHost {
   }
 
   setDailyCap(capUsd: number): AgentSpendReport {
-    if (!Number.isFinite(capUsd) || capUsd <= 0) throw new Error('a daily stop must be above $0')
-    setAppMeta(this.ws, DAILY_CAP_USD_KEY, String(capUsd))
-    return this.spend()
+    return this.budget.setCap(capUsd)
   }
 
   resume(): void {
-    resumeAgent(this.ws)
+    this.budget.resume()
+  }
+
+  /** Stop the session's running turn. Its open approvals are answered "no" on the way out. */
+  cancel(sessionId: string): boolean {
+    const turn = this.turns.get(sessionId)
+    if (!turn) return false
+    turn.abort()
+    this.approvals.dropSession(sessionId)
+    return true
   }
 
   inference(): Promise<InferenceStatus> {
@@ -202,9 +157,14 @@ export class AgentHost {
     // AI SDK, where Washi owns the history.
     const native = credential.provider === 'anthropic'
     const port = native ? this.claudePort : this.aiSdkPort
+    if (this.turns.has(sessionId)) {
+      this.fail(sessionId, 'A turn is already running in this conversation. Stop it first.')
+      return
+    }
     const started = Date.now()
+    const abort = new AbortController()
     updateSession(this.ws, sessionId, { status: 'running' })
-    this.running += 1
+    this.turns.set(sessionId, abort)
 
     try {
       const result = await port.prompt(
@@ -215,6 +175,7 @@ export class AgentHost {
           model: { provider: credential.provider, model: credential.model },
           history: native ? [] : this.history(sessionId),
           resumeToken: native ? getSdkSessionId(this.ws, sessionId) : null,
+          signal: abort.signal,
         },
         (update) => this.emit(sessionId, update),
       )
@@ -228,7 +189,7 @@ export class AgentHost {
       })
       updateSession(this.ws, sessionId, { status: 'error' })
     } finally {
-      this.running -= 1
+      this.turns.delete(sessionId)
     }
   }
 
@@ -238,9 +199,10 @@ export class AgentHost {
     result: TurnResult,
     durationMs: number,
   ) {
+    const stopReason = result.cancelled ? 'cancelled' : result.error ? 'error' : 'end_turn'
     this.record(sessionId, {
       kind: 'turn_done',
-      stopReason: result.error ? 'error' : 'end_turn',
+      stopReason,
       ...(result.error ? { error: result.error } : {}),
       ...(result.costUsd != null ? { costUsd: result.costUsd } : {}),
       billing: result.billing,
@@ -248,17 +210,13 @@ export class AgentHost {
       durationMs,
     })
     updateSession(this.ws, sessionId, {
-      status: result.error ? 'error' : 'idle',
+      status: stopReason === 'error' ? 'error' : 'idle',
       ...(result.resumeToken ? { sdkSessionId: result.resumeToken } : {}),
       ...(result.costUsd != null && result.billing === 'metered'
         ? { costUsd: result.costUsd }
         : {}),
     })
-
-    // Every turn counts, priced or not, plan or key. Only metered dollars move the cap.
-    const total = recordSpend(this.ws, result.costUsd, { billing: result.billing })
-    const overSpend = total.costUsd >= this.dailyCap() + acknowledgedSpend(this.ws)
-    if (overSpend || total.turns >= this.dailyTurnCap()) pauseAgent(this.ws)
+    this.budget.charge(result.costUsd, result.billing)
   }
 
   private fail(sessionId: string, error: string) {

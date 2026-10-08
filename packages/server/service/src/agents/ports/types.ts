@@ -31,6 +31,8 @@ export interface TurnResult {
   resumeToken?: string | null
   /** Set when the turn ended badly but the port still produced a result. */
   error?: string
+  /** A person pressed Stop. Not an error: nothing went wrong, someone changed their mind. */
+  cancelled?: boolean
 }
 
 /**

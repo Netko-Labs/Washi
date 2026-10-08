@@ -58,6 +58,7 @@ export default defineCheck(async (app: CheckDriver) => {
   await app.click('[data-agent-fab]')
   await app.waitFor('[data-agent-panel]')
   await app.expectText('watching this vault')
+  await app.waitFor('[data-inference]', { timeoutMs: 10_000 })
 
   app.step('clearing the conversation starts a fresh session with the empty chat')
   await app.click('[aria-label="Clear conversation"]')

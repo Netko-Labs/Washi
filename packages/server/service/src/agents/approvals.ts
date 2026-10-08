@@ -16,7 +16,10 @@ export class ApprovalDesk implements ToolGate {
   private readonly ws: Workspace
   private readonly events: EventsRef
   private readonly desk: CapabilityDesk
-  private readonly pending = new Map<string, (decision: ApprovalDecision) => void>()
+  private readonly pending = new Map<
+    string,
+    { sessionId: string; settle: (decision: ApprovalDecision) => void }
+  >()
   private readonly alwaysAllowed = new Map<string, Set<string>>()
 
   constructor(ws: Workspace, events: EventsRef, desk: CapabilityDesk) {
@@ -35,8 +38,15 @@ export class ApprovalDesk implements ToolGate {
 
   resolve(id: string, decision: ApprovalDecision): void {
     resolveApproval(this.ws, id, decision === 'reject_once' ? 'denied' : 'allowed')
-    this.pending.get(id)?.(decision)
+    this.pending.get(id)?.settle(decision)
     this.pending.delete(id)
+  }
+
+  /** A stopped turn takes its open questions with it: each one reads as a denial. */
+  dropSession(sessionId: string): void {
+    for (const [id, entry] of this.pending) {
+      if (entry.sessionId === sessionId) this.resolve(id, 'reject_once')
+    }
   }
 
   async approve(sessionId: string, toolName: string, input: unknown): Promise<boolean> {
@@ -89,9 +99,12 @@ export class ApprovalDesk implements ToolGate {
         resolveApproval(this.ws, request.id, 'denied')
         resolve('reject_once')
       }, APPROVAL_TIMEOUT_MS)
-      this.pending.set(request.id, (decision) => {
-        clearTimeout(timeout)
-        resolve(decision)
+      this.pending.set(request.id, {
+        sessionId,
+        settle: (decision) => {
+          clearTimeout(timeout)
+          resolve(decision)
+        },
       })
     })
   }
