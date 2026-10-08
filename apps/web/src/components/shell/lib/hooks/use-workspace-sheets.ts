@@ -13,7 +13,6 @@ export function useWorkspaceSheets(workspaceId: string) {
     try {
       const next = await api.sheets.list.query()
       setSheets(next)
-      setActiveId((current) => current ?? next[0]?.id ?? null)
       setError(null)
     } catch (cause) {
       setError(String(cause))

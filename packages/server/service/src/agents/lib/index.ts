@@ -5,7 +5,10 @@ export {
   DEFAULT_DAILY_CAP_USD,
   DEFAULT_DAILY_TURN_CAP,
   MAX_TURN_BUDGET_USD,
+  PROMPT_PREVIEW_CHARS,
   READ_TOOLS,
+  TODAY_TURN_LIMIT,
+  TODAY_WINDOW_MS,
 } from './constants'
 export { agentEnv } from './env'
 export type {
@@ -21,5 +24,7 @@ export type {
   InferenceStatus,
   LocalCliStatus,
   LocalModel,
+  TodayReport,
+  TurnSummary,
 } from './types'
 export { SYSTEM_INSTRUCTIONS } from './values'

@@ -4,6 +4,7 @@ import {
   IconPlus,
   IconSettings,
   IconSparkles,
+  IconSun,
   IconX,
 } from '@tabler/icons-react'
 import { useMemo, useState } from 'react'
@@ -12,6 +13,7 @@ import { AgentStatus } from '@/components/agent-status'
 import { FirstRunGate } from '@/components/first-run'
 import { SettingsScreen } from '@/components/settings'
 import { SheetView } from '@/components/sheet'
+import { TodayView } from '@/components/today'
 import { createPaperHost } from '@/lib/paper-host'
 import { api } from '@/lib/rpc'
 import type { WorkspaceSummary } from '@/lib/types'
@@ -126,6 +128,21 @@ export function WorkspaceShell({
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-2">
+          <button
+            type="button"
+            onClick={() => {
+              setActiveId(null)
+              setSettingsOpen(false)
+              setNavOpen(false)
+            }}
+            aria-current={activeId === null && !settingsOpen ? 'page' : undefined}
+            className={`flex h-11 w-full items-center gap-2 rounded-lg px-2.5 text-left text-[13.5px] ${
+              activeId === null && !settingsOpen ? 'bg-accent font-bold' : 'hover:bg-accent'
+            }`}
+          >
+            <IconSun className="size-4" />
+            Today
+          </button>
           <p className="px-2.5 py-2 font-bold text-[11px] text-muted-foreground tracking-[0.12em] uppercase">
             Pages
           </p>
@@ -177,7 +194,11 @@ export function WorkspaceShell({
           <SettingsScreen workspaceId={workspace.id} onClose={() => setSettingsOpen(false)} />
         ) : (
           <FirstRunGate workspace={workspace}>
-            <SheetView id={activeId} host={host} />
+            {activeId ? (
+              <SheetView id={activeId} host={host} />
+            ) : (
+              <TodayView workspace={workspace} onOpenAgent={() => setAgentOpen(true)} />
+            )}
           </FirstRunGate>
         )}
       </main>

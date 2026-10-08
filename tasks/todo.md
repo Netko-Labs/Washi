@@ -85,6 +85,11 @@ are gone — none of them did anything, and features.md §2 forbids a control th
       account gets 403 — checked against the live server). Listing your own invitations needs a
       verified email in Better Auth 1.7, which a box without SMTP can't give, so accept-by-link is
       the path. Driven in the browser: invite → sign out → open link → sign up → inside.
+- [x] **Today** (design board 2, honest version) — the web's home: what happened in the last
+      day (each turn's ask, the tools it touched, its receipt), Needs you (approvals answerable
+      inline), today's money. Read from the transcript and the desk; nothing new stored, nothing
+      invented. "While you slept" waits on scheduled runs, which do not exist yet.
+- [x] **Who said yes** — `approvals.resolved_by`, stamped from the session.
 - `host.ts` is 249 lines: the daily stop moved to `budget.ts`.
 
 ## Caught while building

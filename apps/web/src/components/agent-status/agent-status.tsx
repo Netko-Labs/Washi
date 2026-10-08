@@ -22,7 +22,8 @@ export function AgentStatus({ onOpenAgent, onOpenSettings }: AgentStatusProps) {
         <span className="text-muted-foreground">· {STATE_LABEL[status.state]}</span>
       </span>
       <span className="pl-4 font-mono text-[11px] text-muted-foreground">
-        today {formatUsd(status.costUsd)} of ${status.capUsd} · {status.turns} turns
+        today {formatUsd(status.costUsd)} of ${status.capUsd} · {status.turns}{' '}
+        {status.turns === 1 ? 'turn' : 'turns'}
         {status.savedUsd > 0 && ` · saved ${formatUsd(status.savedUsd)}`}
       </span>
     </button>

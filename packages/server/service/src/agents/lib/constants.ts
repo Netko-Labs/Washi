@@ -29,3 +29,8 @@ export const READ_TOOLS: ReadonlySet<string> = new Set([
 
 /** An unanswered approval is a denial, not a hang. */
 export const APPROVAL_TIMEOUT_MS = 5 * 60_000
+
+/** How far back Today looks, and how much of it a list should hold. */
+export const TODAY_WINDOW_MS = 24 * 60 * 60_000
+export const TODAY_TURN_LIMIT = 20
+export const PROMPT_PREVIEW_CHARS = 140

@@ -1,4 +1,4 @@
-import type { ApprovalRequest, CapabilityOrigin, TranscriptEntry } from '@washi/domain'
+import type { AgentUpdate, ApprovalRequest, CapabilityOrigin, TranscriptEntry } from '@washi/domain'
 import type { ProviderId } from '../ports/types'
 
 /**
@@ -91,3 +91,21 @@ export interface AgentHostEvents {
 }
 
 export type EventsRef = () => AgentHostEvents | null
+
+export interface TurnSummary {
+  sessionId: string
+  sessionTitle: string
+  /** What the person asked, trimmed for a list. */
+  prompt: string
+  /** Distinct tools the turn touched, in order. */
+  tools: string[]
+  receipt: Extract<AgentUpdate, { kind: 'turn_done' }>
+  /** Wall-clock ms of the receipt. */
+  at: number
+}
+
+export interface TodayReport {
+  turns: TurnSummary[]
+  pending: ApprovalRequest[]
+  spend: AgentSpendReport
+}

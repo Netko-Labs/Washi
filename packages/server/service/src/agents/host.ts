@@ -24,10 +24,12 @@ import type {
   InferencePreference,
   InferenceStatus,
   LocalModel,
+  TodayReport,
 } from './lib'
 import { SYSTEM_INSTRUCTIONS } from './lib'
 import { proposedDiff } from './normalize'
 import { type AgentPort, createAiSdkPort, createClaudeSdkPort, type TurnResult } from './ports'
+import { recentTurns } from './today'
 
 export class AgentHost {
   private events: AgentHostEvents | null = null
@@ -133,6 +135,11 @@ export class AgentHost {
 
   pendingApprovals(): ApprovalRequest[] {
     return this.approvals.list()
+  }
+
+  /** What happened, what needs you, what it cost — one read for the Today screen. */
+  today(): TodayReport {
+    return { turns: recentTurns(this.ws), pending: this.approvals.list(), spend: this.spend() }
   }
 
   resolveApprovalRequest(
