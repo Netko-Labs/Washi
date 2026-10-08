@@ -69,6 +69,12 @@ export default defineCheck(async (app: CheckDriver) => {
   await app.expectText('Ask me anything')
   await app.screenshot('m2-agent-panel')
 
+  app.step('the dashboard reports real turns, not invented ones')
+  await app.click('text=Dashboard')
+  await app.expectText('Saved by your plan')
+  await app.expectText('Turns today')
+  await app.screenshot('mlp-dashboard')
+
   app.step('the Agents tab says who Washi thinks with')
   await app.click('text=Local account')
   await app.click('text=Settings')
