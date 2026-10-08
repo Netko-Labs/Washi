@@ -1,11 +1,13 @@
-import { ACTIVITY, REVIEWS } from '@/components/dashboard/review-data'
+import { receiptLine } from '@/components/agent/lib'
 import { AgentMascot } from '@/components/mascot/AgentMascot'
-import { useViewStore } from '@/stores/view/view-store'
+import { useToday } from '@/components/shared/today'
+import { useAgentStore } from '@/stores/agent/agent-store'
 
-/** Inbox view (Washi.dc.html rev 2): review queue + activity feed in one place. */
+/** Everything Washi is waiting on, answerable here, then what it did — nothing invented. */
 export function Inbox() {
-  const { dismissedReviews, dismissReview } = useViewStore()
-  const pending = REVIEWS.filter((review) => !dismissedReviews.includes(review.id))
+  const { approvals, resolveApproval } = useAgentStore()
+  const { today } = useToday()
+  const turns = today?.turns ?? []
 
   return (
     <div className="flex-1 overflow-y-auto">
@@ -16,33 +18,37 @@ export function Inbox() {
         </p>
 
         <div className="mb-[26px] overflow-hidden rounded-[14px] border border-border bg-card">
-          {pending.map((review) => (
+          {approvals.map((request) => (
             <div
-              key={review.id}
+              key={request.id}
               className="flex items-center gap-3 border-border border-b px-4 py-3 last:border-0"
             >
               <AgentMascot state="suggesting" size={22} />
               <div className="min-w-0 flex-1">
-                <div className="truncate font-medium text-[13px]">{review.title}</div>
-                <div className="text-[11.5px] text-muted-foreground">{review.meta}</div>
+                <div className="truncate font-medium text-[13px]">
+                  Washi asks to run <span className="font-mono">{request.toolName}</span>
+                </div>
+                <div className="truncate font-mono text-[11.5px] text-muted-foreground">
+                  {JSON.stringify(request.input ?? {}).slice(0, 140)}
+                </div>
               </div>
               <button
                 type="button"
-                onClick={() => dismissReview(review.id)}
+                onClick={() => void resolveApproval(request.id, 'reject_once')}
                 className="h-[26px] rounded-lg border border-border bg-background px-2.5 text-[12px] hover:bg-accent"
               >
-                Dismiss
+                Reject
               </button>
               <button
                 type="button"
-                onClick={() => dismissReview(review.id)}
+                onClick={() => void resolveApproval(request.id, 'allow_once')}
                 className="h-[26px] rounded-lg bg-primary px-2.5 font-medium text-[12px] text-primary-foreground"
               >
-                Review
+                Accept
               </button>
             </div>
           ))}
-          {pending.length === 0 && (
+          {approvals.length === 0 && (
             <div className="flex items-center gap-2.5 p-4 text-[13px] text-muted-foreground">
               <AgentMascot state="done" size={22} />
               Inbox zero — Washi has nothing waiting on you.
@@ -54,12 +60,21 @@ export function Inbox() {
           Earlier
         </div>
         <div className="flex flex-col gap-3.5 pl-1">
-          {ACTIVITY.map((item) => (
-            <div key={item.text} className="flex gap-2.5">
+          {turns.length === 0 && (
+            <p className="text-[13px] text-muted-foreground">Nothing in the last day.</p>
+          )}
+          {turns.map((turn) => (
+            <div key={`${turn.sessionId}-${turn.at}`} className="flex gap-2.5">
               <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-agent" />
-              <div>
-                <div className="text-[13px] leading-normal">{item.text}</div>
-                <div className="text-[11px] text-muted-foreground">{item.when}</div>
+              <div className="min-w-0">
+                <div className="truncate text-[13px] leading-normal">
+                  {turn.prompt || turn.sessionTitle}
+                </div>
+                <div className="font-mono text-[11px] text-muted-foreground">
+                  {turn.receipt.stopReason === 'error'
+                    ? (turn.receipt.error ?? 'failed')
+                    : receiptLine(turn.receipt)}
+                </div>
               </div>
             </div>
           ))}

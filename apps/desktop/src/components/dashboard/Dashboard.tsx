@@ -1,8 +1,8 @@
 import { IconFileText } from '@tabler/icons-react'
 import { receiptLine, usd } from '@/components/agent/lib'
+import { useToday } from '@/components/shared/today'
 import { useSheetsStore } from '@/stores/sheets/sheets-store'
 import { useViewStore } from '@/stores/view/view-store'
-import { useToday } from './lib'
 
 // hlc = zero-padded ms wall clock, then counter, then device id
 function greeting(hour = new Date().getHours()): string {

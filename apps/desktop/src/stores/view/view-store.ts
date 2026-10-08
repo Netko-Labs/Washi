@@ -19,8 +19,6 @@ interface ViewState {
   finishOnboarding: () => void
   identity: Identity
   setIdentity: (patch: Partial<Identity>) => void
-  dismissedReviews: string[]
-  dismissReview: (id: string) => void
 }
 
 export const ONBOARDED_KEY = 'washi.onboarded'
@@ -87,7 +85,4 @@ export const useViewStore = create<ViewState>((set, get) => ({
     localStorage.setItem(IDENTITY_KEY, JSON.stringify(identity))
     set({ identity })
   },
-
-  dismissedReviews: [],
-  dismissReview: (id) => set((state) => ({ dismissedReviews: [...state.dismissedReviews, id] })),
 }))

@@ -26,6 +26,9 @@ export function App() {
   useEffect(() => {
     void refresh()
     subscribeDevCommands()
+    // From boot, not from the panel: the inbox badge and Inbox need live approvals
+    // whether or not the panel was ever opened.
+    void useAgentStore.getState().init()
   }, [refresh])
 
   return (
