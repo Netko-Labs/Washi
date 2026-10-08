@@ -502,6 +502,9 @@ dashboard are rewritten in phase 3 rather than patched.
 - A fix to a concurrency primitive needs a slow-consumer test. Iterating a snapshot of the
   buffer looked equivalent and lost every event emitted while the consumer was mid-write.
 - `check:live` caught a bug 175 unit tests did not. Run it after touching the bus or the host.
+- It caught a second one later: Clear conversation + a fast send put the prompt in the old
+  session while the screen showed the new one. Diagnosed by reading the workspace db (the
+  turn had completed, in the other session), not by guessing — the first guess was wrong.
 
 - drizzle `.run()` types as void on bun-sqlite — use raw `getSqlite().query().run()`
   when you need `changes`.
