@@ -59,7 +59,16 @@ export interface AgentKeySource {
 
 export type BreakerState =
   | { kind: 'open' }
-  | { kind: 'tripped'; day: string; costUsd: number; capUsd: number }
+  | {
+      kind: 'tripped'
+      /** Which limit: a dollar cap the person set, or the turn cap behind it. */
+      reason: 'spend' | 'turns'
+      day: string
+      costUsd: number
+      capUsd: number
+      turns: number
+      turnCap: number
+    }
   | { kind: 'paused'; day: string }
 
 export interface AgentSpendReport {

@@ -167,8 +167,10 @@ export class AgentHost {
       this.fail(
         sessionId,
         state.kind === 'paused'
-          ? 'The agent is paused for this workspace. Resume it in settings.'
-          : `This workspace has spent ${state.costUsd.toFixed(2)} of its ${state.capUsd} daily cap. Raise the cap or resume tomorrow.`,
+          ? 'Washi is paused for this workspace. Resume it in settings.'
+          : state.reason === 'turns'
+            ? `Washi has run ${state.turns} turns today, its limit of ${state.turnCap}. Resume it in settings, or wait until tomorrow.`
+            : `This workspace has spent $${state.costUsd.toFixed(2)} of its $${state.capUsd} daily stop. Resume or raise it in settings.`,
       )
       return
     }

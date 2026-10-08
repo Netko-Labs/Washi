@@ -39,6 +39,7 @@ export {
 } from './storage/sheets'
 export {
   acknowledgedSpend,
+  acknowledgedTurns,
   type DaySpend,
   pauseAgent,
   pausedOn,

@@ -96,6 +96,18 @@ describe('the daily circuit breaker', () => {
     expect(host().breaker().kind).toBe('tripped')
   })
 
+  test('a turn-cap trip says so, and Resume really reopens it', () => {
+    setAppMeta(ws, DAILY_TURN_CAP_KEY, '3')
+    for (let i = 0; i < 3; i += 1) recordSpend(ws, 0.1, { billing: 'plan' })
+    const agent = host()
+    const state = agent.breaker()
+    expect(state.kind === 'tripped' && state.reason).toBe('turns')
+    agent.resume()
+    expect(agent.breaker().kind).toBe('open')
+    for (let i = 0; i < 3; i += 1) recordSpend(ws, null)
+    expect(agent.breaker().kind).toBe('tripped')
+  })
+
   test('spend reports the cap alongside the total, so a client can show both', () => {
     setAppMeta(ws, DAILY_CAP_USD_KEY, '12')
     recordSpend(ws, 2)

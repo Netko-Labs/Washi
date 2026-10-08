@@ -91,15 +91,29 @@ export function pauseAgent(ws: Workspace, day = today()): void {
  * check trips again on the same spend, which is a button that does nothing.
  */
 export function acknowledgedSpend(ws: Workspace, day = today()): number {
+  return acknowledged(ws, day).costUsd
+}
+
+/** Turns are acknowledged the same way, or a turn-cap trip could never be resumed. */
+export function acknowledgedTurns(ws: Workspace, day = today()): number {
+  return acknowledged(ws, day).turns
+}
+
+function acknowledged(ws: Workspace, day: string): { costUsd: number; turns: number } {
   const raw = getAppMeta(ws, ACKNOWLEDGED_KEY)
-  if (!raw) return 0
-  const [storedDay, amount] = raw.split('|')
-  if (storedDay !== day) return 0
-  const parsed = Number(amount)
-  return Number.isFinite(parsed) ? parsed : 0
+  if (!raw) return { costUsd: 0, turns: 0 }
+  const [storedDay, amount, turns] = raw.split('|')
+  if (storedDay !== day) return { costUsd: 0, turns: 0 }
+  const costUsd = Number(amount)
+  const turnCount = Number(turns)
+  return {
+    costUsd: Number.isFinite(costUsd) ? costUsd : 0,
+    turns: Number.isFinite(turnCount) ? turnCount : 0,
+  }
 }
 
 export function resumeAgent(ws: Workspace, day = today()): void {
+  const spend = spendForDay(ws, day)
   setAppMeta(ws, PAUSED_KEY, '')
-  setAppMeta(ws, ACKNOWLEDGED_KEY, `${day}|${spendForDay(ws, day).costUsd}`)
+  setAppMeta(ws, ACKNOWLEDGED_KEY, `${day}|${spend.costUsd}|${spend.turns}`)
 }

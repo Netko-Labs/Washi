@@ -1,6 +1,7 @@
 import type { TurnBilling } from '@washi/domain'
 import {
   acknowledgedSpend,
+  acknowledgedTurns,
   getAppMeta,
   pauseAgent,
   pausedOn,
@@ -46,13 +47,13 @@ export class DailyBudget {
     if (paused) return { kind: 'paused', day: paused }
     const { costUsd, turns } = spendForDay(this.ws, day)
     const capUsd = this.capUsd()
-    // Measured from the last acknowledgement, so Resume grants real headroom.
-    if (costUsd - acknowledgedSpend(this.ws, day) >= capUsd) {
-      return { kind: 'tripped', day, costUsd, capUsd }
-    }
+    const turnCap = this.turnCap()
+    const tripped = { kind: 'tripped', day, costUsd, capUsd, turns, turnCap } as const
+    // Both measured from the last acknowledgement, so Resume grants real headroom.
+    if (costUsd - acknowledgedSpend(this.ws, day) >= capUsd) return { ...tripped, reason: 'spend' }
     // An unpriced model (openrouter/auto routes to anything) contributes $0 to
     // the line above forever, so turns are the bound that still applies.
-    if (turns >= this.turnCap()) return { kind: 'tripped', day, costUsd, capUsd }
+    if (turns - acknowledgedTurns(this.ws, day) >= turnCap) return { ...tripped, reason: 'turns' }
     return { kind: 'open' }
   }
 
@@ -83,7 +84,8 @@ export class DailyBudget {
   charge(costUsd: number | null, billing: TurnBilling): void {
     const total = recordSpend(this.ws, costUsd, { billing })
     const overSpend = total.costUsd >= this.capUsd() + acknowledgedSpend(this.ws)
-    if (overSpend || total.turns >= this.turnCap()) pauseAgent(this.ws)
+    const overTurns = total.turns >= this.turnCap() + acknowledgedTurns(this.ws)
+    if (overSpend || overTurns) pauseAgent(this.ws)
   }
 
   private setting(key: string, fallback: number): number {
