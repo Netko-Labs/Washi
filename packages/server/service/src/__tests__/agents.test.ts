@@ -9,6 +9,7 @@ import {
   type Workspace,
 } from '@washi/repository'
 import { AgentHost } from '../agents/host'
+import type { AgentKeySource } from '../agents/lib'
 import { normalizeMessage } from '../agents/normalize'
 import { checkSource, createSheetFromSource } from '../sheets/service'
 import { defineUserTable, runQuery } from '../tables/service'
@@ -231,5 +232,54 @@ describe('who answered', () => {
       resolved_by: string | null
     }
     expect(row).toEqual({ status: 'allowed', resolved_by: 'user_mara' })
+  })
+})
+
+describe('a turn owns its session from the first moment', () => {
+  const slowSource = () => {
+    let release: (value: null) => void = () => {}
+    const gate = new Promise<null>((resolve) => {
+      release = resolve
+    })
+    const source: AgentKeySource = {
+      resolve: () => gate,
+      status: async () => ({
+        preference: 'auto',
+        active: null,
+        localCli: null,
+        localModel: null,
+        apiKey: null,
+        missing: 'nothing to think with',
+      }),
+    }
+    return { source, release: () => release(null) }
+  }
+
+  test('Stop during a slow key probe ends the turn as stopped, not as a missing key', async () => {
+    const { source, release } = slowSource()
+    const host = new AgentHost(ws, source)
+    const session = createSession(ws, 'probe')
+    const turn = host.prompt(session.id, 'hello')
+    expect(host.cancel(session.id)).toBe(true)
+    release()
+    await turn
+    expect(getTranscript(ws, session.id).at(-1)?.update).toMatchObject({
+      kind: 'turn_done',
+      stopReason: 'cancelled',
+    })
+    expect(host.isRunning(session.id)).toBe(false)
+  })
+
+  test('a second prompt is refused and leaves the running turn untouched', async () => {
+    const { source, release } = slowSource()
+    const host = new AgentHost(ws, source)
+    const session = createSession(ws, 'busy')
+    const turn = host.prompt(session.id, 'first')
+    await expect(host.prompt(session.id, 'second')).rejects.toThrow('already running')
+    expect(
+      getTranscript(ws, session.id).filter((entry) => entry.update.kind === 'user_message'),
+    ).toHaveLength(1)
+    release()
+    await turn
   })
 })

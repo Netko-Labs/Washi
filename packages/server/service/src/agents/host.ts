@@ -158,45 +158,48 @@ export class AgentHost {
     return this.desk.fetchForSheet(url, actorId)
   }
 
-  /** One user turn: persist, run it on whichever port the credential picks, close it with a receipt. */
+  isRunning(sessionId: string): boolean {
+    return this.turns.has(sessionId)
+  }
+
+  /**
+   * One user turn: persist, run it on whichever port the credential picks, close
+   * it with a receipt. The turn is registered before anything awaits, so Stop
+   * works from the first moment — including while the local CLI is probed.
+   */
   async prompt(sessionId: string, text: string): Promise<void> {
-    this.record(sessionId, { kind: 'user_message', text })
-
-    const state = this.breaker()
-    if (state.kind !== 'open') {
-      this.fail(
-        sessionId,
-        state.kind === 'paused'
-          ? 'Washi is paused for this workspace. Resume it in settings.'
-          : state.reason === 'turns'
-            ? `Washi has run ${state.turns} turns today, its limit of ${state.turnCap}. Resume it in settings, or wait until tomorrow.`
-            : `This workspace has spent $${state.costUsd.toFixed(2)} of its $${state.capUsd} daily stop. Resume or raise it in settings.`,
-      )
-      return
-    }
-
-    const credential = await this.keys.resolve()
-    if (!credential) {
-      const status = await this.keys.status()
-      this.fail(sessionId, status.missing ?? 'Nothing can run this turn yet.')
-      return
-    }
-
-    // Two ports, one vocabulary (§05). Anthropic keeps the native Claude Agent
-    // SDK path, which resumes sessions itself; anything else goes through the
-    // AI SDK, where Washi owns the history.
-    const native = credential.provider === 'anthropic'
-    const port = native ? this.claudePort : this.aiSdkPort
     if (this.turns.has(sessionId)) {
-      this.fail(sessionId, 'A turn is already running in this conversation. Stop it first.')
-      return
+      throw new Error('A turn is already running in this conversation. Stop it first.')
     }
-    const started = Date.now()
     const abort = new AbortController()
-    updateSession(this.ws, sessionId, { status: 'running' })
+    const started = Date.now()
     this.turns.set(sessionId, abort)
 
     try {
+      this.record(sessionId, { kind: 'user_message', text })
+      const refusal = this.refusal()
+      if (refusal) {
+        this.fail(sessionId, refusal)
+        return
+      }
+
+      const credential = await this.keys.resolve()
+      if (abort.signal.aborted) {
+        this.record(sessionId, { kind: 'turn_done', stopReason: 'cancelled', durationMs: 0 })
+        return
+      }
+      if (!credential) {
+        const status = await this.keys.status()
+        this.fail(sessionId, status.missing ?? 'Nothing can run this turn yet.')
+        return
+      }
+
+      // Two ports, one vocabulary (§05). Anthropic keeps the native Claude Agent
+      // SDK path, which resumes sessions itself; anything else goes through the
+      // AI SDK, where Washi owns the history.
+      const native = credential.provider === 'anthropic'
+      const port = native ? this.claudePort : this.aiSdkPort
+      updateSession(this.ws, sessionId, { status: 'running' })
       const result = await port.prompt(
         {
           sessionId,
@@ -220,7 +223,18 @@ export class AgentHost {
       updateSession(this.ws, sessionId, { status: 'error' })
     } finally {
       this.turns.delete(sessionId)
+      // A turn that ended — however — has nobody left to hear its questions.
+      this.approvals.dropSession(sessionId)
     }
+  }
+
+  private refusal(): string | null {
+    const state = this.breaker()
+    if (state.kind === 'open') return null
+    if (state.kind === 'paused') return 'Washi is paused for this workspace. Resume it in settings.'
+    return state.reason === 'turns'
+      ? `Washi has run ${state.turns} turns today, its limit of ${state.turnCap}. Resume it in settings, or wait until tomorrow.`
+      : `This workspace has spent $${state.costUsd.toFixed(2)} of its $${state.capUsd} daily stop. Resume or raise it in settings.`
   }
 
   private close(

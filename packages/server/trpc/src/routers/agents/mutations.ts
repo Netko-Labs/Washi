@@ -14,7 +14,15 @@ export const agentMutations = router({
   prompt: workspaceProcedure
     .input(z.object({ sessionId: z.string(), text: z.string() }))
     .mutation(({ ctx, input }) => {
-      void ctx.host.prompt(input.sessionId, input.text)
+      // Refused here, before anything is recorded: a second prompt must not
+      // touch the transcript or the session of the turn already running.
+      if (ctx.host.isRunning(input.sessionId)) {
+        throw new TRPCError({
+          code: 'CONFLICT',
+          message: 'A turn is already running in this conversation. Stop it first.',
+        })
+      }
+      void ctx.host.prompt(input.sessionId, input.text).catch(() => {})
     }),
   /** Stop the running turn. Its open approvals are answered "no" on the way out. */
   cancel: workspaceProcedure
