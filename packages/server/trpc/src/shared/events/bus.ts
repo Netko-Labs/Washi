@@ -30,28 +30,19 @@ export function createEventBus(): EventBus {
       options?: { lastEventId?: string | null; signal?: AbortSignal },
     ): AsyncGenerator<Tracked<WashiEvents[K]>> {
       const buffer = bufferFor(name)
-      const after = options?.lastEventId ? Number(options.lastEventId) : Number.NaN
-      // Resume point: the first buffered event newer than lastEventId, or the
-      // live edge when the client is caught up (or its id has aged out).
-      let cursor = Number.isNaN(after)
-        ? buffer.length
-        : Math.max(
-            0,
-            buffer.findIndex((event) => Number(event.id) > after),
-          )
-      if (!Number.isNaN(after) && buffer.every((event) => Number(event.id) <= after)) {
-        cursor = buffer.length
-      }
+      // A cursor is the last sequence seen, never a buffer index: emit trims the
+      // buffer from the front, and an index would then point past the live edge.
+      const requested = options?.lastEventId ? Number(options.lastEventId) : Number.NaN
+      let seen = Number.isNaN(requested) ? sequence : requested
 
       const wakeSet = waiters.get(name) ?? new Set<Waiter>()
       waiters.set(name, wakeSet)
 
       try {
         while (!options?.signal?.aborted) {
-          while (cursor < buffer.length) {
-            const event = buffer[cursor]
-            cursor += 1
-            if (event) yield event as Tracked<WashiEvents[K]>
+          for (const event of buffer.filter((entry) => Number(entry.id) > seen)) {
+            seen = Number(event.id)
+            yield event as Tracked<WashiEvents[K]>
           }
 
           await new Promise<void>((resolve) => {
