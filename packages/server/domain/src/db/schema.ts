@@ -69,6 +69,8 @@ export const approvalTable = sqliteTable('approvals', {
   status: text('status').notNull().default('pending'),
   createdAt: text('created_at').notNull(),
   resolvedAt: text('resolved_at'),
+  /** The actor who answered. Null for embedded (one person) and for timeouts and stops. */
+  resolvedBy: text('resolved_by'),
 })
 
 export const capabilityCallTable = sqliteTable('capability_calls', {

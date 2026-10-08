@@ -140,9 +140,11 @@ function createTables(sqlite: Database) {
       input TEXT NOT NULL,
       status TEXT NOT NULL DEFAULT 'pending',
       created_at TEXT NOT NULL,
-      resolved_at TEXT
+      resolved_at TEXT,
+      resolved_by TEXT
     )
   `)
+  ensureColumn(sqlite, 'approvals', 'resolved_by', 'TEXT')
 
   sqlite.exec(`
     CREATE TABLE IF NOT EXISTS capability_calls (

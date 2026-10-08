@@ -56,6 +56,6 @@ export const agentMutations = router({
   resolveApproval: workspaceProcedure
     .input(z.object({ id: z.string(), decision: decisionSchema }))
     .mutation(({ ctx, input }) => {
-      ctx.host.resolveApprovalRequest(input.id, input.decision)
+      ctx.host.resolveApprovalRequest(input.id, input.decision, ctx.actorId)
     }),
 })

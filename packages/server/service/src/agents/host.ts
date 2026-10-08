@@ -135,8 +135,12 @@ export class AgentHost {
     return this.approvals.list()
   }
 
-  resolveApprovalRequest(id: string, decision: ApprovalDecision): void {
-    this.approvals.resolve(id, decision)
+  resolveApprovalRequest(
+    id: string,
+    decision: ApprovalDecision,
+    actorId: string | null = null,
+  ): void {
+    this.approvals.resolve(id, decision, actorId)
   }
 
   executeAction(input: unknown, caller: Caller = { origin: 'agent' }): Promise<void> {

@@ -112,10 +112,17 @@ export function createApproval(
   return request
 }
 
-export function resolveApproval(ws: Workspace, id: string, status: 'allowed' | 'denied'): boolean {
+export function resolveApproval(
+  ws: Workspace,
+  id: string,
+  status: 'allowed' | 'denied',
+  actorId: string | null = null,
+): boolean {
   const result = ws.sqlite
-    .query("UPDATE approvals SET status = ?, resolved_at = ? WHERE id = ? AND status = 'pending'")
-    .run(status, ws.now(), id)
+    .query(
+      "UPDATE approvals SET status = ?, resolved_at = ?, resolved_by = ? WHERE id = ? AND status = 'pending'",
+    )
+    .run(status, ws.now(), actorId, id)
   return result.changes > 0
 }
 

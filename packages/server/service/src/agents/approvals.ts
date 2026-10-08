@@ -41,8 +41,9 @@ export class ApprovalDesk implements ToolGate {
     return [...this.pending.values()].map((entry) => entry.request)
   }
 
-  resolve(id: string, decision: ApprovalDecision): void {
-    resolveApproval(this.ws, id, decision === 'reject_once' ? 'denied' : 'allowed')
+  /** `actorId` is who answered — the team's audit trail. Null for a timeout or a Stop. */
+  resolve(id: string, decision: ApprovalDecision, actorId: string | null = null): void {
+    resolveApproval(this.ws, id, decision === 'reject_once' ? 'denied' : 'allowed', actorId)
     this.pending.get(id)?.settle(decision)
     this.pending.delete(id)
   }

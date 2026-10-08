@@ -214,3 +214,22 @@ describe('a client that opens late', () => {
     expect(row()?.status).toBe('denied')
   })
 })
+
+describe('who answered', () => {
+  test('an approval remembers the person who resolved it', async () => {
+    const { host, approvals } = makeHost()
+    const session = createSession(ws, 'audit')
+    // biome-ignore lint/complexity/useLiteralKeys: reaching into a private member for the test
+    const pending = host['approvals'].gateSdkTool(session.id, 'mcp__washi__sheet_create', {
+      title: 'x',
+    })
+    await Bun.sleep(5)
+    host.resolveApprovalRequest(approvals[0]!.id, 'allow_once', 'user_mara')
+    await pending
+    const row = ws.sqlite.query('SELECT status, resolved_by FROM approvals').get() as {
+      status: string
+      resolved_by: string | null
+    }
+    expect(row).toEqual({ status: 'allowed', resolved_by: 'user_mara' })
+  })
+})
