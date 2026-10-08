@@ -1,4 +1,4 @@
-# MLP+1 — the agent runs where it is cheapest — IN PROGRESS (2026-10-08)
+# MLP+1 — the agent runs where it is cheapest — DONE, awaiting review (2026-10-08)
 
 Overnight, unattended. Design source: "Washi — product design" (12 boards; First run · Today ·
 Review · Sprint · Accounts · Research). Scope cut to the agent, because the agent is the product.
@@ -10,13 +10,18 @@ Review · Sprint · Accounts · Research). Scope cut to the agent, because the a
 - **+1:** every turn ends in a receipt — where it ran, how long, what it cost or what the plan
   saved — and the agent's state is visible without opening settings.
 
-Acceptance:
+Acceptance — all met:
 
-- `bun test`, `bun run typecheck`, `bun run check` green; `mirin check` green
-- embedded with no `ANTHROPIC_API_KEY` but a logged-in `claude` → a real turn completes
-- a plan-covered turn never counts toward the dollar cap; it still counts as a turn
-- hosted never runs a local CLI, whatever the machine has installed
-- the web asks for a key in first run, and the daily stop is settable there
+- [x] `bun test` (188), `bun run typecheck` (14/14), `bun run check` green; `mirin check` green
+- [x] embedded with no `ANTHROPIC_API_KEY` but a logged-in `claude` → a real turn completes
+      (`check:live`: ask → accept at the desk → page opens → plan receipt)
+- [x] a plan-covered turn never counts toward the dollar cap; it still counts as a turn
+- [x] hosted never runs a local CLI, whatever the machine has installed
+- [x] the web asks for a key in first run, and the daily stop is settable there
+- [x] `docker compose up` builds and a hosted turn reaches Anthropic from inside the container
+
+Not verified: **a successful hosted turn on a real API key** — no key was available unattended;
+everything up to the provider's 401 is proven, in the browser and in the container.
 
 ## Steps
 
@@ -26,8 +31,8 @@ Acceptance:
       paths too), read `--version` and `auth status`. Never store the account email.
 - [x] **3 · credential kinds** — `api_key` | `local_cli`. Embedded: preference `auto` picks the CLI
       when logged in, else `ANTHROPIC_API_KEY`. Hosted: api_key only, asserted at construction.
-- [x] **4 · plan vs metered spend** — `init.apiKeySource === 'oauth'` means the plan paid;
-      record it as `saved_usd`, not `cost_usd`. Turn cap still applies.
+- [x] **4 · plan vs metered spend** — a claude.ai login *and* `apiKeySource` none/oauth means
+      the plan paid; record it as `saved_usd`, not `cost_usd`. Turn cap still applies.
 - [x] **5 · routes** — `agents.inference`, `agents.setInference`, `agents.setDailyCap`.
 - [x] **6 · receipts** — `turn_done` carries model, duration, billing; transcripts render it in mono.
 - [x] **7 · web first run** — "Give Washi a key" after workspace creation; skip leaves it asleep.
