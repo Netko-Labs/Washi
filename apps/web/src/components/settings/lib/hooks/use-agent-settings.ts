@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '@/lib/rpc'
 import type { ModelOption } from '@/lib/types'
-import type { KeyState, SpendState } from '../types'
+import type { KeyInput, KeyState, SpendState } from '../types'
 
 /**
  * Everything the settings screen needs in one place: the stored key, what the
@@ -38,7 +38,7 @@ export function useAgentSettings() {
     void refresh()
   }, [refresh])
 
-  const save = async (input: { key: string; provider: string; model: string | null }) => {
+  const save = async (input: KeyInput) => {
     setError(null)
     try {
       await api.workspaces.setAgentKey.mutate({
@@ -58,5 +58,26 @@ export function useAgentSettings() {
     setSpend((await api.agents.resume.mutate()) as SpendState)
   }
 
-  return { key, spend, models, catalogueSource, error, loading, save, resume, refresh }
+  const setDailyCap = async (capUsd: number) => {
+    try {
+      setSpend((await api.agents.setDailyCap.mutate({ capUsd })) as SpendState)
+      return true
+    } catch (cause) {
+      setError(String(cause))
+      return false
+    }
+  }
+
+  return {
+    key,
+    spend,
+    models,
+    catalogueSource,
+    error,
+    loading,
+    save,
+    resume,
+    setDailyCap,
+    refresh,
+  }
 }

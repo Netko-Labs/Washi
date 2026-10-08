@@ -29,9 +29,9 @@ Acceptance:
 - [x] **4 · plan vs metered spend** — `init.apiKeySource === 'oauth'` means the plan paid;
       record it as `saved_usd`, not `cost_usd`. Turn cap still applies.
 - [x] **5 · routes** — `agents.inference`, `agents.setInference`, `agents.setDailyCap`.
-- [ ] **6 · receipts** — `turn_done` carries model, duration, billing; transcripts render it in mono.
-- [ ] **7 · web first run** — "Give Washi a key" after workspace creation; skip leaves it asleep.
-- [ ] **8 · agent status** — Idle / Working / Needs you · today $x of $cap, in the shell.
+- [x] **6 · receipts** — `turn_done` carries model, duration, billing; transcripts render it in mono.
+- [x] **7 · web first run** — "Give Washi a key" after workspace creation; skip leaves it asleep.
+- [x] **8 · agent status** — Idle / Working / Needs you · today $x of $cap, in the shell.
 - [ ] **9 · desktop settings** — Agents tab stops being design copy: inference source, spend,
       saved, Resume.
 
@@ -43,6 +43,21 @@ Acceptance:
 - `init.apiKeySource` is `none` — not `oauth` — for a claude.ai login. The docs suggest
   `oauth`; the binary says otherwise. Billing is `plan` unless the source names a key.
 - `tools: []` really does leave the agent with zero built-ins (init lists `tools: []`).
+
+## Verified in the browser (hosted, Postgres, 1280px and 375px)
+
+sign up → create workspace → first run shows "Give Washi a key", chip reads `Asleep · no key` →
+save a key with a $10 stop → first run closes, chip reads `Idle · today $0.00 of $10` → prompt
+→ events stream over the now-scoped SSE (`connectionParams.workspace`) → a rejected key reads
+"The model provider rejected this API key. Replace it in settings" instead of SDK internals.
+
+## Caught while building
+
+- **Every transcript on a hosted server was public.** `onAgentUpdate` / `onApprovalRequested`
+  were publicProcedures over one server-wide bus. Fixed in its own commit, with tests that fail
+  against the old procedures.
+- **The SDK throws on an error result** instead of yielding it, so a failed turn skipped the
+  receipt and the turn count. The port now catches and returns it as a turn.
 
 ---
 

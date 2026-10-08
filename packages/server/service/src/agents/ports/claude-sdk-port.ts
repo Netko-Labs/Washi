@@ -4,7 +4,7 @@ import type { Workspace } from '@washi/repository'
 import { agentEnv, MAX_TURN_BUDGET_USD } from '../lib'
 import { normalizeMessage } from '../normalize'
 import { createWashiTools } from '../tools'
-import { DISALLOWED_BUILTINS, KEYED_SOURCES, SIGNED_OUT_PATTERN } from './constants'
+import { DISALLOWED_BUILTINS, KEYED_SOURCES, REJECTED_PATTERN } from './constants'
 import type { AgentPort, PromptRequest, ToolVerdict, TurnResult } from './types'
 
 export interface ClaudeSdkPortDeps {
@@ -18,8 +18,11 @@ export interface ClaudeSdkPortDeps {
   ) => Promise<ToolVerdict>
 }
 
-const SIGNED_OUT_MESSAGE =
-  'Claude Code on this computer is signed out. Run `claude` in a terminal, sign in, then ask again.'
+const REJECTED = {
+  local_cli:
+    'Claude Code on this computer is signed out. Run `claude` in a terminal, sign in, then ask again.',
+  api_key: 'The model provider rejected this API key. Replace it in settings, then ask again.',
+} as const
 
 /**
  * The native path: the Claude Agent SDK drives a `claude` subprocess, which
@@ -42,7 +45,6 @@ export function createClaudeSdkPort(deps: ClaudeSdkPortDeps): AgentPort {
       let model: string | undefined
       let costUsd: number | null = null
       let error: string | undefined
-      let lastText = ''
 
       const stream = query({
         prompt: request.text,
@@ -68,28 +70,30 @@ export function createClaudeSdkPort(deps: ClaudeSdkPortDeps): AgentPort {
         },
       })
 
-      for await (const message of stream) {
-        if (message.type === 'system' && message.subtype === 'init') {
-          resumeToken = message.session_id
-          model = message.model
-          // A claude.ai login reports `none` or `oauth`; a console key still bills per token.
-          if (local && !KEYED_SOURCES.has(message.apiKeySource)) billing = 'plan'
-          continue
-        }
-        for (const update of normalizeMessage(message)) {
-          if (update.kind === 'turn_done') {
-            costUsd = update.costUsd ?? null
-            if (update.stopReason === 'error') error = update.error ?? 'the turn failed'
+      try {
+        for await (const message of stream) {
+          if (message.type === 'system' && message.subtype === 'init') {
+            resumeToken = message.session_id
+            model = message.model
+            // A claude.ai login reports `none` or `oauth`; a console key still bills per token.
+            if (local && !KEYED_SOURCES.has(message.apiKeySource)) billing = 'plan'
             continue
           }
-          if (update.kind === 'message_chunk') lastText = update.text
-          emit(update)
+          for (const update of normalizeMessage(message)) {
+            if (update.kind === 'turn_done') {
+              costUsd = update.costUsd ?? null
+              if (update.stopReason === 'error') error = update.error ?? 'the turn failed'
+              continue
+            }
+            emit(update)
+          }
         }
+      } catch (cause) {
+        // The SDK throws on an error result rather than yielding it; it is still a turn.
+        error = cause instanceof Error ? cause.message : String(cause)
       }
 
-      if (local && SIGNED_OUT_PATTERN.test(error ? `${error} ${lastText}` : '')) {
-        error = SIGNED_OUT_MESSAGE
-      }
+      if (error && REJECTED_PATTERN.test(error)) error = REJECTED[credential.kind]
 
       return { costUsd, billing, model, resumeToken, error }
     },

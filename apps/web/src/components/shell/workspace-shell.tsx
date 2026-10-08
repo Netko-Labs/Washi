@@ -8,6 +8,8 @@ import {
 } from '@tabler/icons-react'
 import { useMemo, useState } from 'react'
 import { AgentPanel } from '@/components/agent'
+import { AgentStatus } from '@/components/agent-status'
+import { FirstRunGate } from '@/components/first-run'
 import { SettingsScreen } from '@/components/settings'
 import { SheetView } from '@/components/sheet'
 import { createPaperHost } from '@/lib/paper-host'
@@ -138,6 +140,16 @@ export function WorkspaceShell({
         </div>
 
         <div className="shrink-0 border-border border-t p-2">
+          <AgentStatus
+            onOpenAgent={() => {
+              setAgentOpen(true)
+              setNavOpen(false)
+            }}
+            onOpenSettings={() => {
+              setSettingsOpen(true)
+              setNavOpen(false)
+            }}
+          />
           <button
             type="button"
             onClick={() => void newPage()}
@@ -164,7 +176,9 @@ export function WorkspaceShell({
         {settingsOpen ? (
           <SettingsScreen onClose={() => setSettingsOpen(false)} />
         ) : (
-          <SheetView id={activeId} host={host} />
+          <FirstRunGate workspace={workspace}>
+            <SheetView id={activeId} host={host} />
+          </FirstRunGate>
         )}
       </main>
 

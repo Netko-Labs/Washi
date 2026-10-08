@@ -17,7 +17,21 @@ export type AgentUpdateView =
       input?: unknown
     }
   | { kind: 'tool_call_update'; toolCallId: string; status: string; diff?: unknown }
-  | { kind: 'turn_done'; stopReason: string; costUsd?: number; error?: string }
+  | TurnDoneView
+
+export interface TurnDoneView {
+  kind: 'turn_done'
+  stopReason: string
+  costUsd?: number
+  error?: string
+  billing?: 'metered' | 'plan'
+  model?: string
+  durationMs?: number
+}
+
+export interface TurnReceiptProps {
+  update: TurnDoneView
+}
 
 export interface ApprovalView {
   id: string

@@ -1,5 +1,6 @@
-import { IconCheck, IconTool, IconX } from '@tabler/icons-react'
+import { IconTool, IconX } from '@tabler/icons-react'
 import type { TranscriptEntryView } from './lib'
+import { TurnReceipt } from './turn-receipt'
 
 /**
  * Un-bubbled: the agent's prose is the page's prose. Tool calls are pills, not
@@ -63,12 +64,7 @@ function Entry({ entry }: { entry: TranscriptEntryView }) {
         </p>
       )
     }
-    return (
-      <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-        <IconCheck className="size-3" />
-        done{update.costUsd != null && ` · $${update.costUsd.toFixed(3)}`}
-      </p>
-    )
+    return <TurnReceipt update={update} />
   }
 
   return null

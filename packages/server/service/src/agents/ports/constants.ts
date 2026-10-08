@@ -50,8 +50,9 @@ export const DISALLOWED_BUILTINS = [
   'Write',
 ]
 
-/** What a signed-out CLI says, and what a person should be told instead. */
-export const SIGNED_OUT_PATTERN = /invalid api key|please run \/login|not logged in|oauth token/i
+/** What a rejected credential sounds like, from either a signed-out CLI or a bad key. */
+export const REJECTED_PATTERN =
+  /invalid api key|api key is invalid|please run \/login|not logged in|oauth token|failed to authenticate|\b401\b/i
 
 /** `apiKeySource` values that mean a key, not a plan, is paying for the turn. */
 export const KEYED_SOURCES: ReadonlySet<string> = new Set(['user', 'project', 'org', 'temporary'])
