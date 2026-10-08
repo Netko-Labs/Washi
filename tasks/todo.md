@@ -12,7 +12,7 @@ Review · Sprint · Accounts · Research). Scope cut to the agent, because the a
 
 Acceptance — all met:
 
-- [x] `bun test` (188), `bun run typecheck` (14/14), `bun run check` green; `mirin check` green
+- [x] `bun test` (186), `bun run typecheck` (14/14), `bun run check` green; `mirin check` green
 - [x] embedded with no `ANTHROPIC_API_KEY` but a logged-in `claude` → a real turn completes
       (`check:live`: ask → accept at the desk → page opens → plan receipt)
 - [x] a plan-covered turn never counts toward the dollar cap; it still counts as a turn
