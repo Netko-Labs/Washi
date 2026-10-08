@@ -39,5 +39,6 @@ export interface DailyStopProps {
 }
 
 export interface SettingsScreenProps {
+  workspaceId: string
   onClose: () => void
 }

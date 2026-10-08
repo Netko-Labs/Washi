@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { InviteBanner } from '@/components/invite'
 import { signOut, useSession } from '@/lib/auth'
 import { useWorkspaces } from './lib'
 
@@ -36,6 +37,13 @@ export function WorkspacePicker({ onOpen }: { onOpen: (id: string) => void }) {
           ? 'Each one is its own set of pages, and its own set of people.'
           : 'A workspace holds your pages and the people you invite to review them.'}
       </p>
+
+      <InviteBanner
+        onAccepted={(id) => {
+          open(id)
+          onOpen(id)
+        }}
+      />
 
       {loading && <p className="mt-8 text-[14px] text-muted-foreground">Loading…</p>}
 

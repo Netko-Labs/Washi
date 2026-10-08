@@ -79,6 +79,12 @@ are gone — none of them did anything, and features.md §2 forbids a control th
 - [x] **Claude Code model** — Default · Opus · Sonnet · Haiku per workspace. The CLI's default
       on Max is Opus, which spends plan limits fastest; aliases verified live
       (`sonnet` → claude-sonnet-5-5, `haiku` → claude-haiku-5-5). The composer names it.
+- [x] **Invite the team** (design board 1, step 2) — Settings → People: members, invite by
+      email, pending invitations with Copy link / Cancel. No email server is assumed: the link
+      `?invite=<id>` is the invitation, and only the invited address can accept it (a different
+      account gets 403 — checked against the live server). Listing your own invitations needs a
+      verified email in Better Auth 1.7, which a box without SMTP can't give, so accept-by-link is
+      the path. Driven in the browser: invite → sign out → open link → sign up → inside.
 - `host.ts` is 249 lines: the daily stop moved to `budget.ts`.
 
 ## Caught while building

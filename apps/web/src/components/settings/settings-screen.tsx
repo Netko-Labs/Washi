@@ -1,10 +1,11 @@
 import { IconX } from '@tabler/icons-react'
 import { formatUsd } from '@/components/agent'
+import { PeopleSection } from '@/components/people'
 import { DailyStop } from './daily-stop'
 import { KeyForm } from './key-form'
 import { type SettingsScreenProps, useAgentSettings } from './lib'
 
-export function SettingsScreen({ onClose }: SettingsScreenProps) {
+export function SettingsScreen({ workspaceId, onClose }: SettingsScreenProps) {
   const settings = useAgentSettings()
   const { key, spend, error, loading } = settings
 
@@ -80,6 +81,8 @@ export function SettingsScreen({ onClose }: SettingsScreenProps) {
           )}
         </section>
       )}
+
+      <PeopleSection workspaceId={workspaceId} />
 
       {error && <p className="mt-6 text-[13px] text-destructive">{error}</p>}
     </div>

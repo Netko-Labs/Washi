@@ -174,7 +174,7 @@ export function WorkspaceShell({
 
       <main className="min-h-0 min-w-0 flex-1 overflow-y-auto">
         {settingsOpen ? (
-          <SettingsScreen onClose={() => setSettingsOpen(false)} />
+          <SettingsScreen workspaceId={workspace.id} onClose={() => setSettingsOpen(false)} />
         ) : (
           <FirstRunGate workspace={workspace}>
             <SheetView id={activeId} host={host} />

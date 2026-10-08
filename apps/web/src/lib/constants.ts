@@ -9,3 +9,6 @@ export const WORKSPACE_HEADER = 'x-washi-workspace'
 
 /** Which workspace the viewer last had open. A convenience, never a permission. */
 export const ACTIVE_WORKSPACE_KEY = 'washi:active-workspace'
+
+/** `?invite=<invitation id>` — the link a teammate is sent. */
+export const INVITE_PARAM = 'invite'

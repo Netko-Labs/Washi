@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { AuthScreen } from '@/components/auth'
+import { pendingInvite } from '@/components/invite'
 import { WorkspaceShell } from '@/components/shell'
 import { WorkspacePicker } from '@/components/workspace'
 import { useSession } from '@/lib/auth'
@@ -22,7 +23,8 @@ export function App() {
       setRestoring(false)
       return
     }
-    const saved = activeWorkspace()
+    // An invite link wins over the last workspace: the picker accepts it.
+    const saved = pendingInvite() ? null : activeWorkspace()
     if (!saved) {
       setRestoring(false)
       return
