@@ -1,15 +1,16 @@
-# Self-hosting Washi. `cp .env.example .env`, fill in WASHI_SECRET_KEY, `docker compose up`.
+# Self-hosting Washi. `cp .env.example .env`, fill in POSTGRES_PASSWORD and WASHI_SECRET_KEY,
+# `docker compose up`.
 services:
   postgres:
     image: postgres:17-alpine
     environment:
       POSTGRES_USER: washi
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-washi}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
       POSTGRES_DB: washi
     ports:
-      # Published so the server can also run from source (`bun run --cwd apps/server dev`)
-      # against this database. The containerised server talks to postgres:5432 instead.
-      - '${POSTGRES_PORT:-5432}:5432'
+      # Loopback only, so `bun run dev:server` on this machine can reach it. The
+      # containerised server talks to postgres:5432 instead.
+      - '127.0.0.1:${POSTGRES_PORT:-5432}:5432'
     volumes:
       - postgres:/var/lib/postgresql/data
     healthcheck:
@@ -27,7 +28,9 @@ services:
         condition: service_healthy
     environment:
       WASHI_MODE: hosted
-      WASHI_DATABASE_URL: postgres://washi:${POSTGRES_PASSWORD:-washi}@postgres:5432/washi
+      # No password in the url: Bun's SQL takes it from PGPASSWORD, so it needs no url-encoding.
+      WASHI_DATABASE_URL: postgres://washi@postgres:5432/washi
+      PGPASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
       WASHI_SECRET_KEY: ${WASHI_SECRET_KEY:?set WASHI_SECRET_KEY in .env — 32+ chars}
       WASHI_BASE_URL: ${WASHI_BASE_URL:-http://localhost:3000}
       WASHI_TRUSTED_ORIGINS: ${WASHI_TRUSTED_ORIGINS:-}
