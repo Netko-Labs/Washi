@@ -85,6 +85,25 @@ describe('the bus never sleeps through an event', () => {
     expect(seen).toEqual(['a', 'b'])
   })
 
+  test('a lastEventId older than the buffer resumes at the live edge, not mid-gap', async () => {
+    const bus = createEventBus()
+    for (let i = 0; i < EVENT_BUFFER_SIZE + 10; i += 1) {
+      bus.emit('openSheetRequested', { workspaceId: 'w', id: `old-${i}` })
+    }
+    const seen = await drain(bus, '1', () => {
+      for (const id of ['a', 'b']) bus.emit('openSheetRequested', { workspaceId: 'w', id })
+    })
+    expect(seen).toEqual(['a', 'b'])
+  })
+
+  test('a cursor still inside the buffer replays even when other events share the sequence', async () => {
+    const bus = createEventBus()
+    bus.emit('devCommand', { command: 'reload' })
+    for (const id of ['a', 'b']) bus.emit('openSheetRequested', { workspaceId: 'w', id })
+    const seen = await drain(bus, '2', () => {})
+    expect(seen).toEqual(['b'])
+  })
+
   test('one subscriber ending never silences another on the same event', async () => {
     const bus = createEventBus()
     const quitter = new AbortController()

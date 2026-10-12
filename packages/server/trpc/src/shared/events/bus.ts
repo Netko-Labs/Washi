@@ -6,6 +6,7 @@ type Waiter = () => void
 export function createEventBus(): EventBus {
   const buffers = new Map<EventName, Tracked<unknown>[]>()
   const waiters = new Map<EventName, Set<Waiter>>()
+  const trimmedThrough = new Map<EventName, number>()
   let sequence = 0
 
   const bufferFor = (name: EventName) => {
@@ -21,7 +22,10 @@ export function createEventBus(): EventBus {
       sequence += 1
       const buffer = bufferFor(name)
       buffer.push({ id: String(sequence), data: payload })
-      if (buffer.length > EVENT_BUFFER_SIZE) buffer.splice(0, buffer.length - EVENT_BUFFER_SIZE)
+      if (buffer.length > EVENT_BUFFER_SIZE) {
+        const dropped = buffer.splice(0, buffer.length - EVENT_BUFFER_SIZE)
+        trimmedThrough.set(name, Number(dropped.at(-1)?.id))
+      }
       for (const wake of [...(waiters.get(name) ?? [])]) wake()
     },
 
@@ -33,9 +37,11 @@ export function createEventBus(): EventBus {
       const signal = options?.signal
       // A cursor is the last sequence seen, never a buffer index: emit trims the
       // buffer from the front. An id this process has not reached came from a
-      // previous one (a restart), so it resumes at the live edge.
+      // previous one (a restart), and one older than the trim has a gap a partial
+      // replay would hide; both resume at the live edge.
       const requested = options?.lastEventId ? Number(options.lastEventId) : Number.NaN
-      let seen = Number.isNaN(requested) || requested > sequence ? sequence : requested
+      const expired = requested < (trimmedThrough.get(name) ?? 0)
+      let seen = Number.isNaN(requested) || requested > sequence || expired ? sequence : requested
       const next = () => buffer.find((event) => Number(event.id) > seen)
 
       while (!signal?.aborted) {

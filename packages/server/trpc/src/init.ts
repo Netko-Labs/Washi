@@ -123,16 +123,9 @@ export const workspaceProcedure = t.procedure.use(async ({ ctx, next }) => {
     throw new TRPCError({ code: 'NOT_FOUND', message: `unknown workspace "${ctx.workspaceId}"` })
   }
 
-  let resolved: ResolvedWorkspace
-  try {
-    resolved = ctx.runtime.resolve(ctx.workspaceId)
-  } catch (cause) {
-    throw new TRPCError({
-      code: 'NOT_FOUND',
-      message: `unknown workspace "${ctx.workspaceId}"`,
-      cause,
-    })
-  }
+  // Membership above is the only unknown-workspace answer; a throw here is a
+  // failed open (disk, sqlite) and surfaces as INTERNAL_SERVER_ERROR.
+  const resolved = ctx.runtime.resolve(ctx.workspaceId)
   return next({
     ctx: { ...ctx, ws: resolved.workspace, host: resolved.host },
   })

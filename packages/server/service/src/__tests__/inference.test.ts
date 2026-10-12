@@ -191,6 +191,13 @@ describe('a plan-covered turn is not a dollar spent', () => {
     expect(spendForDay(ws)).toMatchObject({ savedUsd: 0.4, costUsd: 0.1, turns: 2 })
   })
 
+  test('the upsert adds in the database and returns the row it left', () => {
+    recordSpend(ws, 0.25)
+    const total = recordSpend(ws, null, { billing: 'plan' })
+    expect(total).toEqual(spendForDay(ws))
+    expect(total).toMatchObject({ costUsd: 0.25, savedUsd: 0, turns: 2 })
+  })
+
   test('the dollar cap never trips on plan turns', () => {
     setAppMeta(ws, DAILY_CAP_USD_KEY, '1')
     for (let i = 0; i < 5; i += 1) recordSpend(ws, 3, { billing: 'plan' })

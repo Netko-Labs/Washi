@@ -12,6 +12,7 @@ import {
 import { ApprovalDesk } from './approvals'
 import { DailyBudget } from './budget'
 import { CapabilityDesk } from './desk'
+import { conversationHistory } from './history'
 import { createEmbeddedKeySource } from './inference'
 import type {
   AgentActivity,
@@ -216,7 +217,7 @@ export class AgentHost {
           text,
           credential,
           model: { provider: credential.provider, model: credential.model },
-          history: native ? [] : this.history(sessionId),
+          history: native ? [] : conversationHistory(getTranscript(this.ws, sessionId)),
           resumeToken: native ? getSdkSessionId(this.ws, sessionId) : null,
           signal: abort.signal,
         },
@@ -267,17 +268,6 @@ export class AgentHost {
   private fail(sessionId: string, error: string) {
     this.record(sessionId, { kind: 'turn_done', stopReason: 'error', error })
     updateSession(this.ws, sessionId, { status: 'error' })
-  }
-
-  /** The AI SDK port has no server-side session, so it is handed the conversation so far. */
-  private history(sessionId: string) {
-    return getTranscript(this.ws, sessionId)
-      .flatMap((entry) =>
-        entry.update.kind === 'user_message'
-          ? [{ role: 'user' as const, text: entry.update.text }]
-          : [],
-      )
-      .slice(0, -1)
   }
 
   /** sheet_replace proposals also render as diffs in the transcript (spec §6). */

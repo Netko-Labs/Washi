@@ -1,4 +1,5 @@
 import {
+  CATALOGUE_RETRY_MS,
   CATALOGUE_TTL_MS,
   FETCH_TIMEOUT_MS,
   MODELS_DEV_URL,
@@ -10,6 +11,7 @@ import { type Catalogue, catalogueSchema, type ModelEntry, type ModelSummary } f
 export interface CatalogueOptions {
   url?: string
   ttlMs?: number
+  retryMs?: number
   /** Providers to keep. The live index has 222; Washi can reach two. */
   providers?: readonly string[]
   fetchImpl?: typeof fetch
@@ -45,15 +47,18 @@ function prune(raw: Catalogue, providers: readonly string[]): Catalogue {
 export function createModelCatalogue(options: CatalogueOptions = {}): ModelCatalogue {
   const url = options.url ?? MODELS_DEV_URL
   const ttlMs = options.ttlMs ?? CATALOGUE_TTL_MS
+  const retryMs = options.retryMs ?? CATALOGUE_RETRY_MS
   const providers = options.providers ?? SUPPORTED_PROVIDERS
   const doFetch = options.fetchImpl ?? fetch
 
   let cached: Catalogue | null = null
   let cachedAt = 0
+  let failedAt = Number.NEGATIVE_INFINITY
   let from: 'network' | 'fallback' | 'unloaded' = 'unloaded'
   let inflight: Promise<Catalogue> | null = null
 
-  const fresh = () => cached !== null && Date.now() - cachedAt < ttlMs
+  const fresh = () =>
+    cached !== null && (Date.now() - cachedAt < ttlMs || Date.now() - failedAt < retryMs)
 
   async function refresh(): Promise<Catalogue> {
     try {
@@ -67,7 +72,10 @@ export function createModelCatalogue(options: CatalogueOptions = {}): ModelCatal
     } catch {
       // A catalogue is a convenience, never a dependency. Keep the last good
       // copy if there is one; otherwise fall back to the bundled floor.
-      if (cached) return cached
+      if (cached) {
+        failedAt = Date.now()
+        return cached
+      }
       cached = prune(FALLBACK_CATALOGUE, providers)
       cachedAt = Date.now()
       from = 'fallback'

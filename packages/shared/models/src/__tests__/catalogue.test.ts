@@ -64,6 +64,24 @@ describe('the catalogue is a convenience, never a dependency', () => {
     await catalogue.model('anthropic', 'claude-opus-5')
     expect(calls).toBe(1)
   })
+
+  test('a failed refresh backs off instead of refetching on every lookup', async () => {
+    let calls = 0
+    const catalogue = createModelCatalogue({
+      ttlMs: 0,
+      fetchImpl: (async () => {
+        calls += 1
+        if (calls > 1) throw new Error('offline')
+        return new Response(JSON.stringify(LIVE_SHAPE), { status: 200 })
+      }) as unknown as typeof fetch,
+    })
+    await catalogue.load()
+    await catalogue.load()
+    expect(await catalogue.model('anthropic', 'claude-opus-5')).not.toBeNull()
+    await catalogue.list()
+    expect(calls).toBe(2)
+    expect(catalogue.source()).toBe('network')
+  })
 })
 
 describe('pricing a turn', () => {
@@ -84,5 +102,13 @@ describe('pricing a turn', () => {
     // A free-looking turn would let the breaker wave through an unknown model.
     expect(priceTurn({ id: 'y' }, { inputTokens: 999_999 })).toBeNull()
     expect(priceTurn(null, { inputTokens: 999_999 })).toBeNull()
+  })
+
+  test('a side with usage but no published rate is unpriced, not free', () => {
+    const inputOnly = { id: 'i', cost: { input: 5 } }
+    const outputOnly = { id: 'o', cost: { output: 25 } }
+    expect(priceTurn(inputOnly, { inputTokens: 1_000_000, outputTokens: 1 })).toBeNull()
+    expect(priceTurn(outputOnly, { inputTokens: 1, outputTokens: 1_000_000 })).toBeNull()
+    expect(priceTurn(inputOnly, { inputTokens: 1_000_000, outputTokens: 0 })).toBeCloseTo(5)
   })
 })
