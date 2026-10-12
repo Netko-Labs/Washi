@@ -41,16 +41,16 @@ export function createClaudeSdkPort(deps: ClaudeSdkPortDeps): AgentPort {
 
     async prompt(request: PromptRequest, emit: (update: AgentUpdate) => void): Promise<TurnResult> {
       const { credential } = request
+      const local = credential.kind === 'local_cli'
+      const onPlan = local && credential.plan
       if (request.signal?.aborted) {
         return {
           costUsd: null,
-          billing: 'metered',
+          billing: onPlan ? 'plan' : 'metered',
           resumeToken: request.resumeToken,
           cancelled: true,
         }
       }
-      const local = credential.kind === 'local_cli'
-      const onPlan = local && credential.plan
       const abort = new AbortController()
       request.signal?.addEventListener('abort', () => abort.abort(), { once: true })
 
