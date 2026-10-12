@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
-import { listCapabilityCalls, openWorkspace, type Workspace } from '@washi/repository'
+import { getSheet, listCapabilityCalls, openWorkspace, type Workspace } from '@washi/repository'
+import { parse } from '@washi/wsx'
 import { AgentHost } from '../agents/host'
 import { defineUserTable, runQuery } from '../tables/service'
 
@@ -22,6 +23,19 @@ function makeHost() {
 
 /** Spec §09 P4 + Q13: one gate for both callers, and everything leaves a row. */
 describe('sheet actions pass the same desk as agent actions', () => {
+  test('sheet.create keeps a hostile title as text, not markup', async () => {
+    const { host, opened } = makeHost()
+    const title = 'a </Title><Missing/> "q" {x} & \\'
+    await host.executeAction({ verb: 'sheet.create', title }, { origin: 'sheet' })
+    const sheet = getSheet(ws, opened[0] ?? '')
+    expect(sheet?.title).toBe(title)
+    const root = parse(sheet?.source ?? '')
+    expect(root.props.title).toBe(title)
+    expect(root.children).toEqual([
+      { kind: 'element', name: 'Title', props: {}, children: [{ kind: 'text', value: title }] },
+    ])
+  })
+
   test('a click runs reversible in-vault verbs and ledgers them', async () => {
     const { host } = makeHost()
     defineUserTable(ws, { name: 'tasks', columns: [{ name: 'title', type: 'text' }] })

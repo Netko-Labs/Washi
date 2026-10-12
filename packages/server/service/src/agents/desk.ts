@@ -90,7 +90,9 @@ export class CapabilityDesk {
         this.events()?.openSheet(action.sheet)
       },
       'sheet.create': (action) => {
-        const source = `<Sheet title=${JSON.stringify(action.title)} wsx="1">\n  <Title>${action.title}</Title>\n</Sheet>\n`
+        // A JS string literal in braces: JSX text and attribute strings have no escapes.
+        const title = `{${JSON.stringify(action.title)}}`
+        const source = `<Sheet title=${title} wsx="1">\n  <Title>${title}</Title>\n</Sheet>\n`
         const sheet = createSheetFromSource(this.ws, { title: action.title, source })
         this.events()?.openSheet(sheet.id)
       },

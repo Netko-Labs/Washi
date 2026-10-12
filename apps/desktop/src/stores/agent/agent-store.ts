@@ -69,7 +69,12 @@ export const useAgentStore = create<AgentState>((set, get) => ({
   toggleExpanded: () => set((state) => ({ chatExpanded: !state.chatExpanded })),
 
   init: () => {
-    initializing ??= get().initialize()
+    initializing ??= get()
+      .initialize()
+      .catch((error: unknown) => {
+        initializing = null
+        throw error
+      })
     return initializing
   },
 
@@ -159,7 +164,12 @@ export const useAgentStore = create<AgentState>((set, get) => ({
     }
     if (!sessionId || !text.trim()) return
     set({ running: true })
-    await api.agents.prompt.mutate({ sessionId, text })
+    try {
+      await api.agents.prompt.mutate({ sessionId, text })
+    } catch (error) {
+      set({ running: false })
+      throw error
+    }
   },
 
   stopTurn: async () => {

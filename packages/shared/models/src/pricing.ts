@@ -15,11 +15,15 @@ export function priceTurn(model: ModelEntry | null, usage: TokenUsage): number |
 
   const cached = usage.cachedInputTokens ?? 0
   const fresh = Math.max(0, (usage.inputTokens ?? 0) - cached)
+  const output = usage.outputTokens ?? 0
 
-  const inputRate = cost.input ?? 0
+  const inputRate = cost.input
   const cachedRate = cost.cache_read ?? inputRate
-  const outputRate = cost.output ?? 0
+  const outputRate = cost.output
+  // A missing rate is unknown, not free: only absent usage may skip it.
+  if ((fresh && inputRate == null) || (cached && cachedRate == null)) return null
+  if (output && outputRate == null) return null
 
-  const total = fresh * inputRate + cached * cachedRate + (usage.outputTokens ?? 0) * outputRate
+  const total = fresh * (inputRate ?? 0) + cached * (cachedRate ?? 0) + output * (outputRate ?? 0)
   return total / TOKENS_PER_PRICE_UNIT
 }

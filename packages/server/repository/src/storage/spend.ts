@@ -1,6 +1,6 @@
 import type { TurnBilling } from '@washi/domain'
 import { agentSpendTable } from '@washi/domain/db'
-import { eq } from 'drizzle-orm'
+import { eq, sql } from 'drizzle-orm'
 import type { Workspace } from './client'
 import { getAppMeta, setAppMeta } from './meta'
 
@@ -51,29 +51,28 @@ export function recordSpend(
   costUsd: number | null,
   { day = today(), billing = 'metered' }: SpendOptions = {},
 ): DaySpend {
-  const current = spendForDay(ws, day)
   const amount = Math.max(0, costUsd ?? 0)
-  const next = {
-    day,
-    costUsd: current.costUsd + (billing === 'metered' ? amount : 0),
-    savedUsd: current.savedUsd + (billing === 'plan' ? amount : 0),
-    turns: current.turns + 1,
-    updatedAt: ws.now(),
-  }
-  ws.db
+  const row = ws.db
     .insert(agentSpendTable)
-    .values(next)
+    .values({
+      day,
+      costUsd: billing === 'metered' ? amount : 0,
+      savedUsd: billing === 'plan' ? amount : 0,
+      turns: 1,
+      updatedAt: ws.now(),
+    })
     .onConflictDoUpdate({
       target: agentSpendTable.day,
       set: {
-        costUsd: next.costUsd,
-        savedUsd: next.savedUsd,
-        turns: next.turns,
-        updatedAt: next.updatedAt,
+        costUsd: sql`${agentSpendTable.costUsd} + excluded.cost_usd`,
+        savedUsd: sql`${agentSpendTable.savedUsd} + excluded.saved_usd`,
+        turns: sql`${agentSpendTable.turns} + excluded.turns`,
+        updatedAt: sql`excluded.updated_at`,
       },
     })
-    .run()
-  return { day, costUsd: next.costUsd, savedUsd: next.savedUsd, turns: next.turns }
+    .returning()
+    .get()
+  return { day, costUsd: row.costUsd, savedUsd: row.savedUsd, turns: row.turns }
 }
 
 /** The day the breaker tripped, or null. A person clears it; nothing clears it for them. */

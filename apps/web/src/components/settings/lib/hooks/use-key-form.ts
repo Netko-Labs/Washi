@@ -11,6 +11,7 @@ export function useKeyForm(onSave: (input: KeyInput) => Promise<boolean>) {
   const pickProvider = (id: string) => {
     setProvider(id)
     setModel(null)
+    setSecret('')
   }
 
   const submit = async () => {

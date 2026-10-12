@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import { createModelCatalogue } from '@washi/models'
-import { defaultModelFor, isReadTool } from '../agents/ports'
+import { openWorkspace } from '@washi/repository'
+import { createClaudeSdkPort, defaultModelFor, isReadTool } from '../agents/ports'
 
 /**
  * "Two ports, one vocabulary" (§05) is only true if both ports gate the same
@@ -76,5 +77,33 @@ describe('a workspace that names no model still gets one', () => {
 
   test('an unknown provider does not throw', async () => {
     expect(await defaultModelFor(offline, 'nonesuch')).toBeString()
+  })
+})
+
+describe('a Stop pressed before the turn starts', () => {
+  test('never reaches the SDK', async () => {
+    const ws = openWorkspace({ id: 'test', path: ':memory:' })
+    const port = createClaudeSdkPort({
+      ws,
+      catalogue: createModelCatalogue(),
+      instructions: '',
+      runHankoAction: async () => {},
+      canUseTool: async () => ({ behavior: 'deny', message: 'no' }),
+    })
+    const emitted: unknown[] = []
+    const result = await port.prompt(
+      {
+        sessionId: 's',
+        text: 'hi',
+        credential: { kind: 'api_key', apiKey: 'sk-test', provider: 'anthropic' },
+        model: { provider: 'anthropic' },
+        history: [],
+        signal: AbortSignal.abort(),
+      },
+      (update) => emitted.push(update),
+    )
+    ws.close()
+    expect(result).toMatchObject({ cancelled: true, costUsd: null })
+    expect(emitted).toEqual([])
   })
 })

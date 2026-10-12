@@ -41,6 +41,14 @@ export function createClaudeSdkPort(deps: ClaudeSdkPortDeps): AgentPort {
 
     async prompt(request: PromptRequest, emit: (update: AgentUpdate) => void): Promise<TurnResult> {
       const { credential } = request
+      if (request.signal?.aborted) {
+        return {
+          costUsd: null,
+          billing: 'metered',
+          resumeToken: request.resumeToken,
+          cancelled: true,
+        }
+      }
       const local = credential.kind === 'local_cli'
       const onPlan = local && credential.plan
       const abort = new AbortController()

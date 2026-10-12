@@ -9,4 +9,4 @@ export type {
   TurnDoneView,
   TurnReceiptProps,
 } from './types'
-export { formatDuration, formatUsd, receiptParts } from './utils'
+export { formatDuration, formatUsd, mergeMessageChunks, receiptParts } from './utils'

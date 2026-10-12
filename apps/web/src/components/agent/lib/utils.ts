@@ -1,9 +1,10 @@
-import type { TurnDoneView } from './types'
+import type { TranscriptEntryView, TurnDoneView } from './types'
 
 export function formatDuration(ms: number): string {
-  if (ms < 60_000) return `${(ms / 1000).toFixed(1)}s`
-  const minutes = Math.floor(ms / 60_000)
-  return `${minutes}m ${Math.round((ms % 60_000) / 1000)}s`
+  const tenths = Math.round(ms / 100)
+  if (tenths < 600) return `${(tenths / 10).toFixed(1)}s`
+  const seconds = Math.round(ms / 1000)
+  return `${Math.floor(seconds / 60)}m ${seconds % 60}s`
 }
 
 export function formatUsd(amount: number): string {
@@ -21,4 +22,21 @@ export function receiptParts(update: TurnDoneView): string[] {
   }
   if (update.model) parts.push(update.model)
   return parts
+}
+
+/** Streamed chunks arrive one per event; adjacent ones are a single message. */
+export function mergeMessageChunks(entries: TranscriptEntryView[]): TranscriptEntryView[] {
+  const merged: TranscriptEntryView[] = []
+  for (const entry of entries) {
+    const last = merged.at(-1)
+    if (entry.update.kind === 'message_chunk' && last?.update.kind === 'message_chunk') {
+      merged[merged.length - 1] = {
+        ...last,
+        update: { kind: 'message_chunk', text: last.update.text + entry.update.text },
+      }
+      continue
+    }
+    merged.push(entry)
+  }
+  return merged
 }

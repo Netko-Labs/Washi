@@ -17,8 +17,7 @@ export function WorkspacePicker({ onOpen }: { onOpen: (id: string) => void }) {
   const submit = async () => {
     if (!name.trim()) return
     setBusy(true)
-    const id = await create(name.trim())
-    setBusy(false)
+    const id = await create(name.trim()).finally(() => setBusy(false))
     if (id) {
       setName('')
       open(id)
