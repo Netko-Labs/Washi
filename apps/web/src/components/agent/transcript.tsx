@@ -1,5 +1,5 @@
 import { IconTool, IconX } from '@tabler/icons-react'
-import type { TranscriptEntryView } from './lib'
+import { mergeMessageChunks, type TranscriptEntryView } from './lib'
 import { ProposedEdit } from './proposed-edit'
 import { TurnReceipt } from './turn-receipt'
 
@@ -25,7 +25,7 @@ export function Transcript({ entries }: { entries: TranscriptEntryView[] }) {
 
   return (
     <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-4 py-4">
-      {entries.map((entry) => (
+      {mergeMessageChunks(entries).map((entry) => (
         <Entry key={entry.id} entry={entry} />
       ))}
     </div>

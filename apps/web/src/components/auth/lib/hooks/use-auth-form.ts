@@ -20,17 +20,22 @@ export function useAuthForm(onDone: () => void) {
   const submit = async () => {
     patch({ busy: true, error: null })
     const { email, password, name, mode } = state
-    const result =
-      mode === 'sign-up'
-        ? await signUp.email({ email, password, name: name || email.split('@')[0] || 'You' })
-        : await signIn.email({ email, password })
+    try {
+      const result =
+        mode === 'sign-up'
+          ? await signUp.email({ email, password, name: name || email.split('@')[0] || 'You' })
+          : await signIn.email({ email, password })
 
-    if (result.error) {
-      patch({ busy: false, error: result.error.message ?? 'That did not work.' })
-      return
+      if (result.error) {
+        patch({ error: result.error.message ?? 'That did not work.' })
+        return
+      }
+      onDone()
+    } catch (cause) {
+      patch({ error: cause instanceof Error ? cause.message : String(cause) })
+    } finally {
+      patch({ busy: false })
     }
-    patch({ busy: false })
-    onDone()
   }
 
   return { state, patch, setMode, submit }

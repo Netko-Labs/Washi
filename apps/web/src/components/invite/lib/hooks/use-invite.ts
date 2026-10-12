@@ -12,20 +12,28 @@ export function useInvite(onAccepted: (workspaceId: string) => void): InviteStat
   useEffect(() => {
     const invitationId = pendingInvite()
     if (!invitationId) return
-    void auth.organization.acceptInvitation({ invitationId }).then((result) => {
-      clearInvite()
-      const workspaceId = result.data?.invitation.organizationId
-      if (workspaceId) {
-        setState({ kind: 'none' })
-        onAccepted(workspaceId)
-        return
-      }
-      setState({
-        kind: 'failed',
-        message:
-          result.error?.message ?? 'That invitation could not be accepted. Ask for a fresh link.',
+    auth.organization
+      .acceptInvitation({ invitationId })
+      .then((result) => {
+        clearInvite()
+        const workspaceId = result.data?.invitation.organizationId
+        if (workspaceId) {
+          setState({ kind: 'none' })
+          onAccepted(workspaceId)
+          return
+        }
+        setState({
+          kind: 'failed',
+          message:
+            result.error?.message ?? 'That invitation could not be accepted. Ask for a fresh link.',
+        })
       })
-    })
+      .catch(() =>
+        setState({
+          kind: 'failed',
+          message: 'Could not reach the server to accept that invitation. Reload to try again.',
+        }),
+      )
   }, [onAccepted])
 
   return state

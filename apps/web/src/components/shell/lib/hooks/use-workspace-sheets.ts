@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { api } from '@/lib/rpc'
 import type { SheetListItem } from '@/lib/types'
 
@@ -7,17 +7,21 @@ export function useWorkspaceSheets(workspaceId: string) {
   const [activeId, setActiveId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const current = useRef(workspaceId)
+  current.current = workspaceId
 
   const refresh = useCallback(async () => {
+    const issuedFor = current.current
     setLoading(true)
     try {
       const next = await api.sheets.list.query()
+      if (issuedFor !== current.current) return
       setSheets(next)
       setError(null)
     } catch (cause) {
-      setError(String(cause))
+      if (issuedFor === current.current) setError(String(cause))
     } finally {
-      setLoading(false)
+      if (issuedFor === current.current) setLoading(false)
     }
     // workspaceId is not read here — it rides the request header — but changing
     // it must refetch, so it stays in the dependency list deliberately.

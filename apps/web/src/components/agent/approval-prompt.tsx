@@ -17,8 +17,8 @@ export function ApprovalPrompt({
         Washi wants to run <span className="font-mono">{approval.toolName}</span>
       </p>
       {approval.input != null && (
-        <pre className="mt-2 max-h-28 overflow-auto rounded-lg bg-muted p-2 font-mono text-[11px] leading-relaxed">
-          {JSON.stringify(approval.input, null, 2).slice(0, 600)}
+        <pre className="mt-2 max-h-64 overflow-auto whitespace-pre-wrap break-all rounded-lg bg-muted p-2 font-mono text-[11px] leading-relaxed">
+          {JSON.stringify(approval.input, null, 2)}
         </pre>
       )}
       <div className="mt-3 flex flex-wrap gap-2">

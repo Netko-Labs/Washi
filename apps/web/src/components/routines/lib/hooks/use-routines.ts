@@ -9,8 +9,10 @@ export function useRoutines() {
   const refresh = useCallback(async () => {
     try {
       setRoutines(await api.routines.list.query())
+      return true
     } catch (cause) {
       setError(String(cause))
+      return false
     }
   }, [])
 
@@ -22,8 +24,7 @@ export function useRoutines() {
     setError(null)
     try {
       await action()
-      await refresh()
-      return true
+      return await refresh()
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : String(cause))
       return false

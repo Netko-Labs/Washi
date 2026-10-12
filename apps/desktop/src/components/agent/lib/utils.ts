@@ -3,8 +3,10 @@ import type { AgentUpdate } from '@washi/domain'
 type TurnDone = Extract<AgentUpdate, { kind: 'turn_done' }>
 
 function duration(ms: number): string {
-  if (ms < 60_000) return `${(ms / 1000).toFixed(1)}s`
-  return `${Math.floor(ms / 60_000)}m ${Math.round((ms % 60_000) / 1000)}s`
+  const tenths = Math.round(ms / 100)
+  if (tenths < 600) return `${(tenths / 10).toFixed(1)}s`
+  const seconds = Math.round(ms / 1000)
+  return `${Math.floor(seconds / 60)}m ${seconds % 60}s`
 }
 
 export function usd(amount: number): string {

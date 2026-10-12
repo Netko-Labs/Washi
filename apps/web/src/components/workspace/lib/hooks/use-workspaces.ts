@@ -29,13 +29,18 @@ export function useWorkspaces() {
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-|-$/g, '')}-${Date.now().toString(36)}`
-    const result = await auth.organization.create({ name, slug })
-    if (result.error) {
-      setError(result.error.message ?? 'Could not create that workspace.')
+    try {
+      const result = await auth.organization.create({ name, slug })
+      if (result.error) {
+        setError(result.error.message ?? 'Could not create that workspace.')
+        return null
+      }
+      await refresh()
+      return result.data?.id ?? null
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : String(cause))
       return null
     }
-    await refresh()
-    return result.data?.id ?? null
   }
 
   const open = (id: string) => setActiveWorkspace(id)
