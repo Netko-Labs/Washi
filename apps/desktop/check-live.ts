@@ -30,7 +30,7 @@ export default defineCheck(async (app: CheckDriver) => {
   app.step('ask for a page')
   const composer = 'textarea[placeholder="Ask, or tell Washi what to write…"]'
   await app.type(
-    `Create a sheet titled "${TITLE}" with a single H1 that reads "${TITLE}". Run sheet_check first. Keep it minimal.`,
+    `Create a sheet titled "${TITLE}" with a single <Title> that reads "${TITLE}". Run sheet_check first. Keep it minimal.`,
     { selector: composer },
   )
   await app.key('Enter')

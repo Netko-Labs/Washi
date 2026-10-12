@@ -1,0 +1,268 @@
+/*
+ * @washi/paper — the styling surface a page cannot reach.
+ * Theme tokens arrive inline as --wsx-l-* / --wsx-d-*; the reader's mode picks.
+ */
+
+.wsx {
+  --bg: var(--wsx-l-bg);
+  --card: var(--wsx-l-card);
+  --ink: var(--wsx-l-ink);
+  --muted: var(--wsx-l-muted);
+  --border: var(--wsx-l-border);
+  --muted-bg: var(--wsx-l-muted-bg);
+  --accent: var(--wsx-l-accent);
+  --accent-ink: var(--wsx-l-accent-ink);
+
+  --tone-info: #3d5a73;
+  --tone-info-text: #2f4a61;
+  --tone-info-on: #fbf9f4;
+  --tone-success: #94a06b;
+  --tone-success-text: #5a6638;
+  --tone-success-on: #221f1a;
+  --tone-warning: #c08a2e;
+  --tone-warning-text: #7a5612;
+  --tone-warning-on: #221f1a;
+  --tone-danger: #b5543c;
+  --tone-danger-text: #9a4530;
+  --tone-danger-on: #fbf9f4;
+  --tone-neutral: #6f685d;
+  --tone-neutral-text: #5c564c;
+  --tone-neutral-on: #fbf9f4;
+  --tone-accent-text: #9e4a20;
+
+  --chart-1: #c25f2c;
+  --chart-2: #3d5a73;
+  --chart-3: #94a06b;
+  --chart-4: #a97f52;
+  --chart-5: #e3a99c;
+  --kraft: #a97f52;
+  --blush: #e3a99c;
+
+  --shadow-card: 0 2px 10px rgba(34, 31, 26, 0.04);
+  --shadow-drag: 0 8px 18px rgba(34, 31, 26, 0.16);
+  --shadow-modal: 0 20px 60px rgba(34, 31, 26, 0.25);
+
+  --font-serif: "Young Serif", Georgia, serif;
+  --font-sans: "Karla Variable", Karla, system-ui, sans-serif;
+  --font-mono: ui-monospace, "JetBrains Mono Variable", Menlo, monospace;
+
+  --r-cell: 4px;
+  --r-chip: 7px;
+  --r-input: 11px;
+  --r-card: 15px;
+  --r-sheet: 19px;
+
+  --ease: 150ms ease;
+  --ease-size: 200ms ease;
+}
+
+.dark .wsx {
+  --bg: var(--wsx-d-bg);
+  --card: var(--wsx-d-card);
+  --ink: var(--wsx-d-ink);
+  --muted: var(--wsx-d-muted);
+  --border: var(--wsx-d-border);
+  --muted-bg: var(--wsx-d-muted-bg);
+  --accent: var(--wsx-d-accent);
+  --accent-ink: var(--wsx-d-accent-ink);
+
+  --tone-info-text: #9dbbd6;
+  --tone-success-text: #b9c48f;
+  --tone-warning-text: #e0b466;
+  --tone-danger-text: #e39a86;
+  --tone-neutral-text: #b5ab9b;
+  --tone-accent-text: var(--accent);
+  --shadow-card: 0 2px 10px rgba(0, 0, 0, 0.3);
+  --shadow-drag: 0 8px 18px rgba(0, 0, 0, 0.5);
+}
+
+/* tone = a pre-checked triplet: fill, text-on-tint, text-on-fill */
+.wsx,
+.wsx [data-tone="neutral"] {
+  --t-fill: var(--tone-neutral);
+  --t-text: var(--tone-neutral-text);
+  --t-on: var(--tone-neutral-on);
+}
+.wsx [data-tone="accent"] {
+  --t-fill: var(--accent);
+  --t-text: var(--tone-accent-text);
+  --t-on: var(--accent-ink);
+}
+.wsx [data-tone="info"] {
+  --t-fill: var(--tone-info);
+  --t-text: var(--tone-info-text);
+  --t-on: var(--tone-info-on);
+}
+.wsx [data-tone="success"] {
+  --t-fill: var(--tone-success);
+  --t-text: var(--tone-success-text);
+  --t-on: var(--tone-success-on);
+}
+.wsx [data-tone="warning"] {
+  --t-fill: var(--tone-warning);
+  --t-text: var(--tone-warning-text);
+  --t-on: var(--tone-warning-on);
+}
+.wsx [data-tone="danger"] {
+  --t-fill: var(--tone-danger);
+  --t-text: var(--tone-danger-text);
+  --t-on: var(--tone-danger-on);
+}
+.wsx [data-tone] {
+  --t-tint: color-mix(in srgb, var(--t-fill) 14%, transparent);
+  --t-line: color-mix(in srgb, var(--t-fill) 40%, var(--border));
+}
+
+/* the kit takes its tone from the sheet accent, so a page cannot assemble a rainbow */
+.wsx,
+.wsx[data-accent="accent"] {
+  --k-fill: var(--accent);
+  --k-text: var(--tone-accent-text);
+  --k-on: var(--accent-ink);
+}
+.wsx[data-accent="info"] {
+  --k-fill: var(--tone-info);
+  --k-text: var(--tone-info-text);
+  --k-on: var(--tone-info-on);
+}
+.wsx[data-accent="success"] {
+  --k-fill: var(--tone-success);
+  --k-text: var(--tone-success-text);
+  --k-on: var(--tone-success-on);
+}
+.wsx[data-accent="warning"] {
+  --k-fill: var(--tone-warning);
+  --k-text: var(--tone-warning-text);
+  --k-on: var(--tone-warning-on);
+}
+.wsx[data-accent="danger"] {
+  --k-fill: var(--tone-danger);
+  --k-text: var(--tone-danger-text);
+  --k-on: var(--tone-danger-on);
+}
+.wsx .wsx-tape:not([data-tone]),
+.wsx .wsx-stamp:not([data-tone]),
+.wsx .wsx-chip:not([data-tone]),
+.wsx .wsx-quote:not([data-tone]),
+.wsx .wsx-progress:not([data-tone]),
+.wsx .wsx-step:not([data-tone]) {
+  --t-fill: var(--k-fill);
+  --t-text: var(--k-text);
+  --t-on: var(--k-on);
+  --t-tint: color-mix(in srgb, var(--k-fill) 14%, transparent);
+  --t-line: color-mix(in srgb, var(--k-fill) 40%, var(--border));
+}
+
+/* size scales type and space together */
+.wsx,
+.wsx [data-size="md"] {
+  --sz: 1;
+}
+.wsx [data-size="sm"] {
+  --sz: 0.88;
+}
+.wsx [data-size="lg"] {
+  --sz: 1.18;
+}
+
+/* emphasis = hierarchy within the current tone */
+.wsx [data-emphasis="quiet"] {
+  --em-alpha: 0.72;
+  --em-weight: 400;
+}
+.wsx,
+.wsx [data-emphasis="normal"] {
+  --em-alpha: 1;
+  --em-weight: 400;
+}
+.wsx [data-emphasis="strong"] {
+  --em-alpha: 1;
+  --em-weight: 700;
+}
+
+/* gap tokens: the only spacing a page can name */
+.wsx {
+  --gap-tight: 7px;
+  --gap-normal: 14px;
+  --gap-loose: 26px;
+}
+.wsx [data-gap="tight"] {
+  --gap: var(--gap-tight);
+}
+.wsx,
+.wsx [data-gap="normal"] {
+  --gap: var(--gap-normal);
+}
+.wsx [data-gap="loose"] {
+  --gap: var(--gap-loose);
+}
+
+/* feel reproportions every primitive at once — measures are the design's page frames */
+.wsx,
+.wsx[data-feel="note"] {
+  --measure: 760px;
+  --pad: 40px 32px;
+  --rhythm: 18px;
+  --body: 15px;
+  --t1: 32px;
+  --t2: 22px;
+  --t3: 17px;
+  --hero: 46px;
+  --card-border: 1.5px;
+}
+.wsx[data-feel="editorial"] {
+  --measure: 700px;
+  --pad: 56px 40px;
+  --rhythm: 22px;
+  --body: 16px;
+  --t1: 40px;
+  --t2: 24px;
+  --t3: 17px;
+  --hero: 58px;
+  --card-border: 0px;
+}
+.wsx[data-feel="board"] {
+  --measure: 1180px;
+  --pad: 26px;
+  --rhythm: 16px;
+  --body: 14px;
+  --t1: 28px;
+  --t2: 20px;
+  --t3: 15px;
+  --hero: 34px;
+  --card-border: 1.5px;
+}
+.wsx[data-feel="deck"] {
+  --measure: 960px;
+  --pad: 56px 48px;
+  --rhythm: 32px;
+  --body: 17px;
+  --t1: 46px;
+  --t2: 28px;
+  --t3: 20px;
+  --hero: 58px;
+  --card-border: 0px;
+  text-align: center;
+}
+
+/* the panel contract: 320 / 400 / 720 / full — density per bucket */
+@container wsx (max-width: 400px) {
+  .wsx-page {
+    --pad: 20px 16px;
+    --rhythm: 14px;
+    --t1: 26px;
+    --hero: 32px;
+  }
+}
+@container wsx (max-width: 720px) {
+  .wsx-page {
+    --hero: min(var(--hero), 40px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wsx * {
+    transition: none !important;
+    animation: none !important;
+  }
+}

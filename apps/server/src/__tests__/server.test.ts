@@ -102,7 +102,7 @@ describe('the server serves the whole surface over http', () => {
     const created = (await mutate('sheets.create', {
       write: {
         title: 'Roadmap',
-        source: '<Sheet title="Roadmap"><P>goblin objectives</P></Sheet>',
+        source: '<Sheet title="Roadmap"><Text>goblin objectives</Text></Sheet>',
       },
     })) as { result?: { data: { id: string } } }
     const id = created.result?.data.id

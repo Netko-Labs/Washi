@@ -1,48 +1,43 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "@fontsource-variable/inter";
 @import "@fontsource/zen-kaku-gothic-new/700.css";
 @import "@fontsource/zen-kaku-gothic-new/900.css";
 @import "@fontsource-variable/karla";
+@import "@fontsource/young-serif";
+@import "@washi/paper/css";
 @import "@fontsource-variable/jetbrains-mono";
 @import "@fontsource/shippori-mincho/600.css";
 @import "@fontsource/shippori-mincho/800.css";
 @import "@fontsource/m-plus-rounded-1c/500.css";
 @import "@fontsource/m-plus-rounded-1c/800.css";
 
-@source "../../../packages/shared/paper/src";
-
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* token set from the Washi.dc.html handoff — design-exact hex */
-  --background: #fbf5ea;
-  --foreground: #453325;
-  --card: #fffdf6;
-  --card-foreground: #453325;
-  --popover: #fffcf3;
-  --popover-foreground: #453325;
-  --muted: #f4ead7;
-  --muted-foreground: #97815f;
-  --accent: #f2e3cc;
-  --accent-foreground: #453325;
-  --secondary: #f4ead7;
-  --secondary-foreground: #453325;
-  --border: #e8dbc2;
-  --input: #e2d3b6;
-  --primary: #cf6b36;
-  --primary-foreground: #fff6e4;
-  --destructive: #c53030;
+  /* Washi.dc.html (0.4) — the paper palette, design-exact hex */
+  --background: #f1ede5;
+  --foreground: #221f1a;
+  --card: #fbf9f4;
+  --card-foreground: #221f1a;
+  --popover: #fffdf8;
+  --popover-foreground: #221f1a;
+  --muted: #e9e4d9;
+  --muted-foreground: #6f685d;
+  --accent: #e6e0d4;
+  --accent-foreground: #221f1a;
+  --secondary: #e9e4d9;
+  --secondary-foreground: #221f1a;
+  --border: #dcd5c8;
+  --input: #cbc3b4;
+  --primary: #c25f2c;
+  --primary-foreground: #fbf9f4;
+  --destructive: #b5543c;
   --ring: var(--primary);
-  --agent: rgb(43 127 255);
-
-  --tape-pink: oklch(0.72 0.16 356);
-  --tape-teal: oklch(0.7 0.115 183);
-  --tape-blue: oklch(0.68 0.1 245);
-  --tape-mustard: oklch(0.75 0.13 80);
-  --tape-violet: oklch(0.66 0.12 292);
-  --tape-moss: oklch(0.66 0.1 132);
-  --tape-slate: oklch(0.62 0.04 255);
+  --brand-indigo: #3d5a73;
+  --brand-matcha: #94a06b;
+  --brand-blush: #e3a99c;
+  --brand-kraft: #a97f52;
+  --agent: var(--brand-indigo);
 }
 
 .dark {
@@ -85,15 +80,8 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-tape-pink: var(--tape-pink);
-  --color-tape-teal: var(--tape-teal);
-  --color-tape-blue: var(--tape-blue);
-  --color-tape-mustard: var(--tape-mustard);
-  --color-tape-violet: var(--tape-violet);
-  --color-tape-moss: var(--tape-moss);
-  --color-tape-slate: var(--tape-slate);
 
-  --font-sans: "Inter Variable", system-ui, sans-serif;
+  --font-sans: "Karla Variable", Karla, system-ui, sans-serif;
   --color-agent: var(--agent);
   --font-display: "Zen Kaku Gothic New", "Karla Variable", sans-serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;

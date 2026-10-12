@@ -1,0 +1,258 @@
+/* Frame + Text primitives. The Sheet owns paper, ink, measure, padding and rhythm. */
+
+.wsx {
+  container: wsx / inline-size;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  user-select: text;
+}
+.wsx-page {
+  width: 100%;
+  max-width: var(--measure);
+  min-width: min(100%, 320px);
+  margin: 0 auto;
+  padding: var(--pad);
+}
+.wsx-page > * + *,
+.wsx-section > * + *,
+.wsx-tab > * + *,
+.wsx-card-body > * + *,
+.wsx-callout-body > * + *,
+.wsx-reveal-body > * + * {
+  margin-top: var(--rhythm);
+}
+.wsx-section > * + * {
+  margin-top: var(--gap);
+}
+.wsx-section-title {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding-bottom: 7px;
+  border-bottom: 1px solid var(--border);
+}
+.wsx-section + .wsx-section {
+  margin-top: calc(var(--rhythm) * 2);
+}
+
+.wsx-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap);
+  align-items: var(--align, flex-start);
+}
+.wsx-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  align-items: var(--align, stretch);
+}
+.wsx-grid {
+  display: grid;
+  gap: var(--gap);
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+.wsx-grid > * {
+  grid-column: span var(--span, 12);
+  min-width: 0;
+}
+@container wsx (max-width: 400px) {
+  .wsx-grid > * {
+    grid-column: span 12;
+  }
+}
+.wsx-divider {
+  border: 0;
+  border-top: 1px solid var(--border);
+  opacity: var(--em-alpha);
+}
+.wsx-divider[data-emphasis="strong"] {
+  border-top-width: 2px;
+  border-color: var(--ink);
+}
+
+/* type roles — selected by role, never by px */
+.wsx-title {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.12;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.wsx-title[data-level="1"] {
+  font-size: var(--t1);
+  line-height: 1.1;
+}
+.wsx-title[data-level="2"] {
+  font-size: var(--t2);
+  line-height: 1.2;
+}
+.wsx-title[data-level="3"] {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: var(--t3);
+  line-height: 1.3;
+}
+.wsx-text {
+  font-size: calc(var(--body) * var(--sz));
+  line-height: 1.6;
+  font-weight: var(--em-weight);
+  color: var(--ink);
+  opacity: var(--em-alpha);
+  max-width: var(--measure);
+}
+.wsx-text[data-tone]:not([data-tone="neutral"]) {
+  color: var(--t-text);
+}
+.wsx-text[data-emphasis="quiet"] {
+  color: var(--muted);
+  opacity: 1;
+}
+.wsx-text[data-lead] {
+  font-size: calc(var(--body) * 1.2);
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.wsx-list {
+  padding-left: 1.4em;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.wsx-list[data-marker="bullet"] {
+  list-style: disc;
+}
+.wsx-list[data-marker="number"] {
+  list-style: decimal;
+}
+.wsx-list[data-marker="check"] {
+  list-style: none;
+  padding-left: 0;
+}
+.wsx-item {
+  line-height: 1.55;
+}
+.wsx-list::marker,
+.wsx-item::marker {
+  color: var(--muted);
+}
+.wsx-list[data-marker="check"] .wsx-item {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+}
+.wsx-item-check {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-top: 4px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-cell);
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  color: var(--accent-ink);
+}
+.wsx-item[data-done] .wsx-item-check {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.wsx-item[data-done] > span:last-child {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+
+.wsx-quote {
+  margin: 0;
+  padding: 4px 0 4px 18px;
+  border-left: 2px solid var(--t-fill);
+  font-family: var(--font-serif);
+  font-size: calc(var(--body) * 1.25);
+  line-height: 1.4;
+  color: var(--ink);
+}
+.wsx-quote[data-tone="neutral"] {
+  border-left-color: var(--border);
+}
+.wsx-code {
+  margin: 0;
+  padding: 14px 16px;
+  background: var(--muted-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-input);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-x: auto;
+  color: var(--ink);
+}
+.wsx-code-lang {
+  float: right;
+  font-family: var(--font-sans);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.wsx-pair {
+  display: grid;
+  grid-template-columns: minmax(96px, 30%) 1fr;
+  gap: 4px 16px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border);
+}
+.wsx-pair dt {
+  font-weight: 700;
+  font-size: 13.5px;
+  color: var(--muted);
+}
+.wsx-pair dd {
+  margin: 0;
+  min-width: 0;
+}
+@container wsx (max-width: 400px) {
+  .wsx-pair {
+    grid-template-columns: 1fr;
+  }
+}
+.wsx-note {
+  display: flex;
+  gap: 9px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+.wsx-note-n,
+.wsx-source-n {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent);
+  flex: none;
+  padding-top: 2px;
+}
+.wsx-source {
+  font-size: 12px;
+  color: var(--muted);
+  font-style: normal;
+  display: flex;
+  gap: 7px;
+}
+.wsx-money {
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--em-weight);
+}
+.wsx-money[data-negative] {
+  color: var(--tone-danger-text);
+}

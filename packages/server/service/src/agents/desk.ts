@@ -2,7 +2,7 @@ import { checkAction, type HankoHandlers, isReversibleVerb, runAction } from '@w
 import { recordCapability, setAppMeta, type Workspace } from '@washi/repository'
 import { guardedFetch, isPrivateAddress } from '@washi/tsuru'
 import { createSheetFromSource } from '../sheets/service'
-import { runMutation } from '../tables/service'
+import { deleteRecord, runMutation, updateRecord } from '../tables/service'
 import type { Caller, EventsRef } from './lib'
 import { currentFetchPolicy, TSURU_HOSTS_KEY } from './tools'
 
@@ -41,7 +41,7 @@ export class CapabilityDesk {
     await runAction(checked.action, this.handlers())
   }
 
-  /** The sheet <Fetch> component's path — same policy, no approval loop. */
+  /** A page-side fetch path — same policy, no approval loop. */
   async fetchForSheet(url: string, actorId: string | null = null): Promise<string> {
     const caller: Caller = { origin: 'sheet', actorId }
     try {
@@ -90,12 +90,21 @@ export class CapabilityDesk {
         this.events()?.openSheet(action.sheet)
       },
       'sheet.create': (action) => {
-        const source = `<Sheet title=${JSON.stringify(action.title)}>\n  <H1>${action.title}</H1>\n</Sheet>\n`
+        const source = `<Sheet title=${JSON.stringify(action.title)} wsx="1">\n  <Title>${action.title}</Title>\n</Sheet>\n`
         const sheet = createSheetFromSource(this.ws, { title: action.title, source })
         this.events()?.openSheet(sheet.id)
       },
       'table.insert': (action) => {
         runMutation(this.ws, { kind: 'insert', table: action.table, data: action.data })
+      },
+      'table.update': (action) => {
+        updateRecord(this.ws, action.table, action.row, action.set)
+      },
+      'table.reorder': (action) => {
+        updateRecord(this.ws, action.table, action.row, action.set)
+      },
+      'table.delete': (action) => {
+        deleteRecord(this.ws, action.table, action.row)
       },
       'url.open': (action) => {
         const url = new URL(action.url)

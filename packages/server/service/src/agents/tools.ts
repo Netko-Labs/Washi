@@ -137,7 +137,7 @@ export function createWashiTools(ws: Workspace, context: ToolContext) {
       ),
       tool(
         'action_run',
-        'Run a stamped hanko action: sheet.open, sheet.create, table.insert, url.open.',
+        'Run a stamped hanko action: sheet.open, sheet.create, table.insert, table.update, table.reorder, table.delete, url.open.',
         { action: z.record(z.string(), z.unknown()) },
         async ({ action }) => {
           await context.runHankoAction(action)

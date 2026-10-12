@@ -1,21 +1,18 @@
 import { createContext, type ReactNode, useContext, useState } from 'react'
+import type { Row } from './lib/types'
 
 export type SheetStateValue = string | number | boolean | null
 
 /**
- * The declarative answer to "react hooks" (spec Q11): a validated key/value
- * store per rendered sheet. Controls write to it, <Show> reads from it —
- * hook-shaped interactivity with zero executable content in the sheet.
+ * Declared sheet state: controls write keys, `expr` reads them. `local` and
+ * `stored` share one bag until stored persistence lands — both reset on reopen.
  */
 interface SheetStateContextValue {
   values: Record<string, SheetStateValue>
   set: (key: string, value: SheetStateValue) => void
 }
 
-const SheetStateContext = createContext<SheetStateContextValue>({
-  values: {},
-  set: () => {},
-})
+const SheetStateContext = createContext<SheetStateContextValue>({ values: {}, set: () => {} })
 
 export function SheetStateProvider({
   initial,
@@ -39,4 +36,15 @@ export function SheetStateProvider({
 
 export function useSheetState(): SheetStateContextValue {
   return useContext(SheetStateContext)
+}
+
+/** The row a <Repeat> put in scope — `$row.column` resolves against it. */
+const RowContext = createContext<Row | null>(null)
+
+export function RowProvider({ row, children }: { row: Row; children: ReactNode }) {
+  return <RowContext.Provider value={row}>{children}</RowContext.Provider>
+}
+
+export function useRow(): Row | null {
+  return useContext(RowContext)
 }

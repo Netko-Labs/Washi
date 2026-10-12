@@ -22,8 +22,8 @@ export default defineCheck(async (app: CheckDriver) => {
   app.step('showcase sheets render their design directions')
   await app.click('[aria-label="Open Launch Dashboard"]')
   await app.expectText('sum(points)')
-  await app.click('[aria-label="Open Release Playbook"]')
-  await app.expectText('Freeze')
+  await app.click('[aria-label="Open Kyoto in October"]')
+  await app.expectText('Arashiyama')
   await app.screenshot('showcase-playbook')
 
   app.step('creating a sheet adds it to the sidebar and opens it')

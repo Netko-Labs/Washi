@@ -17,23 +17,13 @@ interface SheetsState {
   search: (term: string) => Promise<void>
 }
 
-/**
- * The scaffold is a product surface, not a stub (spec Q15): primitives carry no
- * styling, so a bare <H1> would open as unstyled HTML. This is a composed sheet
- * the agent can edit — and a worked example of the vocabulary while it does.
- */
+/** A starter tree, not a stub: the agent edits a page that already reads as one. */
 const NEW_SHEET_SOURCE = (title: string) =>
-  `<Sheet title=${JSON.stringify(title)} class="min-h-full bg-background px-8 py-12 text-foreground @md:px-16">
-  <Box class="mx-auto max-w-2xl">
-    <H1 class="font-display font-black text-4xl tracking-tight">${title}</H1>
-    <P class="mt-4 text-[17px] text-muted-foreground leading-relaxed">
-      Blank canvas. Ask the agent to design this page, or describe what it should hold.
-    </P>
-    <Divider class="my-8 border-border" />
-    <P class="text-muted-foreground text-sm">
-      Every block here is styled by this sheet — nothing is inherited.
-    </P>
-  </Box>
+  `<Sheet title=${JSON.stringify(title)} icon="notebook" wsx="1">
+  <Title>${title}</Title>
+  <Text lead>Blank canvas. Ask the agent to design this page, or describe what it should hold.</Text>
+  <Divider />
+  <Text emphasis="quiet">Components own appearance; this page owns content and meaning.</Text>
 </Sheet>
 `
 

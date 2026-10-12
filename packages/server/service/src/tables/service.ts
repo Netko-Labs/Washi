@@ -3,6 +3,7 @@ import {
   type InkMutation,
   type InkQuery,
   type QueryResult,
+  type RecordData,
   type TableSpec,
   tableSpecSchema,
   unknownQueryColumns,
@@ -84,6 +85,31 @@ export function runMutation(
       const ids = matchRecordIds(ws, table.id, mutation.where)
       return { affected: deleteRecords(ws, table.id, ids) }
     }
+  }
+}
+
+/** Patch one record by id — the `table.update` verb. Columns must exist and typecheck. */
+export function updateRecord(
+  ws: Workspace,
+  tableName: string,
+  recordId: string,
+  patch: RecordData,
+): void {
+  const table = requireTable(ws, tableName)
+  const issues = validateRecord(table.spec, patch)
+  if (issues.length > 0) {
+    throw new InkError(issues.map((issue) => `${issue.path}: ${issue.message}`).join('; '))
+  }
+  if (updateRecords(ws, table.id, [recordId], patch) === 0) {
+    throw new InkError(`unknown record "${recordId}" on table "${tableName}"`)
+  }
+}
+
+/** Soft-delete one record by id — the `table.delete` verb. The row keeps its history. */
+export function deleteRecord(ws: Workspace, tableName: string, recordId: string): void {
+  const table = requireTable(ws, tableName)
+  if (deleteRecords(ws, table.id, [recordId]) === 0) {
+    throw new InkError(`unknown record "${recordId}" on table "${tableName}"`)
   }
 }
 

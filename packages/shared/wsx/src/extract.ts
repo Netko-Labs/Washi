@@ -1,4 +1,4 @@
-import type { WsxElement, WsxNode } from './types'
+import type { WsxElement, WsxMissing, WsxNode } from './types'
 
 function walk(node: WsxNode, visit: (node: WsxNode) => void) {
   visit(node)
@@ -27,4 +27,23 @@ export function extractRefs(root: WsxElement): string[] {
     }
   })
   return [...refs]
+}
+
+/** Capabilities a sheet asked for that the registry lacks — each is a registry request. */
+export function extractMissing(root: WsxElement): WsxMissing[] {
+  const out: WsxMissing[] = []
+  const descend = (node: WsxNode, path: string) => {
+    if (node.kind !== 'element') return
+    const nodePath = path ? `${path} > ${node.name}` : node.name
+    if (node.name === 'Missing') {
+      out.push({
+        kind: String(node.props.kind ?? ''),
+        reason: String(node.props.reason ?? ''),
+        path: nodePath,
+      })
+    }
+    for (const child of node.children) descend(child, nodePath)
+  }
+  descend(root, '')
+  return out
 }

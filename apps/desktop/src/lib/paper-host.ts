@@ -15,8 +15,6 @@ export const paperHost: PaperHost = {
     await api.capabilities.runAction.mutate({ action })
   },
 
-  runFetch: (url) => api.capabilities.fetchUrl.query({ url }),
-
   resolveSheet: async (id) => {
     const sheet = await api.sheets.get.query({ id })
     return sheet ? { title: sheet.title, icon: sheet.icon } : null
@@ -30,4 +28,11 @@ export const paperHost: PaperHost = {
   toggleTask: async (recordId, done) => {
     await api.tables.toggleTask.mutate({ recordId, done })
   },
+
+  describeTable: async (name) => {
+    const tables = await api.tables.list.query()
+    return tables.find((table) => table.spec.name === name)?.spec ?? null
+  },
+
+  locale: navigator.language,
 }

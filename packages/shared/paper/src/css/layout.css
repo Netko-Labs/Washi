@@ -1,0 +1,196 @@
+/* The `class` allowlist: layout-only tokens on the 4px scale. Nothing here touches colour, type, border or radius. */
+
+.wsx .row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--gap);
+}
+.wsx .col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+.wsx .wrap {
+  flex-wrap: wrap;
+}
+.wsx .nowrap {
+  flex-wrap: nowrap;
+}
+.wsx .grid-2,
+.wsx .grid-3,
+.wsx .grid-4 {
+  display: grid;
+  gap: var(--gap);
+}
+.wsx .grid-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.wsx .grid-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.wsx .grid-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.wsx .gap-0 {
+  gap: 0;
+}
+.wsx .gap-tight {
+  gap: var(--gap-tight);
+}
+.wsx .gap-normal {
+  gap: var(--gap-normal);
+}
+.wsx .gap-loose {
+  gap: var(--gap-loose);
+}
+
+.wsx .p-0 {
+  padding: 0;
+}
+.wsx .p-1 {
+  padding: 4px;
+}
+.wsx .p-2 {
+  padding: 8px;
+}
+.wsx .p-3 {
+  padding: 12px;
+}
+.wsx .p-4 {
+  padding: 16px;
+}
+.wsx .p-6 {
+  padding: 24px;
+}
+.wsx .p-8 {
+  padding: 32px;
+}
+
+.wsx .items-start {
+  align-items: flex-start;
+}
+.wsx .items-center {
+  align-items: center;
+}
+.wsx .items-end {
+  align-items: flex-end;
+}
+.wsx .items-stretch {
+  align-items: stretch;
+}
+.wsx .items-baseline {
+  align-items: baseline;
+}
+.wsx .justify-start {
+  justify-content: flex-start;
+}
+.wsx .justify-center {
+  justify-content: center;
+}
+.wsx .justify-end {
+  justify-content: flex-end;
+}
+.wsx .justify-between {
+  justify-content: space-between;
+}
+.wsx .text-left {
+  text-align: left;
+}
+.wsx .text-center {
+  text-align: center;
+}
+.wsx .text-right {
+  text-align: right;
+}
+.wsx .grow {
+  flex: 1 1 0%;
+  min-width: 0;
+}
+.wsx .none {
+  flex: none;
+}
+.wsx .full {
+  width: 100%;
+}
+
+/* container-prefixed variants: the page measures itself, never the window */
+@container wsx (min-width: 400px) {
+  .wsx .\@sm\:row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--gap);
+  }
+  .wsx .\@sm\:col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+  }
+  .wsx .\@sm\:grid-2 {
+    display: grid;
+    gap: var(--gap);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .wsx .\@sm\:grid-3 {
+    display: grid;
+    gap: var(--gap);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@container wsx (min-width: 720px) {
+  .wsx .\@md\:row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--gap);
+  }
+  .wsx .\@md\:col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+  }
+  .wsx .\@md\:grid-2 {
+    display: grid;
+    gap: var(--gap);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .wsx .\@md\:grid-3 {
+    display: grid;
+    gap: var(--gap);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .wsx .\@md\:grid-4 {
+    display: grid;
+    gap: var(--gap);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+@container wsx (min-width: 960px) {
+  .wsx .\@lg\:row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--gap);
+  }
+  .wsx .\@lg\:grid-3 {
+    display: grid;
+    gap: var(--gap);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .wsx .\@lg\:grid-4 {
+    display: grid;
+    gap: var(--gap);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* grids collapse below 400 no matter what the page asked for */
+@container wsx (max-width: 400px) {
+  .wsx .grid-2,
+  .wsx .grid-3,
+  .wsx .grid-4 {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

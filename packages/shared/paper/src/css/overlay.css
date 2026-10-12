@@ -1,0 +1,98 @@
+/* Drawer and Compose. */
+
+.wsx-drawer-root {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+}
+.wsx-drawer-scrim {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  background: rgba(34, 31, 26, 0.32);
+  animation: wsxFade 150ms ease both;
+  cursor: default;
+}
+.wsx-drawer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(440px, 100%);
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  color: var(--ink);
+  border-left: 1px solid var(--border);
+  box-shadow: var(--shadow-modal);
+  animation: wsxSlide 180ms ease both;
+  font-size: var(--body);
+}
+.wsx-drawer-head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.wsx-drawer-title {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wsx-drawer-close {
+  border: 0;
+  background: none;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: var(--r-chip);
+}
+.wsx-drawer-close:hover {
+  background: var(--muted-bg);
+  color: var(--ink);
+}
+.wsx-drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+.wsx-drawer-body > * + * {
+  margin-top: var(--gap);
+}
+@keyframes wsxFade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes wsxSlide {
+  from {
+    transform: translateX(24px);
+    opacity: 0;
+  }
+}
+
+/* compose */
+.wsx-compose {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+.wsx-compose .wsx-field-input {
+  flex: 1;
+  min-width: 0;
+  resize: vertical;
+}
+.wsx-compose textarea.wsx-field-input {
+  height: auto;
+  padding: 8px 11px;
+  line-height: 1.5;
+}
