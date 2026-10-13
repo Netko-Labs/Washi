@@ -1,0 +1,9 @@
+**/node_modules
+**/dist
+**/.mirin
+.git
+.env
+.env.*
+!.env.example
+*.bun-build
+.washi
