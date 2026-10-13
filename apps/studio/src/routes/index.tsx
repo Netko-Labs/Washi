@@ -1,6 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { App } from '@/components/app'
 
-// Phase 3 mounts the ported web shell here.
+// Session, workspace choice and the shell all read browser state (cookie, localStorage).
 export const Route = createFileRoute('/')({
-  component: () => <main className="p-8 font-black text-2xl">Washi</main>,
+  ssr: false,
+  component: App,
 })

@@ -1,8 +1,10 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "@fontsource-variable/inter";
-
-@source "../../../packages/shared/paper/src";
+@import "@fontsource-variable/karla";
+@import "@fontsource/young-serif";
+@import "@fontsource-variable/jetbrains-mono";
+@import "@washi/paper/css";
 
 @custom-variant dark (&:is(.dark *));
 

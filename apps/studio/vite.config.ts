@@ -20,9 +20,13 @@ const HSTS_HEADER = { 'strict-transport-security': 'max-age=31536000; includeSub
 
 export default defineConfig(({ command }) => ({
   server: { port: Number(process.env.PORT ?? 3000) },
-  resolve: { tsconfigPaths: true },
+  // One React: workspace packages resolve their own copy under the isolated linker.
+  resolve: { tsconfigPaths: true, dedupe: ['react', 'react-dom'] },
   // Packages that read their own files at runtime stay real packages; nitro's traceDeps ships them.
   ssr: { external: RUNTIME_FILE_DEPS },
+  // The scan crawls server routes too; an unresolvable `bun` import aborts it, and every client
+  // dep is then found late, one full reload at a time.
+  optimizeDeps: { rolldownOptions: { external: [/^bun(:|$)/] } },
   build: {
     rolldownOptions: {
       // Bun's own modules (SQL, SQLite) exist only at runtime on Bun.
