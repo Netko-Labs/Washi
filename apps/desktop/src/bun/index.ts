@@ -2,9 +2,11 @@ import { homedir } from 'node:os'
 import { join } from 'node:path'
 import { createEmbeddedControlPlane } from '@washi/control/embedded'
 import { listSheets, listTables } from '@washi/repository'
-import { DEFAULT_WORKSPACE_ID, startServer } from '@washi/server'
+import { DEFAULT_WORKSPACE_ID, startRuntime } from '@washi/runtime'
+import { createContext } from '@washi/trpc'
 import { app, devtools, type MenuItemTemplate, menu } from 'mirinjs'
 import { developMenu } from './dev-menu'
+import { createDesktopRpc } from './rpc'
 import { seedShowcase } from './showcase'
 import { createWindowStore } from './window-store'
 
@@ -20,27 +22,29 @@ const appDataDir = join(
   app.isDev ? `${appId}-dev` : appId,
 )
 
-// The desktop app is a client of its own server (C4). Embedded mode binds
-// loopback on an OS-assigned port; the renderer is handed the origin and does
-// not otherwise know it is local.
-const server = startServer({
+// The same runtime a studio boots, embedded: one workspace, no accounts, no port. The renderer
+// reaches it through tRPC over mirin IPC (C4: same router, different transport).
+const booted = startRuntime({
   mode: 'embedded',
   dataDir: join(appDataDir, 'workspaces'),
   control: createEmbeddedControlPlane({ workspaceId: DEFAULT_WORKSPACE_ID }),
 })
-const runtime = server.runtime
+const runtime = booted.runtime
 const { workspace } = runtime.resolve(DEFAULT_WORKSPACE_ID)
 
-console.log(`[Washi] storage at ${appDataDir} · server at ${server.url}`)
+const desktopRpc = createDesktopRpc(() =>
+  createContext(runtime, { workspaceId: DEFAULT_WORKSPACE_ID }),
+)
+const served = app.serve(desktopRpc.router)
+desktopRpc.connect((frame) => served.rpc.trpcFrame.broadcast(frame))
+
+console.log(`[Washi] storage at ${appDataDir}`)
 seedShowcase(workspace)
 
 const windowStore = createWindowStore(appDataDir)
-const uiUrl =
-  `app://ui/index.html?server=${encodeURIComponent(server.url)}` +
-  `&token=${encodeURIComponent(server.token)}`
+const uiUrl = 'app://ui/index.html'
 
 devtools.expose('store', () => ({
-  server: server.url,
   workspace: workspace.id,
   sheets: listSheets(workspace).length,
   tables: listTables(workspace).length,
@@ -139,5 +143,6 @@ app.on('ready', () => {
 })
 
 app.on('window-all-closed', () => {
-  void server.stop().then(() => app.quit())
+  desktopRpc.bridge.stopAll()
+  void booted.stop().then(() => app.quit())
 })
