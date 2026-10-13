@@ -42,9 +42,9 @@ plan or the key, first run, receipts, Stop, invites) is the current block.
   Mode is asserted once at boot in `assertMode`, never per request.
 - `apps/desktop` — mirin shell and a **client of its own server**: window, menu, icon, Develop
   menu, and the embedded server booted in-process. `src/bun/` is the main process.
-- `packages/server/{domain,repository,service,trpc}` — one-way layering: domain → repository →
+- `packages/washi/{domain,repository,service,trpc}` — one-way layering: domain → repository →
   service → trpc → ui. DB access only in repository; business logic in service; routers in trpc.
-- `packages/server/control` — Postgres control plane: Better Auth, organizations, members,
+- `packages/washi/control` — Postgres control plane: Better Auth, organizations, members,
   invitations, encrypted API keys. Import `@washi/control/embedded` for the stub — the root
   barrel pulls in Better Auth and a Postgres driver.
 - `packages/shared/wsx` — WSX parse/validate/serialize (isomorphic, no DOM)
@@ -91,7 +91,7 @@ plan or the key, first run, receipts, Stop, invites) is the current block.
 - WSX is inert data: registry primitives, literal props, the closed `expr` grammar only. Components
   own appearance (four enums: `variant tone size emphasis`); pages own content. Validation before
   persist and before render. Format reference: `docs/wsx.md`.
-- tRPC v11. Routers live in `packages/server/trpc/src/routers/{entity}/` per conventions §3.
+- tRPC v11. Routers live in `packages/washi/trpc/src/routers/{entity}/` per conventions §3.
   Subscriptions are SSE with `tracked()`, so they resume from `lastEventId`. Phase 8's `/sync`
   will be raw binary WS instead — Loro deltas have no business in JSON.
 - `WASHI_SECRET_KEY` is the session secret **and** the root of every workspace's BYOK key

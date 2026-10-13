@@ -4,11 +4,11 @@ FROM oven/bun:1.4-slim AS deps
 WORKDIR /app
 COPY package.json bun.lock ./
 COPY apps/server/package.json apps/server/
-COPY packages/server/control/package.json packages/server/control/
-COPY packages/server/domain/package.json packages/server/domain/
-COPY packages/server/repository/package.json packages/server/repository/
-COPY packages/server/service/package.json packages/server/service/
-COPY packages/server/trpc/package.json packages/server/trpc/
+COPY packages/washi/control/package.json packages/washi/control/
+COPY packages/washi/domain/package.json packages/washi/domain/
+COPY packages/washi/repository/package.json packages/washi/repository/
+COPY packages/washi/service/package.json packages/washi/service/
+COPY packages/washi/trpc/package.json packages/washi/trpc/
 COPY packages/shared/hanko/package.json packages/shared/hanko/
 COPY packages/shared/ink/package.json packages/shared/ink/
 COPY packages/shared/models/package.json packages/shared/models/

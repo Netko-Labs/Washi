@@ -118,91 +118,6 @@
         "vite": "^7.3.6",
       },
     },
-    "packages/server/control": {
-      "name": "@washi/control",
-      "version": "0.1.0",
-      "dependencies": {
-        "@washi/trpc": "workspace:*",
-        "better-auth": "^1.7.5",
-        "drizzle-orm": "^0.45.2",
-        "zod": "^4.4.3",
-      },
-      "devDependencies": {
-        "@types/bun": "latest",
-        "@washi/typescript-config": "workspace:*",
-      },
-    },
-    "packages/server/domain": {
-      "name": "@washi/domain",
-      "version": "0.1.0",
-      "dependencies": {
-        "@washi/ink": "workspace:*",
-        "drizzle-orm": "^0.45.2",
-        "drizzle-zod": "^0.8.3",
-        "zod": "^4.4.3",
-      },
-      "devDependencies": {
-        "@types/bun": "latest",
-        "@washi/typescript-config": "workspace:*",
-      },
-    },
-    "packages/server/repository": {
-      "name": "@washi/repository",
-      "version": "0.1.0",
-      "dependencies": {
-        "@washi/domain": "workspace:*",
-        "@washi/ink": "workspace:*",
-        "@washi/wsx": "workspace:*",
-        "drizzle-orm": "^0.45.2",
-        "loro-crdt": "^1.14.1",
-      },
-      "devDependencies": {
-        "@types/bun": "latest",
-        "@washi/typescript-config": "workspace:*",
-      },
-    },
-    "packages/server/service": {
-      "name": "@washi/service",
-      "version": "0.1.0",
-      "dependencies": {
-        "@ai-sdk/anthropic": "^4",
-        "@anthropic-ai/claude-agent-sdk": "^0.3.228",
-        "@openrouter/ai-sdk-provider": "^3",
-        "@washi/domain": "workspace:*",
-        "@washi/hanko": "workspace:*",
-        "@washi/ink": "workspace:*",
-        "@washi/models": "workspace:*",
-        "@washi/paper": "workspace:*",
-        "@washi/repository": "workspace:*",
-        "@washi/tsuru": "workspace:*",
-        "@washi/wsx": "workspace:*",
-        "ai": "^7",
-        "mirinjs": "0.1.0-alpha.19",
-        "zod": "^4.4.3",
-      },
-      "devDependencies": {
-        "@types/bun": "latest",
-        "@washi/typescript-config": "workspace:*",
-      },
-    },
-    "packages/server/trpc": {
-      "name": "@washi/trpc",
-      "version": "0.1.0",
-      "dependencies": {
-        "@trpc/server": "^11.19.0",
-        "@washi/domain": "workspace:*",
-        "@washi/hanko": "workspace:*",
-        "@washi/ink": "workspace:*",
-        "@washi/models": "workspace:*",
-        "@washi/repository": "workspace:*",
-        "@washi/service": "workspace:*",
-        "zod": "^4.4.3",
-      },
-      "devDependencies": {
-        "@types/bun": "latest",
-        "@washi/typescript-config": "workspace:*",
-      },
-    },
     "packages/shared/hanko": {
       "name": "@washi/hanko",
       "version": "0.1.0",
@@ -279,6 +194,91 @@
       },
       "devDependencies": {
         "@babel/types": "^7.29.0",
+        "@types/bun": "latest",
+        "@washi/typescript-config": "workspace:*",
+      },
+    },
+    "packages/washi/control": {
+      "name": "@washi/control",
+      "version": "0.1.0",
+      "dependencies": {
+        "@washi/trpc": "workspace:*",
+        "better-auth": "^1.7.5",
+        "drizzle-orm": "^0.45.2",
+        "zod": "^4.4.3",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+        "@washi/typescript-config": "workspace:*",
+      },
+    },
+    "packages/washi/domain": {
+      "name": "@washi/domain",
+      "version": "0.1.0",
+      "dependencies": {
+        "@washi/ink": "workspace:*",
+        "drizzle-orm": "^0.45.2",
+        "drizzle-zod": "^0.8.3",
+        "zod": "^4.4.3",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+        "@washi/typescript-config": "workspace:*",
+      },
+    },
+    "packages/washi/repository": {
+      "name": "@washi/repository",
+      "version": "0.1.0",
+      "dependencies": {
+        "@washi/domain": "workspace:*",
+        "@washi/ink": "workspace:*",
+        "@washi/wsx": "workspace:*",
+        "drizzle-orm": "^0.45.2",
+        "loro-crdt": "^1.14.1",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+        "@washi/typescript-config": "workspace:*",
+      },
+    },
+    "packages/washi/service": {
+      "name": "@washi/service",
+      "version": "0.1.0",
+      "dependencies": {
+        "@ai-sdk/anthropic": "^4",
+        "@anthropic-ai/claude-agent-sdk": "^0.3.228",
+        "@openrouter/ai-sdk-provider": "^3",
+        "@washi/domain": "workspace:*",
+        "@washi/hanko": "workspace:*",
+        "@washi/ink": "workspace:*",
+        "@washi/models": "workspace:*",
+        "@washi/paper": "workspace:*",
+        "@washi/repository": "workspace:*",
+        "@washi/tsuru": "workspace:*",
+        "@washi/wsx": "workspace:*",
+        "ai": "^7",
+        "mirinjs": "0.1.0-alpha.19",
+        "zod": "^4.4.3",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+        "@washi/typescript-config": "workspace:*",
+      },
+    },
+    "packages/washi/trpc": {
+      "name": "@washi/trpc",
+      "version": "0.1.0",
+      "dependencies": {
+        "@trpc/server": "^11.19.0",
+        "@washi/domain": "workspace:*",
+        "@washi/hanko": "workspace:*",
+        "@washi/ink": "workspace:*",
+        "@washi/models": "workspace:*",
+        "@washi/repository": "workspace:*",
+        "@washi/service": "workspace:*",
+        "zod": "^4.4.3",
+      },
+      "devDependencies": {
         "@types/bun": "latest",
         "@washi/typescript-config": "workspace:*",
       },
@@ -767,11 +767,11 @@
 
     "@vitejs/plugin-react": ["@vitejs/plugin-react@5.2.0", "", { "dependencies": { "@babel/core": "^7.29.0", "@babel/plugin-transform-react-jsx-self": "^7.27.1", "@babel/plugin-transform-react-jsx-source": "^7.27.1", "@rolldown/pluginutils": "1.0.0-rc.3", "@types/babel__core": "^7.20.5", "react-refresh": "^0.18.0" }, "peerDependencies": { "vite": "^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0" } }, "sha512-YmKkfhOAi3wsB1PhJq5Scj3GXMn3WvtQ/JC0xoopuHoXSdmtdStOpFrYaT1kie2YgFBcIe64ROzMYRjCrYOdYw=="],
 
-    "@washi/control": ["@washi/control@workspace:packages/server/control"],
+    "@washi/control": ["@washi/control@workspace:packages/washi/control"],
 
     "@washi/desktop": ["@washi/desktop@workspace:apps/desktop"],
 
-    "@washi/domain": ["@washi/domain@workspace:packages/server/domain"],
+    "@washi/domain": ["@washi/domain@workspace:packages/washi/domain"],
 
     "@washi/hanko": ["@washi/hanko@workspace:packages/shared/hanko"],
 
@@ -781,13 +781,13 @@
 
     "@washi/paper": ["@washi/paper@workspace:packages/shared/paper"],
 
-    "@washi/repository": ["@washi/repository@workspace:packages/server/repository"],
+    "@washi/repository": ["@washi/repository@workspace:packages/washi/repository"],
 
     "@washi/server": ["@washi/server@workspace:apps/server"],
 
-    "@washi/service": ["@washi/service@workspace:packages/server/service"],
+    "@washi/service": ["@washi/service@workspace:packages/washi/service"],
 
-    "@washi/trpc": ["@washi/trpc@workspace:packages/server/trpc"],
+    "@washi/trpc": ["@washi/trpc@workspace:packages/washi/trpc"],
 
     "@washi/tsuru": ["@washi/tsuru@workspace:packages/shared/tsuru"],
 
@@ -1247,8 +1247,6 @@
 
     "@washi/service/mirinjs": ["mirinjs@0.1.0-alpha.19", "", {}, "sha512-QGBOvZfKW7uv/PV9p4222mXxI4Dx2H8xPLgJ2xLyEAHebpNvyLKW35tkiMPIDCj1GQFYpJjG6DIvZ95beNPzlg=="],
 
-    "@washi/web/@types/bun": ["@types/bun@1.4.2", "", { "dependencies": { "bun-types": "1.4.2" } }, "sha512-GimotNn7+ZV0uVArItBbriZsR1oNf0+WTzPkdcFrzShI7k2norL0uzEaJT8T33dWr7O/c9ZDuAFQrctKCi72oQ=="],
-
     "better-call/@better-auth/utils": ["@better-auth/utils@0.5.0", "", { "dependencies": { "@noble/hashes": "^2.0.1" } }, "sha512-BL8W4EfIZFwlu0r54m3v1ztjDhu6dDe/amLTm0xybmbZaNgYUqhD3SjpAsnq0q8YD6/ki4iwIgxJNLP/N3TxiA=="],
 
     "body-parser/content-type": ["content-type@2.0.0", "", {}, "sha512-j/O/d7GcZCyNl7/hwZAb606rzqkyvaDctLmckbxLzHvFBzTJHuGEdodATcP3yIRoDrLHkIATJuvzbFlp/ki2cQ=="],
@@ -1262,7 +1260,5 @@
     "type-is/content-type": ["content-type@2.0.0", "", {}, "sha512-j/O/d7GcZCyNl7/hwZAb606rzqkyvaDctLmckbxLzHvFBzTJHuGEdodATcP3yIRoDrLHkIATJuvzbFlp/ki2cQ=="],
 
     "wrap-ansi/string-width": ["string-width@7.2.0", "", { "dependencies": { "emoji-regex": "^10.3.0", "get-east-asian-width": "^1.0.0", "strip-ansi": "^7.1.0" } }, "sha512-tsaTIkKW9b4N+AEj+SVA+WhJzV7/zMhcSu78mLKWSk7cXMOSHsBKFWUs0fWwq8QyK3MgJBQRX6Gbi4kYbdvGkQ=="],
-
-    "@washi/web/@types/bun/bun-types": ["bun-types@1.4.2", "", { "dependencies": { "@types/node": "*" } }, "sha512-bxV1FgK7yBIzjRe5zBozIM4Bem11ZJcCXSrjWRG3YWLt8yFDePu4cLjpebO8OvPeIE9trbyPF4fuj3Cia4Fj3w=="],
   }
 }
