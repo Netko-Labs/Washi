@@ -3,7 +3,7 @@
   "provider": "node",
   "steps": {
     "install": {
-      "commands": ["bun install --frozen-lockfile --filter @washi/studio"]
+      "commands": ["bun install --frozen-lockfile --ignore-scripts --filter @washi/studio"]
     },
     "build": {
       "commands": ["bun run --cwd apps/studio build"]
