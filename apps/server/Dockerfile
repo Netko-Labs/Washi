@@ -29,5 +29,8 @@ COPY packages packages
 
 ENV NODE_ENV=production
 EXPOSE 3000
+# slim has no curl or wget, so the probe is bun itself; Coolify defers to an image HEALTHCHECK.
+HEALTHCHECK --interval=10s --timeout=5s --start-period=10s --retries=5 \
+  CMD ["bun", "-e", "const r = await fetch('http://localhost:3000/health'); process.exit(r.ok ? 0 : 1)"]
 # Bun runs the TypeScript entry directly; there is no build step to drift from source.
 CMD ["bun", "run", "apps/server/src/main.ts"]
