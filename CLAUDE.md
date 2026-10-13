@@ -4,9 +4,10 @@ Agent-first knowledge base. Notes are WSX — JSX as a serialization format, ren
 `@washi/paper` registry. Structure rules: @docs/conventions.md — that file wins for structure, this
 one for project facts.
 
-**Washi is a server with clients.** One Bun binary runs in two modes: `embedded` (what the desktop
-app boots in-process — loopback, a per-boot token, no accounts, one workspace) and `hosted` (a team
-server — Better Auth sessions, organizations, invitations, BYOK). Team collaboration ships first;
+**Washi is one runtime, two hosts.** `@washi/runtime` builds it in two modes: `embedded` (what the
+desktop's main process boots — no accounts, one workspace, no port) and `hosted` (the studio, a team
+server — Better Auth sessions, organizations, invitations, BYOK). Both serve the **same `appRouter`**:
+the studio over HTTP + `/trpc-ws`, the desktop over mirin IPC. Team collaboration ships first;
 local-only mode is deferred to phase 7, not cut.
 
 Specs (visual, canonical):
@@ -17,14 +18,17 @@ Specs (visual, canonical):
   Its constraints **C1–C4** are law, not guidance — they are what keep phase 7 a redeployment
   rather than a second implementation.
 
-Progress lives in `tasks/todo.md`. Phases 1–6 are done; the MLP+1 (agent inference on the
-plan or the key, first run, receipts, Stop, invites) is the current block.
+Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the studio architecture
+(template-based web, desktop over mirin IPC) is the current block.
 
 ## Commands
 
 - `bun dev` — run the desktop app (`mirin dev`; root script handles the cwd)
-- `bun run dev:server` — run the server standalone. **From the repo root**: Bun reads `.env` from
-  the cwd, so `--cwd apps/server` silently starts embedded mode instead.
+- `bun run dev:studio` — the studio (`bun --bun vite dev`, port from `PORT`). Hosted needs the
+  `WASHI_*` env and Postgres (`docker compose up postgres`). Vite must run under Bun (`--bun`):
+  Node can't load `bun:` modules, and the error looks like a 500 on every route.
+- `bun run --cwd apps/studio build` — `.output/`, what Railpack ships; `bun --no-install
+  apps/studio/.output/server/index.mjs` runs it.
 - `bun run typecheck` — tsgo across all workspaces (turbo)
 - `bun run check` — biome check
 - `bun test` — unit tests across workspaces
@@ -34,17 +38,23 @@ plan or the key, first run, receipts, Stop, invites) is the current block.
 - `bun run --cwd apps/desktop check:live` — the golden path through a **real** turn on this
   machine's Claude Code login (ask → accept at the desk → page opens → plan receipt). Opt-in:
   it spends plan usage, so it is never part of `check`.
-- `docker compose up` — hosted mode + Postgres. Needs `.env` (see `.env.example`).
+- `docker compose up` — the studio + Postgres (self-hosting). Needs `.env` (see `.env.example`).
+  Coolify builds the same app with Railpack: `RAILPACK_CONFIG_FILE=apps/studio/railpack.json`.
 
 ## Topology
 
-- `apps/server` — the Bun binary. `Bun.serve` with `/health`, `/api/auth/*`, `/trpc/*`.
-  Mode is asserted once at boot in `assertMode`, never per request.
-- `apps/desktop` — mirin shell and a **client of its own server**: window, menu, icon, Develop
-  menu, and the embedded server booted in-process. `src/bun/` is the main process.
-- `packages/server/{domain,repository,service,trpc}` — one-way layering: domain → repository →
+- `apps/studio` — TanStack Start on Nitro (bun preset), from `Netko-Labs/tanstack-solo-server-
+  monorepo-template`: SSR, `/api/auth/*`, `/api/trpc/*`, `/trpc-ws`, `/api/health`. A Nitro plugin
+  boots the runtime at start (so the routine clock ticks unvisited) and drains sockets on SIGTERM.
+- `apps/desktop` — mirin shell: window, menu, icon, Develop menu. `src/bun/` (main) boots the
+  embedded runtime and serves `appRouter` via `createMirinBridge`; the renderer's `api` is a tRPC
+  client over `mirinLink`. No port, no token.
+- `packages/washi/runtime` — `bootRuntime(env)` / `startRuntime(options)`: mode assertion, control
+  plane, workspace registry, one AgentHost per workspace, the routine clock. Mode is asserted once
+  at boot, never per request.
+- `packages/washi/{domain,repository,service,trpc}` — one-way layering: domain → repository →
   service → trpc → ui. DB access only in repository; business logic in service; routers in trpc.
-- `packages/server/control` — Postgres control plane: Better Auth, organizations, members,
+- `packages/washi/control` — Postgres control plane: Better Auth, organizations, members,
   invitations, encrypted API keys. Import `@washi/control/embedded` for the stub — the root
   barrel pulls in Better Auth and a Postgres driver.
 - `packages/shared/wsx` — WSX parse/validate/serialize (isomorphic, no DOM)
@@ -76,9 +86,10 @@ plan or the key, first run, receipts, Stop, invites) is the current block.
 - A `plan` turn lands in `saved_usd`, never `cost_usd`: the daily stop counts metered dollars
   only, and every turn counts toward the turn cap. `init.apiKeySource` is `none` (not `oauth`)
   for a claude.ai login — the binary, not the docs, set that rule.
-- Agent SSE subscriptions are workspaceProcedures and filter on `workspaceId`: one bus serves
-  every workspace. EventSource can't set headers, so the workspace rides `connectionParams`.
-- **Routines** run on the server's minute clock (`apps/server/src/lib/clock.ts`), over the
+- Agent subscriptions are workspaceProcedures and filter on `workspaceId`: one bus serves every
+  workspace. HTTP names the workspace in `x-washi-workspace`; a socket in `connectionParams`
+  (`contextFromRequest` is the one place both are read). Switching workspace closes the socket.
+- **Routines** run on the server's minute clock (`packages/washi/runtime/src/clock.ts`), over the
   workspaces `ControlPlane.workspaceIds()` knows that already have a file — never a stray or
   deleted one, never a conjured `default`. A run is an ordinary `host.prompt` in a fresh session:
   daily stop, desk and receipt all apply. One routine in flight per workspace, parked or not —
@@ -91,9 +102,17 @@ plan or the key, first run, receipts, Stop, invites) is the current block.
 - WSX is inert data: registry primitives, literal props, the closed `expr` grammar only. Components
   own appearance (four enums: `variant tone size emphasis`); pages own content. Validation before
   persist and before render. Format reference: `docs/wsx.md`.
-- tRPC v11. Routers live in `packages/server/trpc/src/routers/{entity}/` per conventions §3.
-  Subscriptions are SSE with `tracked()`, so they resume from `lastEventId`. Phase 8's `/sync`
-  will be raw binary WS instead — Loro deltas have no business in JSON.
+- tRPC v11. Routers live in `packages/washi/trpc/src/routers/{entity}/` per conventions §3.
+  Web subscriptions ride `/trpc-ws` (the template's crossws bridge, cookie on the upgrade); the
+  desktop's ride mirin events. Both yield `tracked()` and arrive as `{ id, data }`. Phase 8's
+  `/sync` will be raw binary WS — Loro deltas have no business in JSON.
+- **Client code imports `@washi/trpc/client`, never the barrel.** The barrel carries the router,
+  and with it the service layer and the Agent SDK — into the browser bundle.
+- `loro-crdt` and the Agent SDK read their own files at runtime (.wasm, the native `claude`
+  binary): they stay external in Vite's SSR build and Nitro traces them into `.output`
+  (`RUNTIME_FILE_DEPS` in `apps/studio/vite.config.ts`). Inline them and SSR dies on ENOENT.
+- One React repo-wide (root `overrides`). Bun's isolated linker will otherwise give workspace
+  packages a second copy — an invalid hook call.
 - `WASHI_SECRET_KEY` is the session secret **and** the root of every workspace's BYOK key
   derivation. Rotating it signs everyone out and makes every stored API key unreadable.
 - `mirin.config.ts` is pure data. Mirin commands run with `apps/desktop` as cwd.

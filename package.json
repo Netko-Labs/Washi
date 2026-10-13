@@ -5,7 +5,7 @@
   "type": "module",
   "workspaces": [
     "apps/*",
-    "packages/server/*",
+    "packages/washi/*",
     "packages/shared/*"
   ],
   "scripts": {
@@ -23,10 +23,9 @@
     "check": "biome check .",
     "test": "bun test",
     "prepare": "husky",
-    "dev:server": "bun run apps/server/src/main.ts",
-    "dev:web": "bun run --cwd apps/web dev"
+    "dev:studio": "bun run --cwd apps/studio dev"
   },
-  "packageManager": "bun@1.3.14",
+  "packageManager": "bun@1.4.0",
   "devDependencies": {
     "@biomejs/biome": "^2.5.3",
     "@commitlint/cli": "^21.2.1",
@@ -49,5 +48,12 @@
     "@mirinjs/linux-x64": "0.1.0-alpha.25",
     "@mirinjs/win32-arm64": "0.1.0-alpha.25",
     "@mirinjs/win32-x64": "0.1.0-alpha.25"
+  },
+  "patchedDependencies": {
+    "nitro@3.0.260903-beta": "patches/nitro@3.0.260903-beta.patch"
+  },
+  "overrides": {
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
   }
 }

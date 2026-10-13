@@ -1,0 +1,60 @@
+import {
+  createTRPCClient,
+  createWSClient,
+  httpBatchLink,
+  splitLink,
+  type TRPCWebSocketClient,
+  wsLink,
+} from '@trpc/client'
+import { type AppRouter, MAX_TRPC_BATCH_SIZE, WORKSPACE_HEADER } from '@washi/trpc/client'
+import {
+  getWebSocketUrl,
+  readActiveWorkspace,
+  TRPC_HTTP_URL,
+  TRPC_WS_IDLE_CLOSE_MS,
+  writeActiveWorkspace,
+} from './lib'
+
+const wsClient: TRPCWebSocketClient | undefined =
+  typeof window === 'undefined'
+    ? undefined
+    : createWSClient({
+        url: getWebSocketUrl,
+        lazy: { enabled: true, closeMs: TRPC_WS_IDLE_CLOSE_MS },
+        connectionParams: () => {
+          const workspace = readActiveWorkspace()
+          return workspace ? { workspace } : {}
+        },
+      })
+
+/** A socket keeps the workspace it connected with; switching closes it so the next one reconnects. */
+export function setActiveWorkspace(id: string | null): void {
+  if (readActiveWorkspace() === id) return
+  writeActiveWorkspace(id)
+  wsClient?.close()
+}
+
+/**
+ * Queries and mutations batch over HTTP with the workspace in a header; subscriptions ride one
+ * lazy WebSocket to `/trpc-ws`. SSR never subscribes, so the server build stays HTTP-only.
+ */
+function createLinks() {
+  const http = httpBatchLink<AppRouter>({
+    url: TRPC_HTTP_URL,
+    maxItems: MAX_TRPC_BATCH_SIZE,
+    headers: () => {
+      const workspace = readActiveWorkspace()
+      return workspace ? { [WORKSPACE_HEADER]: workspace } : {}
+    },
+  })
+  if (!wsClient) return [http]
+  return [
+    splitLink({
+      condition: (op) => op.type === 'subscription',
+      true: wsLink<AppRouter>({ client: wsClient }),
+      false: http,
+    }),
+  ]
+}
+
+export const api = createTRPCClient<AppRouter>({ links: createLinks() })

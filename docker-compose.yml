@@ -8,8 +8,8 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
       POSTGRES_DB: washi
     ports:
-      # Loopback only, so `bun run dev:server` on this machine can reach it. The
-      # containerised server talks to postgres:5432 instead.
+      # Loopback only, so `bun run dev:studio` on this machine can reach it. The
+      # containerised studio talks to postgres:5432 instead.
       - '127.0.0.1:${POSTGRES_PORT:-5432}:5432'
     volumes:
       - postgres:/var/lib/postgresql/data
@@ -19,10 +19,10 @@ services:
       timeout: 5s
       retries: 10
 
-  server:
+  studio:
     build:
       context: .
-      dockerfile: apps/server/Dockerfile
+      dockerfile: apps/studio/Dockerfile
     depends_on:
       postgres:
         condition: service_healthy
@@ -35,10 +35,8 @@ services:
       WASHI_BASE_URL: ${WASHI_BASE_URL:-http://localhost:3000}
       WASHI_TRUSTED_ORIGINS: ${WASHI_TRUSTED_ORIGINS:-}
       WASHI_DATA_DIR: /data/workspaces
-      WASHI_HOSTNAME: 0.0.0.0
-      WASHI_PORT: 3000
     ports:
-      - '${WASHI_PORT:-3000}:3000'
+      - '${STUDIO_PORT:-3000}:3000'
     volumes:
       # The workspaces. One SQLite file each — this is what a backup must cover.
       - workspaces:/data/workspaces

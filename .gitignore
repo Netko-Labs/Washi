@@ -18,3 +18,8 @@ build/
 .env
 .env.*
 !.env.example
+
+# TanStack Start / Nitro build output
+.output/
+.nitro/
+.tanstack/

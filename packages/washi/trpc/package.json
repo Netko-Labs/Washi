@@ -1,0 +1,28 @@
+{
+  "name": "@washi/trpc",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./client": "./src/client.ts"
+  },
+  "scripts": {
+    "check-types": "tsgo -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@trpc/client": "^11.19.0",
+    "@trpc/server": "^11.19.0",
+    "@washi/domain": "workspace:*",
+    "@washi/hanko": "workspace:*",
+    "@washi/ink": "workspace:*",
+    "@washi/models": "workspace:*",
+    "@washi/repository": "workspace:*",
+    "@washi/service": "workspace:*",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@washi/typescript-config": "workspace:*",
+    "@types/bun": "latest"
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "$schema": "https://schema.railpack.com",
+  "provider": "node",
+  "steps": {
+    "install": {
+      "commands": ["bun install --frozen-lockfile --ignore-scripts --filter @washi/studio"]
+    },
+    "build": {
+      "commands": ["bun run --cwd apps/studio build"]
+    }
+  },
+  "deploy": {
+    "inputs": [
+      {
+        "step": "packages:mise",
+        "include": [
+          "/mise/shims",
+          "/mise/installs",
+          "/usr/local/bin/mise",
+          "/etc/mise/config.toml",
+          "/root/.local/state/mise"
+        ]
+      },
+      { "step": "build", "include": ["apps/studio/.output"] }
+    ],
+    "aptPackages": ["curl"],
+    "variables": { "CI": "", "NODE_ENV": "production" },
+    "startCommand": "bun --no-install apps/studio/.output/server/index.mjs"
+  }
+}
