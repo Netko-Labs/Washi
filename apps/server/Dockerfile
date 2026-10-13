@@ -21,8 +21,9 @@ RUN bun install --frozen-lockfile --production --ignore-scripts
 
 FROM oven/bun:1.4-slim
 WORKDIR /app
-COPY --from=deps /app/node_modules node_modules
-COPY package.json ./
+# The whole tree, not just ./node_modules: bun's isolated linker puts workspace links in each
+# workspace's own node_modules, and without them `@washi/*` does not resolve.
+COPY --from=deps /app ./
 COPY apps/server apps/server
 COPY packages packages
 
