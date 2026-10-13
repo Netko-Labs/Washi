@@ -1,4 +1,0 @@
-{
-  "extends": "@washi/typescript-config/bun.json",
-  "include": ["src/**/*.ts"]
-}

@@ -16,11 +16,12 @@ apps/desktop   mirin: runtime in main, renderer → mirin link → appRouter.cre
 ```
 
 - [x] 1 · `packages/server` → `packages/washi` (names unchanged)
-- [ ] 2 · Bun 1.4.0 · `@washi/runtime` out of apps/server · trpc http/ws edges from the template ·
+- [x] 2 · Bun 1.4.0 · `@washi/runtime` out of apps/server · trpc http/ws edges from the template ·
       `apps/studio` scaffold (config, auth, trpc, health, railpack)
-- [ ] 3 · web screens ported into studio routes
-- [ ] 4 · mirin link: `@washi/trpc/mirin` server + client link; desktop drops the embedded server
-- [ ] 5 · Coolify: Railpack app for studio; delete `apps/server`, `apps/web`, their Coolify apps
+- [x] 3 · web screens ported into studio routes
+- [x] 4 · mirin link: `@washi/trpc/mirin` server + client link; desktop drops the embedded server
+- [x] 5a · `apps/server`, `apps/web` deleted; compose builds the studio image
+- [ ] 5b · Coolify: Railpack app for studio at washi.netko.dev; retire washi-server / washi-web
 
 Acceptance: typecheck, biome, `bun test` green each phase · studio smoke (health, SSR, trpc http +
 ws, auth) · desktop `mirin check` · washi.netko.dev signs up → workspace → first run in a browser.
