@@ -116,6 +116,10 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
 - `WASHI_SECRET_KEY` is the session secret **and** the root of every workspace's BYOK key
   derivation. Rotating it signs everyone out and makes every stored API key unreadable.
 - `mirin.config.ts` is pure data. Mirin commands run with `apps/desktop` as cwd.
+- **Brand lives in `Netko-Labs/brand-assets` (`washi/`)**: icon masters, the Icon Composer
+  bundle, the kit. `apps/desktop/icon.iconset`, `icon.icon` and the favicons in
+  `apps/studio/public/` are synced output — never edit them here; change the source there,
+  `bun run washi && bun run washi:sync ../Washi`, commit both repos.
 
 ## Git
 

@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
-  <defs>
+  <defs><clipPath id="tile"><rect width="1024" height="1024" rx="230.4"/></clipPath>
     <linearGradient id="cbgL" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#D4713F"/><stop offset="1" stop-color="#E28C55"/>
     </linearGradient>
@@ -13,7 +13,7 @@
       <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.45 0 0 0 0 0.37 0 0 0 0 0.26 0 0 0 0.9 0" result="c"/>
       <feComposite in="c" in2="SourceAlpha" operator="in"/>
     </filter>
-  </defs>
+  </defs><g clip-path="url(#tile)">
   <rect width="1024" height="1024" fill="url(#cbgL)"/>
   <rect width="1024" height="1024" fill="#000" opacity="0.10" filter="url(#cgrain)"/>
   <g opacity="0.75">
@@ -36,4 +36,4 @@
   <ellipse cx="512" cy="798" rx="34" ry="18" fill="#E8836B"/>
   <rect x="286" y="952" width="140" height="130" rx="60" fill="#F7EDD6" stroke="#6B3A1F" stroke-width="18"/>
   <rect x="598" y="952" width="140" height="130" rx="60" fill="#F7EDD6" stroke="#6B3A1F" stroke-width="18"/>
-</svg>
+</g></svg>
