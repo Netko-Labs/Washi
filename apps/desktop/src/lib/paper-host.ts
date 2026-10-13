@@ -3,7 +3,7 @@ import { api } from './rpc'
 
 /** Wires the closed capability surface of rendered sheets to the main process. */
 export const paperHost: PaperHost = {
-  runQuery: (query) => api.queryRecords({ query }),
+  runQuery: (query) => api.tables.query.query({ query }),
 
   runAction: async (action) => {
     if (action.verb === 'sheet.open' && typeof action.sheet === 'string') {
@@ -12,13 +12,13 @@ export const paperHost: PaperHost = {
       )
       return
     }
-    await api.runAction({ action })
+    await api.capabilities.runAction.mutate({ action })
   },
 
-  runFetch: (url) => api.fetchUrl({ url }),
+  runFetch: (url) => api.capabilities.fetchUrl.query({ url }),
 
   resolveSheet: async (id) => {
-    const sheet = await api.getSheet({ id })
+    const sheet = await api.sheets.get.query({ id })
     return sheet ? { title: sheet.title, icon: sheet.icon } : null
   },
 
@@ -28,6 +28,6 @@ export const paperHost: PaperHost = {
     ),
 
   toggleTask: async (recordId, done) => {
-    await api.toggleTask({ recordId, done })
+    await api.tables.toggleTask.mutate({ recordId, done })
   },
 }

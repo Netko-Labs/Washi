@@ -1,0 +1,8 @@
+export { createAuth, type WashiAuth } from './lib/auth'
+export { type ControlDB, createControlDb } from './lib/client'
+export { DATABASE_ENV, SECRET_ENV } from './lib/constants'
+export { open, seal } from './lib/crypto'
+export { ensureControlSchema } from './lib/ddl'
+export { createEmbeddedControlPlane, type EmbeddedControlPlaneOptions } from './lib/embedded'
+export { createHostedControlPlane, type HostedControlPlane } from './lib/hosted'
+export type { ControlPlaneOptions, SealedSecret } from './lib/types'

@@ -10,7 +10,6 @@ import {
   IconSearch,
   IconTrash,
 } from '@tabler/icons-react'
-import { REVIEWS } from '@/components/dashboard/review-data'
 import { UserRow } from '@/components/workspace/UserRow'
 import { WorkspaceSwitcher } from '@/components/workspace/WorkspaceSwitcher'
 import { useAgentStore } from '@/stores/agent/agent-store'
@@ -27,8 +26,8 @@ const NAV: { tab: TabKey; label: string; icon: typeof IconLayoutDashboard }[] = 
 export function Sidebar() {
   const { sheets, activeId, createSheet, deleteSheet, openPalette } = useSheetsStore()
   const running = useAgentStore((state) => state.running)
-  const { activeTab, openTab, dismissedReviews } = useViewStore()
-  const inboxCount = REVIEWS.length - dismissedReviews.length
+  const inboxCount = useAgentStore((state) => state.approvals.length)
+  const { activeTab, openTab } = useViewStore()
 
   return (
     <aside className="flex w-[248px] shrink-0 flex-col border-border border-r bg-muted">

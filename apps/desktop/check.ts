@@ -28,7 +28,9 @@ export default defineCheck(async (app: CheckDriver) => {
 
   app.step('creating a sheet adds it to the sidebar and opens it')
   await app.click('[aria-label="New sheet"]')
-  await app.expectText('Blank canvas. Ask the agent to design this page, or describe what it should hold.')
+  await app.expectText(
+    'Blank canvas. Ask the agent to design this page, or describe what it should hold.',
+  )
 
   app.step('inbox and daily note open as tabs')
   await app.click('text=Inbox')
@@ -56,6 +58,7 @@ export default defineCheck(async (app: CheckDriver) => {
   await app.click('[data-agent-fab]')
   await app.waitFor('[data-agent-panel]')
   await app.expectText('watching this vault')
+  await app.waitFor('[data-inference]', { timeoutMs: 10_000 })
 
   app.step('clearing the conversation starts a fresh session with the empty chat')
   await app.click('[aria-label="Clear conversation"]')
@@ -66,10 +69,35 @@ export default defineCheck(async (app: CheckDriver) => {
   await app.expectText('Ask me anything')
   await app.screenshot('m2-agent-panel')
 
-  app.step('no RPC call failed along the way')
-  const failed = await app.logs({ type: ['rpc.error'] })
+  app.step('the dashboard reports real turns, not invented ones')
+  await app.click('text=Dashboard')
+  await app.expectText('Saved by your plan')
+  await app.expectText('Turns today')
+  await app.screenshot('mlp-dashboard')
+
+  app.step('the Agents tab says who Washi thinks with')
+  await app.click('text=Local account')
+  await app.click('text=Settings')
+  await app.click('text=Agents')
+  await app.expectText('Claude Code on this computer', { timeoutMs: 10_000 })
+  await app.expectText('Saved by your Claude plan')
+  await app.expectText('Claude Code model')
+  await app.expectText('Add a routine')
+  await app.screenshot('mlp-agents-tab')
+
+  app.step('the transport carried every call without an error')
+  // mirin's rpc.error no longer exists — the renderer is an http client now, so a
+  // failed procedure surfaces as a renderer exception or a console error instead.
+  const failed = await app.logs({ type: ['renderer.error', 'renderer.exception'] })
   app.assert(
     failed.length === 0,
-    `${failed.length} RPC call(s) failed: ${failed.map((event) => event.msg).join('; ')}`,
+    `${failed.length} renderer error(s): ${failed.map((event) => event.msg).join('; ')}`,
+  )
+
+  const exposedAfter = (await app.exposed()) as { store?: { server?: string } }
+  app.assert(
+    typeof exposedAfter.store?.server === 'string' &&
+      exposedAfter.store.server.startsWith('http://127.0.0.1:'),
+    `expected a loopback server origin, saw ${exposedAfter.store?.server}`,
   )
 })

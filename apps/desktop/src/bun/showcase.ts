@@ -1,10 +1,10 @@
-import { getSheet, getTableByName, listSheets } from '@washi/desktop-repository'
+import { getSheet, getTableByName, listSheets, type Workspace } from '@washi/repository'
 import {
   createSheetFromSource,
   defineUserTable,
   runMutation,
   updateSheetFromSource,
-} from '@washi/desktop-service'
+} from '@washi/service'
 
 /**
  * Seeded showcase sheets — one per design direction, proving WSX carries a
@@ -215,9 +215,9 @@ const LAUNCH_TASKS = [
   { title: 'Smoke test on Linux', status: 'todo', points: 2 },
 ]
 
-export function seedShowcase(): void {
-  if (!getTableByName('launch_tasks')) {
-    defineUserTable({
+export function seedShowcase(ws: Workspace): void {
+  if (!getTableByName(ws, 'launch_tasks')) {
+    defineUserTable(ws, {
       name: 'launch_tasks',
       columns: [
         { name: 'title', type: 'text' },
@@ -227,7 +227,7 @@ export function seedShowcase(): void {
       ],
     })
     for (const task of LAUNCH_TASKS) {
-      runMutation({
+      runMutation(ws, {
         kind: 'insert',
         table: 'launch_tasks',
         data: { ...task, done: task.status === 'shipped' },
@@ -235,7 +235,7 @@ export function seedShowcase(): void {
     }
   }
 
-  const byTitle = new Map(listSheets().map((sheet) => [sheet.title, sheet.id]))
+  const byTitle = new Map(listSheets(ws).map((sheet) => [sheet.title, sheet.id]))
   const seeds = [
     { title: 'Welcome to Washi', icon: '📜', source: WELCOME },
     { title: 'Launch Dashboard', icon: '📊', source: DASHBOARD },
@@ -249,10 +249,10 @@ export function seedShowcase(): void {
   for (const seed of seeds) {
     const existingId = byTitle.get(seed.title)
     if (!existingId) {
-      createSheetFromSource(seed)
-    } else if (getSheet(existingId)?.source !== seed.source) {
+      createSheetFromSource(ws, seed)
+    } else if (getSheet(ws, existingId)?.source !== seed.source) {
       // Showcase sheets track the build — refresh them when their source evolves.
-      updateSheetFromSource(existingId, seed)
+      updateSheetFromSource(ws, existingId, seed)
     }
   }
 }

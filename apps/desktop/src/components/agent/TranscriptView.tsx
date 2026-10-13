@@ -6,9 +6,10 @@ import {
   IconSearch,
   IconWorld,
 } from '@tabler/icons-react'
-import type { AgentUpdate, TranscriptEntry } from '@washi/desktop-domain'
+import type { AgentUpdate, TranscriptEntry } from '@washi/domain'
 import type { ReactNode } from 'react'
 import { Mascot } from '@/components/mascot/Mascot'
+import { receiptLine } from './lib'
 
 function toolIcon(update: Extract<AgentUpdate, { kind: 'tool_call' }>): ReactNode {
   if (update.title.startsWith('sheet_replace') || update.title.startsWith('sheet_create'))
@@ -119,8 +120,8 @@ export function TranscriptView({ transcript }: { transcript: TranscriptEntry[] }
                 {update.error ?? 'the turn failed'}
               </div>
             ) : (
-              <div key={entry.id} className="my-1.5 text-[11px] text-muted-foreground">
-                done{update.costUsd != null ? ` · $${update.costUsd.toFixed(4)}` : ''}
+              <div key={entry.id} className="my-1.5 font-mono text-[11px] text-muted-foreground">
+                {receiptLine(update)}
               </div>
             )
           default:

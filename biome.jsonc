@@ -98,7 +98,11 @@
       "!**/build",
       "!**/.mirin",
       "!**/src/components/ui",
-      "!**/docs/spec.html"
+      "!**/.claude",
+      "!**/design",
+      "!**/icon.icon",
+      "!**/docs/spec.html",
+      "!**/docs/server.html"
     ]
   }
 }

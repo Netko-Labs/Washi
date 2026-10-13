@@ -1,0 +1,23 @@
+{
+  "name": "@washi/repository",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "check-types": "tsgo -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@washi/domain": "workspace:*",
+    "@washi/ink": "workspace:*",
+    "@washi/wsx": "workspace:*",
+    "drizzle-orm": "^0.45.2",
+    "loro-crdt": "^1.14.1"
+  },
+  "devDependencies": {
+    "@washi/typescript-config": "workspace:*",
+    "@types/bun": "latest"
+  }
+}

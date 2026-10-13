@@ -1,0 +1,23 @@
+{
+  "name": "@washi/control",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./embedded": "./src/embedded.ts"
+  },
+  "scripts": {
+    "check-types": "tsgo -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@washi/trpc": "workspace:*",
+    "better-auth": "^1.7.5",
+    "drizzle-orm": "^0.45.2",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@washi/typescript-config": "workspace:*"
+  }
+}

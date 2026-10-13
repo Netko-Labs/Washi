@@ -12,7 +12,12 @@ const TABS = [
     icon: IconAdjustmentsHorizontal,
     desc: 'Theme, files and editor behavior.',
   },
-  { key: 'agents', label: 'Agents', icon: IconRobot, desc: 'How agents behave inside your vault.' },
+  {
+    key: 'agents',
+    label: 'Agents',
+    icon: IconRobot,
+    desc: 'Who Washi thinks with, and what it cost today.',
+  },
   {
     key: 'sync',
     label: 'Sync & sharing',

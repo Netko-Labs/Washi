@@ -7,5 +7,5 @@
     "types": ["node"],
     "erasableSyntaxOnly": true
   },
-  "include": ["mirin.config.ts", "vite.config.ts", "check.ts"]
+  "include": ["mirin.config.ts", "vite.config.ts", "check.ts", "check-live.ts"]
 }

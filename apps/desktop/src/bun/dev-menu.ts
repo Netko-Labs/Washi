@@ -1,16 +1,18 @@
-import type { DevCommand } from '@washi/desktop-api'
 import {
   clearAgentHistory,
   clearCapabilityLedger,
-  eraseVault,
-  vaultStats,
-} from '@washi/desktop-repository'
+  eraseWorkspace,
+  type Workspace,
+  workspaceStats,
+} from '@washi/repository'
+import type { DevCommand } from '@washi/trpc'
 import { dialog, type MenuItemTemplate } from 'mirinjs'
 import { seedShowcase } from './showcase'
 
 export interface DevMenuDeps {
-  /** Where the vault lives, for "Reveal data folder". */
+  /** Where the workspace lives, for "Reveal data folder". */
   appDataDir: string
+  ws: Workspace
   /** Broadcasts to the renderer; it owns localStorage and the reload. */
   send: (command: DevCommand) => void
 }
@@ -32,7 +34,7 @@ function reveal(path: string): void {
  * Dev-only escape hatches for getting back to a known state. Mounted only when
  * `app.isDev`, because every item here destroys data without touching the oplog.
  */
-export function developMenu({ appDataDir, send }: DevMenuDeps): MenuItemTemplate {
+export function developMenu({ appDataDir, ws, send }: DevMenuDeps): MenuItemTemplate {
   return {
     label: 'Develop',
     submenu: [
@@ -47,21 +49,21 @@ export function developMenu({ appDataDir, send }: DevMenuDeps): MenuItemTemplate
       {
         label: 'Reseed Showcase Sheets',
         click: () => {
-          seedShowcase()
+          seedShowcase(ws)
           send('reload')
         },
       },
       {
         label: 'Clear Agent History',
         click: () => {
-          clearAgentHistory()
+          clearAgentHistory(ws)
           send('reload')
         },
       },
       {
         label: 'Clear Capability Ledger',
         click: () => {
-          clearCapabilityLedger()
+          clearCapabilityLedger(ws)
           send('reload')
         },
       },
@@ -71,16 +73,16 @@ export function developMenu({ appDataDir, send }: DevMenuDeps): MenuItemTemplate
         label: 'Erase All Washi Data…',
         click: () => {
           void (async () => {
-            const stats = vaultStats()
+            const stats = workspaceStats(ws)
             const ok = await confirmDestructive(
-              'Erase this vault?',
+              'Erase this workspace?',
               `${stats.sheets} sheets, ${stats.tables} tables (${stats.records} records), ` +
                 `${stats.sessions} agent sessions and ${stats.oplogEntries} oplog entries are ` +
                 'deleted permanently. Showcase sheets are reseeded afterwards. This cannot be undone.',
             )
             if (!ok) return
-            eraseVault()
-            seedShowcase()
+            eraseWorkspace(ws)
+            seedShowcase(ws)
             send('clear-local-state')
           })()
         },
@@ -90,7 +92,7 @@ export function developMenu({ appDataDir, send }: DevMenuDeps): MenuItemTemplate
       { label: 'Reveal Data Folder', click: () => reveal(appDataDir) },
       {
         label: 'Log Vault Stats',
-        click: () => console.log('[Washi] vault', vaultStats()),
+        click: () => console.log('[Washi] workspace', workspaceStats(ws)),
       },
     ],
   }

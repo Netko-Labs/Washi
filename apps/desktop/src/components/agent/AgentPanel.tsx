@@ -1,6 +1,4 @@
-// conventions: >300 lines — the agent popover is one cohesive surface (header/switcher/chat/composer); split when next touched
 import {
-  IconArrowUp,
   IconCheck,
   IconChevronDown,
   IconEraser,
@@ -14,6 +12,7 @@ import { AgentMascot } from '@/components/mascot/AgentMascot'
 import { mascotStateFor, useAgentStore } from '@/stores/agent/agent-store'
 import { useSheetsStore } from '@/stores/sheets/sheets-store'
 import { useViewStore } from '@/stores/view/view-store'
+import { AgentComposer } from './AgentComposer'
 import { TranscriptView } from './TranscriptView'
 
 function ApprovalBar() {
@@ -117,7 +116,6 @@ export function AgentPanel() {
     toggleExpanded,
   } = useAgentStore()
   const { sheets, activeId } = useSheetsStore()
-  const [draft, setDraft] = useState('')
   const [convosOpen, setConvosOpen] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
 
@@ -133,11 +131,8 @@ export function AgentPanel() {
   const mascotState = mascotStateFor(transcript, running, approvals)
   const activeSession = sessions.find((session) => session.id === activeSessionId)
 
-  const submit = (text?: string) => {
-    const prompt = text ?? draft
-    if (!prompt.trim() || running) return
-    void sendPrompt(prompt)
-    setDraft('')
+  const submit = (text: string) => {
+    if (!running) void sendPrompt(text)
   }
 
   return (
@@ -259,54 +254,7 @@ export function AgentPanel() {
 
         <ApprovalBar />
 
-        <div className="px-3 pb-3">
-          <div className="rounded-2xl border border-border bg-background px-3 pt-2.5 pb-2 shadow-[0_1px_3px_rgb(0_0_0/0.05)]">
-            <textarea
-              value={draft}
-              onChange={(event) => setDraft(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' && !event.shiftKey) {
-                  event.preventDefault()
-                  submit()
-                }
-              }}
-              placeholder="Ask, or tell Washi what to write…"
-              rows={2}
-              className="w-full resize-none bg-transparent text-[13px] outline-none placeholder:text-muted-foreground"
-            />
-            <div className="flex items-center gap-2 pt-1">
-              <button
-                type="button"
-                aria-label="Attach"
-                className="grid size-[26px] place-items-center rounded-full border border-border text-muted-foreground hover:bg-accent"
-              >
-                <IconPlus className="size-3.5" />
-              </button>
-              <button
-                type="button"
-                className="flex h-[26px] items-center gap-1 rounded-lg px-1.5 text-[12px] text-muted-foreground hover:bg-accent"
-              >
-                Sonnet 4.5
-                <IconChevronDown className="size-3" />
-              </button>
-              <div
-                className="ml-auto h-1 w-11 overflow-hidden rounded-full bg-muted"
-                title="32k / 200k"
-              >
-                <div className="h-full w-[16%] rounded-full bg-agent" />
-              </div>
-              <button
-                type="button"
-                aria-label="Send"
-                disabled={running || !draft.trim()}
-                onClick={() => submit()}
-                className="grid size-7 place-items-center rounded-full bg-primary text-primary-foreground disabled:opacity-40"
-              >
-                <IconArrowUp className="size-4" />
-              </button>
-            </div>
-          </div>
-        </div>
+        <AgentComposer />
       </aside>
     </>
   )
