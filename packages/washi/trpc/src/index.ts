@@ -27,6 +27,7 @@ export const appRouter = router({
 
 export type AppRouter = typeof appRouter
 
+export { createTRPCHttpHandler, MAX_TRPC_BATCH_SIZE } from './http'
 export {
   type Actor,
   type AgentCredentialInput,
@@ -41,8 +42,16 @@ export {
   type WorkspaceRef,
 } from './init'
 export {
+  type CreateContextOptions,
+  contextFromRequest,
+  type EdgeLogger,
+  WORKSPACE_HEADER,
+} from './shared/edge'
+export {
   createEventBus,
   type DevCommand,
   type EventBus,
   type WashiEvents,
 } from './shared/events'
+export { isTrustedOrigin } from './shared/origin'
+export { closeAllPeers, createTRPCWebSocketHooks, type PeerLike } from './ws'
