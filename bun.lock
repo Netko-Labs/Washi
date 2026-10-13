@@ -321,6 +321,7 @@
       "name": "@washi/trpc",
       "version": "0.1.0",
       "dependencies": {
+        "@trpc/client": "^11.19.0",
         "@trpc/server": "^11.19.0",
         "@washi/domain": "workspace:*",
         "@washi/hanko": "workspace:*",

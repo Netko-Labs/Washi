@@ -41,6 +41,7 @@ export {
   type ServerRuntime,
   type WorkspaceRef,
 } from './init'
+export { createMirinBridge, type MirinFrame } from './mirin'
 export {
   type CreateContextOptions,
   contextFromRequest,
