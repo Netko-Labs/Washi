@@ -3,7 +3,7 @@ FROM oven/bun:1.3.14-slim AS build
 WORKDIR /app
 COPY . .
 # --ignore-scripts: the root `prepare` installs git hooks (husky); an image has no git.
-RUN bun install --frozen-lockfile --ignore-scripts
+RUN bun install --frozen-lockfile --ignore-scripts --filter @washi/web
 ARG VITE_WASHI_SERVER
 ENV VITE_WASHI_SERVER=$VITE_WASHI_SERVER
 RUN test -n "$VITE_WASHI_SERVER" && bun run --cwd apps/web build
