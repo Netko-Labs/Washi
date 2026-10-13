@@ -1,0 +1,22 @@
+{
+  "name": "@washi/runtime",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "check-types": "tsgo -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@washi/control": "workspace:*",
+    "@washi/repository": "workspace:*",
+    "@washi/service": "workspace:*",
+    "@washi/trpc": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@washi/typescript-config": "workspace:*"
+  }
+}

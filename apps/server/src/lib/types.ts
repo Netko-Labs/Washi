@@ -1,14 +1,7 @@
-import type { StoredKey } from '@washi/service'
-import type { ControlPlane, ServerMode, ServerRuntime } from '@washi/trpc'
+import type { RuntimeOptions } from '@washi/runtime'
+import type { ServerMode, ServerRuntime } from '@washi/trpc'
 
-export interface ServerOptions {
-  mode: ServerMode
-  /** Identity and membership. Hosted is Postgres + Better Auth; embedded is a stub. */
-  control: ControlPlane
-  /** The single workspace in embedded mode; the fallback in hosted. */
-  defaultWorkspaceId?: string
-  /** Directory holding `<workspace-id>.db`. */
-  dataDir: string
+export interface ServerOptions extends RuntimeOptions {
   hostname?: string
   /** 0 asks the OS for a free port — what embedded mode wants. */
   port?: number
@@ -18,8 +11,6 @@ export interface ServerOptions {
   trustedOrigins?: string[]
   /** Run routines on the minute. On unless a test says otherwise. */
   routines?: boolean
-  /** Hosted only: the organization's decrypted key, for the agent and nothing else. */
-  storedAgentKey?: (workspaceId: string) => Promise<StoredKey | null>
 }
 
 export interface RunningServer {

@@ -5,11 +5,10 @@ import {
   createHostedControlPlane,
   ensureControlSchema,
 } from '@washi/control'
+import { assertHostedSecrets, assertMode, DEFAULT_WORKSPACE_ID } from '@washi/runtime'
 import type { StoredKey } from '@washi/service'
 import type { ControlPlane } from '@washi/trpc'
 import { startServer } from './index'
-import { DEFAULT_WORKSPACE_ID } from './lib/constants'
-import { assertHostedSecrets, assertMode } from './lib/mode'
 
 const mode = assertMode(process.env.WASHI_MODE)
 const dataDir = process.env.WASHI_DATA_DIR ?? join(homedir(), '.washi', 'workspaces')

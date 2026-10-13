@@ -83,6 +83,7 @@
         "@trpc/server": "^11.19.0",
         "@washi/control": "workspace:*",
         "@washi/repository": "workspace:*",
+        "@washi/runtime": "workspace:*",
         "@washi/service": "workspace:*",
         "@washi/trpc": "workspace:*",
       },
@@ -235,6 +236,20 @@
         "@washi/wsx": "workspace:*",
         "drizzle-orm": "^0.45.2",
         "loro-crdt": "^1.14.1",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+        "@washi/typescript-config": "workspace:*",
+      },
+    },
+    "packages/washi/runtime": {
+      "name": "@washi/runtime",
+      "version": "0.1.0",
+      "dependencies": {
+        "@washi/control": "workspace:*",
+        "@washi/repository": "workspace:*",
+        "@washi/service": "workspace:*",
+        "@washi/trpc": "workspace:*",
       },
       "devDependencies": {
         "@types/bun": "latest",
@@ -782,6 +797,8 @@
     "@washi/paper": ["@washi/paper@workspace:packages/shared/paper"],
 
     "@washi/repository": ["@washi/repository@workspace:packages/washi/repository"],
+
+    "@washi/runtime": ["@washi/runtime@workspace:packages/washi/runtime"],
 
     "@washi/server": ["@washi/server@workspace:apps/server"],
 

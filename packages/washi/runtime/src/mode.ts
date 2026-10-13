@@ -1,11 +1,7 @@
 import { DATABASE_ENV, SECRET_ENV } from '@washi/control'
 import type { ServerMode } from '@washi/trpc'
 import { MIN_SECRET_LENGTH } from './constants'
-
-export interface HostedSecrets {
-  databaseUrl: string
-  masterKey: string
-}
+import type { HostedSecrets } from './types'
 
 /**
  * C2: the mode is decided once, here, and asserted before anything listens.

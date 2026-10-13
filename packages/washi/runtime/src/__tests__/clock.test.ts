@@ -3,7 +3,7 @@ import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import type { ControlPlane } from '@washi/trpc'
-import { liveWorkspaceIds } from '../lib/clock'
+import { liveWorkspaceIds } from '../clock'
 
 let dir = ''
 afterEach(() => {

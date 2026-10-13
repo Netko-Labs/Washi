@@ -1,15 +1,15 @@
 import { join } from 'node:path'
 import { createWorkspaceRegistry, type Workspace } from '@washi/repository'
 import { AgentHost, createStoredKeySource } from '@washi/service'
-import { createEventBus, type ResolvedWorkspace, type ServerRuntime } from '@washi/trpc'
+import { createEventBus, type ResolvedWorkspace } from '@washi/trpc'
 import { DEFAULT_WORKSPACE_ID } from './constants'
-import type { ServerOptions } from './types'
+import type { Runtime, RuntimeOptions } from './types'
 
 /**
  * One AgentHost per workspace, created with it. The host holds a workspace for
  * its whole life, so a turn can never write into a workspace it did not start in.
  */
-export function createRuntime(options: ServerOptions): ServerRuntime & { close(): void } {
+export function createRuntime(options: RuntimeOptions): Runtime {
   const events = createEventBus()
   const registry = createWorkspaceRegistry((id) => join(options.dataDir, `${id}.db`))
   const hosts = new Map<string, ResolvedWorkspace>()

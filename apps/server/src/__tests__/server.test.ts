@@ -3,10 +3,9 @@ import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { createEmbeddedControlPlane } from '@washi/control/embedded'
+import { assertHostedSecrets, assertMode, DEFAULT_WORKSPACE_ID } from '@washi/runtime'
 import { startServer } from '../index'
-import { DEFAULT_WORKSPACE_ID } from '../lib/constants'
 import { tokenFrom } from '../lib/http'
-import { assertHostedSecrets, assertMode } from '../lib/mode'
 import type { RunningServer } from '../lib/types'
 
 let server: RunningServer
