@@ -1,3 +1,30 @@
+# Studio architecture — one Start app, a desktop with no port (2026-10-12)
+
+Why: two images (Bun.serve + a Vite SPA) built from the whole monorepo took 30+ min on Kuma and
+never shipped. Base on `Netko-Labs/tanstack-solo-server-monorepo-template`.
+
+Decided (all the recommended options):
+- desktop calls the **same `appRouter`** over mirin IPC (a tRPC link), no loopback HTTP or token
+- web subscriptions over **`/trpc-ws`** (template's crossws bridge), cookie auth on the upgrade
+- **backend first**; a shared UI package is a follow-up
+- auth stays **email + password** + invite links
+
+```
+packages/washi/{domain,repository,service,trpc,control,runtime}   shared by both apps
+apps/studio    TanStack Start on Nitro: SSR, /api/auth, /api/trpc, /trpc-ws, routine clock
+apps/desktop   mirin: runtime in main, renderer → mirin link → appRouter.createCaller
+```
+
+- [x] 1 · `packages/server` → `packages/washi` (names unchanged)
+- [ ] 2 · Bun 1.4.0 · `@washi/runtime` out of apps/server · trpc http/ws edges from the template ·
+      `apps/studio` scaffold (config, auth, trpc, health, railpack)
+- [ ] 3 · web screens ported into studio routes
+- [ ] 4 · mirin link: `@washi/trpc/mirin` server + client link; desktop drops the embedded server
+- [ ] 5 · Coolify: Railpack app for studio; delete `apps/server`, `apps/web`, their Coolify apps
+
+Acceptance: typecheck, biome, `bun test` green each phase · studio smoke (health, SSR, trpc http +
+ws, auth) · desktop `mirin check` · washi.netko.dev signs up → workspace → first run in a browser.
+
 # MLP+1 — the agent runs where it is cheapest — DONE, awaiting review (2026-10-08)
 
 Overnight, unattended. Design source: "Washi — product design" (12 boards; First run · Today ·
