@@ -1,15 +1,53 @@
 {
   "files": [],
   "references": [
-    { "path": "apps/desktop" },
-    { "path": "packages/desktop/domain" },
-    { "path": "packages/desktop/repository" },
-    { "path": "packages/desktop/service" },
-    { "path": "packages/desktop/api" },
-    { "path": "packages/shared/wsx" },
-    { "path": "packages/shared/paper" },
-    { "path": "packages/shared/ink" },
-    { "path": "packages/shared/tsuru" },
-    { "path": "packages/shared/hanko" }
+    {
+      "path": "apps/desktop"
+    },
+    {
+      "path": "apps/server"
+    },
+    {
+      "path": "apps/studio"
+    },
+    {
+      "path": "apps/web"
+    },
+    {
+      "path": "packages/washi/control"
+    },
+    {
+      "path": "packages/washi/domain"
+    },
+    {
+      "path": "packages/washi/repository"
+    },
+    {
+      "path": "packages/washi/runtime"
+    },
+    {
+      "path": "packages/washi/service"
+    },
+    {
+      "path": "packages/washi/trpc"
+    },
+    {
+      "path": "packages/shared/hanko"
+    },
+    {
+      "path": "packages/shared/ink"
+    },
+    {
+      "path": "packages/shared/models"
+    },
+    {
+      "path": "packages/shared/paper"
+    },
+    {
+      "path": "packages/shared/tsuru"
+    },
+    {
+      "path": "packages/shared/wsx"
+    }
   ]
 }

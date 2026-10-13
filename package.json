@@ -24,7 +24,8 @@
     "test": "bun test",
     "prepare": "husky",
     "dev:server": "bun run apps/server/src/main.ts",
-    "dev:web": "bun run --cwd apps/web dev"
+    "dev:web": "bun run --cwd apps/web dev",
+    "dev:studio": "bun run --cwd apps/studio dev"
   },
   "packageManager": "bun@1.4.0",
   "devDependencies": {
@@ -49,5 +50,8 @@
     "@mirinjs/linux-x64": "0.1.0-alpha.25",
     "@mirinjs/win32-arm64": "0.1.0-alpha.25",
     "@mirinjs/win32-x64": "0.1.0-alpha.25"
+  },
+  "patchedDependencies": {
+    "nitro@3.0.260903-beta": "patches/nitro@3.0.260903-beta.patch"
   }
 }

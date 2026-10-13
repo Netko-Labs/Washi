@@ -9,7 +9,7 @@ function toBase64(bytes: ArrayBuffer | Uint8Array): string {
   return Buffer.from(view).toString('base64')
 }
 
-function fromBase64(value: string): Uint8Array {
+function fromBase64(value: string): Uint8Array<ArrayBuffer> {
   return new Uint8Array(Buffer.from(value, 'base64'))
 }
 
