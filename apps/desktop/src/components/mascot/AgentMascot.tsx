@@ -226,34 +226,42 @@ function stateContent(state: AgentMascotState): { wrap?: string; inner: ReactNod
   }
 }
 
-/** Agent status mascot (22px chip → full card). One SVG per state, pure CSS motion. */
+/**
+ * Agent status mascot (22px chip → full card). One SVG per state, pure CSS motion.
+ * `crop` is the FAB close-up from Washi.dc.html: the face at 1.5× filling a circle.
+ */
 export function AgentMascot({
   state,
   size = 22,
   className,
+  crop = false,
 }: {
   state: AgentMascotState
   size?: number
   className?: string
+  crop?: boolean
 }) {
   const { wrap, inner, backdrop } = stateContent(state)
+  const radius = crop ? 0 : Math.round(size * 0.3)
   return (
     <svg
       viewBox="0 0 1024 1024"
       width={size}
       height={size}
       className={`mascot-motion ${className ?? ''}`}
-      style={{ display: 'block', borderRadius: size <= 32 ? 6 : 12 }}
+      style={{ display: 'block', borderRadius: radius }}
       aria-hidden
     >
       <clipPath id={`am-${state}`}>
         <rect x="12" y="12" width="1000" height="1000" rx="220" />
       </clipPath>
-      <g clipPath={`url(#am-${state})`}>
-        <rect x="12" y="12" width="1000" height="1000" fill={BG} />
-        {backdrop}
-        <g style={{ animation: wrap, transformBox: 'fill-box', transformOrigin: 'center' }}>
-          {inner}
+      <g transform={crop ? 'translate(-256 -330) scale(1.5)' : undefined}>
+        <g clipPath={`url(#am-${state})`}>
+          <rect x="12" y="12" width="1000" height="1000" fill={BG} />
+          {backdrop}
+          <g style={{ animation: wrap, transformBox: 'fill-box', transformOrigin: 'center' }}>
+            {inner}
+          </g>
         </g>
       </g>
     </svg>

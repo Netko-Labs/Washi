@@ -86,7 +86,32 @@ describe('hanko actions through the host', () => {
 
     defineUserTable(ws, { name: 'tasks', columns: [{ name: 'title', type: 'text' }] })
     await host.executeAction({ verb: 'table.insert', table: 'tasks', data: { title: 'stamped' } })
-    expect(runQuery(ws, { table: 'tasks' }).rows[0]?.title).toBe('stamped')
+    const row = runQuery(ws, { table: 'tasks' }).rows[0]
+    expect(row?.title).toBe('stamped')
+
+    await host.executeAction({
+      verb: 'table.update',
+      table: 'tasks',
+      row: String(row?.id),
+      set: { title: 'patched' },
+    })
+    expect(runQuery(ws, { table: 'tasks' }).rows[0]?.title).toBe('patched')
+    await expect(
+      host.executeAction({
+        verb: 'table.update',
+        table: 'tasks',
+        row: 'nope',
+        set: { title: 'x' },
+      }),
+    ).rejects.toThrow('unknown record')
+    await expect(
+      host.executeAction({
+        verb: 'table.update',
+        table: 'tasks',
+        row: String(row?.id),
+        set: { ghost: 1 },
+      }),
+    ).rejects.toThrow('ghost')
   })
 
   test('unknown verbs and private url.open are refused', async () => {
@@ -155,10 +180,10 @@ describe('transcript persistence', () => {
 describe('wsx guardrails stay closed for agents', () => {
   test('sheet_check catches executable smuggling; valid sheets save', () => {
     expect(checkSource('<Sheet title={window.location} />').ok).toBe(false)
-    expect(checkSource('<Sheet title="ok"><P>fine</P></Sheet>').ok).toBe(true)
+    expect(checkSource('<Sheet title="ok"><Text>fine</Text></Sheet>').ok).toBe(true)
     const sheet = createSheetFromSource(ws, {
       title: 'ok',
-      source: '<Sheet title="ok"><P>fine</P></Sheet>',
+      source: '<Sheet title="ok"><Text>fine</Text></Sheet>',
     })
     expect(sheet.id).toBeTruthy()
   })

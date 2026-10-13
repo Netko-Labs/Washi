@@ -48,8 +48,8 @@ plan or the key, first run, receipts, Stop, invites) is the current block.
   invitations, encrypted API keys. Import `@washi/control/embedded` for the stub — the root
   barrel pulls in Better Auth and a Postgres driver.
 - `packages/shared/wsx` — WSX parse/validate/serialize (isomorphic, no DOM)
-- `packages/shared/paper` — note component registry; `./registry` subpath is zod-only (main
-  process safe), root export is React (renderer only)
+- `packages/shared/paper` — note primitive registry; `./registry` subpath is zod-only (main
+  process safe), root export is React (renderer only), `./css` is the styling surface
 - `packages/shared/ink` — typed table DSL (descriptors; executed in repository)
 - `packages/shared/tsuru` — scoped fetch policy + guarded client
 - `packages/shared/hanko` — safe action verb registry
@@ -88,8 +88,9 @@ plan or the key, first run, receipts, Stop, invites) is the current block.
   caller-free path into a turn — keep it that way.
 - Agent tools are the ONLY capability surface: ink (data), tsuru (network), hanko (actions).
   Never hand agents fs/shell/raw SQL.
-- WSX is inert data: registry components, literal props, no expressions. Validation before
-  persist and before render.
+- WSX is inert data: registry primitives, literal props, the closed `expr` grammar only. Components
+  own appearance (four enums: `variant tone size emphasis`); pages own content. Validation before
+  persist and before render. Format reference: `docs/wsx.md`.
 - tRPC v11. Routers live in `packages/server/trpc/src/routers/{entity}/` per conventions §3.
   Subscriptions are SSE with `tracked()`, so they resume from `lastEventId`. Phase 8's `/sync`
   will be raw binary WS instead — Loro deltas have no business in JSON.

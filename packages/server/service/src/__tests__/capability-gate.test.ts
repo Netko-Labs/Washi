@@ -25,14 +25,14 @@ function makeHost() {
 describe('sheet actions pass the same desk as agent actions', () => {
   test('sheet.create keeps a hostile title as text, not markup', async () => {
     const { host, opened } = makeHost()
-    const title = 'a </H1><Missing/> "q" {x} & \\'
+    const title = 'a </Title><Missing/> "q" {x} & \\'
     await host.executeAction({ verb: 'sheet.create', title }, { origin: 'sheet' })
     const sheet = getSheet(ws, opened[0] ?? '')
     expect(sheet?.title).toBe(title)
     const root = parse(sheet?.source ?? '')
     expect(root.props.title).toBe(title)
     expect(root.children).toEqual([
-      { kind: 'element', name: 'H1', props: {}, children: [{ kind: 'text', value: title }] },
+      { kind: 'element', name: 'Title', props: {}, children: [{ kind: 'text', value: title }] },
     ])
   })
 

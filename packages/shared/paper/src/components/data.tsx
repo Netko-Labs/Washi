@@ -1,81 +1,33 @@
-import type { InkQuery, QueryRow } from '@washi/ink'
-import { type ReactNode, useEffect, useState } from 'react'
-import { cn, TOUCH_TARGET } from '../lib'
+import type { InkQuery } from '@washi/ink'
+import type { ReactNode } from 'react'
+import { styled, useBind, useExprValue } from '../lib'
+import type { BlockProps, Row } from '../lib/types'
 import { usePaperHost } from '../provider'
+import { RowProvider } from '../state'
+import { Chart } from './chart'
+import { Bound, cell } from './states'
 
-function useBind(query: InkQuery | undefined): { rows: QueryRow[]; error: string | null } {
-  const host = usePaperHost()
-  const [rows, setRows] = useState<QueryRow[]>([])
-  const [error, setError] = useState<string | null>(null)
+export { Chart }
 
-  useEffect(() => {
-    if (!query) return
-    let alive = true
-    host
-      .runQuery(query)
-      .then((result) => alive && setRows(result.rows))
-      .catch((cause: unknown) => alive && setError(String(cause)))
-    return () => {
-      alive = false
-    }
-  }, [host, JSON.stringify(query)])
-
-  return { rows, error }
-}
-
-export function Task({
-  done = false,
-  record,
-  className,
-  children,
-}: {
-  done?: boolean
-  record?: string
-  className?: string
-  children?: ReactNode
-}) {
-  const host = usePaperHost()
-  const [checked, setChecked] = useState(done)
-
-  return (
-    <label className={cn('flex items-center gap-2', className)}>
-      <input
-        type="checkbox"
-        checked={checked}
-        disabled={!record}
-        onChange={async (event) => {
-          const next = event.target.checked
-          setChecked(next)
-          if (record) await host.toggleTask(record, next)
-        }}
-        className={cn('size-4 shrink-0 accent-primary', TOUCH_TARGET)}
-      />
-      <span className={checked ? 'text-muted-foreground line-through' : ''}>{children}</span>
-    </label>
-  )
-}
-
-export function TaskList({
+/** Renders children once per row with `$row.column` in scope. The power multiplier. */
+export function Repeat({
   bind,
-  className,
+  empty,
   children,
-}: {
-  bind?: InkQuery
-  className?: string
-  children?: ReactNode
-}) {
-  const { rows, error } = useBind(bind)
-
+  ...rest
+}: BlockProps & { bind: InkQuery; empty?: string; children: (row: Row) => ReactNode }) {
+  const state = useBind(bind)
   return (
-    <div className={className}>
-      {children}
-      {error && <div className="text-destructive">{error}</div>}
-      {bind &&
-        rows.map((row) => (
-          <Task key={String(row.id)} record={String(row.id)} done={row.done === true}>
-            {String(row.title ?? row.id)}
-          </Task>
-        ))}
+    <div {...styled(rest, 'wsx-repeat wsx-stack')}>
+      <Bound state={state} empty={empty}>
+        {(rows) =>
+          rows.map((row, index) => (
+            <RowProvider key={String(row.id ?? index)} row={row}>
+              {children(row)}
+            </RowProvider>
+          ))
+        }
+      </Bound>
     </div>
   )
 }
@@ -83,83 +35,151 @@ export function TaskList({
 export function Table({
   bind,
   columns,
-  className,
-}: {
-  bind: InkQuery
-  columns?: string[]
-  className?: string
-}) {
-  const { rows, error } = useBind(bind)
-  if (error) return <div className="text-destructive">{error}</div>
-
-  const keys = columns ?? Object.keys(rows[0] ?? {}).filter((key) => key !== 'id')
-
+  empty,
+  ...rest
+}: BlockProps & { bind: InkQuery; columns?: string[]; empty?: string }) {
+  const state = useBind(bind)
   return (
-    <div className={cn('overflow-x-auto', className)}>
-      <table className="w-full">
-        <thead>
-          <tr>
-            {keys.map((key) => (
-              <th key={key} className="text-left">
-                {key}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row, index) => (
-            <tr key={String(row.id ?? index)}>
-              {keys.map((key) => (
-                <td key={key}>
-                  {row[key] === null || row[key] === undefined ? '' : String(row[key])}
-                </td>
-              ))}
-            </tr>
-          ))}
-          {rows.length === 0 && (
-            <tr>
-              <td colSpan={Math.max(keys.length, 1)}>no rows</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+    <Bound state={state} empty={empty}>
+      {(rows) => {
+        const keys = columns ?? Object.keys(rows[0] ?? {}).filter((key) => key !== 'id')
+        return (
+          <div {...styled(rest, 'wsx-table-wrap')}>
+            <table className="wsx-table">
+              <thead>
+                <tr>
+                  {keys.map((key) => (
+                    <th key={key}>{key.replace(/_/g, ' ')}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((row, index) => (
+                  <tr key={String(row.id ?? index)}>
+                    {keys.map((key) => (
+                      <td key={key} data-num={typeof row[key] === 'number' || undefined}>
+                        {cell(row[key])}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )
+      }}
+    </Bound>
+  )
+}
+
+const TREND_GLYPH = { up: '↑', down: '↓', flat: '→' } as const
+
+export function Stat({
+  value,
+  expr,
+  label,
+  hint,
+  trend,
+  ...rest
+}: BlockProps & {
+  value?: string | number
+  expr?: string
+  label: string
+  hint?: string
+  trend?: keyof typeof TREND_GLYPH
+}) {
+  const host = usePaperHost()
+  const computed = useExprValue(expr)
+  const raw = expr ? computed : (value ?? null)
+  const shown =
+    typeof raw === 'number'
+      ? new Intl.NumberFormat(host.locale, { maximumFractionDigits: 2 }).format(raw)
+      : raw === null
+        ? '—'
+        : String(raw)
+  return (
+    <div {...styled(rest, 'wsx-stat')}>
+      <div className="wsx-stat-value">
+        {shown}
+        {trend && (
+          <span className="wsx-stat-trend" data-trend={trend}>
+            {TREND_GLYPH[trend]}
+          </span>
+        )}
+      </div>
+      <div className="wsx-stat-label">{label}</div>
+      {hint && <div className="wsx-stat-hint">{hint}</div>}
     </div>
   )
 }
 
-export function Board({
-  bind,
-  groupBy,
-  className,
-}: {
-  bind: InkQuery
-  groupBy: string
-  className?: string
-}) {
-  const { rows, error } = useBind(bind)
-  if (error) return <div className="text-destructive">{error}</div>
+export function Timeline({ children, ...rest }: BlockProps) {
+  return <ol {...styled(rest, 'wsx-timeline')}>{children}</ol>
+}
 
-  const groups = new Map<string, QueryRow[]>()
-  for (const row of rows) {
-    const key = String(row[groupBy] ?? '—')
-    const bucket = groups.get(key) ?? []
-    bucket.push(row)
-    groups.set(key, bucket)
-  }
-
+export function Step({
+  marker,
+  title,
+  children,
+  ...rest
+}: BlockProps & { marker: string; title?: string }) {
   return (
-    <div className={cn('flex gap-3 overflow-x-auto', className)}>
-      {[...groups.entries()].map(([group, items]) => (
-        <div key={group} className="min-w-40 flex-1 basis-56">
-          <div>
-            {group} · {items.length}
-          </div>
-          {items.map((row) => (
-            <div key={String(row.id)}>{String(row.title ?? row.id)}</div>
-          ))}
+    <li {...styled(rest, 'wsx-step')}>
+      <span className="wsx-step-marker">{marker}</span>
+      <div>
+        {title && <div className="wsx-step-title">{title}</div>}
+        <div className="wsx-step-body">{children}</div>
+      </div>
+    </li>
+  )
+}
+
+export function Progress({
+  value,
+  expr,
+  label,
+  ...rest
+}: BlockProps & { value?: number; expr?: string; label?: string }) {
+  const computed = useExprValue(expr)
+  const ratio = Math.min(1, Math.max(0, typeof computed === 'number' ? computed : (value ?? 0)))
+  const percent = Math.round(ratio * 100)
+  return (
+    <div
+      {...styled(rest, 'wsx-progress')}
+      role="progressbar"
+      aria-valuenow={percent}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-label={label}
+    >
+      {label && (
+        <div className="wsx-progress-label">
+          <span>{label}</span>
+          <span>{percent}%</span>
         </div>
-      ))}
-      {groups.size === 0 && <div>no rows</div>}
+      )}
+      <div className="wsx-progress-track">
+        <div className="wsx-progress-fill" style={{ width: `${percent}%` }} />
+      </div>
     </div>
+  )
+}
+
+export function Badge({ expr, children, ...rest }: BlockProps & { expr?: string }) {
+  const computed = useExprValue(expr)
+  return <span {...styled(rest, 'wsx-badge')}>{expr ? String(computed ?? '') : children}</span>
+}
+
+export function Avatar({ label, ...rest }: BlockProps & { label: string }) {
+  const initials = label
+    .split(/\s+/)
+    .map((part) => part[0] ?? '')
+    .join('')
+    .slice(0, 2)
+    .toUpperCase()
+  return (
+    <span {...styled(rest, 'wsx-avatar')} role="img" title={label} aria-label={label}>
+      {initials}
+    </span>
   )
 }

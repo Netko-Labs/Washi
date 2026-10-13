@@ -66,12 +66,14 @@ describe('serialize', () => {
 
 describe('validate', () => {
   const registry: WsxRegistry = {
-    Sheet: {
-      props: z.object({ title: z.string(), icon: z.string().optional() }).strict(),
-      children: 'nodes',
+    components: {
+      Sheet: {
+        props: z.object({ title: z.string(), icon: z.string().optional() }).strict(),
+        children: 'nodes',
+      },
+      H1: { props: z.object({}).strict(), children: 'text' },
+      Divider: { props: z.object({}).strict(), children: 'none' },
     },
-    H1: { props: z.object({}).strict(), children: 'text' },
-    Divider: { props: z.object({}).strict(), children: 'none' },
   }
 
   test('flags unknown components, bad props, child policy violations', () => {
@@ -80,7 +82,7 @@ describe('validate', () => {
     const messages = diagnostics.map((diagnostic) => diagnostic.message).join('\n')
     expect(messages).toContain('takes text children only')
     expect(messages).toContain('does not take children')
-    expect(messages).toContain('<Ghost> is not a registry component')
+    expect(messages).toContain('<Ghost> is not a registry primitive')
   })
 
   test('requires Sheet root and clean props pass', () => {

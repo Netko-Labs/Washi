@@ -1,118 +1,113 @@
 import { describe, expect, test } from 'bun:test'
-import { parse, validate } from '@washi/wsx'
-import { invalidClasses, paperRegistry } from '../index'
+import { hasErrors, parse, validate } from '@washi/wsx'
+import { classProblems, PRIMITIVE_GROUPS, paperRegistry } from '../index'
 
-describe('tailwind class guard', () => {
-  test('accepts the full vocabulary — arbitrary values, gradients, variants', () => {
-    expect(invalidClasses('mt-6 flex items-center gap-2 text-sm text-muted-foreground')).toEqual([])
-    expect(invalidClasses('mt-[13px] hover:bg-red-500 bg-gradient-to-r from-fuchsia-500')).toEqual(
-      [],
-    )
-    expect(invalidClasses('grid-cols-[1fr_2fr] rotate-[17deg] shadow-[0_8px_30px_#0003]')).toEqual(
-      [],
+const messages = (source: string) =>
+  validate(parse(source), paperRegistry)
+    .map((diagnostic) => `${diagnostic.path}: ${diagnostic.message}`)
+    .join('\n')
+
+describe('the styling surface', () => {
+  test('layout tokens pass; colour, type, radius and margins name the prop to use instead', () => {
+    expect(classProblems('row items-center gap-tight @md:grid-3 grow')).toEqual([])
+    expect(classProblems('bg-red-500')[0]).toMatch(/colour.*use tone/)
+    expect(classProblems('text-xl')[0]).toMatch(/type.*size or emphasis/)
+    expect(classProblems('rounded-xl')[0]).toMatch(/variant/)
+    expect(classProblems('mt-6')[0]).toMatch(/rhythm.*Section, Stack or gap/)
+    expect(classProblems('md:flex')[0]).toMatch(/@sm: @md: @lg:/)
+    expect(classProblems('w-[720px]')[0]).toMatch(/measure/)
+    expect(classProblems('grid-cols-[1fr_2fr]')[0]).toMatch(/arbitrary/)
+  })
+
+  test('the four enums are accepted everywhere; off-enum values list the legal ones', () => {
+    expect(
+      messages(
+        `<Sheet title="t"><Card variant="raised" tone="info" size="lg" emphasis="strong" span={6}><Text>x</Text></Card></Sheet>`,
+      ),
+    ).toBe('')
+    const text = messages(`<Sheet title="t"><Card tone="purple"><Text>x</Text></Card></Sheet>`)
+    expect(text).toContain(
+      'Sheet > Card: prop tone: "purple" is not one of neutral · accent · info',
     )
   })
 
-  test('rejects network-capable and breakout tokens', () => {
-    expect(invalidClasses('bg-[url(https://evil.example/x)]')).toHaveLength(1)
-    expect(invalidClasses('bg-[URL(//x)]')).toHaveLength(1)
-    expect(invalidClasses('content-["hi"]')).toHaveLength(1)
-    expect(invalidClasses('p-2;}body{background:red')).toHaveLength(1)
-    expect(invalidClasses(`w-[${'x'.repeat(140)}]`)).toHaveLength(1)
+  test('a hex, a style prop or a handler is refused with the alternative named', () => {
+    const text = messages(
+      `<Sheet title="t"><Text color="#ff0000" style="x" onClick="go">x</Text></Sheet>`,
+    )
+    expect(text).toContain('prop color is not addressable on <Text> — use tone')
+    expect(text).toContain('prop style is not addressable on <Text>')
+    expect(text).toContain(
+      'prop onClick is not addressable on <Text> — interaction is a prop, not a handler',
+    )
+  })
+
+  test('the Sheet has no class and never pins the mode', () => {
+    const text = messages(`<Sheet title="t" class="p-4" mood="dark"><Text>x</Text></Sheet>`)
+    expect(text).toContain('prop class is not addressable on <Sheet> — the Sheet owns measure')
+    expect(text).toContain('mood')
   })
 })
 
-describe('paper registry', () => {
-  test('the spec example validates clean', () => {
-    const root = parse(`
-      <Sheet title="Q3 Roadmap" icon="🗺️" tags={['planning']}>
-        <H1>Q3 Roadmap</H1>
-        <Callout tone="warning" class="mt-6 font-medium">Dates aspirational.</Callout>
-        <TaskList bind={{ table: 'tasks', where: [{ column: 'status', op: 'eq', value: 'todo' }] }} />
-        <Table bind={{ table: 'tasks' }} columns={['title', 'status']} />
-        <Button action={{ verb: 'table.insert', table: 'tasks' }}>Add task</Button>
-        <Ref sheet="0198c2f0">design doc</Ref>
-      </Sheet>
-    `)
-    expect(validate(root, paperRegistry)).toEqual([])
+describe('the registry', () => {
+  test('the five reference-app shapes validate clean', () => {
+    expect(
+      messages(`
+      <Sheet title="Board" icon="kanban" feel="board" theme="aizome" state={{ local: { tab: 'board' }, stored: { mine: false } }} wsx="1">
+        <Hero title="Sprint 12" subtitle="Two weeks" />
+        <Row>
+          <Stat label="open" expr="count(tasks where status = 'open')" />
+          <Stat label="points" expr="sum(tasks.points)" trend="up" />
+        </Row>
+        <Board bind={{ table: 'tasks' }} groupBy="status" />
+        <Repeat bind={{ table: 'tasks' }}>
+          <Card title="$row.title"><Task row="$row.id">$row.title</Task><Field field="points" kind="number" table="tasks" row="$row.id" /></Card>
+        </Repeat>
+        <Section title="Money"><Money expr="sum(tasks.points) * 12.5" currency="EUR" /></Section>
+        <Show expr="mine = true"><Callout tone="success" title="Yours">Only your rows.</Callout></Show>
+        <Tabs labels={['board', 'list']} state="tab"><Tab><Text>a</Text></Tab><Tab><Text>b</Text></Tab></Tabs>
+        <Timeline><Step marker="01" title="Freeze">no new features</Step></Timeline>
+        <Chart bind={{ table: 'tasks', groupBy: { column: 'status', aggregates: [{ fn: 'count' }] } }} kind="donut" />
+        <List marker="check"><Item done>shipped</Item><Item>next</Item></List>
+        <Text>See <Ref sheet="0198">the brief</Ref>, press <Kbd>⌘K</Kbd>, <Mark>note this</Mark> <Tag>wsx</Tag></Text>
+        <Note>Footnote one.</Note><Source>Handoff 0.4</Source>
+        <Row><Tape>live</Tape><Stamp label="決" /><Chip tone="success">ready</Chip><Mascot mood="wink" /></Row>
+        <Missing kind="Matrix" reason="habit grid over 28 days" />
+      </Sheet>`),
+    ).toBe('')
   })
 
-  test('flags url() classes, http urls, unknown props', () => {
-    const root = parse(`
-      <Sheet title="t">
-        <P class="bg-[url(https://evil.example)]">x</P>
-        <Img src="http://insecure.example/pic.png" />
-        <H1 onClick="alert">hi</H1>
-      </Sheet>
-    `)
-    const diagnostics = validate(root, paperRegistry)
-    const text = diagnostics
-      .map((diagnostic) => `${diagnostic.path}: ${diagnostic.message}`)
-      .join('\n')
-    expect(text).toContain('forbidden tokens')
-    expect(text).toMatch(/Img.*(protocol|url|Invalid)/i)
-    expect(text).toMatch(/H1.*onClick/)
+  test('what the registry refuses: Box, Span, H1, emoji icons, http figures, nested Repeat, two mascots', () => {
+    const text = messages(`
+      <Sheet title="t" icon="🗺️">
+        <Box><Span>x</Span></Box>
+        <H1>hi</H1>
+        <Figure src="http://x.example/a.png" alt="a" />
+        <Repeat bind={{ table: 't' }}><Repeat bind={{ table: 't' }}><Text>x</Text></Repeat></Repeat>
+        <Mascot /><Mascot />
+        <Item>orphan</Item>
+      </Sheet>`)
+    expect(text).toContain('<Box> is not a registry primitive — write <Missing kind="Box"')
+    expect(text).toContain('<H1> is not a registry primitive')
+    expect(text).toMatch(/Sheet: prop icon/)
+    expect(text).toMatch(/Figure.*(protocol|url|Invalid)/i)
+    expect(text).toContain('<Repeat> cannot contain another <Repeat>')
+    expect(text).toContain('<Mascot> may appear once per sheet')
+    expect(text).toContain('<Item> is only legal inside <List>')
   })
 
-  test('every registry component parses its own defaults', () => {
-    expect(Object.keys(paperRegistry).length).toBeGreaterThanOrEqual(28)
+  test('the complexity budget is a warning, not an error', () => {
+    const many = Array.from({ length: 401 }, () => '<Text>x</Text>').join('')
+    const diagnostics = validate(parse(`<Sheet title="t">${many}</Sheet>`), paperRegistry)
+    expect(hasErrors(diagnostics)).toBe(false)
+    expect(diagnostics[0]?.severity).toBe('warning')
+    expect(diagnostics[0]?.message).toContain('402 nodes (budget 400)')
   })
 
-  test('themes and display components validate clean', () => {
-    const root = parse(`
-      <Sheet title="Playbook" theme={{ accent: 'blue', face: 'rounded', paper: 'dots' }}>
-        <Tape color="teal">live data</Tape>
-        <Hero size="lg" align="center" title="Big" subtitle="small" />
-        <P><Chip color="pink">wsx</Chip><Stamp label="決" /></P>
-        <Columns><Column><Stat value="7" label="open" hint="count" /></Column></Columns>
-        <Card title="Owner" accent="mustard"><P>x</P></Card>
-        <Timeline><Step marker="01" title="Freeze" color="slate">no new features</Step></Timeline>
-      </Sheet>
-    `)
-    expect(validate(root, paperRegistry)).toEqual([])
-  })
-
-  test('controls + sheet state validate; bad state keys are refused', () => {
-    const root = parse(`
-      <Sheet title="t" state={{ view: 'a', open: false, n: 3 }}>
-        <Tabs labels={['a', 'b']} state="view"><Tab><P>a</P></Tab><Tab><P>b</P></Tab></Tabs>
-        <Switch state="open" label="toggle" />
-        <Show when="open"><Callout>hidden</Callout></Show>
-        <Slider state="n" min={0} max={10} />
-        <Dialog trigger="Open" title="t"><P>x</P></Dialog>
-        <Accordion><AccordionItem title="q"><P>a</P></AccordionItem></Accordion>
-        <P><Badge tone="outline">b</Badge><Avatar label="Juan V" /><Kbd>⌘K</Kbd></P>
-        <Progress value={62} />
-      </Sheet>
-    `)
-    expect(validate(root, paperRegistry)).toEqual([])
-
-    const bad = parse(`<Sheet title="t" state={{ fn: 'x' }}><Show>oops</Show></Sheet>`)
-    expect(validate(bad, paperRegistry).length).toBeGreaterThan(0)
-  })
-
-  test('presets validate; unknown presets are refused', () => {
-    for (const preset of ['washi', 'midnight', 'broadsheet', 'sticker', 'terminal', 'blueprint']) {
-      const root = parse(`<Sheet title="t" theme={{ preset: '${preset}' }}><P>x</P></Sheet>`)
-      expect(validate(root, paperRegistry)).toEqual([])
-    }
-    const bad = parse(`<Sheet title="t" theme={{ preset: 'vaporwave' }} />`)
-    expect(validate(bad, paperRegistry).length).toBeGreaterThan(0)
-  })
-
-  test('bad themes and off-enum colors are refused', () => {
-    const root = parse(`
-      <Sheet title="t" theme={{ accent: 'chartreuse', gradient: true }}>
-        <Tape color="neon">x</Tape>
-        <Hero title="t" size="xl" />
-      </Sheet>
-    `)
-    const text = validate(root, paperRegistry)
-      .map((diagnostic) => diagnostic.message)
-      .join('\n')
-    expect(text).toMatch(/accent/)
-    expect(text).toMatch(/gradient/)
-    expect(text).toMatch(/color/)
-    expect(text).toMatch(/size/)
+  test('every primitive is in exactly one group', () => {
+    const grouped = Object.values(PRIMITIVE_GROUPS).flat()
+    expect(new Set(grouped).size).toBe(grouped.length)
+    expect(grouped.sort()).toEqual(Object.keys(paperRegistry.components).sort())
+    expect(grouped.length).toBeGreaterThanOrEqual(44)
   })
 })

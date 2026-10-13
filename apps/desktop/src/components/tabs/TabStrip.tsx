@@ -1,6 +1,5 @@
 import {
   IconCalendar,
-  IconFileText,
   IconInbox,
   IconLayoutDashboard,
   IconPlus,
@@ -8,6 +7,7 @@ import {
   IconX,
 } from '@tabler/icons-react'
 import type { ReactNode } from 'react'
+import { SheetIcon } from '@/components/shared/sheet-icon'
 import { useSheetsStore } from '@/stores/sheets/sheets-store'
 import { type TabKey, useViewStore } from '@/stores/view/view-store'
 
@@ -28,8 +28,8 @@ export function TabStrip() {
     const sheet = sheets.find((item) => item.id === key.slice(5))
     if (!sheet) return null
     return {
-      label: `${sheet.icon ? `${sheet.icon} ` : ''}${sheet.title}`,
-      icon: <IconFileText className="size-[13px]" />,
+      label: sheet.title,
+      icon: <SheetIcon name={sheet.icon} className="size-[13px]" />,
     }
   }
 

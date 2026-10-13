@@ -1,5 +1,6 @@
 import { IconFileText } from '@tabler/icons-react'
 import { receiptLine, usd } from '@/components/agent/lib'
+import { SheetIcon } from '@/components/shared/sheet-icon'
 import { useToday } from '@/components/shared/today'
 import { useSheetsStore } from '@/stores/sheets/sheets-store'
 import { useViewStore } from '@/stores/view/view-store'
@@ -138,11 +139,7 @@ export function Dashboard() {
                   onClick={() => openSheet(sheet.id)}
                   className="flex items-center gap-3 rounded-xl border border-border bg-card px-[15px] py-[13px] text-left hover:bg-accent"
                 >
-                  {sheet.icon ? (
-                    <span className="text-[13px]">{sheet.icon}</span>
-                  ) : (
-                    <IconFileText className="size-[15px] text-muted-foreground" />
-                  )}
+                  <SheetIcon name={sheet.icon} className="size-[15px] text-muted-foreground" />
                   <span className="min-w-0 flex-1">
                     <span className="block truncate font-medium">{sheet.title}</span>
                     <span className="text-muted-foreground text-xs">

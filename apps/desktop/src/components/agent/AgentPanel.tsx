@@ -285,9 +285,9 @@ export function AgentFab() {
       aria-label="Ask Washi (⌘J)"
       title="Ask Washi (⌘J)"
       onClick={togglePanel}
-      className="fixed right-6 bottom-6 z-[48] grid size-[52px] place-items-center rounded-full border border-border bg-card shadow-[0_8px_28px_rgb(0_0_0/0.18)] hover:shadow-[0_12px_34px_rgb(0_0_0/0.24)]"
+      className="fixed right-6 bottom-6 z-[48] size-[52px] overflow-hidden rounded-full border-2 border-card bg-[#DF8552] shadow-[0_8px_28px_rgb(0_0_0/0.18)] transition-[transform,box-shadow] duration-150 hover:-translate-y-px hover:shadow-[0_12px_34px_rgb(0_0_0/0.24)]"
     >
-      <AgentMascot state={mascotStateFor(transcript, running, approvals)} size={36} />
+      <AgentMascot state={mascotStateFor(transcript, running, approvals)} size={48} crop />
     </button>
   )
 }

@@ -37,8 +37,10 @@ export {
 } from './sheets/service'
 export {
   defineUserTable,
+  deleteRecord,
   InkError,
   runMutation,
   runQuery,
   toggleTaskRecord,
+  updateRecord,
 } from './tables/service'
