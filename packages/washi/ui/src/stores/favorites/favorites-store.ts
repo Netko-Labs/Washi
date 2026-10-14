@@ -1,14 +1,6 @@
 import { create } from 'zustand'
-
-const KEY_PREFIX = 'washi:favorites:'
-
-interface FavoritesState {
-  workspaceKey: string | null
-  ids: string[]
-  /** The host names the workspace once it is entered; favorites are per person, per workspace. */
-  bind: (workspaceKey: string) => void
-  toggle: (sheetId: string) => void
-}
+import { KEY_PREFIX } from './constants'
+import type { FavoritesState } from './types'
 
 function read(key: string): string[] {
   try {
