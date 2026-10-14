@@ -1,3 +1,24 @@
+# Washi, defined → prod (2026-10-14) — one PR per row, code-whiskers until clean, then merge
+
+Juan's calls: `docs/washi.html` Q1–Q7 — Q5 "do as Notion does", the rest as recommended. "Go, I
+want this on prod." Every merge to main ships to washi.netko.dev.
+
+- [ ] 0 · docs: the definition, the team's week, Q1–Q7 called
+- [ ] 1 · the desk lets go: page + table writes land (marked, undoable); fetch/action still ask
+- [ ] 2 · databases: `status` `multi_select` `person` `url` `relation` properties, date with an end
+- [ ] 3 · rows are pages: every row has a body page; drawer peek, full open, comments
+- [ ] 4 · database page: table view with editable cells + add row/property, board view, views as tabs
+- [ ] 5 · history: append-only row change log, ink `history` query, `Chart` over time
+- [ ] 6 · linked views: `/view` in the editor inserts a bound view of any table
+- [ ] 7 · roadmap: `Timeline` binds a table (start/end bars, drag to reschedule)
+- [ ] 8 · team space starter: backlog, roadmap, wiki, ideas canvas, weekly review routine
+- [ ] 9 · canvas: `Canvas` `Node` `Edge` (React Flow), node = label + tone + page link
+- [ ] 10 · live together: Loro over `/sync`, presence, Washi presence + authorship marks
+- [ ] 11 · find: search across pages, backlinks
+
+Log (one line per merged PR):
+
+
 # Notion parity, web (2026-10-14) — one PR per row, code-whiskers until clean, then merge
 
 Juan's call: Notion-style nesting (a "folder" is a page with children), all four parity areas,
