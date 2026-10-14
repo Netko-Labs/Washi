@@ -30,6 +30,20 @@ export const READ_TOOLS: ReadonlySet<string> = new Set([
   'db_query',
 ])
 
+/**
+ * Tools that change the workspace — pages and tables. Auto-approve may wave these
+ * through; nothing that leaves the server (fetch, actions) is ever on this list.
+ */
+export const CHANGE_TOOLS: ReadonlySet<string> = new Set([
+  'sheet_create',
+  'sheet_replace',
+  'db_define',
+  'db_mutate',
+])
+
+/** '1' when a person chose to let Washi make changes without asking. */
+export const AUTO_APPROVE_KEY = 'agent_auto_approve_changes'
+
 /** An unanswered approval is a denial, not a hang. */
 export const APPROVAL_TIMEOUT_MS = 5 * 60_000
 

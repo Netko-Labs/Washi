@@ -1,25 +1,9 @@
-import {
-  IconAlertTriangle,
-  IconFileText,
-  IconGitPullRequest,
-  IconPencil,
-  IconSearch,
-  IconWorld,
-} from '@tabler/icons-react'
+import { IconAlertTriangle } from '@tabler/icons-react'
 import type { AgentUpdate, TranscriptEntry } from '@washi/domain'
-import type { ReactNode } from 'react'
+import { useDescribeTool } from '../approval'
 import { Markdown } from '../markdown'
 import { Mascot } from '../mascot'
 import { mergeMessageChunks, receiptLine } from './lib'
-
-function toolIcon(update: Extract<AgentUpdate, { kind: 'tool_call' }>): ReactNode {
-  if (update.title.startsWith('sheet_replace') || update.title.startsWith('sheet_create'))
-    return <IconGitPullRequest className="size-[13px]" />
-  if (update.toolKind === 'edit') return <IconPencil className="size-[13px]" />
-  if (update.toolKind === 'search') return <IconSearch className="size-[13px]" />
-  if (update.toolKind === 'fetch') return <IconWorld className="size-[13px]" />
-  return <IconFileText className="size-[13px]" />
-}
 
 function DiffView({ diff }: { diff: { path: string; oldText: string; newText: string } }) {
   return (
@@ -40,7 +24,9 @@ function DiffView({ diff }: { diff: { path: string; oldText: string; newText: st
 }
 
 function ToolPill({ update, followups }: { update: AgentUpdate; followups: AgentUpdate[] }) {
+  const describe = useDescribeTool()
   if (update.kind !== 'tool_call') return null
+  const { icon: Icon, action, subject } = describe(update.title, update.input)
   const latest = followups.at(-1)
   const status = latest?.kind === 'tool_call_update' ? latest.status : update.status
   const diff = followups.find(
@@ -62,8 +48,11 @@ function ToolPill({ update, followups }: { update: AgentUpdate; followups: Agent
             status === 'failed' ? 'text-destructive' : ''
           }`}
         >
-          {toolIcon(update)}
-          {update.title}
+          <Icon className="size-[13px] shrink-0" />
+          <span className="max-w-[260px] truncate" title={update.title}>
+            {action}
+            {subject && ` ${subject}`}
+          </span>
           {status === 'in_progress' && <span className="animate-pulse">…</span>}
         </summary>
         {output && (

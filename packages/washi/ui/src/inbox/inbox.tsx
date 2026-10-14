@@ -1,11 +1,13 @@
 import { receiptLine } from '../agent/lib'
+import { ApprovalCard } from '../approval'
 import { AgentMascot } from '../mascot'
 import { useAgentStore } from '../stores'
 import { useToday } from '../today'
 
 /** Everything Washi is waiting on, answerable here, then what it did — nothing invented. */
 export function Inbox() {
-  const { approvals, resolveApproval } = useAgentStore()
+  const approvals = useAgentStore((state) => state.approvals)
+  const resolveApproval = useAgentStore((state) => state.resolveApproval)
   const { today } = useToday()
   const turns = today?.turns ?? []
 
@@ -17,39 +19,17 @@ export function Inbox() {
           Everything Washi wants you to look at, in one queue.
         </p>
 
-        <div className="mb-[26px] overflow-hidden rounded-[14px] border border-border bg-card">
+        <div className="mb-[26px] grid gap-3">
           {approvals.map((request) => (
-            <div
+            <ApprovalCard
               key={request.id}
-              className="flex items-center gap-3 border-border border-b px-4 py-3 last:border-0"
-            >
-              <AgentMascot state="suggesting" size={22} />
-              <div className="min-w-0 flex-1">
-                <div className="truncate font-medium text-[13px]">
-                  Washi asks to run <span className="font-mono">{request.toolName}</span>
-                </div>
-                <div className="truncate font-mono text-[11.5px] text-muted-foreground">
-                  {JSON.stringify(request.input ?? {}).slice(0, 140)}
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => void resolveApproval(request.id, 'reject_once')}
-                className="h-[26px] rounded-lg border border-border bg-background px-2.5 text-[12px] hover:bg-accent"
-              >
-                Reject
-              </button>
-              <button
-                type="button"
-                onClick={() => void resolveApproval(request.id, 'allow_once')}
-                className="h-[26px] rounded-lg bg-primary px-2.5 font-medium text-[12px] text-primary-foreground"
-              >
-                Accept
-              </button>
-            </div>
+              toolName={request.toolName}
+              input={request.input}
+              onDecide={(decision) => resolveApproval(request.id, decision)}
+            />
           ))}
           {approvals.length === 0 && (
-            <div className="flex items-center gap-2.5 p-4 text-[13px] text-muted-foreground">
+            <div className="flex items-center gap-2.5 rounded-[14px] border border-border bg-card p-4 text-[13px] text-muted-foreground">
               <AgentMascot state="done" size={22} />
               Inbox zero — Washi has nothing waiting on you.
             </div>

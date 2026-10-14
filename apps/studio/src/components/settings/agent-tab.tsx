@@ -1,4 +1,4 @@
-import { usd as formatUsd } from '@washi/ui'
+import { AutoApproveRow, usd as formatUsd } from '@washi/ui'
 import { DailyStop } from './daily-stop'
 import { KeyForm } from './key-form'
 import { useAgentSettings } from './lib'
@@ -33,6 +33,11 @@ export function AgentTab() {
             onSave={settings.save}
           />
         </div>
+      </section>
+
+      <section className="mt-10 border-border border-t pt-8">
+        <h2 className="mb-3 font-semibold text-[15px]">Approvals</h2>
+        <AutoApproveRow />
       </section>
 
       {spend && (

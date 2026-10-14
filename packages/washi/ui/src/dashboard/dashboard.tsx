@@ -1,5 +1,5 @@
-import { IconFileText } from '@tabler/icons-react'
 import { receiptLine, usd } from '../agent/lib'
+import { ApprovalCard } from '../approval'
 import { SheetIcon } from '../sheet-icon'
 import { useSheetsStore, useViewStore } from '../stores'
 import { useToday } from '../today'
@@ -93,38 +93,16 @@ export function Dashboard() {
                 {pending.length}
               </span>
             </div>
-            {pending.map((request) => (
-              <div
-                key={request.id}
-                className="flex flex-wrap items-center gap-2.5 border-border border-b px-[18px] py-[11px]"
-              >
-                <IconFileText className="size-[15px]" />
-                <span className="min-w-0 flex-[1_1_240px]">
-                  <span className="block truncate font-medium text-[13px]">
-                    Washi wants to run <span className="font-mono">{request.toolName}</span>
-                  </span>
-                  <span className="block truncate font-mono text-[11.5px] text-muted-foreground">
-                    {JSON.stringify(request.input ?? {}).slice(0, 120)}
-                  </span>
-                </span>
-                <span className="flex flex-none gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => void decide(request.id, 'reject_once')}
-                    className="h-[26px] rounded-lg border border-border bg-background px-2.5 text-xs hover:bg-accent"
-                  >
-                    Reject
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => void decide(request.id, 'allow_once')}
-                    className="h-[26px] rounded-lg bg-primary px-2.5 font-medium text-primary-foreground text-xs hover:opacity-90"
-                  >
-                    Accept
-                  </button>
-                </span>
-              </div>
-            ))}
+            <div className="grid gap-2.5 p-3">
+              {pending.map((request) => (
+                <ApprovalCard
+                  key={request.id}
+                  toolName={request.toolName}
+                  input={request.input}
+                  onDecide={(decision) => decide(request.id, decision)}
+                />
+              ))}
+            </div>
           </div>
         )}
 

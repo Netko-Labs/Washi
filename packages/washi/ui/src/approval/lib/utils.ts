@@ -1,0 +1,147 @@
+import {
+  IconBolt,
+  IconDatabase,
+  IconDatabaseEdit,
+  IconEye,
+  IconFilePencil,
+  IconFilePlus,
+  IconFileSearch,
+  IconLink,
+  IconSearch,
+  IconTable,
+  IconTablePlus,
+  IconTool,
+  IconWorld,
+} from '@tabler/icons-react'
+import { api } from '../../api'
+import { useAgentStore } from '../../stores'
+import type { TitleOf, ToolDescription } from './types'
+
+const record = (value: unknown): Record<string, unknown> =>
+  value && typeof value === 'object' ? (value as Record<string, unknown>) : {}
+
+const text = (value: unknown): string | null =>
+  typeof value === 'string' && value.trim() ? value : null
+
+/** The first readable value of a row — its title, usually. */
+function rowLabel(data: Record<string, unknown>): string | null {
+  for (const value of Object.values(data)) {
+    if (typeof value === 'string' && value.trim()) return value
+  }
+  return null
+}
+
+function hostOf(url: string | null): string | null {
+  if (!url) return null
+  try {
+    return new URL(url).hostname
+  } catch {
+    return url
+  }
+}
+
+const base = (partial: Partial<ToolDescription> & Pick<ToolDescription, 'icon' | 'action'>) => ({
+  subject: null,
+  details: [],
+  outbound: false,
+  preview: null,
+  ...partial,
+})
+
+function describeTable(name: string, input: Record<string, unknown>): ToolDescription {
+  if (name === 'db_define') {
+    const spec = record(input.spec)
+    const columns = Array.isArray(spec.columns)
+      ? spec.columns.map((column) => text(record(column).name)).filter(Boolean)
+      : []
+    return base({
+      icon: IconTablePlus,
+      action: 'Create a table',
+      subject: text(spec.name),
+      details: columns.length ? [`Columns: ${columns.join(', ')}`] : [],
+    })
+  }
+  const mutation = record(input.mutation)
+  const table = text(mutation.table)
+  const label = rowLabel(record(mutation.data))
+  if (mutation.kind === 'insert') {
+    return base({
+      icon: IconDatabaseEdit,
+      action: label ? `Add “${label}” to` : 'Add a row to',
+      subject: table,
+    })
+  }
+  if (mutation.kind === 'delete') {
+    return base({ icon: IconDatabaseEdit, action: 'Remove rows from', subject: table })
+  }
+  const fields = Object.keys(record(mutation.data))
+  return base({
+    icon: IconDatabaseEdit,
+    action: 'Update rows in',
+    subject: table,
+    details: fields.length ? [`Changes ${fields.join(', ')}`] : [],
+  })
+}
+
+/** Every Washi tool, in words. Unknown tools fall back to their name, de-snake-cased. */
+export function describeTool(name: string, input: unknown, titleOf: TitleOf): ToolDescription {
+  const args = record(input)
+  const sheetTitle = () => {
+    const id = text(args.id)
+    return id ? titleOf(id) : null
+  }
+  switch (name) {
+    case 'sheet_create':
+      return base({
+        icon: IconFilePlus,
+        action: 'Create a page',
+        subject: text(args.title),
+        preview: text(args.source),
+      })
+    case 'sheet_replace':
+      return base({
+        icon: IconFilePencil,
+        action: 'Update the page',
+        subject: text(args.title) ?? sheetTitle(),
+        preview: text(args.source),
+      })
+    case 'db_define':
+    case 'db_mutate':
+      return describeTable(name, args)
+    case 'fetch_url':
+      return base({
+        icon: IconWorld,
+        action: 'Visit',
+        subject: hostOf(text(args.url)),
+        details: text(args.url) ? [String(args.url)] : [],
+        outbound: true,
+      })
+    case 'action_run': {
+      const action = record(args.action)
+      return base({ icon: IconBolt, action: 'Run', subject: text(action.verb), outbound: true })
+    }
+    case 'sheet_list':
+      return base({ icon: IconFileSearch, action: 'Looked through your pages' })
+    case 'sheet_get':
+      return base({ icon: IconEye, action: 'Read', subject: sheetTitle() })
+    case 'sheet_check':
+      return base({ icon: IconFileSearch, action: 'Checked the page design' })
+    case 'sheet_backlinks':
+      return base({ icon: IconLink, action: 'Found links to', subject: sheetTitle() })
+    case 'search':
+      return base({ icon: IconSearch, action: 'Searched for', subject: text(args.term) })
+    case 'db_list_tables':
+      return base({ icon: IconDatabase, action: 'Looked at your tables' })
+    case 'db_query':
+      return base({ icon: IconTable, action: 'Read', subject: text(record(args.query).table) })
+    default:
+      return base({ icon: IconTool, action: name.replaceAll('_', ' ') })
+  }
+}
+
+/** Flips the workspace setting, then re-reads what is still waiting — the server already answered the changes. */
+export async function setAutoApprove(on: boolean): Promise<boolean> {
+  const state = await api.agents.setAutoApprove.mutate({ on })
+  useAgentStore.setState({ approvals: await api.agents.pendingApprovals.query() })
+  return state.on
+}

@@ -1,8 +1,21 @@
 import type { ApprovalDecision, ApprovalRequest } from '@washi/domain'
-import { createApproval, resolveApproval, type Workspace } from '@washi/repository'
+import {
+  createApproval,
+  getAppMeta,
+  resolveApproval,
+  setAppMeta,
+  type Workspace,
+} from '@washi/repository'
 import { checkUrl } from '@washi/tsuru'
 import type { CapabilityDesk } from './desk'
-import { APPROVAL_TIMEOUT_MS, type EventsRef, READ_TOOLS, ROUTINE_APPROVAL_TIMEOUT_MS } from './lib'
+import {
+  APPROVAL_TIMEOUT_MS,
+  AUTO_APPROVE_KEY,
+  CHANGE_TOOLS,
+  type EventsRef,
+  READ_TOOLS,
+  ROUTINE_APPROVAL_TIMEOUT_MS,
+} from './lib'
 import { shortToolName } from './normalize'
 import type { ToolGate, ToolVerdict } from './ports'
 import { currentFetchPolicy } from './tools'
@@ -62,7 +75,21 @@ export class ApprovalDesk implements ToolGate {
     }
   }
 
+  autoApproving(): boolean {
+    return getAppMeta(this.ws, AUTO_APPROVE_KEY) === '1'
+  }
+
+  /** Turning it on also answers the changes already waiting — that is what was asked. */
+  setAutoApprove(on: boolean, actorId: string | null): void {
+    setAppMeta(this.ws, AUTO_APPROVE_KEY, on ? '1' : '0')
+    if (!on) return
+    for (const [id, entry] of this.pending) {
+      if (CHANGE_TOOLS.has(entry.request.toolName)) this.resolve(id, 'allow_once', actorId)
+    }
+  }
+
   async approve(sessionId: string, toolName: string, input: unknown): Promise<boolean> {
+    if (CHANGE_TOOLS.has(toolName) && this.autoApproving()) return true
     if (this.alwaysAllowed.get(sessionId)?.has(toolName)) return true
     const decision = await this.request(sessionId, toolName, input)
     if (decision === 'allow_always') this.remember(sessionId, toolName, input)

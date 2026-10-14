@@ -1,3 +1,4 @@
+import type { ApprovalDecision } from '@washi/domain'
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '../../api'
 
@@ -23,7 +24,7 @@ export function useToday() {
     return () => clearInterval(timer)
   }, [refresh])
 
-  const decide = async (id: string, decision: 'allow_once' | 'reject_once') => {
+  const decide = async (id: string, decision: ApprovalDecision) => {
     await api.agents.resolveApproval.mutate({ id, decision })
     await refresh()
   }
