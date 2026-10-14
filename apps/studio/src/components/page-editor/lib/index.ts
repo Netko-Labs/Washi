@@ -18,4 +18,12 @@ export type {
   TextKind,
 } from './types'
 export { frameOf, kindMatches, newBlock, numberedPositions, toBlocks, toSheet } from './utils'
-export { KIND_OPTIONS, LIST_MARKERS, SAVE_LABELS } from './values'
+export {
+  FIELD_CLASS,
+  HEADING_LEVELS,
+  KIND_LOOKS,
+  KIND_OPTIONS,
+  KIND_PLACEHOLDERS,
+  LIST_MARKERS,
+  SAVE_LABELS,
+} from './values'

@@ -2,9 +2,7 @@ import type { SheetFrame } from '@washi/paper'
 import type { WsxElement, WsxNode, WsxValue } from '@washi/wsx'
 import type { ComponentProps } from 'react'
 import type { Block, KindOption, TextBlock, TextKind } from './types'
-import { KIND_OPTIONS, LIST_MARKERS, SHORTCUTS } from './values'
-
-const HEADINGS: Partial<Record<TextKind, number>> = { h1: 1, h2: 2, h3: 3 }
+import { HEADING_LEVELS, KIND_OPTIONS, LIST_MARKERS, SHORTCUTS } from './values'
 
 function element(name: string, props: Record<string, WsxValue>, children: WsxNode[]): WsxElement {
   return { kind: 'element', name, props, children }
@@ -14,16 +12,16 @@ function text(value: string): WsxNode[] {
   return value ? [{ kind: 'text', value }] : []
 }
 
-/** A block's text when every child is text (or one plain `<Text>`); null when it holds more. */
+/**
+ * A block's text when it is one run of text (or one plain `<Text>`); null when it holds more.
+ * Several runs stay locked: the parser trims each, so no join would give the page's own spacing.
+ */
 function plainText(node: WsxElement): string | null {
-  if (node.children.every((child) => child.kind === 'text')) {
-    return node.children.map((child) => (child.kind === 'text' ? child.value : '')).join(' ')
-  }
-  const [only] = node.children
-  if (node.children.length === 1 && only?.kind === 'element' && only.name === 'Text') {
-    return plainText(only)
-  }
-  return null
+  const [only, ...rest] = node.children
+  if (!only) return ''
+  if (rest.length > 0) return null
+  if (only.kind === 'text') return only.value
+  return only.name === 'Text' ? plainText(only) : null
 }
 
 export function newBlock(kind: TextKind = 'text', value = ''): TextBlock {
@@ -81,7 +79,7 @@ function toNode(block: TextBlock): WsxElement | null {
   if (block.kind === 'divider') return element('Divider', block.props, [])
   if (block.kind === 'code') return element('Code', block.props, text(block.text))
   if (!block.text.trim()) return null
-  const level = HEADINGS[block.kind]
+  const level = HEADING_LEVELS[block.kind]
   if (level)
     return element('Title', level > 1 ? { ...block.props, level } : block.props, text(block.text))
   const names: Partial<Record<TextKind, string>> = {

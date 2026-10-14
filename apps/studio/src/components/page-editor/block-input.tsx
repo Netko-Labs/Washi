@@ -2,6 +2,10 @@ import type { KeyboardEvent } from 'react'
 import { useRef } from 'react'
 import {
   type BlockInputProps,
+  FIELD_CLASS,
+  HEADING_LEVELS,
+  KIND_LOOKS,
+  KIND_PLACEHOLDERS,
   kindMatches,
   type TextKind,
   useAutoSize,
@@ -9,30 +13,6 @@ import {
   useFocusRequest,
 } from './lib'
 import { SlashMenu } from './slash-menu'
-
-const FIELD =
-  'block w-full resize-none overflow-hidden border-0 bg-transparent p-0 outline-none placeholder:text-muted-foreground/50 placeholder:opacity-0 focus:placeholder:opacity-100'
-
-const LOOK: Partial<Record<TextKind, string>> = {
-  h1: 'wsx-title',
-  h2: 'wsx-title',
-  h3: 'wsx-title',
-  code: 'font-mono text-[13px]',
-}
-
-const PLACEHOLDER: Partial<Record<TextKind, string>> = {
-  h1: 'Heading 1',
-  h2: 'Heading 2',
-  h3: 'Heading 3',
-  bullet: 'List',
-  number: 'List',
-  todo: 'To-do',
-  quote: 'Quote',
-  callout: 'Something to notice',
-  code: 'Code',
-}
-
-const LEVEL: Partial<Record<TextKind, number>> = { h1: 1, h2: 2, h3: 3 }
 
 export function BlockInput({ block, numberAt }: BlockInputProps) {
   const ref = useRef<HTMLTextAreaElement>(null)
@@ -93,12 +73,12 @@ export function BlockInput({ block, numberAt }: BlockInputProps) {
         ref={ref}
         rows={1}
         value={block.text}
-        data-level={LEVEL[block.kind]}
-        placeholder={PLACEHOLDER[block.kind] ?? "Type '/' for blocks"}
-        aria-label={PLACEHOLDER[block.kind] ?? 'Text'}
+        data-level={HEADING_LEVELS[block.kind]}
+        placeholder={KIND_PLACEHOLDERS[block.kind] ?? "Type '/' for blocks"}
+        aria-label={KIND_PLACEHOLDERS[block.kind] ?? 'Text'}
         onChange={(event) => store().setText(block.id, event.target.value)}
         onKeyDown={onKeyDown}
-        className={`${FIELD} ${LOOK[block.kind] ?? 'wsx-text'} ${
+        className={`${FIELD_CLASS} ${KIND_LOOKS[block.kind] ?? 'wsx-text'} ${
           block.kind === 'todo' && block.done ? 'line-through opacity-50' : ''
         }`}
       />

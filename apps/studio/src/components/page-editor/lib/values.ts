@@ -40,3 +40,28 @@ export const SAVE_LABELS: Record<SaveState, string> = {
   saving: 'Saving…',
   failed: "Couldn't save — keep typing to retry",
 }
+
+export const HEADING_LEVELS: Partial<Record<TextKind, number>> = { h1: 1, h2: 2, h3: 3 }
+
+export const FIELD_CLASS =
+  'block w-full resize-none overflow-hidden border-0 bg-transparent p-0 outline-none placeholder:text-muted-foreground/50 placeholder:opacity-0 focus:placeholder:opacity-100'
+
+/** The paper's own type for headings; everything else reads as body text. */
+export const KIND_LOOKS: Partial<Record<TextKind, string>> = {
+  h1: 'wsx-title',
+  h2: 'wsx-title',
+  h3: 'wsx-title',
+  code: 'font-mono text-[13px]',
+}
+
+export const KIND_PLACEHOLDERS: Partial<Record<TextKind, string>> = {
+  h1: 'Heading 1',
+  h2: 'Heading 2',
+  h3: 'Heading 3',
+  bullet: 'List',
+  number: 'List',
+  todo: 'To-do',
+  quote: 'Quote',
+  callout: 'Something to notice',
+  code: 'Code',
+}

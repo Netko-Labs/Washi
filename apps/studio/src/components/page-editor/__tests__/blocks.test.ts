@@ -42,6 +42,12 @@ describe('page editor blocks', () => {
     expect(parse(serialize(sheet))).toEqual(sheet)
   })
 
+  test('text in several runs stays locked rather than gaining or losing spaces', () => {
+    const root = parse('<Sheet title="t"><Text>Tom {"&"} Jerry</Text></Sheet>')
+    expect(toBlocks(root).map((block) => block.kind)).toEqual(['locked'])
+    expect(parse(serialize(toSheet(root, toBlocks(root))))).toEqual(root)
+  })
+
   test('markdown shortcuts turn a text block into its kind', () => {
     expect(applyShortcut(newBlock('text', '## Goals'))).toMatchObject({ kind: 'h2', text: 'Goals' })
     expect(applyShortcut(newBlock('text', '[] milk'))).toMatchObject({ kind: 'todo', text: 'milk' })
