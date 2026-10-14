@@ -11,6 +11,11 @@ export function AgentTab() {
     <div>
       {loading && <p className="mb-4 text-[13px] text-muted-foreground">Loading…</p>}
 
+      <section className="mb-10 border-border border-b pb-8">
+        <h2 className="mb-3 font-semibold text-[15px]">Approvals</h2>
+        <AutoApproveRow />
+      </section>
+
       <section>
         <h2 className="font-semibold text-[15px]">Agent key</h2>
         <p className="mt-1 text-[13.5px] text-muted-foreground leading-relaxed">
@@ -33,11 +38,6 @@ export function AgentTab() {
             onSave={settings.save}
           />
         </div>
-      </section>
-
-      <section className="mt-10 border-border border-t pt-8">
-        <h2 className="mb-3 font-semibold text-[15px]">Approvals</h2>
-        <AutoApproveRow />
       </section>
 
       {spend && (
