@@ -4,7 +4,7 @@ Juan asleep; autopilot (push → PR → bot review → fix every finding → squ
 Inspiration: Mobbin web references — Notion, Fibery, Obvious, Copilot, Grok (docked AI was declined:
 the agent stays a floating popover).
 
-- [ ] 1 · safety: two-step page delete (both sidebars) · invalid WSX → 400 not 500 · sessions left
+- [x] 1 · safety: two-step page delete (both sidebars) · invalid WSX → 400 not 500 · sessions left
       `running` by a killed process → `error` at boot
 - [ ] 2 · sidebar: Recent + Favorites (per person, browser storage — no backend), star in header
 - [ ] 3 · page polish: loading state, real "page not found" for dead links, "edited X ago"
@@ -12,6 +12,8 @@ the agent stays a floating popover).
 - [ ] 5 · verify washi.netko.dev serves the last merge; log what shipped
 
 Log (one line per merged PR):
+
+- #14 `9371afb` safety pass — two-step delete, WSX 400, interrupted sessions → error. Bot: approved, no findings.
 
 # Studio rev 2 — one UI package, the web catches up (2026-10-14)
 

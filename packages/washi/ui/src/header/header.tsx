@@ -1,3 +1,4 @@
+import { FavoriteStar } from '../favorite-star'
 import { AgentMascot } from '../mascot'
 import { mascotStateFor, useAgentStore, useSheetsStore, useViewStore, viewOf } from '../stores'
 import type { HeaderProps } from './lib/types'
@@ -37,12 +38,13 @@ export function Header({ leading, actions }: HeaderProps) {
   return (
     <header className="flex h-12 shrink-0 items-center gap-2.5 border-border border-b px-4">
       {leading}
-      <div className="min-w-0 flex-1 truncate text-[13px]">
+      <div className="min-w-0 truncate text-[13px]">
         <span className="text-muted-foreground">
           {workspaceName} <span className="opacity-50">/</span>
         </span>{' '}
         <span className="font-medium">{leaf}</span>
       </div>
+      {view === 'note' && active && <FavoriteStar sheetId={active.id} />}
 
       <div className="ml-auto flex flex-none items-center gap-1.5">
         {view === 'note' && (

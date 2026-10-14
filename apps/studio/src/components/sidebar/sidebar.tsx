@@ -74,9 +74,6 @@ export function Sidebar({ workspace, open, onClose }: SidebarProps) {
 
         <SidebarNav workspaceId={workspace.id} onNavigate={onClose} />
 
-        <div className="px-4 pt-[18px] pb-1.5 font-semibold text-[11px] text-muted-foreground uppercase tracking-[0.06em]">
-          Pages
-        </div>
         <SidebarPages workspaceId={workspace.id} onNavigate={onClose} />
 
         <div className="border-border border-t px-2 py-1.5">

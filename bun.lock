@@ -83,6 +83,7 @@
         "@trpc/server": "^11.19.0",
         "@trpc/tanstack-react-query": "^11.19.0",
         "@washi/control": "workspace:*",
+        "@washi/domain": "workspace:*",
         "@washi/paper": "workspace:*",
         "@washi/runtime": "workspace:*",
         "@washi/trpc": "workspace:*",
