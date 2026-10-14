@@ -153,6 +153,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
 - `loro-crdt` and the Agent SDK read their own files at runtime (.wasm, the native `claude`
   binary): they stay external in Vite's SSR build and Nitro traces them into `.output`
   (`RUNTIME_FILE_DEPS` in `apps/studio/vite.config.ts`). Inline them and SSR dies on ENOENT.
+  Nitro ships every installed platform binary; the studio `build` script drops the `-musl` ones
+  (~285 MB): both hosts are glibc.
 - One React repo-wide (root `overrides`). Bun's isolated linker will otherwise give workspace
   packages a second copy — an invalid hook call.
 - `WASHI_SECRET_KEY` is the session secret **and** the root of every workspace's BYOK key
