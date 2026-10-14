@@ -13,8 +13,6 @@ interface AgentState {
   activeSessionId: string | null
   transcript: TranscriptEntry[]
   approvals: ApprovalRequest[]
-  /** Null until the workspace says; changes skip the desk while true. */
-  autoApprove: boolean | null
   running: boolean
   panelOpen: boolean
   togglePanel: () => void
@@ -27,8 +25,6 @@ interface AgentState {
   sendPrompt: (text: string) => Promise<void>
   stopTurn: () => Promise<void>
   resolveApproval: (id: string, decision: ApprovalDecision) => Promise<void>
-  /** Turning it on answers the waiting changes server-side; re-read what is left. */
-  setAutoApprove: (on: boolean) => Promise<boolean>
   reset: () => void
 }
 
@@ -69,7 +65,6 @@ export const useAgentStore = create<AgentState>((set, get) => ({
   activeSessionId: null,
   transcript: [],
   approvals: [],
-  autoApprove: null,
   running: false,
   panelOpen: false,
   togglePanel: () => set((state) => ({ panelOpen: !state.panelOpen })),
@@ -122,15 +117,13 @@ export const useAgentStore = create<AgentState>((set, get) => ({
       subscriptions.push(agentUpdates, approvalRequests, openSheetRequests)
     }
     const issued = generation
-    const [sessions, pending, auto] = await Promise.all([
+    const [sessions, pending] = await Promise.all([
       api.agents.listSessions.query(),
       api.agents.pendingApprovals.query(),
-      api.agents.autoApprove.query(),
     ])
     if (issued !== generation) return
     set((state) => ({
       sessions,
-      autoApprove: auto.on,
       approvals: [
         ...state.approvals,
         ...pending.filter((request) => !state.approvals.some((a) => a.id === request.id)),
@@ -195,12 +188,6 @@ export const useAgentStore = create<AgentState>((set, get) => ({
     set((state) => ({ approvals: state.approvals.filter((approval) => approval.id !== id) }))
   },
 
-  setAutoApprove: async (on) => {
-    const state = await api.agents.setAutoApprove.mutate({ on })
-    set({ autoApprove: state.on, approvals: await api.agents.pendingApprovals.query() })
-    return state.on
-  },
-
   /** Another workspace: its sessions, approvals and subscriptions are not this one's. */
   reset: () => {
     for (const subscription of subscriptions ?? []) subscription.unsubscribe()
@@ -212,7 +199,6 @@ export const useAgentStore = create<AgentState>((set, get) => ({
       activeSessionId: null,
       transcript: [],
       approvals: [],
-      autoApprove: null,
       running: false,
     })
   },

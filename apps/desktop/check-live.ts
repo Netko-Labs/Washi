@@ -1,5 +1,5 @@
 /**
- * The golden path, live: ask → approve at the desk → the page lands → the receipt
+ * The golden path, live: ask → the page lands, no desk stop → the receipt
  * says who paid. Runs a real turn on this machine's Claude Code login, so it is
  * opt-in and never part of `check`.
  * Run: `bun run --cwd apps/desktop check:live`
@@ -34,11 +34,6 @@ export default defineCheck(async (app: CheckDriver) => {
     { selector: composer },
   )
   await app.key('Enter')
-
-  app.step('the write stops at the desk, and a person accepts it')
-  await app.waitFor('[data-approval-bar]', { timeoutMs: 180_000 })
-  await app.screenshot('live-approval')
-  await app.click('text=Accept')
 
   app.step('the turn ends in a receipt billed to the plan')
   await app.waitUntil(

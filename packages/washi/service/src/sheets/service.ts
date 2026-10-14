@@ -1,6 +1,14 @@
-import type { SheetDetail, SheetWrite } from '@washi/domain'
+import type { SheetAuthor, SheetDetail, SheetWrite } from '@washi/domain'
 import { paperRegistry } from '@washi/paper/registry'
-import { createSheet, deleteSheet, getSheet, updateSheet, type Workspace } from '@washi/repository'
+import {
+  createSheet,
+  deleteSheet,
+  getSheet,
+  latestRevision,
+  restoreRevision,
+  updateSheet,
+  type Workspace,
+} from '@washi/repository'
 import {
   type Diagnostic,
   extractMissing,
@@ -54,20 +62,42 @@ export function createSheetFromSource(
   ws: Workspace,
   write: SheetWrite,
   parentId: string | null = null,
+  editedBy: SheetAuthor = null,
 ): SheetDetail {
   const root = parseValidated(write.source)
   if (parentId) requireSheet(ws, parentId)
-  return createSheet(ws, write, { body: extractText(root), refs: extractRefs(root) }, parentId)
+  return createSheet(ws, write, indexOf(root), parentId, editedBy)
 }
 
-export function updateSheetFromSource(ws: Workspace, id: string, write: SheetWrite): SheetDetail {
-  const root = parseValidated(write.source)
-  const updated = updateSheet(ws, id, write, {
-    body: extractText(root),
-    refs: extractRefs(root),
-  })
+export function updateSheetFromSource(
+  ws: Workspace,
+  id: string,
+  write: SheetWrite,
+  editedBy: SheetAuthor = null,
+): SheetDetail {
+  const updated = updateSheet(ws, id, write, indexOf(parseValidated(write.source)), editedBy)
   if (!updated) throw new Error(`sheet not found: ${id}`)
   return updated
+}
+
+export class SheetUndoError extends Error {
+  constructor(id: string) {
+    super(`nothing of Washi's to undo on ${id}`)
+    this.name = 'SheetUndoError'
+  }
+}
+
+/** Takes back Washi's last write — only while nobody has written the page since. */
+export function undoWashiWrite(ws: Workspace, id: string): SheetDetail {
+  const revision = latestRevision(ws, id)
+  if (!revision || !restoreRevision(ws, revision, indexOf(parse(revision.source)))) {
+    throw new SheetUndoError(id)
+  }
+  return requireSheet(ws, id)
+}
+
+function indexOf(root: ReturnType<typeof parse>) {
+  return { body: extractText(root), refs: extractRefs(root) }
 }
 
 export function removeSheet(ws: Workspace, id: string): void {

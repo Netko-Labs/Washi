@@ -20,6 +20,8 @@ export interface SheetsState {
   updateMeta: (id: string, patch: SheetMetaPatch) => Promise<void>
   /** A copy below the original, opened in a tab. */
   duplicateSheet: (id: string) => Promise<void>
+  /** Takes back Washi's last write on the page. */
+  undoWashi: (id: string) => Promise<void>
   search: (term: string) => Promise<void>
   reset: () => void
 }

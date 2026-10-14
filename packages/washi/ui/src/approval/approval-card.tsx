@@ -1,6 +1,5 @@
 import { IconChevronDown, IconWorld } from '@tabler/icons-react'
 import { useState } from 'react'
-import { useAgentStore } from '../stores'
 import { type ApprovalCardProps, useDescribeTool } from './lib'
 import { PagePreview } from './page-preview'
 
@@ -10,18 +9,7 @@ export function ApprovalCard({ toolName, input, onDecide, more = 0 }: ApprovalCa
   const [previewOpen, setPreviewOpen] = useState(true)
   const { icon: Icon, action, subject, details, outbound, preview } = describe(toolName, input)
 
-  const always = outbound
-    ? {
-        label: toolName === 'fetch_url' ? 'Always allow this site' : 'Allow for this chat',
-        run: () => onDecide('allow_always'),
-      }
-    : {
-        label: 'Allow all changes',
-        run: async () => {
-          await useAgentStore.getState().setAutoApprove(true)
-          await onDecide('allow_once')
-        },
-      }
+  const always = toolName === 'fetch_url' ? 'Always allow this site' : 'Allow for this chat'
 
   return (
     <div className="overflow-hidden rounded-xl border border-agent bg-card" data-approval-card>
@@ -71,10 +59,10 @@ export function ApprovalCard({ toolName, input, onDecide, more = 0 }: ApprovalCa
       <div className="mt-1 flex flex-wrap items-center gap-1.5 px-3 py-2.5">
         <button
           type="button"
-          onClick={() => void always.run()}
+          onClick={() => void onDecide('allow_always')}
           className="h-7 rounded-lg px-1.5 text-[12px] text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
         >
-          {always.label}
+          {always}
         </button>
         <span className="flex-1" />
         <button

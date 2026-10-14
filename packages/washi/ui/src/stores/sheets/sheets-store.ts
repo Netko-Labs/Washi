@@ -93,6 +93,14 @@ export const useSheetsStore = create<SheetsState>((set, get) => ({
     useViewStore.getState().openTab(`note:${copy.id}`)
   },
 
+  undoWashi: async (id) => {
+    try {
+      await api.sheets.undoWashi.mutate({ id })
+    } finally {
+      await get().refresh()
+    }
+  },
+
   search: async (term) => {
     set({ searchTerm: term })
     if (!term.trim()) {

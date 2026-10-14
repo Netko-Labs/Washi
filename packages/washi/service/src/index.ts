@@ -33,7 +33,9 @@ export {
   createSheetFromSource,
   removeSheet,
   requireSheet,
+  SheetUndoError,
   SheetValidationError,
+  undoWashiWrite,
   updateSheetFromSource,
   type WsxCheck,
 } from './sheets/service'

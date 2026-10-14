@@ -1,6 +1,12 @@
 import { initTRPC, TRPCError } from '@trpc/server'
 import type { Workspace } from '@washi/repository'
-import { type AgentHost, CommentError, SheetMoveError, SheetValidationError } from '@washi/service'
+import {
+  type AgentHost,
+  CommentError,
+  SheetMoveError,
+  SheetUndoError,
+  SheetValidationError,
+} from '@washi/service'
 import type { EventBus } from './shared/events'
 
 /**
@@ -120,6 +126,7 @@ export const workspaceProcedure = t.procedure
       !result.ok &&
       (result.error.cause instanceof SheetValidationError ||
         result.error.cause instanceof SheetMoveError ||
+        result.error.cause instanceof SheetUndoError ||
         result.error.cause instanceof CommentError)
     ) {
       throw new TRPCError({

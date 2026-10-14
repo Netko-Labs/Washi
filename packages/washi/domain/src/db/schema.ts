@@ -11,12 +11,24 @@ export const sheetTable = sqliteTable('sheets', {
   /** A preset key from the host's cover palette; never a URL. */
   cover: text('cover'),
   fullWidth: integer('full_width', { mode: 'boolean' }).notNull().default(false),
+  /** Who wrote the content last: Washi, or null for a person. */
+  editedBy: text('edited_by', { enum: ['washi'] }),
   /** Derived cache of the Loro doc's text — queries and FTS read this. */
   source: text('source').notNull(),
   loroSnapshot: blob('loro_snapshot', { mode: 'buffer' }).notNull(),
   hlcCreated: text('hlc_created').notNull(),
   hlcUpdated: text('hlc_updated').notNull(),
   deletedAt: text('deleted_at'),
+})
+
+/** What a page held before each of Washi's writes since a person last wrote it — its undo stack. */
+export const sheetRevisionTable = sqliteTable('sheet_revisions', {
+  id: text('id').primaryKey(),
+  sheetId: text('sheet_id').notNull(),
+  title: text('title').notNull(),
+  icon: text('icon'),
+  source: text('source').notNull(),
+  hlcCreated: text('hlc_created').notNull(),
 })
 
 export const sheetLinkTable = sqliteTable(

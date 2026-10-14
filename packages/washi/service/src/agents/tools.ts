@@ -67,7 +67,7 @@ export function createWashiTools(ws: Workspace, context: ToolContext) {
           parentId: z.string().optional(),
         },
         async ({ parentId, ...input }) => {
-          const sheet = createSheetFromSource(ws, input, parentId ?? null)
+          const sheet = createSheetFromSource(ws, input, parentId ?? null, 'washi')
           context.openSheet?.(sheet.id)
           return text(sheet)
         },
@@ -81,7 +81,7 @@ export function createWashiTools(ws: Workspace, context: ToolContext) {
           icon: z.string().max(16).optional(),
           source: z.string(),
         },
-        async ({ id, ...write }) => text(updateSheetFromSource(ws, id, write)),
+        async ({ id, ...write }) => text(updateSheetFromSource(ws, id, write, 'washi')),
       ),
       tool(
         'sheet_backlinks',

@@ -6,7 +6,7 @@ export interface ToolDescription {
   action: string
   subject: string | null
   details: string[]
-  /** Leaves the server — never covered by auto-approve. */
+  /** Leaves the server — the only kind of tool that still asks. */
   outbound: boolean
   /** A page's source, for a preview before it is saved. */
   preview: string | null

@@ -118,6 +118,7 @@ function purge(ws: Workspace, ids: string[]): number {
     for (const id of ids) {
       ws.sqlite.query('DELETE FROM sheet_links WHERE src = ?').run(id)
       ws.sqlite.query('DELETE FROM sheets WHERE id = ?').run(id)
+      ws.sqlite.query('DELETE FROM sheet_revisions WHERE sheet_id = ?').run(id)
       deleteSheetComments(ws, id)
       appendOp(ws, 'sheet', id, { kind: 'purge' })
     }

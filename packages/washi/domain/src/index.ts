@@ -36,6 +36,7 @@ export {
 } from './entities/comments'
 export {
   type SearchHit,
+  type SheetAuthor,
   type SheetDetail,
   type SheetMetaPatch,
   type SheetSummary,

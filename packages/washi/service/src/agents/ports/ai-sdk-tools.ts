@@ -89,7 +89,7 @@ export function createAiTools({ ws, runHankoAction, openSheet }: AiToolDeps) {
         parentId: z.string().optional(),
       }),
       execute: async ({ parentId, ...input }) => {
-        const sheet = createSheetFromSource(ws, input, parentId ?? null)
+        const sheet = createSheetFromSource(ws, input, parentId ?? null, 'washi')
         openSheet?.(sheet.id)
         return sheet
       },
@@ -102,7 +102,7 @@ export function createAiTools({ ws, runHankoAction, openSheet }: AiToolDeps) {
         icon: z.string().max(16).optional(),
         source: z.string(),
       }),
-      execute: async ({ id, ...write }) => updateSheetFromSource(ws, id, write),
+      execute: async ({ id, ...write }) => updateSheetFromSource(ws, id, write, 'washi'),
     }),
     db_define: tool({
       description: 'Create or update a table definition.',

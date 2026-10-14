@@ -39,6 +39,11 @@ export {
 export { getAppMeta, setAppMeta } from './storage/meta'
 export { createWorkspaceRegistry, type WorkspaceRegistry } from './storage/registry'
 export {
+  latestRevision,
+  restoreRevision,
+  type SheetRevision,
+} from './storage/revisions'
+export {
   createRoutine,
   deleteRoutine,
   getRoutine,
