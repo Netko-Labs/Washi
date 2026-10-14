@@ -12,6 +12,9 @@ local-only mode is deferred to phase 7, not cut.
 
 Specs (visual, canonical):
 
+- `docs/washi.html` (2026-10-14) — **what Washi is.** A team workspace of living pages; people and
+  the agent co-author, live. Overrules features.md §1 · §2 · §5, spec Q2 and server.html's
+  "multiplayer is review". Design every flow against it.
 - `docs/spec.html` (v0.5) — WSX, Paper, ink/tsuru/hanko, the P0–P8 audit. Still current.
 - `docs/server.html` (v0.6) — **the server pivot.** Supersedes v0.5 §03 · §04 · §07 · §08 and
   Q12 · Q17 · Q19. Read it for anything about processes, storage topology, identity, or the road.

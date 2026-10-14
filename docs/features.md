@@ -1,5 +1,8 @@
 # Washi — feature scope
 
+> **Superseded in part by `docs/washi.html` (2026-10-14).** §1, §2 and §5 no longer hold: people and
+> the agent both write, pages share a house style, co-editing is live. The surface lists still stand.
+
 A design brief: every feature Washi should and will have, described as capability rather than
 construction. Architecture lives in `docs/spec.html`; nothing here should require reading it.
 
