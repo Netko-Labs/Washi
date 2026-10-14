@@ -2,7 +2,7 @@ import { AgentMascot, VaultIcon } from '@washi/ui'
 import { useState } from 'react'
 import { InviteBanner } from '@/components/invite'
 import { signOut, useSession } from '@/integrations/auth'
-import { useWorkspaces } from './lib'
+import { topicFor, useWorkspaces } from './lib'
 
 /**
  * The rest of onboarding. A workspace is one SQLite file and one organization,
@@ -62,7 +62,7 @@ export function WorkspacePicker({ onOpen }: { onOpen: (id: string) => void }) {
                 }}
                 className="flex h-14 w-full items-center gap-3 rounded-xl border border-border bg-card px-4 text-left hover:border-primary"
               >
-                <VaultIcon topic="plain" size={32} className="shrink-0" />
+                <VaultIcon topic={topicFor(workspace.id)} size={32} className="shrink-0" />
                 <span className="min-w-0 flex-1">
                   <span className="block truncate font-semibold text-[14px]">{workspace.name}</span>
                   <span className="block text-[12px] text-muted-foreground">{workspace.role}</span>

@@ -1,12 +1,11 @@
-import { IconChevronLeft, IconEdit, IconSearch, IconX } from '@tabler/icons-react'
-import { Link } from '@tanstack/react-router'
-import { useAgentStore, useSheetsStore, useViewStore, VaultIcon } from '@washi/ui'
+import { IconEdit, IconX } from '@tabler/icons-react'
+import { useAgentStore, useSheetsStore, useViewStore } from '@washi/ui'
 import { AgentStatus } from '@/components/agent-status'
-import { setActiveWorkspace } from '@/integrations/trpc'
 import type { SidebarProps } from './lib'
 import { SidebarNav } from './sidebar-nav'
 import { SidebarPages } from './sidebar-pages'
 import { UserRow } from './user-row'
+import { WorkspaceSwitcher } from './workspace-switcher'
 
 /** The desktop's 248px sidebar, as a drawer under `md` — same nav, same tree, web chrome. */
 export function Sidebar({ workspace, open, onClose }: SidebarProps) {
@@ -27,29 +26,7 @@ export function Sidebar({ workspace, open, onClose }: SidebarProps) {
         }`}
       >
         <div className="flex h-12 shrink-0 items-center gap-1 px-2">
-          <Link
-            to="/workspaces"
-            onClick={() => setActiveWorkspace(null)}
-            aria-label="All workspaces"
-            title="All workspaces"
-            className="flex h-9 min-w-0 flex-1 items-center gap-2 rounded-lg px-1.5 text-left hover:bg-accent"
-          >
-            <IconChevronLeft className="size-3.5 shrink-0 text-muted-foreground" />
-            <VaultIcon topic="plain" size={22} className="shrink-0" />
-            <span className="truncate font-semibold text-[13px]">{workspace.name}</span>
-          </Link>
-          <button
-            type="button"
-            aria-label="Search (⌘K)"
-            title="Search (⌘K)"
-            onClick={() => {
-              useSheetsStore.getState().openPalette()
-              onClose()
-            }}
-            className="grid size-8 shrink-0 place-items-center rounded-lg text-muted-foreground hover:bg-accent"
-          >
-            <IconSearch className="size-[15px]" />
-          </button>
+          <WorkspaceSwitcher workspace={workspace} onNavigate={onClose} />
           <button
             type="button"
             aria-label="New page"

@@ -1,6 +1,7 @@
 import { useRouter } from '@tanstack/react-router'
 import { useViewStore } from '@washi/ui'
 import { useEffect } from 'react'
+import { readActiveWorkspace } from '@/integrations/trpc'
 import { pathFor, saveTabs } from '../utils'
 
 /**
@@ -13,6 +14,8 @@ export function useTabNavigation(workspaceId: string) {
   useEffect(
     () =>
       useViewStore.subscribe((state, previous) => {
+        // A switch resets the stores in the next workspace's loader, while this shell is mounted.
+        if (readActiveWorkspace() !== workspaceId) return
         if (state.tabs !== previous.tabs) saveTabs(workspaceId, state.tabs)
         if (state.activeTab === previous.activeTab) return
         const target = pathFor(workspaceId, state.activeTab)

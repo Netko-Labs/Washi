@@ -11,5 +11,5 @@ export async function loadWorkspace(workspaceId: string, href: string) {
   const workspace = workspaces.find((entry) => entry.id === workspaceId)
   if (!workspace) throw redirect({ to: '/workspaces', search: {} })
   enterWorkspace(workspace)
-  return { workspace }
+  return { workspace, workspaces }
 }

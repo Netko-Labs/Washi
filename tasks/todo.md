@@ -1,3 +1,14 @@
+# Workspace switcher (2026-10-14) — switch organizations without leaving the page
+
+- [x] sidebar header is a switcher (Mobbin: v0 · hilos · Replit): every workspace with its own
+      mascot tile, ✓ on the current one, inline "New workspace", "All workspaces"; Search is a row
+- [x] switching keeps each workspace's tab strip — the outgoing shell no longer writes the
+      incoming tabs under its own key or pushes its own URLs while the next loader runs
+- [x] returning to a visited workspace resets the stores again (`gcTime: 0` on `/w/$workspaceId`)
+- [x] dashboard → dashboard switch selects the tab (shell keyed by workspace id)
+- Verified locally in a browser: A↔B↔new workspace, page → other workspace, Back, Escape,
+  outside click, mobile drawer. Desktop untouched — embedded mode has one workspace.
+
 # Overnight UX loop (2026-10-14) — PR per item, code-whiskers until clean, then merge
 
 Juan asleep; autopilot (push → PR → bot review → fix every finding → squash-merge → verify deploy).
