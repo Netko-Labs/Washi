@@ -1,5 +1,6 @@
 import { receiptLine, usd } from '../agent/lib'
 import { ApprovalCard } from '../approval'
+import { byRecent, relativeMs, relativeTime } from '../page-time'
 import { SheetIcon } from '../sheet-icon'
 import { useSheetsStore, useViewStore } from '../stores'
 import { useToday } from '../today'
@@ -12,28 +13,13 @@ function greeting(hour = new Date().getHours()): string {
   return 'Good evening'
 }
 
-function relativeTime(hlc: string): string {
-  return relativeMs(Number(hlc.slice(0, 14)))
-}
-
-function relativeMs(ms: number): string {
-  if (!Number.isFinite(ms) || ms <= 0) return 'recently'
-  const minutes = Math.floor((Date.now() - ms) / 60_000)
-  if (minutes < 1) return 'just now'
-  if (minutes < 60) return `${minutes} min ago`
-  const hours = Math.floor(minutes / 60)
-  if (hours < 24) return `${hours} hour${hours === 1 ? '' : 's'} ago`
-  const days = Math.floor(hours / 24)
-  return days === 1 ? 'yesterday' : `${days} days ago`
-}
-
 export function Dashboard() {
   const { sheets } = useSheetsStore()
   const { openTab, identity } = useViewStore()
   const { today, decide } = useToday()
   const turns = today?.turns ?? []
   const pending = today?.pending ?? []
-  const recent = sheets.slice(0, 3)
+  const recent = byRecent(sheets).slice(0, 3)
   const firstName = identity.name.trim().split(/\s+/)[0] || 'there'
   const onPlan = (today?.spend.savedUsd ?? 0) > 0
 

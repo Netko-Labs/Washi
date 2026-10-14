@@ -1,4 +1,5 @@
 import type { Icon } from '@tabler/icons-react'
+import type { SheetSummary } from '@washi/domain'
 import type { TabKey } from '@washi/ui'
 import type { WorkspaceSummary } from '@/lib/types'
 
@@ -19,4 +20,8 @@ export interface SidebarProps {
 export interface SidebarSectionProps {
   workspaceId: string
   onNavigate: () => void
+}
+
+export interface SidebarPageRowProps extends SidebarSectionProps {
+  sheet: SheetSummary
 }

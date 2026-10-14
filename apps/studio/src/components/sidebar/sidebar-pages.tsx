@@ -1,64 +1,46 @@
 import { IconPlus } from '@tabler/icons-react'
-import {
-  ConfirmDeleteButton,
-  SheetIcon,
-  useAgentStore,
-  useSheetsStore,
-  useViewStore,
-} from '@washi/ui'
-import { pathFor } from '@/components/shell'
-import { openInPlace, type SidebarSectionProps } from './lib'
+import { byRecent, useFavoritesStore, useSheetsStore } from '@washi/ui'
+import type { SidebarSectionProps } from './lib'
+import { SidebarPageRow } from './sidebar-page-row'
 
+const HEADING =
+  'px-2 pt-[18px] pb-1.5 font-semibold text-[11px] text-muted-foreground uppercase tracking-[0.06em]'
+
+/** Favorites first, then every page with the most recently edited on top. */
 export function SidebarPages({ workspaceId, onNavigate }: SidebarSectionProps) {
   const sheets = useSheetsStore((state) => state.sheets)
-  const running = useAgentStore((state) => state.running)
-  const activeTab = useViewStore((state) => state.activeTab)
+  const favoriteIds = useFavoritesStore((state) => state.ids)
+  const favorites = sheets.filter((sheet) => favoriteIds.includes(sheet.id))
 
   return (
     <div className="min-h-0 flex-1 space-y-px overflow-y-auto px-2 pb-2">
+      {favorites.length > 0 && (
+        <>
+          <div className={HEADING}>Favorites</div>
+          {favorites.map((sheet) => (
+            <SidebarPageRow
+              key={sheet.id}
+              sheet={sheet}
+              workspaceId={workspaceId}
+              onNavigate={onNavigate}
+            />
+          ))}
+        </>
+      )}
+      <div className={HEADING}>Pages</div>
       {sheets.length === 0 && (
         <p className="px-2 py-1 text-[12.5px] text-muted-foreground leading-relaxed">
           No pages yet. Ask Washi for one — there is nothing to type into here.
         </p>
       )}
-      {sheets.map((sheet) => {
-        const active = activeTab === `note:${sheet.id}`
-        return (
-          <div
-            key={sheet.id}
-            className={`group flex h-9 items-center rounded-lg md:h-[29px] ${
-              active ? 'bg-accent font-medium' : 'text-muted-foreground hover:bg-accent'
-            }`}
-          >
-            <a
-              href={pathFor(workspaceId, `note:${sheet.id}`)}
-              aria-label={`Open ${sheet.title}`}
-              onClick={(event) =>
-                openInPlace(event, () => {
-                  useViewStore.getState().openTab(`note:${sheet.id}`)
-                  onNavigate()
-                })
-              }
-              className="flex h-full min-w-0 flex-1 items-center gap-2 px-2 text-left text-[13px]"
-            >
-              <SheetIcon name={sheet.icon} className="size-[15px] shrink-0" />
-              <span className="truncate">{sheet.title}</span>
-              {active && running && (
-                <span
-                  className="ml-auto size-1.5 shrink-0 rounded-full bg-agent"
-                  style={{ animation: 'wdot 2s ease-in-out infinite' }}
-                />
-              )}
-            </a>
-            <span className="mr-1 hidden shrink-0 group-focus-within:block group-hover:block">
-              <ConfirmDeleteButton
-                label={`Delete ${sheet.title}`}
-                onConfirm={() => void useSheetsStore.getState().deleteSheet(sheet.id)}
-              />
-            </span>
-          </div>
-        )
-      })}
+      {byRecent(sheets).map((sheet) => (
+        <SidebarPageRow
+          key={sheet.id}
+          sheet={sheet}
+          workspaceId={workspaceId}
+          onNavigate={onNavigate}
+        />
+      ))}
       <button
         type="button"
         onClick={() => {

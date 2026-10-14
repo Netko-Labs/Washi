@@ -1,4 +1,4 @@
-import { type Identity, useViewStore } from '@washi/ui'
+import { type Identity, useFavoritesStore, useViewStore } from '@washi/ui'
 import { create } from 'zustand'
 import { IDENTITY_KEY, ONBOARDED_KEY } from './constants'
 import type { ProfileState } from './types'
@@ -15,6 +15,8 @@ function storedIdentity(): Identity {
 }
 
 useViewStore.getState().setIdentity(storedIdentity())
+// One workspace on the desktop; favorites still key by it so a future second one starts clean.
+useFavoritesStore.getState().bind('default')
 
 export const useProfileStore = create<ProfileState>((set) => ({
   onboarding: localStorage.getItem(ONBOARDED_KEY) !== '1',
