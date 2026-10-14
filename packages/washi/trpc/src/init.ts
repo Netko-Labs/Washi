@@ -1,6 +1,6 @@
 import { initTRPC, TRPCError } from '@trpc/server'
 import type { Workspace } from '@washi/repository'
-import { type AgentHost, SheetMoveError, SheetValidationError } from '@washi/service'
+import { type AgentHost, CommentError, SheetMoveError, SheetValidationError } from '@washi/service'
 import type { EventBus } from './shared/events'
 
 /**
@@ -113,12 +113,14 @@ export const publicProcedure = t.procedure
  */
 export const workspaceProcedure = t.procedure
   .use(async ({ next }) => {
-    // A page the validator refused, or a move into itself, is the caller's mistake: 400, not 500.
+    // A page the validator refused, a move into itself, a reply to another page's thread: the
+    // caller's mistake, so 400, not 500.
     const result = await next()
     if (
       !result.ok &&
       (result.error.cause instanceof SheetValidationError ||
-        result.error.cause instanceof SheetMoveError)
+        result.error.cause instanceof SheetMoveError ||
+        result.error.cause instanceof CommentError)
     ) {
       throw new TRPCError({
         code: 'BAD_REQUEST',

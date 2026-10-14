@@ -1,10 +1,13 @@
 import { IconSearch } from '@tabler/icons-react'
 import { useAgentStore, useSheetsStore, useViewStore } from '@washi/ui'
+import { useMentionsStore } from '@/components/mentions'
 import { pathFor } from '@/components/shell'
 import { NAV, openInPlace, type SidebarSectionProps } from './lib'
 
 export function SidebarNav({ workspaceId, onNavigate }: SidebarSectionProps) {
-  const inboxCount = useAgentStore((state) => state.approvals.length)
+  const approvals = useAgentStore((state) => state.approvals.length)
+  const mentions = useMentionsStore((state) => state.unread)
+  const inboxCount = approvals + mentions
   const activeTab = useViewStore((state) => state.activeTab)
 
   return (

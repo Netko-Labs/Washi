@@ -105,6 +105,10 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   inline marks) stays a locked block, kept byte-for-byte. Saves go through `sheets.update` — the
   same validation as the agent's. `serialize` writes text with `<{}>&`, runs of spaces or
   newlines as a string literal, so typed text always round-trips.
+- Comments live in the workspace file (`comments`, `mention_inbox`), so they travel with it (C1).
+  The author is the session's actor — never the request body; embedded mode signs as `You`. A
+  mention is an unread Inbox row for that person; a trashed page hides its mentions, a purge
+  deletes its discussion. The studio polls the unread count every 30s (no socket yet).
 - Ids: `Bun.randomUUIDv7()`. Timestamps: HLC strings from domain.
 - **Who pays for a turn.** A credential is `api_key` or `local_cli`. Embedded finds the
   person's installed `claude` (PATH is empty for a GUI app — known install paths too) and runs

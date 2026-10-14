@@ -24,6 +24,17 @@ export {
   capabilityOriginSchema,
 } from './entities/capabilities'
 export {
+  type Comment,
+  type CommentAuthor,
+  type CommentWrite,
+  commentSchema,
+  commentWriteSchema,
+  type MentionItem,
+  type MentionRef,
+  mentionItemSchema,
+  mentionRefSchema,
+} from './entities/comments'
+export {
   type SearchHit,
   type SheetDetail,
   type SheetMetaPatch,

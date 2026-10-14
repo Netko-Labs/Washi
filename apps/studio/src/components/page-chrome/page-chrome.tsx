@@ -1,6 +1,7 @@
-import { IconMoodSmile, IconPhoto } from '@tabler/icons-react'
+import { IconMessageCircle, IconMoodSmile, IconPhoto } from '@tabler/icons-react'
 import { SheetIcon, useSheetsStore } from '@washi/ui'
 import { useState } from 'react'
+import { useCommentsStore } from '@/components/comments'
 import { CoverPicker } from './cover-picker'
 import { IconPicker } from './icon-picker'
 import { type ChromePicker, COVERS, type PageChromeProps } from './lib'
@@ -62,6 +63,14 @@ export function PageChrome({ pageId }: PageChromeProps) {
                 Add cover
               </button>
             )}
+            <button
+              type="button"
+              onClick={() => useCommentsStore.getState().open(sheet.id)}
+              className={QUIET_BUTTON}
+            >
+              <IconMessageCircle className="size-4" />
+              Add comment
+            </button>
           </div>
         )}
         {picker === 'icon' && (

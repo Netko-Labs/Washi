@@ -1,5 +1,6 @@
 import { positionBetween, type TrashEntry } from '@washi/domain'
 import type { Workspace } from './client'
+import { deleteSheetComments } from './comments'
 import { appendOp } from './oplog'
 
 /** Counts trashed siblings too, so a restored page never ties with one made since. */
@@ -117,6 +118,7 @@ function purge(ws: Workspace, ids: string[]): number {
     for (const id of ids) {
       ws.sqlite.query('DELETE FROM sheet_links WHERE src = ?').run(id)
       ws.sqlite.query('DELETE FROM sheets WHERE id = ?').run(id)
+      deleteSheetComments(ws, id)
       appendOp(ws, 'sheet', id, { kind: 'purge' })
     }
   })()

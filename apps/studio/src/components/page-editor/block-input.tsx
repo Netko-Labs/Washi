@@ -27,6 +27,8 @@ export function BlockInput({ block, numberAt }: BlockInputProps) {
   }
 
   const onKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    // Enter and Backspace belong to the input method while it is composing (kana → kanji).
+    if (event.nativeEvent.isComposing) return
     const field = event.currentTarget
     const atStart = field.selectionStart === 0 && field.selectionEnd === 0
     const atEnd = field.selectionStart === field.value.length

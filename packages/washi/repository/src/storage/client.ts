@@ -217,6 +217,30 @@ function createTables(sqlite: Database) {
   `)
 
   sqlite.exec(`
+    CREATE TABLE IF NOT EXISTS comments (
+      id TEXT PRIMARY KEY,
+      sheet_id TEXT NOT NULL,
+      thread_id TEXT NOT NULL,
+      author_id TEXT NOT NULL,
+      author_name TEXT NOT NULL,
+      body TEXT NOT NULL,
+      mentions TEXT NOT NULL DEFAULT '[]',
+      resolved INTEGER NOT NULL DEFAULT 0,
+      hlc_created TEXT NOT NULL
+    )
+  `)
+  sqlite.exec('CREATE INDEX IF NOT EXISTS idx_comments_sheet ON comments(sheet_id, hlc_created)')
+  sqlite.exec(`
+    CREATE TABLE IF NOT EXISTS mention_inbox (
+      user_id TEXT NOT NULL,
+      comment_id TEXT NOT NULL,
+      sheet_id TEXT NOT NULL,
+      read_at TEXT,
+      PRIMARY KEY (user_id, comment_id)
+    )
+  `)
+
+  sqlite.exec(`
     CREATE VIRTUAL TABLE IF NOT EXISTS sheets_fts USING fts5(id UNINDEXED, title, body)
   `)
 
