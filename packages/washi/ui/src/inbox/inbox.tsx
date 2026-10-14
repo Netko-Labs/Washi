@@ -1,6 +1,6 @@
 import { receiptLine } from '../agent/lib'
 import { AgentMascot } from '../mascot'
-import { useAgentStore } from '../stores/agent/agent-store'
+import { useAgentStore } from '../stores'
 import { useToday } from '../today'
 
 /** Everything Washi is waiting on, answerable here, then what it did — nothing invented. */

@@ -2,9 +2,9 @@ import { IconPlus, IconTrash } from '@tabler/icons-react'
 import { SheetIcon, useAgentStore, useSheetsStore, useViewStore } from '@washi/ui'
 
 export function SidebarPages({ onNavigate }: { onNavigate: () => void }) {
-  const { sheets, activeId, createSheet, deleteSheet } = useSheetsStore()
+  const sheets = useSheetsStore((state) => state.sheets)
   const running = useAgentStore((state) => state.running)
-  const { activeTab, openTab } = useViewStore()
+  const activeTab = useViewStore((state) => state.activeTab)
 
   return (
     <div className="min-h-0 flex-1 space-y-px overflow-y-auto px-2 pb-2">
@@ -26,14 +26,14 @@ export function SidebarPages({ onNavigate }: { onNavigate: () => void }) {
               type="button"
               aria-label={`Open ${sheet.title}`}
               onClick={() => {
-                openTab(`note:${sheet.id}`)
+                useViewStore.getState().openTab(`note:${sheet.id}`)
                 onNavigate()
               }}
               className="flex h-full min-w-0 flex-1 items-center gap-2 px-2 text-left text-[13px]"
             >
               <SheetIcon name={sheet.icon} className="size-[15px] shrink-0" />
               <span className="truncate">{sheet.title}</span>
-              {active && sheet.id === activeId && running && (
+              {active && running && (
                 <span
                   className="ml-auto size-1.5 shrink-0 rounded-full bg-agent"
                   style={{ animation: 'wdot 2s ease-in-out infinite' }}
@@ -43,7 +43,7 @@ export function SidebarPages({ onNavigate }: { onNavigate: () => void }) {
             <button
               type="button"
               aria-label={`Delete ${sheet.title}`}
-              onClick={() => void deleteSheet(sheet.id)}
+              onClick={() => void useSheetsStore.getState().deleteSheet(sheet.id)}
               className="mr-1 hidden size-6 shrink-0 place-items-center rounded text-muted-foreground group-hover:grid hover:text-destructive"
             >
               <IconTrash className="size-3" />
@@ -54,7 +54,7 @@ export function SidebarPages({ onNavigate }: { onNavigate: () => void }) {
       <button
         type="button"
         onClick={() => {
-          void createSheet()
+          void useSheetsStore.getState().createSheet()
           onNavigate()
         }}
         className="flex h-9 w-full items-center gap-2 rounded-lg px-2 text-[13px] text-muted-foreground hover:bg-accent md:h-[29px]"

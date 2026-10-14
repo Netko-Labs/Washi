@@ -28,5 +28,5 @@ export function useWorkspaceBoot(workspace: WorkspaceSummary) {
       useSheetsStore.getState().reset()
       useViewStore.getState().closeAll()
     }
-  }, [workspace.name])
+  }, [workspace])
 }

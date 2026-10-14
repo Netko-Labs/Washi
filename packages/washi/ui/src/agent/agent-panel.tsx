@@ -9,9 +9,7 @@ import {
 } from '@tabler/icons-react'
 import { useEffect, useRef, useState } from 'react'
 import { AgentMascot } from '../mascot'
-import { mascotStateFor, useAgentStore } from '../stores/agent/agent-store'
-import { useSheetsStore } from '../stores/sheets/sheets-store'
-import { useViewStore } from '../stores/view/view-store'
+import { mascotStateFor, useAgentStore, useSheetsStore, useViewStore } from '../stores'
 import { AgentComposer } from './agent-composer'
 import { TranscriptView } from './transcript-view'
 

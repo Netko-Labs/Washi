@@ -8,8 +8,7 @@ import {
 } from '@tabler/icons-react'
 import type { ReactNode } from 'react'
 import { SheetIcon } from '../sheet-icon'
-import { useSheetsStore } from '../stores/sheets/sheets-store'
-import { type TabKey, useViewStore } from '../stores/view/view-store'
+import { type TabKey, useSheetsStore, useViewStore } from '../stores'
 
 const VIEW_TABS: Record<string, { label: string; icon: ReactNode }> = {
   'view:dashboard': { label: 'Dashboard', icon: <IconLayoutDashboard className="size-[13px]" /> },

@@ -3,7 +3,7 @@ import { NAV } from './lib'
 
 export function SidebarNav({ onNavigate }: { onNavigate: () => void }) {
   const inboxCount = useAgentStore((state) => state.approvals.length)
-  const { activeTab, openTab } = useViewStore()
+  const activeTab = useViewStore((state) => state.activeTab)
 
   return (
     <nav className="space-y-px px-2 pt-2">
@@ -12,7 +12,7 @@ export function SidebarNav({ onNavigate }: { onNavigate: () => void }) {
           key={tab}
           type="button"
           onClick={() => {
-            openTab(tab)
+            useViewStore.getState().openTab(tab)
             onNavigate()
           }}
           className={`flex h-9 w-full items-center gap-2 rounded-lg px-2 text-[13px] md:h-[30px] ${

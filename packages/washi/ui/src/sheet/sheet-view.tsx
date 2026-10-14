@@ -4,8 +4,8 @@ import { parse, type WsxElement } from '@washi/wsx'
 import { useEffect, useState } from 'react'
 import { api } from '../api'
 import { Mascot } from '../mascot'
-import { paperHost } from '../paper-host/paper-host'
-import { useSheetsStore } from '../stores/sheets/sheets-store'
+import { paperHost } from '../paper-host'
+import { useSheetsStore } from '../stores'
 
 interface Loaded {
   sheet: SheetDetail

@@ -1,6 +1,6 @@
 import { IconArrowUp, IconPlayerStopFilled, IconPlus } from '@tabler/icons-react'
 import { useState } from 'react'
-import { useAgentStore } from '../stores/agent/agent-store'
+import { useAgentStore } from '../stores'
 import { useInferenceLabel } from './lib'
 
 /** While a turn runs, Send becomes Stop: an agent you cannot interrupt is not one you trust. */

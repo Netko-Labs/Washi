@@ -28,6 +28,9 @@ const NEW_SHEET_SOURCE = (title: string) =>
 </Sheet>
 `
 
+/** Bumped by reset: a list fetched for the last workspace must not land in this one. */
+let generation = 0
+
 export const useSheetsStore = create<SheetsState>((set, get) => ({
   sheets: [],
   activeId: null,
@@ -38,7 +41,9 @@ export const useSheetsStore = create<SheetsState>((set, get) => ({
   closePalette: () => set({ paletteOpen: false, searchTerm: '', searchHits: [] }),
 
   refresh: async () => {
+    const issued = generation
     const sheets = await api.sheets.list.query()
+    if (issued !== generation) return
     set((state) => ({
       sheets,
       activeId: state.activeId ?? sheets[0]?.id ?? null,
@@ -75,6 +80,8 @@ export const useSheetsStore = create<SheetsState>((set, get) => ({
     set({ searchHits })
   },
 
-  reset: () =>
-    set({ sheets: [], activeId: null, searchTerm: '', searchHits: [], paletteOpen: false }),
+  reset: () => {
+    generation += 1
+    set({ sheets: [], activeId: null, searchTerm: '', searchHits: [], paletteOpen: false })
+  },
 }))

@@ -29,6 +29,8 @@ interface AgentState {
 }
 
 let subscriptions: { unsubscribe: () => void }[] | null = null
+/** Bumped by reset: a load issued for the last workspace must not land in this one. */
+let generation = 0
 /** Boot and the panel both call init; the second caller must join the first, not race it. */
 let initializing: Promise<void> | null = null
 let creating: Promise<void> | null = null
@@ -114,10 +116,12 @@ export const useAgentStore = create<AgentState>((set, get) => ({
       })
       subscriptions.push(agentUpdates, approvalRequests, openSheetRequests)
     }
+    const issued = generation
     const [sessions, pending] = await Promise.all([
       api.agents.listSessions.query(),
       api.agents.pendingApprovals.query(),
     ])
+    if (issued !== generation) return
     set((state) => ({
       sessions,
       approvals: [
@@ -189,6 +193,7 @@ export const useAgentStore = create<AgentState>((set, get) => ({
     for (const subscription of subscriptions ?? []) subscription.unsubscribe()
     subscriptions = null
     initializing = null
+    generation += 1
     set({ sessions: [], activeSessionId: null, transcript: [], approvals: [], running: false })
   },
 }))

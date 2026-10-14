@@ -1,12 +1,7 @@
 import { type Identity, useViewStore } from '@washi/ui'
 import { create } from 'zustand'
 import { IDENTITY_KEY, ONBOARDED_KEY } from './constants'
-
-interface ProfileState {
-  onboarding: boolean
-  finishOnboarding: () => void
-  setIdentity: (patch: Partial<Identity>) => void
-}
+import type { ProfileState } from './types'
 
 /** The desktop has no account: who you are is what onboarding wrote down on this computer. */
 function storedIdentity(): Identity {

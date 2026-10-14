@@ -2,9 +2,7 @@ import { IconSearch, IconSparkles } from '@tabler/icons-react'
 import { Command } from 'cmdk'
 import { useEffect } from 'react'
 import { SheetIcon } from '../sheet-icon'
-import { useAgentStore } from '../stores/agent/agent-store'
-import { useSheetsStore } from '../stores/sheets/sheets-store'
-import { useViewStore } from '../stores/view/view-store'
+import { useAgentStore, useSheetsStore, useViewStore } from '../stores'
 
 /** ⌘K palette per Washi.dc.html: scrim, 560px panel at 14vh, pages + agent actions. */
 export function CommandPalette() {

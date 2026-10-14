@@ -1,6 +1,6 @@
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { MARKDOWN_COMPONENTS } from './lib/values'
+import { MARKDOWN_COMPONENTS } from './markdown-components'
 
 const PLUGINS = [remarkGfm]
 

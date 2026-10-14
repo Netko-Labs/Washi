@@ -1,8 +1,7 @@
 import { IconFileText } from '@tabler/icons-react'
 import { receiptLine, usd } from '../agent/lib'
 import { SheetIcon } from '../sheet-icon'
-import { useSheetsStore } from '../stores/sheets/sheets-store'
-import { useViewStore } from '../stores/view/view-store'
+import { useSheetsStore, useViewStore } from '../stores'
 import { useToday } from '../today'
 
 // hlc = zero-padded ms wall clock, then counter, then device id

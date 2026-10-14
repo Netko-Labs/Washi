@@ -8,10 +8,6 @@ import { UserRow } from './user-row'
 
 /** The desktop's 248px sidebar, as a drawer under `md` — same nav, same tree, web chrome. */
 export function Sidebar({ workspace, open, onClose, onLeave }: SidebarProps) {
-  const { createSheet, openPalette } = useSheetsStore()
-  const openTab = useViewStore((state) => state.openTab)
-  const togglePanel = useAgentStore((state) => state.togglePanel)
-
   return (
     <>
       {open && (
@@ -45,7 +41,7 @@ export function Sidebar({ workspace, open, onClose, onLeave }: SidebarProps) {
             aria-label="Search (⌘K)"
             title="Search (⌘K)"
             onClick={() => {
-              openPalette()
+              useSheetsStore.getState().openPalette()
               onClose()
             }}
             className="grid size-8 shrink-0 place-items-center rounded-lg text-muted-foreground hover:bg-accent"
@@ -57,7 +53,7 @@ export function Sidebar({ workspace, open, onClose, onLeave }: SidebarProps) {
             aria-label="New page"
             title="New page"
             onClick={() => {
-              void createSheet()
+              void useSheetsStore.getState().createSheet()
               onClose()
             }}
             className="grid size-8 shrink-0 place-items-center rounded-lg text-muted-foreground hover:bg-accent"
@@ -84,11 +80,11 @@ export function Sidebar({ workspace, open, onClose, onLeave }: SidebarProps) {
         <div className="border-border border-t px-2 py-1.5">
           <AgentStatus
             onOpenAgent={() => {
-              togglePanel()
+              useAgentStore.getState().togglePanel()
               onClose()
             }}
             onOpenSettings={() => {
-              openTab('view:settings')
+              useViewStore.getState().openTab('view:settings')
               onClose()
             }}
           />
