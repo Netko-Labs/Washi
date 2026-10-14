@@ -1,7 +1,8 @@
-import { sheetWriteSchema } from '@washi/domain'
-import { emptyTrash, purgeSheet } from '@washi/repository'
+import { sheetMetaPatchSchema, sheetWriteSchema } from '@washi/domain'
+import { emptyTrash, purgeSheet, updateSheetMeta } from '@washi/repository'
 import {
   createSheetFromSource,
+  duplicateSheet,
   moveSheetTo,
   removeSheet,
   restoreSheetTree,
@@ -21,6 +22,16 @@ export const sheetMutations = router({
   update: workspaceProcedure
     .input(z.object({ id: z.string(), write: sheetWriteSchema }))
     .mutation(({ ctx, input }) => updateSheetFromSource(ctx.ws, input.id, input.write)),
+  updateMeta: workspaceProcedure
+    .input(z.object({ id: z.string(), patch: sheetMetaPatchSchema }))
+    .mutation(({ ctx, input }) => {
+      const sheet = updateSheetMeta(ctx.ws, input.id, input.patch)
+      if (!sheet) throw new Error(`sheet not found: ${input.id}`)
+      return sheet
+    }),
+  duplicate: workspaceProcedure
+    .input(byId)
+    .mutation(({ ctx, input }) => duplicateSheet(ctx.ws, input.id)),
   remove: workspaceProcedure.input(byId).mutation(({ ctx, input }) => {
     removeSheet(ctx.ws, input.id)
   }),

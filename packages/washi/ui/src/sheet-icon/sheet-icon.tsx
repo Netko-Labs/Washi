@@ -30,6 +30,7 @@ import {
   IconUser,
 } from '@tabler/icons-react'
 import type { ComponentType } from 'react'
+import { isEmoji, type SheetIconProps } from './lib'
 
 const ICONS: Record<string, ComponentType<{ className?: string }>> = {
   notebook: IconNotebook,
@@ -62,8 +63,21 @@ const ICONS: Record<string, ComponentType<{ className?: string }>> = {
   user: IconUser,
 }
 
-/** A sheet's `icon` resolves against the vault icon registry; unknown names fall back to a page glyph. */
-export function SheetIcon({ name, className }: { name: string | null; className?: string }) {
+/**
+ * A sheet's `icon` is a registry name or an emoji a person picked; unknown names fall back to a
+ * page glyph.
+ */
+export function SheetIcon({ name, className }: SheetIconProps) {
+  if (name && isEmoji(name)) {
+    return (
+      <span
+        aria-hidden
+        className={`inline-grid place-items-center leading-none ${className ?? ''}`}
+      >
+        {name}
+      </span>
+    )
+  }
   const Icon = (name && ICONS[name]) || IconFileText
   return <Icon className={className} />
 }

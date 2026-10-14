@@ -54,6 +54,7 @@ export {
   type SheetIndexInput,
   searchSheets,
   updateSheet,
+  updateSheetMeta,
 } from './storage/sheets'
 export {
   acknowledgedSpend,

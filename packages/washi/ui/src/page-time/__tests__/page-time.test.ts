@@ -11,6 +11,8 @@ const sheet = (id: string, ms: number) =>
     tags: [],
     parentId: null,
     position: 'V',
+    cover: null,
+    fullWidth: false,
     hlcUpdated: hlcAt(ms),
   }) satisfies SheetSummary
 

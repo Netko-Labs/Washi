@@ -9,6 +9,8 @@ const page = (id: string, parentId: string | null, position: string): SheetSumma
   tags: [],
   parentId,
   position,
+  cover: null,
+  fullWidth: false,
   hlcUpdated: '0',
 })
 

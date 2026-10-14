@@ -65,6 +65,34 @@ export const useSheetsStore = create<SheetsState>((set, get) => ({
     }
   },
 
+  updateMeta: async (id, patch) => {
+    set({
+      sheets: get().sheets.map((sheet) =>
+        sheet.id === id
+          ? {
+              ...sheet,
+              ...(patch.title !== undefined && { title: patch.title }),
+              ...(patch.icon !== undefined && { icon: patch.icon }),
+              ...(patch.cover !== undefined && { cover: patch.cover }),
+              ...(patch.fullWidth !== undefined && { fullWidth: patch.fullWidth }),
+            }
+          : sheet,
+      ),
+    })
+    try {
+      await api.sheets.updateMeta.mutate({ id, patch })
+    } finally {
+      await get().refresh()
+    }
+  },
+
+  duplicateSheet: async (id) => {
+    const copy = await api.sheets.duplicate.mutate({ id })
+    await get().refresh()
+    const { useViewStore } = await import('../view/view-store')
+    useViewStore.getState().openTab(`note:${copy.id}`)
+  },
+
   search: async (term) => {
     set({ searchTerm: term })
     if (!term.trim()) {

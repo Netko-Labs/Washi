@@ -78,6 +78,8 @@ function createTables(sqlite: Database) {
   `)
   ensureColumn(sqlite, 'sheets', 'parent_id', 'TEXT')
   ensureColumn(sqlite, 'sheets', 'position', 'TEXT')
+  ensureColumn(sqlite, 'sheets', 'cover', 'TEXT')
+  ensureColumn(sqlite, 'sheets', 'full_width', 'INTEGER NOT NULL DEFAULT 0')
   sqlite.exec('CREATE INDEX IF NOT EXISTS idx_sheets_parent ON sheets(parent_id, position)')
   backfillPositions(sqlite)
 

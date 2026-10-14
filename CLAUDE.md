@@ -95,6 +95,11 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   that stamp is the batch Restore and Purge act on. A restored page whose parent is gone comes
   back at the top level. The service refuses a move into a page's own subtree (`SheetMoveError`
   → 400).
+- Page chrome (icon, `cover`, `full_width`, rename) is metadata — `sheets.updateMeta` never
+  touches the Loro doc, and width alone is not an edit. The studio draws it **above** the sheet
+  through `SheetView`'s `chrome` slot, outside the paper, so Q18 holds: everything on the sheet
+  is still authored by the sheet. A cover is a preset key, never a URL; an icon is a registry
+  name or an emoji.
 - Ids: `Bun.randomUUIDv7()`. Timestamps: HLC strings from domain.
 - **Who pays for a turn.** A credential is `api_key` or `local_cli`. Embedded finds the
   person's installed `claude` (PATH is empty for a GUI app — known install paths too) and runs

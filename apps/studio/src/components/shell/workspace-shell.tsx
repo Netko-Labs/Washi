@@ -3,7 +3,7 @@ import { CommandPalette, Header, MascotDefs, TabStrip } from '@washi/ui'
 import { useState } from 'react'
 import { Sidebar } from '@/components/sidebar'
 import { AgentLayer } from './agent-layer'
-import { CopyLinkButton } from './copy-link-button'
+import { HeaderActions } from './header-actions'
 import { useTabNavigation, useWorkspaceBoot, type WorkspaceShellProps } from './lib'
 
 /** The desktop's rev-2 shell on the web: the same components, real addresses, a drawer under `md`. */
@@ -31,7 +31,7 @@ export function WorkspaceShell({ workspace, children }: WorkspaceShellProps) {
               <IconMenu2 className="size-[18px]" />
             </button>
           }
-          actions={<CopyLinkButton />}
+          actions={<HeaderActions />}
         />
         {children}
       </main>

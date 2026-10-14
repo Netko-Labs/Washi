@@ -18,3 +18,10 @@
 - CI failing in `bun install` with "Fail extracting tarball" is the registry, not the code: rerun the job
   once; if it repeats, look at the lockfile.
 - Shell-built HTML/JS crawls break on zsh globbing and huge variables; a 15-line Bun script is faster.
+
+## Notion parity (2026-10-14)
+
+- **Stacked PRs: retarget the child to `main` before merging the parent with `--delete-branch`.**
+  Deleting a base branch closes every PR on it, and a closed PR whose head was force-pushed
+  cannot be reopened — the way back is pushing both heads to their pre-close commits, reopen,
+  retarget, then push the rebase again.

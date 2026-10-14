@@ -1,5 +1,6 @@
 import type { SheetDetail } from '@washi/domain'
 import type { WsxElement } from '@washi/wsx'
+import type { ReactNode } from 'react'
 
 export type SheetState =
   | { status: 'idle' }
@@ -10,4 +11,9 @@ export type SheetState =
 
 export interface SheetFailedProps {
   error: string
+}
+
+export interface SheetViewProps {
+  /** The host's own band above the sheet — cover and icon on the web. */
+  chrome?: ReactNode
 }

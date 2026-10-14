@@ -8,6 +8,9 @@ export const sheetTable = sqliteTable('sheets', {
   parentId: text('parent_id'),
   /** Fractional key among siblings; backfilled at open, so never null in practice. */
   position: text('position').notNull(),
+  /** A preset key from the host's cover palette; never a URL. */
+  cover: text('cover'),
+  fullWidth: integer('full_width', { mode: 'boolean' }).notNull().default(false),
   /** Derived cache of the Loro doc's text — queries and FTS read this. */
   source: text('source').notNull(),
   loroSnapshot: blob('loro_snapshot', { mode: 'buffer' }).notNull(),
