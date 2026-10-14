@@ -1,20 +1,23 @@
 import { useAgentStore, useViewStore } from '@washi/ui'
-import { NAV } from './lib'
+import { pathFor } from '@/components/shell'
+import { NAV, openInPlace, type SidebarSectionProps } from './lib'
 
-export function SidebarNav({ onNavigate }: { onNavigate: () => void }) {
+export function SidebarNav({ workspaceId, onNavigate }: SidebarSectionProps) {
   const inboxCount = useAgentStore((state) => state.approvals.length)
   const activeTab = useViewStore((state) => state.activeTab)
 
   return (
     <nav className="space-y-px px-2 pt-2">
       {NAV.map(({ tab, label, icon: Icon }) => (
-        <button
+        <a
           key={tab}
-          type="button"
-          onClick={() => {
-            useViewStore.getState().openTab(tab)
-            onNavigate()
-          }}
+          href={pathFor(workspaceId, tab)}
+          onClick={(event) =>
+            openInPlace(event, () => {
+              useViewStore.getState().openTab(tab)
+              onNavigate()
+            })
+          }
           className={`flex h-9 w-full items-center gap-2 rounded-lg px-2 text-[13px] md:h-[30px] ${
             activeTab === tab
               ? 'bg-accent font-medium text-foreground'
@@ -28,7 +31,7 @@ export function SidebarNav({ onNavigate }: { onNavigate: () => void }) {
               {inboxCount}
             </span>
           )}
-        </button>
+        </a>
       ))}
     </nav>
   )

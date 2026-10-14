@@ -16,6 +16,10 @@ interface ViewState {
   openTab: (key: TabKey) => void
   closeTab: (key: TabKey) => void
   closeAll: () => void
+  /** Drag-to-reorder: `key` lands where `target` was. */
+  moveTab: (key: TabKey, target: TabKey) => void
+  /** A host restoring the strip it saved — the web keeps one per workspace. */
+  setTabs: (tabs: TabKey[]) => void
   identity: Identity
   setIdentity: (patch: Partial<Identity>) => void
   workspaceName: string
@@ -62,6 +66,18 @@ export const useViewStore = create<ViewState>((set, get) => ({
   },
 
   closeAll: () => set({ tabs: [], activeTab: null }),
+
+  moveTab: (key, target) => {
+    const { tabs } = get()
+    const from = tabs.indexOf(key)
+    const to = tabs.indexOf(target)
+    if (from < 0 || to < 0 || from === to) return
+    const next = tabs.filter((tab) => tab !== key)
+    next.splice(to, 0, key)
+    set({ tabs: next })
+  },
+
+  setTabs: (tabs) => set({ tabs: [...new Set(tabs)] }),
 
   // The host says who is here: the desktop from its profile, the web from the session.
   identity: { name: '', email: '', color: '#c25f2c' },

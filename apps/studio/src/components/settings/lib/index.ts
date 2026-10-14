@@ -9,4 +9,4 @@ export type {
   SettingsTab,
   SpendState,
 } from './types'
-export { PROVIDERS, SETTINGS_TABS } from './values'
+export { PROVIDERS, SETTINGS_TAB_KEYS, SETTINGS_TABS } from './values'

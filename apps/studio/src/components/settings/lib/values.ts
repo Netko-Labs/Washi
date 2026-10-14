@@ -25,3 +25,5 @@ export const SETTINGS_TABS = [
     desc: 'What Washi does while nobody is watching.',
   },
 ] as const
+
+export const SETTINGS_TAB_KEYS = ['agent', 'people', 'routines'] as const

@@ -1,0 +1,4 @@
+export { DashboardView } from './dashboard-view'
+export { InboxView } from './inbox-view'
+export { PageView } from './page-view'
+export { SettingsView } from './settings-view'

@@ -1,13 +1,12 @@
 import { useAgentStore, useSheetsStore, useViewStore } from '@washi/ui'
 import { useEffect } from 'react'
 import { useSession } from '@/integrations/auth'
-import type { WorkspaceSummary } from '@/lib/types'
 
 /**
- * The shared stores are one per page, and a workspace switch must not leak the last one's
- * tabs, sessions or subscriptions into the next. Who is here comes from the session.
+ * Loads what the loader reset. The reset itself happens in the route loader — child routes
+ * open their tab in an effect, which runs before this one would.
  */
-export function useWorkspaceBoot(workspace: WorkspaceSummary) {
+export function useWorkspaceBoot(workspaceId: string) {
   const { data: session } = useSession()
   const name = session?.user.name
   const email = session?.user.email
@@ -17,16 +16,11 @@ export function useWorkspaceBoot(workspace: WorkspaceSummary) {
   }, [name, email])
 
   useEffect(() => {
-    const view = useViewStore.getState()
-    view.setWorkspaceName(workspace.name)
-    view.closeAll()
-    view.openTab('view:dashboard')
     void useSheetsStore.getState().refresh()
     void useAgentStore.getState().init()
     return () => {
       useAgentStore.getState().reset()
       useSheetsStore.getState().reset()
-      useViewStore.getState().closeAll()
     }
-  }, [workspace])
+  }, [workspaceId])
 }

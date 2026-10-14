@@ -1,11 +1,9 @@
-import { useState } from 'react'
 import { PeopleSection } from '@/components/people'
 import { RoutinesSection } from '@/components/routines'
 import { AgentTab } from './agent-tab'
-import { SETTINGS_TABS, type SettingsScreenProps, type SettingsTab } from './lib'
+import { SETTINGS_TABS, type SettingsScreenProps } from './lib'
 
-export function SettingsScreen({ workspaceId }: SettingsScreenProps) {
-  const [tab, setTab] = useState<SettingsTab>('agent')
+export function SettingsScreen({ workspaceId, tab, onTab }: SettingsScreenProps) {
   const current = SETTINGS_TABS.find((entry) => entry.key === tab) ?? SETTINGS_TABS[0]
 
   return (
@@ -19,7 +17,7 @@ export function SettingsScreen({ workspaceId }: SettingsScreenProps) {
             <button
               type="button"
               key={key}
-              onClick={() => setTab(key)}
+              onClick={() => onTab(key)}
               className={`-mb-px flex h-9 shrink-0 items-center gap-[7px] border-b-2 px-3 font-medium text-[13px] ${
                 tab === key
                   ? 'border-primary text-foreground'

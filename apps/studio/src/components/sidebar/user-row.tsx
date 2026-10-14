@@ -30,7 +30,7 @@ export function UserRow() {
       </button>
       <button
         type="button"
-        onClick={() => void signOut().then(() => window.location.reload())}
+        onClick={() => void signOut().then(() => window.location.assign('/sign-in'))}
         aria-label="Sign out"
         title="Sign out"
         className="grid size-8 shrink-0 place-items-center rounded-lg text-muted-foreground hover:bg-accent"

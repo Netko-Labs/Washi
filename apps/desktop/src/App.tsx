@@ -17,6 +17,7 @@ import { useEffect } from 'react'
 import { DailyNote } from '@/components/daily/DailyNote'
 import { Onboarding } from '@/components/onboarding/Onboarding'
 import { SettingsView } from '@/components/settings/SettingsView'
+import { ShareButton } from '@/components/share/ShareButton'
 import { Sidebar } from '@/components/sidebar/Sidebar'
 import { subscribeDevCommands } from '@/lib/dev-commands'
 import { useProfileStore } from '@/stores/profile'
@@ -42,7 +43,7 @@ export function App() {
       <Sidebar />
       <main className="flex min-w-0 flex-1 flex-col">
         <TabStrip />
-        <Header />
+        <Header actions={<ShareButton />} />
         {view === 'note' && <SheetView />}
         {view === 'dashboard' && <Dashboard />}
         {view === 'inbox' && <Inbox />}

@@ -46,6 +46,10 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
 - `apps/studio` — TanStack Start on Nitro (bun preset), from `Netko-Labs/tanstack-solo-server-
   monorepo-template`: SSR, `/api/auth/*`, `/api/trpc/*`, `/trpc-ws`, `/api/health`. A Nitro plugin
   boots the runtime at start (so the routine clock ticks unvisited) and drains sockets on SIGTERM.
+  Pages are routes: `/sign-in?redirect=`, `/workspaces?invite=`, `/w/$workspaceId` (dashboard),
+  `/p/$pageId`, `/inbox`, `/settings?tab=`. The workspace loader resets the shared stores (child
+  effects run before the layout's); routes mark their tab open, a tab chosen anywhere pushes its
+  URL (`useTabNavigation`), and the strip is saved per workspace in localStorage.
 - `apps/desktop` — mirin shell: window, menu, icon, Develop menu. `src/bun/` (main) boots the
   embedded runtime and serves `appRouter` via `createMirinBridge`; the renderer's `api` is a tRPC
   client over `mirinLink`. No port, no token.
