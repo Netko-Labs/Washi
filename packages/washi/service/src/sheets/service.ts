@@ -50,9 +50,14 @@ function parseValidated(source: string) {
   return parse(source)
 }
 
-export function createSheetFromSource(ws: Workspace, write: SheetWrite): SheetDetail {
+export function createSheetFromSource(
+  ws: Workspace,
+  write: SheetWrite,
+  parentId: string | null = null,
+): SheetDetail {
   const root = parseValidated(write.source)
-  return createSheet(ws, write, { body: extractText(root), refs: extractRefs(root) })
+  if (parentId) requireSheet(ws, parentId)
+  return createSheet(ws, write, { body: extractText(root), refs: extractRefs(root) }, parentId)
 }
 
 export function updateSheetFromSource(ws: Workspace, id: string, write: SheetWrite): SheetDetail {

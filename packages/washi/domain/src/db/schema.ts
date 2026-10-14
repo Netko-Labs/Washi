@@ -5,6 +5,9 @@ export const sheetTable = sqliteTable('sheets', {
   title: text('title').notNull(),
   icon: text('icon'),
   tags: text('tags', { mode: 'json' }).$type<string[]>().notNull().default([]),
+  parentId: text('parent_id'),
+  /** Fractional key among siblings; backfilled at open, so never null in practice. */
+  position: text('position').notNull(),
   /** Derived cache of the Loro doc's text — queries and FTS read this. */
   source: text('source').notNull(),
   loroSnapshot: blob('loro_snapshot', { mode: 'buffer' }).notNull(),

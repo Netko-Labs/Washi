@@ -36,10 +36,20 @@ export {
   updateRoutine,
 } from './storage/routines'
 export {
+  ancestorIds,
+  emptyTrash,
+  listTrash,
+  liveSubtree,
+  moveSheet,
+  purgeSheet,
+  restoreSheet,
+} from './storage/sheet-tree'
+export {
   createSheet,
   deleteSheet,
   getBacklinks,
   getSheet,
+  indexSheet,
   listSheets,
   type SheetIndexInput,
   searchSheets,

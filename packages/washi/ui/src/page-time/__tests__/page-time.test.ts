@@ -4,7 +4,15 @@ import { byRecent, relativeTime } from '../utils'
 
 const hlcAt = (ms: number) => `${String(ms).padStart(14, '0')}:0000:device`
 const sheet = (id: string, ms: number) =>
-  ({ id, title: id, icon: null, tags: [], hlcUpdated: hlcAt(ms) }) as SheetSummary
+  ({
+    id,
+    title: id,
+    icon: null,
+    tags: [],
+    parentId: null,
+    position: 'V',
+    hlcUpdated: hlcAt(ms),
+  }) satisfies SheetSummary
 
 describe('where a person left off', () => {
   test('most recently edited first', () => {

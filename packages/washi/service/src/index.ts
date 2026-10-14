@@ -35,6 +35,7 @@ export {
   updateSheetFromSource,
   type WsxCheck,
 } from './sheets/service'
+export { moveSheetTo, restoreSheetTree, SheetMoveError } from './sheets/tree'
 export {
   defineUserTable,
   deleteRecord,
