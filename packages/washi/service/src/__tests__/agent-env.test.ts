@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from 'bun:test'
-import { agentEnv } from '../agents/lib'
+import { agentEnv, sessionConfigDir } from '../agents/lib'
 
 const saved = { ...process.env }
 afterEach(() => {
@@ -42,5 +42,28 @@ describe('the agent subprocess gets a built environment, not an inherited one', 
     expect(env.PATH).toBe('/usr/bin')
     expect(env.HOME).toBe('/home/washi')
     expect(env.CLAUDE_AGENT_SDK_CLIENT_APP).toBe('washi/0.1.0')
+  })
+})
+
+describe("a keyed turn's Claude session lives with its workspace", () => {
+  test('beside the workspace file, so a redeploy keeps it', () => {
+    expect(sessionConfigDir('/data/workspaces/org_1.db')).toBe('/data/workspaces/org_1.claude')
+  })
+
+  test('an in-memory workspace has nowhere to keep one', () => {
+    expect(sessionConfigDir(':memory:')).toBeNull()
+    expect(sessionConfigDir('')).toBeNull()
+  })
+
+  test('the subprocess is pointed at it, over any ambient config dir', () => {
+    process.env.CLAUDE_CONFIG_DIR = '/home/someone/.claude'
+    expect(agentEnv('sk-ant-x', '/data/workspaces/org_1.claude').CLAUDE_CONFIG_DIR).toBe(
+      '/data/workspaces/org_1.claude',
+    )
+  })
+
+  test('a local CLI keeps its own login', () => {
+    process.env.CLAUDE_CONFIG_DIR = '/home/me/.claude'
+    expect(agentEnv(null, null).CLAUDE_CONFIG_DIR).toBe('/home/me/.claude')
   })
 })

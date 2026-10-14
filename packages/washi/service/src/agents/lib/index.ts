@@ -12,7 +12,7 @@ export {
   TODAY_TURN_LIMIT,
   TODAY_WINDOW_MS,
 } from './constants'
-export { agentEnv } from './env'
+export { agentEnv, sessionConfigDir } from './env'
 export type {
   AgentActivity,
   AgentCredential,

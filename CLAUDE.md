@@ -83,6 +83,9 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   it via the Agent SDK's `pathToClaudeCodeExecutable` with **no** key in the env, so their own
   login pays. `auto` prefers it over `ANTHROPIC_API_KEY`. Hosted runs on the workspace's stored
   key and has no local branch at all — a team server must never bill one person's plan.
+- A keyed turn's Claude session lives in `<dataDir>/<workspace>.claude/` (`CLAUDE_CONFIG_DIR`), beside
+  the `.db` holding its `sdkSessionId` — on the volume, so a redeploy can't orphan it. A resume
+  the CLI no longer knows retries once, fresh. A local CLI keeps its own config dir.
 - A `plan` turn lands in `saved_usd`, never `cost_usd`: the daily stop counts metered dollars
   only, and every turn counts toward the turn cap. `init.apiKeySource` is `none` (not `oauth`)
   for a claude.ai login — the binary, not the docs, set that rule.

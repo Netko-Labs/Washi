@@ -20,7 +20,7 @@ const INHERITED = [
   'CLAUDE_CONFIG_DIR',
 ] as const
 
-export function agentEnv(apiKey: string | null): Record<string, string> {
+export function agentEnv(apiKey: string | null, configDir?: string | null): Record<string, string> {
   const env: Record<string, string> = {}
   for (const name of INHERITED) {
     const value = process.env[name]
@@ -28,5 +28,16 @@ export function agentEnv(apiKey: string | null): Record<string, string> {
   }
   env.CLAUDE_AGENT_SDK_CLIENT_APP = 'washi/0.1.0'
   if (apiKey) env.ANTHROPIC_API_KEY = apiKey
+  if (configDir) env.CLAUDE_CONFIG_DIR = configDir
   return env
+}
+
+/**
+ * Where a keyed turn's Claude session lives: beside the workspace file, so it
+ * survives a redeploy with the `sdkSessionId` that points at it. A local CLI
+ * never gets one — its config dir is the person's own login.
+ */
+export function sessionConfigDir(databaseFile: string): string | null {
+  if (!databaseFile || databaseFile === ':memory:') return null
+  return `${databaseFile.replace(/\.db$/, '')}.claude`
 }
