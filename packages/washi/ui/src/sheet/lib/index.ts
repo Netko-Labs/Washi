@@ -1,2 +1,2 @@
 export { useSheet } from './hooks/use-sheet'
-export type { SheetFailedProps, SheetState, SheetViewProps } from './types'
+export type { SheetBodyProps, SheetFailedProps, SheetState, SheetViewProps } from './types'

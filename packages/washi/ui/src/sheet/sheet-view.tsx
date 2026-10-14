@@ -4,7 +4,7 @@ import { noteIdOf, useSheetsStore, useViewStore } from '../stores'
 import { type SheetViewProps, useSheet } from './lib'
 import { SheetEmpty, SheetFailed, SheetLoading, SheetMissing } from './sheet-states'
 
-export function SheetView({ chrome }: SheetViewProps) {
+export function SheetView({ chrome, body: Body }: SheetViewProps) {
   const pageId = useViewStore((state) => noteIdOf(state.activeTab))
   const summary = useSheetsStore((state) => state.sheets.find((sheet) => sheet.id === pageId))
   const state = useSheet(pageId, summary?.hlcUpdated)
@@ -24,7 +24,11 @@ export function SheetView({ chrome }: SheetViewProps) {
     >
       {chrome}
       <PaperProvider host={paperHost}>
-        <WsxView key={state.sheet.id} root={state.root} />
+        {Body ? (
+          <Body sheet={state.sheet} root={state.root} />
+        ) : (
+          <WsxView key={state.sheet.id} root={state.root} />
+        )}
       </PaperProvider>
     </div>
   )

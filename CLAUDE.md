@@ -100,6 +100,11 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   through `SheetView`'s `chrome` slot, outside the paper, so Q18 holds: everything on the sheet
   is still authored by the sheet. A cover is a preset key, never a URL; an icon is a registry
   name or an emoji.
+- Typing into a page (studio `page-editor`) edits the sheet's **top level** as blocks: plain-text
+  Title/Text/List/Item/Quote/Callout/Code/Divider become typed blocks; anything else (or text with
+  inline marks) stays a locked block, kept byte-for-byte. Saves go through `sheets.update` — the
+  same validation as the agent's. `serialize` writes text with `<{}>&`, runs of spaces or
+  newlines as a string literal, so typed text always round-trips.
 - Ids: `Bun.randomUUIDv7()`. Timestamps: HLC strings from domain.
 - **Who pays for a turn.** A credential is `api_key` or `local_cli`. Embedded finds the
   person's installed `claude` (PATH is empty for a GUI app — known install paths too) and runs

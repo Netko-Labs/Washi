@@ -12,3 +12,13 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
 }
+
+/* A block Washi built, inside the editor: its own paper, minus the page frame around it. */
+.page-editor-locked .wsx {
+  min-height: 0;
+  background: transparent;
+}
+.page-editor-locked .wsx-page {
+  max-width: none;
+  padding: 0;
+}

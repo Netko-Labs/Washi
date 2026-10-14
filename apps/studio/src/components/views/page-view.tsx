@@ -2,6 +2,7 @@ import { getRouteApi } from '@tanstack/react-router'
 import { SheetView } from '@washi/ui'
 import { FirstRunGate } from '@/components/first-run'
 import { PageChrome } from '@/components/page-chrome'
+import { PageBody } from '@/components/page-editor'
 import { useRouteTab } from '@/components/shell'
 
 const workspaceRoute = getRouteApi('/w/$workspaceId')
@@ -13,7 +14,7 @@ export function PageView() {
   useRouteTab(`note:${pageId}`)
   return (
     <FirstRunGate workspace={workspace}>
-      <SheetView chrome={<PageChrome pageId={pageId} />} />
+      <SheetView chrome={<PageChrome pageId={pageId} />} body={PageBody} />
     </FirstRunGate>
   )
 }
