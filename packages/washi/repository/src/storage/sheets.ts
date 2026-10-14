@@ -107,12 +107,14 @@ export function deleteSheet(ws: Workspace, id: string): boolean {
   if (ids.length === 0) return false
   const stamp = ws.now()
   const trash = ws.sqlite.query('UPDATE sheets SET deleted_at = ? WHERE id = ?')
-  for (const each of ids) {
-    trash.run(stamp, each)
-    ws.sqlite.query('DELETE FROM sheets_fts WHERE id = ?').run(each)
-    ws.db.delete(sheetLinkTable).where(eq(sheetLinkTable.src, each)).run()
-  }
-  appendOp(ws, 'sheet', id, { kind: 'delete', ids })
+  ws.sqlite.transaction(() => {
+    for (const each of ids) {
+      trash.run(stamp, each)
+      ws.sqlite.query('DELETE FROM sheets_fts WHERE id = ?').run(each)
+      ws.db.delete(sheetLinkTable).where(eq(sheetLinkTable.src, each)).run()
+    }
+    appendOp(ws, 'sheet', id, { kind: 'delete', ids })
+  })()
   return true
 }
 

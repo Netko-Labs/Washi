@@ -133,3 +133,16 @@ describe('positions for pages made before nesting', () => {
     expect(order).toEqual(['Newer', 'Older'])
   })
 })
+
+describe('a trash write that fails part-way', () => {
+  test('leaves the whole subtree live', () => {
+    const projects = page('Projects')
+    page('Alpha', projects.id)
+    ws.sqlite.exec(
+      "CREATE TRIGGER no_alpha BEFORE UPDATE OF deleted_at ON sheets WHEN NEW.title = 'Alpha' BEGIN SELECT RAISE(ABORT, 'boom'); END",
+    )
+    expect(() => deleteSheet(ws, projects.id)).toThrow('boom')
+    expect(childrenOf(null)).toEqual(['Projects'])
+    expect(childrenOf(projects.id)).toEqual(['Alpha'])
+  })
+})

@@ -100,22 +100,26 @@ export function restoreSheet(ws: Workspace, id: string): string[] {
   const { ids, parentId } = trashedBatch(ws, id)
   if (ids.length === 0) return []
   const restore = ws.sqlite.query('UPDATE sheets SET deleted_at = NULL WHERE id = ?')
-  for (const each of ids) restore.run(each)
-  if (parentId && liveSubtree(ws, parentId).length === 0) {
-    ws.sqlite
-      .query('UPDATE sheets SET parent_id = NULL, position = ? WHERE id = ?')
-      .run(positionBetween(lastChildPosition(ws, null), null), id)
-  }
-  appendOp(ws, 'sheet', id, { kind: 'restore', ids })
+  ws.sqlite.transaction(() => {
+    for (const each of ids) restore.run(each)
+    if (parentId && liveSubtree(ws, parentId).length === 0) {
+      ws.sqlite
+        .query('UPDATE sheets SET parent_id = NULL, position = ? WHERE id = ?')
+        .run(positionBetween(lastChildPosition(ws, null), null), id)
+    }
+    appendOp(ws, 'sheet', id, { kind: 'restore', ids })
+  })()
   return ids
 }
 
 function purge(ws: Workspace, ids: string[]): number {
-  for (const id of ids) {
-    ws.sqlite.query('DELETE FROM sheet_links WHERE src = ?').run(id)
-    ws.sqlite.query('DELETE FROM sheets WHERE id = ?').run(id)
-    appendOp(ws, 'sheet', id, { kind: 'purge' })
-  }
+  ws.sqlite.transaction(() => {
+    for (const id of ids) {
+      ws.sqlite.query('DELETE FROM sheet_links WHERE src = ?').run(id)
+      ws.sqlite.query('DELETE FROM sheets WHERE id = ?').run(id)
+      appendOp(ws, 'sheet', id, { kind: 'purge' })
+    }
+  })()
   return ids.length
 }
 
