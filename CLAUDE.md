@@ -88,6 +88,11 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   hand-written too.
 - Sheet source of truth: Loro text doc (snapshot blob in sqlite); `source` column is a cache.
   Loro is a storage format today — delta export and merge arrive with sync at phase 8.
+- Pages nest Notion-style: `parent_id` + `position`, a fractional key (`positionBetween` in
+  domain), so a move rewrites one row. Delete trashes the subtree under one `deleted_at` stamp;
+  that stamp is the batch Restore and Purge act on. A restored page whose parent is gone comes
+  back at the top level. The service refuses a move into a page's own subtree (`SheetMoveError`
+  → 400).
 - Ids: `Bun.randomUUIDv7()`. Timestamps: HLC strings from domain.
 - **Who pays for a turn.** A credential is `api_key` or `local_cli`. Embedded finds the
   person's installed `claude` (PATH is empty for a GUI app — known install paths too) and runs

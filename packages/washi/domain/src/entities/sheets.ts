@@ -5,6 +5,8 @@ export const sheetSummarySchema = z.object({
   title: z.string(),
   icon: z.string().nullable(),
   tags: z.array(z.string()),
+  parentId: z.string().nullable(),
+  position: z.string(),
   hlcUpdated: z.string(),
 })
 export type SheetSummary = z.infer<typeof sheetSummarySchema>
@@ -22,6 +24,15 @@ export const sheetWriteSchema = z.object({
   source: z.string().min(1).max(512_000),
 })
 export type SheetWrite = z.infer<typeof sheetWriteSchema>
+
+export const trashEntrySchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  icon: z.string().nullable(),
+  deletedAt: z.string(),
+  nestedCount: z.number().int(),
+})
+export type TrashEntry = z.infer<typeof trashEntrySchema>
 
 export interface SearchHit {
   id: string

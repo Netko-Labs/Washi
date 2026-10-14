@@ -1,3 +1,18 @@
+# Notion parity, web (2026-10-14) — one PR per row, code-whiskers until clean, then merge
+
+Juan's call: Notion-style nesting (a "folder" is a page with children), all four parity areas,
+studio only. Mobbin: Notion sidebar + cover/icon header, AirOps trash, Dropbox Dash comments.
+
+- [ ] 1 · data: `parent_id` + `position` (fractional keys), move with cycle guard, delete
+      cascades to the subtree, Trash (list · restore · purge · empty), agent files by parent;
+      switcher drops "All workspaces"
+- [ ] 2 · sidebar tree (expand, + sub-page, drag to reorder/nest), breadcrumbs, `/trash`
+- [ ] 3 · page chrome: icon picker, cover, inline title, full width, ⋯ menu (duplicate · move
+      to · copy link · delete)
+- [ ] 4 · type into pages: block editor over WSX — text-like primitives editable, the rest
+      stay agent-made
+- [ ] 5 · comments + @mentions, mentions land in Inbox
+
 # Workspace switcher (2026-10-14) — switch organizations without leaving the page
 
 - [x] sidebar header is a switcher (Mobbin: v0 · hilos · Replit): every workspace with its own

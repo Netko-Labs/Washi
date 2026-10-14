@@ -39,8 +39,11 @@ export function createWashiTools(ws: Workspace, context: ToolContext) {
     name: 'washi',
     version: '0.1.0',
     tools: [
-      tool('sheet_list', 'List all sheets (id, title, icon, tags).', {}, async () =>
-        text(listSheets(ws)),
+      tool(
+        'sheet_list',
+        'List all sheets (id, title, icon, tags, parentId). A sheet with a parentId is a sub-page of that sheet.',
+        {},
+        async () => text(listSheets(ws)),
       ),
       tool(
         'sheet_get',
@@ -56,14 +59,15 @@ export function createWashiTools(ws: Workspace, context: ToolContext) {
       ),
       tool(
         'sheet_create',
-        'Create a sheet from WSX source. The source must pass sheet_check.',
+        'Create a sheet from WSX source. The source must pass sheet_check. Pass parentId (from sheet_list) to file it under another sheet, as a sub-page.',
         {
           title: z.string().min(1).max(200),
           icon: z.string().max(16).optional(),
           source: z.string(),
+          parentId: z.string().optional(),
         },
-        async (input) => {
-          const sheet = createSheetFromSource(ws, input)
+        async ({ parentId, ...input }) => {
+          const sheet = createSheetFromSource(ws, input, parentId ?? null)
           context.openSheet?.(sheet.id)
           return text(sheet)
         },

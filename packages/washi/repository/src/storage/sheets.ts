@@ -1,9 +1,16 @@
-import type { SearchHit, SheetDetail, SheetSummary, SheetWrite } from '@washi/domain'
+import {
+  positionBetween,
+  type SearchHit,
+  type SheetDetail,
+  type SheetSummary,
+  type SheetWrite,
+} from '@washi/domain'
 import { sheetLinkTable, sheetTable } from '@washi/domain/db'
 import { and, desc, eq, isNull } from 'drizzle-orm'
 import { newId, type Workspace } from './client'
 import { createSnapshot, updateSnapshot } from './loro'
 import { appendOp } from './oplog'
+import { lastChildPosition, liveSubtree } from './sheet-tree'
 
 export interface SheetIndexInput {
   /** Plain text + outbound refs, extracted by the service before persist. */
@@ -18,6 +25,8 @@ export function listSheets(ws: Workspace): SheetSummary[] {
       title: sheetTable.title,
       icon: sheetTable.icon,
       tags: sheetTable.tags,
+      parentId: sheetTable.parentId,
+      position: sheetTable.position,
       hlcUpdated: sheetTable.hlcUpdated,
     })
     .from(sheetTable)
@@ -37,13 +46,21 @@ export function getSheet(ws: Workspace, id: string): SheetDetail | null {
   return detail
 }
 
-export function createSheet(ws: Workspace, write: SheetWrite, index: SheetIndexInput): SheetDetail {
+/** A new page lands last among its siblings, as in Notion. The caller vouches for the parent. */
+export function createSheet(
+  ws: Workspace,
+  write: SheetWrite,
+  index: SheetIndexInput,
+  parentId: string | null = null,
+): SheetDetail {
   const now = ws.now()
   const id = newId()
   ws.db
     .insert(sheetTable)
     .values({
       id,
+      parentId,
+      position: positionBetween(lastChildPosition(ws, parentId), null),
       title: write.title,
       icon: write.icon ?? null,
       tags: write.tags ?? [],
@@ -53,8 +70,8 @@ export function createSheet(ws: Workspace, write: SheetWrite, index: SheetIndexI
       hlcUpdated: now,
     })
     .run()
-  reindexSheet(ws, id, write.title, index)
-  appendOp(ws, 'sheet', id, { kind: 'create', ...write })
+  indexSheet(ws, id, write.title, index)
+  appendOp(ws, 'sheet', id, { kind: 'create', parentId, ...write })
   return getSheet(ws, id) as SheetDetail
 }
 
@@ -79,19 +96,25 @@ export function updateSheet(
     })
     .where(eq(sheetTable.id, id))
     .run()
-  reindexSheet(ws, id, write.title, index)
+  indexSheet(ws, id, write.title, index)
   appendOp(ws, 'sheet', id, { kind: 'update', ...write })
   return getSheet(ws, id)
 }
 
+/** Sub-pages go to the Trash with their page, under one stamp, so Restore brings back the set. */
 export function deleteSheet(ws: Workspace, id: string): boolean {
-  const result = ws.sqlite
-    .query('UPDATE sheets SET deleted_at = ? WHERE id = ? AND deleted_at IS NULL')
-    .run(ws.now(), id)
-  if (result.changes === 0) return false
-  ws.sqlite.query('DELETE FROM sheets_fts WHERE id = ?').run(id)
-  ws.db.delete(sheetLinkTable).where(eq(sheetLinkTable.src, id)).run()
-  appendOp(ws, 'sheet', id, { kind: 'delete' })
+  const ids = liveSubtree(ws, id)
+  if (ids.length === 0) return false
+  const stamp = ws.now()
+  const trash = ws.sqlite.query('UPDATE sheets SET deleted_at = ? WHERE id = ?')
+  ws.sqlite.transaction(() => {
+    for (const each of ids) {
+      trash.run(stamp, each)
+      ws.sqlite.query('DELETE FROM sheets_fts WHERE id = ?').run(each)
+      ws.db.delete(sheetLinkTable).where(eq(sheetLinkTable.src, each)).run()
+    }
+    appendOp(ws, 'sheet', id, { kind: 'delete', ids })
+  })()
   return true
 }
 
@@ -125,7 +148,7 @@ export function searchSheets(ws: Workspace, term: string, limit = 20): SearchHit
     })
 }
 
-function reindexSheet(ws: Workspace, id: string, title: string, index: SheetIndexInput) {
+export function indexSheet(ws: Workspace, id: string, title: string, index: SheetIndexInput) {
   ws.sqlite.query('DELETE FROM sheets_fts WHERE id = ?').run(id)
   ws.sqlite
     .query('INSERT INTO sheets_fts (id, title, body) VALUES (?, ?, ?)')

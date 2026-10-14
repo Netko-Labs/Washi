@@ -43,7 +43,8 @@ export interface AiToolDeps {
 export function createAiTools({ ws, runHankoAction, openSheet }: AiToolDeps) {
   return {
     sheet_list: tool({
-      description: 'List all sheets (id, title, icon, tags).',
+      description:
+        'List all sheets (id, title, icon, tags, parentId). A sheet with a parentId is a sub-page of that sheet.',
       inputSchema: z.object({}),
       execute: async () => listSheets(ws),
     }),
@@ -79,14 +80,16 @@ export function createAiTools({ ws, runHankoAction, openSheet }: AiToolDeps) {
     }),
 
     sheet_create: tool({
-      description: 'Create a sheet from WSX source. It must pass sheet_check.',
+      description:
+        'Create a sheet from WSX source. It must pass sheet_check. Pass parentId (from sheet_list) to file it under another sheet, as a sub-page.',
       inputSchema: z.object({
         title: z.string().min(1).max(200),
         icon: z.string().max(16).optional(),
         source: z.string(),
+        parentId: z.string().optional(),
       }),
-      execute: async (input) => {
-        const sheet = createSheetFromSource(ws, input)
+      execute: async ({ parentId, ...input }) => {
+        const sheet = createSheetFromSource(ws, input, parentId ?? null)
         openSheet?.(sheet.id)
         return sheet
       },

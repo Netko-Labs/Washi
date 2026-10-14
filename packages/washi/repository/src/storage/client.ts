@@ -1,7 +1,7 @@
 import { Database } from 'bun:sqlite'
 import { mkdirSync } from 'node:fs'
 import { dirname } from 'node:path'
-import { createHlcClock } from '@washi/domain'
+import { createHlcClock, positionBetween } from '@washi/domain'
 import * as schema from '@washi/domain/db'
 import { type BunSQLiteDatabase, drizzle } from 'drizzle-orm/bun-sqlite'
 
@@ -76,6 +76,10 @@ function createTables(sqlite: Database) {
       deleted_at TEXT
     )
   `)
+  ensureColumn(sqlite, 'sheets', 'parent_id', 'TEXT')
+  ensureColumn(sqlite, 'sheets', 'position', 'TEXT')
+  sqlite.exec('CREATE INDEX IF NOT EXISTS idx_sheets_parent ON sheets(parent_id, position)')
+  backfillPositions(sqlite)
 
   sqlite.exec(`
     CREATE TABLE IF NOT EXISTS sheet_links (
@@ -217,6 +221,23 @@ function createTables(sqlite: Database) {
   // window_state used to live here. A server has no windows — it moved to the
   // desktop client's own store.
   sqlite.exec('DROP TABLE IF EXISTS window_state')
+}
+
+/** Pages from before nesting keep the order they were listed in: most recently edited first. */
+function backfillPositions(sqlite: Database) {
+  const unplaced = sqlite
+    .query('SELECT id FROM sheets WHERE position IS NULL ORDER BY hlc_updated DESC')
+    .all() as { id: string }[]
+  if (unplaced.length === 0) return
+  const last = sqlite
+    .query('SELECT MAX(position) AS position FROM sheets WHERE parent_id IS NULL')
+    .get() as { position: string | null }
+  let position = last.position
+  const place = sqlite.query('UPDATE sheets SET position = ? WHERE id = ?')
+  for (const { id } of unplaced) {
+    position = positionBetween(position, null)
+    place.run(position, id)
+  }
 }
 
 /** Additive DDL for an existing file; no drizzle-kit migrations by design. */

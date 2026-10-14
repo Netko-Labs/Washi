@@ -1,8 +1,7 @@
-import { IconCheck, IconLayoutGrid } from '@tabler/icons-react'
+import { IconCheck } from '@tabler/icons-react'
 import { getRouteApi, Link, useNavigate } from '@tanstack/react-router'
 import { VaultIcon } from '@washi/ui'
 import { topicFor, useWorkspaces } from '@/components/workspace'
-import { setActiveWorkspace } from '@/integrations/trpc'
 import type { WorkspaceMenuProps } from './lib'
 import { NewWorkspaceForm } from './new-workspace-form'
 
@@ -56,14 +55,6 @@ export function WorkspaceMenu({ currentId, onClose }: WorkspaceMenuProps) {
           await navigate({ to: '/w/$workspaceId', params: { workspaceId } })
         }}
       />
-      <Link
-        to="/workspaces"
-        onClick={() => setActiveWorkspace(null)}
-        className={`${ROW} h-8 text-[13px] text-muted-foreground`}
-      >
-        <IconLayoutGrid className="size-[15px]" />
-        All workspaces
-      </Link>
     </div>
   )
 }
