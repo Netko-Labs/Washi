@@ -4,6 +4,7 @@ import { byRecent, relativeMs, relativeTime } from '../page-time'
 import { SheetIcon } from '../sheet-icon'
 import { useSheetsStore, useViewStore } from '../stores'
 import { useToday } from '../today'
+import { StartHere } from './start-here'
 
 // hlc = zero-padded ms wall clock, then counter, then device id
 function greeting(hour = new Date().getHours()): string {
@@ -41,6 +42,8 @@ export function Dashboard() {
             today.spend.savedUsd > 0 &&
             ` Your Claude plan covered ${usd(today.spend.savedUsd)} of it.`}
         </p>
+
+        {sheets.length === 0 && <StartHere />}
 
         <div className="mb-[30px] grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3.5">
           <div className="rounded-[14px] border border-border bg-card px-[18px] py-4">
@@ -98,6 +101,9 @@ export function Dashboard() {
               Recent pages
             </div>
             <div className="flex flex-col gap-2">
+              {recent.length === 0 && (
+                <p className="text-[13px] text-muted-foreground">No pages yet.</p>
+              )}
               {recent.map((sheet) => (
                 <button
                   key={sheet.id}

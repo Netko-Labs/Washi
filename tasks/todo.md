@@ -7,12 +7,13 @@ the agent stays a floating popover).
 - [x] 1 · safety: two-step page delete (both sidebars) · invalid WSX → 400 not 500 · sessions left
       `running` by a killed process → `error` at boot
 - [x] 2 · sidebar: Recent + Favorites (per person, browser storage — no backend), star in header
-- [ ] 3 · page polish: loading state, real "page not found" for dead links, "edited X ago"
-- [ ] 4 · dashboard: an empty workspace gets starter prompts, not zeros
+- [x] 3 · page polish: loading state, real "page not found" for dead links, "edited X ago"
+- [x] 4 · dashboard: an empty workspace gets starter prompts, not zeros
 - [ ] 5 · verify washi.netko.dev serves the last merge; log what shipped
 
 Log (one line per merged PR):
 
+- #16 `ac72e04` page states (loading · missing · failed · reload-on-edit), edited-ago in header; the open page is the active tab only (fixed a dead link rendering the wrong page). Bot: approved, no findings.
 - #15 `a575397` favorites + recent-first sidebar, ★ in header. Bot round 1: 1 low (inline store type) → fixed; round 2 clean. CI flaked once on an npm tarball download → rerun green.
 - #14 `9371afb` safety pass — two-step delete, WSX 400, interrupted sessions → error. Bot: approved, no findings.
 
