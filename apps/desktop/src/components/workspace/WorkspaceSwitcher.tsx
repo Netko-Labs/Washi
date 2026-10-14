@@ -1,6 +1,6 @@
 import { IconCheck, IconPlus, IconSelector } from '@tabler/icons-react'
+import { VaultIcon } from '@washi/ui'
 import { useState } from 'react'
-import { VaultIcon } from '@/components/mascot/VaultIcon'
 import { CreateWorkspaceDialog } from './CreateWorkspaceDialog'
 
 export function WorkspaceSwitcher({ pages }: { pages: number }) {

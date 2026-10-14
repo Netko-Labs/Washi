@@ -9,7 +9,7 @@ import {
   IconSearch,
   IconTrash,
 } from '@tabler/icons-react'
-import { SheetIcon } from '@/components/shared/sheet-icon'
+import { SheetIcon } from '@washi/ui'
 import { UserRow } from '@/components/workspace/UserRow'
 import { WorkspaceSwitcher } from '@/components/workspace/WorkspaceSwitcher'
 import { useAgentStore } from '@/stores/agent/agent-store'

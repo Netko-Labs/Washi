@@ -1,0 +1,7 @@
+export { AgentMascot } from './agent-mascot'
+export type { AgentMascotState, MascotFace, MascotMotion } from './lib/types'
+export type { VaultTopic, VaultTopicName } from './lib/vault-topics'
+export { VAULT_TOPIC_ORDER, VAULT_TOPICS } from './lib/vault-topics'
+export { Mascot } from './mascot'
+export { MascotDefs } from './mascot-defs'
+export { VaultIcon } from './vault-icon'

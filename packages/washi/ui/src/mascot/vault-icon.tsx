@@ -1,4 +1,4 @@
-import { OPEN_SMILE, SPARKLE_EYES, VAULT_TOPICS } from './vault-topics'
+import { OPEN_SMILE, SPARKLE_EYES, VAULT_TOPICS } from './lib/vault-topics'
 
 const INK = '#6B3A1F'
 const PAPER = '#F7EDD6'

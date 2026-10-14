@@ -7,8 +7,8 @@ import {
   IconPlus,
   IconX,
 } from '@tabler/icons-react'
+import { AgentMascot } from '@washi/ui'
 import { useEffect, useRef, useState } from 'react'
-import { AgentMascot } from '@/components/mascot/AgentMascot'
 import { mascotStateFor, useAgentStore } from '@/stores/agent/agent-store'
 import { useSheetsStore } from '@/stores/sheets/sheets-store'
 import { useViewStore } from '@/stores/view/view-store'

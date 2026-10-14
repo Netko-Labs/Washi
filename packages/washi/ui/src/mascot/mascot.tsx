@@ -1,5 +1,4 @@
-export type MascotFace = 'happy' | 'sleep' | 'curious' | 'sad' | 'dizzy' | 'wink' | 'blank'
-export type MascotMotion = 'none' | 'flip' | 'bob' | 'peek' | 'breathe' | 'sway'
+import type { MascotFace, MascotMotion } from './lib/types'
 
 const FACE_IDS: Record<MascotFace, string> = {
   happy: '#fHappy',

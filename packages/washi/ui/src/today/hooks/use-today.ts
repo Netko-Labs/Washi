@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { api } from '@/lib/rpc'
+import { api } from '../../api'
 
 type TodayWire = Awaited<ReturnType<typeof api.agents.today.query>>
 

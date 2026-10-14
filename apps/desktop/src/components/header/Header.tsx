@@ -1,4 +1,4 @@
-import { AgentMascot } from '@/components/mascot/AgentMascot'
+import { AgentMascot } from '@washi/ui'
 import { mascotStateFor, useAgentStore } from '@/stores/agent/agent-store'
 import { useSheetsStore } from '@/stores/sheets/sheets-store'
 import { useViewStore, viewOf } from '@/stores/view/view-store'

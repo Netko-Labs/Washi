@@ -6,8 +6,8 @@ import {
   IconSettings,
   IconX,
 } from '@tabler/icons-react'
+import { SheetIcon } from '@washi/ui'
 import type { ReactNode } from 'react'
-import { SheetIcon } from '@/components/shared/sheet-icon'
 import { useSheetsStore } from '@/stores/sheets/sheets-store'
 import { type TabKey, useViewStore } from '@/stores/view/view-store'
 

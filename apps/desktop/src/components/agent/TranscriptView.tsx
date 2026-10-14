@@ -7,8 +7,8 @@ import {
   IconWorld,
 } from '@tabler/icons-react'
 import type { AgentUpdate, TranscriptEntry } from '@washi/domain'
+import { Mascot } from '@washi/ui'
 import type { ReactNode } from 'react'
-import { Mascot } from '@/components/mascot/Mascot'
 import { receiptLine } from './lib'
 
 function toolIcon(update: Extract<AgentUpdate, { kind: 'tool_call' }>): ReactNode {

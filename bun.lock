@@ -32,12 +32,6 @@
       "name": "@washi/desktop",
       "version": "0.1.0",
       "dependencies": {
-        "@fontsource-variable/jetbrains-mono": "^5.3.0",
-        "@fontsource-variable/karla": "^5.3.0",
-        "@fontsource/m-plus-rounded-1c": "^5.3.0",
-        "@fontsource/shippori-mincho": "^5.3.0",
-        "@fontsource/young-serif": "^5.3.0",
-        "@fontsource/zen-kaku-gothic-new": "^5.3.0",
         "@tabler/icons-react": "^3.44.0",
         "@tailwindcss/vite": "^4.3.2",
         "@trpc/client": "^11",
@@ -51,6 +45,7 @@
         "@washi/runtime": "workspace:*",
         "@washi/service": "workspace:*",
         "@washi/trpc": "workspace:*",
+        "@washi/ui": "workspace:*",
         "@washi/wsx": "workspace:*",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
@@ -290,6 +285,35 @@
       "devDependencies": {
         "@types/bun": "latest",
         "@washi/typescript-config": "workspace:*",
+      },
+    },
+    "packages/washi/ui": {
+      "name": "@washi/ui",
+      "version": "0.1.0",
+      "dependencies": {
+        "@fontsource-variable/jetbrains-mono": "^5.3.0",
+        "@fontsource-variable/karla": "^5.3.0",
+        "@fontsource/m-plus-rounded-1c": "^5.3.0",
+        "@fontsource/shippori-mincho": "^5.3.0",
+        "@fontsource/young-serif": "^5.3.0",
+        "@fontsource/zen-kaku-gothic-new": "^5.3.0",
+        "@tabler/icons-react": "^3.44.0",
+        "@trpc/client": "^11",
+        "@washi/domain": "workspace:*",
+        "@washi/paper": "workspace:*",
+        "@washi/trpc": "workspace:*",
+        "@washi/wsx": "workspace:*",
+        "cmdk": "^1.1.1",
+        "zustand": "^5.0.14",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+        "@types/react": "^19.2.17",
+        "@washi/typescript-config": "workspace:*",
+        "react": "^19.2.7",
+      },
+      "peerDependencies": {
+        "react": "^19.0.0",
       },
     },
   },
@@ -834,6 +858,8 @@
     "@washi/tsuru": ["@washi/tsuru@workspace:packages/shared/tsuru"],
 
     "@washi/typescript-config": ["@washi/typescript-config@workspace:packages/shared/typescript-config"],
+
+    "@washi/ui": ["@washi/ui@workspace:packages/washi/ui"],
 
     "@washi/wsx": ["@washi/wsx@workspace:packages/shared/wsx"],
 

@@ -1,14 +1,5 @@
 import type { ReactNode } from 'react'
-
-export type AgentMascotState =
-  | 'idle'
-  | 'reading'
-  | 'thinking'
-  | 'writing'
-  | 'suggesting'
-  | 'done'
-  | 'flagged'
-  | 'resting'
+import type { AgentMascotState } from './lib/types'
 
 const INK = '#6B3A1F'
 const BG = '#DF8552'

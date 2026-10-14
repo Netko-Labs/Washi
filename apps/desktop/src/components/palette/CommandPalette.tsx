@@ -1,7 +1,7 @@
 import { IconSearch, IconSparkles } from '@tabler/icons-react'
+import { SheetIcon } from '@washi/ui'
 import { Command } from 'cmdk'
 import { useEffect } from 'react'
-import { SheetIcon } from '@/components/shared/sheet-icon'
 import { useSheetsStore } from '@/stores/sheets/sheets-store'
 
 /** ⌘K palette per Washi.dc.html: scrim, 560px panel at 14vh, pages + agent actions. */

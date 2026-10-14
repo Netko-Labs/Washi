@@ -1,6 +1,5 @@
+import { AgentMascot, useToday } from '@washi/ui'
 import { receiptLine } from '@/components/agent/lib'
-import { AgentMascot } from '@/components/mascot/AgentMascot'
-import { useToday } from '@/components/shared/today'
 import { useAgentStore } from '@/stores/agent/agent-store'
 
 /** Everything Washi is waiting on, answerable here, then what it did — nothing invented. */

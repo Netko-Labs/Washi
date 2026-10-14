@@ -1,5 +1,4 @@
-import { Mascot } from '@/components/mascot/Mascot'
-import { VaultIcon } from '@/components/mascot/VaultIcon'
+import { Mascot, VaultIcon } from '@washi/ui'
 import type { SpeckProps, ToggleProps } from './types'
 
 const GOLD = '#E8B36A'
