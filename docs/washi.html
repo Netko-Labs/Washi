@@ -278,7 +278,7 @@
   <a class="dot" href="#canvas" style="--c:var(--tape-mustard)">canvas</a>
   <a class="dot" href="#brand" style="--c:var(--hanko)">brand</a>
   <a class="dot" href="#retires" style="--c:var(--tape-slate)">retires</a>
-  <a class="dot" href="#open" style="--c:var(--tape-mustard)">open</a>
+  <a class="dot" href="#open" style="--c:var(--tape-mustard)">called</a>
   <a class="dot" href="#next" style="--c:var(--tape-pink)">next</a>
 </nav>
 
@@ -430,9 +430,9 @@
 
     <ul class="tight">
       <li><span class="chip decided">decided</span> A view is a primitive placed on a page — a table's own page and a review doc use the same <code>Board</code>. No "view" noun.</li>
-      <li><span class="chip open">open · Q5</span> Generic tables plus a starter, or a built-in Issues model.</li>
-      <li><span class="chip open">open · Q6</span> Is a row a page?</li>
-      <li><span class="chip open">open · Q7</span> How charts learn the past.</li>
+      <li><span class="chip decided">decided · Q5</span> As Notion does: a table is a database of pages with typed properties, and the team space is a starter, not a built-in model.</li>
+      <li><span class="chip decided">decided · Q6</span> Every row is a page — peeked in a drawer, opened full, commented on.</li>
+      <li><span class="chip decided">decided · Q7</span> An append-only change log per table; ink gains a closed <code>history</code> query.</li>
     </ul>
   </div>
 </section>
@@ -543,10 +543,10 @@
 </section>
 
 <section id="open">
-  <span class="tape" style="--c:var(--tape-mustard)">10 · open</span>
+  <span class="tape" style="--c:var(--tape-mustard)">10 · called</span>
   <div class="card">
-    <h2 class="title">Still to call</h2>
-    <p class="point" style="--c:var(--tape-mustard)">Each one changes a flow we are about to design.</p>
+    <h2 class="title">Called</h2>
+    <p class="point" style="--c:var(--tape-mustard)">All seven called 2026-10-14: Q5 as Notion does, the rest as recommended.</p>
     <div class="qgrid">
       <div class="q"><span class="qn">Q1</span><h3>Does any page write still stop at the desk?</h3>
         <p>Washi now edits live. Routines and asks from the popover write pages too.</p>
@@ -562,8 +562,10 @@
         <p class="rec">Yes, as a one-way move, with local mode.</p></div>
       <div class="q"><span class="qn">Q5</span><h3>Generic tables, or a built-in Issues model?</h3>
         <p>Linear ships one opinionated issue shape. Notion ships blank databases and templates.</p>
-        <p class="rec">Generic tables plus the team-space starter, with three new column kinds: <code>status</code>
-        (grouped todo · doing · done), <code>person</code>, <code>relation</code>. One engine, and Washi already speaks ink.</p></div>
+        <p class="rec">As Notion does. A table is a database whose rows are pages, with typed properties —
+        <code>status</code> (todo · doing · done groups), <code>select</code>, <code>multi_select</code>, <code>person</code>,
+        <code>date</code> with an end, <code>url</code>, <code>relation</code> — and views (table, board, timeline) as tabs.
+        The team space is a starter, not a model.</p></div>
       <div class="q"><span class="qn">Q6</span><h3>Is a row a page?</h3>
         <p>A ticket needs a description, comments and activity, not just cells.</p>
         <p class="rec">Yes. Any row can carry a body page — peeked in a drawer, opened full. Comments and
@@ -579,18 +581,23 @@
 <section id="next">
   <span class="tape" style="--c:var(--tape-pink)">11 · next</span>
   <div class="card">
-    <h2 class="title">Design before code</h2>
-    <p class="point" style="--c:var(--tape-pink)">Flows first, in loop order. No implementation until a flow
-    is drawn and called.</p>
+    <h2 class="title">Build order</h2>
+    <p class="point" style="--c:var(--tape-pink)">"Go, I want this on prod" (2026-10-14). One PR per step,
+    merged to prod when the review is clean. Progress lives in <code>tasks/todo.md</code>.</p>
     <ol class="tight">
-      <li><strong>Make a living page</strong> — type or ask, then wire it to data.</li>
-      <li><strong>Run the week</strong> — ticket in the backlog → board → roadmap → review doc → month graph.</li>
-      <li><strong>Work it together</strong> — teammate + Washi in one page, presence, comments.</li>
-      <li><strong>Return</strong> — the Inbox as "what moved" and "assigned to you".</li>
-      <li><strong>First run</strong> — join a team (the team-space starter), or start solo on the desktop.</li>
-      <li><strong>Canvas</strong> — draw, connect, ask Washi to map something.</li>
+      <li><strong>The desk lets go</strong> — page and table writes land; only fetch and actions ask (Q1).</li>
+      <li><strong>Databases</strong> — status, multi-select, person, date range, url, relation properties.</li>
+      <li><strong>Rows are pages</strong> — every row has a body; peek in a drawer, open full, comment.</li>
+      <li><strong>The database page</strong> — table view with cells you edit, board view, views as tabs.</li>
+      <li><strong>History</strong> — the change log and the <code>history</code> query; charts over time.</li>
+      <li><strong>Linked views</strong> — <em>/view</em> in the editor drops a live view of any table on any page.</li>
+      <li><strong>Roadmap</strong> — <code>Timeline</code> bound to a table, drag to reschedule.</li>
+      <li><strong>Team space</strong> — the starter: backlog, roadmap, wiki, ideas, weekly review.</li>
+      <li><strong>Canvas</strong> — <code>Canvas</code> · <code>Node</code> · <code>Edge</code> on React Flow (Q2).</li>
+      <li><strong>Live together</strong> — Loro over <code>/sync</code>, presence, Washi's presence and marks (Q3).</li>
+      <li><strong>Find</strong> — search across pages, backlinks.</li>
     </ol>
-    <p>The brand sheet runs alongside flow 1.</p>
+    <p>The brand sheet runs alongside. Q4 (solo → team upload) ships with local mode.</p>
   </div>
 </section>
 
