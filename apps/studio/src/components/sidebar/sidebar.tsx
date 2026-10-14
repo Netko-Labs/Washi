@@ -1,13 +1,15 @@
 import { IconChevronLeft, IconEdit, IconSearch, IconX } from '@tabler/icons-react'
+import { Link } from '@tanstack/react-router'
 import { useAgentStore, useSheetsStore, useViewStore, VaultIcon } from '@washi/ui'
 import { AgentStatus } from '@/components/agent-status'
+import { setActiveWorkspace } from '@/integrations/trpc'
 import type { SidebarProps } from './lib'
 import { SidebarNav } from './sidebar-nav'
 import { SidebarPages } from './sidebar-pages'
 import { UserRow } from './user-row'
 
 /** The desktop's 248px sidebar, as a drawer under `md` — same nav, same tree, web chrome. */
-export function Sidebar({ workspace, open, onClose, onLeave }: SidebarProps) {
+export function Sidebar({ workspace, open, onClose }: SidebarProps) {
   return (
     <>
       {open && (
@@ -25,9 +27,9 @@ export function Sidebar({ workspace, open, onClose, onLeave }: SidebarProps) {
         }`}
       >
         <div className="flex h-12 shrink-0 items-center gap-1 px-2">
-          <button
-            type="button"
-            onClick={onLeave}
+          <Link
+            to="/workspaces"
+            onClick={() => setActiveWorkspace(null)}
             aria-label="All workspaces"
             title="All workspaces"
             className="flex h-9 min-w-0 flex-1 items-center gap-2 rounded-lg px-1.5 text-left hover:bg-accent"
@@ -35,7 +37,7 @@ export function Sidebar({ workspace, open, onClose, onLeave }: SidebarProps) {
             <IconChevronLeft className="size-3.5 shrink-0 text-muted-foreground" />
             <VaultIcon topic="plain" size={22} className="shrink-0" />
             <span className="truncate font-semibold text-[13px]">{workspace.name}</span>
-          </button>
+          </Link>
           <button
             type="button"
             aria-label="Search (⌘K)"
@@ -70,12 +72,12 @@ export function Sidebar({ workspace, open, onClose, onLeave }: SidebarProps) {
           </button>
         </div>
 
-        <SidebarNav onNavigate={onClose} />
+        <SidebarNav workspaceId={workspace.id} onNavigate={onClose} />
 
         <div className="px-4 pt-[18px] pb-1.5 font-semibold text-[11px] text-muted-foreground uppercase tracking-[0.06em]">
           Pages
         </div>
-        <SidebarPages onNavigate={onClose} />
+        <SidebarPages workspaceId={workspace.id} onNavigate={onClose} />
 
         <div className="border-border border-t px-2 py-1.5">
           <AgentStatus

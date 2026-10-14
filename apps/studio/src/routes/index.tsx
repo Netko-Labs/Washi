@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { App } from '@/components/app'
+import { HomeRedirect } from '@/components/home'
 
-// Session, workspace choice and the shell all read browser state (cookie, localStorage).
+// Session and the last workspace live in the browser (cookie, localStorage).
 export const Route = createFileRoute('/')({
   ssr: false,
-  component: App,
+  component: HomeRedirect,
 })

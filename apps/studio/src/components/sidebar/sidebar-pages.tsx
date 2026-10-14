@@ -1,7 +1,9 @@
 import { IconPlus, IconTrash } from '@tabler/icons-react'
 import { SheetIcon, useAgentStore, useSheetsStore, useViewStore } from '@washi/ui'
+import { pathFor } from '@/components/shell'
+import { openInPlace, type SidebarSectionProps } from './lib'
 
-export function SidebarPages({ onNavigate }: { onNavigate: () => void }) {
+export function SidebarPages({ workspaceId, onNavigate }: SidebarSectionProps) {
   const sheets = useSheetsStore((state) => state.sheets)
   const running = useAgentStore((state) => state.running)
   const activeTab = useViewStore((state) => state.activeTab)
@@ -22,13 +24,15 @@ export function SidebarPages({ onNavigate }: { onNavigate: () => void }) {
               active ? 'bg-accent font-medium' : 'text-muted-foreground hover:bg-accent'
             }`}
           >
-            <button
-              type="button"
+            <a
+              href={pathFor(workspaceId, `note:${sheet.id}`)}
               aria-label={`Open ${sheet.title}`}
-              onClick={() => {
-                useViewStore.getState().openTab(`note:${sheet.id}`)
-                onNavigate()
-              }}
+              onClick={(event) =>
+                openInPlace(event, () => {
+                  useViewStore.getState().openTab(`note:${sheet.id}`)
+                  onNavigate()
+                })
+              }
               className="flex h-full min-w-0 flex-1 items-center gap-2 px-2 text-left text-[13px]"
             >
               <SheetIcon name={sheet.icon} className="size-[15px] shrink-0" />
@@ -39,7 +43,7 @@ export function SidebarPages({ onNavigate }: { onNavigate: () => void }) {
                   style={{ animation: 'wdot 2s ease-in-out infinite' }}
                 />
               )}
-            </button>
+            </a>
             <button
               type="button"
               aria-label={`Delete ${sheet.title}`}

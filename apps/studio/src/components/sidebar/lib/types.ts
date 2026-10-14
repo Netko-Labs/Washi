@@ -14,5 +14,9 @@ export interface SidebarProps {
   workspace: WorkspaceSummary
   open: boolean
   onClose: () => void
-  onLeave: () => void
+}
+
+export interface SidebarSectionProps {
+  workspaceId: string
+  onNavigate: () => void
 }

@@ -10,18 +10,40 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SignInRouteImport } from './routes/sign-in'
+import { Route as WorkspacesRouteImport } from './routes/workspaces'
 import { Route as ApiHealthRouteImport } from './routes/api/health'
+import { Route as WWorkspaceIdRouteImport } from './routes/w/$workspaceId'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiTrpcSplatRouteImport } from './routes/api/trpc/$'
+import { Route as WWorkspaceIdIndexRouteImport } from './routes/w/$workspaceId/index'
+import { Route as WWorkspaceIdInboxRouteImport } from './routes/w/$workspaceId/inbox'
+import { Route as WWorkspaceIdSettingsRouteImport } from './routes/w/$workspaceId/settings'
+import { Route as WWorkspaceIdPPageIdRouteImport } from './routes/w/$workspaceId/p/$pageId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SignInRoute = SignInRouteImport.update({
+  id: '/sign-in',
+  path: '/sign-in',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WorkspacesRoute = WorkspacesRouteImport.update({
+  id: '/workspaces',
+  path: '/workspaces',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiHealthRoute = ApiHealthRouteImport.update({
   id: '/api/health',
   path: '/api/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WWorkspaceIdRoute = WWorkspaceIdRouteImport.update({
+  id: '/w/$workspaceId',
+  path: '/w/$workspaceId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
@@ -34,37 +56,113 @@ const ApiTrpcSplatRoute = ApiTrpcSplatRouteImport.update({
   path: '/api/trpc/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WWorkspaceIdIndexRoute = WWorkspaceIdIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => WWorkspaceIdRoute,
+} as any)
+const WWorkspaceIdInboxRoute = WWorkspaceIdInboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => WWorkspaceIdRoute,
+} as any)
+const WWorkspaceIdSettingsRoute = WWorkspaceIdSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => WWorkspaceIdRoute,
+} as any)
+const WWorkspaceIdPPageIdRoute = WWorkspaceIdPPageIdRouteImport.update({
+  id: '/p/$pageId',
+  path: '/p/$pageId',
+  getParentRoute: () => WWorkspaceIdRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/sign-in': typeof SignInRoute
+  '/workspaces': typeof WorkspacesRoute
   '/api/health': typeof ApiHealthRoute
+  '/w/$workspaceId': typeof WWorkspaceIdRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/w/$workspaceId/inbox': typeof WWorkspaceIdInboxRoute
+  '/w/$workspaceId/settings': typeof WWorkspaceIdSettingsRoute
+  '/w/$workspaceId/': typeof WWorkspaceIdIndexRoute
+  '/w/$workspaceId/p/$pageId': typeof WWorkspaceIdPPageIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/sign-in': typeof SignInRoute
+  '/workspaces': typeof WorkspacesRoute
   '/api/health': typeof ApiHealthRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/w/$workspaceId/inbox': typeof WWorkspaceIdInboxRoute
+  '/w/$workspaceId/settings': typeof WWorkspaceIdSettingsRoute
+  '/w/$workspaceId': typeof WWorkspaceIdIndexRoute
+  '/w/$workspaceId/p/$pageId': typeof WWorkspaceIdPPageIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/sign-in': typeof SignInRoute
+  '/workspaces': typeof WorkspacesRoute
   '/api/health': typeof ApiHealthRoute
+  '/w/$workspaceId': typeof WWorkspaceIdRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/w/$workspaceId/inbox': typeof WWorkspaceIdInboxRoute
+  '/w/$workspaceId/settings': typeof WWorkspaceIdSettingsRoute
+  '/w/$workspaceId/': typeof WWorkspaceIdIndexRoute
+  '/w/$workspaceId/p/$pageId': typeof WWorkspaceIdPPageIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/health' | '/api/auth/$' | '/api/trpc/$'
+  fullPaths:
+    | '/'
+    | '/sign-in'
+    | '/workspaces'
+    | '/api/health'
+    | '/w/$workspaceId'
+    | '/api/auth/$'
+    | '/api/trpc/$'
+    | '/w/$workspaceId/inbox'
+    | '/w/$workspaceId/settings'
+    | '/w/$workspaceId/'
+    | '/w/$workspaceId/p/$pageId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/health' | '/api/auth/$' | '/api/trpc/$'
-  id: '__root__' | '/' | '/api/health' | '/api/auth/$' | '/api/trpc/$'
+  to:
+    | '/'
+    | '/sign-in'
+    | '/workspaces'
+    | '/api/health'
+    | '/api/auth/$'
+    | '/api/trpc/$'
+    | '/w/$workspaceId/inbox'
+    | '/w/$workspaceId/settings'
+    | '/w/$workspaceId'
+    | '/w/$workspaceId/p/$pageId'
+  id:
+    | '__root__'
+    | '/'
+    | '/sign-in'
+    | '/workspaces'
+    | '/api/health'
+    | '/w/$workspaceId'
+    | '/api/auth/$'
+    | '/api/trpc/$'
+    | '/w/$workspaceId/inbox'
+    | '/w/$workspaceId/settings'
+    | '/w/$workspaceId/'
+    | '/w/$workspaceId/p/$pageId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SignInRoute: typeof SignInRoute
+  WorkspacesRoute: typeof WorkspacesRoute
   ApiHealthRoute: typeof ApiHealthRoute
+  WWorkspaceIdRoute: typeof WWorkspaceIdRouteWithChildren
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiTrpcSplatRoute: typeof ApiTrpcSplatRoute
 }
@@ -78,11 +176,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sign-in': {
+      id: '/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
+      preLoaderRoute: typeof SignInRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/workspaces': {
+      id: '/workspaces'
+      path: '/workspaces'
+      fullPath: '/workspaces'
+      preLoaderRoute: typeof WorkspacesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/health': {
       id: '/api/health'
       path: '/api/health'
       fullPath: '/api/health'
       preLoaderRoute: typeof ApiHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/w/$workspaceId': {
+      id: '/w/$workspaceId'
+      path: '/w/$workspaceId'
+      fullPath: '/w/$workspaceId'
+      preLoaderRoute: typeof WWorkspaceIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/auth/$': {
@@ -99,12 +218,61 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiTrpcSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/w/$workspaceId/': {
+      id: '/w/$workspaceId/'
+      path: '/'
+      fullPath: '/w/$workspaceId/'
+      preLoaderRoute: typeof WWorkspaceIdIndexRouteImport
+      parentRoute: typeof WWorkspaceIdRoute
+    }
+    '/w/$workspaceId/inbox': {
+      id: '/w/$workspaceId/inbox'
+      path: '/inbox'
+      fullPath: '/w/$workspaceId/inbox'
+      preLoaderRoute: typeof WWorkspaceIdInboxRouteImport
+      parentRoute: typeof WWorkspaceIdRoute
+    }
+    '/w/$workspaceId/settings': {
+      id: '/w/$workspaceId/settings'
+      path: '/settings'
+      fullPath: '/w/$workspaceId/settings'
+      preLoaderRoute: typeof WWorkspaceIdSettingsRouteImport
+      parentRoute: typeof WWorkspaceIdRoute
+    }
+    '/w/$workspaceId/p/$pageId': {
+      id: '/w/$workspaceId/p/$pageId'
+      path: '/p/$pageId'
+      fullPath: '/w/$workspaceId/p/$pageId'
+      preLoaderRoute: typeof WWorkspaceIdPPageIdRouteImport
+      parentRoute: typeof WWorkspaceIdRoute
+    }
   }
 }
 
+interface WWorkspaceIdRouteChildren {
+  WWorkspaceIdInboxRoute: typeof WWorkspaceIdInboxRoute
+  WWorkspaceIdSettingsRoute: typeof WWorkspaceIdSettingsRoute
+  WWorkspaceIdIndexRoute: typeof WWorkspaceIdIndexRoute
+  WWorkspaceIdPPageIdRoute: typeof WWorkspaceIdPPageIdRoute
+}
+
+const WWorkspaceIdRouteChildren: WWorkspaceIdRouteChildren = {
+  WWorkspaceIdInboxRoute: WWorkspaceIdInboxRoute,
+  WWorkspaceIdSettingsRoute: WWorkspaceIdSettingsRoute,
+  WWorkspaceIdIndexRoute: WWorkspaceIdIndexRoute,
+  WWorkspaceIdPPageIdRoute: WWorkspaceIdPPageIdRoute,
+}
+
+const WWorkspaceIdRouteWithChildren = WWorkspaceIdRoute._addFileChildren(
+  WWorkspaceIdRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SignInRoute: SignInRoute,
+  WorkspacesRoute: WorkspacesRoute,
   ApiHealthRoute: ApiHealthRoute,
+  WWorkspaceIdRoute: WWorkspaceIdRouteWithChildren,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiTrpcSplatRoute: ApiTrpcSplatRoute,
 }

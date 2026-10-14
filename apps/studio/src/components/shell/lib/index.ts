@@ -1,2 +1,7 @@
+export { enterWorkspace } from './enter-workspace'
+export { useRouteTab } from './hooks/use-route-tab'
+export { useTabNavigation } from './hooks/use-tab-navigation'
 export { useWorkspaceBoot } from './hooks/use-workspace-boot'
+export { loadWorkspace } from './load-workspace'
 export type { WorkspaceShellProps } from './types'
+export { pathFor } from './utils'

@@ -40,6 +40,8 @@ export interface DailyStopProps {
 
 export interface SettingsScreenProps {
   workspaceId: string
+  tab: SettingsTab
+  onTab: (tab: SettingsTab) => void
 }
 
 export type SettingsTab = 'agent' | 'people' | 'routines'

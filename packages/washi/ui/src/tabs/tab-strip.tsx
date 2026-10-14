@@ -6,7 +6,7 @@ import {
   IconSettings,
   IconX,
 } from '@tabler/icons-react'
-import type { ReactNode } from 'react'
+import { type ReactNode, useRef } from 'react'
 import { SheetIcon } from '../sheet-icon'
 import { type TabKey, useSheetsStore, useViewStore } from '../stores'
 
@@ -17,10 +17,11 @@ const VIEW_TABS: Record<string, { label: string; icon: ReactNode }> = {
   'view:settings': { label: 'Settings', icon: <IconSettings className="size-[13px]" /> },
 }
 
-/** Browser-style tab strip above the header (Washi.dc.html rev 2). */
+/** Browser-style tab strip (Washi.dc.html rev 2): drag to reorder, middle-click to close. */
 export function TabStrip() {
-  const { tabs, activeTab, openTab, closeTab } = useViewStore()
+  const { tabs, activeTab, openTab, closeTab, moveTab } = useViewStore()
   const { sheets, createSheet } = useSheetsStore()
+  const dragged = useRef<TabKey | null>(null)
 
   const labelFor = (key: TabKey): { label: string; icon: ReactNode } | null => {
     if (key.startsWith('view:')) return VIEW_TABS[key] ?? null
@@ -33,7 +34,10 @@ export function TabStrip() {
   }
 
   return (
-    <div className="app-drag flex items-end gap-0.5 overflow-x-auto border-border border-b bg-muted px-2 pt-1.5">
+    <div
+      role="tablist"
+      className="app-drag flex items-end gap-0.5 overflow-x-auto border-border border-b bg-muted px-2 pt-1.5"
+    >
       {tabs.map((key) => {
         const info = labelFor(key)
         if (!info) return null
@@ -41,6 +45,25 @@ export function TabStrip() {
         return (
           <div
             key={key}
+            role="tab"
+            aria-selected={active}
+            tabIndex={-1}
+            draggable
+            onDragStart={(event) => {
+              dragged.current = key
+              event.dataTransfer.effectAllowed = 'move'
+            }}
+            onDragEnter={() => {
+              if (dragged.current && dragged.current !== key) moveTab(dragged.current, key)
+            }}
+            onDragOver={(event) => event.preventDefault()}
+            onDragEnd={() => {
+              dragged.current = null
+            }}
+            onAuxClick={(event) => {
+              if (event.button === 1) closeTab(key)
+            }}
+            data-tab={key}
             className={`app-no-drag flex h-[31px] max-w-[190px] min-w-0 flex-initial cursor-pointer items-center gap-1.5 rounded-t-lg border border-b-0 pr-1 pl-2.5 text-[12.5px] ${
               active
                 ? 'border-border bg-background font-medium text-foreground'

@@ -3,23 +3,19 @@ import { CommandPalette, Header, MascotDefs, TabStrip } from '@washi/ui'
 import { useState } from 'react'
 import { Sidebar } from '@/components/sidebar'
 import { AgentLayer } from './agent-layer'
-import { useWorkspaceBoot, type WorkspaceShellProps } from './lib'
-import { ShellView } from './shell-view'
+import { CopyLinkButton } from './copy-link-button'
+import { useTabNavigation, useWorkspaceBoot, type WorkspaceShellProps } from './lib'
 
-/** The desktop's rev-2 shell on the web: the same components, a drawer under `md`. */
-export function WorkspaceShell({ workspace, onLeave }: WorkspaceShellProps) {
-  useWorkspaceBoot(workspace)
+/** The desktop's rev-2 shell on the web: the same components, real addresses, a drawer under `md`. */
+export function WorkspaceShell({ workspace, children }: WorkspaceShellProps) {
+  useWorkspaceBoot(workspace.id)
+  useTabNavigation(workspace.id)
   const [navOpen, setNavOpen] = useState(false)
 
   return (
     <div className="flex h-dvh overflow-hidden bg-background font-sans text-[14px] text-foreground">
       <MascotDefs />
-      <Sidebar
-        workspace={workspace}
-        open={navOpen}
-        onClose={() => setNavOpen(false)}
-        onLeave={onLeave}
-      />
+      <Sidebar workspace={workspace} open={navOpen} onClose={() => setNavOpen(false)} />
       <main className="flex min-w-0 flex-1 flex-col">
         <div className="hidden md:block">
           <TabStrip />
@@ -35,8 +31,9 @@ export function WorkspaceShell({ workspace, onLeave }: WorkspaceShellProps) {
               <IconMenu2 className="size-[18px]" />
             </button>
           }
+          actions={<CopyLinkButton />}
         />
-        <ShellView workspace={workspace} />
+        {children}
       </main>
       <AgentLayer />
       <CommandPalette />

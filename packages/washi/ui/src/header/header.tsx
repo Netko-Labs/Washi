@@ -1,6 +1,6 @@
-import type { ReactNode } from 'react'
 import { AgentMascot } from '../mascot'
 import { mascotStateFor, useAgentStore, useSheetsStore, useViewStore, viewOf } from '../stores'
+import type { HeaderProps } from './lib/types'
 
 const STATE_LABELS: Record<string, string> = {
   idle: 'Washi watching',
@@ -20,13 +20,12 @@ const VIEW_LABELS: Record<string, string> = {
 }
 
 /** 48px header: breadcrumb + agent status pill (Washi.dc.html rev 2 — no bot button, FAB rules). */
-export function Header({ leading }: { leading?: ReactNode }) {
+export function Header({ leading, actions }: HeaderProps) {
   const { sheets, activeId } = useSheetsStore()
   const transcript = useAgentStore((state) => state.transcript)
   const running = useAgentStore((state) => state.running)
   const approvals = useAgentStore((state) => state.approvals)
   const activeTab = useViewStore((state) => state.activeTab)
-  const openTab = useViewStore((state) => state.openTab)
   const workspaceName = useViewStore((state) => state.workspaceName)
 
   const view = viewOf(activeTab)
@@ -55,14 +54,7 @@ export function Header({ leading }: { leading?: ReactNode }) {
             {STATE_LABELS[mascotState]}
           </div>
         )}
-        <button
-          type="button"
-          title="Sharing lands with sync — opens Sync & sharing"
-          onClick={() => openTab('view:settings')}
-          className="hidden h-8 rounded-lg bg-primary px-3 sm:block font-medium text-[13px] text-primary-foreground hover:opacity-90"
-        >
-          Share
-        </button>
+        {actions}
       </div>
     </header>
   )
