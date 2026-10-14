@@ -31,6 +31,11 @@ export function viewOf(tab: TabKey | null): AppView {
   return tab.startsWith('note:') ? 'note' : (tab.slice(5) as AppView)
 }
 
+/** The open page is whatever the active tab says — the URL on the web, the strip on the desktop. */
+export function noteIdOf(tab: TabKey | null): string | null {
+  return tab?.startsWith('note:') ? tab.slice(5) : null
+}
+
 export function initials(name: string): string {
   return (name.trim() || '?')
     .split(/\s+/)

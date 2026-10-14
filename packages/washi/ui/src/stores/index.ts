@@ -5,6 +5,7 @@ export {
   type AppView,
   type Identity,
   initials,
+  noteIdOf,
   type TabKey,
   useViewStore,
   viewOf,

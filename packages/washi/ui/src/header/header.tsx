@@ -1,6 +1,14 @@
 import { FavoriteStar } from '../favorite-star'
 import { AgentMascot } from '../mascot'
-import { mascotStateFor, useAgentStore, useSheetsStore, useViewStore, viewOf } from '../stores'
+import { relativeTime } from '../page-time'
+import {
+  mascotStateFor,
+  noteIdOf,
+  useAgentStore,
+  useSheetsStore,
+  useViewStore,
+  viewOf,
+} from '../stores'
 import type { HeaderProps } from './lib/types'
 
 const STATE_LABELS: Record<string, string> = {
@@ -22,7 +30,7 @@ const VIEW_LABELS: Record<string, string> = {
 
 /** 48px header: breadcrumb + agent status pill (Washi.dc.html rev 2 — no bot button, FAB rules). */
 export function Header({ leading, actions }: HeaderProps) {
-  const { sheets, activeId } = useSheetsStore()
+  const sheets = useSheetsStore((state) => state.sheets)
   const transcript = useAgentStore((state) => state.transcript)
   const running = useAgentStore((state) => state.running)
   const approvals = useAgentStore((state) => state.approvals)
@@ -30,7 +38,7 @@ export function Header({ leading, actions }: HeaderProps) {
   const workspaceName = useViewStore((state) => state.workspaceName)
 
   const view = viewOf(activeTab)
-  const active = sheets.find((sheet) => sheet.id === activeId)
+  const active = sheets.find((sheet) => sheet.id === noteIdOf(activeTab))
   const mascotState = mascotStateFor(transcript, running, approvals)
   const leaf =
     view === 'note' ? (active ? active.title : 'All pages') : (VIEW_LABELS[view] ?? 'Washi')
@@ -43,6 +51,12 @@ export function Header({ leading, actions }: HeaderProps) {
           {workspaceName} <span className="opacity-50">/</span>
         </span>{' '}
         <span className="font-medium">{leaf}</span>
+        {view === 'note' && active && (
+          <span className="hidden text-muted-foreground sm:inline">
+            {' '}
+            · edited {relativeTime(active.hlcUpdated)}
+          </span>
+        )}
       </div>
       {view === 'note' && active && <FavoriteStar sheetId={active.id} />}
 
