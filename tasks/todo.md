@@ -9,13 +9,30 @@ the agent stays a floating popover).
 - [x] 2 · sidebar: Recent + Favorites (per person, browser storage — no backend), star in header
 - [x] 3 · page polish: loading state, real "page not found" for dead links, "edited X ago"
 - [x] 4 · dashboard: an empty workspace gets starter prompts, not zeros
-- [ ] 5 · verify washi.netko.dev serves the last merge; log what shipped
+- [x] 5 · verify washi.netko.dev serves the last merge; log what shipped
 
 Log (one line per merged PR):
 
+- #17 `f3c67b4` dashboard starters for an empty workspace. Bot: approved, no findings. Live 440s
+  after merge; all 14 prod chunks crawled — every feature string from #11–#17 present.
 - #16 `ac72e04` page states (loading · missing · failed · reload-on-edit), edited-ago in header; the open page is the active tab only (fixed a dead link rendering the wrong page). Bot: approved, no findings.
 - #15 `a575397` favorites + recent-first sidebar, ★ in header. Bot round 1: 1 low (inline store type) → fixed; round 2 clean. CI flaked once on an npm tarball download → rerun green.
 - #14 `9371afb` safety pass — two-step delete, WSX 400, interrupted sessions → error. Bot: approved, no findings.
+
+Shipped overnight (all auto-deployed by Coolify, 4–8 min per merge; prod verified at the end):
+
+| PR | What a person notices |
+|---|---|
+| #14 | Trash needs a second click ("Delete?"); bad page code is a clear 400; a chat cut off by a redeploy stops claiming to run |
+| #15 | ★ in the header pins a page to **Favorites**; pages list most recently edited first |
+| #16 | Loading shows placeholders, dead links say "This page isn't here", the open page reloads when Washi edits it, "edited X ago" in the header |
+| #17 | A new workspace opens on four plain-language page ideas instead of zeros |
+
+Follow-ups worth doing (not started):
+- remove `sheets.activeId` — nothing renders from it since #16; `select` is its last reader
+- favorites follow a person across devices (server-side, per member) if people ask
+- a real agent turn on prod with auto-approve on (needs a key in the workspace)
+- the 500→400 middleware only covers `SheetValidationError`; table validation errors could follow
 
 # Studio rev 2 — one UI package, the web catches up (2026-10-14)
 
