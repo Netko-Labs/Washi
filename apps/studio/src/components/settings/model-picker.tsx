@@ -46,7 +46,7 @@ export function ModelPicker({
               }`}
             >
               <span className="min-w-0 flex-1">
-                <span className="block truncate font-bold text-[13.5px]">{model.name}</span>
+                <span className="block truncate font-semibold text-[13.5px]">{model.name}</span>
                 <span className="block truncate font-mono text-[11px] text-muted-foreground">
                   {model.id}
                 </span>

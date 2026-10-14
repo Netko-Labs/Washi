@@ -6,6 +6,7 @@ export type {
   KeyInput,
   KeyState,
   SettingsScreenProps,
+  SettingsTab,
   SpendState,
 } from './types'
-export { PROVIDERS } from './values'
+export { PROVIDERS, SETTINGS_TABS } from './values'

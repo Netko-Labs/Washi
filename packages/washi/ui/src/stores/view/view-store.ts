@@ -18,6 +18,8 @@ interface ViewState {
   closeAll: () => void
   identity: Identity
   setIdentity: (patch: Partial<Identity>) => void
+  workspaceName: string
+  setWorkspaceName: (name: string) => void
 }
 
 export function viewOf(tab: TabKey | null): AppView {
@@ -64,4 +66,6 @@ export const useViewStore = create<ViewState>((set, get) => ({
   // The host says who is here: the desktop from its profile, the web from the session.
   identity: { name: '', email: '', color: '#c25f2c' },
   setIdentity: (patch) => set((state) => ({ identity: { ...state.identity, ...patch } })),
+  workspaceName: 'Workspace',
+  setWorkspaceName: (workspaceName) => set({ workspaceName }),
 }))

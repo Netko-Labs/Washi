@@ -27,7 +27,7 @@ export function DailyStop({ capUsd, onSave }: DailyStopProps) {
       {changed && (
         <button
           type="submit"
-          className="h-11 rounded-xl border border-border px-4 font-bold text-[13px] hover:bg-accent"
+          className="h-11 rounded-xl border border-border px-4 font-semibold text-[13px] hover:bg-accent"
         >
           Set
         </button>

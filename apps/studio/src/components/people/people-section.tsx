@@ -11,8 +11,8 @@ export function PeopleSection({ workspaceId }: PeopleSectionProps) {
   const [email, setEmail] = useState('')
 
   return (
-    <section className="mt-10 border-border border-t pt-8">
-      <h2 className="font-bold text-[15px]">People</h2>
+    <section>
+      <h2 className="font-semibold text-[15px]">People</h2>
       <p className="mt-1 text-[13.5px] text-muted-foreground leading-relaxed">
         Invite someone by email, then send them the link. They sign in with that address and they're
         in.
@@ -21,7 +21,7 @@ export function PeopleSection({ workspaceId }: PeopleSectionProps) {
       <ul className="mt-4 divide-y divide-border">
         {members.map((member) => (
           <li key={member.id} className="flex items-center gap-3 py-2">
-            <span className="grid size-8 shrink-0 place-items-center rounded-full bg-accent font-bold text-[12px]">
+            <span className="grid size-8 shrink-0 place-items-center rounded-full bg-accent font-semibold text-[12px]">
               {member.name.slice(0, 1).toUpperCase()}
             </span>
             <span className="min-w-0 flex-1">
@@ -58,7 +58,7 @@ export function PeopleSection({ workspaceId }: PeopleSectionProps) {
         <button
           type="submit"
           disabled={!email.trim()}
-          className="h-11 shrink-0 rounded-xl border border-border px-4 font-bold text-[13.5px] hover:bg-accent disabled:opacity-50"
+          className="h-11 shrink-0 rounded-xl border border-border px-4 font-semibold text-[13.5px] hover:bg-accent disabled:opacity-50"
         >
           Invite
         </button>

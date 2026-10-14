@@ -11,7 +11,7 @@ export function RoutinesSection() {
 
   return (
     <section>
-      <h2 className="font-bold text-[14px]">Routines</h2>
+      <h2 className="font-semibold text-[14px]">Routines</h2>
       <p className="mt-1 text-[13px] text-muted-foreground leading-relaxed">
         Prompts Washi runs on its own, once a day. What they write waits under Needs you.
       </p>

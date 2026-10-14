@@ -2,20 +2,14 @@ import { IconSearch, IconSparkles } from '@tabler/icons-react'
 import { Command } from 'cmdk'
 import { useEffect } from 'react'
 import { SheetIcon } from '../sheet-icon'
+import { useAgentStore } from '../stores/agent/agent-store'
 import { useSheetsStore } from '../stores/sheets/sheets-store'
+import { useViewStore } from '../stores/view/view-store'
 
 /** ⌘K palette per Washi.dc.html: scrim, 560px panel at 14vh, pages + agent actions. */
 export function CommandPalette() {
-  const {
-    sheets,
-    paletteOpen,
-    openPalette,
-    closePalette,
-    select,
-    createSheet,
-    searchTerm,
-    search,
-  } = useSheetsStore()
+  const { sheets, paletteOpen, openPalette, closePalette, createSheet, searchTerm, search } =
+    useSheetsStore()
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -43,7 +37,7 @@ export function CommandPalette() {
       <Command
         label="Command palette"
         shouldFilter
-        className="relative mx-auto mt-[14vh] w-[560px] overflow-hidden rounded-[14px] border border-border bg-popover text-popover-foreground shadow-[0_16px_48px_rgb(0_0_0/0.28)]"
+        className="relative mx-auto mt-[14vh] w-[min(560px,calc(100vw-24px))] overflow-hidden rounded-[14px] border border-border bg-popover text-popover-foreground shadow-[0_16px_48px_rgb(0_0_0/0.28)]"
       >
         <div className="flex items-center gap-2.5 border-border border-b px-4">
           <IconSearch className="size-4 text-muted-foreground" />
@@ -71,7 +65,7 @@ export function CommandPalette() {
                 key={sheet.id}
                 value={`${sheet.title} ${sheet.id}`}
                 onSelect={() => {
-                  select(sheet.id)
+                  useViewStore.getState().openTab(`note:${sheet.id}`)
                   closePalette()
                 }}
                 className="flex h-9 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-[13px] data-[selected=true]:bg-accent"
@@ -90,6 +84,7 @@ export function CommandPalette() {
               onSelect={() => {
                 void createSheet()
                 closePalette()
+                if (!useAgentStore.getState().panelOpen) useAgentStore.getState().togglePanel()
               }}
               className="flex h-9 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-[13px] data-[selected=true]:bg-accent"
             >

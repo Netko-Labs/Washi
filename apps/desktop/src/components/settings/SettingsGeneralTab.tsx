@@ -1,10 +1,4 @@
-import {
-  RowButton,
-  SegmentedControl,
-  SettingsCard,
-  SettingsRow,
-  StaticToggle,
-} from './SettingsControls'
+import { RowButton, SegmentedControl, SettingsCard, SettingsRow, StaticToggle } from '@washi/ui'
 
 export function SettingsGeneralTab() {
   return (

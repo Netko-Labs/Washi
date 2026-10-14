@@ -1,4 +1,4 @@
-import { formatUsd } from '@/components/agent'
+import { usd as formatUsd } from '@washi/ui'
 import { type AgentStatusProps, STATE_DOT, STATE_LABEL, useAgentStatus } from './lib'
 
 /**
@@ -14,14 +14,14 @@ export function AgentStatus({ onOpenAgent, onOpenSettings }: AgentStatusProps) {
     <button
       type="button"
       onClick={needsSettings ? onOpenSettings : onOpenAgent}
-      className="flex min-h-11 w-full flex-col gap-0.5 rounded-lg px-2.5 py-2 text-left hover:bg-accent"
+      className="flex w-full flex-col gap-0.5 rounded-lg px-2 py-1.5 text-left hover:bg-accent"
     >
-      <span className="flex items-center gap-2 text-[13px]">
+      <span className="flex items-center gap-2 text-[12.5px]">
         <span className={`size-2 shrink-0 rounded-full ${STATE_DOT[status.state]}`} />
-        <span className="font-bold">Washi</span>
+        <span className="font-medium">Washi</span>
         <span className="text-muted-foreground">· {STATE_LABEL[status.state]}</span>
       </span>
-      <span className="pl-4 font-mono text-[11px] text-muted-foreground">
+      <span className="pl-4 font-mono text-[10.5px] text-muted-foreground">
         today {formatUsd(status.costUsd)} of ${status.capUsd} · {status.turns}{' '}
         {status.turns === 1 ? 'turn' : 'turns'}
         {status.savedUsd > 0 && ` · saved ${formatUsd(status.savedUsd)}`}

@@ -1,4 +1,4 @@
-import { OPEN_SMILE, SPARKLE_EYES, VAULT_TOPICS } from './lib/vault-topics'
+import { OPEN_SMILE, SPARKLE_EYES, VAULT_TOPICS, type VaultTopic } from './lib/vault-topics'
 
 const INK = '#6B3A1F'
 const PAPER = '#F7EDD6'
@@ -13,7 +13,7 @@ export function VaultIcon({
   size?: number
   className?: string
 }) {
-  const def = VAULT_TOPICS[topic.toLowerCase()] ?? {
+  const def: VaultTopic = VAULT_TOPICS[topic.toLowerCase()] ?? {
     bg: '#DF8552',
     face: (
       <>

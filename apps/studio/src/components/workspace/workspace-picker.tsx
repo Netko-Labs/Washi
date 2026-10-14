@@ -1,3 +1,4 @@
+import { AgentMascot, VaultIcon } from '@washi/ui'
 import { useState } from 'react'
 import { InviteBanner } from '@/components/invite'
 import { signOut, useSession } from '@/integrations/auth'
@@ -27,8 +28,11 @@ export function WorkspacePicker({ onOpen }: { onOpen: (id: string) => void }) {
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-lg flex-col justify-center px-6 py-12">
-      <p className="font-black text-[15px] tracking-[0.18em] uppercase">和紙 washi</p>
-      <h1 className="mt-6 font-black text-3xl tracking-tight">
+      <div className="flex items-center gap-2.5">
+        <AgentMascot state={workspaces.length ? 'idle' : 'suggesting'} size={44} />
+        <p className="font-semibold text-[15px] tracking-[0.18em] uppercase">和紙 washi</p>
+      </div>
+      <h1 className="mt-6 font-semibold text-[26px] tracking-[-0.02em]">
         {workspaces.length ? 'Your workspaces' : 'Make your first workspace'}
       </h1>
       <p className="mt-2 text-[14px] text-muted-foreground leading-relaxed">
@@ -58,11 +62,9 @@ export function WorkspacePicker({ onOpen }: { onOpen: (id: string) => void }) {
                 }}
                 className="flex h-14 w-full items-center gap-3 rounded-xl border border-border bg-card px-4 text-left hover:border-primary"
               >
-                <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-primary/12 font-black text-[13px]">
-                  {workspace.name.slice(0, 1).toUpperCase()}
-                </span>
+                <VaultIcon topic="plain" size={32} className="shrink-0" />
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate font-bold text-[14px]">{workspace.name}</span>
+                  <span className="block truncate font-semibold text-[14px]">{workspace.name}</span>
                   <span className="block text-[12px] text-muted-foreground">{workspace.role}</span>
                 </span>
               </button>
@@ -87,7 +89,7 @@ export function WorkspacePicker({ onOpen }: { onOpen: (id: string) => void }) {
         <button
           type="submit"
           disabled={busy || !name.trim()}
-          className="h-11 shrink-0 rounded-xl bg-primary px-5 font-bold text-[14px] text-primary-foreground disabled:opacity-50"
+          className="h-11 shrink-0 rounded-xl bg-primary px-5 font-semibold text-[14px] text-primary-foreground disabled:opacity-50"
         >
           Create
         </button>

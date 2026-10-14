@@ -1,7 +1,7 @@
 import { IconPlayerPlay, IconTrash } from '@tabler/icons-react'
+import { SettingsCard, SettingsRow, StaticToggle } from '@washi/ui'
 import { useState } from 'react'
 import { deviceTimeZone, type RoutineDraft, routineTime, toMinuteOfDay, useRoutines } from './lib'
-import { SettingsCard, SettingsRow, StaticToggle } from './SettingsControls'
 
 const EMPTY: RoutineDraft = { title: '', prompt: '', time: '07:00' }
 

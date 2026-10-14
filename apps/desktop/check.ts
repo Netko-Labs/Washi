@@ -57,7 +57,7 @@ export default defineCheck(async (app: CheckDriver) => {
   app.step('the agent FAB opens the popover with composer and status header')
   await app.click('[data-agent-fab]')
   await app.waitFor('[data-agent-panel]')
-  await app.expectText('watching this vault')
+  await app.expectText('watching this workspace')
   await app.waitFor('[data-inference]', { timeoutMs: 10_000 })
 
   app.step('clearing the conversation starts a fresh session with the empty chat')
@@ -71,8 +71,9 @@ export default defineCheck(async (app: CheckDriver) => {
 
   app.step('the dashboard reports real turns, not invented ones')
   await app.click('text=Dashboard')
-  await app.expectText('Saved by your plan')
+  // "Saved by your plan" only once a plan turn saved something; a fresh profile has spent nothing.
   await app.expectText('Turns today')
+  await app.expectText('Spent today')
   await app.screenshot('mlp-dashboard')
 
   app.step('the Agents tab says who Washi thinks with')

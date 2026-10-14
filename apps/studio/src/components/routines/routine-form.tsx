@@ -57,7 +57,7 @@ export function RoutineForm({ onCreate }: RoutineFormProps) {
         <button
           type="submit"
           disabled={!ready}
-          className="h-11 rounded-xl bg-primary px-5 font-bold text-[13.5px] text-primary-foreground disabled:opacity-50"
+          className="h-11 rounded-xl bg-primary px-5 font-semibold text-[13.5px] text-primary-foreground disabled:opacity-50"
         >
           Add routine
         </button>

@@ -1,5 +1,11 @@
-import { initials, useViewStore } from '@washi/ui'
-import { DangerButton, RowButton, SettingsCard, SettingsRow } from './SettingsControls'
+import {
+  DangerButton,
+  initials,
+  RowButton,
+  SettingsCard,
+  SettingsRow,
+  useViewStore,
+} from '@washi/ui'
 
 export function SettingsAccountTab() {
   const identity = useViewStore((state) => state.identity)

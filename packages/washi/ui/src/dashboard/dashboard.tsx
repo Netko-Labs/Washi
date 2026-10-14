@@ -36,6 +36,7 @@ export function Dashboard() {
   const pending = today?.pending ?? []
   const recent = sheets.slice(0, 3)
   const firstName = identity.name.trim().split(/\s+/)[0] || 'there'
+  const onPlan = (today?.spend.savedUsd ?? 0) > 0
 
   const openSheet = (id: string) => {
     openTab(`note:${id}`)
@@ -74,9 +75,11 @@ export function Dashboard() {
             </div>
           </div>
           <div className="rounded-[14px] border border-border bg-card px-[18px] py-4">
-            <div className="mb-1.5 text-muted-foreground text-xs">Saved by your plan</div>
+            <div className="mb-1.5 text-muted-foreground text-xs">
+              {onPlan ? 'Saved by your plan' : 'Spent today'}
+            </div>
             <div className="font-mono font-semibold text-[22px] tracking-[-0.02em]">
-              {usd(today?.spend.savedUsd ?? 0)}
+              {usd((onPlan ? today?.spend.savedUsd : today?.spend.costUsd) ?? 0)}
             </div>
           </div>
         </div>

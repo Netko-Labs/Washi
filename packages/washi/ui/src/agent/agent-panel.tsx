@@ -64,7 +64,7 @@ function ApprovalBar() {
 function EmptyChat({ onStarter }: { onStarter: (text: string) => void }) {
   const identity = useViewStore((state) => state.identity)
   const { sheets, activeId } = useSheetsStore()
-  const leaf = sheets.find((sheet) => sheet.id === activeId)?.title ?? 'this vault'
+  const leaf = sheets.find((sheet) => sheet.id === activeId)?.title ?? 'this workspace'
   const firstName = identity.name.trim().split(/\s+/)[0] || 'there'
 
   const starters = [
@@ -149,8 +149,8 @@ export function AgentPanel() {
         data-agent-panel
         className={`fixed z-50 flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-[0_24px_64px_rgb(0_0_0/0.22),0_4px_16px_rgb(0_0_0/0.10)] ${
           chatExpanded
-            ? 'inset-0 m-auto h-[min(680px,calc(100vh-80px))] w-[min(720px,calc(100vw-80px))]'
-            : 'right-6 bottom-[92px] h-[min(620px,calc(100vh-130px))] w-[400px]'
+            ? 'inset-0 m-auto h-[min(680px,calc(100dvh-24px))] w-[calc(100vw-24px)] sm:h-[min(680px,calc(100dvh-80px))] sm:w-[min(720px,calc(100vw-80px))]'
+            : 'inset-x-3 bottom-[84px] h-[min(620px,calc(100dvh-110px))] sm:inset-x-auto sm:right-6 sm:bottom-[92px] sm:h-[min(620px,calc(100dvh-130px))] sm:w-[400px]'
         }`}
       >
         <div className="relative flex h-[50px] shrink-0 items-center gap-0.5 border-border border-b pr-2 pl-3.5">
@@ -165,7 +165,7 @@ export function AgentPanel() {
                 {activeSession?.title ?? 'Washi'}
               </span>
               <span className="block truncate text-[11px] text-muted-foreground">
-                {running ? `editing ${activeSheet?.title ?? 'a page'}` : 'watching this vault'}
+                {running ? `editing ${activeSheet?.title ?? 'a page'}` : 'watching this workspace'}
               </span>
             </span>
             <IconChevronDown className="size-[13px] shrink-0 text-muted-foreground" />
