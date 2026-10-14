@@ -59,3 +59,6 @@ export const REJECTED_PATTERN =
  * `none`; a Console login reports `/login managed key` and bills per token.
  */
 export const PLAN_SOURCES: ReadonlySet<string> = new Set(['none', 'oauth'])
+
+/** A resume token whose session the CLI no longer has — wiped config dir, other machine. */
+export const MISSING_SESSION_PATTERN = /no conversation found with session id/i

@@ -1,11 +1,17 @@
+import { mkdirSync } from 'node:fs'
 import { query } from '@anthropic-ai/claude-agent-sdk'
 import type { AgentUpdate, TurnBilling } from '@washi/domain'
 import { type ModelCatalogue, priceTurn } from '@washi/models'
 import type { Workspace } from '@washi/repository'
-import { agentEnv, MAX_PLAN_TURN_BUDGET_USD, MAX_TURN_BUDGET_USD } from '../lib'
+import { agentEnv, MAX_PLAN_TURN_BUDGET_USD, MAX_TURN_BUDGET_USD, sessionConfigDir } from '../lib'
 import { normalizeMessage } from '../normalize'
 import { createWashiTools } from '../tools'
-import { DISALLOWED_BUILTINS, PLAN_SOURCES, REJECTED_PATTERN } from './constants'
+import {
+  DISALLOWED_BUILTINS,
+  MISSING_SESSION_PATTERN,
+  PLAN_SOURCES,
+  REJECTED_PATTERN,
+} from './constants'
 import type { AgentPort, PromptRequest, ToolVerdict, TurnResult } from './types'
 import { createUsageTally } from './usage'
 
@@ -60,71 +66,84 @@ export function createClaudeSdkPort(deps: ClaudeSdkPortDeps): AgentPort {
       let costUsd: number | null = null
       let error: string | undefined
       const usage = createUsageTally()
+      const configDir = local ? null : sessionConfigDir(deps.ws.sqlite.filename)
+      if (configDir) mkdirSync(configDir, { recursive: true })
 
-      const stream = query({
-        prompt: request.text,
-        options: {
-          abortController: abort,
-          resume: request.resumeToken ?? undefined,
-          model: request.model.model,
-          pathToClaudeCodeExecutable: local ? credential.executable : undefined,
-          mcpServers: {
-            washi: createWashiTools(deps.ws, {
-              runHankoAction: deps.runHankoAction,
-              openSheet: deps.openSheet,
-            }),
+      const run = async (resume: string | null) => {
+        const stream = query({
+          prompt: request.text,
+          options: {
+            abortController: abort,
+            resume: resume ?? undefined,
+            model: request.model.model,
+            pathToClaudeCodeExecutable: local ? credential.executable : undefined,
+            mcpServers: {
+              washi: createWashiTools(deps.ws, {
+                runHankoAction: deps.runHankoAction,
+                openSheet: deps.openSheet,
+              }),
+            },
+            strictMcpConfig: true,
+            // Stream events carry usage from a response's first byte, which is what
+            // prices a turn stopped mid-generation.
+            includePartialMessages: true,
+            tools: [],
+            disallowedTools: DISALLOWED_BUILTINS,
+            settingSources: [],
+            // Notional on a plan, so a far higher ceiling — but never none: the probe
+            // that said "plan" can be a minute stale.
+            maxBudgetUsd: onPlan ? MAX_PLAN_TURN_BUDGET_USD : MAX_TURN_BUDGET_USD,
+            // Replaces the subprocess env rather than merging — see agentEnv. A
+            // local CLI gets no key at all, so it authenticates as its own login.
+            env: agentEnv(local ? null : credential.apiKey, configDir),
+            systemPrompt: deps.instructions,
+            canUseTool: async (toolName, input) =>
+              deps.canUseTool(request.sessionId, toolName, input),
           },
-          strictMcpConfig: true,
-          // Stream events carry usage from a response's first byte, which is what
-          // prices a turn stopped mid-generation.
-          includePartialMessages: true,
-          tools: [],
-          disallowedTools: DISALLOWED_BUILTINS,
-          settingSources: [],
-          // Notional on a plan, so a far higher ceiling — but never none: the probe
-          // that said "plan" can be a minute stale.
-          maxBudgetUsd: onPlan ? MAX_PLAN_TURN_BUDGET_USD : MAX_TURN_BUDGET_USD,
-          // Replaces the subprocess env rather than merging — see agentEnv. A
-          // local CLI gets no key at all, so it authenticates as its own login.
-          env: agentEnv(local ? null : credential.apiKey),
-          systemPrompt: deps.instructions,
-          canUseTool: async (toolName, input) =>
-            deps.canUseTool(request.sessionId, toolName, input),
-        },
-      })
+        })
 
-      try {
-        for await (const message of stream) {
-          if (message.type === 'system' && message.subtype === 'init') {
-            resumeToken = message.session_id
-            model = message.model
-            // Both must agree: the probe saw a subscription, and no key is in play.
-            if (onPlan && PLAN_SOURCES.has(message.apiKeySource)) billing = 'plan'
-            continue
-          }
-          if (message.type === 'stream_event') {
-            if (message.event.type === 'message_start') {
-              usage.started(message.event.message.id, message.event.message.usage)
-            } else if (message.event.type === 'message_delta') {
-              usage.delta(message.event.usage)
-            }
-            continue
-          }
-          if (message.type === 'assistant') {
-            usage.completed(message.message.id, message.message.usage)
-          }
-          for (const update of normalizeMessage(message)) {
-            if (update.kind === 'turn_done') {
-              costUsd = update.costUsd ?? null
-              if (update.stopReason === 'error') error = update.error ?? 'the turn failed'
+        try {
+          for await (const message of stream) {
+            if (message.type === 'system' && message.subtype === 'init') {
+              resumeToken = message.session_id
+              model = message.model
+              // Both must agree: the probe saw a subscription, and no key is in play.
+              if (onPlan && PLAN_SOURCES.has(message.apiKeySource)) billing = 'plan'
               continue
             }
-            emit(update)
+            if (message.type === 'stream_event') {
+              if (message.event.type === 'message_start') {
+                usage.started(message.event.message.id, message.event.message.usage)
+              } else if (message.event.type === 'message_delta') {
+                usage.delta(message.event.usage)
+              }
+              continue
+            }
+            if (message.type === 'assistant') {
+              usage.completed(message.message.id, message.message.usage)
+            }
+            for (const update of normalizeMessage(message)) {
+              if (update.kind === 'turn_done') {
+                costUsd = update.costUsd ?? null
+                if (update.stopReason === 'error') error = update.error ?? 'the turn failed'
+                continue
+              }
+              emit(update)
+            }
           }
+        } catch (cause) {
+          // The SDK throws on an error result rather than yielding it; it is still a turn.
+          error = cause instanceof Error ? cause.message : String(cause)
         }
-      } catch (cause) {
-        // The SDK throws on an error result rather than yielding it; it is still a turn.
-        error = cause instanceof Error ? cause.message : String(cause)
+      }
+
+      await run(request.resumeToken ?? null)
+      // The session fails before any message, so nothing ran twice: start over, and
+      // lose the history rather than the turn.
+      if (request.resumeToken && error && MISSING_SESSION_PATTERN.test(error)) {
+        error = undefined
+        resumeToken = null
+        await run(null)
       }
 
       if (abort.signal.aborted) {
