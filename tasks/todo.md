@@ -7,11 +7,31 @@ studio only. Mobbin: Notion sidebar + cover/icon header, AirOps trash, Dropbox D
       cascades to the subtree, Trash (list · restore · purge · empty), agent files by parent;
       switcher drops "All workspaces"
 - [x] 2 · sidebar tree (expand, + sub-page, drag to reorder/nest), breadcrumbs, `/trash`
-- [ ] 3 · page chrome: icon picker, cover, inline title, full width, ⋯ menu (duplicate · move
+- [x] 3 · page chrome: icon picker, cover, inline title, full width, ⋯ menu (duplicate · move
       to · copy link · delete)
-- [ ] 4 · type into pages: block editor over WSX — text-like primitives editable, the rest
+- [x] 4 · type into pages: block editor over WSX — text-like primitives editable, the rest
       stay agent-made
-- [ ] 5 · comments + @mentions, mentions land in Inbox
+- [x] 5 · comments + @mentions, mentions land in Inbox
+
+Log (one line per merged PR; every round fixed, merged only on a clean round):
+
+- #20 `d7307cb` nesting + Trash data. Bot: 1 low (subtree trash not atomic) → one transaction each
+  for delete/restore/purge, rollback test.
+- #21 `b9a2589` sidebar tree, drag, breadcrumbs, `/trash`. Bot: 2 low (unhandled failed move,
+  stale drop line) → fixed. Closed itself when #20's branch was deleted — see lessons.
+- #22 `71a5713` icon, cover, full width, ⋯ menu. Bot: no findings.
+- #23 `ced6225` block editor over WSX; `serialize` escapes typed text. Bot: 2 low (multi-run text
+  spacing → locked; labels → values).
+- #24 `79de3be` comments + @mentions in the Inbox. Bot: medium (Enter mid-IME sends — also split
+  editor blocks) + 2 low (double send, unread count capped at 50) → fixed.
+
+Follow-ups worth doing (not started):
+
+- Push mentions/comments over `/trpc-ws` instead of the 30s poll; notify thread participants.
+- Inline marks in the editor (bold, `@page` links via `Ref`); comments anchored to blocks.
+- Duplicate with sub-pages; Trash auto-purge after N days; custom cover images (needs storage).
+- `sheet_move` agent tool (CHANGE_TOOL) so Washi can file existing pages.
+
 
 # Workspace switcher (2026-10-14) — switch organizations without leaving the page
 
