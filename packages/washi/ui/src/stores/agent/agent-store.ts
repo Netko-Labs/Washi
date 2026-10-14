@@ -13,6 +13,8 @@ interface AgentState {
   activeSessionId: string | null
   transcript: TranscriptEntry[]
   approvals: ApprovalRequest[]
+  /** Null until the workspace says; changes skip the desk while true. */
+  autoApprove: boolean | null
   running: boolean
   panelOpen: boolean
   togglePanel: () => void
@@ -67,6 +69,7 @@ export const useAgentStore = create<AgentState>((set, get) => ({
   activeSessionId: null,
   transcript: [],
   approvals: [],
+  autoApprove: null,
   running: false,
   panelOpen: false,
   togglePanel: () => set((state) => ({ panelOpen: !state.panelOpen })),
@@ -119,13 +122,15 @@ export const useAgentStore = create<AgentState>((set, get) => ({
       subscriptions.push(agentUpdates, approvalRequests, openSheetRequests)
     }
     const issued = generation
-    const [sessions, pending] = await Promise.all([
+    const [sessions, pending, auto] = await Promise.all([
       api.agents.listSessions.query(),
       api.agents.pendingApprovals.query(),
+      api.agents.autoApprove.query(),
     ])
     if (issued !== generation) return
     set((state) => ({
       sessions,
+      autoApprove: auto.on,
       approvals: [
         ...state.approvals,
         ...pending.filter((request) => !state.approvals.some((a) => a.id === request.id)),
@@ -192,7 +197,7 @@ export const useAgentStore = create<AgentState>((set, get) => ({
 
   setAutoApprove: async (on) => {
     const state = await api.agents.setAutoApprove.mutate({ on })
-    set({ approvals: await api.agents.pendingApprovals.query() })
+    set({ autoApprove: state.on, approvals: await api.agents.pendingApprovals.query() })
     return state.on
   },
 
@@ -202,6 +207,13 @@ export const useAgentStore = create<AgentState>((set, get) => ({
     subscriptions = null
     initializing = null
     generation += 1
-    set({ sessions: [], activeSessionId: null, transcript: [], approvals: [], running: false })
+    set({
+      sessions: [],
+      activeSessionId: null,
+      transcript: [],
+      approvals: [],
+      autoApprove: null,
+      running: false,
+    })
   },
 }))

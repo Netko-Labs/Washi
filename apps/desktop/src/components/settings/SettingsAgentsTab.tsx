@@ -43,6 +43,8 @@ export function SettingsAgentsTab() {
   const localModel = LOCAL_MODEL_LABELS.find((entry) => entry.value === inference.localModel)
   return (
     <div className="flex flex-col gap-[22px]">
+      <AutoApproveRow />
+
       <SettingsCard>
         <SettingsRow title="Claude Code on this computer" sub={cliLine(inference.localCli)} mono>
           <InUse on={inference.active === 'local_cli'} />
@@ -83,8 +85,6 @@ export function SettingsAgentsTab() {
           />
         </SettingsRow>
       </SettingsCard>
-
-      <AutoApproveRow />
 
       {inference.missing && (
         <p className="rounded-[14px] border border-amber-300 bg-amber-50 px-[18px] py-3 text-[13px] text-amber-900 leading-relaxed">
