@@ -10,7 +10,7 @@ import {
 import { useEffect, useRef, useState } from 'react'
 import { ApprovalCard } from '../approval'
 import { AgentMascot } from '../mascot'
-import { mascotStateFor, useAgentStore, useSheetsStore, useViewStore } from '../stores'
+import { mascotStateFor, noteIdOf, useAgentStore, useSheetsStore, useViewStore } from '../stores'
 import { AgentComposer } from './agent-composer'
 import { TranscriptView } from './transcript-view'
 
@@ -34,8 +34,9 @@ function ApprovalBar() {
 
 function EmptyChat({ onStarter }: { onStarter: (text: string) => void }) {
   const identity = useViewStore((state) => state.identity)
-  const { sheets, activeId } = useSheetsStore()
-  const leaf = sheets.find((sheet) => sheet.id === activeId)?.title ?? 'this workspace'
+  const sheets = useSheetsStore((state) => state.sheets)
+  const pageId = useViewStore((state) => noteIdOf(state.activeTab))
+  const leaf = sheets.find((sheet) => sheet.id === pageId)?.title ?? 'this workspace'
   const firstName = identity.name.trim().split(/\s+/)[0] || 'there'
 
   const starters = [
@@ -86,7 +87,8 @@ export function AgentPanel() {
     chatExpanded,
     toggleExpanded,
   } = useAgentStore()
-  const { sheets, activeId } = useSheetsStore()
+  const sheets = useSheetsStore((state) => state.sheets)
+  const pageId = useViewStore((state) => noteIdOf(state.activeTab))
   const [convosOpen, setConvosOpen] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
 
@@ -98,7 +100,7 @@ export function AgentPanel() {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight })
   }, [transcript.length])
 
-  const activeSheet = sheets.find((sheet) => sheet.id === activeId)
+  const activeSheet = sheets.find((sheet) => sheet.id === pageId)
   const mascotState = mascotStateFor(transcript, running, approvals)
   const activeSession = sessions.find((session) => session.id === activeSessionId)
 

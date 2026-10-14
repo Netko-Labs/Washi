@@ -18,9 +18,8 @@ export function useWorkspaceBoot(workspaceId: string) {
   useEffect(() => {
     void useSheetsStore.getState().refresh()
     void useAgentStore.getState().init()
-    return () => {
-      useAgentStore.getState().reset()
-      useSheetsStore.getState().reset()
-    }
+    // Only the subscriptions need closing; resetting state is the loader's job, and doing it
+    // here as well would wipe what the next workspace's loader already set.
+    return () => useAgentStore.getState().reset()
   }, [workspaceId])
 }
