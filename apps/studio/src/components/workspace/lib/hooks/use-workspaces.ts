@@ -4,9 +4,9 @@ import { api, setActiveWorkspace } from '@/integrations/trpc'
 import type { WorkspaceSummary } from '@/lib/types'
 
 /** A workspace is an organization, so this is Better Auth's list plus a create. */
-export function useWorkspaces() {
-  const [workspaces, setWorkspaces] = useState<WorkspaceSummary[]>([])
-  const [loading, setLoading] = useState(true)
+export function useWorkspaces(initial?: WorkspaceSummary[]) {
+  const [workspaces, setWorkspaces] = useState<WorkspaceSummary[]>(initial ?? [])
+  const [loading, setLoading] = useState(!initial)
   const [error, setError] = useState<string | null>(null)
 
   const refresh = useCallback(async () => {

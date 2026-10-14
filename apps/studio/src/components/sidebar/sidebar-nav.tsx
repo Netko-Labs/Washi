@@ -1,4 +1,5 @@
-import { useAgentStore, useViewStore } from '@washi/ui'
+import { IconSearch } from '@tabler/icons-react'
+import { useAgentStore, useSheetsStore, useViewStore } from '@washi/ui'
 import { pathFor } from '@/components/shell'
 import { NAV, openInPlace, type SidebarSectionProps } from './lib'
 
@@ -7,7 +8,19 @@ export function SidebarNav({ workspaceId, onNavigate }: SidebarSectionProps) {
   const activeTab = useViewStore((state) => state.activeTab)
 
   return (
-    <nav className="space-y-px px-2 pt-2">
+    <nav className="space-y-px px-2 pt-1">
+      <button
+        type="button"
+        onClick={() => {
+          useSheetsStore.getState().openPalette()
+          onNavigate()
+        }}
+        className="flex h-9 w-full items-center gap-2 rounded-lg px-2 text-[13px] text-muted-foreground hover:bg-accent md:h-[30px]"
+      >
+        <IconSearch className="size-[15px]" />
+        <span className="flex-1 text-left">Search</span>
+        <kbd className="hidden font-sans text-[11px] text-muted-foreground/70 md:inline">⌘K</kbd>
+      </button>
       {NAV.map(({ tab, label, icon: Icon }) => (
         <a
           key={tab}

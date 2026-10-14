@@ -5,8 +5,9 @@ const route = getRouteApi('/w/$workspaceId')
 
 export function WorkspaceLayout() {
   const { workspace } = route.useLoaderData()
+  // A switch keeps the route matched, so without a fresh shell no route effect reruns.
   return (
-    <WorkspaceShell workspace={workspace}>
+    <WorkspaceShell key={workspace.id} workspace={workspace}>
       <Outlet />
     </WorkspaceShell>
   )
