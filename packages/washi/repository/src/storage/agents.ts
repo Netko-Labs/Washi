@@ -136,3 +136,10 @@ export function expirePendingApprovals(ws: Workspace): number {
     .run(ws.now())
   return result.changes
 }
+
+/** A turn cannot outlive its process: anything still `running` at boot was cut off mid-way. */
+export function failInterruptedSessions(ws: Workspace): number {
+  return ws.sqlite
+    .query("UPDATE agent_sessions SET status = 'error' WHERE status = 'running'")
+    .run().changes
+}

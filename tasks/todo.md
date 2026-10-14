@@ -1,3 +1,18 @@
+# Overnight UX loop (2026-10-14) — PR per item, code-whiskers until clean, then merge
+
+Juan asleep; autopilot (push → PR → bot review → fix every finding → squash-merge → verify deploy).
+Inspiration: Mobbin web references — Notion, Fibery, Obvious, Copilot, Grok (docked AI was declined:
+the agent stays a floating popover).
+
+- [ ] 1 · safety: two-step page delete (both sidebars) · invalid WSX → 400 not 500 · sessions left
+      `running` by a killed process → `error` at boot
+- [ ] 2 · sidebar: Recent + Favorites (per person, browser storage — no backend), star in header
+- [ ] 3 · page polish: loading state, real "page not found" for dead links, "edited X ago"
+- [ ] 4 · dashboard: an empty workspace gets starter prompts, not zeros
+- [ ] 5 · verify washi.netko.dev serves the last merge; log what shipped
+
+Log (one line per merged PR):
+
 # Studio rev 2 — one UI package, the web catches up (2026-10-14)
 
 Why: the studio is a design generation behind the desktop — no mascot (WSX `<Mascot>` renders

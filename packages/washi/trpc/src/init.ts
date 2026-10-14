@@ -1,6 +1,6 @@
 import { initTRPC, TRPCError } from '@trpc/server'
 import type { Workspace } from '@washi/repository'
-import type { AgentHost } from '@washi/service'
+import { type AgentHost, SheetValidationError } from '@washi/service'
 import type { EventBus } from './shared/events'
 
 /**
@@ -111,22 +111,35 @@ export const publicProcedure = t.procedure
  * Every procedure that touches content. Resolving here is what keeps
  * `repository` and `service` free of requests, users and networks (C3).
  */
-export const workspaceProcedure = t.procedure.use(async ({ ctx, next }) => {
-  if (ctx.mode === 'hosted' && !ctx.actorId) {
-    throw new TRPCError({ code: 'UNAUTHORIZED', message: 'sign in to open a workspace' })
-  }
-
-  // NOT_FOUND rather than FORBIDDEN on purpose: a non-member learns nothing
-  // about whether a workspace exists.
-  const allowed = await ctx.runtime.control.authorize(ctx.actorId, ctx.workspaceId)
-  if (!allowed) {
-    throw new TRPCError({ code: 'NOT_FOUND', message: `unknown workspace "${ctx.workspaceId}"` })
-  }
-
-  // Membership above is the only unknown-workspace answer; a throw here is a
-  // failed open (disk, sqlite) and surfaces as INTERNAL_SERVER_ERROR.
-  const resolved = ctx.runtime.resolve(ctx.workspaceId)
-  return next({
-    ctx: { ...ctx, ws: resolved.workspace, host: resolved.host },
+export const workspaceProcedure = t.procedure
+  .use(async ({ next }) => {
+    // A page the validator refused is the caller's mistake, not the server's: 400, not 500.
+    const result = await next()
+    if (!result.ok && result.error.cause instanceof SheetValidationError) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: result.error.cause.message,
+        cause: result.error.cause,
+      })
+    }
+    return result
   })
-})
+  .use(async ({ ctx, next }) => {
+    if (ctx.mode === 'hosted' && !ctx.actorId) {
+      throw new TRPCError({ code: 'UNAUTHORIZED', message: 'sign in to open a workspace' })
+    }
+
+    // NOT_FOUND rather than FORBIDDEN on purpose: a non-member learns nothing
+    // about whether a workspace exists.
+    const allowed = await ctx.runtime.control.authorize(ctx.actorId, ctx.workspaceId)
+    if (!allowed) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: `unknown workspace "${ctx.workspaceId}"` })
+    }
+
+    // Membership above is the only unknown-workspace answer; a throw here is a
+    // failed open (disk, sqlite) and surfaces as INTERNAL_SERVER_ERROR.
+    const resolved = ctx.runtime.resolve(ctx.workspaceId)
+    return next({
+      ctx: { ...ctx, ws: resolved.workspace, host: resolved.host },
+    })
+  })

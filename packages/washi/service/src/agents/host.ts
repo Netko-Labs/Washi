@@ -3,6 +3,7 @@ import { createModelCatalogue, type ModelCatalogue } from '@washi/models'
 import {
   appendTurn,
   expirePendingApprovals,
+  failInterruptedSessions,
   getSdkSessionId,
   getSheet,
   getTranscript,
@@ -62,6 +63,7 @@ export class AgentHost {
       canStart: () => this.budget.refusal() === null,
     })
     expirePendingApprovals(ws)
+    failInterruptedSessions(ws)
 
     const runHankoAction = (action: unknown) => this.desk.execute(action)
     const openSheet = (id: string) => this.events?.openSheet(id)

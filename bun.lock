@@ -237,6 +237,7 @@
         "@washi/trpc": "workspace:*",
       },
       "devDependencies": {
+        "@trpc/server": "^11",
         "@types/bun": "latest",
         "@washi/typescript-config": "workspace:*",
       },

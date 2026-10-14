@@ -3,6 +3,7 @@ export {
   createApproval,
   createSession,
   expirePendingApprovals,
+  failInterruptedSessions,
   getSdkSessionId,
   getTranscript,
   listSessions,
