@@ -9,9 +9,13 @@ export const useMentionsStore = create<MentionsState>((set, get) => ({
   refreshCount: async () => {
     set({ unread: await api.comments.unreadMentions.query() })
   },
+  // The list stops at 50; the count comes from the server so it never stops with it.
   refresh: async () => {
-    const items = await api.comments.mentions.query()
-    set({ items, unread: items.filter((item) => !item.isRead).length })
+    const [items, unread] = await Promise.all([
+      api.comments.mentions.query(),
+      api.comments.unreadMentions.query(),
+    ])
+    set({ items, unread })
   },
   markRead: async (target) => {
     await api.comments.markRead.mutate(target)
