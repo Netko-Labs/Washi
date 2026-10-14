@@ -29,7 +29,10 @@ export function useRowDrag(sheet: SheetSummary) {
       },
       onDragOver: (event: DragEvent<HTMLElement>) => {
         const target = placementAt(event)
-        if (!target) return
+        if (!target) {
+          useTreeStore.getState().clearHover()
+          return
+        }
         event.preventDefault()
         event.dataTransfer.dropEffect = 'move'
         useTreeStore.getState().hover(sheet.id, target.zone)
@@ -40,7 +43,10 @@ export function useRowDrag(sheet: SheetSummary) {
         useTreeStore.getState().endDrag()
         if (!target) return
         if (target.zone === 'inside') useTreeStore.getState().expand([sheet.id])
-        void useSheetsStore.getState().moveSheet(target.draggingId, target.placement)
+        useSheetsStore
+          .getState()
+          .moveSheet(target.draggingId, target.placement)
+          .catch(() => useTreeStore.getState().report('That move did not save — the page is back.'))
       },
       onDragEnd: () => useTreeStore.getState().endDrag(),
     },
