@@ -12,6 +12,7 @@ export const sheetSummarySchema = z.object({
   editedBy: z.enum(['washi']).nullable(),
   /** Washi's last write can be taken back: nobody has written the page since. */
   undoable: z.boolean(),
+  rowOf: z.string().nullable(),
   hlcUpdated: z.string(),
 })
 export type SheetSummary = z.infer<typeof sheetSummarySchema>

@@ -3,6 +3,7 @@ import type { Workspace } from '@washi/repository'
 import {
   type AgentHost,
   CommentError,
+  InkError,
   SheetMoveError,
   SheetUndoError,
   SheetValidationError,
@@ -127,6 +128,7 @@ export const workspaceProcedure = t.procedure
       (result.error.cause instanceof SheetValidationError ||
         result.error.cause instanceof SheetMoveError ||
         result.error.cause instanceof SheetUndoError ||
+        result.error.cause instanceof InkError ||
         result.error.cause instanceof CommentError)
     ) {
       throw new TRPCError({

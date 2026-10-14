@@ -25,6 +25,13 @@ export const paperHost: PaperHost = {
       useViewStore.getState().openTab(`note:${id}`),
     ),
 
+  openRow: (recordId) =>
+    void api.tables.openRow.mutate({ recordId }).then(async ({ sheetId }) => {
+      const { useSheetsStore, useViewStore } = await import('../stores')
+      await useSheetsStore.getState().refresh()
+      useViewStore.getState().openTab(`note:${sheetId}`)
+    }),
+
   toggleTask: async (recordId, done) => {
     await api.tables.toggleTask.mutate({ recordId, done })
   },

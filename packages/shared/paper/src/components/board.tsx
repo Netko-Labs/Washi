@@ -138,8 +138,10 @@ export function Board({
     }
   }
 
+  const openable = Boolean(onOpen ?? host.openRow)
   const open = (row: Row) => {
     if (onOpen) void run(resolveRowDeep(onOpen as never, row) as never)
+    else if (typeof row.id === 'string') host.openRow?.(row.id)
   }
 
   const over = (event: DragEvent, next: DropTarget) => {
@@ -196,8 +198,8 @@ export function Board({
                     }}
                     onClick={() => open(row)}
                     onKeyDown={(event) => event.key === 'Enter' && open(row)}
-                    tabIndex={onOpen ? 0 : undefined}
-                    data-openable={onOpen ? '' : undefined}
+                    tabIndex={openable ? 0 : undefined}
+                    data-openable={openable ? '' : undefined}
                   >
                     {kicker && <div className="wsx-board-card-kicker">{cell(row[kicker])}</div>}
                     <div className="wsx-board-card-title">{cell(row[title] ?? row.id)}</div>

@@ -22,7 +22,7 @@ export function SidebarPages() {
         </>
       )}
       <div className={HEADING}>Pages</div>
-      {byRecent(sheets).map((sheet) => (
+      {byRecent(sheets.filter((sheet) => sheet.rowOf === null)).map((sheet) => (
         <SidebarPageRow key={sheet.id} sheet={sheet} />
       ))}
       <button

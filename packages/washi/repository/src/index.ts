@@ -62,6 +62,7 @@ export {
 export {
   createSheet,
   deleteSheet,
+  findRowSheet,
   getBacklinks,
   getSheet,
   indexSheet,

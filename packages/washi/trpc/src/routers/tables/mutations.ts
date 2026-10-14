@@ -1,5 +1,5 @@
 import { mutationSchema, tableSpecSchema } from '@washi/ink'
-import { defineUserTable, runMutation, toggleTaskRecord } from '@washi/service'
+import { defineUserTable, openRowPage, runMutation, toggleTaskRecord } from '@washi/service'
 import { z } from 'zod'
 import { router, workspaceProcedure } from '../../init'
 
@@ -10,6 +10,10 @@ export const tableMutations = router({
   mutate: workspaceProcedure
     .input(z.object({ mutation: mutationSchema }))
     .mutation(({ ctx, input }) => runMutation(ctx.ws, input.mutation)),
+  /** Notion's "open as page": the row's page, made on first open. */
+  openRow: workspaceProcedure
+    .input(z.object({ recordId: z.string() }))
+    .mutation(({ ctx, input }) => ({ sheetId: openRowPage(ctx.ws, input.recordId) })),
   toggleTask: workspaceProcedure
     .input(z.object({ recordId: z.string(), done: z.boolean() }))
     .mutation(({ ctx, input }) => {

@@ -28,6 +28,14 @@
   border-bottom: 1px solid var(--border);
   vertical-align: top;
 }
+.wsx-table tr[data-openable] {
+  cursor: pointer;
+}
+
+.wsx-table tr[data-openable]:hover td {
+  background: var(--muted-bg);
+}
+
 .wsx-table tr:last-child td {
   border-bottom: 0;
 }

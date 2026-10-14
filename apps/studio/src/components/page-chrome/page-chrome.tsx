@@ -2,6 +2,7 @@ import { IconMessageCircle, IconMoodSmile, IconPhoto } from '@tabler/icons-react
 import { SheetIcon, useSheetsStore } from '@washi/ui'
 import { useState } from 'react'
 import { useCommentsStore } from '@/components/comments'
+import { RowProperties } from '@/components/row-properties'
 import { CoverPicker } from './cover-picker'
 import { IconPicker } from './icon-picker'
 import { type ChromePicker, COVERS, type PageChromeProps } from './lib'
@@ -75,6 +76,7 @@ export function PageChrome({ pageId }: PageChromeProps) {
             </button>
           </div>
         )}
+        {sheet.rowOf && <RowProperties sheetId={sheet.id} />}
         {picker === 'icon' && (
           <IconPicker
             current={sheet.icon}
