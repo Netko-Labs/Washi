@@ -1,31 +1,68 @@
 import { z } from 'zod'
 
-export const columnTypeSchema = z.enum(['text', 'number', 'boolean', 'date', 'select'])
+/** Notion's property kinds. Array-valued: `multi_select`, `relation` (record ids). */
+export const columnTypeSchema = z.enum([
+  'text',
+  'number',
+  'boolean',
+  'date',
+  'select',
+  'status',
+  'multi_select',
+  'person',
+  'url',
+  'relation',
+])
 export type ColumnType = z.infer<typeof columnTypeSchema>
 
-export const columnSpecSchema = z.object({
-  name: z
+const identifier = (what: string) =>
+  z
     .string()
     .min(1)
     .max(64)
-    .regex(/^[a-z][a-z0-9_]*$/, 'column names are snake_case identifiers'),
-  type: columnTypeSchema,
-  options: z.array(z.string().min(1)).max(64).optional(),
+    .regex(/^[a-z][a-z0-9_]*$/, `${what} names are snake_case identifiers`)
+
+const optionList = z.array(z.string().min(1).max(64)).max(64)
+
+/** A status's options fall into Notion's three groups; `done` is what history counts as shipped. */
+export const statusGroupsSchema = z.object({
+  todo: optionList.min(1),
+  doing: optionList,
+  done: optionList.min(1),
 })
+export type StatusGroups = z.infer<typeof statusGroupsSchema>
+
+export const columnSpecSchema = z
+  .object({
+    name: identifier('column'),
+    type: columnTypeSchema,
+    options: optionList.optional(),
+    groups: statusGroupsSchema.optional(),
+    /** The table a `relation` points at. */
+    table: identifier('table').optional(),
+  })
+  .superRefine((column, ctx) => {
+    // Stored specs are re-parsed on every read: a rule added here must not orphan an old table.
+    const needs = (key: 'groups' | 'table') =>
+      column[key] === undefined &&
+      ctx.addIssue({ code: 'custom', path: [key], message: `a ${column.type} column needs ${key}` })
+    if (column.type === 'status') needs('groups')
+    if (column.type === 'relation') needs('table')
+  })
 export type ColumnSpec = z.infer<typeof columnSpecSchema>
 
 export const tableSpecSchema = z.object({
-  name: z
-    .string()
-    .min(1)
-    .max(64)
-    .regex(/^[a-z][a-z0-9_]*$/, 'table names are snake_case identifiers'),
+  name: identifier('table'),
   columns: z.array(columnSpecSchema).min(1).max(64),
 })
 export type TableSpec = z.infer<typeof tableSpecSchema>
 
 export const scalarSchema = z.union([z.string(), z.number(), z.boolean(), z.null()])
 export type Scalar = z.infer<typeof scalarSchema>
+
+/** A cell: a scalar, or the list a `multi_select` or `relation` holds. */
+export const cellSchema = z.union([scalarSchema, z.array(z.string().min(1).max(200)).max(100)])
+export type Cell = z.infer<typeof cellSchema>
 
 export const filterOpSchema = z.enum(['eq', 'ne', 'gt', 'gte', 'lt', 'lte', 'contains', 'in'])
 export type FilterOp = z.infer<typeof filterOpSchema>
@@ -59,7 +96,7 @@ export const querySchema = z.object({
 })
 export type InkQuery = z.infer<typeof querySchema>
 
-export const recordDataSchema = z.record(z.string(), scalarSchema)
+export const recordDataSchema = z.record(z.string(), cellSchema)
 export type RecordData = z.infer<typeof recordDataSchema>
 
 export const mutationSchema = z.discriminatedUnion('kind', [
@@ -78,7 +115,7 @@ export const mutationSchema = z.discriminatedUnion('kind', [
 ])
 export type InkMutation = z.infer<typeof mutationSchema>
 
-export type QueryRow = Record<string, Scalar>
+export type QueryRow = Record<string, Cell>
 
 export interface QueryResult {
   rows: QueryRow[]

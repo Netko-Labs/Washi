@@ -1,4 +1,5 @@
 import { createSdkMcpServer, tool } from '@anthropic-ai/claude-agent-sdk'
+import { tableSpecSchema } from '@washi/ink'
 import {
   getAppMeta,
   getBacklinks,
@@ -97,19 +98,8 @@ export function createWashiTools(ws: Workspace, context: ToolContext) {
       ),
       tool(
         'db_define',
-        'Create or update a table definition (snake_case name, typed columns).',
-        {
-          spec: z.object({
-            name: z.string(),
-            columns: z.array(
-              z.object({
-                name: z.string(),
-                type: z.enum(['text', 'number', 'boolean', 'date', 'select']),
-                options: z.array(z.string()).optional(),
-              }),
-            ),
-          }),
-        },
+        'Create or update a table — a database of rows, Notion-style. snake_case names. Column types: text, number, boolean, date (ISO, or start/end), select + options, multi_select + options, status + groups {todo, doing, done}, person (member id), url, relation + table (holds record ids).',
+        { spec: tableSpecSchema },
         async ({ spec }) => text(defineUserTable(ws, spec)),
       ),
       tool(

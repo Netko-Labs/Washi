@@ -1,5 +1,7 @@
 import type { UserTable } from '@washi/domain'
 import {
+  ARRAY_COLUMN_TYPES,
+  type Filter,
   type InkMutation,
   type InkQuery,
   type QueryResult,
@@ -36,7 +38,45 @@ function requireTable(ws: Workspace, name: string): UserTable {
 
 export function defineUserTable(ws: Workspace, input: unknown): UserTable {
   const spec: TableSpec = tableSpecSchema.parse(input)
+  for (const column of spec.columns) {
+    if (column.table && column.table !== spec.name && !getTableByName(ws, column.table)) {
+      throw new InkError(`${column.name}: relation to unknown table "${column.table}"`)
+    }
+  }
   return defineTable(ws, spec)
+}
+
+const LIST_OPS: ReadonlySet<Filter['op']> = new Set(['eq', 'ne', 'contains', 'in'])
+
+/** Lists answer membership only, and a row can sit in several groups, so none of them group. */
+function checkListUse(spec: TableSpec, filters: Filter[], groupColumn?: string): void {
+  const lists = new Set(
+    spec.columns.filter((column) => ARRAY_COLUMN_TYPES.has(column.type)).map((c) => c.name),
+  )
+  const misuse = filters.find((filter) => lists.has(filter.column) && !LIST_OPS.has(filter.op))
+  if (misuse) throw new InkError(`"${misuse.op}" does not apply to the list "${misuse.column}"`)
+  if (groupColumn && lists.has(groupColumn)) {
+    throw new InkError(`cannot group by the list "${groupColumn}"`)
+  }
+}
+
+/** Every id a relation cell names must be a live record of the table it points at. */
+function checkRelations(ws: Workspace, spec: TableSpec, data: RecordData): void {
+  for (const column of spec.columns) {
+    const ids = data[column.name]
+    if (column.type !== 'relation' || !Array.isArray(ids) || !column.table) continue
+    const target = requireTable(ws, column.table)
+    const stray = ids.find((id) => findRecordTableId(ws, id) !== target.id)
+    if (stray) throw new InkError(`${column.name}: no record "${stray}" in "${column.table}"`)
+  }
+}
+
+function checkData(ws: Workspace, spec: TableSpec, data: RecordData): void {
+  const issues = validateRecord(spec, data)
+  if (issues.length > 0) {
+    throw new InkError(issues.map((issue) => `${issue.path}: ${issue.message}`).join('; '))
+  }
+  checkRelations(ws, spec, data)
 }
 
 export function runQuery(ws: Workspace, query: InkQuery): QueryResult {
@@ -53,6 +93,7 @@ export function runQuery(ws: Workspace, query: InkQuery): QueryResult {
   ]
   const issues = unknownQueryColumns(table.spec, referenced)
   if (issues.length > 0) throw new InkError(issues.map((issue) => issue.message).join('; '))
+  checkListUse(table.spec, query.where ?? [], query.groupBy?.column)
   return executeQuery(ws, table.id, table.spec, query)
 }
 
@@ -65,24 +106,22 @@ export function runMutation(
   if (mutation.kind !== 'insert') {
     const issues = unknownQueryColumns(table.spec, mutation.where)
     if (issues.length > 0) throw new InkError(issues.map((issue) => issue.message).join('; '))
+    checkListUse(table.spec, mutation.where)
   }
 
   if (mutation.kind === 'insert' || mutation.kind === 'update') {
-    const issues = validateRecord(table.spec, mutation.data)
-    if (issues.length > 0) {
-      throw new InkError(issues.map((issue) => `${issue.path}: ${issue.message}`).join('; '))
-    }
+    checkData(ws, table.spec, mutation.data)
   }
 
   switch (mutation.kind) {
     case 'insert':
       return { affected: 1, id: insertRecord(ws, table.id, mutation.data) }
     case 'update': {
-      const ids = matchRecordIds(ws, table.id, mutation.where)
+      const ids = matchRecordIds(ws, table.id, table.spec, mutation.where)
       return { affected: updateRecords(ws, table.id, ids, mutation.data) }
     }
     case 'delete': {
-      const ids = matchRecordIds(ws, table.id, mutation.where)
+      const ids = matchRecordIds(ws, table.id, table.spec, mutation.where)
       return { affected: deleteRecords(ws, table.id, ids) }
     }
   }
@@ -96,10 +135,7 @@ export function updateRecord(
   patch: RecordData,
 ): void {
   const table = requireTable(ws, tableName)
-  const issues = validateRecord(table.spec, patch)
-  if (issues.length > 0) {
-    throw new InkError(issues.map((issue) => `${issue.path}: ${issue.message}`).join('; '))
-  }
+  checkData(ws, table.spec, patch)
   if (updateRecords(ws, table.id, [recordId], patch) === 0) {
     throw new InkError(`unknown record "${recordId}" on table "${tableName}"`)
   }

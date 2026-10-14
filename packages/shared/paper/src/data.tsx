@@ -7,6 +7,7 @@ import {
   useMemo,
   useState,
 } from 'react'
+import { toRows } from './lib/rows'
 import type { Row } from './lib/types'
 import { usePaperHost } from './provider'
 
@@ -34,7 +35,7 @@ export function DataProvider({ tables, children }: { tables: string[]; children:
       tables.map((table) =>
         host
           .runQuery({ table, limit: 1000 })
-          .then((result) => [table, result.rows] as const)
+          .then((result) => [table, toRows(result.rows)] as const)
           .catch(() => [table, []] as const),
       ),
     ).then((entries) => alive && setLoaded(Object.fromEntries(entries)))

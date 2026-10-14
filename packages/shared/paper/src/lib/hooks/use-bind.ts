@@ -2,6 +2,7 @@ import type { InkQuery } from '@washi/ink'
 import { useEffect, useState } from 'react'
 import { useData } from '../../data'
 import { usePaperHost } from '../../provider'
+import { toRows } from '../rows'
 import type { BindState } from '../types'
 
 /** One bound query. Refetches whenever a verb lands, so a page heals after its own writes. */
@@ -16,7 +17,9 @@ export function useBind(query: InkQuery | undefined): BindState {
     let alive = true
     host
       .runQuery(query)
-      .then((result) => alive && setState({ rows: result.rows, status: 'ready', error: null }))
+      .then(
+        (result) => alive && setState({ rows: toRows(result.rows), status: 'ready', error: null }),
+      )
       .catch(
         (cause: unknown) => alive && setState({ rows: [], status: 'error', error: String(cause) }),
       )

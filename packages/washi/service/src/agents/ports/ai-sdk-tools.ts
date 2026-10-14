@@ -105,7 +105,8 @@ export function createAiTools({ ws, runHankoAction, openSheet }: AiToolDeps) {
       execute: async ({ id, ...write }) => updateSheetFromSource(ws, id, write, 'washi'),
     }),
     db_define: tool({
-      description: 'Create or update a table definition.',
+      description:
+        'Create or update a table — a database of rows, Notion-style. Column types: text, number, boolean, date (ISO, or start/end), select + options, multi_select + options, status + groups {todo, doing, done}, person (member id), url, relation + table (holds record ids).',
       inputSchema: z.object({ spec: tableSpecSchema }),
       execute: async ({ spec }) => defineUserTable(ws, spec),
     }),

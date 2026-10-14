@@ -130,7 +130,9 @@ describe('ink executor', () => {
       }).rows,
     ).toHaveLength(2)
 
-    const ids = matchRecordIds(ws, table.id, [{ column: 'title', op: 'contains', value: 'a' }])
+    const ids = matchRecordIds(ws, table.id, spec, [
+      { column: 'title', op: 'contains', value: 'a' },
+    ])
     expect(updateRecords(ws, table.id, ids, { done: true })).toBe(1)
     expect(
       executeQuery(ws, table.id, spec, {

@@ -3,8 +3,10 @@ export {
   type AggregateFn,
   aggregateFnSchema,
   aggregateSchema,
+  type Cell,
   type ColumnSpec,
   type ColumnType,
+  cellSchema,
   columnSpecSchema,
   columnTypeSchema,
   type Filter,
@@ -20,8 +22,16 @@ export {
   type RecordData,
   recordDataSchema,
   type Scalar,
+  type StatusGroups,
   scalarSchema,
+  statusGroupsSchema,
   type TableSpec,
   tableSpecSchema,
 } from './types'
-export { type InkIssue, unknownQueryColumns, validateRecord } from './validate'
+export {
+  ARRAY_COLUMN_TYPES,
+  type InkIssue,
+  statusOptions,
+  unknownQueryColumns,
+  validateRecord,
+} from './validate'
