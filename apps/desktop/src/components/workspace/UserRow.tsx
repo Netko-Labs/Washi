@@ -7,8 +7,8 @@ import {
   IconSun,
   IconUser,
 } from '@tabler/icons-react'
+import { initials, useViewStore } from '@washi/ui'
 import { useState } from 'react'
-import { initials, useViewStore } from '@/stores/view/view-store'
 
 const MENU_ROW =
   'flex h-[30px] w-full items-center gap-[9px] rounded-lg px-2 text-left text-[12.5px] hover:bg-accent'

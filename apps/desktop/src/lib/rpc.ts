@@ -1,6 +1,6 @@
 import { createTRPCClient } from '@trpc/client'
 import { type AppRouter, mirinLink } from '@washi/trpc/client'
-import { bindApi } from '@washi/ui'
+import { bindHost } from '@washi/ui'
 import { client } from 'mirinjs/client'
 import type { DesktopRpc } from '../bun/rpc'
 
@@ -21,4 +21,4 @@ export const api = createTRPCClient<AppRouter>({
   ],
 })
 
-bindApi(api)
+bindHost({ client: api, place: 'this computer' })

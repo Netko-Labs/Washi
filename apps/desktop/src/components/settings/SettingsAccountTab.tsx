@@ -1,4 +1,4 @@
-import { initials, useViewStore } from '@/stores/view/view-store'
+import { initials, useViewStore } from '@washi/ui'
 import { DangerButton, RowButton, SettingsCard, SettingsRow } from './SettingsControls'
 
 export function SettingsAccountTab() {

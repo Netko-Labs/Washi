@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useViewStore } from '@/stores/view/view-store'
+import { useProfileStore } from '@/stores/profile'
 import { StepLocalFirst, StepProfile, StepSync, StepVault, StepWrapUp } from './OnboardingSteps'
 import type { OnboardingDraft, PatchDraft } from './types'
 
@@ -21,7 +21,7 @@ const STEPS = [1, 2, 3, 4, 5]
 
 /** First-run flow ported 1:1 from the Washi.dc.html onboarding screen. */
 export function Onboarding() {
-  const { onboarding, finishOnboarding, setIdentity } = useViewStore()
+  const { onboarding, finishOnboarding, setIdentity } = useProfileStore()
   const [draft, setDraft] = useState(INITIAL_DRAFT)
   if (!onboarding) return null
 

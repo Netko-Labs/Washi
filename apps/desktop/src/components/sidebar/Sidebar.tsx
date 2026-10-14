@@ -9,12 +9,9 @@ import {
   IconSearch,
   IconTrash,
 } from '@tabler/icons-react'
-import { SheetIcon } from '@washi/ui'
+import { SheetIcon, type TabKey, useAgentStore, useSheetsStore, useViewStore } from '@washi/ui'
 import { UserRow } from '@/components/workspace/UserRow'
 import { WorkspaceSwitcher } from '@/components/workspace/WorkspaceSwitcher'
-import { useAgentStore } from '@/stores/agent/agent-store'
-import { useSheetsStore } from '@/stores/sheets/sheets-store'
-import { type TabKey, useViewStore } from '@/stores/view/view-store'
 
 const NAV: { tab: TabKey; label: string; icon: typeof IconLayoutDashboard }[] = [
   { tab: 'view:dashboard', label: 'Dashboard', icon: IconLayoutDashboard },

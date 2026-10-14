@@ -1,19 +1,27 @@
-import type { WashiClient } from './types'
+import type { HostOptions, WashiClient } from './types'
 
-let bound: WashiClient | null = null
+let bound: HostOptions | null = null
 
-/** Each host binds its own transport once at boot: HTTP + socket on the web, mirin IPC on desktop. */
-export function bindApi(client: WashiClient): void {
-  bound = client
+/**
+ * Each host binds once at boot: its transport (HTTP + socket on the web, mirin IPC on the
+ * desktop) and the few words that differ between a computer and a server.
+ */
+export function bindHost(options: HostOptions): void {
+  bound = options
 }
+
+function host(): HostOptions {
+  if (!bound) throw new Error('@washi/ui: bindHost() must run before the first call')
+  return bound
+}
+
+/** Where a turn ran, for receipts: "this computer" or "your server". */
+export const hostPlace = (): string => host().place
 
 /**
  * The tRPC client every shared component calls, as `api.sheets.list.query()`.
  * A proxy so the binding can happen after the modules that use it are imported.
  */
 export const api = new Proxy({} as WashiClient, {
-  get(_, key) {
-    if (!bound) throw new Error('@washi/ui: bindApi(client) must run before the first call')
-    return bound[key as keyof WashiClient]
-  },
+  get: (_, key) => host().client[key as keyof WashiClient],
 })

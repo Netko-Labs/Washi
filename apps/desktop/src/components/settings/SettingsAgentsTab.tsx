@@ -1,4 +1,4 @@
-import { usd } from '@/components/agent/lib'
+import { usd } from '@washi/ui'
 import { DailyStopInput } from './DailyStopInput'
 import { type InferenceWire, LOCAL_MODEL_LABELS, PREFERENCE_LABELS, useAgentRuntime } from './lib'
 import { RoutinesCard } from './RoutinesCard'
