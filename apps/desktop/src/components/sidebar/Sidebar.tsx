@@ -7,9 +7,15 @@ import {
   IconLayoutSidebarLeftCollapse,
   IconPlus,
   IconSearch,
-  IconTrash,
 } from '@tabler/icons-react'
-import { SheetIcon, type TabKey, useAgentStore, useSheetsStore, useViewStore } from '@washi/ui'
+import {
+  ConfirmDeleteButton,
+  SheetIcon,
+  type TabKey,
+  useAgentStore,
+  useSheetsStore,
+  useViewStore,
+} from '@washi/ui'
 import { UserRow } from '@/components/workspace/UserRow'
 import { WorkspaceSwitcher } from '@/components/workspace/WorkspaceSwitcher'
 
@@ -115,14 +121,12 @@ export function Sidebar() {
                   />
                 )}
               </button>
-              <button
-                type="button"
-                aria-label={`Delete ${sheet.title}`}
-                onClick={() => void deleteSheet(sheet.id)}
-                className="mr-1 hidden size-5 shrink-0 place-items-center rounded text-muted-foreground group-hover:grid hover:text-destructive"
-              >
-                <IconTrash className="size-3" />
-              </button>
+              <span className="mr-1 hidden shrink-0 group-focus-within:block group-hover:block">
+                <ConfirmDeleteButton
+                  label={`Delete ${sheet.title}`}
+                  onConfirm={() => void deleteSheet(sheet.id)}
+                />
+              </span>
             </div>
           )
         })}

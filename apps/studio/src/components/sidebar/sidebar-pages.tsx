@@ -1,5 +1,11 @@
-import { IconPlus, IconTrash } from '@tabler/icons-react'
-import { SheetIcon, useAgentStore, useSheetsStore, useViewStore } from '@washi/ui'
+import { IconPlus } from '@tabler/icons-react'
+import {
+  ConfirmDeleteButton,
+  SheetIcon,
+  useAgentStore,
+  useSheetsStore,
+  useViewStore,
+} from '@washi/ui'
 import { pathFor } from '@/components/shell'
 import { openInPlace, type SidebarSectionProps } from './lib'
 
@@ -44,14 +50,12 @@ export function SidebarPages({ workspaceId, onNavigate }: SidebarSectionProps) {
                 />
               )}
             </a>
-            <button
-              type="button"
-              aria-label={`Delete ${sheet.title}`}
-              onClick={() => void useSheetsStore.getState().deleteSheet(sheet.id)}
-              className="mr-1 hidden size-6 shrink-0 place-items-center rounded text-muted-foreground group-hover:grid hover:text-destructive"
-            >
-              <IconTrash className="size-3" />
-            </button>
+            <span className="mr-1 hidden shrink-0 group-focus-within:block group-hover:block">
+              <ConfirmDeleteButton
+                label={`Delete ${sheet.title}`}
+                onConfirm={() => void useSheetsStore.getState().deleteSheet(sheet.id)}
+              />
+            </span>
           </div>
         )
       })}

@@ -4,8 +4,10 @@ import {
   createApproval,
   createSession,
   getTranscript,
+  listSessions,
   listSheets,
   openWorkspace,
+  updateSession,
   type Workspace,
 } from '@washi/repository'
 import { AgentHost } from '../agents/host'
@@ -306,5 +308,16 @@ describe('a turn owns its session from the first moment', () => {
     ).toHaveLength(1)
     release()
     await turn
+  })
+})
+
+describe('a turn cut off by a restart does not stay running', () => {
+  test('boot marks interrupted sessions as errored', () => {
+    const ws = openWorkspace({ id: 'restart', path: ':memory:' })
+    const session = createSession(ws, 'cut off')
+    updateSession(ws, session.id, { status: 'running' })
+    new AgentHost(ws)
+    expect(listSessions(ws).find((entry) => entry.id === session.id)?.status).toBe('error')
+    ws.close()
   })
 })
