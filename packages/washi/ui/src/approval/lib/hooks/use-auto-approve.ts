@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../../../api'
-import { setAutoApprove } from '../utils'
+import { useAgentStore } from '../../../stores'
 
 export function useAutoApprove() {
   const [on, setOn] = useState<boolean | null>(null)
@@ -14,7 +14,7 @@ export function useAutoApprove() {
 
   const toggle = async () => {
     if (on === null) return
-    setOn(await setAutoApprove(!on))
+    setOn(await useAgentStore.getState().setAutoApprove(!on))
   }
 
   return { on, toggle }

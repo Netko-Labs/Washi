@@ -13,8 +13,6 @@ import {
   IconTool,
   IconWorld,
 } from '@tabler/icons-react'
-import { api } from '../../api'
-import { useAgentStore } from '../../stores'
 import type { TitleOf, ToolDescription } from './types'
 
 const record = (value: unknown): Record<string, unknown> =>
@@ -137,11 +135,4 @@ export function describeTool(name: string, input: unknown, titleOf: TitleOf): To
     default:
       return base({ icon: IconTool, action: name.replaceAll('_', ' ') })
   }
-}
-
-/** Flips the workspace setting, then re-reads what is still waiting — the server already answered the changes. */
-export async function setAutoApprove(on: boolean): Promise<boolean> {
-  const state = await api.agents.setAutoApprove.mutate({ on })
-  useAgentStore.setState({ approvals: await api.agents.pendingApprovals.query() })
-  return state.on
 }

@@ -1,6 +1,7 @@
 import { IconChevronDown, IconWorld } from '@tabler/icons-react'
 import { useState } from 'react'
-import { type ApprovalCardProps, setAutoApprove, useDescribeTool } from './lib'
+import { useAgentStore } from '../stores'
+import { type ApprovalCardProps, useDescribeTool } from './lib'
 import { PagePreview } from './page-preview'
 
 /** One question from Washi, in words: what it wants to do, to what, and what it will look like. */
@@ -17,7 +18,7 @@ export function ApprovalCard({ toolName, input, onDecide, more = 0 }: ApprovalCa
     : {
         label: 'Allow all changes',
         run: async () => {
-          await setAutoApprove(true)
+          await useAgentStore.getState().setAutoApprove(true)
           await onDecide('allow_once')
         },
       }
