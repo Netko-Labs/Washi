@@ -2,6 +2,7 @@ import {
   positionBetween,
   type SearchHit,
   type SheetDetail,
+  type SheetMetaPatch,
   type SheetSummary,
   type SheetWrite,
 } from '@washi/domain'
@@ -27,6 +28,8 @@ export function listSheets(ws: Workspace): SheetSummary[] {
       tags: sheetTable.tags,
       parentId: sheetTable.parentId,
       position: sheetTable.position,
+      cover: sheetTable.cover,
+      fullWidth: sheetTable.fullWidth,
       hlcUpdated: sheetTable.hlcUpdated,
     })
     .from(sheetTable)
@@ -116,6 +119,40 @@ export function deleteSheet(ws: Workspace, id: string): boolean {
     appendOp(ws, 'sheet', id, { kind: 'delete', ids })
   })()
   return true
+}
+
+/** Title, icon, cover and width — what a person edits around a page; its content is untouched. */
+export function updateSheetMeta(
+  ws: Workspace,
+  id: string,
+  patch: SheetMetaPatch,
+): SheetDetail | null {
+  const [existing] = ws.db
+    .select({ deletedAt: sheetTable.deletedAt })
+    .from(sheetTable)
+    .where(eq(sheetTable.id, id))
+    .all()
+  if (!existing || existing.deletedAt) return null
+  const { title, icon, cover, fullWidth } = patch
+  const isEdit = title !== undefined || icon !== undefined || cover !== undefined
+  if (!isEdit && fullWidth === undefined) return getSheet(ws, id)
+
+  ws.db
+    .update(sheetTable)
+    .set({
+      ...(title !== undefined && { title }),
+      ...(icon !== undefined && { icon }),
+      ...(cover !== undefined && { cover }),
+      ...(fullWidth !== undefined && { fullWidth }),
+      ...(isEdit && { hlcUpdated: ws.now() }),
+    })
+    .where(eq(sheetTable.id, id))
+    .run()
+  if (title !== undefined) {
+    ws.sqlite.query('UPDATE sheets_fts SET title = ? WHERE id = ?').run(title, id)
+  }
+  appendOp(ws, 'sheet', id, { kind: 'meta', ...patch })
+  return getSheet(ws, id)
 }
 
 export function getBacklinks(ws: Workspace, id: string): SheetSummary[] {

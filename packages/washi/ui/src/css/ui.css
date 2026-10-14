@@ -14,6 +14,12 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* A page set to full width drops its feel's measure; outranks every `.wsx[data-feel]`. */
+[data-full-width] .wsx,
+[data-full-width] .wsx[data-feel] {
+  --measure: 100%;
+}
+
 :root {
   /* Washi.dc.html (0.4) — the paper palette, design-exact hex */
   --background: #f1ede5;

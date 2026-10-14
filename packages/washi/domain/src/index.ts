@@ -26,9 +26,11 @@ export {
 export {
   type SearchHit,
   type SheetDetail,
+  type SheetMetaPatch,
   type SheetSummary,
   type SheetWrite,
   sheetDetailSchema,
+  sheetMetaPatchSchema,
   sheetSummarySchema,
   sheetWriteSchema,
   type TrashEntry,

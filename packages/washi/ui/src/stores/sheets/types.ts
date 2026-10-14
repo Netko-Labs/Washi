@@ -1,4 +1,4 @@
-import type { SearchHit, SheetSummary } from '@washi/domain'
+import type { SearchHit, SheetMetaPatch, SheetSummary } from '@washi/domain'
 import type { PagePlacement } from '../../page-tree'
 
 export interface SheetsState {
@@ -16,6 +16,10 @@ export interface SheetsState {
   deleteSheet: (id: string) => Promise<void>
   /** Optimistic: the tree moves at once, the server's list replaces it when it answers. */
   moveSheet: (id: string, placement: PagePlacement) => Promise<void>
+  /** Optimistic like a move: the sidebar and header change before the server answers. */
+  updateMeta: (id: string, patch: SheetMetaPatch) => Promise<void>
+  /** A copy below the original, opened in a tab. */
+  duplicateSheet: (id: string) => Promise<void>
   search: (term: string) => Promise<void>
   reset: () => void
 }

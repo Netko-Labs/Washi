@@ -1,8 +1,9 @@
 import { IconSelector } from '@tabler/icons-react'
 import { VaultIcon } from '@washi/ui'
 import { useRef, useState } from 'react'
+import { useDismiss } from '@/components/shared/dismiss'
 import { topicFor } from '@/components/workspace'
-import { useDismiss, type WorkspaceSwitcherProps } from './lib'
+import type { WorkspaceSwitcherProps } from './lib'
 import { WorkspaceMenu } from './workspace-menu'
 
 /** The workspace name opens every other workspace — no trip back through the picker. */

@@ -7,6 +7,8 @@ export const sheetSummarySchema = z.object({
   tags: z.array(z.string()),
   parentId: z.string().nullable(),
   position: z.string(),
+  cover: z.string().nullable(),
+  fullWidth: z.boolean(),
   hlcUpdated: z.string(),
 })
 export type SheetSummary = z.infer<typeof sheetSummarySchema>
@@ -24,6 +26,15 @@ export const sheetWriteSchema = z.object({
   source: z.string().min(1).max(512_000),
 })
 export type SheetWrite = z.infer<typeof sheetWriteSchema>
+
+/** What a person changes about a page without touching its content. */
+export const sheetMetaPatchSchema = z.object({
+  title: z.string().min(1).max(200).optional(),
+  icon: z.string().max(16).nullable().optional(),
+  cover: z.string().max(32).nullable().optional(),
+  fullWidth: z.boolean().optional(),
+})
+export type SheetMetaPatch = z.infer<typeof sheetMetaPatchSchema>
 
 export const trashEntrySchema = z.object({
   id: z.string(),
