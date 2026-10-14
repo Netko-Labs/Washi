@@ -17,6 +17,16 @@ export {
   openWorkspace,
   type Workspace,
 } from './storage/client'
+export {
+  countUnreadMentions,
+  createComment,
+  deleteComment,
+  getComment,
+  listComments,
+  listMentions,
+  markMentionsRead,
+  setThreadResolved,
+} from './storage/comments'
 export { executeQuery, matchRecordIds } from './storage/ink-executor'
 export { listCapabilityCalls, recordCapability } from './storage/ledger'
 export {

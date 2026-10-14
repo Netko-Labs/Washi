@@ -5,6 +5,8 @@ export {
   appMetaTable,
   approvalTable,
   capabilityCallTable,
+  commentTable,
+  mentionInboxTable,
   oplogTable,
   recordTable,
   routineTable,

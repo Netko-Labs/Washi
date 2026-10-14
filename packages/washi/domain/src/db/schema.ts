@@ -137,3 +137,28 @@ export const appMetaTable = sqliteTable('app_meta', {
   key: text('key').primaryKey(),
   value: text('value').notNull(),
 })
+
+/** A page's discussion: a thread is its first comment; replies point back at it. */
+export const commentTable = sqliteTable('comments', {
+  id: text('id').primaryKey(),
+  sheetId: text('sheet_id').notNull(),
+  threadId: text('thread_id').notNull(),
+  authorId: text('author_id').notNull(),
+  authorName: text('author_name').notNull(),
+  body: text('body').notNull(),
+  mentions: text('mentions', { mode: 'json' }).$type<{ id: string; name: string }[]>().notNull(),
+  resolved: integer('resolved', { mode: 'boolean' }).notNull().default(false),
+  hlcCreated: text('hlc_created').notNull(),
+})
+
+/** One row per person mentioned: their Inbox, read or not. */
+export const mentionInboxTable = sqliteTable(
+  'mention_inbox',
+  {
+    userId: text('user_id').notNull(),
+    commentId: text('comment_id').notNull(),
+    sheetId: text('sheet_id').notNull(),
+    readAt: text('read_at'),
+  },
+  (table) => [primaryKey({ columns: [table.userId, table.commentId] })],
+)

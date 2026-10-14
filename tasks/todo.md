@@ -3,10 +3,10 @@
 Juan's call: Notion-style nesting (a "folder" is a page with children), all four parity areas,
 studio only. Mobbin: Notion sidebar + cover/icon header, AirOps trash, Dropbox Dash comments.
 
-- [ ] 1 · data: `parent_id` + `position` (fractional keys), move with cycle guard, delete
+- [x] 1 · data: `parent_id` + `position` (fractional keys), move with cycle guard, delete
       cascades to the subtree, Trash (list · restore · purge · empty), agent files by parent;
       switcher drops "All workspaces"
-- [ ] 2 · sidebar tree (expand, + sub-page, drag to reorder/nest), breadcrumbs, `/trash`
+- [x] 2 · sidebar tree (expand, + sub-page, drag to reorder/nest), breadcrumbs, `/trash`
 - [ ] 3 · page chrome: icon picker, cover, inline title, full width, ⋯ menu (duplicate · move
       to · copy link · delete)
 - [ ] 4 · type into pages: block editor over WSX — text-like primitives editable, the rest

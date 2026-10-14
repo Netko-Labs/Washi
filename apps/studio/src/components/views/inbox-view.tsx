@@ -1,6 +1,7 @@
 import { getRouteApi } from '@tanstack/react-router'
 import { Inbox } from '@washi/ui'
 import { FirstRunGate } from '@/components/first-run'
+import { MentionsSection } from '@/components/mentions'
 import { useRouteTab } from '@/components/shell'
 
 const workspaceRoute = getRouteApi('/w/$workspaceId')
@@ -10,7 +11,10 @@ export function InboxView() {
   useRouteTab('view:inbox')
   return (
     <FirstRunGate workspace={workspace}>
-      <Inbox />
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <MentionsSection />
+        <Inbox />
+      </div>
     </FirstRunGate>
   )
 }
