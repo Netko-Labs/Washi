@@ -49,6 +49,11 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
 - `apps/desktop` — mirin shell: window, menu, icon, Develop menu. `src/bun/` (main) boots the
   embedded runtime and serves `appRouter` via `createMirinBridge`; the renderer's `api` is a tRPC
   client over `mirinLink`. No port, no token.
+- `packages/washi/ui` — the UI both hosts wear: tokens + fonts + mascot keyframes
+  (`@washi/ui/css`, which `@source`s itself), the mascot, stores (view/sheets/agent), agent panel,
+  palette, inbox, dashboard, tabs, header, sheet view, markdown. Each app calls
+  `bindHost({ client, place })` once at boot; the shared code only ever sees `api`. App-only
+  chrome (desktop onboarding/sidebar, studio sidebar/settings/auth) stays in the app.
 - `packages/washi/runtime` — `bootRuntime(env)` / `startRuntime(options)`: mode assertion, control
   plane, workspace registry, one AgentHost per workspace, the routine clock. Mode is asserted once
   at boot, never per request.
@@ -109,6 +114,9 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   Web subscriptions ride `/trpc-ws` (the template's crossws bridge, cookie on the upgrade); the
   desktop's ride mirin events. Both yield `tracked()` and arrive as `{ id, data }`. Phase 8's
   `/sync` will be raw binary WS — Loro deltas have no business in JSON.
+- Shared stores are SSR-safe: nothing touches `localStorage`/`navigator` at module scope (the
+  studio imports them on the server). Host-specific persistence lives in the app — the desktop's
+  `profile-store` writes identity/onboarding; the studio takes identity from the session.
 - **Client code imports `@washi/trpc/client`, never the barrel.** The barrel carries the router,
   and with it the service layer and the Agent SDK — into the browser bundle.
 - `loro-crdt` and the Agent SDK read their own files at runtime (.wasm, the native `claude`

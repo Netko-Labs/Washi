@@ -1,1 +1,2 @@
-export { useWorkspaceSheets } from './hooks/use-workspace-sheets'
+export { useWorkspaceBoot } from './hooks/use-workspace-boot'
+export type { WorkspaceShellProps } from './types'

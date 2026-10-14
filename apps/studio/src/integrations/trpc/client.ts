@@ -7,6 +7,7 @@ import {
   wsLink,
 } from '@trpc/client'
 import { type AppRouter, MAX_TRPC_BATCH_SIZE, WORKSPACE_HEADER } from '@washi/trpc/client'
+import { bindHost } from '@washi/ui'
 import {
   getWebSocketUrl,
   readActiveWorkspace,
@@ -58,3 +59,5 @@ function createLinks() {
 }
 
 export const api = createTRPCClient<AppRouter>({ links: createLinks() })
+
+bindHost({ client: api, place: 'your server' })

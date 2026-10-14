@@ -4,14 +4,6 @@ export interface WorkspaceSummary {
   role: string
 }
 
-export interface SheetListItem {
-  id: string
-  title: string
-  icon: string | null
-  tags: string[]
-  hlcUpdated: string
-}
-
 export interface ModelOption {
   provider: string
   providerName: string

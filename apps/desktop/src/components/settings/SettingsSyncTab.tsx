@@ -1,4 +1,4 @@
-import { RowButton, SettingsCard, SettingsRow, StaticToggle } from './SettingsControls'
+import { RowButton, SettingsCard, SettingsRow, StaticToggle } from '@washi/ui'
 
 const MEMBERS = [
   { initials: 'JO', email: 'jo@studio.com', role: 'Can edit' },

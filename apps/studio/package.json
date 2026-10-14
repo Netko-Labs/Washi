@@ -10,10 +10,6 @@
     "check-types": "tsgo -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@fontsource-variable/inter": "^5.3.0",
-    "@fontsource-variable/jetbrains-mono": "^5.3.0",
-    "@fontsource-variable/karla": "^5.3.0",
-    "@fontsource/young-serif": "^5.3.0",
     "@tabler/icons-react": "^3.48.0",
     "@tailwindcss/vite": "^4.3.3",
     "@tanstack/react-query": "^5.104.0",
@@ -26,6 +22,7 @@
     "@washi/paper": "workspace:*",
     "@washi/runtime": "workspace:*",
     "@washi/trpc": "workspace:*",
+    "@washi/ui": "workspace:*",
     "@washi/wsx": "workspace:*",
     "better-auth": "^1.7.6",
     "nitro": "3.0.260903-beta",

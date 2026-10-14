@@ -1,7 +1,6 @@
 import { IconFolder } from '@tabler/icons-react'
+import { VAULT_TOPIC_ORDER, VaultIcon } from '@washi/ui'
 import { useState } from 'react'
-import { VaultIcon } from '@/components/mascot/VaultIcon'
-import { VAULT_TOPIC_ORDER } from '@/components/mascot/vault-topics'
 
 const VAULT_CHOICES = VAULT_TOPIC_ORDER
 

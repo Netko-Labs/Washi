@@ -1,3 +1,4 @@
+import { AgentMascot } from '@washi/ui'
 import { PITCH, useAuthForm } from './lib'
 
 /**
@@ -11,15 +12,18 @@ export function AuthScreen({ onDone }: { onDone: () => void }) {
 
   return (
     <main className="grid min-h-dvh grid-cols-1 lg:grid-cols-[1.1fr_1fr]">
-      <section className="hidden flex-col justify-between bg-[#f3ead9] px-12 py-14 lg:flex">
-        <p className="font-black text-[15px] tracking-[0.18em] uppercase">和紙 washi</p>
+      <section className="paper-canvas hidden flex-col justify-between border-border border-r bg-muted px-12 py-14 lg:flex">
+        <p className="font-semibold text-[15px] tracking-[0.18em] uppercase">和紙 washi</p>
         <div className="max-w-md">
-          <h1 className="font-black text-5xl leading-[1.05] tracking-tight">{PITCH.headline}</h1>
+          <AgentMascot state="writing" size={88} className="mb-8" />
+          <h1 className="font-serif font-semibold text-5xl leading-[1.1] tracking-[-0.02em]">
+            {PITCH.headline}
+          </h1>
           <p className="mt-5 text-[17px] text-muted-foreground leading-relaxed">{PITCH.sub}</p>
           <dl className="mt-10 grid gap-5">
             {PITCH.points.map(([term, detail]) => (
               <div key={term}>
-                <dt className="font-bold text-[14px]">{term}</dt>
+                <dt className="font-semibold text-[14px]">{term}</dt>
                 <dd className="mt-1 text-[14px] text-muted-foreground leading-relaxed">{detail}</dd>
               </div>
             ))}
@@ -36,8 +40,11 @@ export function AuthScreen({ onDone }: { onDone: () => void }) {
             void submit()
           }}
         >
-          <p className="font-black text-[15px] tracking-[0.18em] uppercase lg:hidden">和紙 washi</p>
-          <h2 className="mt-6 font-black text-3xl tracking-tight lg:mt-0">
+          <div className="flex items-center gap-2.5 lg:hidden">
+            <AgentMascot state="idle" size={36} />
+            <p className="font-semibold text-[15px] tracking-[0.18em] uppercase">和紙 washi</p>
+          </div>
+          <h2 className="mt-6 font-semibold text-[26px] tracking-[-0.02em] lg:mt-0">
             {signingUp ? 'Create your account' : 'Welcome back'}
           </h2>
           <p className="mt-2 text-[14px] text-muted-foreground">
@@ -81,7 +88,7 @@ export function AuthScreen({ onDone }: { onDone: () => void }) {
           <button
             type="submit"
             disabled={state.busy || !state.email || !state.password}
-            className="mt-6 h-11 w-full rounded-xl bg-primary font-bold text-[14px] text-primary-foreground disabled:opacity-50"
+            className="mt-6 h-11 w-full rounded-xl bg-primary font-semibold text-[14px] text-primary-foreground disabled:opacity-50"
           >
             {state.busy ? 'One moment…' : signingUp ? 'Create account' : 'Sign in'}
           </button>
@@ -114,7 +121,7 @@ function Field({
 }) {
   return (
     <label className="grid gap-1.5">
-      <span className="font-bold text-[13px]">{label}</span>
+      <span className="font-semibold text-[13px]">{label}</span>
       <input
         type={type}
         value={value}

@@ -1,8 +1,7 @@
-import { usd } from '@/components/agent/lib'
+import { RowButton, SegmentedControl, SettingsCard, SettingsRow, usd } from '@washi/ui'
 import { DailyStopInput } from './DailyStopInput'
 import { type InferenceWire, LOCAL_MODEL_LABELS, PREFERENCE_LABELS, useAgentRuntime } from './lib'
 import { RoutinesCard } from './RoutinesCard'
-import { RowButton, SegmentedControl, SettingsCard, SettingsRow } from './SettingsControls'
 
 function cliLine(cli: InferenceWire['localCli']): string {
   if (!cli) return 'Not installed · claude.com/code'

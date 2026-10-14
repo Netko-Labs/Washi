@@ -26,6 +26,9 @@
       "path": "packages/washi/trpc"
     },
     {
+      "path": "packages/washi/ui"
+    },
+    {
       "path": "packages/shared/hanko"
     },
     {

@@ -6,10 +6,7 @@ import {
   IconServer,
   IconUsers,
 } from '@tabler/icons-react'
-import { AgentMascot } from '@/components/mascot/AgentMascot'
-import { Mascot } from '@/components/mascot/Mascot'
-import { VaultIcon } from '@/components/mascot/VaultIcon'
-import { VAULT_TOPIC_ORDER } from '@/components/mascot/vault-topics'
+import { AgentMascot, Mascot, VAULT_TOPIC_ORDER, VaultIcon } from '@washi/ui'
 import { HeroDone, HeroSync, HeroVaults, HeroWelcome, Toggle } from './OnboardingArt'
 import type {
   ChoiceCardProps,

@@ -1,6 +1,6 @@
 import type { DevCommand } from '@washi/trpc'
 import { api } from '@/lib/rpc'
-import { IDENTITY_KEY, ONBOARDED_KEY } from '@/stores/view/view-store'
+import { IDENTITY_KEY, ONBOARDED_KEY } from '@/stores/profile'
 
 /**
  * Renderer half of the Develop menu. Onboarding and identity are localStorage,

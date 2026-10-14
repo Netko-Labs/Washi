@@ -1,5 +1,5 @@
+import { AgentMascot } from '@washi/ui'
 import { useState } from 'react'
-import { AgentMascot } from '@/components/mascot/AgentMascot'
 
 const ACTION_ITEMS = [
   'Send revised label contrast pass by Friday',

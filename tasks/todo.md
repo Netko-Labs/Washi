@@ -1,3 +1,22 @@
+# Studio rev 2 — one UI package, the web catches up (2026-10-14)
+
+Why: the studio is a design generation behind the desktop — no mascot (WSX `<Mascot>` renders
+blank), old palette/fonts, pre-rev-2 agent chat, raw markdown, no tabs/inbox/palette.
+
+Decided: shared **`@washi/ui`** (desktop components move, both apps import); the web keeps
+sign-in → workspace → key and gets reskinned; Daily note waits for real data.
+
+- [x] 1 · `@washi/ui`: css (tokens, fonts, keyframes, `@source`), bindable `api`, mascot, sheet-icon
+- [x] 2 · stores + agent panel + palette + inbox + dashboard + tabs + header + sheet view move in
+- [x] 3 · markdown in agent replies (react-markdown + remark-gfm), chunk merge on both apps
+- [x] 4 · studio shell rev 2: sidebar (web), tabs, header, ⌘K, inbox badge, theme toggle,
+      settings tabs, auth/picker/first-run reskin, mobile drawer
+- [x] 5 · verify: typecheck · biome · `bun test` · desktop `mirin check` · studio in a browser
+      (desktop + phone width) · a page with `<Mascot>` renders
+
+Acceptance: both apps import the moved components from `@washi/ui` (no copies); every check above
+green; studio screenshots before/after in the PR.
+
 # Studio architecture — one Start app, a desktop with no port (2026-10-12)
 
 Why: two images (Bun.serve + a Vite SPA) built from the whole monorepo took 30+ min on Kuma and

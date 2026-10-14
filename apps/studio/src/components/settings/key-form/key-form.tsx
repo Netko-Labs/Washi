@@ -14,7 +14,7 @@ export function KeyForm({ models, catalogueSource, hasKey, onSave, extra }: KeyF
             key={entry.id}
             type="button"
             onClick={() => form.pickProvider(entry.id)}
-            className={`h-11 flex-1 rounded-xl border text-[13.5px] font-bold ${
+            className={`h-11 flex-1 rounded-xl border text-[13.5px] font-semibold ${
               form.provider === entry.id ? 'border-primary bg-accent' : 'border-border'
             }`}
           >
@@ -24,7 +24,7 @@ export function KeyForm({ models, catalogueSource, hasKey, onSave, extra }: KeyF
       </div>
 
       <label className="mt-4 grid gap-1.5">
-        <span className="font-bold text-[13px]">API key</span>
+        <span className="font-semibold text-[13px]">API key</span>
         <input
           type="password"
           value={form.secret}
@@ -39,7 +39,7 @@ export function KeyForm({ models, catalogueSource, hasKey, onSave, extra }: KeyF
       </label>
 
       <div className="mt-4 grid gap-1.5">
-        <span className="font-bold text-[13px]">
+        <span className="font-semibold text-[13px]">
           Model{' '}
           <span className="font-normal text-muted-foreground">
             — optional; a sensible one is chosen otherwise
@@ -64,7 +64,7 @@ export function KeyForm({ models, catalogueSource, hasKey, onSave, extra }: KeyF
         type="button"
         onClick={() => void form.submit()}
         disabled={form.busy || form.secret.length < 8}
-        className="mt-5 h-11 rounded-xl bg-primary px-5 font-bold text-[14px] text-primary-foreground disabled:opacity-50"
+        className="mt-5 h-11 rounded-xl bg-primary px-5 font-semibold text-[14px] text-primary-foreground disabled:opacity-50"
       >
         {hasKey ? 'Replace key' : 'Save key'}
       </button>
