@@ -4,6 +4,7 @@ import {
   IconLayoutDashboard,
   IconPlus,
   IconSettings,
+  IconTrash,
   IconX,
 } from '@tabler/icons-react'
 import { type ReactNode, useRef } from 'react'
@@ -15,6 +16,7 @@ const VIEW_TABS: Record<string, { label: string; icon: ReactNode }> = {
   'view:inbox': { label: 'Inbox', icon: <IconInbox className="size-[13px]" /> },
   'view:daily': { label: 'Daily note', icon: <IconCalendar className="size-[13px]" /> },
   'view:settings': { label: 'Settings', icon: <IconSettings className="size-[13px]" /> },
+  'view:trash': { label: 'Trash', icon: <IconTrash className="size-[13px]" /> },
 }
 
 /** Browser-style tab strip (Washi.dc.html rev 2): drag to reorder, middle-click to close. */

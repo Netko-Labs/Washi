@@ -19,6 +19,7 @@ import { Route as ApiTrpcSplatRouteImport } from './routes/api/trpc/$'
 import { Route as WWorkspaceIdIndexRouteImport } from './routes/w/$workspaceId/index'
 import { Route as WWorkspaceIdInboxRouteImport } from './routes/w/$workspaceId/inbox'
 import { Route as WWorkspaceIdSettingsRouteImport } from './routes/w/$workspaceId/settings'
+import { Route as WWorkspaceIdTrashRouteImport } from './routes/w/$workspaceId/trash'
 import { Route as WWorkspaceIdPPageIdRouteImport } from './routes/w/$workspaceId/p/$pageId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -71,6 +72,11 @@ const WWorkspaceIdSettingsRoute = WWorkspaceIdSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => WWorkspaceIdRoute,
 } as any)
+const WWorkspaceIdTrashRoute = WWorkspaceIdTrashRouteImport.update({
+  id: '/trash',
+  path: '/trash',
+  getParentRoute: () => WWorkspaceIdRoute,
+} as any)
 const WWorkspaceIdPPageIdRoute = WWorkspaceIdPPageIdRouteImport.update({
   id: '/p/$pageId',
   path: '/p/$pageId',
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/api/trpc/$': typeof ApiTrpcSplatRoute
   '/w/$workspaceId/inbox': typeof WWorkspaceIdInboxRoute
   '/w/$workspaceId/settings': typeof WWorkspaceIdSettingsRoute
+  '/w/$workspaceId/trash': typeof WWorkspaceIdTrashRoute
   '/w/$workspaceId/': typeof WWorkspaceIdIndexRoute
   '/w/$workspaceId/p/$pageId': typeof WWorkspaceIdPPageIdRoute
 }
@@ -99,6 +106,7 @@ export interface FileRoutesByTo {
   '/api/trpc/$': typeof ApiTrpcSplatRoute
   '/w/$workspaceId/inbox': typeof WWorkspaceIdInboxRoute
   '/w/$workspaceId/settings': typeof WWorkspaceIdSettingsRoute
+  '/w/$workspaceId/trash': typeof WWorkspaceIdTrashRoute
   '/w/$workspaceId': typeof WWorkspaceIdIndexRoute
   '/w/$workspaceId/p/$pageId': typeof WWorkspaceIdPPageIdRoute
 }
@@ -113,6 +121,7 @@ export interface FileRoutesById {
   '/api/trpc/$': typeof ApiTrpcSplatRoute
   '/w/$workspaceId/inbox': typeof WWorkspaceIdInboxRoute
   '/w/$workspaceId/settings': typeof WWorkspaceIdSettingsRoute
+  '/w/$workspaceId/trash': typeof WWorkspaceIdTrashRoute
   '/w/$workspaceId/': typeof WWorkspaceIdIndexRoute
   '/w/$workspaceId/p/$pageId': typeof WWorkspaceIdPPageIdRoute
 }
@@ -128,6 +137,7 @@ export interface FileRouteTypes {
     | '/api/trpc/$'
     | '/w/$workspaceId/inbox'
     | '/w/$workspaceId/settings'
+    | '/w/$workspaceId/trash'
     | '/w/$workspaceId/'
     | '/w/$workspaceId/p/$pageId'
   fileRoutesByTo: FileRoutesByTo
@@ -140,6 +150,7 @@ export interface FileRouteTypes {
     | '/api/trpc/$'
     | '/w/$workspaceId/inbox'
     | '/w/$workspaceId/settings'
+    | '/w/$workspaceId/trash'
     | '/w/$workspaceId'
     | '/w/$workspaceId/p/$pageId'
   id:
@@ -153,6 +164,7 @@ export interface FileRouteTypes {
     | '/api/trpc/$'
     | '/w/$workspaceId/inbox'
     | '/w/$workspaceId/settings'
+    | '/w/$workspaceId/trash'
     | '/w/$workspaceId/'
     | '/w/$workspaceId/p/$pageId'
   fileRoutesById: FileRoutesById
@@ -239,6 +251,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WWorkspaceIdSettingsRouteImport
       parentRoute: typeof WWorkspaceIdRoute
     }
+    '/w/$workspaceId/trash': {
+      id: '/w/$workspaceId/trash'
+      path: '/trash'
+      fullPath: '/w/$workspaceId/trash'
+      preLoaderRoute: typeof WWorkspaceIdTrashRouteImport
+      parentRoute: typeof WWorkspaceIdRoute
+    }
     '/w/$workspaceId/p/$pageId': {
       id: '/w/$workspaceId/p/$pageId'
       path: '/p/$pageId'
@@ -252,6 +271,7 @@ declare module '@tanstack/react-router' {
 interface WWorkspaceIdRouteChildren {
   WWorkspaceIdInboxRoute: typeof WWorkspaceIdInboxRoute
   WWorkspaceIdSettingsRoute: typeof WWorkspaceIdSettingsRoute
+  WWorkspaceIdTrashRoute: typeof WWorkspaceIdTrashRoute
   WWorkspaceIdIndexRoute: typeof WWorkspaceIdIndexRoute
   WWorkspaceIdPPageIdRoute: typeof WWorkspaceIdPPageIdRoute
 }
@@ -259,6 +279,7 @@ interface WWorkspaceIdRouteChildren {
 const WWorkspaceIdRouteChildren: WWorkspaceIdRouteChildren = {
   WWorkspaceIdInboxRoute: WWorkspaceIdInboxRoute,
   WWorkspaceIdSettingsRoute: WWorkspaceIdSettingsRoute,
+  WWorkspaceIdTrashRoute: WWorkspaceIdTrashRoute,
   WWorkspaceIdIndexRoute: WWorkspaceIdIndexRoute,
   WWorkspaceIdPPageIdRoute: WWorkspaceIdPPageIdRoute,
 }

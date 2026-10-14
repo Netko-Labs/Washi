@@ -1,22 +1,7 @@
-import type { SearchHit, SheetSummary } from '@washi/domain'
 import { create } from 'zustand'
 import { api } from '../../api'
-
-interface SheetsState {
-  sheets: SheetSummary[]
-  activeId: string | null
-  searchTerm: string
-  searchHits: SearchHit[]
-  paletteOpen: boolean
-  openPalette: () => void
-  closePalette: () => void
-  refresh: () => Promise<void>
-  select: (id: string | null) => void
-  createSheet: () => Promise<void>
-  deleteSheet: (id: string) => Promise<void>
-  search: (term: string) => Promise<void>
-  reset: () => void
-}
+import { applyPlacement } from '../../page-tree'
+import type { SheetsState } from './types'
 
 /** A starter tree, not a stub: the agent edits a page that already reads as one. */
 const NEW_SHEET_SOURCE = (title: string) =>
@@ -52,10 +37,11 @@ export const useSheetsStore = create<SheetsState>((set, get) => ({
 
   select: (id) => set({ activeId: id }),
 
-  createSheet: async () => {
+  createSheet: async (parentId = null) => {
     const title = 'Untitled'
     const sheet = await api.sheets.create.mutate({
       write: { title, source: NEW_SHEET_SOURCE(title) },
+      parentId,
     })
     await get().refresh()
     set({ activeId: sheet.id })
@@ -68,6 +54,15 @@ export const useSheetsStore = create<SheetsState>((set, get) => ({
     const { activeId } = get()
     await get().refresh()
     if (activeId === id) set({ activeId: get().sheets[0]?.id ?? null })
+  },
+
+  moveSheet: async (id, placement) => {
+    set({ sheets: applyPlacement(get().sheets, id, placement) })
+    try {
+      await api.sheets.move.mutate({ id, ...placement })
+    } finally {
+      await get().refresh()
+    }
   },
 
   search: async (term) => {
