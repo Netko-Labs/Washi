@@ -6,6 +6,7 @@ import {
   parse,
   serialize,
   validate,
+  type WsxElement,
   WsxParseError,
   type WsxRegistry,
 } from '../index'
@@ -61,6 +62,27 @@ describe('serialize', () => {
     const root = parse(SAMPLE)
     const text = serialize(root)
     expect(parse(text)).toEqual(root)
+  })
+
+  test('typed text survives: markup characters, entities, spacing and newlines', () => {
+    for (const value of [
+      'a < b && c > d',
+      '{not an expr}',
+      'Tom &amp; Jerry',
+      'two  spaces',
+      'line\nbreak',
+      ' padded ',
+    ]) {
+      const root: WsxElement = {
+        kind: 'element',
+        name: 'Sheet',
+        props: {},
+        children: [
+          { kind: 'element', name: 'Text', props: {}, children: [{ kind: 'text', value }] },
+        ],
+      }
+      expect(parse(serialize(root))).toEqual(root)
+    }
   })
 })
 
