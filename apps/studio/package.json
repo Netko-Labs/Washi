@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "bun --bun vite dev",
-    "build": "bun --bun vite build",
+    "build": "bun --bun vite build && rm -rf .output/server/node_modules/@anthropic-ai/claude-agent-sdk-*-musl",
     "start": "NODE_ENV=production bun --no-install .output/server/index.mjs",
     "check-types": "tsgo -p tsconfig.json --noEmit"
   },
