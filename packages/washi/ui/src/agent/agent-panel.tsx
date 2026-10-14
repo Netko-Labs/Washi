@@ -8,6 +8,7 @@ import {
   IconX,
 } from '@tabler/icons-react'
 import { useEffect, useRef, useState } from 'react'
+import { ApprovalCard } from '../approval'
 import { AgentMascot } from '../mascot'
 import { mascotStateFor, useAgentStore, useSheetsStore, useViewStore } from '../stores'
 import { AgentComposer } from './agent-composer'
@@ -15,46 +16,18 @@ import { TranscriptView } from './transcript-view'
 
 function ApprovalBar() {
   const approvals = useAgentStore((state) => state.approvals)
-  const resolveApproval = useAgentStore((state) => state.resolveApproval)
   const next = approvals[0]
   if (!next) return null
 
   return (
-    <div className="mx-3 mb-2 overflow-hidden rounded-xl border border-agent" data-approval-bar>
-      <div className="flex items-center gap-2 border-border border-b bg-muted px-3 py-2 text-[12px]">
-        <AgentMascot state="suggesting" size={18} />
-        <span className="font-medium">Washi asks to run</span>
-        <span className="truncate font-mono text-muted-foreground">{next.toolName}</span>
-        {approvals.length > 1 && (
-          <span className="text-muted-foreground">+{approvals.length - 1}</span>
-        )}
-      </div>
-      <pre className="max-h-24 overflow-auto px-3 py-2 text-[11px] text-muted-foreground">
-        {JSON.stringify(next.input, null, 2)}
-      </pre>
-      <div className="flex justify-end gap-1.5 px-3 pb-2.5">
-        <button
-          type="button"
-          onClick={() => void resolveApproval(next.id, 'reject_once')}
-          className="h-[26px] rounded-lg border border-border bg-background px-2.5 text-[12px] hover:bg-accent"
-        >
-          Reject
-        </button>
-        <button
-          type="button"
-          onClick={() => void resolveApproval(next.id, 'allow_always')}
-          className="h-[26px] rounded-lg border border-border bg-background px-2.5 text-[12px] hover:bg-accent"
-        >
-          Always
-        </button>
-        <button
-          type="button"
-          onClick={() => void resolveApproval(next.id, 'allow_once')}
-          className="h-[26px] rounded-lg bg-primary px-2.5 font-medium text-[12px] text-primary-foreground"
-        >
-          Accept
-        </button>
-      </div>
+    <div className="mx-3 mb-2" data-approval-bar>
+      <ApprovalCard
+        key={next.id}
+        toolName={next.toolName}
+        input={next.input}
+        more={approvals.length - 1}
+        onDecide={(decision) => useAgentStore.getState().resolveApproval(next.id, decision)}
+      />
     </div>
   )
 }

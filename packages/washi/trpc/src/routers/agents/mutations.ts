@@ -39,6 +39,10 @@ export const agentMutations = router({
   setDailyCap: workspaceProcedure
     .input(z.object({ capUsd: z.number().positive().max(10_000) }))
     .mutation(({ ctx, input }) => ctx.host.setDailyCap(input.capUsd)),
+  /** Pages and tables change without asking; anything leaving the server still asks. */
+  setAutoApprove: workspaceProcedure
+    .input(z.object({ on: z.boolean() }))
+    .mutation(({ ctx, input }) => ({ on: ctx.host.setAutoApprove(input.on, ctx.actorId) })),
   /** Embedded only: Claude Code on this computer, the env key, or whichever is there. */
   setInference: workspaceProcedure
     .input(z.object({ preference: z.enum(INFERENCE_PREFERENCES) }))

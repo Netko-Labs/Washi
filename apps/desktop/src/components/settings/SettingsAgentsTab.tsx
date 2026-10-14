@@ -1,4 +1,11 @@
-import { RowButton, SegmentedControl, SettingsCard, SettingsRow, usd } from '@washi/ui'
+import {
+  AutoApproveRow,
+  RowButton,
+  SegmentedControl,
+  SettingsCard,
+  SettingsRow,
+  usd,
+} from '@washi/ui'
 import { DailyStopInput } from './DailyStopInput'
 import { type InferenceWire, LOCAL_MODEL_LABELS, PREFERENCE_LABELS, useAgentRuntime } from './lib'
 import { RoutinesCard } from './RoutinesCard'
@@ -76,6 +83,8 @@ export function SettingsAgentsTab() {
           />
         </SettingsRow>
       </SettingsCard>
+
+      <AutoApproveRow />
 
       {inference.missing && (
         <p className="rounded-[14px] border border-amber-300 bg-amber-50 px-[18px] py-3 text-[13px] text-amber-900 leading-relaxed">

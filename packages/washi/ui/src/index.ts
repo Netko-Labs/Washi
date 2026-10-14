@@ -1,5 +1,6 @@
 export * from './agent'
 export * from './api'
+export * from './approval'
 export * from './dashboard'
 export * from './header'
 export * from './inbox'

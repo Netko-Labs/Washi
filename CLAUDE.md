@@ -105,6 +105,10 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   nothing is marked; the day catches up after Resume. Marked run before it runs; a scheduled run's
   questions wait 12h. Times are wall-clock minute + IANA zone. `routines` is the only
   caller-free path into a turn — keep it that way.
+- **Approvals.** Reads pass; writes stop at the `ApprovalDesk`. Auto-approve (a workspace
+  setting, `agent_auto_approve_changes` in `app_meta`) waves through `CHANGE_TOOLS` only — page
+  and table writes. `fetch_url` and `action_run` always ask: nothing leaves without a person.
+  The UI says every tool in words (`describeTool` in `@washi/ui`) — never a tool name or JSON.
 - Agent tools are the ONLY capability surface: ink (data), tsuru (network), hanko (actions).
   Never hand agents fs/shell/raw SQL.
 - WSX is inert data: registry primitives, literal props, the closed `expr` grammar only. Components

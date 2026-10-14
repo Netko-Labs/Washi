@@ -25,6 +25,8 @@ interface AgentState {
   sendPrompt: (text: string) => Promise<void>
   stopTurn: () => Promise<void>
   resolveApproval: (id: string, decision: ApprovalDecision) => Promise<void>
+  /** Turning it on answers the waiting changes server-side; re-read what is left. */
+  setAutoApprove: (on: boolean) => Promise<boolean>
   reset: () => void
 }
 
@@ -186,6 +188,12 @@ export const useAgentStore = create<AgentState>((set, get) => ({
   resolveApproval: async (id, decision) => {
     await api.agents.resolveApproval.mutate({ id, decision })
     set((state) => ({ approvals: state.approvals.filter((approval) => approval.id !== id) }))
+  },
+
+  setAutoApprove: async (on) => {
+    const state = await api.agents.setAutoApprove.mutate({ on })
+    set({ approvals: await api.agents.pendingApprovals.query() })
+    return state.on
   },
 
   /** Another workspace: its sessions, approvals and subscriptions are not this one's. */
