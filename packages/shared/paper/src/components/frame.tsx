@@ -1,6 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react'
 import { styled } from '../lib'
-import type { BlockProps, Feel, Gap, Tone } from '../lib/types'
+import type { BlockProps, Feel, Gap, PaperSurfaceProps, Tone } from '../lib/types'
 import { THEMES, type ThemeId } from '../registry/themes'
 
 const ALIGN: Record<string, string> = {
@@ -56,7 +56,7 @@ export function SheetFrame({
 }
 
 /** Paper's tokens without the page (no `.wsx`), for paper controls in a host's own chrome. */
-export function PaperSurface({ children }: { children?: ReactNode }) {
+export function PaperSurface({ children }: PaperSurfaceProps) {
   return (
     <div className="wsx-tokens" style={themeVars('washi')}>
       {children}

@@ -43,3 +43,7 @@ export interface DataContextValue {
   version: number
   refresh: () => void
 }
+
+export interface PaperSurfaceProps {
+  children?: ReactNode
+}

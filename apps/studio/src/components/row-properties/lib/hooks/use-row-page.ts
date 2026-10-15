@@ -1,8 +1,7 @@
-import type { RowOf } from '@washi/domain'
 import { useLiveStore, useNoticeStore, useSheetsStore } from '@washi/ui'
 import { useEffect, useState } from 'react'
 import { api } from '@/integrations/trpc'
-import type { CellValue, RowPage } from '../types'
+import type { CellValue, LoadedRow, RowPage } from '../types'
 import { usePeople } from './use-people'
 
 /** The row behind a page, kept live, and how to write one of its cells. Null for a plain page. */
@@ -11,7 +10,7 @@ export function useRowPage(sheetId: string): RowPage | null {
     (state) => state.sheets.find((sheet) => sheet.id === sheetId)?.hlcUpdated,
   )
   const people = usePeople()
-  const [loaded, setLoaded] = useState<{ sheetId: string; rowOf: RowOf | null } | null>(null)
+  const [loaded, setLoaded] = useState<LoadedRow | null>(null)
   const [stale, setStale] = useState(0)
 
   useEffect(() => useLiveStore.getState().onData(() => setStale((count) => count + 1)), [])

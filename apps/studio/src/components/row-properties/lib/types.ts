@@ -8,6 +8,11 @@ export interface RowPropertiesProps {
   sheetId: string
 }
 
+export interface LoadedRow {
+  sheetId: string
+  rowOf: RowOf | null
+}
+
 export interface RowPage {
   rowOf: RowOf
   people: Person[]
