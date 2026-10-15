@@ -1,0 +1,188 @@
+/* Database — Notion's views over one table: tabs, a table that edits in place, a board. */
+
+.wsx-db {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.wsx-db-tabs {
+  display: flex;
+  gap: 2px;
+  border-bottom: 1px solid var(--border);
+}
+.wsx-db-tab {
+  padding: 6px 10px;
+  margin-bottom: -1px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.wsx-db-tab[aria-selected="true"] {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+}
+.wsx-db-grid {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--r-input);
+  background: var(--card);
+}
+.wsx-db-table td {
+  padding: 2px 4px;
+  vertical-align: middle;
+  min-width: 120px;
+}
+.wsx-db-table td[data-title] {
+  position: relative;
+  min-width: 220px;
+}
+.wsx-db-input {
+  width: 100%;
+  min-height: 30px;
+  padding: 4px 8px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 13.5px;
+}
+.wsx-db-input:hover {
+  background: var(--muted-bg);
+}
+.wsx-db-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--bg);
+}
+.wsx-db-input[data-num] {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.wsx-db-table td[data-title] .wsx-db-input {
+  font-weight: 600;
+  padding-right: 56px;
+}
+.wsx-db-choice {
+  appearance: none;
+  cursor: pointer;
+}
+.wsx-db-choice[data-group="doing"] {
+  color: var(--tone-info-text);
+}
+.wsx-db-choice[data-group="done"] {
+  color: var(--tone-success-text);
+}
+.wsx-db-date {
+  display: flex;
+  gap: 2px;
+}
+.wsx-db-check {
+  margin: 0 8px;
+  accent-color: var(--accent);
+}
+.wsx-db-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+}
+.wsx-db-chip {
+  height: 22px;
+  padding: 0 7px;
+  border: 0;
+  border-radius: 5px;
+  background: var(--muted-bg);
+  color: var(--ink);
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+.wsx-db-chip span {
+  color: var(--muted);
+}
+.wsx-db-add {
+  width: 26px;
+  height: 22px;
+  border: 1px dashed var(--border);
+  border-radius: 5px;
+  background: none;
+  color: var(--muted);
+  text-align: center;
+  appearance: none;
+  cursor: pointer;
+}
+.wsx-db-open {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  padding: 2px 7px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--card);
+  color: var(--muted);
+  font: inherit;
+  font-size: 11.5px;
+  opacity: 0;
+  cursor: pointer;
+}
+.wsx-db-table tr:hover .wsx-db-open,
+.wsx-db-open:focus {
+  opacity: 1;
+}
+.wsx-db-plus-cell {
+  width: 1%;
+}
+.wsx-db-plus {
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font-size: 15px;
+  cursor: pointer;
+}
+.wsx-db-property {
+  display: flex;
+  gap: 4px;
+  min-width: 420px;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+}
+.wsx-db-button {
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--ink);
+  color: var(--bg);
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+.wsx-db-new {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  border: 0;
+  border-top: 1px solid var(--border);
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+.wsx-db-new:hover {
+  background: var(--muted-bg);
+}
+.wsx-db-error {
+  margin: 0;
+  padding: 6px 12px;
+  color: var(--tone-danger-text);
+  font-size: 12.5px;
+}

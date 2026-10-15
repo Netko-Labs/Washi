@@ -127,7 +127,8 @@ export function Board({
         verb: 'table.reorder',
         table: bind.table,
         row: id,
-        set: { [groupBy]: to.group, [rank]: nextRank },
+        // No rank column (rank=""): a drop moves the card between groups and keeps no order.
+        set: rank ? { [groupBy]: to.group, [rank]: nextRank } : { [groupBy]: to.group },
       })
     } finally {
       setMoves((current) => {

@@ -13,7 +13,7 @@ export interface AgentCredentialOut {
 }
 
 import { and, eq } from 'drizzle-orm'
-import { member, organization, organizationSecret } from '../db/schema'
+import { member, organization, organizationSecret, user } from '../db/schema'
 import { createAuth } from './auth'
 import { type ControlDB, createControlDb } from './client'
 import { open, seal } from './crypto'
@@ -77,6 +77,14 @@ export function createHostedControlPlane(options: ControlPlaneOptions): HostedCo
         .innerJoin(organization, eq(organization.id, member.organizationId))
         .where(eq(member.userId, actorId))
       return rows satisfies WorkspaceRef[]
+    },
+
+    async listMembers(workspaceId) {
+      return db
+        .select({ id: user.id, name: user.name })
+        .from(member)
+        .innerJoin(user, eq(user.id, member.userId))
+        .where(eq(member.organizationId, workspaceId))
     },
 
     async workspaceIds() {

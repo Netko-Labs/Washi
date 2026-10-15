@@ -1,4 +1,4 @@
-import { querySchema, scalarSchema } from '@washi/ink'
+import { filterSchema, querySchema, scalarSchema } from '@washi/ink'
 import type { ComponentSpec, WsxRegistry } from '@washi/wsx'
 import { z } from 'zod'
 import {
@@ -231,6 +231,33 @@ const dataIn: Record<string, ComponentSpec> = {
     },
     'none',
     { hints: { onMove: 'drag writes table.reorder on its own — set rank and groupBy' } },
+  ),
+  Database: p(
+    {
+      table: z.string().min(1).max(64),
+      views: z
+        .array(
+          z
+            .object({
+              name: z.string().min(1).max(40),
+              kind: z.enum(['table', 'board']),
+              groupBy: columnName.optional(),
+              where: z.array(filterSchema).max(16).optional(),
+              columns: z.array(columnName).max(16).optional(),
+            })
+            .strict(),
+        )
+        .min(1)
+        .max(8)
+        .optional(),
+      empty: z.string().max(160).optional(),
+    },
+    'none',
+    {
+      hints: {
+        views: 'tabs; omit for a table, plus a board grouped by the first status/select column',
+      },
+    },
   ),
   Button: p({ action: actionRefSchema }, 'text'),
   Compose: p(

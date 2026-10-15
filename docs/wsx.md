@@ -175,6 +175,7 @@ the empty *sentence* (`empty="…"`) and nothing else.
 |---|---|---|---|
 | `Field` | `field` `kind` `text\|number\|date\|select\|boolean` `label?` `help?` `table?` `row?` | none | One primitive over all column types. Writes `table.update` on blur (select and boolean on change). `select` offers the column's options (a status column's too) from the table spec — a page never enumerates them. Inside `Repeat`, `row` defaults to `$row.id` |
 | `Board` | `bind` `groupBy` `groups?` `rank?` `kicker?` `title?` `badge?` `meta?` `avatar?` `onAdd?` `empty?` | none | Grouped, draggable records. A drop writes `table.reorder` with the group column and a fractional `rank`. `groups` fixes column order; a numeric `meta` totals per column; `onOpen` runs on click with `$row` in scope; badge values that carry meaning (`highest high bug` → danger, `medium` → warning, `story` → success, `task` → info) take that tone; `onAdd` runs per column with `$group` substituted |
+| `Database` | `table` `views?` `empty?` | none | Notion's database: `views` are tabs (`{ name, kind: table\|board, groupBy?, where?, columns? }`, ≤8); omitted, a table plus a board grouped by the first status/select column. Every cell edits in place (`table.update`), `+ New` adds a row, the header's `+` adds a property (`table.column`), the title opens the row as its page |
 | `Button` | `action` | text | |
 | `Compose` | `action` `label?` `placeholder?` `multiline?` | none | A text box that runs one verb with `$value` (the text) and `$now` (ISO timestamp) filled in — the comment box |
 | `Task` | `row?` `done?` | text | Checkbox bound to a row's `done` column. Inside `Repeat`, `row` defaults to `$row.id` |
@@ -312,6 +313,7 @@ The only side-effect channel. Interaction is a prop, not a handler.
 | `table.insert` | `{ verb, table, data }` | |
 | `table.update` | `{ verb, table, row, set }` | Patch by id. `Field` writes this |
 | `table.reorder` | `{ verb, table, row, set }` | Same shape; `Board` writes the group column and a fractional rank so concurrent drags converge |
+| `table.column` | `{ verb, table, column }` | Appends a property; the whole spec is re-validated. `Database`'s header writes it |
 | `table.delete` | `{ verb, table, row }` | Soft — the row keeps its history |
 | `url.open` | `{ verb, url }` | **Denied from a page** until its consent UI ships |
 

@@ -33,6 +33,7 @@ describe('hanko', () => {
         'table.update': () => {},
         'table.reorder': () => {},
         'table.delete': () => {},
+        'table.column': () => {},
         'url.open': () => {},
       },
     )
@@ -47,9 +48,33 @@ describe('hanko', () => {
           'table.update': () => {},
           'table.reorder': () => {},
           'table.delete': () => {},
+          'table.column': () => {},
           'url.open': () => {},
         },
       ),
     ).rejects.toThrow('unknown action verb')
+  })
+})
+
+describe('table.column', () => {
+  test('reaches its handler', async () => {
+    const added: string[] = []
+    const noop = () => {}
+    await runAction(
+      { verb: 'table.column', table: 'issues', column: { name: 'due', type: 'date' } },
+      {
+        'sheet.open': noop,
+        'sheet.create': noop,
+        'table.insert': noop,
+        'table.update': noop,
+        'table.reorder': noop,
+        'table.delete': noop,
+        'table.column': (action) => {
+          added.push(action.column.name)
+        },
+        'url.open': noop,
+      },
+    )
+    expect(added).toEqual(['due'])
   })
 })

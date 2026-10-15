@@ -8,6 +8,7 @@ export const workspaceQueries = router({
     mode: ctx.mode,
     workspaceId: ctx.workspaceId,
   })),
+  members: workspaceProcedure.query(({ ctx }) => ctx.runtime.control.listMembers(ctx.workspaceId)),
   /** Never the key — only enough to show "set" versus "not set". */
   agentKey: workspaceProcedure.query(
     ({ ctx }) => ctx.runtime.control.secrets?.info(ctx.workspaceId) ?? null,

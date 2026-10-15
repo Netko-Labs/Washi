@@ -11,6 +11,8 @@ export interface PaperHost {
   runAction(action: ActionRef): Promise<void>
   resolveSheet(id: string): Promise<{ title: string; icon: string | null } | null>
   openSheet(id: string): void
+  /** Who a person cell can name. A host with no members (one person, offline) leaves it out. */
+  describePeople?(): Promise<{ id: string; name: string }[]>
   /** Opens a record as its own page, Notion-style. A host without row pages leaves it out. */
   openRow?(recordId: string): void
   toggleTask(recordId: string, done: boolean): Promise<void>
