@@ -11,8 +11,12 @@ export function defaultViews(spec: TableSpec): DatabaseView[] {
   const groupable =
     spec.columns.find((column) => column.type === 'status') ??
     spec.columns.find((column) => column.type === 'select')
-  const table: DatabaseView = { name: 'Table', kind: 'table' }
-  return groupable ? [table, { name: 'Board', kind: 'board', groupBy: groupable.name }] : [table]
+  const dated = spec.columns.find((column) => column.type === 'date')
+  return [
+    { name: 'Table', kind: 'table' },
+    ...(groupable ? [{ name: 'Board', kind: 'board' as const, groupBy: groupable.name }] : []),
+    ...(dated ? [{ name: 'Timeline', kind: 'timeline' as const, date: dated.name }] : []),
+  ]
 }
 
 export function choicesFor(column: ColumnSpec, people: Person[]): Choice[] {

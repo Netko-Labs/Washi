@@ -1,0 +1,94 @@
+/* Roadmap — Notion's timeline: one bar per row on a shared calendar. */
+
+.wsx-roadmap {
+  border: 1px solid var(--border);
+  border-radius: var(--r-input);
+  background: var(--card);
+  overflow: hidden;
+}
+.wsx-roadmap-row {
+  display: grid;
+  grid-template-columns: minmax(140px, 28%) 1fr;
+  border-bottom: 1px solid var(--border);
+  min-height: 38px;
+}
+.wsx-roadmap-row:last-child {
+  border-bottom: 0;
+}
+.wsx-roadmap-head {
+  min-height: 30px;
+  background: var(--muted-bg);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.wsx-roadmap-name {
+  overflow: hidden;
+  padding: 8px 12px;
+  border: 0;
+  border-right: 1px solid var(--border);
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 13.5px;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.wsx-roadmap-name:hover {
+  background: var(--muted-bg);
+}
+.wsx-roadmap-track {
+  position: relative;
+}
+.wsx-roadmap-tick {
+  position: absolute;
+  top: 8px;
+  padding-left: 4px;
+  border-left: 1px solid var(--border);
+  white-space: nowrap;
+}
+.wsx-roadmap-today {
+  position: absolute;
+  top: 0;
+  bottom: -2000px;
+  width: 2px;
+  background: var(--accent);
+  opacity: 0.5;
+  pointer-events: none;
+}
+.wsx-roadmap-bar {
+  position: absolute;
+  top: 7px;
+  bottom: 7px;
+  min-width: 6px;
+  overflow: hidden;
+  padding: 0 8px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--accent) 22%, var(--card));
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 22px;
+  white-space: nowrap;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+.wsx-roadmap-bar[data-dragging] {
+  cursor: grabbing;
+  box-shadow: 0 6px 18px rgb(0 0 0 / 0.14);
+}
+.wsx-roadmap-place {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: none;
+  cursor: copy;
+}
+.wsx-roadmap-place:hover {
+  background: var(--muted-bg);
+}

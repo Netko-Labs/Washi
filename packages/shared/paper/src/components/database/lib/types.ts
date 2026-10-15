@@ -5,8 +5,9 @@ export type { Cell, ColumnSpec, QueryRow, TableSpec }
 
 export interface DatabaseView {
   name: string
-  kind: 'table' | 'board'
+  kind: 'table' | 'board' | 'timeline'
   groupBy?: string
+  date?: string
   where?: Filter[]
   columns?: string[]
 }
