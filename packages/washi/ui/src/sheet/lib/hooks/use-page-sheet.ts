@@ -3,7 +3,7 @@ import { useMemo } from 'react'
 import { paperHost } from '../../../paper-host'
 import { noteIdOf, useSheetsStore, useViewStore } from '../../../stores'
 import type { PageSheet } from '../types'
-import { replaceInSheet } from '../utils'
+import { pageWriter } from '../utils'
 import { useSheet } from './use-sheet'
 
 /** The open page, and a host that can write parts of it back — what a hand-drawn canvas needs. */
@@ -15,10 +15,7 @@ export function usePageSheet(): PageSheet {
   const host = useMemo<PaperHost>(
     () =>
       state.status === 'ready'
-        ? {
-            ...paperHost,
-            replaceNode: (from, to) => replaceInSheet(state.sheet, state.root, from, to),
-          }
+        ? { ...paperHost, replaceNode: pageWriter(state.sheet, state.root) }
         : paperHost,
     [state],
   )

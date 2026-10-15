@@ -255,5 +255,9 @@ export function frameOf(
 export function swapNode(node: WsxNode, from: WsxElement, to: WsxElement): WsxNode {
   if (node === from) return to
   if (node.kind !== 'element') return node
-  return { ...node, children: node.children.map((child) => swapNode(child, from, to)) }
+  // Untouched elements keep their identity: the next swap still finds its block by reference.
+  const children = node.children.map((child) => swapNode(child, from, to))
+  return children.every((child, index) => child === node.children[index])
+    ? node
+    : { ...node, children }
 }
