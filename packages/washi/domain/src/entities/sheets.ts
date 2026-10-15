@@ -21,6 +21,8 @@ export type SheetAuthor = SheetSummary['editedBy']
 export const sheetDetailSchema = sheetSummarySchema.extend({
   source: z.string(),
   hlcCreated: z.string(),
+  /** The Loro version this source is — hand it back with an edit and the edit merges. */
+  version: z.string().optional(),
 })
 export type SheetDetail = z.infer<typeof sheetDetailSchema>
 

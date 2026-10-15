@@ -20,6 +20,7 @@ function swap(node: WsxNode, from: WsxElement, to: WsxElement): WsxNode {
  */
 export function pageWriter(sheet: SheetDetail, loaded: WsxElement) {
   let root = loaded
+  let version = sheet.version
   const replaced = new Map<WsxElement, WsxElement>()
   let saving: Promise<void> = Promise.resolve()
 
@@ -32,10 +33,13 @@ export function pageWriter(sheet: SheetDetail, loaded: WsxElement) {
     saving = saving
       .catch(() => undefined)
       .then(async () => {
-        await api.sheets.update.mutate({
+        // With the version it was drawn from, a canvas edit merges with a teammate's typing.
+        const saved = await api.sheets.update.mutate({
           id: sheet.id,
           write: { title: sheet.title, icon: sheet.icon, source },
+          baseVersion: version,
         })
+        version = saved.version
         await useSheetsStore.getState().refresh()
       })
     return saving

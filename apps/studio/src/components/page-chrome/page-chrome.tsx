@@ -2,6 +2,7 @@ import { IconMessageCircle, IconMoodSmile, IconPhoto } from '@tabler/icons-react
 import { SheetIcon, useSheetsStore } from '@washi/ui'
 import { useState } from 'react'
 import { useCommentsStore } from '@/components/comments'
+import { PagePresence } from '@/components/presence'
 import { RowProperties } from '@/components/row-properties'
 import { CoverPicker } from './cover-picker'
 import { IconPicker } from './icon-picker'
@@ -35,7 +36,10 @@ export function PageChrome({ pageId }: PageChromeProps) {
         </div>
       )}
       <div className={`relative mx-auto px-8 ${sheet.fullWidth ? '' : 'max-w-[760px]'}`}>
-        <WashiMark sheet={sheet} />
+        <div className="absolute top-2 right-8 flex items-center gap-3">
+          <PagePresence sheetId={sheet.id} />
+          <WashiMark sheet={sheet} />
+        </div>
         {sheet.icon && (
           <button
             type="button"

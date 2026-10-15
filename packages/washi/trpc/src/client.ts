@@ -12,3 +12,4 @@ export type {
   MirinTransport,
 } from './mirin/types'
 export { WORKSPACE_HEADER } from './shared/edge/constants'
+export type { PagePresence } from './shared/presence/types'

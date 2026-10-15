@@ -17,7 +17,7 @@ export function WashiMark({ sheet }: WashiMarkProps) {
   }
 
   return (
-    <div className="absolute top-2 right-8 flex items-center gap-1.5 text-[12px] text-muted-foreground">
+    <div className="flex items-center gap-1.5 text-[12px] text-muted-foreground">
       <IconSparkles className="size-3.5 text-agent" />
       <span>
         {failed

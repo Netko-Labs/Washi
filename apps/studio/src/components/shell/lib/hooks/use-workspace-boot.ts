@@ -1,4 +1,4 @@
-import { useAgentStore, useSheetsStore, useViewStore } from '@washi/ui'
+import { useAgentStore, useLiveStore, useSheetsStore, useViewStore } from '@washi/ui'
 import { useEffect } from 'react'
 import { useMentionsPoll } from '@/components/mentions'
 import { useSession } from '@/integrations/auth'
@@ -20,8 +20,12 @@ export function useWorkspaceBoot(workspaceId: string) {
   useEffect(() => {
     void useSheetsStore.getState().refresh()
     void useAgentStore.getState().init()
+    useLiveStore.getState().connect()
     // Only the subscriptions need closing; resetting state is the loader's job, and doing it
     // here as well would wipe what the next workspace's loader already set.
-    return () => useAgentStore.getState().reset()
+    return () => {
+      useAgentStore.getState().reset()
+      useLiveStore.getState().disconnect()
+    }
   }, [workspaceId])
 }

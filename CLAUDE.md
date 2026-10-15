@@ -92,7 +92,17 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   (`ensureColumn` for additive changes). No drizzle-kit migrations — the control plane's DDL is
   hand-written too.
 - Sheet source of truth: Loro text doc (snapshot blob in sqlite); `source` column is a cache.
-  Loro is a storage format today — delta export and merge arrive with sync at phase 8.
+  **Writes merge.** `sheets.get` hands out `version` (encoded frontiers); a write that sends it back
+  as `baseVersion` is replayed on a fork at that version and merged into the present
+  (`mergeSheetSource`), then re-validated — a merge that breaks WSX is `SheetConflictError`. The
+  editor and Washi's `sheet_replace` both send it; without it a write still replaces.
+- **Live.** Every mutation under `sheets.*`, `tables.*` or `capabilities.*` emits
+  `workspaceChanged`, and so does each finished Washi write (`runtime/agent-watch.ts`). Clients
+  hold one `live.onChange` subscription (`useLiveStore`): pages refetch the list, data refetches
+  through `PaperHost.onDataChange`. An open editor takes a remote change in only while it has
+  nothing unsaved (`absorb`, ids kept per row); otherwise its next save merges. Presence is a
+  15s heartbeat (`live.here`) in the runtime's memory, never a record; Washi appears on a page
+  for 20s after each rewrite of it.
 - Pages nest Notion-style: `parent_id` + `position`, a fractional key (`positionBetween` in
   domain), so a move rewrites one row. Delete trashes the subtree under one `deleted_at` stamp;
   that stamp is the batch Restore and Purge act on. A restored page whose parent is gone comes

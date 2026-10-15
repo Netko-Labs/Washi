@@ -10,6 +10,7 @@ import {
   SheetView,
   TabStrip,
   useAgentStore,
+  useLiveStore,
   useSheetsStore,
   useViewStore,
   viewOf,
@@ -36,6 +37,7 @@ export function App() {
     // From boot, not from the panel: the inbox badge and Inbox need live approvals
     // whether or not the panel was ever opened.
     void useAgentStore.getState().init()
+    useLiveStore.getState().connect()
   }, [refresh])
 
   return (

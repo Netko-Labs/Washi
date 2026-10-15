@@ -6,6 +6,7 @@ import {
   listSheets,
   listTables,
   searchSheets,
+  sheetVersion,
   type Workspace,
 } from '@washi/repository'
 import { guardedFetch } from '@washi/tsuru'
@@ -55,9 +56,13 @@ export function createAiTools({ ws, runHankoAction, openSheet, listPeople }: AiT
       execute: async () => listSheets(ws),
     }),
     sheet_get: tool({
-      description: 'Read one sheet: metadata + full WSX source.',
+      description:
+        'Read one sheet: metadata, full WSX source, and its version (for sheet_replace).',
       inputSchema: z.object({ id: z.string() }),
-      execute: async ({ id }) => getSheet(ws, id),
+      execute: async ({ id }) => {
+        const sheet = getSheet(ws, id)
+        return sheet ? { ...sheet, version: sheetVersion(ws, id) } : null
+      },
     }),
     sheet_check: tool({
       description: 'Validate WSX without saving. Run before sheet_create or sheet_replace.',
@@ -112,14 +117,17 @@ export function createAiTools({ ws, runHankoAction, openSheet, listPeople }: AiT
       },
     }),
     sheet_replace: tool({
-      description: "Replace a sheet's WSX source (whole-document write).",
+      description:
+        "Replace a sheet's WSX source (whole-document write). Pass the version sheet_get returned as baseVersion: a teammate typing in the page meanwhile is merged, not overwritten.",
       inputSchema: z.object({
         id: z.string(),
         title: z.string().min(1).max(200),
         icon: z.string().max(16).optional(),
         source: z.string(),
+        baseVersion: z.string().optional(),
       }),
-      execute: async ({ id, ...write }) => updateSheetFromSource(ws, id, write, 'washi'),
+      execute: async ({ id, baseVersion, ...write }) =>
+        updateSheetFromSource(ws, id, write, 'washi', baseVersion),
     }),
     db_define: tool({
       description:

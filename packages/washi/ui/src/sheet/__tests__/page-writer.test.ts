@@ -8,6 +8,7 @@ mock.module('../../api', () => ({
       update: {
         mutate: async ({ write }: { write: { source: string } }) => {
           saved.push(write.source)
+          return { version: `v${saved.length}` }
         },
       },
     },

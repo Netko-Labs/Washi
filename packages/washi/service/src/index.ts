@@ -33,6 +33,7 @@ export {
   createSheetFromSource,
   removeSheet,
   requireSheet,
+  SheetConflictError,
   SheetUndoError,
   SheetValidationError,
   undoWashiWrite,

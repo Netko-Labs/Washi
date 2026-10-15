@@ -261,3 +261,12 @@ export function swapNode(node: WsxNode, from: WsxElement, to: WsxElement): WsxNo
     ? node
     : { ...node, children }
 }
+
+/** Row by row, a block of the same kind keeps its id, so the field being typed in stays mounted. */
+export function reconcile(current: Block[], next: Block[]): Block[] {
+  const merged = next.map((block, index) => {
+    const old = current[index]
+    return old && old.kind === block.kind ? { ...block, id: old.id } : block
+  })
+  return merged.length > 0 ? merged : [newBlock()]
+}

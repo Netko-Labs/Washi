@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@washi/control": "workspace:*",
+    "@washi/domain": "workspace:*",
     "@washi/repository": "workspace:*",
     "@washi/service": "workspace:*",
     "@washi/trpc": "workspace:*"

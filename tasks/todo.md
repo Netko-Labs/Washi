@@ -5,16 +5,17 @@ want this on prod." Every merge to main ships to washi.netko.dev.
 
 - [x] 0 · docs: the definition, the team's week, Q1–Q7 called
 - [x] 1 · the desk lets go: page + table writes land (marked, undoable); fetch/action still ask
-- [ ] 2 · databases: `status` `multi_select` `person` `url` `relation` properties, date with an end
-- [ ] 3 · rows are pages: every row has a body page; drawer peek, full open, comments
-- [ ] 4 · database page: table view with editable cells + add row/property, board view, views as tabs
-- [ ] 5 · history: append-only row change log, ink `history` query, `Chart` over time
-- [ ] 6 · linked views: `/view` in the editor inserts a bound view of any table
-- [ ] 7 · roadmap: `Timeline` binds a table (start/end bars, drag to reschedule)
-- [ ] 8 · team space starter: backlog, roadmap, wiki, ideas canvas, weekly review routine
-- [ ] 9 · canvas: `Canvas` `Node` `Edge` (React Flow), node = label + tone + page link
-- [ ] 10 · live together: Loro over `/sync`, presence, Washi presence + authorship marks
-- [ ] 11 · find: search across pages, backlinks
+- [x] 2 · databases: `status` `multi_select` `person` `url` `relation` properties, date with an end
+- [x] 3 · rows are pages: every row has a body page; full open, comments (drawer peek: later)
+- [x] 4 · database page: table view with editable cells + add row/property, board view, views as tabs
+- [x] 5 · history: append-only row change log, ink `history` query, `Chart` over time
+- [x] 6 · linked views: `/view` in the editor inserts a bound view of any table
+- [x] 7 · roadmap: `Timeline` binds a table (start/end bars, drag to reschedule)
+- [x] 8 · team space starter: backlog, roadmap, wiki, ideas canvas, weekly review routine
+- [x] 9 · canvas: `Canvas` `Node` `Edge` (React Flow), node = label + tone + page link
+- [x] 10 · live together: writes merge on Loro (`baseVersion`), changes push over `/trpc-ws`,
+      presence + Washi presence; raw-binary `/sync` keystroke streaming is still to come
+- [x] 11 · find: search across pages, backlinks
 
 Log (one line per merged PR):
 
@@ -23,8 +24,23 @@ Log (one line per merged PR):
 - #28 `6111113` desk lets go, `sheet_revisions` undo stack. Bot: 1 low (undo rejection unhandled) →
   says so inline.
 
-Noticed along the way (fold into step 8, first run): the sign-in pitch still sells the old product —
-"Edit by asking", "Review is the job", "Every edit … waits for a person".
+- #29 `fa134ab` Notion properties. Bot: no findings.
+- #30 `2cb74df` rows are pages. Bot: 2 low (openRow swallowed errors, stale properties between
+  pages) → a shared `Notice` both hosts mount; medium (blanket catch) → says why; low (inline type).
+- #31 `75c12b9` `Database`. Bot: 2 low (stuck on Loading, inline prop types). Found on the way:
+  hanko's dispatch silently ignored a new verb → exhaustive `never` switch.
+- #32 `d984e8a` history. Bot: **high** — the backfill stamped current data at creation → replays
+  the oplog instead.
+- #33 `e9d3bf4` `/` live data. Bot: medium (failed insert vanished) → Notice.
+- #34 `11dbcc4` `Roadmap`. Bot: 4 rounds on drag state — snap-back, one-frame double shift,
+  mid-drag remote update, `pointercancel` → a shift belongs to its dates; held follows the pointer.
+- #35 `9854811` `Canvas`. Bot: medium (second edit over the first) → one writer per loaded page;
+  `swap` keeps identity for untouched elements (the editor's `swapNode` too).
+- #36 `c3f08f8` team space + `people_list` + new pitch. Bot: no findings.
+- #37 `b927a03` find. Bot: no findings.
+
+Later, still open: drawer peek for rows; saving view filters from the UI; resizing roadmap bars;
+an Undo for table writes (the change log can replay it); keystroke-level `/sync`; desktop presence.
 
 # Notion parity, web (2026-10-14) — one PR per row, code-whiskers until clean, then merge
 

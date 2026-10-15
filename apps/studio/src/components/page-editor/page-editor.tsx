@@ -12,7 +12,7 @@ import {
 /** The page as blocks: type into text, Enter for the next block, `/` or `#`, `-`, `[]` to change kind. */
 export function PageEditor({ sheet, root }: PageEditorProps) {
   const blocks = useEditorStore((state) => state.blocks)
-  useLoadBlocks(sheet.id, root)
+  useLoadBlocks(sheet, root)
   useAutosave(sheet, root)
   const numbers = numberedPositions(blocks)
 

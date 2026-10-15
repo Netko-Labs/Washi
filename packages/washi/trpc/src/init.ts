@@ -4,11 +4,13 @@ import {
   type AgentHost,
   CommentError,
   InkError,
+  SheetConflictError,
   SheetMoveError,
   SheetUndoError,
   SheetValidationError,
 } from '@washi/service'
 import type { EventBus } from './shared/events'
+import type { PresenceBoard } from './shared/presence'
 
 /**
  * Deployment mode. Asserted once at boot, never per request (C2) — two auth
@@ -81,6 +83,7 @@ export interface ServerRuntime {
   resolve(workspaceId: string): ResolvedWorkspace
   control: ControlPlane
   defaultWorkspaceId: string
+  presence: PresenceBoard
 }
 
 export interface Context {
@@ -116,6 +119,13 @@ export const router = t.router
 export const mergeRouters = t.mergeRouters
 export const publicProcedure = t.procedure
 
+/** Which routers' writes move pages, and which move table data. */
+const CHANGES: Record<string, ('page' | 'data')[]> = {
+  sheets: ['page'],
+  tables: ['data', 'page'],
+  capabilities: ['data', 'page'],
+}
+
 /**
  * Every procedure that touches content. Resolving here is what keeps
  * `repository` and `service` free of requests, users and networks (C3).
@@ -130,6 +140,7 @@ export const workspaceProcedure = t.procedure
       (result.error.cause instanceof SheetValidationError ||
         result.error.cause instanceof SheetMoveError ||
         result.error.cause instanceof SheetUndoError ||
+        result.error.cause instanceof SheetConflictError ||
         result.error.cause instanceof InkError ||
         result.error.cause instanceof CommentError)
     ) {
@@ -159,4 +170,16 @@ export const workspaceProcedure = t.procedure
     return next({
       ctx: { ...ctx, ws: resolved.workspace, host: resolved.host },
     })
+  })
+  .use(async ({ ctx, path, type, getRawInput, next }) => {
+    const result = await next()
+    // Every write tells the workspace's other viewers; pages and data refetch on their own.
+    if (result.ok && type === 'mutation') {
+      const input = (await getRawInput().catch(() => null)) as { id?: unknown } | null
+      const id = typeof input?.id === 'string' ? input.id : null
+      for (const kind of CHANGES[path.split('.')[0] ?? ''] ?? []) {
+        ctx.events.emit('workspaceChanged', { workspaceId: ctx.workspaceId, kind, id })
+      }
+    }
+    return result
   })
