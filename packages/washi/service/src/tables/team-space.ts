@@ -1,5 +1,5 @@
 import { createRoutine, getTableByName, type Workspace } from '@washi/repository'
-import { alreadyPassed } from '../agents/routines'
+import { alreadyPassed, zonedNow } from '../agents/routines'
 import { createSheetFromSource } from '../sheets/service'
 import { InkError } from './errors'
 import { defineUserTable, runMutation } from './service'
@@ -23,9 +23,10 @@ const page = (title: string, icon: string, body: string) => ({
 
 const DAY_MS = 86_400_000
 
-/** A UTC day `from` days out, or a range of `length` days from there. */
-function span(from: number, length?: number): string {
-  const day = (offset: number) => new Date(Date.now() + offset * DAY_MS).toISOString().slice(0, 10)
+/** A day `from` days after today in `timeZone`, or a range of `length` days from there. */
+function span(timeZone: string, from: number, length?: number): string {
+  const today = Date.parse(`${zonedNow(new Date(), timeZone).day}T00:00:00Z`)
+  const day = (offset: number) => new Date(today + offset * DAY_MS).toISOString().slice(0, 10)
   return length ? `${day(from)}/${day(from + length)}` : day(from)
 }
 
@@ -40,13 +41,18 @@ export function seedTeamSpace(ws: Workspace, options: TeamSpaceOptions): TeamSpa
     runMutation(ws, {
       kind: 'insert',
       table: 'projects',
-      data: { name: 'Team space', status: 'In progress', when: span(0, 28) },
+      data: { name: 'Team space', status: 'In progress', when: span(options.timeZone, 0, 28) },
     }).id ?? ''
   SEED_ISSUES.forEach((issue, index) => {
     runMutation(ws, {
       kind: 'insert',
       table: 'issues',
-      data: { ...issue, project: [project], rank: index + 1, due: span(7 * (index + 1)) },
+      data: {
+        ...issue,
+        project: [project],
+        rank: index + 1,
+        due: span(options.timeZone, 7 * (index + 1)),
+      },
     })
   })
 

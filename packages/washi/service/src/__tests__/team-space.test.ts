@@ -67,4 +67,11 @@ describe('a team space on day one', () => {
     seedTeamSpace(ws, { timeZone: 'UTC', actorId: null })
     expect(listRoutines(ws)[0]?.lastRunDay).toBeNull()
   })
+
+  test("dates start on the asker's day, not UTC's", () => {
+    // 22:00 in Bogotá is already tomorrow in UTC.
+    setSystemTime(new Date(Date.UTC(2026, 9, 16, 3)))
+    seedTeamSpace(ws, { timeZone: 'America/Bogota', actorId: null })
+    expect(String(runQuery(ws, { table: 'projects' }).rows[0]?.when)).toStartWith('2026-10-15/')
+  })
 })
