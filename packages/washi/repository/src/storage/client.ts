@@ -132,6 +132,18 @@ function createTables(sqlite: Database) {
   sqlite.exec('CREATE INDEX IF NOT EXISTS idx_records_table ON records(table_id)')
 
   sqlite.exec(`
+    CREATE TABLE IF NOT EXISTS record_changes (
+      seq INTEGER PRIMARY KEY AUTOINCREMENT,
+      table_id TEXT NOT NULL,
+      record_id TEXT NOT NULL,
+      data TEXT,
+      at_ms INTEGER NOT NULL
+    )
+  `)
+  sqlite.exec('CREATE INDEX IF NOT EXISTS idx_record_changes ON record_changes(table_id, at_ms)')
+  backfillChanges(sqlite)
+
+  sqlite.exec(`
     CREATE TABLE IF NOT EXISTS agent_sessions (
       id TEXT PRIMARY KEY,
       provider TEXT NOT NULL DEFAULT 'claude',
@@ -292,4 +304,31 @@ function hasColumn(sqlite: Database, table: string, column: string): boolean {
 function ensureColumn(sqlite: Database, table: string, column: string, type: string) {
   if (hasColumn(sqlite, table, column)) return
   sqlite.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${type}`)
+}
+
+/** Rows older than the change log get one: born at creation, gone at deletion. */
+function backfillChanges(sqlite: Database) {
+  const orphans = sqlite
+    .query(
+      `SELECT id, table_id, data, hlc_created, deleted_at FROM records r
+       WHERE NOT EXISTS (SELECT 1 FROM record_changes c WHERE c.record_id = r.id)`,
+    )
+    .all() as {
+    id: string
+    table_id: string
+    data: string
+    hlc_created: string
+    deleted_at: string | null
+  }[]
+  if (orphans.length === 0) return
+  const insert = sqlite.query(
+    'INSERT INTO record_changes (table_id, record_id, data, at_ms) VALUES (?, ?, ?, ?)',
+  )
+  sqlite.transaction(() => {
+    for (const row of orphans) {
+      insert.run(row.table_id, row.id, row.data, Number(row.hlc_created.slice(0, 14)))
+      if (row.deleted_at)
+        insert.run(row.table_id, row.id, null, Number(row.deleted_at.slice(0, 14)))
+    }
+  })()
 }

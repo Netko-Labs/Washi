@@ -158,7 +158,7 @@ primitive accepts the four enums and `class`; the table lists its own props.
 | `Repeat` | `bind` `as?` `empty?` | nodes | Renders children per row with `$row.column` in scope (text, string props, and strings inside `action`/`bind` objects). **Cannot recurse** |
 | `Table` | `bind` `columns?` `empty?` | none | |
 | `Stat` | `value?` `expr?` `label` `hint?` `trend?` `up\|down\|flat` | none | |
-| `Chart` | `bind` `kind` `bar\|line\|area\|donut` `label?` `value?` `empty?` | none | Palette from the chart ramp; series colours not settable |
+| `Chart` | `bind` or `history` · `kind` `bar\|line\|area\|donut` `label?` `value?` `empty?` | none | Palette from the chart ramp; series colours not settable. `bind` draws now; `history` draws one point per day (see §8) — exactly one of the two |
 | `Timeline` | — | nodes | Holds `Step`s |
 | `Step` | `marker` (≤8) `title?` | nodes | Only inside `Timeline` |
 | `Progress` | `value?` (0–1) `expr?` `label?` | none | |
@@ -294,6 +294,17 @@ Column types are Notion's properties:
 | `person` | a member id | — |
 | `url` | http(s) | — |
 | `relation` | list of record ids in `table` | `table` |
+
+### Over time — `history`
+
+`Chart history={{ table, where?, range }}` counts the rows that matched `where` when each day
+closed (UTC), for `range` `7d 14d 30d 90d` (default `30d`). Every write to a row is kept in the
+workspace's change log, so any past day can be replayed: a burn-up is `where` on the done status,
+a backlog is `ne`. Same `where` grammar as `bind`.
+
+```jsx
+<Chart kind="area" history={{ table: 'issues', where: [{ column: 'state', op: 'eq', value: 'Done' }], range: '30d' }} />
+```
 
 A list column (`multi_select`, `relation`) answers membership only: `eq` `contains` `in` mean
 "holds any of", `ne` means "holds none of". It cannot be compared or grouped. On the page it reads

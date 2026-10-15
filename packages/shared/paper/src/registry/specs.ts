@@ -1,4 +1,4 @@
-import { filterSchema, querySchema, scalarSchema } from '@washi/ink'
+import { filterSchema, historyQuerySchema, querySchema, scalarSchema } from '@washi/ink'
 import type { ComponentSpec, WsxRegistry } from '@washi/wsx'
 import { z } from 'zod'
 import {
@@ -151,6 +151,15 @@ const surface: Record<string, ComponentSpec> = {
   ),
 }
 
+const CHART_SHAPE = {
+  bind: querySchema.optional(),
+  history: historyQuerySchema.optional(),
+  kind: z.enum(['bar', 'line', 'area', 'donut']),
+  label: columnName.optional(),
+  value: columnName.optional(),
+  empty: z.string().max(160).optional(),
+}
+
 const dataOut: Record<string, ComponentSpec> = {
   Repeat: p(
     { bind: querySchema, as: z.string().max(32).optional(), empty: z.string().max(160).optional() },
@@ -175,16 +184,15 @@ const dataOut: Record<string, ComponentSpec> = {
     },
     'none',
   ),
-  Chart: p(
-    {
-      bind: querySchema,
-      kind: z.enum(['bar', 'line', 'area', 'donut']),
-      label: columnName.optional(),
-      value: columnName.optional(),
-      empty: z.string().max(160).optional(),
-    },
-    'none',
-  ),
+  Chart: {
+    props: styledSchema
+      .extend(CHART_SHAPE)
+      .strict()
+      .refine((props) => Boolean(props.bind) !== Boolean(props.history), {
+        message: 'a Chart takes bind (now) or history (over time), exactly one',
+      }),
+    children: 'none',
+  },
   Timeline: p({}, 'nodes'),
   Step: p({ marker: z.string().min(1).max(8), title: z.string().max(120).optional() }, 'nodes', {
     within: ['Timeline'],

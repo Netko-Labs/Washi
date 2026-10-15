@@ -10,6 +10,7 @@ export {
   resolveApproval,
   updateSession,
 } from './storage/agents'
+export { listChanges, type RecordChange } from './storage/changes'
 export {
   type DrizzleDB,
   newId,

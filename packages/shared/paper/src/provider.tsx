@@ -1,4 +1,4 @@
-import type { InkQuery, QueryResult, TableSpec } from '@washi/ink'
+import type { HistoryQuery, InkQuery, QueryResult, TableSpec } from '@washi/ink'
 import { createContext, type ReactNode, useContext } from 'react'
 import type { ActionRef } from './lib/types'
 
@@ -8,6 +8,8 @@ import type { ActionRef } from './lib/types'
  */
 export interface PaperHost {
   runQuery(query: InkQuery): Promise<QueryResult>
+  /** `{ day, count }` per day: how many rows matched when each day closed. */
+  runHistory?(query: HistoryQuery): Promise<QueryResult>
   runAction(action: ActionRef): Promise<void>
   resolveSheet(id: string): Promise<{ title: string; icon: string | null } | null>
   openSheet(id: string): void

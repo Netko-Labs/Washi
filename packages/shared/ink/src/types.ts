@@ -96,6 +96,17 @@ export const querySchema = z.object({
 })
 export type InkQuery = z.infer<typeof querySchema>
 
+export const historyRangeSchema = z.enum(['7d', '14d', '30d', '90d'])
+export type HistoryRange = z.infer<typeof historyRangeSchema>
+
+/** How many rows matched `where` at the end of each day — a burn-up, a backlog over time. */
+export const historyQuerySchema = z.object({
+  table: z.string().min(1),
+  where: z.array(filterSchema).max(16).optional(),
+  range: historyRangeSchema.default('30d'),
+})
+export type HistoryQuery = z.infer<typeof historyQuerySchema>
+
 export const recordDataSchema = z.record(z.string(), cellSchema)
 export type RecordData = z.infer<typeof recordDataSchema>
 

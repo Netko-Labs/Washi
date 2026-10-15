@@ -108,6 +108,12 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   inline marks) stays a locked block, kept byte-for-byte. Saves go through `sheets.update` — the
   same validation as the agent's. `serialize` writes text with `<{}>&`, runs of spaces or
   newlines as a string literal, so typed text always round-trips.
+- **Tables are Notion databases.** Properties: `status` (todo · doing · done groups), `select`,
+  `multi_select`, `person` (member id), `date` (`start/end` for a range), `url`, `relation` (record
+  ids). Every row can open as a page (`sheets.row_id`, unique; out of the tree). Every write to a
+  row also appends what it became to `record_changes` — the history a `Chart history` replays day
+  by day. Never update `records` without going through `insertRecord`/`updateRecords`/
+  `deleteRecords`, or history silently forgets.
 - Comments live in the workspace file (`comments`, `mention_inbox`), so they travel with it (C1).
   The author is the session's actor — never the request body; embedded mode signs as `You`. A
   mention is an unread Inbox row for that person; a trashed page hides its mentions, a purge

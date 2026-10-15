@@ -111,3 +111,28 @@ describe('the registry', () => {
     expect(grouped.length).toBeGreaterThanOrEqual(44)
   })
 })
+
+describe('the team week', () => {
+  test('a Chart draws now (bind) or over time (history), never both or neither', () => {
+    const chart = (props: string) =>
+      messages(`<Sheet title="t"><Chart kind="area" ${props} /></Sheet>`)
+    expect(chart(`history={{ table: 'issues', range: '30d' }}`)).toBe('')
+    expect(chart(`bind={{ table: 'issues' }}`)).toBe('')
+    expect(chart('')).toMatch(/exactly one/)
+    expect(chart(`bind={{ table: 'issues' }} history={{ table: 'issues' }}`)).toMatch(/exactly one/)
+  })
+
+  test('a Database names its table and may name its views', () => {
+    expect(messages(`<Sheet title="t"><Database table="issues" /></Sheet>`)).toBe('')
+    expect(
+      messages(
+        `<Sheet title="t"><Database table="issues" views={[{ name: 'Mine', kind: 'board', groupBy: 'state' }]} /></Sheet>`,
+      ),
+    ).toBe('')
+    expect(
+      messages(
+        `<Sheet title="t"><Database table="issues" views={[{ name: 'x', kind: 'gantt' }]} /></Sheet>`,
+      ),
+    ).not.toBe('')
+  })
+})

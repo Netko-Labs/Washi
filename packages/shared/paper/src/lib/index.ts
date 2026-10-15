@@ -1,5 +1,6 @@
 export { useBind } from './hooks/use-bind'
 export { useExprValue } from './hooks/use-expr'
+export { useHistory } from './hooks/use-history'
 export { NowContext, useNow } from './hooks/use-now'
 export { useRunAction } from './hooks/use-run-action'
 export { useSelectOptions } from './hooks/use-select-options'

@@ -11,6 +11,7 @@ const TOOL_KINDS: Record<string, Extract<AgentUpdate, { kind: 'tool_call' }>['to
   search: 'search',
   db_list_tables: 'read',
   db_query: 'search',
+  db_history: 'search',
   db_define: 'edit',
   db_mutate: 'edit',
   fetch_url: 'fetch',
