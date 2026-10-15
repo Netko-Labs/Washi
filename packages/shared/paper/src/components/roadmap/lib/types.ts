@@ -34,6 +34,14 @@ export interface RoadmapRowProps {
   onOpen: () => void
 }
 
+export interface DragShift {
+  /** The bar's start day when the shift was made. */
+  at: number | null
+  days: number
+  /** The pointer is still down: the bar follows it whatever the row does meanwhile. */
+  held: boolean
+}
+
 export interface BarDrag {
   shift: number
   onPointerDown: (event: React.PointerEvent<HTMLElement>) => void
