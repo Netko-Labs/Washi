@@ -15,6 +15,7 @@ const sheet = (id: string, ms: number) =>
     fullWidth: false,
     editedBy: null,
     undoable: false,
+    rowOf: null,
     hlcUpdated: hlcAt(ms),
   }) satisfies SheetSummary
 

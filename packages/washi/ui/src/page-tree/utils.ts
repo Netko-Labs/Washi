@@ -6,14 +6,17 @@ function byPosition(a: SheetSummary, b: SheetSummary): number {
   return a.id < b.id ? -1 : 1
 }
 
+/** A row's page lives in its database, not the tree. */
+const inTree = (sheet: SheetSummary) => sheet.rowOf === null
+
 export function childrenOf(sheets: SheetSummary[], parentId: string | null): SheetSummary[] {
-  return sheets.filter((sheet) => sheet.parentId === parentId).sort(byPosition)
+  return sheets.filter((sheet) => inTree(sheet) && sheet.parentId === parentId).sort(byPosition)
 }
 
 /** Every page's children, ordered, keyed by parent id (`null` is the top level). */
 export function groupByParent(sheets: SheetSummary[]): Map<string | null, SheetSummary[]> {
   const groups = new Map<string | null, SheetSummary[]>()
-  for (const sheet of [...sheets].sort(byPosition)) {
+  for (const sheet of sheets.filter(inTree).sort(byPosition)) {
     const siblings = groups.get(sheet.parentId) ?? []
     siblings.push(sheet)
     groups.set(sheet.parentId, siblings)

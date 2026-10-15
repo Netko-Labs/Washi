@@ -40,6 +40,7 @@ export {
   type WsxCheck,
 } from './sheets/service'
 export { duplicateSheet, moveSheetTo, restoreSheetTree, SheetMoveError } from './sheets/tree'
+export { openRowPage, rowOfSheet, rowTitle } from './tables/rows'
 export {
   defineUserTable,
   deleteRecord,

@@ -39,6 +39,7 @@ export function Table({
   ...rest
 }: BlockProps & { bind: InkQuery; columns?: string[]; empty?: string }) {
   const state = useBind(bind)
+  const { openRow } = usePaperHost()
   return (
     <Bound state={state} empty={empty}>
       {(rows) => {
@@ -55,7 +56,11 @@ export function Table({
               </thead>
               <tbody>
                 {rows.map((row, index) => (
-                  <tr key={String(row.id ?? index)}>
+                  <tr
+                    key={String(row.id ?? index)}
+                    data-openable={openRow && typeof row.id === 'string' ? '' : undefined}
+                    onClick={() => typeof row.id === 'string' && openRow?.(row.id)}
+                  >
                     {keys.map((key) => (
                       <td key={key} data-num={typeof row[key] === 'number' || undefined}>
                         {cell(row[key])}

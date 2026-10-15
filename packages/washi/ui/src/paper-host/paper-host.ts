@@ -25,6 +25,20 @@ export const paperHost: PaperHost = {
       useViewStore.getState().openTab(`note:${id}`),
     ),
 
+  openRow: (recordId) =>
+    void api.tables.openRow
+      .mutate({ recordId })
+      .then(async ({ sheetId }) => {
+        const { useSheetsStore, useViewStore } = await import('../stores')
+        await useSheetsStore.getState().refresh()
+        useViewStore.getState().openTab(`note:${sheetId}`)
+      })
+      .catch(async (cause: unknown) => {
+        const { useNoticeStore } = await import('../stores')
+        const reason = cause instanceof Error ? cause.message : String(cause)
+        useNoticeStore.getState().say(`That row did not open — ${reason}`)
+      }),
+
   toggleTask: async (recordId, done) => {
     await api.tables.toggleTask.mutate({ recordId, done })
   },

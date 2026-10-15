@@ -13,6 +13,7 @@ const page = (id: string, parentId: string | null, position: string): SheetSumma
   fullWidth: false,
   editedBy: null,
   undoable: false,
+  rowOf: null,
   hlcUpdated: '0',
 })
 

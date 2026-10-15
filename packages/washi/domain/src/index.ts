@@ -48,6 +48,6 @@ export {
   type TrashEntry,
   trashEntrySchema,
 } from './entities/sheets'
-export { type UserTable, userTableSchema } from './entities/tables'
+export { type RowOf, type UserTable, userTableSchema } from './entities/tables'
 export { compareHlc, createHlcClock, type HlcClock } from './hlc'
 export { positionBetween } from './position'

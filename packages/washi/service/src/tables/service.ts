@@ -22,13 +22,10 @@ import {
   updateRecords,
   type Workspace,
 } from '@washi/repository'
+import { InkError } from './errors'
+import { trashRowPages } from './rows'
 
-export class InkError extends Error {
-  constructor(message: string) {
-    super(message)
-    this.name = 'InkError'
-  }
-}
+export { InkError }
 
 function requireTable(ws: Workspace, name: string): UserTable {
   const table = getTableByName(ws, name)
@@ -122,7 +119,9 @@ export function runMutation(
     }
     case 'delete': {
       const ids = matchRecordIds(ws, table.id, table.spec, mutation.where)
-      return { affected: deleteRecords(ws, table.id, ids) }
+      const affected = deleteRecords(ws, table.id, ids)
+      trashRowPages(ws, ids)
+      return { affected }
     }
   }
 }
@@ -147,6 +146,7 @@ export function deleteRecord(ws: Workspace, tableName: string, recordId: string)
   if (deleteRecords(ws, table.id, [recordId]) === 0) {
     throw new InkError(`unknown record "${recordId}" on table "${tableName}"`)
   }
+  trashRowPages(ws, [recordId])
 }
 
 /** Task checkbox write-back: flip `done` on one record by id. */

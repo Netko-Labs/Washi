@@ -11,6 +11,8 @@ export interface PaperHost {
   runAction(action: ActionRef): Promise<void>
   resolveSheet(id: string): Promise<{ title: string; icon: string | null } | null>
   openSheet(id: string): void
+  /** Opens a record as its own page, Notion-style. A host without row pages leaves it out. */
+  openRow?(recordId: string): void
   toggleTask(recordId: string, done: boolean): Promise<void>
   /** Column specs, so a select Field offers the column's options — never the page's. */
   describeTable(name: string): Promise<TableSpec | null>

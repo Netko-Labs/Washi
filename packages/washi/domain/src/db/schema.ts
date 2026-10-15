@@ -13,6 +13,8 @@ export const sheetTable = sqliteTable('sheets', {
   fullWidth: integer('full_width', { mode: 'boolean' }).notNull().default(false),
   /** Who wrote the content last: Washi, or null for a person. */
   editedBy: text('edited_by', { enum: ['washi'] }),
+  /** The database row this page is the body of; such a page lives in its table, not the tree. */
+  rowId: text('row_id'),
   /** Derived cache of the Loro doc's text — queries and FTS read this. */
   source: text('source').notNull(),
   loroSnapshot: blob('loro_snapshot', { mode: 'buffer' }).notNull(),

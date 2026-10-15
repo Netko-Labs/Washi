@@ -31,6 +31,7 @@ const SUMMARY = {
   cover: sheetTable.cover,
   fullWidth: sheetTable.fullWidth,
   editedBy: sheetTable.editedBy,
+  rowOf: sheetTable.rowId,
   // Drizzle renders a lone column unqualified here, and `id` would bind to the revision's.
   undoable:
     sql<boolean>`exists (select 1 from sheet_revisions r where r.sheet_id = sheets.id)`.mapWith(
@@ -64,6 +65,7 @@ export function createSheet(
   index: SheetIndexInput,
   parentId: string | null = null,
   editedBy: SheetAuthor = null,
+  rowId: string | null = null,
 ): SheetDetail {
   const now = ws.now()
   const id = newId()
@@ -79,6 +81,7 @@ export function createSheet(
       source: write.source,
       loroSnapshot: Buffer.from(createSnapshot(write.source)),
       editedBy,
+      rowId,
       hlcCreated: now,
       hlcUpdated: now,
     })
@@ -173,6 +176,19 @@ export function updateSheetMeta(
   }
   appendOp(ws, 'sheet', id, { kind: 'meta', ...patch })
   return getSheet(ws, id)
+}
+
+/** The page that is a row's body, trashed or not — a row has one, ever. */
+export function findRowSheet(
+  ws: Workspace,
+  rowId: string,
+): { id: string; trashed: boolean } | null {
+  const [row] = ws.db
+    .select({ id: sheetTable.id, deletedAt: sheetTable.deletedAt })
+    .from(sheetTable)
+    .where(eq(sheetTable.rowId, rowId))
+    .all()
+  return row ? { id: row.id, trashed: row.deletedAt !== null } : null
 }
 
 export function getBacklinks(ws: Workspace, id: string): SheetSummary[] {
