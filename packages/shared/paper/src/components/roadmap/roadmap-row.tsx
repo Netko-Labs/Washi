@@ -5,7 +5,7 @@ import { percent, type RoadmapRowProps, useBarDrag } from './lib'
 export function RoadmapRow({ span, calendar, title, onMove, onPlace, onOpen }: RoadmapRowProps) {
   const track = useRef<HTMLDivElement>(null)
   const dayWidth = () => (track.current?.clientWidth ?? 0) / calendar.days
-  const drag = useBarDrag(dayWidth, onMove)
+  const drag = useBarDrag(dayWidth, span?.start ?? null, onMove)
 
   return (
     <div className="wsx-roadmap-row">

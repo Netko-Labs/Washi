@@ -29,7 +29,7 @@ export interface RoadmapRowProps {
   span: Span | null
   calendar: Calendar
   title: string
-  onMove: (days: number) => void
+  onMove: (days: number) => Promise<void>
   onPlace: (day: number) => void
   onOpen: () => void
 }
