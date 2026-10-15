@@ -10,7 +10,7 @@ import {
 import { sheetLinkTable, sheetTable } from '@washi/domain/db'
 import { and, desc, eq, isNull, sql } from 'drizzle-orm'
 import { newId, type Workspace } from './client'
-import { createSnapshot, updateSnapshot } from './loro'
+import { createSnapshot, mergeText, updateSnapshot, versionOf } from './loro'
 import { appendOp } from './oplog'
 import { clearRevisions, pushRevision } from './revisions'
 import { lastChildPosition, liveSubtree } from './sheet-tree'
@@ -231,4 +231,29 @@ export function indexSheet(ws: Workspace, id: string, title: string, index: Shee
   for (const dst of index.refs) {
     ws.db.insert(sheetLinkTable).values({ src: id, dst }).onConflictDoNothing().run()
   }
+}
+
+/** The page's Loro version — what an editor sends back so its edit merges instead of replacing. */
+export function sheetVersion(ws: Workspace, id: string): string | null {
+  const [row] = ws.db
+    .select({ snapshot: sheetTable.loroSnapshot })
+    .from(sheetTable)
+    .where(and(eq(sheetTable.id, id), isNull(sheetTable.deletedAt)))
+    .all()
+  return row ? versionOf(row.snapshot) : null
+}
+
+/** `next` written against `version`, merged with every edit that landed since. */
+export function mergeSheetSource(
+  ws: Workspace,
+  id: string,
+  version: string,
+  next: string,
+): string | null {
+  const [row] = ws.db
+    .select({ snapshot: sheetTable.loroSnapshot })
+    .from(sheetTable)
+    .where(and(eq(sheetTable.id, id), isNull(sheetTable.deletedAt)))
+    .all()
+  return row ? mergeText(row.snapshot, version, next) : null
 }

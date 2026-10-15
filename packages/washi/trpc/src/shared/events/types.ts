@@ -1,4 +1,5 @@
 import type { ApprovalRequest, TranscriptEntry } from '@washi/domain'
+import type { PagePresence } from '../presence'
 
 /**
  * Develop-menu commands only the client can carry out — onboarding and identity
@@ -14,6 +15,9 @@ export interface WashiEvents {
   agentUpdate: { workspaceId: string; sessionId: string; entry: TranscriptEntry }
   approvalRequested: ApprovalRequest & { workspaceId: string }
   openSheetRequested: { workspaceId: string; id: string }
+  /** Something in the workspace moved: a page, or table data. Viewers refetch what they show. */
+  workspaceChanged: { workspaceId: string; kind: 'page' | 'data'; id: string | null }
+  presenceChanged: { workspaceId: string; sheetId: string; people: PagePresence[] }
   devCommand: { command: DevCommand }
 }
 

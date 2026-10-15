@@ -5,6 +5,7 @@ import {
   deleteSheet,
   getSheet,
   latestRevision,
+  mergeSheetSource,
   restoreRevision,
   updateSheet,
   type Workspace,
@@ -69,13 +70,37 @@ export function createSheetFromSource(
   return createSheet(ws, write, indexOf(root), parentId, editedBy)
 }
 
+export class SheetConflictError extends Error {
+  constructor(id: string) {
+    super(`page ${id} changed under this edit and the two do not fit together; reload it`)
+    this.name = 'SheetConflictError'
+  }
+}
+
+/** Two writers, one page: with the version it read, an edit merges instead of replacing. */
+function mergedSource(ws: Workspace, id: string, write: SheetWrite, baseVersion?: string): string {
+  if (!baseVersion) return write.source
+  let merged: string | null
+  try {
+    merged = mergeSheetSource(ws, id, baseVersion, write.source)
+  } catch {
+    throw new SheetConflictError(id)
+  }
+  if (merged === null) throw new Error(`sheet not found: ${id}`)
+  if (merged !== write.source && !checkSource(merged).ok) throw new SheetConflictError(id)
+  return merged
+}
+
 export function updateSheetFromSource(
   ws: Workspace,
   id: string,
   write: SheetWrite,
   editedBy: SheetAuthor = null,
+  baseVersion?: string,
 ): SheetDetail {
-  const updated = updateSheet(ws, id, write, indexOf(parseValidated(write.source)), editedBy)
+  parseValidated(write.source)
+  const source = mergedSource(ws, id, write, baseVersion)
+  const updated = updateSheet(ws, id, { ...write, source }, indexOf(parse(source)), editedBy)
   if (!updated) throw new Error(`sheet not found: ${id}`)
   return updated
 }

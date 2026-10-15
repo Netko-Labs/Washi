@@ -3,6 +3,7 @@ import { agentsRouter } from './routers/agents'
 import { capabilitiesRouter } from './routers/capabilities'
 import { commentsRouter } from './routers/comments'
 import { devRouter } from './routers/dev'
+import { liveRouter } from './routers/live'
 import { modelsRouter } from './routers/models'
 import { routinesRouter } from './routers/routines'
 import { sheetsRouter } from './routers/sheets'
@@ -25,6 +26,7 @@ export const appRouter = router({
   models: modelsRouter,
   routines: routinesRouter,
   dev: devRouter,
+  live: liveRouter,
 })
 
 export type AppRouter = typeof appRouter
@@ -57,4 +59,10 @@ export {
   type WashiEvents,
 } from './shared/events'
 export { isTrustedOrigin } from './shared/origin'
+export {
+  AGENT_PRESENCE_TTL_MS,
+  createPresenceBoard,
+  type PagePresence,
+  type PresenceBoard,
+} from './shared/presence'
 export { closeAllPeers, createTRPCWebSocketHooks, type PeerLike } from './ws'

@@ -1,5 +1,5 @@
 import { sheetMetaPatchSchema, sheetWriteSchema } from '@washi/domain'
-import { emptyTrash, purgeSheet, updateSheetMeta } from '@washi/repository'
+import { emptyTrash, purgeSheet, sheetVersion, updateSheetMeta } from '@washi/repository'
 import {
   createSheetFromSource,
   duplicateSheet,
@@ -20,9 +20,15 @@ export const sheetMutations = router({
     .mutation(({ ctx, input }) =>
       createSheetFromSource(ctx.ws, input.write, input.parentId ?? null),
     ),
+  /** With `baseVersion` (from `get`), a write merges with whatever landed since it was read. */
   update: workspaceProcedure
-    .input(z.object({ id: z.string(), write: sheetWriteSchema }))
-    .mutation(({ ctx, input }) => updateSheetFromSource(ctx.ws, input.id, input.write)),
+    .input(
+      z.object({ id: z.string(), write: sheetWriteSchema, baseVersion: z.string().optional() }),
+    )
+    .mutation(({ ctx, input }) => {
+      const sheet = updateSheetFromSource(ctx.ws, input.id, input.write, null, input.baseVersion)
+      return { ...sheet, version: sheetVersion(ctx.ws, input.id) ?? undefined }
+    }),
   undoWashi: workspaceProcedure
     .input(byId)
     .mutation(({ ctx, input }) => undoWashiWrite(ctx.ws, input.id)),

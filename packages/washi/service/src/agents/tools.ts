@@ -8,6 +8,7 @@ import {
   listSheets,
   listTables,
   searchSheets,
+  sheetVersion,
   type Workspace,
 } from '@washi/repository'
 import { fetchPolicySchema, guardedFetch } from '@washi/tsuru'
@@ -52,9 +53,12 @@ export function createWashiTools(ws: Workspace, context: ToolContext) {
       ),
       tool(
         'sheet_get',
-        'Read one sheet: metadata + full WSX source.',
+        'Read one sheet: metadata, full WSX source, and its version (for sheet_replace).',
         { id: z.string() },
-        async ({ id }) => text(getSheet(ws, id)),
+        async ({ id }) => {
+          const sheet = getSheet(ws, id)
+          return text(sheet ? { ...sheet, version: sheetVersion(ws, id) } : null)
+        },
       ),
       tool(
         'sheet_check',
@@ -79,14 +83,16 @@ export function createWashiTools(ws: Workspace, context: ToolContext) {
       ),
       tool(
         'sheet_replace',
-        "Replace a sheet's WSX source (whole-document write).",
+        "Replace a sheet's WSX source (whole-document write). Pass the version sheet_get returned as baseVersion: a teammate typing in the page meanwhile is merged, not overwritten.",
         {
           id: z.string(),
           title: z.string().min(1).max(200),
           icon: z.string().max(16).optional(),
           source: z.string(),
+          baseVersion: z.string().optional(),
         },
-        async ({ id, ...write }) => text(updateSheetFromSource(ws, id, write, 'washi')),
+        async ({ id, baseVersion, ...write }) =>
+          text(updateSheetFromSource(ws, id, write, 'washi', baseVersion)),
       ),
       tool(
         'sheet_backlinks',

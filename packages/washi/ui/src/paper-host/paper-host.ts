@@ -1,11 +1,14 @@
 import type { PaperHost } from '@washi/paper'
 import { api } from '../api'
+import { useLiveStore } from '../stores/live/live-store'
 
 /** Wires the closed capability surface of rendered sheets to the main process. */
 export const paperHost: PaperHost = {
   runQuery: (query) => api.tables.query.query({ query }),
 
   runHistory: (query) => api.tables.history.query({ query }),
+
+  onDataChange: (listener) => useLiveStore.getState().onData(listener),
 
   runAction: async (action) => {
     if (action.verb === 'sheet.open' && typeof action.sheet === 'string') {

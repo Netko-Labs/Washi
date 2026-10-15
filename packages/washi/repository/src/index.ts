@@ -68,8 +68,10 @@ export {
   getSheet,
   indexSheet,
   listSheets,
+  mergeSheetSource,
   type SheetIndexInput,
   searchSheets,
+  sheetVersion,
   updateSheet,
   updateSheetMeta,
 } from './storage/sheets'

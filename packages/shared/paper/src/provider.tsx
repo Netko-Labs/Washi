@@ -21,6 +21,8 @@ export interface PaperHost {
    * writes itself back. A read-only host leaves it out, and the canvas stays still.
    */
   replaceNode?(from: WsxElement, to: WsxElement): Promise<void>
+  /** Calls back when table data moved somewhere else (a teammate, Washi); returns the unsubscribe. */
+  onDataChange?(listener: () => void): () => void
   /** Opens a record as its own page, Notion-style. A host without row pages leaves it out. */
   openRow?(recordId: string): void
   toggleTask(recordId: string, done: boolean): Promise<void>

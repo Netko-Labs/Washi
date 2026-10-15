@@ -1,7 +1,8 @@
 import { join } from 'node:path'
 import { createWorkspaceRegistry, type Workspace } from '@washi/repository'
 import { AgentHost, createStoredKeySource } from '@washi/service'
-import { createEventBus, type ResolvedWorkspace } from '@washi/trpc'
+import { createEventBus, createPresenceBoard, type ResolvedWorkspace } from '@washi/trpc'
+import { watchAgentWrites } from './agent-watch'
 import { DEFAULT_WORKSPACE_ID } from './constants'
 import type { Runtime, RuntimeOptions } from './types'
 
@@ -11,6 +12,9 @@ import type { Runtime, RuntimeOptions } from './types'
  */
 export function createRuntime(options: RuntimeOptions): Runtime {
   const events = createEventBus()
+  const presence = createPresenceBoard((workspaceId, sheetId, people) =>
+    events.emit('presenceChanged', { workspaceId, sheetId, people }),
+  )
   const registry = createWorkspaceRegistry((id) => join(options.dataDir, `${id}.db`))
   const hosts = new Map<string, ResolvedWorkspace>()
 
@@ -25,8 +29,12 @@ export function createRuntime(options: RuntimeOptions): Runtime {
         : undefined
     const host = new AgentHost(workspace, keys)
     const workspaceId = workspace.id
+    const watch = watchAgentWrites(workspaceId, events, presence)
     host.setEvents({
-      update: (sessionId, entry) => events.emit('agentUpdate', { workspaceId, sessionId, entry }),
+      update: (sessionId, entry) => {
+        watch(entry)
+        events.emit('agentUpdate', { workspaceId, sessionId, entry })
+      },
       approval: (request) => events.emit('approvalRequested', { ...request, workspaceId }),
       openSheet: (id) => events.emit('openSheetRequested', { workspaceId, id }),
     })
@@ -38,6 +46,7 @@ export function createRuntime(options: RuntimeOptions): Runtime {
     mode: options.mode,
     events,
     control: options.control,
+    presence,
     defaultWorkspaceId: options.defaultWorkspaceId ?? DEFAULT_WORKSPACE_ID,
 
     resolve(workspaceId) {
