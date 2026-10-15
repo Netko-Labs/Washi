@@ -1,6 +1,4 @@
-import type { CellProps, Choice } from './lib'
-
-type ScalarCellProps = Omit<CellProps, 'db'>
+import type { CellProps, ChoiceCellProps, ScalarCellProps } from './lib'
 
 /** Text, number and URL: typed in place, written when the cell is left. */
 export function TextCell({ column, value, commit }: ScalarCellProps) {
@@ -69,12 +67,7 @@ export function CheckCell({ column, value, commit }: ScalarCellProps) {
 }
 
 /** Select, status, person: one choice, or none. */
-export function ChoiceCell({
-  column,
-  value,
-  commit,
-  choices,
-}: ScalarCellProps & { choices: Choice[] }) {
+export function ChoiceCell({ column, value, commit, choices }: ChoiceCellProps) {
   const current = typeof value === 'string' ? value : ''
   return (
     <select
@@ -98,12 +91,7 @@ export function ChoiceCell({
 }
 
 /** Multi-select and relation: chips to drop, a menu to add. */
-export function ListCell({
-  column,
-  value,
-  commit,
-  choices,
-}: ScalarCellProps & { choices: Choice[] }) {
+export function ListCell({ column, value, commit, choices }: ChoiceCellProps) {
   const items = Array.isArray(value) ? value : []
   const label = (item: string) => choices.find((choice) => choice.value === item)?.label ?? item
   const rest = choices.filter((choice) => !items.includes(choice.value))

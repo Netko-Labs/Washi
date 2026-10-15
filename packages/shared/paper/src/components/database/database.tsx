@@ -16,6 +16,13 @@ export function Database({ table, views, empty, ...rest }: DatabaseProps) {
       </div>
     )
   }
+  if (db === 'unreadable') {
+    return (
+      <div className="wsx-empty" data-state="error" role="alert">
+        This database could not load.
+      </div>
+    )
+  }
   if (db === 'missing') {
     return (
       <div className="wsx-empty" data-state="error" role="alert">

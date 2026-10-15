@@ -28,6 +28,9 @@ export interface DatabaseContext {
   people: Person[]
 }
 
+/** Null while loading; a table that is not there, or could not be read, says so. */
+export type DatabaseLoad = DatabaseContext | null | 'missing' | 'unreadable'
+
 export interface ViewProps {
   db: DatabaseContext
   view: DatabaseView
@@ -41,6 +44,16 @@ export interface CellProps {
   column: ColumnSpec
   value: Cell | undefined
   commit: (value: Cell) => void
+}
+
+export type ScalarCellProps = Omit<CellProps, 'db'>
+
+export interface ChoiceCellProps extends ScalarCellProps {
+  choices: Choice[]
+}
+
+export interface AddPropertyProps {
+  onAdd: (name: string, type: ColumnSpec['type'], options: string[]) => Promise<void>
 }
 
 export interface Choice {

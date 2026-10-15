@@ -1,14 +1,10 @@
 import { useState } from 'react'
-import { type ColumnSpec, columnKey, PROPERTY_TYPES } from './lib'
+import { type AddPropertyProps, type ColumnSpec, columnKey, PROPERTY_TYPES } from './lib'
 
 const BLANK = { label: '', type: 'text' as ColumnSpec['type'], options: '' }
 
 /** The header's "+": a name, a type, and options when the type has them. */
-export function AddProperty({
-  onAdd,
-}: {
-  onAdd: (name: string, type: ColumnSpec['type'], options: string[]) => Promise<void>
-}) {
+export function AddProperty({ onAdd }: AddPropertyProps) {
   const [open, setOpen] = useState(false)
   const [form, setForm] = useState(BLANK)
   const needsOptions = form.type === 'select' || form.type === 'multi_select'
