@@ -3,8 +3,8 @@
 Juan's calls: `docs/washi.html` Q1–Q7 — Q5 "do as Notion does", the rest as recommended. "Go, I
 want this on prod." Every merge to main ships to washi.netko.dev.
 
-- [ ] 0 · docs: the definition, the team's week, Q1–Q7 called
-- [ ] 1 · the desk lets go: page + table writes land (marked, undoable); fetch/action still ask
+- [x] 0 · docs: the definition, the team's week, Q1–Q7 called
+- [x] 1 · the desk lets go: page + table writes land (marked, undoable); fetch/action still ask
 - [ ] 2 · databases: `status` `multi_select` `person` `url` `relation` properties, date with an end
 - [ ] 3 · rows are pages: every row has a body page; drawer peek, full open, comments
 - [ ] 4 · database page: table view with editable cells + add row/property, board view, views as tabs
@@ -18,6 +18,13 @@ want this on prod." Every merge to main ships to washi.netko.dev.
 
 Log (one line per merged PR):
 
+- #27 `c94dc2c` the definition + build order. Bot: no findings; CI caught biome linting the new spec
+  → excluded like its siblings.
+- #28 `6111113` desk lets go, `sheet_revisions` undo stack. Bot: 1 low (undo rejection unhandled) →
+  says so inline.
+
+Noticed along the way (fold into step 8, first run): the sign-in pitch still sells the old product —
+"Edit by asking", "Review is the job", "Every edit … waits for a person".
 
 # Notion parity, web (2026-10-14) — one PR per row, code-whiskers until clean, then merge
 
