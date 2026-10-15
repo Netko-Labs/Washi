@@ -121,3 +121,12 @@ describe('extract', () => {
     expect(extractRefs(root)).toEqual(['0198c2f0'])
   })
 })
+
+describe('links between pages', () => {
+  test('a canvas node that opens a page links to it, like a Ref', () => {
+    const root = parse(
+      '<Sheet title="t"><Text><Ref sheet="a">A</Ref></Text><Canvas><Node id="n" x={0} y={0} page="b">B</Node></Canvas></Sheet>',
+    )
+    expect(extractRefs(root).sort()).toEqual(['a', 'b'])
+  })
+})

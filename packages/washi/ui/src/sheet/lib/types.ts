@@ -28,6 +28,8 @@ export interface SheetBodyProps {
 export interface SheetViewProps {
   /** The host's own band above the sheet — cover and icon on the web. */
   chrome?: ReactNode
+  /** The host's band below the sheet — what links here, on the web. */
+  footer?: ReactNode
   /** Draws the sheet instead of the plain view — the web's editor. */
   body?: ComponentType<SheetBodyProps>
 }

@@ -2,7 +2,7 @@ import { PaperProvider, WsxView } from '@washi/paper'
 import { type SheetViewProps, usePageSheet } from './lib'
 import { SheetEmpty, SheetFailed, SheetLoading, SheetMissing } from './sheet-states'
 
-export function SheetView({ chrome, body: Body }: SheetViewProps) {
+export function SheetView({ chrome, footer, body: Body }: SheetViewProps) {
   const { summary, state, host } = usePageSheet()
 
   if (state.status === 'idle') return <SheetEmpty />
@@ -26,6 +26,7 @@ export function SheetView({ chrome, body: Body }: SheetViewProps) {
           <WsxView key={state.sheet.id} root={state.root} />
         )}
       </PaperProvider>
+      {footer}
     </div>
   )
 }
