@@ -55,6 +55,15 @@ export function SheetFrame({
   )
 }
 
+/** Paper's tokens without the page (no `.wsx`), for paper controls in a host's own chrome. */
+export function PaperSurface({ children }: { children?: ReactNode }) {
+  return (
+    <div className="wsx-tokens" style={themeVars('washi')}>
+      {children}
+    </div>
+  )
+}
+
 export function Section({
   title,
   gap,

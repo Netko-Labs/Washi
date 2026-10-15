@@ -3,7 +3,8 @@
  * Theme tokens arrive inline as --wsx-l-* / --wsx-d-*; the reader's mode picks.
  */
 
-.wsx {
+.wsx,
+.wsx-tokens {
   --bg: var(--wsx-l-bg);
   --card: var(--wsx-l-card);
   --ink: var(--wsx-l-ink);
@@ -56,7 +57,8 @@
   --ease-size: 200ms ease;
 }
 
-.dark .wsx {
+.dark .wsx,
+.dark .wsx-tokens {
   --bg: var(--wsx-d-bg);
   --card: var(--wsx-d-card);
   --ink: var(--wsx-d-ink);

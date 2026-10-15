@@ -1,11 +1,12 @@
 import { getRouteApi } from '@tanstack/react-router'
+import type { Person } from '@washi/paper'
 import { useEffect } from 'react'
 import { useCommentsStore } from '@/components/comments'
 
 const workspaceRoute = getRouteApi('/w/$workspaceId')
 
-/** Member names by id — a person cell holds an id, the page shows a name. */
-export function usePeople(): Record<string, string> {
+/** The workspace's members — a person cell holds an id, the page shows a name. */
+export function usePeople(): Person[] {
   const { workspace } = workspaceRoute.useLoaderData()
   const members = useCommentsStore((state) => state.members)
 
@@ -15,5 +16,5 @@ export function usePeople(): Record<string, string> {
     }
   }, [workspace.id])
 
-  return Object.fromEntries(members.map((member) => [member.id, member.name]))
+  return members.map((member) => ({ id: member.id, name: member.name }))
 }

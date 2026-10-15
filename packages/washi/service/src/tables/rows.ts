@@ -1,5 +1,5 @@
 import type { RowOf } from '@washi/domain'
-import type { QueryRow, TableSpec } from '@washi/ink'
+import type { QueryRow, RecordData, TableSpec } from '@washi/ink'
 import {
   createSheet,
   deleteSheet,
@@ -30,9 +30,13 @@ function rowById(ws: Workspace, recordId: string): Row {
   return { table, row }
 }
 
+function titleColumn(spec: TableSpec) {
+  return spec.columns.find((each) => each.type === 'text')
+}
+
 /** Notion's title property: the first text column holds the row's name. */
 export function rowTitle(spec: TableSpec, row: QueryRow): string {
-  const column = spec.columns.find((each) => each.type === 'text')
+  const column = titleColumn(spec)
   const value = column ? row[column.name] : null
   return typeof value === 'string' && value.trim() ? value.trim().slice(0, 200) : 'Untitled'
 }
@@ -49,8 +53,27 @@ export function openRowPage(ws: Workspace, recordId: string): string {
     return createSheet(ws, { title, source }, index, null, null, recordId).id
   }
   if (existing.trashed) restoreSheetTree(ws, existing.id)
-  if (getSheet(ws, existing.id)?.title !== title) updateSheetMeta(ws, existing.id, { title })
+  syncTitle(ws, existing.id, title)
   return existing.id
+}
+
+function syncTitle(ws: Workspace, sheetId: string, title: string): void {
+  if (getSheet(ws, sheetId)?.title !== title) updateSheetMeta(ws, sheetId, { title })
+}
+
+/** Renaming a row renames its page, wherever the rename came from. */
+export function renameRowPages(
+  ws: Workspace,
+  spec: TableSpec,
+  patch: RecordData,
+  recordIds: string[],
+): void {
+  const title = titleColumn(spec)
+  if (!title || !(title.name in patch)) return
+  for (const id of recordIds) {
+    const page = findRowSheet(ws, id)
+    if (page) syncTitle(ws, page.id, rowTitle(spec, rowById(ws, id).row))
+  }
 }
 
 function relatedTitles(ws: Workspace, { table, row }: Row): Record<string, string> {

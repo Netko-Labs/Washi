@@ -37,8 +37,14 @@ describe('every row is a page', () => {
   test("the page's title follows the row", () => {
     const id = openRowPage(ws, issue)
     updateRecord(ws, 'issues', issue, { title: 'Fix sign-in' })
-    openRowPage(ws, issue)
     expect(getSheet(ws, id)?.title).toBe('Fix sign-in')
+    runMutation(ws, {
+      kind: 'update',
+      table: 'issues',
+      where: [{ column: 'id', op: 'eq', value: issue }],
+      data: { title: 'Fix SSO' },
+    })
+    expect(getSheet(ws, id)?.title).toBe('Fix SSO')
   })
 
   test('the page knows its row, and the names its relations point at', () => {

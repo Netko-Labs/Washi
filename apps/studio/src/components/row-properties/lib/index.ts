@@ -1,11 +1,3 @@
-export { usePeople } from './hooks/use-people'
-export { useRowOf } from './hooks/use-row-of'
-export type {
-  CellValue,
-  Column,
-  PropertyValueProps,
-  RowPropertiesProps,
-  StatusGroup,
-} from './types'
-export { formatDate, statusGroup } from './utils'
-export { CHIP, PROPERTY_ICONS, STATUS_CHIP } from './values'
+export { useRowPage } from './hooks/use-row-page'
+export type { CellValue, Column, RowPage, RowPropertiesProps, RowTitleProps } from './types'
+export { PROPERTY_ICONS } from './values'

@@ -20,6 +20,7 @@ export function Dashboard() {
   const { today, decide } = useToday()
   const turns = today?.turns ?? []
   const pending = today?.pending ?? []
+  const pages = sheets.filter((sheet) => !sheet.rowOf)
   const recent = byRecent(sheets).slice(0, 3)
   const firstName = identity.name.trim().split(/\s+/)[0] || 'there'
   const onPlan = (today?.spend.savedUsd ?? 0) > 0
@@ -43,12 +44,12 @@ export function Dashboard() {
             ` Your Claude plan covered ${usd(today.spend.savedUsd)} of it.`}
         </p>
 
-        {sheets.length === 0 && <StartHere />}
+        {pages.length === 0 && <StartHere />}
 
         <div className="mb-[30px] grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3.5">
           <div className="rounded-[14px] border border-border bg-card px-[18px] py-4">
             <div className="mb-1.5 text-muted-foreground text-xs">Pages</div>
-            <div className="font-semibold text-[26px] tracking-[-0.02em]">{sheets.length}</div>
+            <div className="font-semibold text-[26px] tracking-[-0.02em]">{pages.length}</div>
           </div>
           <div className="rounded-[14px] border border-border bg-card px-[18px] py-4">
             <div className="mb-1.5 text-muted-foreground text-xs">Needs you</div>

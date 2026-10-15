@@ -1,6 +1,7 @@
 import { AddProperty } from './add-property'
 import { DatabaseCell } from './database-cell'
 import {
+  isRank,
   labelOf,
   newRow,
   titleColumn,
@@ -19,7 +20,7 @@ export function DatabaseTable({ db, view, empty }: ViewProps) {
   const title = titleColumn(db.spec)
   const shown = view.columns
     ? db.spec.columns.filter((column) => view.columns?.includes(column.name))
-    : db.spec.columns
+    : db.spec.columns.filter((column) => !isRank(column))
   const columns = title ? [title, ...shown.filter((column) => column !== title)] : shown
 
   return (
@@ -65,6 +66,11 @@ export function DatabaseTable({ db, view, empty }: ViewProps) {
           })}
         </tbody>
       </table>
+      {records.status === 'loading' && (
+        <div className="wsx-empty" data-state="loading" aria-busy>
+          Loading…
+        </div>
+      )}
       {records.status === 'ready' && records.rows.length === 0 && (
         <div className="wsx-empty" data-state="empty">
           {empty ?? 'No rows yet.'}
