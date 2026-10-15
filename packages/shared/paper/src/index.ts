@@ -1,4 +1,5 @@
 export { Board } from './components/board'
+export { Canvas } from './components/canvas'
 export {
   Avatar,
   Badge,

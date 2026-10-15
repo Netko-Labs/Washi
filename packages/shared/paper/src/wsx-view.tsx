@@ -1,6 +1,7 @@
 import { type ExprAst, parseExpr, type WsxElement, type WsxNode } from '@washi/wsx'
 import { type ComponentType, createElement, type ReactNode, useMemo } from 'react'
 import { Board } from './components/board'
+import { Canvas } from './components/canvas'
 import {
   Avatar,
   Badge,
@@ -194,6 +195,9 @@ function renderElement(node: WsxElement, ctx: Ctx): ReactNode {
       return createElement(Source, { ...p, number: ctx.numbers.get(node) ?? 0 } as never, ...kids)
     case 'Ref':
       return createElement(Ref, p as never, ...(kids.length ? kids : []))
+    case 'Canvas':
+      // The canvas reads its Node/Edge markup itself: it has to write the same markup back.
+      return <Canvas node={node} />
     default: {
       const component = COMPONENTS[node.name]
       if (!component) return <Missing kind={node.name} reason="not a registry primitive" />

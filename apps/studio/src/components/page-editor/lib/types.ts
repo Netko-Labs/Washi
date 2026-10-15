@@ -123,4 +123,6 @@ export interface EditorState {
   setTables: (tables: TableRef[]) => void
   /** Swaps the `/` block for a live block — a view, a progress chart, a new database. */
   insertData: (id: string, pick: DataPick) => Promise<void>
+  /** A live block that edits itself (a canvas) — its new markup rides the next save. */
+  replaceInBlock: (id: string, from: WsxElement, to: WsxElement) => void
 }

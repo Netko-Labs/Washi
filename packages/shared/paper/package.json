@@ -14,6 +14,7 @@
   "dependencies": {
     "@washi/ink": "workspace:*",
     "@washi/wsx": "workspace:*",
+    "@xyflow/react": "^12.12.0",
     "tailwind-merge": "^3.6.0",
     "zod": "^4.4.3"
   },

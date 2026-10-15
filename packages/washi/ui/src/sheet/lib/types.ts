@@ -1,4 +1,5 @@
-import type { SheetDetail } from '@washi/domain'
+import type { SheetDetail, SheetSummary } from '@washi/domain'
+import type { PaperHost } from '@washi/paper'
 import type { WsxElement } from '@washi/wsx'
 import type { ComponentType, ReactNode } from 'react'
 
@@ -8,6 +9,12 @@ export type SheetState =
   | { status: 'missing' }
   | { status: 'failed'; error: string }
   | { status: 'ready'; sheet: SheetDetail; root: WsxElement }
+
+export interface PageSheet {
+  summary: SheetSummary | undefined
+  state: SheetState
+  host: PaperHost
+}
 
 export interface SheetFailedProps {
   error: string

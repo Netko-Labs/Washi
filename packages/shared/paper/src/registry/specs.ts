@@ -194,6 +194,30 @@ const dataOut: Record<string, ComponentSpec> = {
     children: 'none',
   },
   Timeline: p({}, 'nodes'),
+  Canvas: p({}, 'nodes', {
+    hints: {
+      nodes: 'children are <Node id x y tone? page?>label</Node> and <Edge from to label? />',
+    },
+  }),
+  Node: p(
+    {
+      id: z.string().regex(/^[a-z0-9][a-z0-9_-]{0,63}$/, 'node ids are short lowercase slugs'),
+      x: z.number(),
+      y: z.number(),
+      page: z.string().min(1).max(80).optional(),
+    },
+    'text',
+    { within: ['Canvas'] },
+  ),
+  Edge: p(
+    {
+      from: z.string().min(1).max(64),
+      to: z.string().min(1).max(64),
+      label: z.string().max(60).optional(),
+    },
+    'none',
+    { within: ['Canvas'] },
+  ),
   Roadmap: p(
     {
       bind: querySchema,

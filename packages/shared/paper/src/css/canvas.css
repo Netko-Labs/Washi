@@ -1,0 +1,102 @@
+/* Canvas — ideas and the lines between them, on React Flow. */
+@import "@xyflow/react/dist/base.css";
+
+.wsx-canvas {
+  position: relative;
+  height: 420px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-input);
+  background: var(--card);
+  overflow: hidden;
+}
+.wsx-canvas .react-flow__background {
+  color: var(--border);
+}
+.wsx-canvas .react-flow__edge-path {
+  stroke: var(--muted);
+  stroke-width: 1.5;
+}
+.wsx-canvas .react-flow__edge-textbg {
+  fill: var(--card);
+}
+.wsx-canvas .react-flow__edge-text {
+  fill: var(--muted);
+  font-size: 11px;
+}
+.wsx-canvas .react-flow__controls-button {
+  background: var(--card);
+  border-color: var(--border);
+  color: var(--ink);
+  fill: var(--ink);
+}
+.wsx-canvas-node {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 120px;
+  max-width: 240px;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.35;
+}
+.wsx-canvas-node[data-selected] {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+.wsx-canvas-node[data-tone="accent"] {
+  border-color: var(--accent);
+}
+.wsx-canvas-node[data-tone="info"] {
+  border-color: var(--tone-info);
+}
+.wsx-canvas-node[data-tone="success"] {
+  border-color: var(--tone-success);
+}
+.wsx-canvas-node[data-tone="warning"] {
+  border-color: var(--tone-warning);
+}
+.wsx-canvas-node[data-tone="danger"] {
+  border-color: var(--tone-danger);
+}
+.wsx-canvas-label {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: inherit;
+}
+.wsx-canvas-input {
+  width: 100%;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  outline: none;
+}
+.wsx-canvas-open {
+  margin-left: auto;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+}
+.wsx-canvas-add {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 5;
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+}

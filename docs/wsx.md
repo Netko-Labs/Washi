@@ -161,6 +161,9 @@ primitive accepts the four enums and `class`; the table lists its own props.
 | `Chart` | `bind` or `history` · `kind` `bar\|line\|area\|donut` `label?` `value?` `empty?` | none | Palette from the chart ramp; series colours not settable. `bind` draws now; `history` draws one point per day (see §8) — exactly one of the two |
 | `Timeline` | — | nodes | Holds `Step`s |
 | `Roadmap` | `bind` `date` `title?` `empty?` | none | Notion's timeline: one bar per row from `date` (a day, or `start/end`) on a shared calendar with a today line. Drag a bar to reschedule (`table.update`, length kept); click an empty track to date a row; the name opens the row |
+| `Canvas` | — | nodes | Ideas and the lines between them (React Flow). Holds `Node`s and `Edge`s. People drag, connect, add (`+ Idea`), rename (double-click) and delete (Backspace); every hand edit rewrites this same markup into the page |
+| `Node` | `id` `x` `y` `tone?` `page?` | text | Only inside `Canvas`. `id` is a short lowercase slug; `page` links a page (↗ opens it) |
+| `Edge` | `from` `to` `label?` | none | Only inside `Canvas`; both ends name `Node` ids |
 | `Step` | `marker` (≤8) `title?` | nodes | Only inside `Timeline` |
 | `Progress` | `value?` (0–1) `expr?` `label?` | none | |
 | `Badge` | `expr?` | text | `expr` replaces the text |
