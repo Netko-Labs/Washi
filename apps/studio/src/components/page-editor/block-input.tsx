@@ -6,8 +6,8 @@ import {
   HEADING_LEVELS,
   KIND_LOOKS,
   KIND_PLACEHOLDERS,
-  kindMatches,
-  type TextKind,
+  type SlashOption,
+  slashMatches,
   useAutoSize,
   useEditorStore,
   useFocusRequest,
@@ -21,8 +21,12 @@ export function BlockInput({ block, numberAt }: BlockInputProps) {
   const slash = block.text.startsWith('/') ? block.text.slice(1) : null
   const store = useEditorStore.getState
 
-  const pick = (kind: TextKind) => {
-    store().turnInto(block.id, kind)
+  const pick = (option: SlashOption) => {
+    if (option.type === 'data') {
+      void store().insertData(block.id, option.pick)
+      return
+    }
+    store().turnInto(block.id, option.kind)
     store().setText(block.id, '')
   }
 
@@ -34,8 +38,8 @@ export function BlockInput({ block, numberAt }: BlockInputProps) {
     const atEnd = field.selectionStart === field.value.length
     if (event.key === 'Enter' && !event.shiftKey && block.kind !== 'code') {
       event.preventDefault()
-      const [first] = slash === null ? [] : kindMatches(slash)
-      if (first) pick(first.kind)
+      const [first] = slash === null ? [] : slashMatches(slash, store().tables)
+      if (first) pick(first)
       else store().splitAt(block.id, field.selectionStart)
     } else if (event.key === 'Escape' && slash !== null) {
       store().setText(block.id, '')

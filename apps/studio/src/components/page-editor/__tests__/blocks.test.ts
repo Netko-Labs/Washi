@@ -1,6 +1,15 @@
 import { describe, expect, test } from 'bun:test'
-import { parse, serialize } from '@washi/wsx'
-import { applyShortcut, newBlock, toBlocks, toSheet } from '../lib/utils'
+import { paperRegistry } from '@washi/paper/registry'
+import { hasErrors, parse, serialize, validate } from '@washi/wsx'
+import {
+  applyShortcut,
+  dataNode,
+  lockedBlock,
+  newBlock,
+  slashMatches,
+  toBlocks,
+  toSheet,
+} from '../lib/utils'
 
 const SOURCE = `<Sheet title="Plan" feel="note">
   <Title>Plan</Title>
@@ -53,5 +62,40 @@ describe('page editor blocks', () => {
     expect(applyShortcut(newBlock('text', '[] milk'))).toMatchObject({ kind: 'todo', text: 'milk' })
     expect(applyShortcut(newBlock('text', '---'))).toMatchObject({ kind: 'divider' })
     expect(applyShortcut(newBlock('h1', '# not again'))).toBeNull()
+  })
+})
+
+describe('the / menu drops live data on the page', () => {
+  const issues = { name: 'issues', done: { column: 'state', values: ['Done'] } }
+  const notes = { name: 'notes', done: null }
+  const labels = (query: string) =>
+    slashMatches(query, [issues, notes])
+      .filter((option) => option.type === 'data')
+      .map((option) => option.label)
+
+  test('a view of any table; progress only where a status says what shipped', () => {
+    expect(labels('view')).toEqual(['Linked view · issues', 'Linked view · notes'])
+    expect(labels('progress')).toEqual(['Progress · issues'])
+  })
+
+  test('/database names the new table from what was typed, never a taken name', () => {
+    const pickOf = (query: string, taken = [issues, notes]) =>
+      slashMatches(query, taken).find((option) => option.type === 'data')
+    expect(pickOf('database Bug triage')).toMatchObject({ pick: { name: 'bug_triage' } })
+    expect(pickOf('database')).toMatchObject({ pick: { name: 'database' } })
+    expect(pickOf('database issues')).toMatchObject({ pick: { name: 'issues_2' } })
+  })
+
+  test('what lands is valid WSX: a Database, or a Chart over the done statuses', () => {
+    const root = parse('<Sheet title="Review" wsx="1"><Title>Review</Title></Sheet>')
+    const blocks = [
+      ...toBlocks(root),
+      lockedBlock(dataNode({ kind: 'view', table: 'issues' })),
+      lockedBlock(dataNode({ kind: 'progress', table: issues })),
+    ]
+    const source = serialize(toSheet(root, blocks))
+    expect(source).toContain('<Database table="issues" />')
+    expect(source).toContain('history={{')
+    expect(hasErrors(validate(parse(source), paperRegistry))).toBe(false)
   })
 })

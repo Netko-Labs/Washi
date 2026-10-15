@@ -69,9 +69,24 @@ export interface PageBodyProps {
   root: WsxElement
 }
 
+/** A table the `/` menu can drop live onto the page, and which status counts as shipped. */
+export interface TableRef {
+  name: string
+  done: { column: string; values: string[] } | null
+}
+
+export type DataPick =
+  | { kind: 'view'; table: string }
+  | { kind: 'progress'; table: TableRef }
+  | { kind: 'database'; name: string }
+
+export type SlashOption =
+  | ({ type: 'text' } & KindOption)
+  | { type: 'data'; key: string; label: string; hint: string; pick: DataPick }
+
 export interface SlashMenuProps {
   query: string
-  onPick: (kind: TextKind) => void
+  onPick: (option: SlashOption) => void
 }
 
 export interface LockedBlockProps {
@@ -104,4 +119,8 @@ export interface EditorState {
   move: (id: string, step: -1 | 1) => void
   moveFocus: (id: string, step: -1 | 1) => void
   setSaveState: (saveState: SaveState) => void
+  tables: TableRef[]
+  setTables: (tables: TableRef[]) => void
+  /** Swaps the `/` block for a live block — a view, a progress chart, a new database. */
+  insertData: (id: string, pick: DataPick) => Promise<void>
 }

@@ -1,7 +1,8 @@
 import { create } from 'zustand'
+import { api } from '@/integrations/trpc'
 import type { Block, EditorState, TextBlock } from './types'
-import { applyShortcut, newBlock, turnInto } from './utils'
-import { LIST_MARKERS } from './values'
+import { applyShortcut, dataNode, lockedBlock, newBlock, turnInto } from './utils'
+import { LIST_MARKERS, NEW_DATABASE } from './values'
 
 function isTyped(block: Block | undefined): block is TextBlock {
   return block !== undefined && block.kind !== 'locked' && block.kind !== 'divider'
@@ -118,5 +119,26 @@ export const useEditorStore = create<EditorState>((set, get) => {
     },
 
     setSaveState: (saveState) => set({ saveState }),
+
+    tables: [],
+    setTables: (tables) => set({ tables }),
+    insertData: async (id, pick) => {
+      if (pick.kind === 'database') {
+        await api.tables.define.mutate({ spec: NEW_DATABASE(pick.name) })
+      }
+      const { blocks } = get()
+      const at = blocks.findIndex((block) => block.id === id)
+      if (at < 0) return
+      const next = newBlock()
+      set({
+        blocks: [
+          ...blocks.slice(0, at),
+          lockedBlock(dataNode(pick)),
+          next,
+          ...blocks.slice(at + 1),
+        ],
+        focus: { id: next.id, caret: 0 },
+      })
+    },
   }
 })
