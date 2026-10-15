@@ -173,7 +173,7 @@ the empty *sentence* (`empty="…"`) and nothing else.
 
 | Primitive | Props | Children | Notes |
 |---|---|---|---|
-| `Field` | `field` `kind` `text\|number\|date\|select\|boolean` `label?` `help?` `table?` `row?` | none | One primitive over all column types. Writes `table.update` on blur (select and boolean on change). `select` offers the column's options from the table spec — a page never enumerates them. Inside `Repeat`, `row` defaults to `$row.id` |
+| `Field` | `field` `kind` `text\|number\|date\|select\|boolean` `label?` `help?` `table?` `row?` | none | One primitive over all column types. Writes `table.update` on blur (select and boolean on change). `select` offers the column's options (a status column's too) from the table spec — a page never enumerates them. Inside `Repeat`, `row` defaults to `$row.id` |
 | `Board` | `bind` `groupBy` `groups?` `rank?` `kicker?` `title?` `badge?` `meta?` `avatar?` `onAdd?` `empty?` | none | Grouped, draggable records. A drop writes `table.reorder` with the group column and a fractional `rank`. `groups` fixes column order; a numeric `meta` totals per column; `onOpen` runs on click with `$row` in scope; badge values that carry meaning (`highest high bug` → danger, `medium` → warning, `story` → success, `task` → info) take that tone; `onAdd` runs per column with `$group` substituted |
 | `Button` | `action` | text | |
 | `Compose` | `action` `label?` `placeholder?` `multiline?` | none | A text box that runs one verb with `$value` (the text) and `$now` (ISO timestamp) filled in — the comment box |
@@ -279,8 +279,24 @@ bind={{
 | `limit` | 1–1000, default 200 |
 | `groupBy` | `{ column, aggregates: [{ fn, column? }] }` — `fn`: `count sum avg min max`. Feeds `Chart` directly |
 
-Every column named must exist. Column types: `text number boolean date select`. Bound primitives
-refetch after any verb runs on the page.
+Every column named must exist. Bound primitives refetch after any verb runs on the page.
+
+Column types are Notion's properties:
+
+| Type | Cell | Spec |
+|---|---|---|
+| `text` `number` `boolean` | scalar | — |
+| `date` | ISO date, or `start/end` for a range | — |
+| `select` | one of `options` | `options` |
+| `status` | one option; options sit in `todo` · `doing` · `done` | `groups` |
+| `multi_select` | list of `options` | `options` |
+| `person` | a member id | — |
+| `url` | http(s) | — |
+| `relation` | list of record ids in `table` | `table` |
+
+A list column (`multi_select`, `relation`) answers membership only: `eq` `contains` `in` mean
+"holds any of", `ne` means "holds none of". It cannot be compared or grouped. On the page it reads
+as its items, comma-joined.
 
 ---
 

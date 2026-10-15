@@ -1,5 +1,15 @@
+import type { QueryRow } from '@washi/ink'
 import type { WsxValue } from '@washi/wsx'
 import type { Row } from './types'
+
+/** Pages speak scalars: a list cell (labels, related ids) reads as its items, comma-joined. */
+export function toRows(rows: QueryRow[]): Row[] {
+  return rows.map((row) =>
+    Object.fromEntries(
+      Object.entries(row).map(([key, cell]) => [key, Array.isArray(cell) ? cell.join(', ') : cell]),
+    ),
+  )
+}
 
 const ROW_REF = /\$row\.([a-z_][a-z0-9_]*)/gi
 

@@ -1,4 +1,11 @@
-import type { Filter, InkQuery, QueryResult, Scalar, TableSpec } from '@washi/ink'
+import {
+  ARRAY_COLUMN_TYPES,
+  type Filter,
+  type InkQuery,
+  type QueryResult,
+  type Scalar,
+  type TableSpec,
+} from '@washi/ink'
 
 import type { Workspace } from './client'
 
@@ -34,10 +41,32 @@ function columnExpr(column: string, params: Scalar[]): string {
   return 'json_extract(data, ?)'
 }
 
-function buildWhere(filters: Filter[]): { sql: string; params: Scalar[] } {
+function arrayColumns(spec: TableSpec): Set<string> {
+  return new Set(
+    spec.columns.filter((column) => ARRAY_COLUMN_TYPES.has(column.type)).map((c) => c.name),
+  )
+}
+
+/** On a list column, eq/contains/in ask "holds any of these", and ne asks "holds none". */
+function listClause(filter: Filter, params: Scalar[]): string {
+  if (!['eq', 'ne', 'contains', 'in'].includes(filter.op)) {
+    throw new Error(`"${filter.op}" does not apply to the list column "${filter.column}"`)
+  }
+  const values = Array.isArray(filter.value) ? filter.value : [filter.value]
+  params.push(`$.${assertIdentifier(filter.column)}`, ...values)
+  const holds = `EXISTS (SELECT 1 FROM json_each(data, ?) WHERE value IN (${values.map(() => '?').join(', ')}))`
+  return filter.op === 'ne' ? `NOT ${holds}` : holds
+}
+
+function buildWhere(filters: Filter[], spec: TableSpec): { sql: string; params: Scalar[] } {
   const clauses: string[] = []
   const params: Scalar[] = []
+  const lists = arrayColumns(spec)
   for (const filter of filters) {
+    if (lists.has(filter.column)) {
+      clauses.push(listClause(filter, params))
+      continue
+    }
     const expr = columnExpr(filter.column, params)
     if (filter.op === 'in') {
       const values = Array.isArray(filter.value) ? filter.value : [filter.value]
@@ -54,12 +83,16 @@ function buildWhere(filters: Filter[]): { sql: string; params: Scalar[] } {
 function groupQuery(
   ws: Workspace,
   tableId: string,
+  spec: TableSpec,
   query: InkQuery & { groupBy: NonNullable<InkQuery['groupBy']> },
   limit: number,
 ): QueryResult {
   // Params accumulate in SQL text order: projection, table id, filters, limit.
   const selectParams: Scalar[] = []
   const groupColumn = assertIdentifier(query.groupBy.column)
+  if (arrayColumns(spec).has(groupColumn)) {
+    throw new Error(`cannot group by the list column "${groupColumn}"`)
+  }
   const groupExpr = columnExpr(groupColumn, selectParams)
 
   const aggregates = query.groupBy.aggregates
@@ -71,7 +104,7 @@ function groupQuery(
     })
     .join(', ')
 
-  const where = buildWhere(query.where ?? [])
+  const where = buildWhere(query.where ?? [], spec)
   // GROUP BY 1 targets the first result column, so the expression is not repeated.
   const sql = `
     SELECT ${groupExpr} AS "${groupColumn}", ${aggregates}
@@ -91,7 +124,9 @@ export function executeQuery(
   query: InkQuery,
 ): QueryResult {
   const limit = query.limit ?? 200
-  if (query.groupBy) return groupQuery(ws, tableId, { ...query, groupBy: query.groupBy }, limit)
+  if (query.groupBy) {
+    return groupQuery(ws, tableId, spec, { ...query, groupBy: query.groupBy }, limit)
+  }
 
   const selectParams: Scalar[] = []
   const projection = spec.columns
@@ -101,7 +136,7 @@ export function executeQuery(
     })
     .join(', ')
 
-  const where = buildWhere(query.where ?? [])
+  const where = buildWhere(query.where ?? [], spec)
   // Ordering targets the projected alias, so the json path is bound once.
   const orderSql = query.orderBy
     ? ` ORDER BY "${assertIdentifier(query.orderBy.column)}" ${query.orderBy.direction === 'desc' ? 'DESC' : 'ASC'}`
@@ -113,20 +148,26 @@ export function executeQuery(
     .query(sql)
     .all(...selectParams, tableId, ...where.params, limit) as QueryResult['rows']
 
-  // sqlite stores booleans as 0/1 inside json_extract results — restore them.
+  // json_extract hands back booleans as 0/1 and arrays as JSON text — restore both.
+  const lists = arrayColumns(spec)
   for (const row of rows) {
     for (const column of spec.columns) {
-      if (column.type === 'boolean' && typeof row[column.name] === 'number') {
-        row[column.name] = row[column.name] === 1
-      }
+      const value = row[column.name]
+      if (column.type === 'boolean' && typeof value === 'number') row[column.name] = value === 1
+      if (lists.has(column.name) && typeof value === 'string') row[column.name] = JSON.parse(value)
     }
   }
   return { rows, total: rows.length }
 }
 
 /** Ids matched by a filter set, for update/delete mutations. */
-export function matchRecordIds(ws: Workspace, tableId: string, filters: Filter[]): string[] {
-  const where = buildWhere(filters)
+export function matchRecordIds(
+  ws: Workspace,
+  tableId: string,
+  spec: TableSpec,
+  filters: Filter[],
+): string[] {
+  const where = buildWhere(filters, spec)
   return ws.sqlite
     .query(`SELECT id FROM records WHERE table_id = ? AND deleted_at IS NULL${where.sql}`)
     .all(tableId, ...where.params)
