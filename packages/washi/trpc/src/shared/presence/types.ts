@@ -12,3 +12,6 @@ export interface PresenceBoard {
   leave(workspaceId: string, sheetId: string, personId: string): void
   list(workspaceId: string, sheetId: string): PagePresence[]
 }
+
+/** Who is on a page now, said whenever someone arrives, leaves, or starts or stops editing. */
+export type PresenceChanged = (workspaceId: string, sheetId: string, people: PagePresence[]) => void

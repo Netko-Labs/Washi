@@ -1,10 +1,8 @@
 import { PRESENCE_TTL_MS } from './constants'
-import type { PagePresence, PresenceBoard } from './types'
-
-type Changed = (workspaceId: string, sheetId: string, people: PagePresence[]) => void
+import type { PresenceBoard, PresenceChanged } from './types'
 
 /** Who is on which page, in this process's memory: presence is a heartbeat, never a record. */
-export function createPresenceBoard(changed: Changed): PresenceBoard {
+export function createPresenceBoard(changed: PresenceChanged): PresenceBoard {
   const pages = new Map<string, Map<string, { person: PagePresence; until: number }>>()
   const key = (workspaceId: string, sheetId: string) => `${workspaceId}/${sheetId}`
 
