@@ -26,8 +26,10 @@ export {
   choicesFor,
   columnKey,
   defaultViews,
+  isRank,
   labelOf,
   newRow,
+  tableLabel,
   titleColumn,
 } from './utils'
 export { DEFAULT_STATUS_GROUPS, PROPERTY_TYPES } from './values'

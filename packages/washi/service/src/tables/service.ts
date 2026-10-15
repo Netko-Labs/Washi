@@ -21,7 +21,7 @@ import {
   type Workspace,
 } from '@washi/repository'
 import { InkError } from './errors'
-import { trashRowPages } from './rows'
+import { renameRowPages, trashRowPages } from './rows'
 import { checkListUse } from './rules'
 
 export { InkError }
@@ -110,7 +110,9 @@ export function runMutation(
       return { affected: 1, id: insertRecord(ws, table.id, mutation.data) }
     case 'update': {
       const ids = matchRecordIds(ws, table.id, table.spec, mutation.where)
-      return { affected: updateRecords(ws, table.id, ids, mutation.data) }
+      const affected = updateRecords(ws, table.id, ids, mutation.data)
+      renameRowPages(ws, table.spec, mutation.data, ids)
+      return { affected }
     }
     case 'delete': {
       const ids = matchRecordIds(ws, table.id, table.spec, mutation.where)
@@ -133,6 +135,7 @@ export function updateRecord(
   if (updateRecords(ws, table.id, [recordId], patch) === 0) {
     throw new InkError(`unknown record "${recordId}" on table "${tableName}"`)
   }
+  renameRowPages(ws, table.spec, patch, [recordId])
 }
 
 /** Soft-delete one record by id — the `table.delete` verb. The row keeps its history. */

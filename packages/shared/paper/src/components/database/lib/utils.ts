@@ -49,3 +49,14 @@ export function newRow(spec: TableSpec): Record<string, string> {
     ...(status?.groups?.todo[0] && { [status.name]: status.groups.todo[0] }),
   }
 }
+
+/** A board's order lives in a number column named `rank`; it orders cards, nobody reads it. */
+export function isRank(column: ColumnSpec): boolean {
+  return column.name === 'rank' && column.type === 'number'
+}
+
+/** "bug_triage" reads as "Bug triage". */
+export function tableLabel(name: string): string {
+  const words = labelOf(name)
+  return words.charAt(0).toUpperCase() + words.slice(1)
+}
