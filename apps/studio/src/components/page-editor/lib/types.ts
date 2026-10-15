@@ -104,11 +104,13 @@ export interface EditorState {
   blocks: Block[]
   focus: FocusRequest | null
   saveState: SaveState
+  focusFirst: boolean
   /** The Loro version the blocks were read at; a save sends it so the server can merge. */
   version: string | null
   /** The page as the server last had it from this editor — a different source came from someone else. */
   savedSource: string | null
-  startEditing: (id: string) => void
+  /** `focus`: the caret lands in the first block, as on a page that was just made. */
+  startEditing: (id: string, focus?: boolean) => void
   stopEditing: () => void
   load: (blocks: Block[], version?: string | null, source?: string | null) => void
   /** Someone else's edit, merged: new blocks in, the rows still under the caret keep their ids. */

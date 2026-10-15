@@ -24,6 +24,7 @@ export {
   newBlock,
   numberedPositions,
   slashMatches,
+  titleOf,
   toBlocks,
   toSheet,
 } from './utils'

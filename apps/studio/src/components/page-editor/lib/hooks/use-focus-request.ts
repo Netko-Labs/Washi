@@ -11,5 +11,7 @@ export function useFocusRequest(id: string, ref: RefObject<HTMLTextAreaElement |
     field.focus()
     const at = focus.caret === 'end' ? field.value.length : focus.caret
     field.setSelectionRange(at, at)
+    // Cleared once a field really has the caret: a load that runs twice must not lose it.
+    useEditorStore.setState({ focusFirst: false })
   }, [focus, ref])
 }

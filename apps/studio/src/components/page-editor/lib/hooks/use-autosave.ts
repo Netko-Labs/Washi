@@ -5,7 +5,7 @@ import { useEffect } from 'react'
 import { api } from '@/integrations/trpc'
 import { SAVE_DELAY_MS } from '../constants'
 import { useEditorStore } from '../editor-store'
-import { toBlocks, toSheet } from '../utils'
+import { titleOf, toBlocks, toSheet } from '../utils'
 
 /** A pause in typing saves the page; leaving the editor saves whatever is still pending. */
 export function useAutosave(sheet: SheetDetail, root: WsxElement) {
@@ -22,7 +22,7 @@ export function useAutosave(sheet: SheetDetail, root: WsxElement) {
         const saved = await api.sheets.update.mutate({
           id: sheet.id,
           write: {
-            title: current?.title ?? sheet.title,
+            title: titleOf(blocks, sheet) ?? current?.title ?? sheet.title,
             icon: current?.icon ?? sheet.icon,
             tags: current?.tags ?? sheet.tags,
             source,
