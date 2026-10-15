@@ -4,11 +4,11 @@
  * server existed. This says what actually happens.
  */
 export const PITCH = {
-  headline: 'Notes your agent writes.',
-  sub: 'You direct, it drafts, you approve. Pages are designed, not typed.',
+  headline: "Your team's living pages.",
+  sub: 'Docs, backlogs, roadmaps and graphs, written by your team and Washi together.',
   points: [
-    ['Edit by asking', 'There is no cursor in a page. Tell Washi what to change.'],
-    ['Review is the job', 'Every edit an agent proposes waits for a person.'],
-    ['Your workspace, your server', 'Self-hosted and open source. No plans, no seats.'],
+    ['Type it or ask for it', 'Write in the page, or ask Washi to. The same page either way.'],
+    ['Live data', 'Boards, timelines and charts read your tables and stay current.'],
+    ['Washi keeps it true', 'Its writes are marked and undoable; nothing leaves without a person.'],
   ] as const,
 }

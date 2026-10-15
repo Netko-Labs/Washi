@@ -1,3 +1,4 @@
+import type { Member } from '@washi/domain'
 import { historyQuerySchema, mutationSchema, querySchema, tableSpecSchema } from '@washi/ink'
 import {
   getBacklinks,
@@ -25,6 +26,7 @@ const READ_ONLY = new Set([
   'db_list_tables',
   'db_query',
   'db_history',
+  'people_list',
 ])
 
 export function isReadTool(name: string): boolean {
@@ -35,6 +37,8 @@ export interface AiToolDeps {
   ws: Workspace
   runHankoAction: (input: unknown) => Promise<void>
   openSheet?: (id: string) => void
+  /** Who is on the team, for person cells — the control plane knows; the workspace file does not. */
+  listPeople?: () => Promise<Member[]>
 }
 
 /**
@@ -42,7 +46,7 @@ export interface AiToolDeps {
  * flag is deprecated. The port passes one `toolApproval` function and decides
  * there, using `isReadTool` below, so both ports gate on the same list.
  */
-export function createAiTools({ ws, runHankoAction, openSheet }: AiToolDeps) {
+export function createAiTools({ ws, runHankoAction, openSheet, listPeople }: AiToolDeps) {
   return {
     sheet_list: tool({
       description:
@@ -69,6 +73,11 @@ export function createAiTools({ ws, runHankoAction, openSheet }: AiToolDeps) {
       description: 'Full-text search across sheets.',
       inputSchema: z.object({ term: z.string() }),
       execute: async ({ term }) => searchSheets(ws, term),
+    }),
+    people_list: tool({
+      description: 'Who is on the team: { id, name } per member. A person cell holds the id.',
+      inputSchema: z.object({}),
+      execute: async () => (await listPeople?.()) ?? [],
     }),
     db_list_tables: tool({
       description: 'List user tables and their column specs.',

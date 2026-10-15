@@ -4,7 +4,8 @@ import { RoutineRow } from './routine-row'
 
 /**
  * What Washi does while nobody is watching. Each run is an ordinary turn — the
- * daily stop applies, and anything it writes waits for a person until morning.
+ * daily stop applies, its writes are marked as its own, and a fetch or action waits for a
+ * person until morning.
  */
 export function RoutinesSection() {
   const { routines, error, create, toggle, runNow, remove } = useRoutines()

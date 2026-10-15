@@ -30,6 +30,7 @@ export function createRuntime(options: RuntimeOptions): Runtime {
       approval: (request) => events.emit('approvalRequested', { ...request, workspaceId }),
       openSheet: (id) => events.emit('openSheetRequested', { workspaceId, id }),
     })
+    host.setPeople(() => options.control.listMembers(workspaceId))
     return { workspace, host }
   }
 

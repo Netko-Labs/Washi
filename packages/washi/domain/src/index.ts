@@ -34,6 +34,7 @@ export {
   mentionItemSchema,
   mentionRefSchema,
 } from './entities/comments'
+export type { Member } from './entities/members'
 export {
   type SearchHit,
   type SheetAuthor,

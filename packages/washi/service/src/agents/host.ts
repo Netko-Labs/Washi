@@ -1,4 +1,4 @@
-import type { AgentUpdate, ApprovalDecision, ApprovalRequest } from '@washi/domain'
+import type { AgentUpdate, ApprovalDecision, ApprovalRequest, Member } from '@washi/domain'
 import { createModelCatalogue, type ModelCatalogue } from '@washi/models'
 import {
   appendTurn,
@@ -36,6 +36,7 @@ import { recentTurns } from './today'
 
 export class AgentHost {
   private events: AgentHostEvents | null = null
+  private people: (() => Promise<Member[]>) | null = null
   /** One per running turn, keyed by session — Stop aborts exactly that turn. */
   private readonly turns = new Map<string, AbortController>()
 
@@ -67,6 +68,7 @@ export class AgentHost {
 
     const runHankoAction = (action: unknown) => this.desk.execute(action)
     const openSheet = (id: string) => this.events?.openSheet(id)
+    const listPeople = () => this.people?.() ?? Promise.resolve([])
     const models = catalogue ?? createModelCatalogue()
     this.claudePort = createClaudeSdkPort({
       ws,
@@ -74,6 +76,7 @@ export class AgentHost {
       instructions: SYSTEM_INSTRUCTIONS,
       runHankoAction,
       openSheet,
+      listPeople,
       canUseTool: (sessionId, name, input) => this.approvals.gateSdkTool(sessionId, name, input),
     })
     this.aiSdkPort = createAiSdkPort({
@@ -81,6 +84,7 @@ export class AgentHost {
       instructions: SYSTEM_INSTRUCTIONS,
       runHankoAction,
       openSheet,
+      listPeople,
       gate: this.approvals,
       catalogue: models,
     })
@@ -144,6 +148,11 @@ export class AgentHost {
 
   setEvents(events: AgentHostEvents): void {
     this.events = events
+  }
+
+  /** The runtime knows the members; the host only asks when Washi needs a name. */
+  setPeople(people: () => Promise<Member[]>): void {
+    this.people = people
   }
 
   pendingApprovals(): ApprovalRequest[] {

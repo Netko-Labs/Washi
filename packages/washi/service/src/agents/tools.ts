@@ -1,4 +1,5 @@
 import { createSdkMcpServer, tool } from '@anthropic-ai/claude-agent-sdk'
+import type { Member } from '@washi/domain'
 import { historyQuerySchema, tableSpecSchema } from '@washi/ink'
 import {
   getAppMeta,
@@ -30,6 +31,8 @@ export interface ToolContext {
   runHankoAction: (input: unknown) => Promise<void>
   /** A page the agent just made is the page the person wants to look at. */
   openSheet?: (id: string) => void
+  /** Who is on the team, for person cells — the control plane knows; the workspace file does not. */
+  listPeople?: () => Promise<Member[]>
 }
 
 /**
@@ -93,6 +96,12 @@ export function createWashiTools(ws: Workspace, context: ToolContext) {
       ),
       tool('search', 'Full-text search across sheets.', { term: z.string() }, async ({ term }) =>
         text(searchSheets(ws, term)),
+      ),
+      tool(
+        'people_list',
+        'Who is on the team: { id, name } per member. A person cell holds the id.',
+        {},
+        async () => text((await context.listPeople?.()) ?? []),
       ),
       tool('db_list_tables', 'List user tables and their column specs.', {}, async () =>
         text(listTables(ws)),
