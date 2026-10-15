@@ -4,18 +4,19 @@ import { api } from '@/integrations/trpc'
 
 /** The row behind a page, refetched when the page changes; null for an ordinary page. */
 export function useRowOf(sheetId: string, version: string | undefined): RowOf | null {
-  const [rowOf, setRowOf] = useState<RowOf | null>(null)
+  const [loaded, setLoaded] = useState<{ sheetId: string; rowOf: RowOf | null } | null>(null)
 
   useEffect(() => {
     let alive = true
     api.tables.rowOf
       .query({ sheetId })
-      .then((next) => alive && setRowOf(next))
-      .catch(() => alive && setRowOf(null))
+      .then((rowOf) => alive && setLoaded({ sheetId, rowOf }))
+      .catch(() => alive && setLoaded({ sheetId, rowOf: null }))
     return () => {
       alive = false
     }
   }, [sheetId, version])
 
-  return rowOf
+  // Another page's row never shows while this one's loads.
+  return loaded?.sheetId === sheetId ? loaded.rowOf : null
 }
