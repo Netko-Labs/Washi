@@ -38,7 +38,7 @@ export function isDue(routine: Routine, now: Date): boolean {
 }
 
 /** Today counts as run when its minute has already passed: nothing fires on save or resume. */
-function alreadyPassed(minuteOfDay: number, timeZone: string, now: Date): string | null {
+export function alreadyPassed(minuteOfDay: number, timeZone: string, now: Date): string | null {
   const { day, minute } = zonedNow(now, timeZone)
   return minute >= minuteOfDay ? day : null
 }
