@@ -1,5 +1,6 @@
 import { getRouteApi } from '@tanstack/react-router'
 import { SheetView } from '@washi/ui'
+import { Backlinks } from '@/components/backlinks'
 import { CommentsPanel } from '@/components/comments'
 import { FirstRunGate } from '@/components/first-run'
 import { PageChrome } from '@/components/page-chrome'
@@ -16,7 +17,11 @@ export function PageView() {
   return (
     <FirstRunGate workspace={workspace}>
       <div className="flex min-h-0 flex-1">
-        <SheetView chrome={<PageChrome pageId={pageId} />} body={PageBody} />
+        <SheetView
+          chrome={<PageChrome pageId={pageId} />}
+          footer={<Backlinks pageId={pageId} />}
+          body={PageBody}
+        />
         <CommentsPanel sheetId={pageId} />
       </div>
     </FirstRunGate>

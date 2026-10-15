@@ -6,8 +6,16 @@ import { useAgentStore, useSheetsStore, useViewStore } from '../stores'
 
 /** ⌘K palette per Washi.dc.html: scrim, 560px panel at 14vh, pages + agent actions. */
 export function CommandPalette() {
-  const { sheets, paletteOpen, openPalette, closePalette, createSheet, searchTerm, search } =
-    useSheetsStore()
+  const {
+    sheets,
+    paletteOpen,
+    openPalette,
+    closePalette,
+    createSheet,
+    searchTerm,
+    searchHits,
+    search,
+  } = useSheetsStore()
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -73,6 +81,33 @@ export function CommandPalette() {
               </Command.Item>
             ))}
           </Command.Group>
+          {searchHits.length > 0 && (
+            <Command.Group
+              heading="Inside pages"
+              className="[&_[cmdk-group-heading]]:px-2.5 [&_[cmdk-group-heading]]:pt-2 [&_[cmdk-group-heading]]:pb-1 [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:text-[11px] [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-[0.06em]"
+            >
+              {searchHits.map((hit) => (
+                <Command.Item
+                  key={`hit:${hit.id}`}
+                  // cmdk filters on value; the term is in it, so a body match is never filtered out.
+                  value={`${searchTerm} ${hit.title} ${hit.id} body`}
+                  onSelect={() => {
+                    useViewStore.getState().openTab(`note:${hit.id}`)
+                    closePalette()
+                  }}
+                  className="flex cursor-pointer items-start gap-2.5 rounded-lg px-2.5 py-2 text-[13px] data-[selected=true]:bg-accent"
+                >
+                  <SheetIcon name={hit.icon} className="mt-0.5 size-4 text-muted-foreground" />
+                  <span className="min-w-0">
+                    <span className="block truncate">{hit.title}</span>
+                    <span className="block truncate text-[12px] text-muted-foreground">
+                      {hit.snippet}
+                    </span>
+                  </span>
+                </Command.Item>
+              ))}
+            </Command.Group>
+          )}
           <Command.Group
             heading="Agents"
             className="[&_[cmdk-group-heading]]:px-2.5 [&_[cmdk-group-heading]]:pt-2 [&_[cmdk-group-heading]]:pb-1 [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:text-[11px] [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-[0.06em]"
