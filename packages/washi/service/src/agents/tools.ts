@@ -1,5 +1,5 @@
 import { createSdkMcpServer, tool } from '@anthropic-ai/claude-agent-sdk'
-import { tableSpecSchema } from '@washi/ink'
+import { historyQuerySchema, tableSpecSchema } from '@washi/ink'
 import {
   getAppMeta,
   getBacklinks,
@@ -12,6 +12,7 @@ import {
 import { fetchPolicySchema, guardedFetch } from '@washi/tsuru'
 import { z } from 'zod'
 import { checkSource, createSheetFromSource, updateSheetFromSource } from '../sheets/service'
+import { runHistory } from '../tables/history'
 import { defineUserTable, runMutation, runQuery } from '../tables/service'
 
 export const TSURU_HOSTS_KEY = 'tsuru_allowed_hosts'
@@ -110,6 +111,12 @@ export function createWashiTools(ws: Workspace, context: ToolContext) {
           const { querySchema } = await import('@washi/ink')
           return text(runQuery(ws, querySchema.parse(query)))
         },
+      ),
+      tool(
+        'db_history',
+        'How many rows matched a filter at the close of each day, over 7d/14d/30d/90d: burn-ups, backlog over time, what shipped this month. Same where grammar as db_query.',
+        { query: z.record(z.string(), z.unknown()) },
+        async ({ query }) => text(runHistory(ws, historyQuerySchema.parse(query))),
       ),
       tool(
         'db_mutate',

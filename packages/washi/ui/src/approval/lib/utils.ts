@@ -1,5 +1,6 @@
 import {
   IconBolt,
+  IconChartLine,
   IconDatabase,
   IconDatabaseEdit,
   IconEye,
@@ -132,6 +133,12 @@ export function describeTool(name: string, input: unknown, titleOf: TitleOf): To
       return base({ icon: IconDatabase, action: 'Looked at your tables' })
     case 'db_query':
       return base({ icon: IconTable, action: 'Read', subject: text(record(args.query).table) })
+    case 'db_history':
+      return base({
+        icon: IconChartLine,
+        action: 'Looked back through',
+        subject: text(record(args.query).table),
+      })
     default:
       return base({ icon: IconTool, action: name.replaceAll('_', ' ') })
   }

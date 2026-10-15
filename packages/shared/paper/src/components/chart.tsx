@@ -1,6 +1,6 @@
-import type { InkQuery } from '@washi/ink'
-import { styled, useBind } from '../lib'
-import type { BlockProps, Row } from '../lib/types'
+import type { HistoryQuery, InkQuery } from '@washi/ink'
+import { styled, useBind, useHistory } from '../lib'
+import type { BindState, BlockProps, Row } from '../lib/types'
 import { Bound } from './states'
 
 const RAMP = [
@@ -133,22 +133,43 @@ function Donut({ points }: { points: Point[] }) {
   )
 }
 
+type ChartLook = BlockProps & {
+  kind: 'bar' | 'line' | 'area' | 'donut'
+  label?: string
+  value?: string
+  empty?: string
+}
+
 /** Palette from the chart ramp; series colours are never settable by a page. */
 export function Chart({
   bind,
+  history,
+  ...look
+}: ChartLook & { bind?: InkQuery; history?: HistoryQuery }) {
+  return history ? (
+    <HistoryChart history={history} {...look} />
+  ) : (
+    <BoundChart bind={bind} {...look} />
+  )
+}
+
+function BoundChart({ bind, ...look }: ChartLook & { bind?: InkQuery }) {
+  return <ChartBody state={useBind(bind)} {...look} />
+}
+
+/** Over time: one point per day, labelled the way a person reads a date. */
+function HistoryChart({ history, ...look }: ChartLook & { history: HistoryQuery }) {
+  return <ChartBody state={useHistory(history)} label="day" value="count" {...look} />
+}
+
+function ChartBody({
+  state,
   kind,
   label,
   value,
   empty,
   ...rest
-}: BlockProps & {
-  bind: InkQuery
-  kind: 'bar' | 'line' | 'area' | 'donut'
-  label?: string
-  value?: string
-  empty?: string
-}) {
-  const state = useBind(bind)
+}: ChartLook & { state: BindState }) {
   return (
     <Bound state={state} empty={empty}>
       {(rows) => {

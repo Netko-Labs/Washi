@@ -5,6 +5,8 @@ import { api } from '../api'
 export const paperHost: PaperHost = {
   runQuery: (query) => api.tables.query.query({ query }),
 
+  runHistory: (query) => api.tables.history.query({ query }),
+
   runAction: async (action) => {
     if (action.verb === 'sheet.open' && typeof action.sheet === 'string') {
       void import('../stores').then(({ useViewStore }) =>

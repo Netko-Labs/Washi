@@ -2,6 +2,7 @@ import type { UserTable } from '@washi/domain'
 import { recordTable, userTableTable } from '@washi/domain/db'
 import { type RecordData, type TableSpec, tableSpecSchema } from '@washi/ink'
 import { and, eq, inArray, isNull } from 'drizzle-orm'
+import { appendChange } from './changes'
 import { newId, type Workspace } from './client'
 import { appendOp } from './oplog'
 
@@ -58,6 +59,7 @@ export function insertRecord(ws: Workspace, tableId: string, data: RecordData): 
   const id = newId()
   ws.db.insert(recordTable).values({ id, tableId, data, hlcCreated: now, hlcUpdated: now }).run()
   appendOp(ws, 'record', id, { kind: 'insert', tableId, data })
+  appendChange(ws, tableId, id, data)
   return id
 }
 
@@ -91,6 +93,7 @@ export function updateRecords(
       .where(eq(recordTable.id, row.id))
       .run()
     appendOp(ws, 'record', row.id, { kind: 'update', tableId, patch })
+    appendChange(ws, tableId, row.id, merged)
   }
   return rows.length
 }
@@ -101,6 +104,9 @@ export function deleteRecords(ws: Workspace, tableId: string, ids: string[]): nu
   const result = ws.sqlite
     .query(`UPDATE records SET deleted_at = ? WHERE table_id = ? AND id IN (${placeholders})`)
     .run(ws.now(), tableId, ...ids)
-  for (const id of ids) appendOp(ws, 'record', id, { kind: 'delete', tableId })
+  for (const id of ids) {
+    appendOp(ws, 'record', id, { kind: 'delete', tableId })
+    appendChange(ws, tableId, id, null)
+  }
   return result.changes
 }

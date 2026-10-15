@@ -1,4 +1,4 @@
-import { mutationSchema, querySchema, tableSpecSchema } from '@washi/ink'
+import { historyQuerySchema, mutationSchema, querySchema, tableSpecSchema } from '@washi/ink'
 import {
   getBacklinks,
   getSheet,
@@ -11,6 +11,7 @@ import { guardedFetch } from '@washi/tsuru'
 import { tool } from 'ai'
 import { z } from 'zod'
 import { checkSource, createSheetFromSource, updateSheetFromSource } from '../../sheets/service'
+import { runHistory } from '../../tables/history'
 import { defineUserTable, runMutation, runQuery } from '../../tables/service'
 import { currentFetchPolicy } from '../tools'
 
@@ -23,6 +24,7 @@ const READ_ONLY = new Set([
   'search',
   'db_list_tables',
   'db_query',
+  'db_history',
 ])
 
 export function isReadTool(name: string): boolean {
@@ -77,6 +79,12 @@ export function createAiTools({ ws, runHankoAction, openSheet }: AiToolDeps) {
       description: 'Query a table: filters, orderBy, limit, groupBy aggregations.',
       inputSchema: z.object({ query: querySchema }),
       execute: async ({ query }) => runQuery(ws, query),
+    }),
+    db_history: tool({
+      description:
+        'How many rows matched a filter at the close of each day, over 7d/14d/30d/90d: burn-ups, backlog over time, what shipped this month. Same where grammar as db_query.',
+      inputSchema: z.object({ query: historyQuerySchema }),
+      execute: async ({ query }) => runHistory(ws, query),
     }),
 
     sheet_create: tool({

@@ -4,6 +4,7 @@ import { dirname } from 'node:path'
 import { createHlcClock, positionBetween } from '@washi/domain'
 import * as schema from '@washi/domain/db'
 import { type BunSQLiteDatabase, drizzle } from 'drizzle-orm/bun-sqlite'
+import { backfillChanges } from './changes-backfill'
 
 export type DrizzleDB = BunSQLiteDatabase<typeof schema>
 
@@ -130,6 +131,18 @@ function createTables(sqlite: Database) {
     )
   `)
   sqlite.exec('CREATE INDEX IF NOT EXISTS idx_records_table ON records(table_id)')
+
+  sqlite.exec(`
+    CREATE TABLE IF NOT EXISTS record_changes (
+      seq INTEGER PRIMARY KEY AUTOINCREMENT,
+      table_id TEXT NOT NULL,
+      record_id TEXT NOT NULL,
+      data TEXT,
+      at_ms INTEGER NOT NULL
+    )
+  `)
+  sqlite.exec('CREATE INDEX IF NOT EXISTS idx_record_changes ON record_changes(table_id, at_ms)')
+  backfillChanges(sqlite)
 
   sqlite.exec(`
     CREATE TABLE IF NOT EXISTS agent_sessions (

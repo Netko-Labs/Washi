@@ -1,3 +1,4 @@
+export { matchesFilters } from './match'
 export {
   type Aggregate,
   type AggregateFn,
@@ -13,6 +14,10 @@ export {
   type FilterOp,
   filterOpSchema,
   filterSchema,
+  type HistoryQuery,
+  type HistoryRange,
+  historyQuerySchema,
+  historyRangeSchema,
   type InkMutation,
   type InkQuery,
   mutationSchema,

@@ -1,7 +1,5 @@
 import type { UserTable } from '@washi/domain'
 import {
-  ARRAY_COLUMN_TYPES,
-  type Filter,
   type InkMutation,
   type InkQuery,
   type QueryResult,
@@ -24,6 +22,7 @@ import {
 } from '@washi/repository'
 import { InkError } from './errors'
 import { trashRowPages } from './rows'
+import { checkListUse } from './rules'
 
 export { InkError }
 
@@ -51,20 +50,6 @@ export function addColumn(ws: Workspace, tableName: string, column: unknown): Us
     throw new InkError(`"${String(name)}" is already a property of "${tableName}"`)
   }
   return defineUserTable(ws, { ...table.spec, columns: [...table.spec.columns, column] })
-}
-
-const LIST_OPS: ReadonlySet<Filter['op']> = new Set(['eq', 'ne', 'contains', 'in'])
-
-/** Lists answer membership only, and a row can sit in several groups, so none of them group. */
-function checkListUse(spec: TableSpec, filters: Filter[], groupColumn?: string): void {
-  const lists = new Set(
-    spec.columns.filter((column) => ARRAY_COLUMN_TYPES.has(column.type)).map((c) => c.name),
-  )
-  const misuse = filters.find((filter) => lists.has(filter.column) && !LIST_OPS.has(filter.op))
-  if (misuse) throw new InkError(`"${misuse.op}" does not apply to the list "${misuse.column}"`)
-  if (groupColumn && lists.has(groupColumn)) {
-    throw new InkError(`cannot group by the list "${groupColumn}"`)
-  }
 }
 
 /** Every id a relation cell names must be a live record of the table it points at. */
