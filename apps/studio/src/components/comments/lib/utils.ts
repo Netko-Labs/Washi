@@ -34,6 +34,12 @@ export function mentionQuery(text: string, caret: number): string | null {
   return match ? (match[1] ?? '') : null
 }
 
+/** Who an `@query` could mean: names containing it, at most six. */
+export function mentionMatches(members: MentionRef[], query: string): MentionRef[] {
+  const needle = query.toLowerCase()
+  return members.filter((member) => member.name.toLowerCase().includes(needle)).slice(0, 6)
+}
+
 /** The people still named in the text — a mention deleted from the draft is not sent. */
 export function keptMentions(text: string, picked: MentionRef[]): MentionRef[] {
   return picked.filter((member) => text.includes(`@${member.name}`))
