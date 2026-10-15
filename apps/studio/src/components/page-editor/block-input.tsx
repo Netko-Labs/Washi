@@ -1,3 +1,4 @@
+import { useNoticeStore } from '@washi/ui'
 import type { KeyboardEvent } from 'react'
 import { useRef } from 'react'
 import {
@@ -23,7 +24,14 @@ export function BlockInput({ block, numberAt }: BlockInputProps) {
 
   const pick = (option: SlashOption) => {
     if (option.type === 'data') {
-      void store().insertData(block.id, option.pick)
+      // The `/` text stays put, so a refused name (taken since the menu loaded) can be retyped.
+      store()
+        .insertData(block.id, option.pick)
+        .catch((cause: unknown) =>
+          useNoticeStore
+            .getState()
+            .say(`That did not land — ${cause instanceof Error ? cause.message : String(cause)}`),
+        )
       return
     }
     store().turnInto(block.id, option.kind)
