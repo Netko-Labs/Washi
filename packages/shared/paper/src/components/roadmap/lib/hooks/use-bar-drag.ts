@@ -23,15 +23,25 @@ export function useBarDrag(
     const days = (x: number) => (width > 0 ? Math.round((x - from) / width) : 0)
     const move = (next: globalThis.PointerEvent) =>
       setDrag({ at, days: days(next.clientX), held: true })
-    const up = (next: globalThis.PointerEvent) => {
+    const release = () => {
       target.removeEventListener('pointermove', move)
       target.removeEventListener('pointerup', up)
+      target.removeEventListener('pointercancel', cancel)
+    }
+    // The browser took the pointer (a scroll, a system gesture): nothing was dropped.
+    const cancel = () => {
+      release()
+      setDrag({ at, days: 0, held: false })
+    }
+    const up = (next: globalThis.PointerEvent) => {
+      release()
       const moved = days(next.clientX)
       setDrag({ at, days: moved, held: false })
       if (moved !== 0) onMove(moved).catch(() => setDrag({ at, days: 0, held: false }))
     }
     target.addEventListener('pointermove', move)
     target.addEventListener('pointerup', up)
+    target.addEventListener('pointercancel', cancel)
   }
 
   return { shift: drag.held || drag.at === at ? drag.days : 0, onPointerDown }
