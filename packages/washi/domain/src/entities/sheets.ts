@@ -9,9 +9,13 @@ export const sheetSummarySchema = z.object({
   position: z.string(),
   cover: z.string().nullable(),
   fullWidth: z.boolean(),
+  editedBy: z.enum(['washi']).nullable(),
+  /** Washi's last write can be taken back: nobody has written the page since. */
+  undoable: z.boolean(),
   hlcUpdated: z.string(),
 })
 export type SheetSummary = z.infer<typeof sheetSummarySchema>
+export type SheetAuthor = SheetSummary['editedBy']
 
 export const sheetDetailSchema = sheetSummarySchema.extend({
   source: z.string(),

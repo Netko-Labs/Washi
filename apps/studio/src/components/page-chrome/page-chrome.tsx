@@ -5,6 +5,7 @@ import { useCommentsStore } from '@/components/comments'
 import { CoverPicker } from './cover-picker'
 import { IconPicker } from './icon-picker'
 import { type ChromePicker, COVERS, type PageChromeProps } from './lib'
+import { WashiMark } from './washi-mark'
 
 const QUIET_BUTTON =
   'flex h-7 items-center gap-1.5 rounded-md px-2 text-[12.5px] text-muted-foreground hover:bg-accent'
@@ -33,6 +34,7 @@ export function PageChrome({ pageId }: PageChromeProps) {
         </div>
       )}
       <div className={`relative mx-auto px-8 ${sheet.fullWidth ? '' : 'max-w-[760px]'}`}>
+        <WashiMark sheet={sheet} />
         {sheet.icon && (
           <button
             type="button"

@@ -39,7 +39,7 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   **Stop `bun dev` first** — both want CDP port 9222, and the collision reports as
   "never published an inspector endpoint", which looks identical to a crash at boot.
 - `bun run --cwd apps/desktop check:live` — the golden path through a **real** turn on this
-  machine's Claude Code login (ask → accept at the desk → page opens → plan receipt). Opt-in:
+  machine's Claude Code login (ask → page lands → plan receipt). Opt-in:
   it spends plan usage, so it is never part of `check`.
 - `docker compose up` — the studio + Postgres (self-hosting). Needs `.env` (see `.env.example`).
   Coolify builds the same app with Railpack: `RAILPACK_CONFIG_FILE=apps/studio/railpack.json`.
@@ -135,9 +135,10 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   nothing is marked; the day catches up after Resume. Marked run before it runs; a scheduled run's
   questions wait 12h. Times are wall-clock minute + IANA zone. `routines` is the only
   caller-free path into a turn — keep it that way.
-- **Approvals.** Reads pass; writes stop at the `ApprovalDesk`. Auto-approve (a workspace
-  setting, `agent_auto_approve_changes` in `app_meta`) waves through `CHANGE_TOOLS` only — page
-  and table writes. `fetch_url` and `action_run` always ask: nothing leaves without a person.
+- **Approvals.** Reads pass; page and table writes (`CHANGE_TOOLS`) land without asking, marked
+  `edited_by = 'washi'`. Each Washi write pushes the page's prior state onto `sheet_revisions` —
+  its undo stack, cleared the moment a person changes the page, so Undo never erases their words.
+  `fetch_url` and `action_run` always stop at the `ApprovalDesk`: nothing leaves without a person.
   The UI says every tool in words (`describeTool` in `@washi/ui`) — never a tool name or JSON.
 - Agent tools are the ONLY capability surface: ink (data), tsuru (network), hanko (actions).
   Never hand agents fs/shell/raw SQL.

@@ -1,6 +1,5 @@
 import { IconArrowUp, IconPlayerStopFilled, IconPlus } from '@tabler/icons-react'
 import { useState } from 'react'
-import { AutoApproveChip } from '../approval'
 import { useAgentStore } from '../stores'
 import { useInferenceLabel } from './lib'
 
@@ -40,7 +39,6 @@ export function AgentComposer() {
           >
             <IconPlus className="size-3.5" />
           </button>
-          <AutoApproveChip />
           {label && (
             <span className="truncate font-mono text-[11px] text-muted-foreground" data-inference>
               {label}

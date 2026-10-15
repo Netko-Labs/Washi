@@ -11,7 +11,6 @@ export const agentQueries = router({
   /** What the next turn will run on. Embedded probes the local Claude CLI, so not free. */
   inference: workspaceProcedure.query(({ ctx }) => ctx.host.inference()),
   /** Whether page and table changes skip the desk. Outbound actions always ask. */
-  autoApprove: workspaceProcedure.query(({ ctx }) => ({ on: ctx.host.autoApproving() })),
   /** What Washi is waiting on right now — so a panel opened late can still answer. */
   pendingApprovals: workspaceProcedure.query(({ ctx }) => ctx.host.pendingApprovals()),
   /** The last day's turns with their receipts, what is waiting on a person, and the spend. */

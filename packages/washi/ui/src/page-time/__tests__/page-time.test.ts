@@ -13,6 +13,8 @@ const sheet = (id: string, ms: number) =>
     position: 'V',
     cover: null,
     fullWidth: false,
+    editedBy: null,
+    undoable: false,
     hlcUpdated: hlcAt(ms),
   }) satisfies SheetSummary
 

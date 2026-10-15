@@ -1,4 +1,10 @@
+import type { SheetSummary } from '@washi/domain'
+
 export type ChromePicker = 'icon' | 'cover'
+
+export interface WashiMarkProps {
+  sheet: SheetSummary
+}
 
 export interface PageChromeProps {
   pageId: string

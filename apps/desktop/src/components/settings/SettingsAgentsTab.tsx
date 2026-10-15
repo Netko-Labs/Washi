@@ -1,11 +1,4 @@
-import {
-  AutoApproveRow,
-  RowButton,
-  SegmentedControl,
-  SettingsCard,
-  SettingsRow,
-  usd,
-} from '@washi/ui'
+import { RowButton, SegmentedControl, SettingsCard, SettingsRow, usd } from '@washi/ui'
 import { DailyStopInput } from './DailyStopInput'
 import { type InferenceWire, LOCAL_MODEL_LABELS, PREFERENCE_LABELS, useAgentRuntime } from './lib'
 import { RoutinesCard } from './RoutinesCard'
@@ -43,8 +36,6 @@ export function SettingsAgentsTab() {
   const localModel = LOCAL_MODEL_LABELS.find((entry) => entry.value === inference.localModel)
   return (
     <div className="flex flex-col gap-[22px]">
-      <AutoApproveRow />
-
       <SettingsCard>
         <SettingsRow title="Claude Code on this computer" sub={cliLine(inference.localCli)} mono>
           <InUse on={inference.active === 'local_cli'} />

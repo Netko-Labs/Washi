@@ -11,6 +11,7 @@ export {
   recordTable,
   routineTable,
   sheetLinkTable,
+  sheetRevisionTable,
   sheetTable,
   userTableTable,
 } from './schema'

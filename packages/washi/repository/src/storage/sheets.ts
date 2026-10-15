@@ -1,16 +1,18 @@
 import {
   positionBetween,
   type SearchHit,
+  type SheetAuthor,
   type SheetDetail,
   type SheetMetaPatch,
   type SheetSummary,
   type SheetWrite,
 } from '@washi/domain'
 import { sheetLinkTable, sheetTable } from '@washi/domain/db'
-import { and, desc, eq, isNull } from 'drizzle-orm'
+import { and, desc, eq, isNull, sql } from 'drizzle-orm'
 import { newId, type Workspace } from './client'
 import { createSnapshot, updateSnapshot } from './loro'
 import { appendOp } from './oplog'
+import { clearRevisions, pushRevision } from './revisions'
 import { lastChildPosition, liveSubtree } from './sheet-tree'
 
 export interface SheetIndexInput {
@@ -19,19 +21,27 @@ export interface SheetIndexInput {
   refs: string[]
 }
 
+const SUMMARY = {
+  id: sheetTable.id,
+  title: sheetTable.title,
+  icon: sheetTable.icon,
+  tags: sheetTable.tags,
+  parentId: sheetTable.parentId,
+  position: sheetTable.position,
+  cover: sheetTable.cover,
+  fullWidth: sheetTable.fullWidth,
+  editedBy: sheetTable.editedBy,
+  // Drizzle renders a lone column unqualified here, and `id` would bind to the revision's.
+  undoable:
+    sql<boolean>`exists (select 1 from sheet_revisions r where r.sheet_id = sheets.id)`.mapWith(
+      Boolean,
+    ),
+  hlcUpdated: sheetTable.hlcUpdated,
+}
+
 export function listSheets(ws: Workspace): SheetSummary[] {
   return ws.db
-    .select({
-      id: sheetTable.id,
-      title: sheetTable.title,
-      icon: sheetTable.icon,
-      tags: sheetTable.tags,
-      parentId: sheetTable.parentId,
-      position: sheetTable.position,
-      cover: sheetTable.cover,
-      fullWidth: sheetTable.fullWidth,
-      hlcUpdated: sheetTable.hlcUpdated,
-    })
+    .select(SUMMARY)
     .from(sheetTable)
     .where(isNull(sheetTable.deletedAt))
     .orderBy(desc(sheetTable.hlcUpdated))
@@ -40,13 +50,11 @@ export function listSheets(ws: Workspace): SheetSummary[] {
 
 export function getSheet(ws: Workspace, id: string): SheetDetail | null {
   const [row] = ws.db
-    .select()
+    .select({ ...SUMMARY, source: sheetTable.source, hlcCreated: sheetTable.hlcCreated })
     .from(sheetTable)
     .where(and(eq(sheetTable.id, id), isNull(sheetTable.deletedAt)))
     .all()
-  if (!row) return null
-  const { loroSnapshot: _snapshot, deletedAt: _deleted, ...detail } = row
-  return detail
+  return row ?? null
 }
 
 /** A new page lands last among its siblings, as in Notion. The caller vouches for the parent. */
@@ -55,6 +63,7 @@ export function createSheet(
   write: SheetWrite,
   index: SheetIndexInput,
   parentId: string | null = null,
+  editedBy: SheetAuthor = null,
 ): SheetDetail {
   const now = ws.now()
   const id = newId()
@@ -69,12 +78,13 @@ export function createSheet(
       tags: write.tags ?? [],
       source: write.source,
       loroSnapshot: Buffer.from(createSnapshot(write.source)),
+      editedBy,
       hlcCreated: now,
       hlcUpdated: now,
     })
     .run()
   indexSheet(ws, id, write.title, index)
-  appendOp(ws, 'sheet', id, { kind: 'create', parentId, ...write })
+  appendOp(ws, 'sheet', id, { kind: 'create', parentId, editedBy, ...write })
   return getSheet(ws, id) as SheetDetail
 }
 
@@ -83,24 +93,34 @@ export function updateSheet(
   id: string,
   write: SheetWrite,
   index: SheetIndexInput,
+  editedBy: SheetAuthor = null,
 ): SheetDetail | null {
   const [existing] = ws.db.select().from(sheetTable).where(eq(sheetTable.id, id)).all()
   if (!existing || existing.deletedAt) return null
+  const changed =
+    write.source !== existing.source ||
+    write.title !== existing.title ||
+    (write.icon ?? null) !== existing.icon
 
-  ws.db
-    .update(sheetTable)
-    .set({
-      title: write.title,
-      icon: write.icon ?? null,
-      tags: write.tags ?? existing.tags,
-      source: write.source,
-      loroSnapshot: Buffer.from(updateSnapshot(existing.loroSnapshot, write.source)),
-      hlcUpdated: ws.now(),
-    })
-    .where(eq(sheetTable.id, id))
-    .run()
-  indexSheet(ws, id, write.title, index)
-  appendOp(ws, 'sheet', id, { kind: 'update', ...write })
+  ws.sqlite.transaction(() => {
+    if (editedBy === 'washi') pushRevision(ws, existing)
+    else if (changed) clearRevisions(ws, id)
+    ws.db
+      .update(sheetTable)
+      .set({
+        title: write.title,
+        icon: write.icon ?? null,
+        tags: write.tags ?? existing.tags,
+        source: write.source,
+        loroSnapshot: Buffer.from(updateSnapshot(existing.loroSnapshot, write.source)),
+        editedBy: editedBy ?? (changed ? null : existing.editedBy),
+        hlcUpdated: ws.now(),
+      })
+      .where(eq(sheetTable.id, id))
+      .run()
+    indexSheet(ws, id, write.title, index)
+    appendOp(ws, 'sheet', id, { kind: 'update', editedBy, ...write })
+  })()
   return getSheet(ws, id)
 }
 

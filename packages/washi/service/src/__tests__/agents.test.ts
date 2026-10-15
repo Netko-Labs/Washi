@@ -137,13 +137,13 @@ describe('approval flow', () => {
       input: Record<string, unknown>,
     ) => Promise<{ behavior: string }>
 
-    const pendingAllow = gate(session.id, 'mcp__washi__sheet_create', { title: 'x' })
+    const pendingAllow = gate(session.id, 'mcp__washi__action_run', { action: {} })
     await Bun.sleep(5)
     expect(approvals).toHaveLength(1)
     host.resolveApprovalRequest(approvals[0]!.id, 'allow_once')
     expect((await pendingAllow).behavior).toBe('allow')
 
-    const pendingDeny = gate(session.id, 'mcp__washi__db_mutate', { mutation: {} })
+    const pendingDeny = gate(session.id, 'mcp__washi__action_run', { action: {} })
     await Bun.sleep(5)
     host.resolveApprovalRequest(approvals[1]!.id, 'reject_once')
     expect((await pendingDeny).behavior).toBe('deny')
@@ -203,8 +203,8 @@ describe('stop', () => {
     const theirs = createSession(ws, 'theirs')
     // biome-ignore lint/complexity/useLiteralKeys: reaching into a private member for the test
     const desk = host['approvals']
-    const pendingMine = desk.gateSdkTool(mine.id, 'mcp__washi__sheet_create', { title: 'x' })
-    const pendingTheirs = desk.gateSdkTool(theirs.id, 'mcp__washi__sheet_create', { title: 'y' })
+    const pendingMine = desk.gateSdkTool(mine.id, 'mcp__washi__action_run', { action: {} })
+    const pendingTheirs = desk.gateSdkTool(theirs.id, 'mcp__washi__action_run', { action: {} })
     await Bun.sleep(5)
     expect(approvals).toHaveLength(2)
 
@@ -222,8 +222,8 @@ describe('a client that opens late', () => {
     const { host, approvals } = makeHost()
     const session = createSession(ws, 'late')
     // biome-ignore lint/complexity/useLiteralKeys: reaching into a private member for the test
-    const pending = host['approvals'].gateSdkTool(session.id, 'mcp__washi__sheet_create', {
-      title: 'x',
+    const pending = host['approvals'].gateSdkTool(session.id, 'mcp__washi__action_run', {
+      action: {},
     })
     await Bun.sleep(5)
     expect(host.pendingApprovals().map((request) => request.id)).toEqual([approvals[0]!.id])
@@ -248,8 +248,8 @@ describe('who answered', () => {
     const { host, approvals } = makeHost()
     const session = createSession(ws, 'audit')
     // biome-ignore lint/complexity/useLiteralKeys: reaching into a private member for the test
-    const pending = host['approvals'].gateSdkTool(session.id, 'mcp__washi__sheet_create', {
-      title: 'x',
+    const pending = host['approvals'].gateSdkTool(session.id, 'mcp__washi__action_run', {
+      action: {},
     })
     await Bun.sleep(5)
     host.resolveApprovalRequest(approvals[0]!.id, 'allow_once', 'user_mara')

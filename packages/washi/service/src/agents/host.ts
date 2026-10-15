@@ -115,15 +115,6 @@ export class AgentHost {
     this.budget.resume()
   }
 
-  autoApproving(): boolean {
-    return this.approvals.autoApproving()
-  }
-
-  setAutoApprove(on: boolean, actorId: string | null): boolean {
-    this.approvals.setAutoApprove(on, actorId)
-    return this.approvals.autoApproving()
-  }
-
   /** Stop the session's running turn. Its open approvals are answered "no" on the way out. */
   cancel(sessionId: string): boolean {
     const turn = this.turns.get(sessionId)

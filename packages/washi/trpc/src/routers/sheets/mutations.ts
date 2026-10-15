@@ -6,6 +6,7 @@ import {
   moveSheetTo,
   removeSheet,
   restoreSheetTree,
+  undoWashiWrite,
   updateSheetFromSource,
 } from '@washi/service'
 import { z } from 'zod'
@@ -22,6 +23,9 @@ export const sheetMutations = router({
   update: workspaceProcedure
     .input(z.object({ id: z.string(), write: sheetWriteSchema }))
     .mutation(({ ctx, input }) => updateSheetFromSource(ctx.ws, input.id, input.write)),
+  undoWashi: workspaceProcedure
+    .input(byId)
+    .mutation(({ ctx, input }) => undoWashiWrite(ctx.ws, input.id)),
   updateMeta: workspaceProcedure
     .input(z.object({ id: z.string(), patch: sheetMetaPatchSchema }))
     .mutation(({ ctx, input }) => {
