@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import type { Comment } from '@washi/domain'
-import { bodySegments, keptMentions, mentionQuery, threadsOf } from '../lib/utils'
+import { bodySegments, keptMentions, mentionMatches, mentionQuery, threadsOf } from '../lib/utils'
 
 const comment = (id: string, threadId: string): Comment => ({
   id,
@@ -40,6 +40,15 @@ describe('comments', () => {
     expect(mentionQuery('hi @ke', 6)).toBe('ke')
     expect(mentionQuery('mail a@b', 8)).toBeNull()
     expect(mentionQuery('done @kenji ', 12)).toBeNull()
+  })
+
+  test('an @query matches names anywhere in them, case-blind', () => {
+    const people = [
+      { id: 'a', name: 'Kenji Mori' },
+      { id: 'b', name: 'Ana Ruiz' },
+    ]
+    expect(mentionMatches(people, 'MOR').map((each) => each.id)).toEqual(['a'])
+    expect(mentionMatches(people, '')).toHaveLength(2)
   })
 
   test('a mention erased from the draft is not sent', () => {

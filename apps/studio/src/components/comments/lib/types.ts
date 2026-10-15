@@ -1,4 +1,5 @@
 import type { Comment, CommentWrite, MentionRef } from '@washi/domain'
+import type { KeyboardEvent, RefObject } from 'react'
 
 export interface CommentThread {
   root: Comment
@@ -49,8 +50,26 @@ export interface CommentComposerProps {
 }
 
 export interface MentionPickerProps {
-  query: string
+  matches: MentionRef[]
+  active: number
   onPick: (member: MentionRef) => void
+}
+
+export interface CommentDraft {
+  text: string
+  caret: number
+  picked: MentionRef[]
+}
+
+export interface Composer {
+  draft: CommentDraft
+  field: RefObject<HTMLTextAreaElement | null>
+  matches: MentionRef[]
+  active: number
+  pick: (member: MentionRef) => void
+  edit: (text: string, caret: number) => void
+  moveCaret: (caret: number) => void
+  onKeyDown: (event: KeyboardEvent<HTMLTextAreaElement>) => void
 }
 
 export interface CommentsButtonProps {

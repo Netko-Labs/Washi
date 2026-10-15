@@ -1,6 +1,7 @@
 import type { HistoryQuery, InkQuery } from '@washi/ink'
 import { styled, useBind, useHistory } from '../lib'
 import type { BindState, BlockProps, Row } from '../lib/types'
+import { usePaperHost } from '../provider'
 import { Bound } from './states'
 
 const RAMP = [
@@ -13,6 +14,9 @@ const RAMP = [
 const W = 320
 const H = 160
 const PAD = 8
+const DAY = /^\d{4}-\d{2}-\d{2}$/
+const TICK = { fontSize: 9, fill: 'var(--muted)', fontFamily: 'var(--font-sans)' }
+const FIGURE = { fontSize: 9, fontWeight: 600, fill: 'var(--ink)', fontFamily: 'var(--font-sans)' }
 
 interface Point {
   label: string
@@ -30,15 +34,29 @@ function pickColumns(rows: Row[], label?: string, value?: string): [string, stri
   return [labelKey, valueKey]
 }
 
-function toPoints(rows: Row[], label?: string, value?: string): Point[] {
+/** A bare day reads as "Oct 3", a calendar day rather than UTC midnight. */
+function readable(label: string, locale?: string): string {
+  if (!DAY.test(label)) return label
+  return new Date(`${label}T00:00:00Z`).toLocaleDateString(locale, {
+    month: 'short',
+    day: 'numeric',
+    timeZone: 'UTC',
+  })
+}
+
+function figure(value: number, locale?: string): string {
+  return value.toLocaleString(locale, { maximumFractionDigits: 1 })
+}
+
+function toPoints(rows: Row[], label?: string, value?: string, locale?: string): Point[] {
   const [labelKey, valueKey] = pickColumns(rows, label, value)
   return rows.map((row) => ({
-    label: String(row[labelKey] ?? ''),
+    label: readable(String(row[labelKey] ?? ''), locale),
     value: typeof row[valueKey] === 'number' ? (row[valueKey] as number) : 0,
   }))
 }
 
-function Bars({ points }: { points: Point[] }) {
+function Bars({ points, locale }: { points: Point[]; locale?: string }) {
   const max = Math.max(1, ...points.map((point) => point.value))
   const slot = (W - PAD * 2) / points.length
   const bar = Math.min(slot * 0.62, 44)
@@ -57,14 +75,10 @@ function Bars({ points }: { points: Point[] }) {
               rx="4"
               fill={RAMP[index % RAMP.length]}
             />
-            <text
-              x={x + bar / 2}
-              y={H - 6}
-              textAnchor="middle"
-              fontSize="9"
-              fill="var(--muted)"
-              fontFamily="var(--font-sans)"
-            >
+            <text x={x + bar / 2} y={H - 24 - height} textAnchor="middle" {...FIGURE}>
+              {figure(point.value, locale)}
+            </text>
+            <text x={x + bar / 2} y={H - 6} textAnchor="middle" {...TICK}>
               {point.label.length > 14 ? `${point.label.slice(0, 13)}…` : point.label}
             </text>
           </g>
@@ -74,12 +88,22 @@ function Bars({ points }: { points: Point[] }) {
   )
 }
 
-function Lines({ points, area }: { points: Point[]; area: boolean }) {
+/** First, middle and last label under the line; the latest and the peak value over it. */
+function Lines({ points, area, locale }: { points: Point[]; area: boolean; locale?: string }) {
   const max = Math.max(1, ...points.map((point) => point.value))
   const step = points.length > 1 ? (W - PAD * 2) / (points.length - 1) : 0
   const coords = points.map(
     (point, index) => [PAD + step * index, H - 20 - ((H - 28) * point.value) / max] as const,
   )
+  const last = points.length - 1
+  const ticks = [...new Set([0, Math.floor(last / 2), last])].filter((index) => index >= 0)
+  const peak = points.reduce(
+    (best, point, index) => (point.value > (points[best]?.value ?? 0) ? index : best),
+    0,
+  )
+  const isPeakAbove = (points[peak]?.value ?? 0) > (points[last]?.value ?? 0)
+  const marked = (isPeakAbove ? [peak, last] : [last]).filter((index) => index >= 0)
+  const anchor = (index: number) => (index === 0 ? 'start' : index === last ? 'end' : 'middle')
   const path = coords
     .map(([x, y], index) => `${index === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`)
     .join(' ')
@@ -94,7 +118,31 @@ function Lines({ points, area }: { points: Point[]; area: boolean }) {
       )}
       <path d={path} fill="none" stroke="var(--chart-1)" strokeWidth="2" strokeLinejoin="round" />
       {coords.map(([x, y], index) => (
-        <circle key={index} cx={x} cy={y} r="3" fill="var(--chart-1)" />
+        <circle key={index} cx={x} cy={y} r="3" fill="var(--chart-1)">
+          <title>{`${points[index]?.label} · ${figure(points[index]?.value ?? 0, locale)}`}</title>
+        </circle>
+      ))}
+      {marked.map((index) => (
+        <text
+          key={`v${index}`}
+          x={coords[index]?.[0]}
+          y={(coords[index]?.[1] ?? 0) - 7}
+          textAnchor={anchor(index)}
+          {...FIGURE}
+        >
+          {figure(points[index]?.value ?? 0, locale)}
+        </text>
+      ))}
+      {ticks.map((index) => (
+        <text
+          key={`t${index}`}
+          x={coords[index]?.[0]}
+          y={H - 6}
+          textAnchor={anchor(index)}
+          {...TICK}
+        >
+          {points[index]?.label}
+        </text>
       ))}
     </svg>
   )
@@ -170,15 +218,16 @@ function ChartBody({
   empty,
   ...rest
 }: ChartLook & { state: BindState }) {
+  const { locale } = usePaperHost()
   return (
     <Bound state={state} empty={empty}>
       {(rows) => {
-        const points = toPoints(rows, label, value)
+        const points = toPoints(rows, label, value, locale)
         return (
           <div {...styled(rest, 'wsx-chart')} data-kind={kind}>
-            {kind === 'bar' && <Bars points={points} />}
+            {kind === 'bar' && <Bars points={points} locale={locale} />}
             {(kind === 'line' || kind === 'area') && (
-              <Lines points={points} area={kind === 'area'} />
+              <Lines points={points} area={kind === 'area'} locale={locale} />
             )}
             {kind === 'donut' && <Donut points={points} />}
             {kind === 'donut' && (
@@ -186,7 +235,7 @@ function ChartBody({
                 {points.map((point, index) => (
                   <span key={point.label + index}>
                     <i style={{ background: RAMP[index % RAMP.length] }} />
-                    {point.label} · {point.value}
+                    {point.label} · {figure(point.value, locale)}
                   </span>
                 ))}
               </div>

@@ -1,12 +1,7 @@
 import { initials } from '@washi/ui'
-import { type MentionPickerProps, useCommentsStore } from './lib'
+import type { MentionPickerProps } from './lib'
 
-export function MentionPicker({ query, onPick }: MentionPickerProps) {
-  const members = useCommentsStore((state) => state.members)
-  const needle = query.toLowerCase()
-  const matches = members.filter((member) => member.name.toLowerCase().includes(needle)).slice(0, 6)
-
-  if (matches.length === 0) return null
+export function MentionPicker({ matches, active, onPick }: MentionPickerProps) {
   return (
     <div
       role="listbox"
@@ -18,13 +13,13 @@ export function MentionPicker({ query, onPick }: MentionPickerProps) {
           key={member.id}
           type="button"
           role="option"
-          aria-selected={index === 0}
+          aria-selected={index === active}
           onMouseDown={(event) => {
             event.preventDefault()
             onPick(member)
           }}
           className={`flex h-8 w-full items-center gap-2 rounded-lg px-2 text-left text-[13px] hover:bg-accent ${
-            index === 0 ? 'bg-accent' : ''
+            index === active ? 'bg-accent' : ''
           }`}
         >
           <span className="grid size-5 place-items-center rounded-full bg-primary font-semibold text-[9px] text-primary-foreground">
