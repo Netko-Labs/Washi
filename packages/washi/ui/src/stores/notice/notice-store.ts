@@ -1,10 +1,5 @@
 import { create } from 'zustand'
-
-interface NoticeState {
-  message: string | null
-  say: (message: string) => void
-  dismiss: () => void
-}
+import type { NoticeState } from './types'
 
 let timer: ReturnType<typeof setTimeout> | null = null
 
