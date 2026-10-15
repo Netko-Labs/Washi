@@ -1,5 +1,5 @@
 import { IconMenu2 } from '@tabler/icons-react'
-import { CommandPalette, Header, MascotDefs, TabStrip } from '@washi/ui'
+import { CommandPalette, Header, MascotDefs, Notice, TabStrip } from '@washi/ui'
 import { useState } from 'react'
 import { Sidebar } from '@/components/sidebar'
 import { AgentLayer } from './agent-layer'
@@ -37,6 +37,7 @@ export function WorkspaceShell({ workspace, children }: WorkspaceShellProps) {
       </main>
       <AgentLayer />
       <CommandPalette />
+      <Notice />
     </div>
   )
 }

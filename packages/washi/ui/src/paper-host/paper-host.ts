@@ -25,7 +25,6 @@ export const paperHost: PaperHost = {
       useViewStore.getState().openTab(`note:${id}`),
     ),
 
-  // A row deleted under the click has no page to open; the board refetches and it is gone.
   openRow: (recordId) =>
     void api.tables.openRow
       .mutate({ recordId })
@@ -34,7 +33,11 @@ export const paperHost: PaperHost = {
         await useSheetsStore.getState().refresh()
         useViewStore.getState().openTab(`note:${sheetId}`)
       })
-      .catch(() => undefined),
+      .catch(async (cause: unknown) => {
+        const { useNoticeStore } = await import('../stores')
+        const reason = cause instanceof Error ? cause.message : String(cause)
+        useNoticeStore.getState().say(`That row did not open — ${reason}`)
+      }),
 
   toggleTask: async (recordId, done) => {
     await api.tables.toggleTask.mutate({ recordId, done })

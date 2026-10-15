@@ -6,6 +6,7 @@ import {
   Header,
   Inbox,
   MascotDefs,
+  Notice,
   SheetView,
   TabStrip,
   useAgentStore,
@@ -53,6 +54,7 @@ export function App() {
       <AgentFab />
       {panelOpen && <AgentPanel />}
       <CommandPalette />
+      <Notice />
       {onboarding && <Onboarding />}
     </div>
   )
