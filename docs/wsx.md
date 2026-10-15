@@ -160,6 +160,7 @@ primitive accepts the four enums and `class`; the table lists its own props.
 | `Stat` | `value?` `expr?` `label` `hint?` `trend?` `up\|down\|flat` | none | |
 | `Chart` | `bind` or `history` · `kind` `bar\|line\|area\|donut` `label?` `value?` `empty?` | none | Palette from the chart ramp; series colours not settable. `bind` draws now; `history` draws one point per day (see §8) — exactly one of the two |
 | `Timeline` | — | nodes | Holds `Step`s |
+| `Roadmap` | `bind` `date` `title?` `empty?` | none | Notion's timeline: one bar per row from `date` (a day, or `start/end`) on a shared calendar with a today line. Drag a bar to reschedule (`table.update`, length kept); click an empty track to date a row; the name opens the row |
 | `Step` | `marker` (≤8) `title?` | nodes | Only inside `Timeline` |
 | `Progress` | `value?` (0–1) `expr?` `label?` | none | |
 | `Badge` | `expr?` | text | `expr` replaces the text |
@@ -175,7 +176,7 @@ the empty *sentence* (`empty="…"`) and nothing else.
 |---|---|---|---|
 | `Field` | `field` `kind` `text\|number\|date\|select\|boolean` `label?` `help?` `table?` `row?` | none | One primitive over all column types. Writes `table.update` on blur (select and boolean on change). `select` offers the column's options (a status column's too) from the table spec — a page never enumerates them. Inside `Repeat`, `row` defaults to `$row.id` |
 | `Board` | `bind` `groupBy` `groups?` `rank?` `kicker?` `title?` `badge?` `meta?` `avatar?` `onAdd?` `empty?` | none | Grouped, draggable records. A drop writes `table.reorder` with the group column and a fractional `rank`. `groups` fixes column order; a numeric `meta` totals per column; `onOpen` runs on click with `$row` in scope; badge values that carry meaning (`highest high bug` → danger, `medium` → warning, `story` → success, `task` → info) take that tone; `onAdd` runs per column with `$group` substituted |
-| `Database` | `table` `views?` `empty?` | none | Notion's database: `views` are tabs (`{ name, kind: table\|board, groupBy?, where?, columns? }`, ≤8); omitted, a table plus a board grouped by the first status/select column. Every cell edits in place (`table.update`), `+ New` adds a row, the header's `+` adds a property (`table.column`), the title opens the row as its page |
+| `Database` | `table` `views?` `empty?` | none | Notion's database: `views` are tabs (`{ name, kind: table\|board\|timeline, groupBy?, date?, where?, columns? }`, ≤8); omitted, a table, a board grouped by the first status/select column, and a timeline over the first date column. Every cell edits in place (`table.update`), `+ New` adds a row, the header's `+` adds a property (`table.column`), the title opens the row as its page |
 | `Button` | `action` | text | |
 | `Compose` | `action` `label?` `placeholder?` `multiline?` | none | A text box that runs one verb with `$value` (the text) and `$now` (ISO timestamp) filled in — the comment box |
 | `Task` | `row?` `done?` | text | Checkbox bound to a row's `done` column. Inside `Repeat`, `row` defaults to `$row.id` |

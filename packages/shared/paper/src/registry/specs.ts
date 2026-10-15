@@ -194,6 +194,16 @@ const dataOut: Record<string, ComponentSpec> = {
     children: 'none',
   },
   Timeline: p({}, 'nodes'),
+  Roadmap: p(
+    {
+      bind: querySchema,
+      date: columnName,
+      title: columnName.optional(),
+      empty: z.string().max(160).optional(),
+    },
+    'none',
+    { hints: { start: 'one date column holds the range: date="when" with start/end values' } },
+  ),
   Step: p({ marker: z.string().min(1).max(8), title: z.string().max(120).optional() }, 'nodes', {
     within: ['Timeline'],
   }),
@@ -248,8 +258,9 @@ const dataIn: Record<string, ComponentSpec> = {
           z
             .object({
               name: z.string().min(1).max(40),
-              kind: z.enum(['table', 'board']),
+              kind: z.enum(['table', 'board', 'timeline']),
               groupBy: columnName.optional(),
+              date: columnName.optional(),
               where: z.array(filterSchema).max(16).optional(),
               columns: z.array(columnName).max(16).optional(),
             })

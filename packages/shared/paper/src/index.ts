@@ -16,6 +16,7 @@ export { Reveal, Show, Tab, Tabs } from './components/flow'
 export { Divider, Grid, Row, Section, SheetFrame, Stack } from './components/frame'
 export { Button, Compose, Field, Slider, Switch, Task } from './components/input'
 export { Chip, Mascot, Missing, Stamp, Tape } from './components/kit'
+export { Roadmap } from './components/roadmap'
 export { Callout, Card, Figure, Hero } from './components/surface'
 export {
   Code,

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { styled } from '../../lib'
 import { Board } from '../board'
+import { Roadmap } from '../roadmap'
 import { DatabaseTable } from './database-table'
 import { choicesFor, type DatabaseProps, defaultViews, titleColumn, useDatabase } from './lib'
 
@@ -37,6 +38,8 @@ export function Database({ table, views, empty, ...rest }: DatabaseProps) {
     ? db.spec.columns.find((column) => column.name === view.groupBy)
     : undefined
   const rank = db.spec.columns.find((column) => column.name === 'rank' && column.type === 'number')
+  const date =
+    view.date ?? db.spec.columns.find((column) => column.type === 'date')?.name ?? undefined
 
   return (
     <section {...styled(rest, 'wsx-db')} aria-label={table}>
@@ -54,7 +57,14 @@ export function Database({ table, views, empty, ...rest }: DatabaseProps) {
           </button>
         ))}
       </div>
-      {view.kind === 'board' && group ? (
+      {view.kind === 'timeline' && date ? (
+        <Roadmap
+          bind={{ table, where: view.where }}
+          date={date}
+          title={titleColumn(db.spec)?.name}
+          empty={empty}
+        />
+      ) : view.kind === 'board' && group ? (
         <Board
           bind={{ table, where: view.where }}
           groupBy={group.name}
