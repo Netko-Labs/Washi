@@ -10,6 +10,7 @@ const TOOL_KINDS: Record<string, Extract<AgentUpdate, { kind: 'tool_call' }>['to
   sheet_replace: 'edit',
   search: 'search',
   db_list_tables: 'read',
+  people_list: 'read',
   db_query: 'search',
   db_history: 'search',
   db_define: 'edit',

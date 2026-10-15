@@ -1,6 +1,6 @@
 import { mkdirSync } from 'node:fs'
 import { query } from '@anthropic-ai/claude-agent-sdk'
-import type { AgentUpdate, TurnBilling } from '@washi/domain'
+import type { AgentUpdate, Member, TurnBilling } from '@washi/domain'
 import { type ModelCatalogue, priceTurn } from '@washi/models'
 import type { Workspace } from '@washi/repository'
 import { agentEnv, MAX_PLAN_TURN_BUDGET_USD, MAX_TURN_BUDGET_USD, sessionConfigDir } from '../lib'
@@ -22,6 +22,7 @@ export interface ClaudeSdkPortDeps {
   instructions: string
   runHankoAction: (input: unknown) => Promise<void>
   openSheet?: (id: string) => void
+  listPeople?: () => Promise<Member[]>
   canUseTool: (
     sessionId: string,
     toolName: string,
@@ -81,6 +82,7 @@ export function createClaudeSdkPort(deps: ClaudeSdkPortDeps): AgentPort {
               washi: createWashiTools(deps.ws, {
                 runHankoAction: deps.runHankoAction,
                 openSheet: deps.openSheet,
+                listPeople: deps.listPeople,
               }),
             },
             strictMcpConfig: true,

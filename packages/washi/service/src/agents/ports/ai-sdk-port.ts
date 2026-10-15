@@ -1,6 +1,6 @@
 import { createAnthropic } from '@ai-sdk/anthropic'
 import { createOpenRouter } from '@openrouter/ai-sdk-provider'
-import type { AgentUpdate } from '@washi/domain'
+import type { AgentUpdate, Member } from '@washi/domain'
 import { type ModelCatalogue, priceTurn } from '@washi/models'
 import type { Workspace } from '@washi/repository'
 import { type LanguageModel, stepCountIs, ToolLoopAgent } from 'ai'
@@ -14,6 +14,7 @@ export interface AiSdkPortDeps {
   gate: ToolGate
   runHankoAction: (input: unknown) => Promise<void>
   openSheet?: (id: string) => void
+  listPeople?: () => Promise<Member[]>
   instructions: string
   /** Prices the turn, so the daily breaker works on a provider that bills tokens. */
   catalogue: ModelCatalogue
@@ -34,6 +35,7 @@ export function createAiSdkPort({
   gate,
   runHankoAction,
   openSheet,
+  listPeople,
   instructions,
   catalogue,
 }: AiSdkPortDeps): AgentPort {
@@ -45,7 +47,7 @@ export function createAiSdkPort({
       if (credential.kind !== 'api_key') {
         throw new Error('the AI SDK port runs on an API key, never a local CLI login')
       }
-      const tools = createAiTools({ ws, runHankoAction, openSheet })
+      const tools = createAiTools({ ws, runHankoAction, openSheet, listPeople })
       const model =
         request.model.model ?? (await defaultModelFor(catalogue, request.model.provider))
 
@@ -54,7 +56,7 @@ export function createAiSdkPort({
         instructions,
         tools,
         stopWhen: stepCountIs(MAX_STEPS),
-        // One gate, both ports. Reads pass; everything else waits for a person,
+        // One gate, both ports. Reads and page/table writes pass; what leaves waits for a person,
         // through the same desk a sheet's action goes through (spec §09 P4).
         toolApproval: async ({ toolCall }) => {
           if (gate.isRead(toolCall.toolName)) return 'not-applicable'

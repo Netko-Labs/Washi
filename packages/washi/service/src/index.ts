@@ -52,3 +52,5 @@ export {
   toggleTaskRecord,
   updateRecord,
 } from './tables/service'
+export { seedTeamSpace } from './tables/team-space'
+export type { TeamSpace, TeamSpaceOptions } from './tables/types'

@@ -1,5 +1,12 @@
+import { routineCreateSchema } from '@washi/domain'
 import { mutationSchema, tableSpecSchema } from '@washi/ink'
-import { defineUserTable, openRowPage, runMutation, toggleTaskRecord } from '@washi/service'
+import {
+  defineUserTable,
+  openRowPage,
+  runMutation,
+  seedTeamSpace,
+  toggleTaskRecord,
+} from '@washi/service'
 import { z } from 'zod'
 import { router, workspaceProcedure } from '../../init'
 
@@ -14,6 +21,12 @@ export const tableMutations = router({
   openRow: workspaceProcedure
     .input(z.object({ recordId: z.string() }))
     .mutation(({ ctx, input }) => ({ sheetId: openRowPage(ctx.ws, input.recordId) })),
+  /** Backlog, roadmap, wiki, ideas and a weekly review, on the asker's clock. */
+  seedTeamSpace: workspaceProcedure
+    .input(routineCreateSchema.pick({ timeZone: true }))
+    .mutation(({ ctx, input }) =>
+      seedTeamSpace(ctx.ws, { timeZone: input.timeZone, actorId: ctx.actorId }),
+    ),
   toggleTask: workspaceProcedure
     .input(z.object({ recordId: z.string(), done: z.boolean() }))
     .mutation(({ ctx, input }) => {

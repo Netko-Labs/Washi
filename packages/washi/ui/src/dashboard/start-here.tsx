@@ -1,5 +1,5 @@
 import { Mascot } from '../mascot'
-import { useAgentStore } from '../stores'
+import { useAgentStore, useNoticeStore, useSheetsStore } from '../stores'
 import { STARTERS } from './lib'
 
 /** An empty workspace gets somewhere to begin, not a row of zeros. */
@@ -17,10 +17,28 @@ export function StartHere() {
         <div>
           <div className="font-semibold text-[15px]">Start with a page</div>
           <p className="text-[13px] text-muted-foreground">
-            Pick one and Washi designs it. You approve before anything is saved.
+            Pick one and Washi writes it. Its writes are marked, and Undo takes them back.
           </p>
         </div>
       </div>
+      <button
+        type="button"
+        onClick={() =>
+          void useSheetsStore
+            .getState()
+            .seedTeamSpace()
+            .catch((cause: unknown) =>
+              useNoticeStore.getState().say(cause instanceof Error ? cause.message : String(cause)),
+            )
+        }
+        className="mb-2.5 flex w-full flex-col items-start gap-1 rounded-xl border border-primary/40 bg-background p-3.5 text-left hover:border-primary"
+        data-team-space
+      >
+        <span className="font-medium text-[13.5px]">Set up a team space</span>
+        <span className="text-[12px] text-muted-foreground leading-snug">
+          A backlog, a roadmap, a wiki, an ideas canvas and a weekly review Washi keeps current.
+        </span>
+      </button>
       <div className="grid gap-2.5 sm:grid-cols-2">
         {STARTERS.map(({ icon: Icon, title, prompt }) => (
           <button

@@ -116,6 +116,11 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   row also appends what it became to `record_changes` — the history a `Chart history` replays day
   by day. Never update `records` without going through `insertRecord`/`updateRecords`/
   `deleteRecords`, or history silently forgets.
+- **Team space.** `tables.seedTeamSpace` makes `projects` + `issues`, the Backlog, Roadmap, Wiki
+  (+ How we work), Ideas canvas and Weekly review pages, and a 17:00 routine (the asker's zone) that
+  rewrites only the review's "This week" callout. It refuses a workspace that already has either
+  table. Members come from `ControlPlane.listMembers` — `workspaces.members` for the UI,
+  `people_list` for Washi (a person cell holds the member id).
 - **A canvas edits its own markup.** `<Canvas>` holds `<Node>`/`<Edge>`; React Flow draws it, and a
   hand edit calls `PaperHost.replaceNode(from, to)`: in view mode `SheetView`'s host swaps the
   element and saves through `sheets.update`; in the page editor `LockedBlock` routes it into the

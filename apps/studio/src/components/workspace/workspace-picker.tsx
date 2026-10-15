@@ -38,7 +38,7 @@ export function WorkspacePicker({ onOpen }: { onOpen: (id: string) => void }) {
       <p className="mt-2 text-[14px] text-muted-foreground leading-relaxed">
         {workspaces.length
           ? 'Each one is its own set of pages, and its own set of people.'
-          : 'A workspace holds your pages and the people you invite to review them.'}
+          : 'A workspace holds your pages, your tables and the people you work with.'}
       </p>
 
       <InviteBanner

@@ -12,6 +12,7 @@ import {
   IconTable,
   IconTablePlus,
   IconTool,
+  IconUsers,
   IconWorld,
 } from '@tabler/icons-react'
 import type { TitleOf, ToolDescription } from './types'
@@ -131,6 +132,8 @@ export function describeTool(name: string, input: unknown, titleOf: TitleOf): To
       return base({ icon: IconSearch, action: 'Searched for', subject: text(args.term) })
     case 'db_list_tables':
       return base({ icon: IconDatabase, action: 'Looked at your tables' })
+    case 'people_list':
+      return base({ icon: IconUsers, action: 'Looked at who is on the team' })
     case 'db_query':
       return base({ icon: IconTable, action: 'Read', subject: text(record(args.query).table) })
     case 'db_history':

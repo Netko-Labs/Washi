@@ -93,6 +93,15 @@ export const useSheetsStore = create<SheetsState>((set, get) => ({
     useViewStore.getState().openTab(`note:${copy.id}`)
   },
 
+  seedTeamSpace: async () => {
+    const { backlog } = await api.tables.seedTeamSpace.mutate({
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    })
+    await get().refresh()
+    const { useViewStore } = await import('../view/view-store')
+    useViewStore.getState().openTab(`note:${backlog}`)
+  },
+
   undoWashi: async (id) => {
     try {
       await api.sheets.undoWashi.mutate({ id })
