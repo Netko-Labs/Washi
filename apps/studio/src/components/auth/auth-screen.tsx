@@ -29,7 +29,7 @@ export function AuthScreen({ onDone }: { onDone: () => void }) {
             ))}
           </dl>
         </div>
-        <p className="text-[13px] text-muted-foreground">Open source · self-hosted</p>
+        <p className="text-[13px] text-muted-foreground">Open source</p>
       </section>
 
       <section className="flex items-center justify-center px-6 py-12">

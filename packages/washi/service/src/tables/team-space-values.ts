@@ -1,3 +1,9 @@
+/** 17:00 in the zone of whoever set the space up. */
+export const REVIEW_MINUTE = 17 * 60
+
+/** The table view leaves out `rank`: it orders the board, nobody reads it. */
+export const ISSUE_COLUMNS = ['title', 'status', 'assignee', 'priority', 'labels', 'project', 'due']
+
 export const ISSUE_GROUPS = {
   todo: ['Backlog', 'Todo'],
   doing: ['In progress', 'In review'],

@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
+import { afterEach, beforeEach, describe, expect, setSystemTime, test } from 'bun:test'
 import {
   listRoutines,
   listSheets,
@@ -14,7 +14,10 @@ let ws: Workspace
 beforeEach(() => {
   ws = openWorkspace({ id: 'test', path: ':memory:' })
 })
-afterEach(() => ws.close())
+afterEach(() => {
+  setSystemTime()
+  ws.close()
+})
 
 describe('a team space on day one', () => {
   test('backlog, roadmap, wiki, ideas and a review — every page valid, a routine to keep it', () => {
@@ -40,5 +43,35 @@ describe('a team space on day one', () => {
   test('never twice, never over a team that already tracks issues', () => {
     seedTeamSpace(ws, { timeZone: 'UTC', actorId: null })
     expect(() => seedTeamSpace(ws, { timeZone: 'UTC', actorId: null })).toThrow(InkError)
+  })
+
+  test('pages carry their icons, the project its dates, the issues their due days', () => {
+    seedTeamSpace(ws, { timeZone: 'UTC', actorId: null })
+    expect(listSheets(ws).find((sheet) => sheet.title === 'Backlog')?.icon).toBe('kanban')
+    expect(runQuery(ws, { table: 'projects' }).rows[0]?.when).toMatch(
+      /^\d{4}-\d{2}-\d{2}\/\d{4}-\d{2}-\d{2}$/,
+    )
+    expect(runQuery(ws, { table: 'issues' }).rows.every((row) => typeof row.due === 'string')).toBe(
+      true,
+    )
+  })
+
+  test('set up after 17:00, the review waits for tomorrow instead of running at once', () => {
+    setSystemTime(new Date(Date.UTC(2026, 9, 15, 21)))
+    seedTeamSpace(ws, { timeZone: 'UTC', actorId: null })
+    expect(listRoutines(ws)[0]?.lastRunDay).toBe('2026-10-15')
+  })
+
+  test('set up in the morning, today still gets its review', () => {
+    setSystemTime(new Date(Date.UTC(2026, 9, 15, 9)))
+    seedTeamSpace(ws, { timeZone: 'UTC', actorId: null })
+    expect(listRoutines(ws)[0]?.lastRunDay).toBeNull()
+  })
+
+  test("dates start on the asker's day, not UTC's", () => {
+    // 22:00 in Bogotá is already tomorrow in UTC.
+    setSystemTime(new Date(Date.UTC(2026, 9, 16, 3)))
+    seedTeamSpace(ws, { timeZone: 'America/Bogota', actorId: null })
+    expect(String(runQuery(ws, { table: 'projects' }).rows[0]?.when)).toStartWith('2026-10-15/')
   })
 })

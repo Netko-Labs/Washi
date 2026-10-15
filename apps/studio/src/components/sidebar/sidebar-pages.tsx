@@ -35,7 +35,7 @@ export function SidebarPages({ workspaceId, onNavigate }: SidebarSectionProps) {
       <div className={HEADING}>Pages</div>
       {sheets.length === 0 && (
         <p className="px-2 py-1 text-[12.5px] text-muted-foreground leading-relaxed">
-          No pages yet. Ask Washi for one — there is nothing to type into here.
+          No pages yet. Start one, or ask Washi to.
         </p>
       )}
       <SidebarTree workspaceId={workspaceId} onNavigate={onNavigate} />
