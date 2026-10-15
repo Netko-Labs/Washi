@@ -1,5 +1,5 @@
 import { PRESENCE_TTL_MS } from './constants'
-import type { PresenceBoard, PresenceChanged } from './types'
+import type { PagePresence, PresenceBoard, PresenceChanged } from './types'
 
 /** Who is on which page, in this process's memory: presence is a heartbeat, never a record. */
 export function createPresenceBoard(changed: PresenceChanged): PresenceBoard {
