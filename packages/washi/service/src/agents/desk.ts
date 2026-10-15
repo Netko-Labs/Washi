@@ -2,7 +2,7 @@ import { checkAction, type HankoHandlers, isReversibleVerb, runAction } from '@w
 import { recordCapability, setAppMeta, type Workspace } from '@washi/repository'
 import { guardedFetch, isPrivateAddress } from '@washi/tsuru'
 import { createSheetFromSource } from '../sheets/service'
-import { deleteRecord, runMutation, updateRecord } from '../tables/service'
+import { addColumn, deleteRecord, runMutation, updateRecord } from '../tables/service'
 import type { Caller, EventsRef } from './lib'
 import { currentFetchPolicy, TSURU_HOSTS_KEY } from './tools'
 
@@ -107,6 +107,9 @@ export class CapabilityDesk {
       },
       'table.delete': (action) => {
         deleteRecord(this.ws, action.table, action.row)
+      },
+      'table.column': (action) => {
+        addColumn(this.ws, action.table, action.column)
       },
       'url.open': (action) => {
         const url = new URL(action.url)

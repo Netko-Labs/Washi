@@ -25,6 +25,8 @@ export const paperHost: PaperHost = {
       useViewStore.getState().openTab(`note:${id}`),
     ),
 
+  describePeople: () => api.workspaces.members.query(),
+
   openRow: (recordId) =>
     void api.tables.openRow
       .mutate({ recordId })

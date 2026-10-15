@@ -63,6 +63,8 @@ export interface ControlPlane {
   /** Embedded always says yes; hosted checks organization membership. */
   authorize(actorId: string | null, workspaceId: string): Promise<boolean>
   listWorkspaces(actorId: string | null): Promise<WorkspaceRef[]>
+  /** Who a person cell or a mention can name. Embedded has one: the person at the machine. */
+  listMembers(workspaceId: string): Promise<{ id: string; name: string }[]>
   /** Every workspace that exists, for the server's own clock — never for a request. */
   workspaceIds(): Promise<string[]>
   /** Auth and organization routes, or null when this request is not one. */

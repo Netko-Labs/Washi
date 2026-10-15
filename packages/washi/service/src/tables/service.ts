@@ -43,6 +43,16 @@ export function defineUserTable(ws: Workspace, input: unknown): UserTable {
   return defineTable(ws, spec)
 }
 
+/** A property added from a database's header: appended, then the whole spec re-validated. */
+export function addColumn(ws: Workspace, tableName: string, column: unknown): UserTable {
+  const table = requireTable(ws, tableName)
+  const name = (column as { name?: unknown } | null)?.name
+  if (table.spec.columns.some((existing) => existing.name === name)) {
+    throw new InkError(`"${String(name)}" is already a property of "${tableName}"`)
+  }
+  return defineUserTable(ws, { ...table.spec, columns: [...table.spec.columns, column] })
+}
+
 const LIST_OPS: ReadonlySet<Filter['op']> = new Set(['eq', 'ne', 'contains', 'in'])
 
 /** Lists answer membership only, and a row can sit in several groups, so none of them group. */

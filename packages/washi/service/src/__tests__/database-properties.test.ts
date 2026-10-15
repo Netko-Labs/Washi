@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import { openWorkspace, type Workspace } from '@washi/repository'
+import { CapabilityDesk } from '../agents/desk'
 import { defineUserTable, InkError, runMutation, runQuery, updateRecord } from '../tables/service'
 
 let ws: Workspace
@@ -97,5 +98,18 @@ describe('a database, Notion-style', () => {
         columns: [{ name: 'parent', type: 'relation', table: 'tasks' }],
       }),
     ).not.toThrow()
+  })
+
+  test('a property added from the header joins the spec; a taken name is refused', async () => {
+    const desk = new CapabilityDesk(ws, () => null)
+    const add = (name: string) =>
+      desk.execute(
+        { verb: 'table.column', table: 'issues', column: { name, type: 'date' } },
+        { origin: 'sheet' },
+      )
+    await add('due')
+    const [row] = runQuery(ws, { table: 'issues', limit: 1 }).rows
+    expect(row).toHaveProperty('due')
+    expect(add('due')).rejects.toThrow(InkError)
   })
 })

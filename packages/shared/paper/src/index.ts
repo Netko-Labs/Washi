@@ -10,6 +10,7 @@ export {
   Table,
   Timeline,
 } from './components/data'
+export { Database } from './components/database'
 export { Drawer, Schema } from './components/drawer'
 export { Reveal, Show, Tab, Tabs } from './components/flow'
 export { Divider, Grid, Row, Section, SheetFrame, Stack } from './components/frame'

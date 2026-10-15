@@ -12,6 +12,7 @@ import {
   Table,
   Timeline,
 } from './components/data'
+import { Database } from './components/database'
 import { Drawer, Schema } from './components/drawer'
 import { Reveal, Show, Tab, Tabs } from './components/flow'
 import { Divider, Grid, Row, Section, SheetFrame, Stack } from './components/frame'
@@ -146,6 +147,7 @@ const COMPONENTS: Record<string, ComponentType<never>> = {
   Avatar,
   Field,
   Board,
+  Database,
   Button,
   Task,
   Switch,

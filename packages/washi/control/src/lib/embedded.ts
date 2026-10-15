@@ -24,6 +24,9 @@ export function createEmbeddedControlPlane(options: EmbeddedControlPlaneOptions)
     async listWorkspaces() {
       return [{ id: workspaceId, name: workspaceName, role: 'owner' }]
     },
+    async listMembers() {
+      return [{ id: 'local', name: 'You' }]
+    },
     async workspaceIds() {
       return [workspaceId]
     },
