@@ -251,3 +251,9 @@ export function frameOf(
     accent: pick(root.props.accent),
   } as Pick<ComponentProps<typeof SheetFrame>, 'theme' | 'feel' | 'accent'>
 }
+
+export function swapNode(node: WsxNode, from: WsxElement, to: WsxElement): WsxNode {
+  if (node === from) return to
+  if (node.kind !== 'element') return node
+  return { ...node, children: node.children.map((child) => swapNode(child, from, to)) }
+}

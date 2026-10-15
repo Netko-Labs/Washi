@@ -116,6 +116,10 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   row also appends what it became to `record_changes` — the history a `Chart history` replays day
   by day. Never update `records` without going through `insertRecord`/`updateRecords`/
   `deleteRecords`, or history silently forgets.
+- **A canvas edits its own markup.** `<Canvas>` holds `<Node>`/`<Edge>`; React Flow draws it, and a
+  hand edit calls `PaperHost.replaceNode(from, to)`: in view mode `SheetView`'s host swaps the
+  element and saves through `sheets.update`; in the page editor `LockedBlock` routes it into the
+  editor store instead, so autosave never writes a stale canvas over a fresh one.
 - Comments live in the workspace file (`comments`, `mention_inbox`), so they travel with it (C1).
   The author is the session's actor — never the request body; embedded mode signs as `You`. A
   mention is an unread Inbox row for that person; a trashed page hides its mentions, a purge

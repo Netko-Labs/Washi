@@ -1,4 +1,5 @@
 import type { HistoryQuery, InkQuery, QueryResult, TableSpec } from '@washi/ink'
+import type { WsxElement } from '@washi/wsx'
 import { createContext, type ReactNode, useContext } from 'react'
 import type { ActionRef } from './lib/types'
 
@@ -15,6 +16,11 @@ export interface PaperHost {
   openSheet(id: string): void
   /** Who a person cell can name. A host with no members (one person, offline) leaves it out. */
   describePeople?(): Promise<{ id: string; name: string }[]>
+  /**
+   * Swaps one element of the open page for another and saves it — how a hand-drawn canvas
+   * writes itself back. A read-only host leaves it out, and the canvas stays still.
+   */
+  replaceNode?(from: WsxElement, to: WsxElement): Promise<void>
   /** Opens a record as its own page, Notion-style. A host without row pages leaves it out. */
   openRow?(recordId: string): void
   toggleTask(recordId: string, done: boolean): Promise<void>

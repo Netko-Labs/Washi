@@ -1,13 +1,9 @@
 import { PaperProvider, WsxView } from '@washi/paper'
-import { paperHost } from '../paper-host'
-import { noteIdOf, useSheetsStore, useViewStore } from '../stores'
-import { type SheetViewProps, useSheet } from './lib'
+import { type SheetViewProps, usePageSheet } from './lib'
 import { SheetEmpty, SheetFailed, SheetLoading, SheetMissing } from './sheet-states'
 
 export function SheetView({ chrome, body: Body }: SheetViewProps) {
-  const pageId = useViewStore((state) => noteIdOf(state.activeTab))
-  const summary = useSheetsStore((state) => state.sheets.find((sheet) => sheet.id === pageId))
-  const state = useSheet(pageId, summary?.hlcUpdated)
+  const { summary, state, host } = usePageSheet()
 
   if (state.status === 'idle') return <SheetEmpty />
   if (state.status === 'loading') return <SheetLoading />
@@ -23,7 +19,7 @@ export function SheetView({ chrome, body: Body }: SheetViewProps) {
       data-full-width={summary?.fullWidth || undefined}
     >
       {chrome}
-      <PaperProvider host={paperHost}>
+      <PaperProvider host={host}>
         {Body ? (
           <Body sheet={state.sheet} root={state.root} />
         ) : (

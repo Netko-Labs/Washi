@@ -1,7 +1,8 @@
+import type { WsxElement } from '@washi/wsx'
 import { create } from 'zustand'
 import { api } from '@/integrations/trpc'
 import type { Block, EditorState, TextBlock } from './types'
-import { applyShortcut, dataNode, lockedBlock, newBlock, turnInto } from './utils'
+import { applyShortcut, dataNode, lockedBlock, newBlock, swapNode, turnInto } from './utils'
 import { LIST_MARKERS, NEW_DATABASE } from './values'
 
 function isTyped(block: Block | undefined): block is TextBlock {
@@ -119,6 +120,15 @@ export const useEditorStore = create<EditorState>((set, get) => {
     },
 
     setSaveState: (saveState) => set({ saveState }),
+
+    replaceInBlock: (id, from, to) =>
+      set(({ blocks }) => ({
+        blocks: blocks.map((block) =>
+          block.id === id && block.kind === 'locked'
+            ? { ...block, node: swapNode(block.node, from, to) as WsxElement }
+            : block,
+        ),
+      })),
 
     tables: [],
     setTables: (tables) => set({ tables }),
