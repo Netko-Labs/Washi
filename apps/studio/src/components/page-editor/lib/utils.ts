@@ -1,7 +1,15 @@
 import type { SheetFrame } from '@washi/paper'
 import type { WsxElement, WsxNode, WsxValue } from '@washi/wsx'
 import type { ComponentProps } from 'react'
-import type { Block, KindOption, TextBlock, TextKind } from './types'
+import type {
+  Block,
+  DataPick,
+  KindOption,
+  SlashOption,
+  TableRef,
+  TextBlock,
+  TextKind,
+} from './types'
 import { HEADING_LEVELS, KIND_OPTIONS, LIST_MARKERS, SHORTCUTS } from './values'
 
 function element(name: string, props: Record<string, WsxValue>, children: WsxNode[]): WsxElement {
@@ -135,6 +143,92 @@ export function applyShortcut(block: TextBlock): TextBlock | null {
 export function kindMatches(query: string): KindOption[] {
   const needle = query.trim().toLowerCase()
   return KIND_OPTIONS.filter((option) => option.label.toLowerCase().includes(needle))
+}
+
+/** `/database Bugs` names the new table `bugs`; a bare `/database` takes the next free name. */
+function newDatabaseName(query: string, taken: string[]): string {
+  const typed = query
+    .replace(/^\s*(new\s+)?database\s*/i, '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+  const base = /^[a-z]/.test(typed) ? typed.slice(0, 48) : 'database'
+  if (!taken.includes(base)) return base
+  let n = 2
+  while (taken.includes(`${base}_${n}`)) n++
+  return `${base}_${n}`
+}
+
+/** Text kinds first, then what can live on the page: a new database, a view, a progress chart. */
+export function slashMatches(query: string, tables: TableRef[]): SlashOption[] {
+  const needle = query.trim().toLowerCase()
+  const kinds = kindMatches(query).map((option) => ({ type: 'text' as const, ...option }))
+  const name = newDatabaseName(
+    query,
+    tables.map((table) => table.name),
+  )
+  const data: Extract<SlashOption, { type: 'data' }>[] = [
+    {
+      type: 'data',
+      key: 'database',
+      label: 'New database',
+      hint: name,
+      pick: { kind: 'database', name },
+    },
+    ...tables.flatMap((table): Extract<SlashOption, { type: 'data' }>[] => [
+      {
+        type: 'data',
+        key: `view:${table.name}`,
+        label: `Linked view · ${table.name.replace(/_/g, ' ')}`,
+        hint: 'live',
+        pick: { kind: 'view', table: table.name },
+      },
+      ...(table.done
+        ? [
+            {
+              type: 'data' as const,
+              key: `progress:${table.name}`,
+              label: `Progress · ${table.name.replace(/_/g, ' ')}`,
+              hint: '30 days',
+              pick: { kind: 'progress' as const, table },
+            },
+          ]
+        : []),
+    ]),
+  ]
+  const matching = data.filter(
+    (option) =>
+      option.label.toLowerCase().includes(needle) ||
+      (option.key === 'database' && /^(new\s+)?database/.test(needle)),
+  )
+  return [...kinds, ...matching]
+}
+
+/** The live block a pick becomes, as WSX the page keeps whole. */
+export function dataNode(pick: DataPick): WsxElement {
+  if (pick.kind === 'progress' && pick.table.done) {
+    const { column, values } = pick.table.done
+    return element(
+      'Chart',
+      {
+        kind: 'area',
+        history: {
+          table: pick.table.name,
+          where: [{ column, op: 'in', value: values }],
+          range: '30d',
+        },
+      },
+      [],
+    )
+  }
+  const table =
+    pick.kind === 'progress' ? pick.table.name : pick.kind === 'view' ? pick.table : pick.name
+  return element('Database', { table }, [])
+}
+
+export function lockedBlock(node: WsxElement): Block {
+  return locked(node)
 }
 
 /** Each numbered item's number: a run of numbered blocks counts from 1. */

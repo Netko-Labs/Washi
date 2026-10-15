@@ -105,7 +105,9 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   name or an emoji.
 - Typing into a page (studio `page-editor`) edits the sheet's **top level** as blocks: plain-text
   Title/Text/List/Item/Quote/Callout/Code/Divider become typed blocks; anything else (or text with
-  inline marks) stays a locked block, kept byte-for-byte. Saves go through `sheets.update` — the
+  inline marks) stays a locked block, kept byte-for-byte. `/` also drops live blocks in as locked
+  blocks: a new database (`/database Name` defines the table), a linked view of any table
+  (`<Database>`), or a 30-day progress chart over a status's done group. Saves go through `sheets.update` — the
   same validation as the agent's. `serialize` writes text with `<{}>&`, runs of spaces or
   newlines as a string literal, so typed text always round-trips.
 - **Tables are Notion databases.** Properties: `status` (todo · doing · done groups), `select`,

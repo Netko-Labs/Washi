@@ -14,10 +14,19 @@ export type {
   PageBodyProps,
   PageEditorProps,
   SlashMenuProps,
+  SlashOption,
   TextBlock,
   TextKind,
 } from './types'
-export { frameOf, kindMatches, newBlock, numberedPositions, toBlocks, toSheet } from './utils'
+export {
+  frameOf,
+  kindMatches,
+  newBlock,
+  numberedPositions,
+  slashMatches,
+  toBlocks,
+  toSheet,
+} from './utils'
 export {
   FIELD_CLASS,
   HEADING_LEVELS,

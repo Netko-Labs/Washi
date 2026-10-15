@@ -1,12 +1,12 @@
 import { WsxView } from '@washi/paper'
 import type { LockedBlockProps } from './lib'
 
-/** Washi's own blocks — tables, charts, boards — stay whole: move or delete them, ask Washi to change them. */
+/** Live blocks — databases, charts, boards — move and delete whole; their rows edit in place. */
 export function LockedBlock({ block, rootProps }: LockedBlockProps) {
   return (
     <div
       className="page-editor-locked rounded-lg ring-1 ring-transparent ring-offset-4 ring-offset-transparent hover:ring-border"
-      title="Washi made this — ask Washi to change it"
+      title="A live block: move or delete it here"
     >
       <WsxView
         root={{ kind: 'element', name: 'Sheet', props: rootProps, children: [block.node] }}

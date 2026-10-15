@@ -1,5 +1,18 @@
 import type { KindOption, SaveState, TextKind } from './types'
 
+/** What `/database` makes: a name, and Notion's three-step status. */
+export const NEW_DATABASE = (name: string) => ({
+  name,
+  columns: [
+    { name: 'name', type: 'text' as const },
+    {
+      name: 'status',
+      type: 'status' as const,
+      groups: { todo: ['Not started'], doing: ['In progress'], done: ['Done'] },
+    },
+  ],
+})
+
 export const KIND_OPTIONS: KindOption[] = [
   { kind: 'text', label: 'Text', hint: 'Plain paragraph' },
   { kind: 'h1', label: 'Heading 1', hint: '#' },
