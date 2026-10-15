@@ -7,6 +7,7 @@ import {
   lockedBlock,
   newBlock,
   slashMatches,
+  titleOf,
   toBlocks,
   toSheet,
 } from '../lib/utils'
@@ -97,5 +98,25 @@ describe('the / menu drops live data on the page', () => {
     expect(source).toContain('<Database table="issues" />')
     expect(source).toContain('history={{')
     expect(hasErrors(validate(parse(source), paperRegistry))).toBe(false)
+  })
+})
+
+describe('the heading names the page', () => {
+  const blocks = (source: string) => toBlocks(parse(source))
+
+  test('a first level-1 heading with text is the page title', () => {
+    expect(
+      titleOf(blocks('<Sheet title="t"><Title>Sprint review</Title></Sheet>'), { rowOf: null }),
+    ).toBe('Sprint review')
+  })
+
+  test('an empty heading, a lower heading or a row page keeps the title it has', () => {
+    expect(titleOf(blocks('<Sheet title="t"><Title></Title></Sheet>'), { rowOf: null })).toBeNull()
+    expect(
+      titleOf(blocks('<Sheet title="t"><Title level={2}>Part</Title></Sheet>'), { rowOf: null }),
+    ).toBeNull()
+    expect(
+      titleOf(blocks('<Sheet title="t"><Title>Row</Title></Sheet>'), { rowOf: 'record' }),
+    ).toBeNull()
   })
 })

@@ -13,6 +13,10 @@ export interface SheetsState {
   select: (id: string | null) => void
   /** A new page, last under `parentId` (the top level when omitted), opened in a tab. */
   createSheet: (parentId?: string | null) => Promise<void>
+  /** The page just made, until a host that can type into it claims it. */
+  fresh: string | null
+  /** True once, for the page `createSheet` just made: the host opens it ready to type. */
+  takeFresh: (id: string) => boolean
   deleteSheet: (id: string) => Promise<void>
   /** Optimistic: the tree moves at once, the server's list replaces it when it answers. */
   moveSheet: (id: string, placement: PagePlacement) => Promise<void>

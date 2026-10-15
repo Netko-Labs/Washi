@@ -3,13 +3,10 @@ import { api } from '../../api'
 import { applyPlacement } from '../../page-tree'
 import type { SheetsState } from './types'
 
-/** A starter tree, not a stub: the agent edits a page that already reads as one. */
+/** A blank page, as in Notion: an empty heading waiting for its name. */
 const NEW_SHEET_SOURCE = (title: string) =>
   `<Sheet title=${JSON.stringify(title)} icon="notebook" wsx="1">
-  <Title>${title}</Title>
-  <Text lead>Blank canvas. Ask the agent to design this page, or describe what it should hold.</Text>
-  <Divider />
-  <Text emphasis="quiet">Components own appearance; this page owns content and meaning.</Text>
+  <Title></Title>
 </Sheet>
 `
 
@@ -21,6 +18,7 @@ export const useSheetsStore = create<SheetsState>((set, get) => ({
   activeId: null,
   searchTerm: '',
   searchHits: [],
+  fresh: null,
   paletteOpen: false,
   openPalette: () => set({ paletteOpen: true }),
   closePalette: () => set({ paletteOpen: false, searchTerm: '', searchHits: [] }),
@@ -44,9 +42,15 @@ export const useSheetsStore = create<SheetsState>((set, get) => ({
       parentId,
     })
     await get().refresh()
-    set({ activeId: sheet.id })
+    set({ activeId: sheet.id, fresh: sheet.id })
     const { useViewStore } = await import('../view/view-store')
     useViewStore.getState().openTab(`note:${sheet.id}`)
+  },
+
+  takeFresh: (id) => {
+    if (get().fresh !== id) return false
+    set({ fresh: null })
+    return true
   },
 
   deleteSheet: async (id) => {
@@ -122,6 +126,13 @@ export const useSheetsStore = create<SheetsState>((set, get) => ({
 
   reset: () => {
     generation += 1
-    set({ sheets: [], activeId: null, searchTerm: '', searchHits: [], paletteOpen: false })
+    set({
+      sheets: [],
+      activeId: null,
+      searchTerm: '',
+      searchHits: [],
+      fresh: null,
+      paletteOpen: false,
+    })
   },
 }))
