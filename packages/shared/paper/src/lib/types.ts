@@ -23,6 +23,8 @@ export interface BlockProps extends StyledProps {
 
 export type Row = Record<string, Scalar>
 
+export type CellKind = 'string' | 'number'
+
 export interface ActionRef {
   verb: string
   [key: string]: unknown

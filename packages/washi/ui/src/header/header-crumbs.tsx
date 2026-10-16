@@ -44,7 +44,7 @@ export function HeaderCrumbs() {
         ))}
         <span className="truncate font-medium">{leaf}</span>
         {view === 'note' && active && (
-          <span className="hidden shrink-0 text-muted-foreground sm:inline">
+          <span className="hidden shrink-0 text-muted-foreground @3xl:inline">
             · edited {relativeTime(active.hlcUpdated)}
           </span>
         )}

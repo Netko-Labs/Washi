@@ -1,6 +1,6 @@
 import type { QueryRow } from '@washi/ink'
 import type { WsxValue } from '@washi/wsx'
-import type { Row } from './types'
+import type { CellKind, Row } from './types'
 
 /** Pages speak scalars: a list cell (labels, related ids) reads as its items, comma-joined. */
 export function toRows(rows: QueryRow[]): Row[] {
@@ -9,6 +9,13 @@ export function toRows(rows: QueryRow[]): Row[] {
       Object.entries(row).map(([key, cell]) => [key, Array.isArray(cell) ? cell.join(', ') : cell]),
     ),
   )
+}
+
+/** A column holding `kind` in any row, preferred names first; a null in row one doesn't hide it. */
+export function columnOf(rows: Row[], kind: CellKind, prefer: string[] = []): string | undefined {
+  const holds = (key: string) => rows.some((row) => typeof row[key] === kind)
+  const keys = [...new Set(rows.flatMap((row) => Object.keys(row)))]
+  return prefer.find(holds) ?? keys.find((key) => key !== 'id' && holds(key))
 }
 
 const ROW_REF = /\$row\.([a-z_][a-z0-9_]*)/gi

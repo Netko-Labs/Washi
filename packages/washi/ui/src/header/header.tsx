@@ -9,13 +9,13 @@ export function Header({ leading, actions }: HeaderProps) {
   const mascotState = useAgentMood()
 
   return (
-    <header className="flex h-12 shrink-0 items-center gap-2.5 border-border border-b px-4">
+    <header className="@container flex h-12 shrink-0 items-center gap-2.5 border-border border-b px-4">
       {leading}
       <HeaderCrumbs />
       <div className="ml-auto flex flex-none items-center gap-1.5">
         {isNote && (
           <div
-            className="hidden h-[26px] items-center gap-1.5 rounded-full border border-agent border-dashed sm:flex px-2.5 text-[12px] text-muted-foreground"
+            className="hidden h-[26px] items-center gap-1.5 rounded-full border border-agent border-dashed @xl:flex px-2.5 text-[12px] text-muted-foreground"
             data-agent-pill
           >
             <AgentMascot state={mascotState} size={17} />
