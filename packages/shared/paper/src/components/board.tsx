@@ -1,7 +1,7 @@
 import type { InkQuery } from '@washi/ink'
 import { type CSSProperties, type DragEvent, useState } from 'react'
 import { useData } from '../data'
-import { resolveRowDeep, styled, useBind, useRunAction } from '../lib'
+import { columnOf, resolveRowDeep, styled, useBind, useRunAction } from '../lib'
 import type { ActionRef, BlockProps, Row, Tone } from '../lib/types'
 import { usePaperHost } from '../provider'
 import { Avatar, Badge } from './data'
@@ -65,7 +65,7 @@ export function Board({
   groupBy,
   groups,
   rank = 'rank',
-  title = 'title',
+  title,
   kicker,
   badge,
   meta,
@@ -145,6 +145,9 @@ export function Board({
     else if (typeof row.id === 'string') host.openRow?.(row.id)
   }
 
+  const shown = (value: Row[string] | undefined) =>
+    typeof value === 'number' ? value.toLocaleString(host.locale) : cell(value)
+
   const over = (event: DragEvent, next: DropTarget) => {
     if (!dragging) return
     event.preventDefault()
@@ -153,87 +156,92 @@ export function Board({
 
   return (
     <Bound state={state} empty={empty}>
-      {(rows) => (
-        <div {...styled(rest, 'wsx-board')}>
-          {columns(rows).map(({ name, items }, index) => (
-            <section
-              key={name}
-              aria-label={name}
-              className="wsx-board-col"
-              data-hot={target?.group === name || undefined}
-              style={{ '--col': `var(--chart-${(index % 5) + 1})` } as CSSProperties}
-              onDragOver={(event) => over(event, { group: name, before: null })}
-              onDrop={() => void drop(rows, { group: name, before: null })}
-            >
-              <div className="wsx-board-head">
-                <span className="wsx-board-head-name">
-                  <i />
-                  {name}
-                </span>
-                <span className="wsx-board-head-count">{headCount(items, meta)}</span>
-              </div>
-              {items.map((row) => {
-                const id = String(row.id)
-                return (
-                  <article
-                    key={id}
-                    className="wsx-board-card"
-                    draggable
-                    data-dragging={dragging === id || undefined}
-                    data-before={target?.group === name && target.before === id ? '' : undefined}
-                    onDragStart={(event) => {
-                      event.dataTransfer.effectAllowed = 'move'
-                      setDragging(id)
-                    }}
-                    onDragEnd={() => {
-                      setDragging(null)
-                      setTarget(null)
-                    }}
-                    onDragOver={(event) => {
-                      event.stopPropagation()
-                      over(event, { group: name, before: id })
-                    }}
-                    onDrop={(event) => {
-                      event.stopPropagation()
-                      void drop(rows, { group: name, before: id })
-                    }}
-                    onClick={() => open(row)}
-                    onKeyDown={(event) => event.key === 'Enter' && open(row)}
-                    tabIndex={openable ? 0 : undefined}
-                    data-openable={openable ? '' : undefined}
-                  >
-                    {kicker && <div className="wsx-board-card-kicker">{cell(row[kicker])}</div>}
-                    <div className="wsx-board-card-title">{cell(row[title] ?? row.id)}</div>
-                    {(badge || meta || avatar) && (
-                      <div className="wsx-board-card-meta">
-                        {badge && row[badge] !== null && row[badge] !== undefined && (
-                          <Badge size="sm" tone={BADGE_TONES[String(row[badge]).toLowerCase()]}>
-                            {cell(row[badge])}
-                          </Badge>
-                        )}
-                        {meta && <span className="wsx-board-card-note">{cell(row[meta])}</span>}
-                        {avatar && typeof row[avatar] === 'string' && row[avatar] && (
-                          <Avatar label={row[avatar] as string} size="sm" />
-                        )}
+      {(rows) => {
+        const titleKey = title ?? columnOf(rows, 'string', ['title', 'name']) ?? 'name'
+        return (
+          <div {...styled(rest, 'wsx-board')}>
+            {columns(rows).map(({ name, items }, index) => (
+              <section
+                key={name}
+                aria-label={name}
+                className="wsx-board-col"
+                data-hot={target?.group === name || undefined}
+                style={{ '--col': `var(--chart-${(index % 5) + 1})` } as CSSProperties}
+                onDragOver={(event) => over(event, { group: name, before: null })}
+                onDrop={() => void drop(rows, { group: name, before: null })}
+              >
+                <div className="wsx-board-head">
+                  <span className="wsx-board-head-name">
+                    <i />
+                    {name}
+                  </span>
+                  <span className="wsx-board-head-count">{headCount(items, meta)}</span>
+                </div>
+                {items.map((row) => {
+                  const id = String(row.id)
+                  return (
+                    <article
+                      key={id}
+                      className="wsx-board-card"
+                      draggable
+                      data-dragging={dragging === id || undefined}
+                      data-before={target?.group === name && target.before === id ? '' : undefined}
+                      onDragStart={(event) => {
+                        event.dataTransfer.effectAllowed = 'move'
+                        setDragging(id)
+                      }}
+                      onDragEnd={() => {
+                        setDragging(null)
+                        setTarget(null)
+                      }}
+                      onDragOver={(event) => {
+                        event.stopPropagation()
+                        over(event, { group: name, before: id })
+                      }}
+                      onDrop={(event) => {
+                        event.stopPropagation()
+                        void drop(rows, { group: name, before: id })
+                      }}
+                      onClick={() => open(row)}
+                      onKeyDown={(event) => event.key === 'Enter' && open(row)}
+                      tabIndex={openable ? 0 : undefined}
+                      data-openable={openable ? '' : undefined}
+                    >
+                      {kicker && <div className="wsx-board-card-kicker">{cell(row[kicker])}</div>}
+                      <div className="wsx-board-card-title">
+                        {cell(row[titleKey]) || 'Untitled'}
                       </div>
-                    )}
-                  </article>
-                )
-              })}
-              {items.length === 0 && <div className="wsx-board-drop">Drop here</div>}
-              {onAdd && (
-                <button
-                  type="button"
-                  className="wsx-board-add"
-                  onClick={() => void run(substitute(onAdd, name))}
-                >
-                  + Add card
-                </button>
-              )}
-            </section>
-          ))}
-        </div>
-      )}
+                      {(badge || meta || avatar) && (
+                        <div className="wsx-board-card-meta">
+                          {badge && row[badge] !== null && row[badge] !== undefined && (
+                            <Badge size="sm" tone={BADGE_TONES[String(row[badge]).toLowerCase()]}>
+                              {shown(row[badge])}
+                            </Badge>
+                          )}
+                          {meta && <span className="wsx-board-card-note">{shown(row[meta])}</span>}
+                          {avatar && typeof row[avatar] === 'string' && row[avatar] && (
+                            <Avatar label={row[avatar] as string} size="sm" />
+                          )}
+                        </div>
+                      )}
+                    </article>
+                  )
+                })}
+                {items.length === 0 && <div className="wsx-board-drop">Drop here</div>}
+                {onAdd && (
+                  <button
+                    type="button"
+                    className="wsx-board-add"
+                    onClick={() => void run(substitute(onAdd, name))}
+                  >
+                    + Add card
+                  </button>
+                )}
+              </section>
+            ))}
+          </div>
+        )
+      }}
     </Bound>
   )
 }

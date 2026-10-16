@@ -1,5 +1,5 @@
 import type { HistoryQuery, InkQuery } from '@washi/ink'
-import { styled, useBind, useHistory } from '../lib'
+import { columnOf, styled, useBind, useHistory } from '../lib'
 import type { BindState, BlockProps, Row } from '../lib/types'
 import { usePaperHost } from '../provider'
 import { Bound } from './states'
@@ -24,14 +24,7 @@ interface Point {
 }
 
 function pickColumns(rows: Row[], label?: string, value?: string): [string, string] {
-  const first = rows[0] ?? {}
-  const labelKey =
-    label ??
-    Object.keys(first).find((key) => key !== 'id' && typeof first[key] === 'string') ??
-    'id'
-  const valueKey =
-    value ?? Object.keys(first).find((key) => typeof first[key] === 'number') ?? 'count'
-  return [labelKey, valueKey]
+  return [label ?? columnOf(rows, 'string') ?? 'id', value ?? columnOf(rows, 'number') ?? 'count']
 }
 
 /** A bare day reads as "Oct 3", a calendar day rather than UTC midnight. */
@@ -51,7 +44,7 @@ function figure(value: number, locale?: string): string {
 function toPoints(rows: Row[], label?: string, value?: string, locale?: string): Point[] {
   const [labelKey, valueKey] = pickColumns(rows, label, value)
   return rows.map((row) => ({
-    label: readable(String(row[labelKey] ?? ''), locale),
+    label: row[labelKey] === null ? 'None' : readable(String(row[labelKey] ?? ''), locale),
     value: typeof row[valueKey] === 'number' ? (row[valueKey] as number) : 0,
   }))
 }
@@ -201,8 +194,8 @@ export function Chart({
   )
 }
 
-function BoundChart({ bind, ...look }: ChartLook & { bind?: InkQuery }) {
-  return <ChartBody state={useBind(bind)} {...look} />
+function BoundChart({ bind, label, ...look }: ChartLook & { bind?: InkQuery }) {
+  return <ChartBody state={useBind(bind)} label={label ?? bind?.groupBy?.column} {...look} />
 }
 
 /** Over time: one point per day, labelled the way a person reads a date. */
