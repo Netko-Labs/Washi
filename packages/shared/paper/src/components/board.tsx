@@ -157,7 +157,7 @@ export function Board({
   return (
     <Bound state={state} empty={empty}>
       {(rows) => {
-        const titleKey = title ?? columnOf(rows, 'string', ['title', 'name']) ?? 'id'
+        const titleKey = title ?? columnOf(rows, 'string', ['title', 'name']) ?? 'name'
         return (
           <div {...styled(rest, 'wsx-board')}>
             {columns(rows).map(({ name, items }, index) => (
