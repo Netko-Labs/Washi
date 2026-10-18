@@ -52,6 +52,7 @@ export const SAVE_LABELS: Record<SaveState, string> = {
   saved: 'Saved',
   saving: 'Saving…',
   failed: "Couldn't save — keep typing to retry",
+  invalid: 'Not saved — the source has errors',
 }
 
 export const HEADING_LEVELS: Partial<Record<TextKind, number>> = { h1: 1, h2: 2, h3: 3 }

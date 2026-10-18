@@ -28,12 +28,14 @@ export const useEditorStore = create<EditorState>((set, get) => {
 
   return {
     editingId: null,
+    mode: 'blocks',
     blocks: [],
     focus: null,
     saveState: 'saved',
     focusFirst: false,
-    startEditing: (editingId, focus = false) =>
-      set({ editingId, saveState: 'saved', focusFirst: focus }),
+    startEditing: (editingId, focus = false, mode = 'blocks') =>
+      set({ editingId, mode, saveState: 'saved', focusFirst: focus }),
+    setMode: (mode) => set({ mode, saveState: 'saved' }),
     // Blocks stay until the next load: the editor's last save still reads them as it unmounts.
     stopEditing: () => set({ editingId: null, focus: null }),
     version: null,

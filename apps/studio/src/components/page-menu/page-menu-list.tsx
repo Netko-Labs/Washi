@@ -1,11 +1,13 @@
 import {
   IconArrowsHorizontal,
+  IconCode,
   IconCopy,
   IconCornerDownRight,
   IconCursorText,
   IconTrash,
 } from '@tabler/icons-react'
 import { useSheetsStore } from '@washi/ui'
+import { useEditorStore } from '@/components/page-editor'
 import type { PageMenuListProps } from './lib'
 
 const ITEM =
@@ -55,6 +57,17 @@ export function PageMenuList({ sheet, onMode, onDone }: PageMenuListProps) {
       <button type="button" onClick={() => onMode('move')} className={ITEM}>
         <IconCornerDownRight className="size-4 text-muted-foreground" />
         Move to…
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          useEditorStore.getState().startEditing(sheet.id, false, 'source')
+          onDone()
+        }}
+        className={ITEM}
+      >
+        <IconCode className="size-4 text-muted-foreground" />
+        Edit source
       </button>
       <div className="my-1 h-px bg-border" />
       <button
