@@ -120,6 +120,11 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   (`<Database>`), or a 30-day progress chart over a status's done group. Saves go through `sheets.update` — the
   same validation as the agent's. `serialize` writes text with `<{}>&`, runs of spaces or
   newlines as a string literal, so typed text always round-trips.
+- **Source mode** (the `</>` toggle while editing, or *Edit source* in the page menu) edits the
+  sheet's raw WSX in CodeMirror. It runs the server's own check client-side (parse + validate
+  against `paperRegistry`), autosaves only a valid draft through `sheets.update` with
+  `baseVersion`, and holds Done while the draft has errors. There are no hooks to edit: `state`,
+  `expr`, `bind` and `action` are a page's whole behaviour, and nothing in it executes.
 - **Tables are Notion databases.** Properties: `status` (todo · doing · done groups), `select`,
   `multi_select`, `person` (member id), `date` (`start/end` for a range), `url`, `relation` (record
   ids). Every row can open as a page (`sheets.row_id`, unique; out of the tree). Every write to a

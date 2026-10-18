@@ -32,7 +32,9 @@ export interface LockedBlock {
 
 export type Block = TextBlock | LockedBlock
 
-export type SaveState = 'saved' | 'saving' | 'failed'
+export type SaveState = 'saved' | 'saving' | 'failed' | 'invalid'
+
+export type EditMode = 'blocks' | 'source'
 
 export interface PageEditorProps {
   sheet: SheetDetail
@@ -101,6 +103,7 @@ export interface FocusRequest {
 
 export interface EditorState {
   editingId: string | null
+  mode: EditMode
   blocks: Block[]
   focus: FocusRequest | null
   saveState: SaveState
@@ -110,7 +113,8 @@ export interface EditorState {
   /** The page as the server last had it from this editor — a different source came from someone else. */
   savedSource: string | null
   /** `focus`: the caret lands in the first block, as on a page that was just made. */
-  startEditing: (id: string, focus?: boolean) => void
+  startEditing: (id: string, focus?: boolean, mode?: EditMode) => void
+  setMode: (mode: EditMode) => void
   stopEditing: () => void
   load: (blocks: Block[], version?: string | null, source?: string | null) => void
   /** Someone else's edit, merged: new blocks in, the rows still under the caret keep their ids. */

@@ -10,6 +10,10 @@
     "check-types": "tsgo -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@codemirror/lang-javascript": "^6.2.5",
+    "@codemirror/lint": "^6.9.7",
+    "@codemirror/state": "^6.7.6",
+    "@codemirror/view": "^6.43.14",
     "@tabler/icons-react": "^3.48.0",
     "@tailwindcss/vite": "^4.3.3",
     "@tanstack/react-query": "^5.104.0",
@@ -26,6 +30,7 @@
     "@washi/ui": "workspace:*",
     "@washi/wsx": "workspace:*",
     "better-auth": "^1.7.6",
+    "codemirror": "^6.0.2",
     "nitro": "3.0.260903-beta",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
