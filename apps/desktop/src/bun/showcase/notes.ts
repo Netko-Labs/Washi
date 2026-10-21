@@ -1,7 +1,7 @@
 /** The six notes: one per feel, several themes, every primitive group. */
 
 export const WELCOME = `<Sheet title="Welcome to Washi" icon="sparkles" wsx="1">
-  <Row align="center"><Tape>washi</Tape><Mascot mood="happy" size="sm" /></Row>
+  <Row align="center"><Chip>washi</Chip><Mascot mood="happy" size="sm" /></Row>
   <Hero title="Notes agents can design." subtitle="Sheets are WSX — a closed component format an agent writes and Washi renders. Components own appearance; pages own content and meaning. Nothing in a page executes." />
   <Row>
     <Chip>wsx</Chip>
@@ -100,7 +100,7 @@ export const ESSAY = `<Sheet title="On Paper" icon="pen" feel="editorial" theme=
 `
 
 export const POSTMORTEM = `<Sheet title="Postmortem: stored keys" icon="flag" feel="editorial" theme="kobai" wsx="1">
-  <Row align="center"><Stamp label="done" /><Tape tone="danger">incident</Tape></Row>
+  <Row align="center"><Chip tone="success">done</Chip><Chip tone="danger">incident</Chip></Row>
   <Title>A rename garbage-collected stored state on 41 sheets</Title>
   <Text lead>No data was lost for good — the action log had every write — but 41 readers opened a page that had forgotten their filters.</Text>
   <Grid>

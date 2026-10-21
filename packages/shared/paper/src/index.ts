@@ -32,7 +32,7 @@ export {
   Stack,
 } from './components/frame'
 export { Button, Compose, Field, Slider, Switch, Task } from './components/input'
-export { Chip, Mascot, Missing, Stamp, Tape } from './components/kit'
+export { Chip, Mascot, Missing } from './components/kit'
 export { Roadmap } from './components/roadmap'
 export { Callout, Card, Figure, Hero } from './components/surface'
 export {

@@ -23,11 +23,7 @@ export function Card({ title, children, ...rest }: BlockProps & { title?: string
   return (
     <div {...styled(rest, 'wsx-card')}>
       {rest.variant === 'tape' && (
-        <span
-          className="wsx-tape"
-          data-tone={rest.tone ?? 'accent'}
-          style={{ position: 'absolute', top: -12, left: 16 }}
-        >
+        <span className="wsx-card-tape" data-tone={rest.tone ?? 'accent'}>
           {title ?? 'note'}
         </span>
       )}

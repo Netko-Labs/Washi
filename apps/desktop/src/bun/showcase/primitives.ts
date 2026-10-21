@@ -2,7 +2,7 @@
 export const primitivesSheet = (
   welcome: string,
 ) => `<Sheet title="WSX Primitives" icon="sparkles" tags={['wsx', 'registry']} state={{ local: { tab: 'board', fine: false, points: 5 } }} wsx="1">
-  <Row align="center"><Tape>registry</Tape><Text emphasis="quiet" size="sm">46 primitives · house style · no utilities</Text></Row>
+  <Row align="center"><Chip>registry</Chip><Text emphasis="quiet" size="sm">54 primitives · house style · no utilities</Text></Row>
   <Hero title="Every primitive, once." subtitle="Each block is the rendered primitive plus the line that produced it. Nothing here names a colour, a size in px or a margin." />
 
   <Section title="00 · Foundations">
@@ -151,8 +151,8 @@ export const primitivesSheet = (
     <Row><Money value={1234.5} currency="USD" /><Money value={1234.5} currency="EUR" /><Money value={123450} currency="JPY" /><Money value={-42} currency="GBP" /><Money expr="sum(tasks.points) * 12.5" currency="CHF" /></Row>
   </Section>
 
-  <Section title="09 · Washi kit — Tape · Stamp · Chip · Mascot">
-    <Row align="center"><Tape>tape</Tape><Stamp label="done" /><Chip>chip</Chip><Chip tone="success">shipped</Chip><Chip tone="warning">in review</Chip><Mascot mood="wink" size="sm" /></Row>
+  <Section title="09 · Washi kit — Chip · Mascot">
+    <Row align="center"><Chip>chip</Chip><Chip tone="success">shipped</Chip><Chip tone="warning">in review</Chip><Mascot mood="wink" size="sm" /></Row>
     <Text size="sm" emphasis="quiet">The only decorative primitives. They take tone from the sheet accent, so a page cannot assemble a rainbow. One mascot per page.</Text>
   </Section>
 </Sheet>

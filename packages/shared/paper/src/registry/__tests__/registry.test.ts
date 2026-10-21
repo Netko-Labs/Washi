@@ -71,7 +71,7 @@ describe('the registry', () => {
         <List marker="check"><Item done>shipped</Item><Item>next</Item></List>
         <Text>See <Ref sheet="0198">the brief</Ref>, press <Kbd>⌘K</Kbd>, <Mark>note this</Mark> <Tag>wsx</Tag></Text>
         <Note>Footnote one.</Note><Source>Handoff 0.4</Source>
-        <Row><Tape>live</Tape><Stamp label="ok" /><Chip tone="success">ready</Chip><Mascot mood="wink" /></Row>
+        <Row><Chip tone="success">ready</Chip><Mascot mood="wink" /></Row>
         <Missing kind="Matrix" reason="habit grid over 28 days" />
       </Sheet>`),
     ).toBe('')

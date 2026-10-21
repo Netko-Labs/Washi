@@ -186,8 +186,6 @@ export const SPECIMENS: Record<string, Specimen> = {
     wrap: `<Repeat ${TASKS}><Button variant="outline" action={{ verb: 'state.set', key: 'issue', value: '$row.id' }}>Open $row.title</Button></Repeat><Here />`,
   },
 
-  Tape: { children: 'registry' },
-  Stamp: { props: { label: 'done' } },
   Chip: { props: { tone: 'success' }, children: 'shipped' },
   Mascot: { props: { mood: 'happy', size: 'md' } },
   Missing: { props: { kind: 'Calendar', reason: 'rows placed by date; not in the registry yet' } },

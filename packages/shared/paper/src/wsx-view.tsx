@@ -18,7 +18,7 @@ import { Drawer, Schema } from './components/drawer'
 import { Reveal, Show, Tab, Tabs } from './components/flow'
 import { Divider, Grid, Row, Section, SheetFrame, Stack } from './components/frame'
 import { Button, Compose, Field, Slider, Switch, Task } from './components/input'
-import { Chip, Mascot, Missing, Stamp, Tape } from './components/kit'
+import { Chip, Mascot, Missing } from './components/kit'
 import { Roadmap } from './components/roadmap'
 import { Callout, Card, Figure, Hero } from './components/surface'
 import {
@@ -159,8 +159,6 @@ const COMPONENTS: Record<string, ComponentType<never>> = {
   Tabs,
   Tab,
   Reveal,
-  Tape,
-  Stamp,
   Chip,
   Mascot,
   Missing,
