@@ -815,6 +815,9 @@ passes; no key → the tool says where to add one.
 - [ ] 4 · implement D in the studio sidebar (next PR): ask field (palette + panel), Home row with
       Inbox · Threads · Routines, Recents (`sheets.list` by touched), grey labels with empty-state
       actions, workspace footer with the avatar menu; `agents.threads` query for Threads
+- [ ] 5 · studio: drop the tab strip (D58, 2026-10-21) — routes stop marking tabs open,
+      `useTabNavigation` and the per-workspace strip in localStorage go; the desktop keeps
+      `TabStrip` from `@washi/ui`. Frames and PRD already show it.
 
 # Mihon — the WSX sample book (2026-10-21) — branch `feat/mihon`
 
