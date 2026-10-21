@@ -1,5 +1,6 @@
 import type { AgentUpdate, ApprovalRequest, CapabilityOrigin, TranscriptEntry } from '@washi/domain'
 import type { ProviderId } from '../ports/types'
+import type { APPROVAL_MODES } from './constants'
 
 /**
  * Where a turn's inference comes from. `api_key` bills a key — the workspace's
@@ -123,3 +124,5 @@ export interface TodayReport {
 
 /** The workspace's Exa key, or null when nobody has set one. */
 export type SearchKeyLookup = () => Promise<string | null>
+
+export type ApprovalMode = (typeof APPROVAL_MODES)[number]

@@ -430,7 +430,7 @@
     </div></div>
     <div class="fnote"><b>Proposed, not built.</b> An <code>ask_person</code> tool would park the turn like an approval does and render choices as chips; the kit's <code>.ask</code> already exists for it. Until then Washi guesses and writes, and Undo is the answer.</div>
   </article>
-  <div class="sticky" style="left:4440px;top:60px"><b>decided</b><ol><li>Reads pass. Page and table writes land, marked. <code>fetch_url</code>, <code>web_search</code> and <code>action_run</code> stop at the desk — always; "always" lists the host.</li><li>Undo belongs to the page, and a person's edit empties it. Washi never erases their words.</li><li>Stop is honoured and still charged.</li></ol></div>
+  <div class="sticky" style="left:4440px;top:60px"><b>decided</b><ol><li>Reads pass. Page and table writes land, marked. <code>fetch_url</code>, <code>web_search</code> and <code>action_run</code> stop at the desk; "always" lists the host, and a workspace in <em>auto</em> (D56) says yes standing, ledgered.</li><li>Undo belongs to the page, and a person's edit empties it. Washi never erases their words.</li><li>Stop is honoured and still charged.</li></ol></div>
 </section>
 
 <!-- ───────────────────────── 3 · THE DESK ───────────────────────── -->
@@ -689,6 +689,9 @@
             <div class="fld"><span class="l">API key</span><span class="in">sk-ant-…</span><span class="h">Encrypted on your server. You will see the last four and never the rest.</span></div>
             <div class="fld"><span class="l">Model <em>— optional; a sensible one is chosen otherwise</em></span><span class="in sans" style="color:#a39b8d">Search 48 models…</span></div>
             <span class="bigbtn dis">Replace key</span>
+            <h2 style="margin-top:28px">Approvals</h2>
+            <p class="p">Reads pass and page edits land either way. This is about what leaves the server.</p>
+            <div class="prov"><span class="on">Ask</span><span>Auto</span></div>
             <h2 style="margin-top:28px">Web search</h2>
             <p class="p">With an Exa key Washi can search the web. Every search still stops at the desk until someone allows it always.</p>
             <div class="keyline">exa · ••••m4Tq</div>

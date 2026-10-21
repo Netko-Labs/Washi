@@ -1,9 +1,19 @@
 import type { ApprovalDecision, ApprovalRequest } from '@washi/domain'
-import { createApproval, resolveApproval, type Workspace } from '@washi/repository'
+import {
+  createApproval,
+  getAppMeta,
+  recordCapability,
+  resolveApproval,
+  setAppMeta,
+  type Workspace,
+} from '@washi/repository'
 import { checkUrl, EXA_SEARCH_URL, type PolicyVerdict } from '@washi/tsuru'
 import type { CapabilityDesk } from './desk'
 import {
+  APPROVAL_MODE_KEY,
+  APPROVAL_MODES,
   APPROVAL_TIMEOUT_MS,
+  type ApprovalMode,
   CHANGE_TOOLS,
   type EventsRef,
   READ_TOOLS,
@@ -51,6 +61,16 @@ export class ApprovalDesk implements ToolGate {
     return READ_TOOLS.has(toolName)
   }
 
+  mode(): ApprovalMode {
+    const stored = getAppMeta(this.ws, APPROVAL_MODE_KEY)
+    return APPROVAL_MODES.find((mode) => mode === stored) ?? 'ask'
+  }
+
+  setMode(mode: ApprovalMode): ApprovalMode {
+    setAppMeta(this.ws, APPROVAL_MODE_KEY, mode)
+    return this.mode()
+  }
+
   hasPending(): boolean {
     return this.pending.size > 0
   }
@@ -80,6 +100,10 @@ export class ApprovalDesk implements ToolGate {
     const verdict = this.policyVerdict(toolName, input)
     if (verdict?.ok) return true
     if (verdict && !verdict.needsApproval) return false
+    if (this.mode() === 'auto') {
+      recordCapability(this.ws, { origin: 'agent', subject: toolName, input, decision: 'auto' })
+      return true
+    }
     if (this.alwaysAllowed.get(sessionId)?.has(toolName)) return true
     const decision = await this.request(sessionId, toolName, input)
     if (decision === 'allow_always') this.remember(sessionId, toolName, input)

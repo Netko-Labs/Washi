@@ -1,4 +1,6 @@
 export {
+  APPROVAL_MODE_KEY,
+  APPROVAL_MODES,
   APPROVAL_TIMEOUT_MS,
   CHANGE_TOOLS,
   DAILY_CAP_USD_KEY,
@@ -20,6 +22,7 @@ export type {
   AgentHostEvents,
   AgentKeySource,
   AgentSpendReport,
+  ApprovalMode,
   BreakerState,
   Caller,
   EventsRef,

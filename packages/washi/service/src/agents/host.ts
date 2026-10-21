@@ -21,6 +21,7 @@ import type {
   AgentHostEvents,
   AgentKeySource,
   AgentSpendReport,
+  ApprovalMode,
   BreakerState,
   Caller,
   InferencePreference,
@@ -114,6 +115,14 @@ export class AgentHost {
           ? 'idle'
           : 'paused'
     return { state, ...this.spend() }
+  }
+
+  approvalMode(): ApprovalMode {
+    return this.approvals.mode()
+  }
+
+  setApprovalMode(mode: ApprovalMode): ApprovalMode {
+    return this.approvals.setMode(mode)
   }
 
   setDailyCap(capUsd: number): AgentSpendReport {

@@ -798,6 +798,9 @@ Washi can search the web through Exa. Network stays tsuru's; the desk stays the 
 - [x] 5 · ui `describeTool('web_search')` + studio Settings → Agent "Web search" section
 - [x] 6 · docs: prd A2/D55, design account+agent settings frames, CLAUDE.md, .env.example
 
+- [x] 7 · approvals `auto` mode: workspace setting (`agent_approval_mode`), both settings UIs,
+      ledgered as `auto`, refusals unchanged · D56
+
 Acceptance: a turn asking "what's new in Loro 1.x" calls `web_search`, the panel asks in words
 ("Search the web for …"), Allow always puts `api.exa.ai` on the allowlist and the next search
 passes; no key → the tool says where to add one.

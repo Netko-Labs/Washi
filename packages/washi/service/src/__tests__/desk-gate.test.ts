@@ -38,6 +38,18 @@ describe('changes land; only what leaves the server asks', () => {
     expect(desk.list()).toHaveLength(0)
   })
 
+  test('auto mode is a standing yes for what leaves — refusals still refuse', async () => {
+    expect(desk.mode()).toBe('ask')
+    expect(desk.setMode('auto')).toBe('auto')
+    expect(await within(desk.approve('s1', 'fetch_url', { url: 'https://x.dev' }))).toBe(true)
+    expect(await within(desk.approve('s1', 'web_search', { query: 'loro' }))).toBe(true)
+    expect(await within(desk.approve('s1', 'action_run', { action: {} }))).toBe(true)
+    expect(await within(desk.approve('s1', 'fetch_url', { url: 'http://x.dev' }))).toBe(false)
+    expect(desk.list()).toHaveLength(0)
+    desk.setMode('ask')
+    expect(await within(desk.approve('s1', 'fetch_url', { url: 'https://x.dev' }))).toBe('waiting')
+  })
+
   test('"always" on a search lists the Exa host, so the next one passes in any session', async () => {
     const first = desk.approve('s1', 'web_search', { query: 'loro' })
     await within(first)

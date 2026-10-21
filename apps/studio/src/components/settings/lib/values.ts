@@ -27,3 +27,16 @@ export const SETTINGS_TABS = [
 ] as const
 
 export const SETTINGS_TAB_KEYS = ['agent', 'people', 'routines'] as const
+
+export const APPROVAL_MODE_OPTIONS = [
+  {
+    id: 'ask',
+    label: 'Ask',
+    desc: 'Fetches, searches and actions wait for a person. Nothing leaves without one.',
+  },
+  {
+    id: 'auto',
+    label: 'Auto',
+    desc: 'A standing yes from this workspace. Each call is still written to the ledger.',
+  },
+] as const

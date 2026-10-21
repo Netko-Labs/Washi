@@ -18,6 +18,8 @@ export interface SearchKeyFormProps {
   onSave: (key: string) => Promise<boolean>
 }
 
+export type ApprovalMode = 'ask' | 'auto'
+
 export interface SpendState {
   day: string
   costUsd: number
