@@ -1,0 +1,1346 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Washi — the golden flow, designed</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@700;900&family=Karla:ital,wght@0,400;0,600;0,800;1,400&family=JetBrains+Mono:wght@400;600&family=Young+Serif&display=swap" rel="stylesheet" />
+<style>
+  /* ── document chrome: same skeleton as washi.html ── */
+  :root {
+    --paper: #f8f6f1; --paper-2: #fffdf9; --ink: #26241f; --ink-soft: #5c574c; --line: #e4ddd0;
+    --hanko: #c63d2f; --tape-pink: #f27ba9; --tape-teal: #2fb8a6; --tape-blue: #5b9bd5;
+    --tape-mustard: #e8a93d; --tape-violet: #8b7bd8; --tape-moss: #7fa35c; --tape-slate: #7d8ba1;
+    --radius: 14px; --w: 46rem;
+    /* studio tokens (packages/washi/ui/src/css/ui.css) — the mockups wear these */
+    --s-bg: #f1ede5; --s-card: #fbf9f4; --s-pop: #fffdf8; --s-muted: #e9e4d9; --s-mfg: #6f685d;
+    --s-accent: #e6e0d4; --s-border: #dcd5c8; --s-fg: #221f1a; --s-primary: #c25f2c;
+    --s-agent: #3d5a73; --s-matcha: #94a06b; --s-blush: #e3a99c; --s-kraft: #a97f52;
+    --s-ok: #5e7d5a; --s-warn: #b7832a; --s-bad: #b5543c;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    margin: 0; background: var(--paper);
+    background-image: radial-gradient(#00000006 1px, transparent 1px); background-size: 22px 22px;
+    color: var(--ink); font: 400 1.02rem/1.65 "Karla", system-ui, sans-serif;
+  }
+  h1, h2, h3 { font-family: "Zen Kaku Gothic New", "Karla", sans-serif; line-height: 1.15; margin: 0; }
+  code, .mono { font-family: "JetBrains Mono", monospace; }
+  a { color: inherit; }
+  strong { font-weight: 800; }
+  :focus-visible { outline: 2px solid var(--hanko); outline-offset: 2px; }
+
+  nav.toc {
+    position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: .9rem;
+    padding: .55rem 1.2rem; background: color-mix(in oklab, var(--paper) 88%, white);
+    backdrop-filter: blur(6px); border-bottom: 1px solid var(--line); overflow-x: auto; white-space: nowrap;
+  }
+  nav.toc .brand { font-family: "Zen Kaku Gothic New"; font-weight: 900; font-size: 1rem; letter-spacing: .02em; }
+  nav.toc .brand em { font-style: normal; color: var(--hanko); }
+  nav.toc a.dot {
+    font: 600 .74rem/1 "JetBrains Mono", monospace; text-decoration: none; color: var(--ink-soft);
+    padding: .38rem .6rem; border-radius: 999px; border: 1px solid transparent;
+  }
+  nav.toc a.dot:hover, nav.toc a.dot:focus-visible { border-color: var(--line); background: var(--paper-2); }
+  nav.toc a.dot::before { content: "●"; margin-right: .4rem; font-size: .6rem; color: var(--c, var(--ink-soft)); }
+
+  main { max-width: var(--w); margin: 0 auto; padding: 2.5rem 1.2rem 6rem; }
+  .tape {
+    display: inline-block; font: 800 .78rem/1 "Karla", sans-serif; letter-spacing: .14em; text-transform: uppercase;
+    color: #fff; padding: .5rem 1.3rem;
+    background: repeating-linear-gradient(90deg, #ffffff26 0 6px, transparent 6px 14px), var(--c, var(--tape-pink));
+    clip-path: polygon(2% 0, 98% 4%, 100% 92%, 1% 100%); transform: rotate(-1.2deg);
+    box-shadow: 0 2px 4px #00000018; opacity: .96;
+  }
+  section:nth-of-type(even) .tape { transform: rotate(1deg); }
+  header.hero { padding: 3.5rem 0 1.5rem; }
+  .hero .kanji { font-family: "Zen Kaku Gothic New"; font-weight: 900; font-size: clamp(3rem, 8vw, 5rem); letter-spacing: .03em; }
+  .hero .kanji span { color: var(--hanko); }
+  .hero p.pitch { font-size: 1.18rem; max-width: 38rem; margin: .9rem 0 0; }
+  .meta-chips { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.1rem; }
+  .meta-chips span {
+    font: 600 .72rem/1 "JetBrains Mono", monospace; color: var(--ink-soft);
+    border: 1px solid var(--line); background: var(--paper-2); padding: .42rem .65rem; border-radius: 999px;
+  }
+  .tldr {
+    background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 1.4rem 1.5rem; margin: 1.6rem 0 0; box-shadow: 0 3px 14px #0000000a;
+  }
+  .tldr h2 { font-size: 1rem; letter-spacing: .12em; text-transform: uppercase; color: var(--hanko); }
+  .tldr ul { margin: .8rem 0 0; padding: 0; list-style: none; display: grid; gap: .55rem; }
+  .tldr li { padding-left: 1.5rem; position: relative; }
+  .tldr li::before { content: attr(data-k); position: absolute; left: 0; top: .1em; font-size: .95rem; }
+  section { margin-top: 3.6rem; }
+  section > .card {
+    background: var(--paper-2); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 1.6rem 1.7rem 1.7rem; margin-top: -0.9rem; box-shadow: 0 3px 14px #0000000a;
+  }
+  section h2.title { font-size: 1.7rem; font-weight: 900; margin: 1.1rem 0 .2rem; }
+  .point {
+    font-weight: 800; font-size: 1.02rem; margin: .5rem 0 1rem; padding: .6rem .9rem;
+    border-left: 4px solid var(--c, var(--tape-pink));
+    background: color-mix(in oklab, var(--c, var(--tape-pink)) 8%, var(--paper-2)); border-radius: 0 8px 8px 0;
+  }
+  .point::before { content: "the point → "; font: 600 .72rem/1 "JetBrains Mono", monospace; color: var(--ink-soft); display: block; margin-bottom: .2rem; letter-spacing: .08em; }
+  ul.tight, ol.tight { margin: .6rem 0; padding-left: 1.15rem; }
+  ul.tight li, ol.tight li { margin: .45rem 0; }
+  .chip {
+    display: inline-flex; align-items: center; gap: .35rem; font: 600 .68rem/1 "JetBrains Mono", monospace;
+    letter-spacing: .06em; padding: .3rem .55rem; border-radius: 6px; vertical-align: middle;
+  }
+  .chip.decided { background: #c63d2f14; color: var(--hanko); border: 1px solid #c63d2f3d; }
+  .chip.decided::before { content: "決"; font-weight: 400; font-size: .8rem; }
+  .chip.open { background: #e8a93d1c; color: #8a6414; border: 1px solid #e8a93d55; }
+  .chip.open::before { content: "?"; }
+  .chip.new { background: #5b9bd51a; color: #2f5f8f; border: 1px solid #5b9bd555; }
+  .chip.new::before { content: "+"; }
+  .chip.have { background: #5e7d5a1a; color: #3e5c3a; border: 1px solid #5e7d5a4d; }
+  .chip.have::before { content: "✓"; }
+  code:not(pre code) { background: #26241f0d; border: 1px solid var(--line); padding: .1rem .35rem; border-radius: 5px; font-size: .85em; }
+  details { border: 1px dashed var(--line); border-radius: 10px; padding: .7rem 1rem; margin: .9rem 0; background: var(--paper); }
+  details summary { cursor: pointer; font-weight: 800; font-size: .9rem; list-style: none; display: flex; align-items: center; gap: .5rem; color: var(--ink-soft); }
+  details summary::before { content: "▸"; color: var(--c, var(--ink-soft)); transition: transform .15s; }
+  details[open] summary::before { transform: rotate(90deg); }
+  details[open] summary { margin-bottom: .5rem; }
+  table.doc { border-collapse: collapse; width: 100%; font-size: .88rem; margin: .8rem 0; }
+  table.doc th { text-align: left; font: 600 .7rem/1.4 "JetBrains Mono", monospace; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-soft); }
+  table.doc th, table.doc td { padding: .5rem .6rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .refs { display: flex; flex-wrap: wrap; gap: .4rem; margin: .9rem 0 0; font-size: .8rem; color: var(--ink-soft); align-items: center; }
+  .refs a { font: 600 .7rem/1 "JetBrains Mono", monospace; text-decoration: none; padding: .32rem .5rem; border-radius: 6px; border: 1px solid var(--line); background: var(--paper); }
+  .refs a:hover { border-color: var(--ink-soft); }
+  footer { margin-top: 4rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: .5rem; font: 600 .7rem/1.4 "JetBrains Mono", monospace; color: var(--ink-soft); }
+
+  /* flow strip */
+  .strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(8.2rem, 1fr)); gap: .55rem; margin: 1rem 0 .4rem; }
+  .strip a {
+    text-decoration: none; display: block; background: var(--paper); border: 1px solid var(--line);
+    border-top: 3px solid var(--c); border-radius: 10px; padding: .6rem .7rem; font-size: .82rem; line-height: 1.35;
+  }
+  .strip a b { display: block; font: 800 .68rem/1 "JetBrains Mono", monospace; color: var(--c); margin-bottom: .3rem; letter-spacing: .06em; }
+  .strip a:hover { background: var(--paper-2); }
+
+  /* annotation legend */
+  ol.notes { list-style: none; padding: 0; margin: 1rem 0 0; display: grid; gap: .5rem; counter-reset: n; }
+  ol.notes li { position: relative; padding-left: 2rem; font-size: .93rem; }
+  ol.notes li::before {
+    counter-increment: n; content: counter(n); position: absolute; left: 0; top: .1rem;
+    width: 1.35rem; height: 1.35rem; border-radius: 50%; background: var(--hanko); color: #fff;
+    font: 800 .7rem/1.35rem "JetBrains Mono", monospace; text-align: center;
+  }
+
+  /* ── wide stage for mockups ─────────────────── */
+  .stage { width: min(76rem, calc(100vw - 2rem)); margin: 1.4rem 0 0 50%; transform: translateX(-50%); }
+  .stage.mid { width: min(60rem, calc(100vw - 2rem)); }
+  .cap { font: 600 .7rem/1.4 "JetBrains Mono", monospace; color: var(--ink-soft); margin: .55rem 0 0; text-align: center; letter-spacing: .04em; }
+  .pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr)); gap: 1rem; align-items: start; }
+
+  /* ── the app (mockup) ───────────────────────── */
+  .app {
+    position: relative; background: var(--s-bg); color: var(--s-fg); border: 1px solid #d3cbbb;
+    border-radius: 12px; overflow: hidden; box-shadow: 0 18px 50px -18px #3b2f1c40, 0 2px 6px #0000000d;
+    font: 400 13px/1.5 "Karla", system-ui, sans-serif; text-align: left;
+  }
+  .app .bar { display: flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px; background: #e9e4da; border-bottom: 1px solid var(--s-border); }
+  .app .bar i { width: 10px; height: 10px; border-radius: 50%; background: #d6cfc2; }
+  .app .bar span { margin-left: 10px; font: 600 10.5px/1 "JetBrains Mono", monospace; color: var(--s-mfg); }
+  .shell { display: grid; grid-template-columns: 200px 1fr; min-height: 100%; }
+  .side { background: #ebe6dc; border-right: 1px solid var(--s-border); padding: 10px 8px; font-size: 12.5px; }
+  .side .ws { display: flex; align-items: center; gap: 8px; font-weight: 800; padding: 4px 6px 10px; }
+  .side .ws i { width: 20px; height: 20px; border-radius: 6px; background: var(--s-primary); display: inline-block; }
+  .side .it { display: flex; align-items: center; gap: 8px; padding: 4px 8px; border-radius: 7px; color: #3a362f; }
+  .side .it.on { background: var(--s-accent); font-weight: 600; }
+  .side .it .g { width: 14px; text-align: center; color: var(--s-mfg); font-size: 11px; }
+  .side .it .n { margin-left: auto; font: 600 10px/1 "JetBrains Mono"; color: var(--s-mfg); }
+  .side .lbl { font: 600 10px/1 "JetBrains Mono"; letter-spacing: .1em; color: var(--s-mfg); padding: 14px 8px 6px; text-transform: uppercase; }
+  .side .ind { padding-left: 22px; }
+  .content { min-width: 0; display: flex; flex-direction: column; }
+  .tabs { display: flex; gap: 2px; padding: 6px 10px 0; background: #ebe6dc; border-bottom: 1px solid var(--s-border); }
+  .tabs span { padding: 6px 12px; border-radius: 8px 8px 0 0; font-size: 12px; color: var(--s-mfg); }
+  .tabs span.on { background: var(--s-bg); color: var(--s-fg); font-weight: 600; border: 1px solid var(--s-border); border-bottom-color: var(--s-bg); margin-bottom: -1px; }
+  .hdr { display: flex; align-items: center; gap: 10px; padding: 10px 18px; border-bottom: 1px solid var(--s-border); font-size: 12.5px; }
+  .hdr .crumb { color: var(--s-mfg); }
+  .hdr .crumb b { color: var(--s-fg); font-weight: 600; }
+  .hdr .sp { flex: 1; }
+  .btn { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--s-border); background: var(--s-card); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .btn.pri { background: var(--s-primary); border-color: var(--s-primary); color: #fff; }
+  .btn.ghost { border-color: transparent; background: transparent; color: var(--s-mfg); }
+  .kbd { font: 600 10px/1 "JetBrains Mono"; padding: 2px 5px; border-radius: 4px; border: 1px solid var(--s-border); color: var(--s-mfg); background: var(--s-pop); }
+  .av { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; font: 800 9px/1 "Karla"; color: #fff; background: var(--c, var(--s-kraft)); flex: none; }
+  .av.w { background: var(--s-agent); }
+  .avs { display: inline-flex; }
+  .avs .av { margin-left: -5px; box-shadow: 0 0 0 2px var(--s-bg); }
+  .live { display: inline-flex; align-items: center; gap: 5px; font: 600 10.5px/1 "JetBrains Mono"; color: var(--s-ok); }
+  .live::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--s-ok); box-shadow: 0 0 0 3px #5e7d5a26; }
+
+  /* pills, keys, chips inside the app */
+  .key { font: 600 11px/1 "JetBrains Mono"; color: var(--s-mfg); }
+  .pill { display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 8px; border-radius: 999px; font-size: 11.5px; font-weight: 600; border: 1px solid var(--s-border); background: var(--s-card); white-space: nowrap; }
+  .pill .dot { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--d, var(--s-mfg)); }
+  .pill.todo .dot { --d: #8f887c; }
+  .pill.prog .dot { --d: var(--s-warn); background: linear-gradient(90deg, var(--s-warn) 50%, transparent 50%); }
+  .pill.rev .dot { --d: var(--s-agent); background: linear-gradient(90deg, var(--s-agent) 75%, transparent 75%); }
+  .pill.done .dot { --d: var(--s-ok); background: var(--s-ok); }
+  .pill.metric { border-color: #b7832a66; background: #b7832a14; }
+  .pill.metric.good { border-color: #5e7d5a66; background: #5e7d5a14; }
+  .pill.agent { border-color: #3d5a7355; background: #3d5a7312; color: var(--s-agent); }
+  .tchip { display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px 2px 4px; border-radius: 6px; background: var(--s-card); border: 1px solid var(--s-border); font-size: 12px; white-space: nowrap; vertical-align: 1px; }
+  .tchip .key { font-size: 10.5px; }
+  .prio { display: inline-flex; gap: 1.5px; align-items: flex-end; height: 10px; }
+  .prio i { width: 3px; background: var(--s-mfg); border-radius: 1px; }
+  .prio i:nth-child(1) { height: 4px; } .prio i:nth-child(2) { height: 7px; } .prio i:nth-child(3) { height: 10px; }
+  .prio.med i:nth-child(3) { opacity: .25; } .prio.low i:nth-child(2), .prio.low i:nth-child(3) { opacity: .25; }
+  .prio.high i { background: var(--s-primary); }
+
+  /* callout pins on mockups */
+  .pin { position: absolute; z-index: 5; width: 22px; height: 22px; border-radius: 50%; background: var(--hanko); color: #fff; font: 800 11px/22px "JetBrains Mono"; text-align: center; box-shadow: 0 0 0 3px #fffdf9, 0 2px 6px #0003; }
+
+  /* page (sheet) typography inside the app */
+  .sheet { padding: 22px 40px 30px; max-width: 760px; margin: 0 auto; width: 100%; }
+  .sheet h1 { font: 400 28px/1.2 "Young Serif", Georgia, serif; margin: 6px 0 8px; }
+  .sheet h3 { font: 800 14.5px/1.3 "Karla"; margin: 18px 0 8px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--s-mfg); align-items: center; }
+  .meta b { color: var(--s-fg); font-weight: 600; }
+  .callout { display: flex; gap: 10px; padding: 12px 14px; border-radius: 10px; background: #efe7d6; border: 1px solid #e2d6bd; margin: 14px 0; }
+  .callout .ic { font-size: 15px; }
+  .washi { position: relative; border-left: 3px solid var(--s-agent); background: #3d5a730b; border-radius: 0 10px 10px 0; padding: 10px 12px 12px; margin: 12px 0; }
+  .washi .by { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--s-agent); font-weight: 600; margin-bottom: 6px; }
+  .washi .by .u { margin-left: auto; color: var(--s-mfg); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+  .chartcard { border: 1px solid var(--s-border); background: var(--s-card); border-radius: 10px; padding: 10px 12px 6px; }
+  .chartcard .h { display: flex; align-items: baseline; gap: 8px; font-size: 12px; }
+  .chartcard .h b { font-size: 13px; }
+  .chartcard .h .src { margin-left: auto; color: var(--s-mfg); font: 600 10.5px/1 "JetBrains Mono"; }
+  .hyp { display: grid; gap: 6px; margin: 4px 0; padding: 0; list-style: none; }
+  .hyp li { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+  .state { font: 600 10px/1 "JetBrains Mono"; letter-spacing: .05em; text-transform: uppercase; padding: 4px 6px; border-radius: 5px; min-width: 76px; text-align: center; }
+  .state.ok { background: #5e7d5a1f; color: var(--s-ok); }
+  .state.no { background: #8f887c1c; color: var(--s-mfg); text-decoration: line-through; }
+  .state.op { background: #b7832a1f; color: #8a6414; }
+  .find { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; counter-reset: f; }
+  .find li { position: relative; padding: 8px 10px 8px 34px; border-radius: 8px; font-size: 13px; }
+  .find li::before { counter-increment: f; content: counter(f); position: absolute; left: 10px; top: 9px; font: 800 11px/1 "JetBrains Mono"; color: var(--s-mfg); }
+  .find li.hover { background: var(--s-card); outline: 1px solid var(--s-border); }
+  .find .row2 { margin-top: 6px; }
+  .float { position: absolute; display: flex; align-items: center; gap: 4px; padding: 4px; border-radius: 10px; background: #26241f; color: #f4efe6; font-size: 12px; box-shadow: 0 8px 24px #0004; }
+  .float span { padding: 4px 8px; border-radius: 7px; display: inline-flex; gap: 6px; align-items: center; }
+  .float span.on { background: #ffffff1f; }
+  .float .kbd { background: transparent; border-color: #ffffff33; color: #d8d1c4; }
+
+  /* popover */
+  .pop { background: var(--s-pop); border: 1px solid var(--s-border); border-radius: 12px; box-shadow: 0 16px 40px -10px #3b2f1c55; padding: 14px; font-size: 12.5px; }
+  .pop .ttl { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 13px; }
+  .field { display: grid; grid-template-columns: 82px 1fr; gap: 8px; align-items: center; padding: 5px 0; }
+  .field .k { color: var(--s-mfg); font-size: 12px; }
+  .input { border: 1px solid var(--s-input, #cbc3b4); border-radius: 8px; padding: 7px 9px; background: #fff; font-size: 13px; }
+  .sugg { font-size: 10.5px; color: var(--s-agent); font-weight: 600; margin-left: 6px; }
+  .toggle { width: 26px; height: 15px; border-radius: 99px; background: var(--s-primary); position: relative; display: inline-block; vertical-align: middle; }
+  .toggle::after { content: ""; position: absolute; right: 2px; top: 2px; width: 11px; height: 11px; border-radius: 50%; background: #fff; }
+
+  /* board */
+  .boardbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px 18px; border-bottom: 1px solid var(--s-border); }
+  .seg { display: inline-flex; border: 1px solid var(--s-border); border-radius: 8px; overflow: hidden; background: var(--s-card); }
+  .seg span { padding: 4px 10px; font-size: 12px; color: var(--s-mfg); }
+  .seg span.on { background: var(--s-accent); color: var(--s-fg); font-weight: 600; }
+  .fchip { display: inline-flex; gap: 6px; align-items: center; height: 26px; padding: 0 9px; border-radius: 8px; border: 1px dashed var(--s-border); font-size: 12px; color: var(--s-mfg); }
+  .fchip.on { border-style: solid; background: var(--s-card); color: var(--s-fg); }
+  .progress { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--s-mfg); }
+  .progress .track { width: 120px; height: 6px; border-radius: 99px; background: var(--s-muted); overflow: hidden; display: inline-flex; }
+  .progress .track i { display: block; height: 100%; }
+  .cols { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; padding: 14px 18px 18px; }
+  .col { background: #ebe6dc; border-radius: 12px; padding: 8px; min-height: 380px; }
+  .col .ch { display: flex; align-items: center; gap: 8px; padding: 4px 6px 10px; font-weight: 800; font-size: 12.5px; }
+  .col .ch .n { font: 600 10.5px/1 "JetBrains Mono"; color: var(--s-mfg); background: var(--s-card); border: 1px solid var(--s-border); border-radius: 99px; padding: 3px 6px; }
+  .col .ch .plus { margin-left: auto; color: var(--s-mfg); font-weight: 400; }
+  .card { background: var(--s-card); border: 1px solid var(--s-border); border-radius: 10px; padding: 9px 10px; margin-bottom: 8px; box-shadow: 0 1px 0 #0000000a; }
+  .card.sel { outline: 2px solid var(--s-primary); outline-offset: -1px; }
+  .card .top { display: flex; align-items: center; gap: 6px; }
+  .card .top .av { margin-left: auto; }
+  .card .t { font-size: 13px; font-weight: 600; line-height: 1.35; margin: 5px 0 8px; }
+  .card .sig { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 11px; color: var(--s-mfg); }
+  .sigi { display: inline-flex; align-items: center; gap: 4px; height: 20px; padding: 0 6px; border-radius: 6px; background: var(--s-bg); border: 1px solid var(--s-border); font: 600 10.5px/1 "JetBrains Mono"; color: var(--s-mfg); }
+  .sigi .b { width: 7px; height: 7px; border-radius: 50%; background: var(--c, var(--s-mfg)); }
+  .sigi.run { --c: var(--s-warn); } .sigi.pass { --c: var(--s-ok); } .sigi.fail { --c: var(--s-bad); }
+  .sigi.mbad { color: #8a6414; border-color: #b7832a55; background: #b7832a12; }
+  .sigi.mgood { color: var(--s-ok); border-color: #5e7d5a55; background: #5e7d5a12; }
+  .sigi.verify { color: var(--s-agent); border-color: #3d5a7355; background: #3d5a7310; }
+  .pts { margin-left: auto; font: 600 10.5px/1 "JetBrains Mono"; color: var(--s-mfg); }
+
+  /* ticket page */
+  .ticket { display: grid; grid-template-columns: minmax(0, 1fr) 290px; gap: 0; }
+  .tmain { padding: 18px 34px 28px; border-right: 1px solid var(--s-border); min-width: 0; }
+  .tmain h1 { font: 400 25px/1.25 "Young Serif", Georgia, serif; margin: 6px 0 10px; }
+  .chiprow { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .sec { margin-top: 20px; position: relative; }
+  .tmain, .rcard { position: relative; }
+  .sec .sh { display: flex; align-items: center; gap: 8px; font: 600 10.5px/1 "JetBrains Mono"; letter-spacing: .09em; text-transform: uppercase; color: var(--s-mfg); margin-bottom: 8px; }
+  .sec .sh .add { margin-left: auto; letter-spacing: 0; text-transform: none; font-family: "Karla"; font-size: 12px; font-weight: 600; }
+  .check { display: flex; align-items: center; gap: 8px; padding: 3px 0; font-size: 13px; }
+  .box { width: 14px; height: 14px; border-radius: 4px; border: 1.5px solid #a39b8d; flex: none; }
+  .box.bound { border-color: var(--s-agent); }
+  .box.on { background: var(--s-ok); border-color: var(--s-ok); }
+  .rel { border: 1px solid var(--s-border); border-radius: 10px; background: var(--s-card); overflow: hidden; }
+  .rel .grp { font: 600 10px/1 "JetBrains Mono"; letter-spacing: .07em; text-transform: uppercase; color: var(--s-mfg); padding: 8px 10px 4px; }
+  .rel .r { display: flex; align-items: center; gap: 8px; padding: 6px 10px; font-size: 12.5px; border-top: 1px solid #eee8dd; }
+  .rel .r .ty { width: 16px; text-align: center; color: var(--s-mfg); }
+  .rel .r .pill { margin-left: auto; height: 20px; font-size: 11px; }
+  .act { list-style: none; margin: 0; padding: 0; }
+  .act li { display: flex; gap: 10px; align-items: flex-start; padding: 6px 0; font-size: 12.5px; color: var(--s-mfg); }
+  .act li b { color: var(--s-fg); font-weight: 600; }
+  .act li .ico { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; background: var(--s-muted); font-size: 10px; flex: none; color: var(--s-mfg); }
+  .act li.cm { display: block; background: var(--s-card); border: 1px solid var(--s-border); border-radius: 10px; padding: 9px 11px; color: var(--s-fg); margin: 6px 0; }
+  .act .when { margin-left: auto; font: 600 10px/1.6 "JetBrains Mono"; color: #a39b8d; white-space: nowrap; }
+  .composer { border: 1px solid var(--s-border); border-radius: 10px; background: var(--s-card); padding: 9px 11px; color: #a39b8d; font-size: 12.5px; display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+  .composer .sp { flex: 1; }
+  .rail { padding: 14px 14px 20px; display: grid; gap: 12px; align-content: start; background: #eee9df; }
+  .rcard { background: var(--s-card); border: 1px solid var(--s-border); border-radius: 10px; padding: 10px 12px; }
+  .rcard .rh { display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 12px; margin-bottom: 6px; }
+  .rcard .rh .x { margin-left: auto; font-weight: 600; color: var(--s-mfg); font-size: 11px; }
+  .prop { display: grid; grid-template-columns: 74px 1fr; gap: 6px; align-items: center; padding: 3.5px 0; font-size: 12.5px; }
+  .prop .k { color: var(--s-mfg); font-size: 12px; }
+  .prop .v { display: flex; align-items: center; gap: 6px; min-width: 0; }
+  .big { font: 800 22px/1 "Karla"; }
+  .delta { font: 600 11px/1 "JetBrains Mono"; }
+  .delta.dn { color: var(--s-bad); } .delta.up { color: var(--s-ok); }
+  .prc { display: grid; gap: 5px; font-size: 12px; }
+  .prc .l { display: flex; align-items: center; gap: 6px; }
+  .prc .l .k { color: var(--s-mfg); width: 56px; flex: none; }
+  .prstate { display: inline-flex; align-items: center; gap: 5px; height: 20px; padding: 0 7px; border-radius: 99px; font: 600 11px/1 "Karla"; color: #fff; background: #2f7d4f; }
+  .prstate.merged { background: #7a54c7; } .prstate.draft { background: #8f887c; } .prstate.fail { background: var(--s-bad); }
+  .bars { display: flex; gap: 2px; }
+  .bars i { width: 9px; height: 6px; border-radius: 2px; background: var(--s-ok); }
+  .bars i.run { background: var(--s-warn); } .bars i.f { background: var(--s-bad); }
+  .thumb { height: 64px; border-radius: 8px; background: #efe9dd; border: 1px solid var(--s-border); position: relative; overflow: hidden; }
+
+  /* peek */
+  .peekwrap { display: grid; grid-template-columns: 1fr 430px; min-height: 420px; }
+  .dim { background: #ebe6dc; position: relative; padding: 14px; overflow: hidden; }
+  .dim::after { content: ""; position: absolute; inset: 0; background: #26241f1f; }
+  .peek { background: var(--s-bg); border-left: 1px solid var(--s-border); box-shadow: -14px 0 30px -14px #3b2f1c40; padding: 12px 18px 18px; }
+  .peek .ptop { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--s-mfg); padding-bottom: 8px; border-bottom: 1px solid var(--s-border); }
+  .peek h2 { font: 400 20px/1.25 "Young Serif", Georgia, serif; margin: 12px 0 8px; }
+
+  /* stat page */
+  .stathead { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: end; }
+  .stathead .num { font: 800 38px/1 "Karla"; letter-spacing: -.01em; }
+  .ribbon { display: flex; align-items: center; gap: 10px; padding: 7px 18px; font-size: 12px; background: #3d5a7314; border-bottom: 1px solid #3d5a7333; color: var(--s-agent); }
+  .ribbon b { color: var(--s-fg); }
+  .ribbon .x { margin-left: auto; color: var(--s-mfg); }
+  .statgrid { display: grid; grid-template-columns: minmax(0, 1fr) 250px; gap: 18px; padding: 18px 26px 24px; }
+  .wlist { display: grid; gap: 8px; }
+  .wrow { background: var(--s-card); border: 1px solid var(--s-border); border-radius: 10px; padding: 8px 10px; font-size: 12px; }
+  .wrow .l1 { display: flex; align-items: center; gap: 6px; }
+  .wrow .l2 { color: var(--s-mfg); margin-top: 4px; font-size: 11.5px; }
+  .minis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+  .mini { background: var(--s-card); border: 1px solid var(--s-border); border-radius: 10px; padding: 8px 10px; font-size: 11.5px; color: var(--s-mfg); }
+  .mini b { display: block; color: var(--s-fg); font-size: 12px; margin-bottom: 4px; }
+
+  /* canvas */
+  .board-canvas { position: relative; height: 470px; background-color: #f4f0e8; background-image: radial-gradient(#cfc6b6 1px, transparent 1px); background-size: 18px 18px; overflow: hidden; }
+  .node { position: absolute; width: 180px; background: #fff8e1; border: 1px solid #e3d6ae; border-radius: 6px; padding: 9px 10px; font-size: 12.5px; box-shadow: 0 2px 0 #0000000f, 0 6px 14px -8px #0003; }
+  .node.q { background: var(--s-card); border-color: var(--s-border); width: 210px; }
+  .node.chosen { background: #fff; border: 2px solid var(--s-primary); box-shadow: 0 0 0 4px #c25f2c22, 0 6px 14px -8px #0003; }
+  .node.out { opacity: .55; filter: grayscale(.6); }
+  .node .nt { font-weight: 700; line-height: 1.3; }
+  .node .nc { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+  .node .nc span { font: 600 10px/1 "JetBrains Mono"; padding: 3px 5px; border-radius: 4px; background: #00000009; color: var(--s-mfg); }
+  .node .votes { position: absolute; top: -9px; right: -9px; background: var(--s-agent); color: #fff; font: 800 10px/1 "JetBrains Mono"; padding: 4px 6px; border-radius: 99px; }
+  .node .tag { position: absolute; top: -10px; left: 10px; background: var(--s-primary); color: #fff; font: 800 9.5px/1 "JetBrains Mono"; letter-spacing: .06em; padding: 4px 6px; border-radius: 4px; }
+  .vote { position: absolute; right: 14px; top: 14px; width: 220px; }
+  .vote .vr { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; font-size: 12px; margin-top: 8px; }
+  .vote .vr .track { grid-column: 1 / -1; height: 5px; border-radius: 99px; background: var(--s-muted); overflow: hidden; }
+  .vote .vr .track i { display: block; height: 100%; background: var(--s-agent); }
+  .tools { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); display: flex; gap: 2px; padding: 4px; background: var(--s-pop); border: 1px solid var(--s-border); border-radius: 12px; box-shadow: 0 6px 18px -8px #0004; }
+  .tools span { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 8px; font-size: 14px; color: var(--s-mfg); }
+  .tools span.on { background: var(--s-accent); color: var(--s-fg); }
+
+  /* integration states */
+  .ints { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 12px; padding: 16px; }
+  .rule { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border: 1px solid var(--s-border); border-radius: 9px; background: var(--s-card); font-size: 12.5px; margin-top: 6px; }
+  .rule .arrow { color: var(--s-mfg); }
+
+  /* inbox / review */
+  .inbox .row { display: flex; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--s-border); font-size: 12.5px; align-items: flex-start; }
+  .inbox .row.unread { background: var(--s-card); }
+  .inbox .row .when { margin-left: auto; font: 600 10px/1.6 "JetBrains Mono"; color: #a39b8d; white-space: nowrap; }
+
+  @media (max-width: 900px) {
+    .shell { grid-template-columns: 1fr; } .side { display: none; }
+    .ticket, .statgrid, .peekwrap { grid-template-columns: 1fr; }
+    .tmain { border-right: 0; } .dim { display: none; }
+    .cols { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .pin { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="toc" aria-label="Sections">
+  <span class="brand">和紙 <em>WASHI</em> · golden flow</span>
+  <a class="dot" href="#tldr" style="--c:var(--hanko)">tl;dr</a>
+  <a class="dot" href="#called" style="--c:var(--hanko)">called</a>
+  <a class="dot" href="#flow" style="--c:var(--tape-pink)">flow</a>
+  <a class="dot" href="#investigation" style="--c:var(--tape-blue)">investigation</a>
+  <a class="dot" href="#make" style="--c:var(--tape-teal)">make ticket</a>
+  <a class="dot" href="#board" style="--c:var(--tape-mustard)">board</a>
+  <a class="dot" href="#ticket" style="--c:var(--tape-violet)">ticket</a>
+  <a class="dot" href="#stat" style="--c:var(--tape-moss)">stat page</a>
+  <a class="dot" href="#canvas" style="--c:var(--tape-pink)">canvas</a>
+  <a class="dot" href="#pr" style="--c:var(--tape-slate)">PR</a>
+  <a class="dot" href="#loop" style="--c:var(--tape-teal)">loop</a>
+  <a class="dot" href="#system" style="--c:var(--tape-blue)">system</a>
+  <a class="dot" href="#build" style="--c:var(--tape-mustard)">build</a>
+  <a class="dot" href="#judge" style="--c:var(--hanko)">judge it</a>
+</nav>
+
+<main>
+
+<header class="hero">
+  <div class="kanji">golden flow<span>。</span></div>
+  <p class="pitch">A question becomes tickets, tickets gather their <strong>evidence, options and code</strong>,
+  and the work is finished when a <strong>live number</strong> says so. Every page in between keeps itself
+  current.</p>
+  <div class="meta-chips">
+    <span>design for review · not built</span>
+    <span>2026-10-21</span>
+    <span>refs: Mobbin (Linear, Jira, Plane, Amplitude, Miro…)</span>
+    <span>extends docs/washi.html §04 work</span>
+  </div>
+
+  <div class="tldr" id="tldr">
+    <h2>30-second version</h2>
+    <ul>
+      <li data-k="①"><strong>Investigation is a page type.</strong> Question, live evidence, hypotheses with
+      states, findings. A finding turns into a ticket in place and then shows that ticket's status.</li>
+      <li data-k="②"><strong>Tickets are Linear-quiet, Jira-complete.</strong> A calm centre column and a right
+      rail of cards: Properties · Watching · Development · Canvas. They open as a peek over the board or as a full tab.</li>
+      <li data-k="③"><strong>Metrics are first-class.</strong> A named number with a target. Tickets watch it,
+      stat pages chart it with deploy markers, and a <em>Done when</em> item ticks itself.</li>
+      <li data-k="④"><strong>Integrations are cards, never copies.</strong> A GitHub app attaches PRs by key, shows
+      checks, reviews and deploys, and moves the ticket by rule. Washi never reviews the code.</li>
+      <li data-k="⑤"><strong>Done has a second half.</strong> A deploy moves the ticket to Done and starts a 7-day
+      <em>verifying</em> watch. A miss makes a linked follow-up and leaves the original ticket closed.</li>
+    </ul>
+  </div>
+</header>
+
+<!-- ═════════════════════════ CALLED ═════════════════════════ -->
+<section id="called">
+  <span class="tape" style="--c:var(--hanko)">00 · called</span>
+  <div class="card">
+    <h2 class="title">The six open questions, decided</h2>
+    <p class="point" style="--c:var(--hanko)">I decided each one so this design can be judged as a whole. Each
+    choice has a reason, and any of them can be overruled.</p>
+    <table class="doc">
+      <tr><th>Question</th><th>Call</th><th>Why</th></tr>
+      <tr><td>Metric: own object or an <code>expr</code>?</td>
+        <td><span class="chip decided">own object</span> a <code>metrics</code> table in the workspace file,
+        defined over a table (ink) or a fetched source (tsuru)</td>
+        <td>Watches, targets and deploy markers need a stable id. A page shows a metric through
+        <code>&lt;Metric&gt;</code> and <code>&lt;MetricChart&gt;</code>, so pages are still inert WSX.</td></tr>
+      <tr><td>Ticket keys</td>
+        <td><span class="chip decided">per project</span> <code>WEB-142</code>, <code>API-31</code></td>
+        <td>That's how Linear and Jira do it, and keys stay short. The team-space starter makes one
+        project named after the workspace.</td></tr>
+      <tr><td>Done = merged or deployed?</td>
+        <td><span class="chip decided">deployed</span> or merged when no deploy feed exists, plus a
+        <em>verifying</em> badge while a watch runs</td>
+        <td>"Shipped" means users have it. Verifying is a badge, not a column, so the board stays
+        four columns.</td></tr>
+      <tr><td>How integrations connect</td>
+        <td><span class="chip decided">GitHub App + webhooks</span> per workspace (hosted); the desktop polls</td>
+        <td>Events arrive in seconds. Connecting the app is the approval for these reads. Outward writes
+        (Slack posts, Sentry reopen) still stop at the desk.</td></tr>
+      <tr><td>Linear / Jira</td>
+        <td><span class="chip decided">one-time import</span>, no two-way sync</td>
+        <td>A sync locks Washi to their data model. An import lets a team move in, and a later sync can
+        be added if teams ask for it.</td></tr>
+      <tr><td>Metric misses its target</td>
+        <td><span class="chip decided">follow-up ticket</span> linked <em>follow-up of</em>; the finding reopens</td>
+        <td>Reopening would rewrite sprint history. A follow-up keeps the record honest and puts the
+        work back in the investigation, where the question lives.</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ═════════════════════════ FLOW ═════════════════════════ -->
+<section id="flow">
+  <span class="tape" style="--c:var(--tape-pink)">01 · flow</span>
+  <div class="card">
+    <h2 class="title">Nine screens, one loop</h2>
+    <p class="point" style="--c:var(--tape-pink)">Each screen below is a moment in one story: Mika asks why
+    signups stalled, Rin fixes it, and a week later the number confirms the fix. Nobody writes a status update.</p>
+    <div class="strip">
+      <a href="#investigation" style="--c:var(--tape-blue)"><b>1</b>Investigation page</a>
+      <a href="#make" style="--c:var(--tape-teal)"><b>2</b>Make ticket</a>
+      <a href="#board" style="--c:var(--tape-mustard)"><b>3</b>Sprint board</a>
+      <a href="#ticket" style="--c:var(--tape-violet)"><b>4–5</b>Ticket · peek &amp; full</a>
+      <a href="#stat" style="--c:var(--tape-moss)"><b>6</b>Stat page, focused</a>
+      <a href="#canvas" style="--c:var(--tape-pink)"><b>7</b>Ideas canvas</a>
+      <a href="#pr" style="--c:var(--tape-slate)"><b>8</b>PR card &amp; rules</a>
+      <a href="#loop" style="--c:var(--tape-teal)"><b>9</b>Loop closes</a>
+    </div>
+    <p style="font-size:.9rem;color:var(--ink-soft);margin:.6rem 0 0">Cast: <strong>Mika</strong> (product
+    engineer, owns the question) · <strong>Rin</strong> (owns email) · <strong>Kai</strong> · <strong>Washi</strong>
+    (the agent; its writes are marked in indigo). Screens 1–5 are Wed Oct 14, screen 6 is Oct 24, and §9 jumps to Wed Oct 28.</p>
+  </div>
+</section>
+
+<!-- ═════════════════════════ 1 INVESTIGATION ═════════════════════════ -->
+<section id="investigation">
+  <span class="tape" style="--c:var(--tape-blue)">02 · investigation</span>
+  <div class="card">
+    <h2 class="title">A question, written as a page</h2>
+    <p class="point" style="--c:var(--tape-blue)">The <em>Investigation</em> template has four typed parts:
+    question, evidence, hypotheses, findings. The numbers on it are live, and its findings point at the tickets
+    they became.</p>
+  </div>
+
+  <div class="stage">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / netko-labs / p / signup-stall</span></div>
+      <div class="shell">
+        <aside class="side">
+          <div class="ws"><i></i>Netko Labs</div>
+          <div class="it"><span class="g">⌕</span>Search<span class="n">⌘K</span></div>
+          <div class="it"><span class="g">◫</span>Inbox<span class="n">3</span></div>
+          <div class="it"><span class="g">◎</span>My tickets<span class="n">4</span></div>
+          <div class="lbl">Pages</div>
+          <div class="it"><span class="g">▤</span>Sprint 14</div>
+          <div class="it"><span class="g">▥</span>Backlog</div>
+          <div class="it"><span class="g">⌕</span>Investigations</div>
+          <div class="it ind on"><span class="g">·</span>Signup stall</div>
+          <div class="it ind"><span class="g">·</span>Slow exports</div>
+          <div class="it"><span class="g">∿</span>Signup health</div>
+          <div class="it"><span class="g">◇</span>Ideas</div>
+          <div class="it"><span class="g">☰</span>Wiki</div>
+          <div class="it"><span class="g">☷</span>Weekly review</div>
+        </aside>
+        <div class="content">
+          <div class="tabs"><span>Sprint 14</span><span class="on">Signup stall</span><span>Signup health</span></div>
+          <div class="hdr">
+            <span class="crumb">Investigations / <b>Signup stall at verification</b> · edited just now</span>
+            <span class="sp"></span>
+            <span class="live">live</span>
+            <span class="avs"><span class="av" style="--c:#a97f52">MK</span><span class="av w">和</span></span>
+            <span class="btn">Comments</span><span class="btn">Edit</span><span class="btn ghost">⋯</span>
+          </div>
+          <div class="sheet" style="position:relative">
+            <span class="pin" style="left:-6px;top:296px">1</span>
+            <span class="pin" style="left:-6px;top:446px">2</span>
+            <span class="pin" style="left:-6px;top:540px">3</span>
+            <span class="pin" style="left:-6px;top:646px">4</span>
+            <div class="meta"><span>Investigation</span><span>Status <span class="pill prog"><span class="dot"></span>Investigating</span></span><span>Owner <b>Mika</b></span><span>Opened <b>Oct 9</b></span><span><b>2</b> tickets · <b>1</b> canvas</span></div>
+            <h1>Why did signups stall at email verification?</h1>
+            <div class="callout"><span class="ic">?</span><div><b>Question.</b> Since Oct 8, people who start
+            signup finish verification far less often. What changed, and what do we fix first?</div></div>
+
+            <h3>Evidence</h3>
+            <div class="chartcard">
+              <div class="h"><b>Verify rate</b><span class="delta dn">▼ 9.8 pts</span><span class="src">Signup health › verify_rate · live</span></div>
+              <svg viewBox="0 0 560 140" width="100%" role="img" aria-label="Verify rate fell from about 91% to 81% on Oct 8">
+                <line x1="30" x2="530" y1="54" y2="54" stroke="#b7832a" stroke-dasharray="4 4" stroke-width="1"/>
+                <text x="532" y="57" font-size="10" fill="#8a6414" font-family="JetBrains Mono">92</text>
+                <line x1="30" x2="530" y1="114" y2="114" stroke="#e2dbcd"/>
+                <text x="532" y="117" font-size="10" fill="#a39b8d" font-family="JetBrains Mono">80</text>
+                <line x1="368" x2="368" y1="10" y2="124" stroke="#3d5a73" stroke-dasharray="3 3"/>
+                <rect x="263" y="8" width="210" height="18" rx="4" fill="#3d5a73"/>
+                <text x="368" y="21" font-size="10" fill="#fff" text-anchor="middle" font-family="JetBrains Mono">Oct 8 · email provider switched</text>
+                <polyline fill="none" stroke="#c25f2c" stroke-width="2" points="30,59.0 56,61.0 82,58.0 108,60.0 134,57.0 160,59.5 186,58.5 212,60.5 238,57.5 264,59.0 290,60.0 316,58.0 342,59.0 368,94.0 394,108.0 420,109.5 446,106.5 472,109.0 498,111.0 524,107.5"/>
+                <text x="30" y="136" font-size="10" fill="#a39b8d" font-family="JetBrains Mono">Sep 25</text>
+                <text x="524" y="136" font-size="10" fill="#a39b8d" font-family="JetBrains Mono" text-anchor="end">Oct 14</text>
+              </svg>
+            </div>
+            <div class="washi">
+              <div class="by"><span class="av w" style="width:16px;height:16px;font-size:8px">和</span>Washi · from deploys and the GitHub feed · 2m ago <span class="u">Undo</span></div>
+              The drop starts at <b>14:20 on Oct 8</b>, the deploy that switched email providers (<span class="tchip"><span class="key">PR</span>#788</span>).
+              Soft bounces rose from 0.4% to 11%, and none of them were retried.
+            </div>
+
+            <h3>Hypotheses</h3>
+            <ul class="hyp">
+              <li><span class="state ok">confirmed</span>Soft-bounced mail is never retried by the new provider</li>
+              <li><span class="state op">open</span>The 15-minute link expiry loses slow readers</li>
+              <li><span class="state no">ruled out</span>Mail lands in spam</li>
+            </ul>
+
+            <h3>Findings</h3>
+            <ol class="find">
+              <li>The new provider drops soft-bounced mail without retrying.
+                <div class="row2"><span class="tchip"><span class="pill prog" style="height:18px;border:0;padding:0"><span class="dot"></span></span><span class="key">WEB-142</span>Retry verification on soft bounce · <span class="av" style="--c:#7a6a9c;width:16px;height:16px;font-size:8px">R</span></span></div></li>
+              <li>22% of verify clicks come after the link has expired.
+                <div class="row2"><span class="tchip"><span class="pill todo" style="height:18px;border:0;padding:0"><span class="dot"></span></span><span class="key">WEB-143</span>Extend verify link to 24 h</span></div></li>
+              <li class="hover" style="position:relative">Nobody was alerted when the rate fell.
+                <div class="float" style="right:8px;top:-18px"><span class="on">⊕ Make ticket <span class="kbd">⌘⇧T</span></span><span>和 Ask Washi</span><span>💬</span></div></li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="cap">screen 1 · the investigation, mid-flight</p>
+  </div>
+
+  <div class="card" style="margin-top:1.2rem">
+    <ol class="notes">
+      <li><strong>Evidence is live.</strong> <code>/stat</code> drops in a metric chart, the same metric the ticket
+      will watch (§6). Annotations such as the provider switch come from deploy events and integration cards,
+      not hand-drawn lines.</li>
+      <li><strong>Washi writes on the page as a co-author.</strong> Its blocks have the indigo bar, say where the
+      facts came from, and have a one-click Undo, matching how Washi writes everywhere else.</li>
+      <li><strong>Hypotheses have states.</strong> Open · confirmed · ruled out, picked from a menu. Ruled out
+      stays visible and struck through, because what didn't cause it is part of the answer.</li>
+      <li><strong>Findings become tickets in place.</strong> A finding with a ticket shows a live chip:
+      status dot, key, title, assignee. Hovering a finding without one shows <em>Make ticket</em>.</li>
+    </ol>
+    <details style="--c:var(--tape-blue)"><summary>States not shown</summary>
+      <ul class="tight">
+        <li><strong>Empty template:</strong> four headed parts with ghost text; the Question callout is focused.</li>
+        <li><strong>Resolved:</strong> the status pill turns green and a <em>Resolution</em> block appears under
+        Question (§9).</li>
+        <li><strong>Finding whose ticket missed:</strong> its chip shows <em>follow-up</em> and links the new ticket.</li>
+      </ul>
+    </details>
+    <div class="refs">borrowed from
+      <a href="https://mobbin.com/screens/8562b611-0214-49b5-bf86-b458e781bfb1">Confluence · chart bound to a table</a>
+      <a href="https://mobbin.com/screens/944ddae2-0103-4f1f-86d9-bf59e51de5a2">Mixpanel · chart annotations</a>
+      <a href="https://mobbin.com/screens/73891735-c12b-4ed3-bd7f-fc6bc3c52228">Linear · new issue from comment</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════ 2 MAKE TICKET ═════════════════════════ -->
+<section id="make">
+  <span class="tape" style="--c:var(--tape-teal)">03 · make ticket</span>
+  <div class="card">
+    <h2 class="title">One keystroke from finding to ticket</h2>
+    <p class="point" style="--c:var(--tape-teal)">Washi pre-fills the ticket and the person checks it. Every
+    suggestion is labelled as Washi's, so it's clear what the person chose and what was filled in.</p>
+  </div>
+  <div class="stage mid">
+    <div class="pair">
+      <div class="app">
+        <div class="bar"><i></i><i></i><i></i><span>⌘⇧T on finding 3</span></div>
+        <div style="padding:18px">
+          <div class="pop">
+            <div class="ttl">New ticket <span class="pill agent" style="height:20px;font-size:10.5px">和 drafted by Washi</span><span style="margin-left:auto;color:var(--s-mfg)">✕</span></div>
+            <div class="input" style="margin:10px 0 6px;font-weight:700">Alert when verify rate drops below 85%</div>
+            <div class="field"><span class="k">Project</span><span><span class="pill">WEB · Web</span></span></div>
+            <div class="field"><span class="k">Sprint</span><span><span class="pill">Sprint 14 (current)</span></span></div>
+            <div class="field"><span class="k">Assignee</span><span><span class="pill"><span class="av" style="--c:#5c7f8f;width:16px;height:16px;font-size:8px">K</span>Kai</span><span class="sugg">owns alerting</span></span></div>
+            <div class="field"><span class="k">Priority</span><span><span class="pill"><span class="prio med"><i></i><i></i><i></i></span>Medium</span></span></div>
+            <div class="field"><span class="k">Done when</span><span style="font-size:12px"><span class="toggle"></span> alert fires in staging when <b>verify_rate</b> &lt; 85%</span></div>
+            <div class="field"><span class="k">From</span><span style="font-size:12px;color:var(--s-mfg)">Signup stall · finding 3 <span style="color:var(--s-fg)">↩ links both ways</span></span></div>
+            <div style="display:flex;gap:8px;margin-top:12px;align-items:center">
+              <span style="font-size:11.5px;color:var(--s-mfg)">Body: the finding + evidence chart</span>
+              <span style="flex:1"></span>
+              <span class="btn">Create &amp; open</span><span class="btn pri">Create <span class="kbd" style="background:transparent;color:#fff;border-color:#ffffff55">↵</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="app">
+        <div class="bar"><i></i><i></i><i></i><span>"turn these into tickets" — batch</span></div>
+        <div style="padding:18px">
+          <div class="pop">
+            <div class="ttl">和 3 tickets from 3 findings</div>
+            <div style="font-size:12px;color:var(--s-mfg);margin:4px 0 10px">Into Sprint 14 · review, then create all</div>
+            <div class="check"><span class="box on"></span>Retry verification on soft bounce <span class="pill" style="margin-left:auto;height:20px">Rin</span></div>
+            <div class="check"><span class="box on"></span>Extend verify link to 24 h <span class="pill" style="margin-left:auto;height:20px">Kai</span></div>
+            <div class="check"><span class="box"></span><span style="color:var(--s-mfg)">Alert on verify rate &lt; 85%</span> <span class="pill" style="margin-left:auto;height:20px">backlog</span></div>
+            <div style="display:flex;gap:8px;margin-top:14px"><span class="btn ghost">Edit each</span><span style="flex:1"></span><span class="btn pri">Create 2</span></div>
+          </div>
+          <p style="font-size:12px;color:var(--s-mfg);margin:12px 2px 0">Unticked items go to the backlog
+          instead. Rows have no Done-when until a person adds one.</p>
+        </div>
+      </div>
+    </div>
+    <p class="cap">screen 2 · single and batch</p>
+  </div>
+  <div class="card" style="margin-top:1.2rem">
+    <ul class="tight">
+      <li><strong>Defaults come from the room</strong>, not from settings. The project and sprint are where the
+      investigation's earlier tickets went. The assignee is suggested from who closed similar tickets.</li>
+      <li><strong>Done when is offered</strong> only when a metric is already in the evidence. Washi never makes
+      up a target.</li>
+      <li><strong>Escape keeps nothing.</strong> No draft tickets pile up in the backlog.</li>
+    </ul>
+    <div class="refs">borrowed from
+      <a href="https://mobbin.com/screens/f83fbd31-555d-4840-9ef8-44891e099e34">Confluence · create Jira issue inline</a>
+      <a href="https://mobbin.com/screens/ea62781d-5b45-4361-9698-0373a8218750">Loom · issue drafted from content</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════ 3 BOARD ═════════════════════════ -->
+<section id="board">
+  <span class="tape" style="--c:var(--tape-mustard)">04 · board</span>
+  <div class="card">
+    <h2 class="title">The sprint board reads at a glance</h2>
+    <p class="point" style="--c:var(--tape-mustard)">The card's bottom row shows the signals from Washi: PR
+    state, the watched metric against its target, a linked canvas and verifying progress. You can tell where a
+    ticket stands without opening it.</p>
+  </div>
+  <div class="stage">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / netko-labs / p / sprint-14</span></div>
+      <div class="shell">
+        <aside class="side">
+          <div class="ws"><i></i>Netko Labs</div>
+          <div class="it"><span class="g">⌕</span>Search<span class="n">⌘K</span></div>
+          <div class="it"><span class="g">◫</span>Inbox<span class="n">3</span></div>
+          <div class="it"><span class="g">◎</span>My tickets<span class="n">4</span></div>
+          <div class="lbl">Pages</div>
+          <div class="it on"><span class="g">▤</span>Sprint 14</div>
+          <div class="it"><span class="g">▥</span>Backlog</div>
+          <div class="it"><span class="g">⌕</span>Investigations</div>
+          <div class="it"><span class="g">∿</span>Signup health</div>
+          <div class="it"><span class="g">◇</span>Ideas</div>
+          <div class="it"><span class="g">☰</span>Wiki</div>
+          <div class="it"><span class="g">☷</span>Weekly review</div>
+        </aside>
+        <div class="content" style="position:relative">
+          <span class="pin" style="left:262px;top:30px">3</span>
+          <span class="pin" style="left:235px;top:257px">1</span>
+          <span class="pin" style="left:712px;top:241px">2</span>
+          <div class="tabs"><span class="on">Sprint 14</span><span>Signup stall</span></div>
+          <div class="hdr">
+            <span style="font:400 18px/1 'Young Serif',serif">Sprint 14</span>
+            <span class="crumb">Oct 12 – Oct 23 · Web</span>
+            <span class="progress"><span class="track"><i style="width:29%;background:var(--s-ok)"></i><i style="width:12%;background:var(--s-agent)"></i><i style="width:24%;background:var(--s-warn)"></i></span>5 of 17 done · 2 verifying</span>
+            <span class="sp"></span>
+            <span class="live">live</span>
+            <span class="btn">Share</span><span class="btn pri">+ Ticket <span class="kbd" style="background:transparent;color:#fff;border-color:#ffffff55">C</span></span>
+          </div>
+          <div class="boardbar">
+            <span class="seg"><span class="on">Board</span><span>List</span><span>Timeline</span></span>
+            <span class="fchip on">Group: Status</span>
+            <span class="fchip">+ Assignee</span><span class="fchip">+ Label</span>
+            <span class="fchip on">Has PR</span><span class="fchip">Watching a metric</span>
+            <span class="sp" style="flex:1"></span>
+            <span class="fchip">Swimlanes: none</span>
+          </div>
+          <div class="cols">
+            <div class="col">
+              <div class="ch"><span class="pill todo" style="border:0;padding:0;background:none"><span class="dot"></span></span>Todo <span class="n">4</span><span class="plus">+</span></div>
+              <div class="card"><div class="top"><span class="key">WEB-143</span><span class="prio high"><i></i><i></i><i></i></span><span class="av" style="--c:#5c7f8f">K</span></div>
+                <div class="t">Extend verify link to 24 h</div>
+                <div class="sig"><span class="sigi">⌕ Signup stall</span><span class="pts">2</span></div></div>
+              <div class="card"><div class="top"><span class="key">WEB-151</span><span class="prio med"><i></i><i></i><i></i></span><span class="av" style="--c:#5c7f8f">K</span></div>
+                <div class="t">Alert when verify rate drops below 85%</div>
+                <div class="sig"><span class="sigi mbad"><span class="b" style="background:var(--s-warn)"></span>verify 81%</span><span class="pts">1</span></div></div>
+              <div class="card"><div class="top"><span class="key">WEB-148</span><span class="prio low"><i></i><i></i><i></i></span><span class="av" style="--c:#a97f52">M</span></div>
+                <div class="t">Empty state for the export list</div>
+                <div class="sig"><span class="pts">1</span></div></div>
+              <div class="card"><div class="top"><span class="key">WEB-152</span><span class="prio med"><i></i><i></i><i></i></span></div>
+                <div class="t">Copy pass on the onboarding checklist</div>
+                <div class="sig"><span class="pts">1</span></div></div>
+            </div>
+            <div class="col">
+              <div class="ch"><span class="pill prog" style="border:0;padding:0;background:none"><span class="dot"></span></span>In progress <span class="n">3</span><span class="plus">+</span></div>
+              <div class="card sel"><div class="top"><span class="key">WEB-142</span><span class="prio high"><i></i><i></i><i></i></span><span class="av" style="--c:#7a6a9c">R</span></div>
+                <div class="t">Retry verification on soft bounce</div>
+                <div class="sig"><span class="sigi run"><span class="b"></span>#812 · 12/14</span><span class="sigi mbad"><span class="b" style="background:var(--s-warn)"></span>81% → 92%</span><span class="sigi">◇ 4</span><span class="pts">3</span></div></div>
+              <div class="card"><div class="top"><span class="key">WEB-139</span><span class="prio med"><i></i><i></i><i></i></span><span class="av" style="--c:#a97f52">M</span></div>
+                <div class="t">CSV export times out over 50k rows</div>
+                <div class="sig"><span class="sigi">⌕ Slow exports</span><span class="pts">5</span></div></div>
+              <div class="card"><div class="top"><span class="key">WEB-146</span><span class="prio low"><i></i><i></i><i></i></span><span class="av" style="--c:#5c7f8f">K</span></div>
+                <div class="t">Dark-mode chart colours</div>
+                <div class="sig"><span class="sigi run"><span class="b"></span>#809 draft</span><span class="pts">1</span></div></div>
+            </div>
+            <div class="col">
+              <div class="ch"><span class="pill rev" style="border:0;padding:0;background:none"><span class="dot"></span></span>In review <span class="n">2</span><span class="plus">+</span></div>
+              <div class="card"><div class="top"><span class="key">WEB-137</span><span class="prio med"><i></i><i></i><i></i></span><span class="av" style="--c:#7a6a9c">R</span></div>
+                <div class="t">Rate-limit the resend button</div>
+                <div class="sig"><span class="sigi pass"><span class="b"></span>#806 · approved</span><span class="pts">2</span></div></div>
+              <div class="card"><div class="top"><span class="key">WEB-140</span><span class="prio med"><i></i><i></i><i></i></span><span class="av" style="--c:#a97f52">M</span></div>
+                <div class="t">Stream CSV rows instead of buffering</div>
+                <div class="sig"><span class="sigi fail"><span class="b"></span>#810 · 1 failing</span><span class="pts">3</span></div></div>
+            </div>
+            <div class="col">
+              <div class="ch"><span class="pill done" style="border:0;padding:0;background:none"><span class="dot"></span></span>Done <span class="n">5</span><span class="plus">+</span></div>
+              <div class="card"><div class="top"><span class="key">WEB-130</span><span class="prio high"><i></i><i></i><i></i></span><span class="av" style="--c:#5c7f8f">K</span></div>
+                <div class="t">Fix SSO redirect loop</div>
+                <div class="sig"><span class="sigi verify">verifying 3/7</span><span class="sigi mgood"><span class="b" style="background:var(--s-ok)"></span>SSO ok 99.2%</span></div></div>
+              <div class="card"><div class="top"><span class="key">WEB-131</span><span class="prio med"><i></i><i></i><i></i></span><span class="av" style="--c:#a97f52">M</span></div>
+                <div class="t">Faster first paint on the dashboard</div>
+                <div class="sig"><span class="sigi verify">verifying 5/7</span><span class="sigi mgood"><span class="b" style="background:var(--s-ok)"></span>LCP 1.4s</span></div></div>
+              <div class="card" style="opacity:.75"><div class="top"><span class="key">WEB-127</span><span class="av" style="--c:#7a6a9c">R</span></div>
+                <div class="t">Remove the legacy mailer</div>
+                <div class="sig"><span class="sigi pass"><span class="b"></span>#790 merged</span></div></div>
+              <div style="font-size:11.5px;color:var(--s-mfg);padding:4px 6px">+ 2 more</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="cap">screen 3 · Sprint 14, WEB-142 selected</p>
+  </div>
+  <div class="card" style="margin-top:1.2rem">
+    <ol class="notes">
+      <li><strong>The signal row</strong> shows only what exists: PR (dot colour = checks), metric (amber when
+      below target), canvas (◇ + node count), source investigation (⌕) and estimate. A ticket with none of
+      these shows just its estimate.</li>
+      <li><strong>Verifying is a badge, not a column.</strong> Done cards with a watch show its progress through
+      the window. A miss turns the badge red and a follow-up card appears in Todo.</li>
+      <li><strong>Sprint progress counts verifying separately</strong> (indigo) from done-and-confirmed (green),
+      so the bar can't show success that hasn't happened yet.</li>
+    </ol>
+    <p style="margin:.8rem 0 0;font-size:.92rem">Keys: <code>C</code> new ticket · <code>↑↓←→</code> move focus ·
+    <code>Space</code> peek · <code>↵</code> open · <code>S</code> <code>A</code> <code>P</code> set status,
+    assignee, priority on the focused card. A drag is a row write, so charts and history see it.</p>
+    <div class="refs">borrowed from
+      <a href="https://mobbin.com/screens/b0713e1b-1097-4828-bd2a-841bf0ff9bec">Programa · counts and progress on cards</a>
+      <a href="https://mobbin.com/screens/913e271b-5104-454a-96aa-56b7c255c167">Height · quiet tinted columns</a>
+      <a href="https://mobbin.com/screens/7e98b037-9d01-46b5-bd5b-50cb02ed249a">ClickUp · sprint board density</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════ 4–5 TICKET ═════════════════════════ -->
+<section id="ticket">
+  <span class="tape" style="--c:var(--tape-violet)">05 · ticket</span>
+  <div class="card">
+    <h2 class="title">Peek to triage, open to work</h2>
+    <p class="point" style="--c:var(--tape-violet)">Space opens a peek over the board, good for a change and back.
+    Enter opens the full ticket as a tab. Both show the same ticket; the peek just hides the rail cards behind
+    one row.</p>
+  </div>
+
+  <div class="stage">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>Space on WEB-142</span></div>
+      <div class="peekwrap">
+        <div class="dim">
+          <div class="cols" style="grid-template-columns:repeat(3,minmax(0,1fr));padding:0">
+            <div class="col" style="min-height:360px"><div class="ch">Todo <span class="n">4</span></div><div class="card"><div class="t">Extend verify link to 24 h</div></div><div class="card"><div class="t">Alert when verify rate…</div></div></div>
+            <div class="col" style="min-height:360px"><div class="ch">In progress <span class="n">3</span></div><div class="card sel"><div class="t">Retry verification on soft bounce</div></div><div class="card"><div class="t">CSV export times out…</div></div></div>
+            <div class="col" style="min-height:360px"><div class="ch">In review <span class="n">2</span></div><div class="card"><div class="t">Rate-limit the resend…</div></div></div>
+          </div>
+        </div>
+        <div class="peek">
+          <div class="ptop"><span class="key">WEB-142</span><span class="sp" style="flex:1"></span><span>↑ ↓</span><span class="btn" style="height:24px">Open ⤢ <span class="kbd">↵</span></span><span>✕</span></div>
+          <h2>Retry verification on soft bounce</h2>
+          <div class="chiprow"><span class="pill prog"><span class="dot"></span>In progress</span><span class="pill"><span class="av" style="--c:#7a6a9c;width:16px;height:16px;font-size:8px">R</span>Rin</span><span class="pill"><span class="prio high"><i></i><i></i><i></i></span>High</span><span class="pill">3 pts</span></div>
+          <div class="chiprow" style="margin-top:8px"><span class="pill metric">∿ verify 81% → 92%</span><span class="pill"><span class="b" style="width:7px;height:7px;border-radius:50%;background:var(--s-warn)"></span>#812 · 12/14 checks</span><span class="pill">◇ 4 options · 1 chosen</span></div>
+          <p style="font-size:13px;margin:14px 0 6px">Since the Oct 8 provider switch, soft-bounced verification
+          mail is dropped. Retry 3 times over 30 minutes, then fall back to the old provider.</p>
+          <div class="sec"><div class="sh">Done when</div>
+            <div class="check"><span class="box"></span>Retry on soft bounce is live in production</div>
+            <div class="check"><span class="box bound"></span>verify rate ≥ 92% for 7 days <span class="pill agent" style="height:18px;font-size:10px">bound · now 81%</span></div></div>
+          <div class="sec"><div class="sh">Latest</div>
+            <ul class="act"><li><span class="ico" style="background:#3d5a7322;color:var(--s-agent)">和</span><span>Washi attached <b>PR #812</b> by its branch</span><span class="when">10m</span></li>
+            <li><span class="av" style="--c:#7a6a9c">R</span><span><b>Rin</b>: retry worker is in; fallback next</span><span class="when">1h</span></li></ul></div>
+          <div class="composer"><span>Comment, or ask Washi…</span><span class="sp"></span><span class="kbd">⌘↵</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="cap">screen 4 · peek</p>
+  </div>
+
+  <div class="stage" style="margin-top:2rem">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / netko-labs / t / WEB-142</span></div>
+      <div class="tabs"><span>Sprint 14</span><span>Signup stall</span><span class="on">WEB-142</span></div>
+      <div class="hdr">
+        <span class="crumb">Web / Sprint 14 / <b>WEB-142</b></span>
+        <span class="sp"></span>
+        <span class="avs"><span class="av" style="--c:#7a6a9c">R</span><span class="av" style="--c:#a97f52">MK</span></span>
+        <span class="btn ghost">🔔 Subscribed</span><span class="btn ghost">⧉ Copy key</span><span class="btn">Open PR ↗</span><span class="btn ghost">⋯</span>
+      </div>
+      <div class="ticket" style="position:relative">
+        <div class="tmain">
+          <span class="pin" style="left:6px;top:14px">1</span>
+          <span class="key">WEB-142</span>
+          <h1>Retry verification on soft bounce</h1>
+          <div class="chiprow"><span class="pill prog"><span class="dot"></span>In progress</span><span class="pill metric">∿ verify_rate 81% · target ≥ 92% for 7 d</span><span class="pill">From ⌕ Signup stall · finding 1</span></div>
+
+          <div class="sec"><div class="sh">Problem</div>
+            <p style="margin:0 0 8px;font-size:13.5px">Since the Oct 8 provider switch, soft-bounced verification mail
+            is dropped. 11% of new signups never get the email.</p>
+            <div class="chartcard" style="padding:8px 10px 2px">
+              <svg viewBox="0 0 560 120" width="100%" height="90" preserveAspectRatio="none" role="img" aria-label="Verify rate dropped on Oct 8">
+                <line x1="30" x2="530" y1="54" y2="54" stroke="#b7832a" stroke-dasharray="4 4"/>
+                <line x1="368" x2="368" y1="10" y2="118" stroke="#3d5a73" stroke-dasharray="3 3"/>
+                <polyline fill="none" stroke="#c25f2c" stroke-width="2" points="30,59.0 56,61.0 82,58.0 108,60.0 134,57.0 160,59.5 186,58.5 212,60.5 238,57.5 264,59.0 290,60.0 316,58.0 342,59.0 368,94.0 394,108.0 420,109.5 446,106.5 472,109.0 498,111.0 524,107.5"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="sec"><span class="pin" style="left:-30px;top:-5px">2</span><div class="sh">Approach <span style="letter-spacing:0;text-transform:none;font-family:Karla;font-size:11.5px">· chosen on ◇ Verify flow — options</span></div>
+            <div class="callout" style="margin:0;background:#c25f2c0d;border-color:#c25f2c40"><span class="ic">◇</span><div>Retry soft bounces 3× over 30 min with backoff; after that, send through the old provider.
+            <span style="color:var(--s-mfg)">Rejected: switch back entirely (cost), magic link (scope).</span></div></div>
+          </div>
+
+          <div class="sec"><span class="pin" style="left:-30px;top:-5px">3</span><div class="sh">Done when</div>
+            <div class="check"><span class="box on"></span><s style="color:var(--s-mfg)">Retry worker handles 4xx soft bounces</s></div>
+            <div class="check"><span class="box"></span>Fallback to the old provider after 3 failures</div>
+            <div class="check"><span class="box"></span>Live in production</div>
+            <div class="check"><span class="box bound"></span><b>verify rate ≥ 92% for 7 days</b> <span class="pill agent" style="height:18px;font-size:10px">bound to verify_rate · ticks itself</span></div>
+          </div>
+
+          <div class="sec"><div class="sh">Relations <span class="add">+ Add</span></div>
+            <div class="rel">
+              <div class="grp">from</div>
+              <div class="r"><span class="ty">⌕</span>Signup stall at verification · finding 1<span class="pill prog"><span class="dot"></span>Investigating</span></div>
+              <div class="grp">blocks</div>
+              <div class="r"><span class="ty">→</span><span class="key">WEB-151</span>Alert when verify rate drops below 85%<span class="pill todo"><span class="dot"></span>Todo</span></div>
+              <div class="grp">related</div>
+              <div class="r"><span class="ty">↔</span><span class="key">WEB-143</span>Extend verify link to 24 h<span class="pill todo"><span class="dot"></span>Todo</span></div>
+            </div>
+          </div>
+
+          <div class="sec"><span class="pin" style="left:-30px;top:-5px">4</span><div class="sh">Activity <span class="seg" style="margin-left:8px;letter-spacing:0;text-transform:none"><span class="on">All</span><span>Comments</span><span>Changes</span></span></div>
+            <ul class="act">
+              <li><span class="ico">⎇</span><span><b>PR #812</b> checks: 12 of 14 passed, 2 running</span><span class="when">4m</span></li>
+              <li><span class="ico" style="background:#3d5a7322;color:var(--s-agent)">和</span><span><b>Washi</b> attached PR #812 (branch <code>web-142-retry-soft-bounce</code>)</span><span class="when">10m</span></li>
+              <li class="cm"><div style="display:flex;gap:8px;align-items:center;margin-bottom:4px"><span class="av" style="--c:#7a6a9c">R</span><b>Rin</b><span class="when">1h</span></div>Retry worker is in. Fallback next; it needs the old provider's key kept for 30 days. @Mika ok?</li>
+              <li><span class="ico">◇</span><span><b>Rin</b> chose “retry on soft bounce” on Verify flow — options</span><span class="when">3h</span></li>
+              <li><span class="ico">●</span><span><b>Rin</b> moved Todo → In progress</span><span class="when">3h</span></li>
+            </ul>
+            <div class="composer"><span>Comment, @mention, or ask Washi…</span><span class="sp"></span><span class="kbd">⌘↵</span></div>
+          </div>
+        </div>
+
+        <aside class="rail">
+          <div class="rcard"><span class="pin" style="left:-12px;top:-10px">5</span><div class="rh">Properties</div>
+            <div class="prop"><span class="k">Status</span><span class="v"><span class="pill prog"><span class="dot"></span>In progress</span></span></div>
+            <div class="prop"><span class="k">Assignee</span><span class="v"><span class="av" style="--c:#7a6a9c">R</span>Rin</span></div>
+            <div class="prop"><span class="k">Priority</span><span class="v"><span class="prio high"><i></i><i></i><i></i></span>High</span></div>
+            <div class="prop"><span class="k">Sprint</span><span class="v">Sprint 14 · 8 days left</span></div>
+            <div class="prop"><span class="k">Estimate</span><span class="v">3 points</span></div>
+            <div class="prop"><span class="k">Labels</span><span class="v"><span class="pill" style="height:20px">signup</span><span class="pill" style="height:20px">email</span></span></div>
+          </div>
+          <div class="rcard"><div class="rh">∿ Watching <span class="x">Signup health ↗</span></div>
+            <div style="display:flex;align-items:baseline;gap:8px"><span class="big">81.4%</span><span class="delta dn">▼ 9.8 since Oct 8</span></div>
+            <svg viewBox="0 0 182 60" width="100%" style="margin-top:6px" role="img" aria-label="verify rate sparkline">
+              <line x1="0" x2="182" y1="21.6" y2="21.6" stroke="#b7832a" stroke-dasharray="3 3"/>
+              <polyline fill="none" stroke="#c25f2c" stroke-width="1.6" points="4,23.8 10,24.7 16,23.4 22,24.2 28,22.9 34,24.0 40,23.6 46,24.5 52,23.1 58,23.8 64,24.2 70,23.4 76,23.8 82,39.2 88,45.4 94,46.0 100,44.7 106,45.8 112,46.7 118,45.1"/>
+            </svg>
+            <div style="font-size:11.5px;color:var(--s-mfg)">Target <b style="color:var(--s-fg)">≥ 92%</b> for <b style="color:var(--s-fg)">7 days</b> after deploy</div>
+          </div>
+          <div class="rcard"><span class="pin" style="left:-12px;top:-10px">6</span><div class="rh">⎇ Development <span class="x">GitHub</span></div>
+            <div class="prc">
+              <div class="l"><span class="prstate">Open</span><b>#812</b> Retry verification on soft bounce</div>
+              <div class="l"><span class="k">Checks</span><span class="bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="run"></i><i class="run"></i></span>12/14</div>
+              <div class="l"><span class="k">Review</span>✓ approved · Kai</div>
+              <div class="l"><span class="k">Diff</span><span class="mono" style="font-size:11px"><span style="color:var(--s-ok)">+182</span> <span style="color:var(--s-bad)">−41</span> · 6 files</span></div>
+              <div class="l"><span class="k">Deploys</span>staging ✓ 14:02 · prod —</div>
+            </div>
+          </div>
+          <div class="rcard"><div class="rh">◇ Canvas <span class="x">open ↗</span></div>
+            <div class="thumb">
+              <span style="position:absolute;left:10px;top:10px;width:46px;height:18px;background:#fff8e1;border:1px solid #e3d6ae;border-radius:3px"></span>
+              <span style="position:absolute;left:68px;top:22px;width:46px;height:18px;background:#fff;border:2px solid var(--s-primary);border-radius:3px"></span>
+              <span style="position:absolute;left:126px;top:8px;width:46px;height:18px;background:#fff8e1;border:1px solid #e3d6ae;border-radius:3px;opacity:.5"></span>
+              <span style="position:absolute;left:30px;top:38px;width:46px;height:18px;background:#fff8e1;border:1px solid #e3d6ae;border-radius:3px;opacity:.5"></span>
+            </div>
+            <div style="font-size:11.5px;color:var(--s-mfg);margin-top:6px">Verify flow — options · 4 options · 1 chosen</div>
+          </div>
+        </aside>
+      </div>
+    </div>
+    <p class="cap">screen 5 · the full ticket</p>
+  </div>
+
+  <div class="card" style="margin-top:1.2rem">
+    <ol class="notes">
+      <li><strong>Header in three facts:</strong> status, the watched metric against its target, and where the
+      ticket came from. These are what someone opening a ticket wants to know first.</li>
+      <li><strong>Approach comes from the canvas.</strong> Choosing a node writes this block and lists the
+      rejected options, so the reasoning travels with the ticket.</li>
+      <li><strong>Done when can be bound.</strong> A bound item shows <em>bound · ticks itself</em> and can't be
+      ticked by hand. It ticks when the metric holds its target for the whole window.</li>
+      <li><strong>One Activity stream</strong> for comments, moves, PR events and Washi's actions, with filters.
+      The composer takes comments and asks: <em>"@Washi summarise this thread"</em> answers inline, marked as Washi's.</li>
+      <li><strong>The rail is a stack of cards</strong> (Jira's grouping, Linear's calm). Properties are always
+      there; Watching, Development and Canvas show only when they exist.</li>
+      <li><strong>Development is read-only.</strong> PR state, checks as a bar of cells, review, diff size and
+      deploys. Clicking opens GitHub. Washi reads it and doesn't comment on it.</li>
+    </ol>
+    <div class="refs">borrowed from
+      <a href="https://mobbin.com/screens/cef36326-d8ec-4c6f-acd4-a9f1e1060d33">Linear · calm issue page</a>
+      <a href="https://mobbin.com/screens/8c62f591-194a-4e6d-a033-c096fe7886a5">Jira · Details + Development cards, linked items by type</a>
+      <a href="https://mobbin.com/screens/7c7c881c-256a-47a1-b359-b9dc648e7323">Plane · relation actions</a>
+      <a href="https://mobbin.com/screens/d0c81936-c473-405f-948c-b6626e769534">ClickUp · peek over a list</a>
+      <a href="https://mobbin.com/screens/08a81d90-d5dd-45fd-af2e-bb81293f9b33">Asana · side panel</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════ 6 STAT ═════════════════════════ -->
+<section id="stat">
+  <span class="tape" style="--c:var(--tape-moss)">06 · stat page</span>
+  <div class="card">
+    <h2 class="title">The number, with the story marked on it</h2>
+    <p class="point" style="--c:var(--tape-moss)">Opening a stat page from a ticket brings you to that ticket's
+    metric. The target, the watch window and every related event are drawn on the chart, so you can see whether
+    the change moved the number.</p>
+  </div>
+  <div class="stage">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / netko-labs / p / signup-health ? focus = verify_rate &amp; from = WEB-142</span></div>
+      <div class="tabs"><span>Sprint 14</span><span>WEB-142</span><span class="on">Signup health</span></div>
+      <div class="ribbon">∿ Focused from <b>WEB-142</b> · Done · verifying day 3 of 7<span class="x">Show whole page ✕</span></div>
+      <div class="statgrid" style="position:relative">
+        <span class="pin" style="left:-4px;top:2px">1</span>
+        <span class="pin" style="left:-4px;top:140px">2</span>
+        <span class="pin" style="right:282px;top:2px">3</span>
+        <div>
+          <div class="stathead">
+            <div>
+              <div class="key" style="margin-bottom:4px">METRIC · verify_rate</div>
+              <div style="font:400 22px/1.2 'Young Serif',serif">Verify rate</div>
+              <div style="display:flex;align-items:baseline;gap:10px;margin-top:8px"><span class="stathead num">93.4%</span><span class="delta up">▲ 12.0 pts since deploy</span></div>
+              <div style="font-size:12px;color:var(--s-mfg);margin-top:4px">verified ÷ started · daily · from <code style="font-size:11px">signups</code> · live</div>
+            </div>
+            <div style="display:flex;gap:6px"><span class="seg"><span>7D</span><span class="on">30D</span><span>90D</span></span><span class="btn">+ Watch</span></div>
+          </div>
+          <div class="chartcard" style="margin-top:12px;padding:8px 8px 4px">
+            <svg viewBox="0 0 700 236" width="100%" role="img" aria-label="Verify rate dropped on Oct 8 and recovered above target after the Oct 21 deploy">
+              <rect x="560" y="14" width="120" height="196" fill="#5e7d5a14"/>
+              <text x="620" y="204" font-size="9" fill="#5e7d5a" text-anchor="middle" font-family="JetBrains Mono">watch window</text>
+              <line x1="40" x2="680" y1="20" y2="20" stroke="#ece6da"/><text x="34" y="23" font-size="9" fill="#a39b8d" text-anchor="end" font-family="JetBrains Mono">100</text>
+              <line x1="40" x2="680" y1="80" y2="80" stroke="#ece6da"/><text x="34" y="83" font-size="9" fill="#a39b8d" text-anchor="end" font-family="JetBrains Mono">90</text>
+              <line x1="40" x2="680" y1="140" y2="140" stroke="#ece6da"/><text x="34" y="143" font-size="9" fill="#a39b8d" text-anchor="end" font-family="JetBrains Mono">80</text>
+              <line x1="40" x2="680" y1="68" y2="68" stroke="#b7832a" stroke-dasharray="5 4"/>
+              <rect x="44" y="56" width="140" height="17" rx="8.5" fill="#b7832a"/>
+              <text x="114" y="68" font-size="9" fill="#fff" text-anchor="middle" font-family="JetBrains Mono">target ≥ 92% · WEB-142</text>
+              <line x1="300" x2="300" y1="14" y2="210" stroke="#3d5a73" stroke-dasharray="3 3"/>
+              <path d="M300 200 l6 6 l-6 6 l-6 -6z" fill="#3d5a73"/>
+              <text x="294" y="196" font-size="9" fill="#3d5a73" text-anchor="end" font-family="JetBrains Mono">Oct 8 · #788 provider switch</text>
+              <line x1="420" x2="420" y1="14" y2="210" stroke="#8f887c" stroke-dasharray="2 3"/>
+              <circle cx="420" cy="206" r="4" fill="#8f887c"/>
+              <text x="426" y="34" font-size="9" fill="#6f685d" font-family="JetBrains Mono">Oct 14 · WEB-142 opened</text>
+              <line x1="560" x2="560" y1="14" y2="210" stroke="#c25f2c" stroke-dasharray="3 3"/>
+              <path d="M560 200 l6 6 l-6 6 l-6 -6z" fill="#c25f2c"/>
+              <text x="554" y="104" font-size="9" fill="#c25f2c" text-anchor="end" font-family="JetBrains Mono">Oct 21 · #812 deployed</text>
+              <polyline fill="none" stroke="#c25f2c" stroke-width="2.2" points="40,74.0 60,76.4 80,72.8 100,75.2 120,71.6 140,74.6 160,73.4 180,75.8 200,72.2 220,74.0 240,75.2 260,72.8 280,74.0 300,116.0 320,132.8 340,134.6 360,131.0 380,134.0 400,136.4 420,132.2 440,133.4 460,135.2 480,131.6 500,134.0 520,132.8 540,131.6 560,89.0 580,64.4 600,61.4 620,59.6"/>
+              <circle cx="620" cy="59.6" r="4" fill="#c25f2c"/>
+              <text x="40" y="228" font-size="9" fill="#a39b8d" font-family="JetBrains Mono">Sep 25</text>
+              <text x="620" y="50" font-size="9" fill="#c25f2c" text-anchor="middle" font-family="JetBrains Mono">today 93.4</text>
+              <text x="680" y="228" font-size="9" fill="#a39b8d" text-anchor="end" font-family="JetBrains Mono">Oct 27</text>
+            </svg>
+          </div>
+          <div class="minis">
+            <div class="mini"><b>Signup funnel</b>started → verified → active</div>
+            <div class="mini"><b>Soft bounce rate</b>by provider · 0.6% now</div>
+            <div class="mini"><b>Time to verify</b>median 3m 40s</div>
+          </div>
+        </div>
+        <div>
+          <div class="sh" style="font:600 10.5px/1 'JetBrains Mono';letter-spacing:.09em;text-transform:uppercase;color:var(--s-mfg);margin:4px 0 10px">Watched by</div>
+          <div class="wlist">
+            <div class="wrow"><div class="l1"><span class="pill done" style="height:20px"><span class="dot"></span></span><span class="key">WEB-142</span>Retry verification…</div>
+              <div class="l2">≥ 92% · 7 days · <b style="color:var(--s-ok)">holding · day 3</b></div></div>
+            <div class="wrow"><div class="l1"><span class="pill todo" style="height:20px"><span class="dot"></span></span><span class="key">WEB-151</span>Alert below 85%</div>
+              <div class="l2">alert threshold · not set up yet</div></div>
+            <div class="wrow"><div class="l1">⌕ Signup stall at verification</div>
+              <div class="l2">evidence chart · finding 1</div></div>
+          </div>
+          <div class="washi" style="margin-top:14px;font-size:12px">
+            <div class="by"><span class="av w" style="width:16px;height:16px;font-size:8px">和</span>Washi</div>
+            Above target for 3 days since the deploy. If it holds to Oct 27, WEB-142 is verified and the
+            investigation can close.
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="cap">screen 6 · Signup health, focused on verify_rate · Oct 24</p>
+  </div>
+  <div class="card" style="margin-top:1.2rem">
+    <ol class="notes">
+      <li><strong>The metric's header</strong> shows the value now, the change since the event that matters, and
+      its definition in plain words. The time range and <em>+ Watch</em> are on the right.</li>
+      <li><strong>The chart is annotated by events, not by people:</strong> deploys (diamonds), ticket moves
+      (dots), the target line labelled with whoever set it, and the shaded watch window running into the
+      future.</li>
+      <li><strong>Watched by</strong> turns the stat page into a map of what the team is trying to move. Every
+      ticket, investigation and alert that points at this metric is listed with its state.</li>
+    </ol>
+    <div class="refs">borrowed from
+      <a href="https://mobbin.com/screens/14b04b6a-d7a0-40a5-a490-a0429632f0f3">Amplitude · current value + delta header</a>
+      <a href="https://mobbin.com/screens/bce70f16-d098-4a30-b0fe-c31037eb0336">Causal · labelled target line</a>
+      <a href="https://mobbin.com/screens/944ddae2-0103-4f1f-86d9-bf59e51de5a2">Mixpanel · annotations</a>
+      <a href="https://mobbin.com/screens/0a5b137a-9faf-4286-bfc2-9bf871ef0c40">Customer.io · goal page</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════ 7 CANVAS ═════════════════════════ -->
+<section id="canvas">
+  <span class="tape" style="--c:var(--tape-pink)">07 · canvas</span>
+  <div class="card">
+    <h2 class="title">Options on a canvas, with a decision</h2>
+    <p class="point" style="--c:var(--tape-pink)">A ticket's canvas keeps the question it was made for in a
+    ribbon. A short vote surfaces what people prefer, and <em>Choose</em> writes the decision back into the
+    ticket.</p>
+  </div>
+  <div class="stage">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / netko-labs / p / verify-flow-options</span></div>
+      <div class="tabs"><span>WEB-142</span><span class="on">Verify flow — options</span></div>
+      <div class="ribbon">◇ Exploring for <b>WEB-142</b> · Retry verification on soft bounce · In progress<span class="x">Open ticket ↗</span></div>
+      <div class="board-canvas">
+        <span class="pin" style="left:14px;top:14px">1</span>
+        <span class="pin" style="left:302px;top:206px">2</span>
+        <span class="pin" style="right:240px;top:14px">3</span>
+        <svg width="100%" height="100%" style="position:absolute;inset:0" aria-hidden="true">
+          <g stroke="#a39b8d" stroke-width="1.3" fill="none">
+            <path d="M360 122 C 320 160, 180 160, 160 200"/>
+            <path d="M405 122 L 418 222"/>
+            <path d="M450 122 C 520 150, 640 160, 650 200"/>
+            <path d="M300 100 C 20 120, 30 320, 140 350"/>
+            <path d="M250 244 L 330 262" stroke-dasharray="4 4"/>
+          </g>
+          <text x="262" y="282" font-size="10.5" fill="#6f685d" font-family="JetBrains Mono">conflicts</text>
+        </svg>
+        <div class="node q" style="left:290px;top:52px"><div class="nt">Soft-bounced verify mail is dropped (11%)</div><div class="nc"><span>⌕ finding 1</span><span>∿ verify 81%</span></div></div>
+        <div class="node out" style="left:70px;top:200px"><div class="nt">Switch back to the old provider</div><div class="nc"><span>effort S</span><span>cost +$1.2k/mo</span></div><span class="votes">1</span></div>
+        <div class="node chosen" style="left:330px;top:222px"><span class="tag">CHOSEN · Rin</span><div class="nt">Retry soft bounces 3× over 30 min, then fall back</div><div class="nc"><span>effort M</span><span>risk low</span><span>∿ est. → 92%</span></div><span class="votes">3</span></div>
+        <div class="node" style="left:560px;top:200px"><div class="nt">Magic-link sign-in instead of verify</div><div class="nc"><span>effort L</span><span>→ make ticket</span></div><span class="votes">1</span></div>
+        <div class="node out" style="left:60px;top:350px"><div class="nt">Let people in before they verify</div><div class="nc"><span>risk high · spam</span></div></div>
+        <div class="vote pop">
+          <div class="ttl">Vote · which option? <span style="margin-left:auto;font:600 10px/1 'JetBrains Mono';color:var(--s-mfg)">ended</span></div>
+          <div style="font-size:11.5px;color:var(--s-mfg);margin-top:2px">1 vote each · 5 of 5 voted</div>
+          <div class="vr"><span>Retry, then fall back</span><b>3</b><span class="track"><i style="width:60%"></i></span></div>
+          <div class="vr"><span>Switch back</span><b>1</b><span class="track"><i style="width:20%"></i></span></div>
+          <div class="vr"><span>Magic link</span><b>1</b><span class="track"><i style="width:20%"></i></span></div>
+          <div style="display:flex;gap:6px;margin-top:12px"><span class="btn" style="flex:1;justify-content:center">Re-run</span><span class="btn pri" style="flex:1;justify-content:center">Choose top</span></div>
+        </div>
+        <div class="tools"><span class="on">↖</span><span>✋</span><span>▭</span><span>◯</span><span>⟶</span><span>T</span><span>∿</span><span>⌕</span><span>和</span></div>
+      </div>
+    </div>
+    <p class="cap">screen 7 · Verify flow — options, after the vote</p>
+  </div>
+  <div class="card" style="margin-top:1.2rem">
+    <ol class="notes">
+      <li><strong>The ribbon</strong> names the ticket the canvas serves, with its live status. A canvas made from
+      a ticket starts seeded by Washi: the problem in the centre and the findings around it.</li>
+      <li><strong>Chosen is a state, not a colour someone picked.</strong> It writes the ticket's
+      <em>Approach</em> block. Rejected options grey out but stay, with their chips as the reasons. Any node can
+      be turned into its own ticket.</li>
+      <li><strong>Votes are a timed session</strong> with one vote each, then results. They inform the decision;
+      a person still makes it with <em>Choose</em>.</li>
+    </ol>
+    <p style="margin:.8rem 0 0;font-size:.92rem">Toolbar extras beyond the basic shapes: <code>∿</code> drops a
+    live metric chip on a node, <code>⌕</code> links evidence, and <code>和</code> asks Washi to lay out or cluster
+    the options people wrote. Washi never adds options of its own unless asked.</p>
+    <div class="refs">borrowed from
+      <a href="https://mobbin.com/screens/5a0d119b-a84d-4dff-af69-a8e69603a78f">Confluence · votes left</a>
+      <a href="https://mobbin.com/screens/28f43c27-c5db-4d93-9163-81dc64abfa5a">Miro · vote results bars</a>
+      <a href="https://mobbin.com/screens/f83fbd31-555d-4840-9ef8-44891e099e34">Confluence · sticky → issue</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════ 8 PR ═════════════════════════ -->
+<section id="pr">
+  <span class="tape" style="--c:var(--tape-slate)">08 · PR</span>
+  <div class="card">
+    <h2 class="title">The PR card through its life, and the rules that move tickets</h2>
+    <p class="point" style="--c:var(--tape-slate)">One card shape covers every state. Each state change is an
+    Activity entry, and the team's rules decide which entries also move the ticket.</p>
+  </div>
+  <div class="stage">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>Development card · four moments · and Settings › Integrations</span></div>
+      <div class="ints">
+        <div class="rcard"><div class="rh">⎇ Development</div><div class="prc">
+          <div class="l"><span class="prstate draft">Draft</span><b>#812</b> Retry verification…</div>
+          <div class="l"><span class="k">Checks</span>not run yet</div>
+          <div class="l"><span class="k">Ticket</span><span style="color:var(--s-mfg)">no move · drafts don't count</span></div></div></div>
+        <div class="rcard" style="border-color:#b5543c66"><div class="rh">⎇ Development</div><div class="prc">
+          <div class="l"><span class="prstate">Open</span><b>#812</b> Retry verification…</div>
+          <div class="l"><span class="k">Checks</span><span class="bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="f"></i><i class="f"></i></span>12/14</div>
+          <div class="washi" style="margin:6px 0 0;padding:6px 8px;font-size:11.5px"><b>2 failing:</b> <code style="font-size:10px">e2e/signup</code>, <code style="font-size:10px">e2e/verify</code>. Merging is blocked until they pass.</div></div></div>
+        <div class="rcard"><div class="rh">⎇ Development</div><div class="prc">
+          <div class="l"><span class="prstate merged">Merged</span><b>#812</b> into main</div>
+          <div class="l"><span class="k">Review</span>✓ approved · Kai</div>
+          <div class="l"><span class="k">Deploys</span>staging ✓ · prod pending</div>
+          <div class="l"><span class="k">Ticket</span>→ In review stays until prod</div></div></div>
+        <div class="rcard" style="border-color:#5e7d5a66"><div class="rh">⎇ Development</div><div class="prc">
+          <div class="l"><span class="prstate merged">Merged</span><b>#812</b> · deployed</div>
+          <div class="l"><span class="k">Deploys</span>staging ✓ · <b>prod ✓ Oct 21 14:40</b></div>
+          <div class="l"><span class="k">Ticket</span>→ Done · verifying 0/7</div></div></div>
+      </div>
+      <div style="padding:0 16px 16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(20rem,1fr));gap:16px">
+        <div class="rcard"><div class="rh">Settings › Integrations › GitHub <span class="x" style="color:var(--s-ok)">● connected</span></div>
+          <div class="prop"><span class="k">Repos</span><span class="v">netko-labs/web · netko-labs/api</span></div>
+          <div class="prop"><span class="k">Match</span><span class="v"><code style="font-size:11px">WEB-142</code> in branch, title or body</span></div>
+          <div class="prop"><span class="k">Deploys</span><span class="v">GitHub Deployments · env <b>production</b></span></div>
+          <div class="prop"><span class="k">Reads</span><span class="v" style="color:var(--s-mfg)">approved by connecting · writes still ask</span></div>
+        </div>
+        <div class="rcard"><div class="rh">Workflow rules · Web</div>
+          <div class="rule">PR opened <span class="arrow">→</span><span class="pill rev"><span class="dot"></span>In review</span></div>
+          <div class="rule">Deployed to production <span class="arrow">→</span><span class="pill done"><span class="dot"></span>Done</span> + start watches</div>
+          <div class="rule">Watch holds <span class="arrow">→</span> tick Done-when · notify assignee</div>
+          <div class="rule">Watch misses <span class="arrow">→</span> follow-up ticket · reopen finding</div>
+          <div style="font-size:11.5px;color:var(--s-mfg);margin-top:8px">Moves made by a rule are logged as <em>by rule</em>, not as a person.</div>
+        </div>
+      </div>
+    </div>
+    <p class="cap">screen 8 · PR states, the connection, the rules</p>
+  </div>
+  <div class="card" style="margin-top:1.2rem">
+    <ul class="tight">
+      <li><strong>Washi explains, never judges.</strong> On failing checks it says which ones fail and what that
+      blocks. No diff critique, no review comments, no merge button. Code review stays out of Washi's scope.</li>
+      <li><strong>Other integrations use the same card:</strong> Sentry issue (events · users · first seen), Slack
+      thread (last reply · participants), Figma frame (thumbnail · last edit). Each is a snapshot plus a link,
+      kept current by events.</li>
+    </ul>
+    <div class="refs">borrowed from
+      <a href="https://mobbin.com/screens/25fc66dc-96d7-4d20-9fcd-93ccfc90fc02">GitHub · merged state colour</a>
+      <a href="https://mobbin.com/screens/8c62f591-194a-4e6d-a033-c096fe7886a5">Jira · Development + Automation cards</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════ 9 LOOP ═════════════════════════ -->
+<section id="loop">
+  <span class="tape" style="--c:var(--tape-teal)">09 · loop</span>
+  <div class="card">
+    <h2 class="title">The number confirms it, and every page updates</h2>
+    <p class="point" style="--c:var(--tape-teal)">On Oct 28 the 7-day watch holds. The ticket's last
+    Done-when ticks, the investigation turns green with a Resolution, the assignee and owner get an Inbox
+    row, and Friday's review reports it in one line.</p>
+  </div>
+  <div class="stage">
+    <div class="pair">
+      <div class="app">
+        <div class="bar"><i></i><i></i><i></i><span>Signup stall · Oct 28</span></div>
+        <div class="sheet" style="padding:18px 26px">
+          <div class="meta"><span>Investigation</span><span>Status <span class="pill done"><span class="dot"></span>Resolved</span></span><span>Owner <b>Mika</b></span><span>Oct 9 → Oct 28</span></div>
+          <h1 style="font-size:22px">Why did signups stall at email verification?</h1>
+          <div class="washi">
+            <div class="by"><span class="av w" style="width:16px;height:16px;font-size:8px">和</span>Washi · Resolution · <span class="u">Edit</span></div>
+            <b>Resolved.</b> Retrying soft bounces (<span class="tchip"><span class="key">WEB-142</span>✓</span>, PR #812, live Oct 21)
+            brought verify rate from <b>81.4%</b> back to <b>93.1%</b>, holding 7 days. Link expiry
+            (<span class="tchip"><span class="key">WEB-143</span>✓</span>) added about 1 pt.
+          </div>
+          <h3>Findings</h3>
+          <ol class="find">
+            <li>The new provider drops soft-bounced mail without retrying.<div class="row2"><span class="tchip"><span class="pill done" style="height:18px;border:0;padding:0"><span class="dot"></span></span><span class="key">WEB-142</span>verified 93.1%</span></div></li>
+            <li>22% of verify clicks come after the link has expired.<div class="row2"><span class="tchip"><span class="pill done" style="height:18px;border:0;padding:0"><span class="dot"></span></span><span class="key">WEB-143</span>done</span></div></li>
+            <li>Nobody was alerted when the rate fell.<div class="row2"><span class="tchip"><span class="pill done" style="height:18px;border:0;padding:0"><span class="dot"></span></span><span class="key">WEB-151</span>alert live</span></div></li>
+          </ol>
+        </div>
+      </div>
+      <div style="display:grid;gap:1rem">
+        <div class="app inbox">
+          <div class="bar"><i></i><i></i><i></i><span>Inbox · Rin</span></div>
+          <div class="row unread"><span class="av w">和</span><div><b>WEB-142 verified.</b> verify rate held ≥ 92% for 7 days (93.1% now). Done-when complete.</div><span class="when">09:00</span></div>
+          <div class="row"><span class="av" style="--c:#a97f52">MK</span><div><b>Mika</b> resolved <b>Signup stall at verification</b></div><span class="when">09:12</span></div>
+          <div class="row"><span class="av" style="--c:#5c7f8f">K</span><div><b>Kai</b> commented on WEB-151</div><span class="when">Mon</span></div>
+        </div>
+        <div class="app">
+          <div class="bar"><i></i><i></i><i></i><span>Weekly review · Fri Oct 30 · 17:00 routine</span></div>
+          <div class="sheet" style="padding:14px 22px">
+            <div class="callout" style="margin:0"><span class="ic">☷</span><div><b>This week.</b> Sprint 14 closed 15 of 17.
+            <b>Signup verification recovered</b> from 81% to 93% after <span class="tchip"><span class="key">WEB-142</span>✓</span>.
+            One follow-up: <span class="tchip"><span class="key">WEB-158</span>CSV export still slow</span>.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="cap">screen 9 · Oct 28 — investigation resolved, Inbox, weekly review</p>
+  </div>
+  <div class="card" style="margin-top:1.2rem">
+    <ul class="tight">
+      <li><strong>Resolution is drafted and the owner decides.</strong> Washi writes the block and proposes
+      <em>Resolved</em>. Mika flips the status, because closing a question is the owner's call.</li>
+      <li><strong>The miss path is the same shape:</strong> the badge goes red, Washi makes
+      <code>WEB-158 follow-up of WEB-139</code> in Todo, the finding's chip shows <em>follow-up</em>, and the
+      investigation status goes back to Investigating.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═════════════════════════ SYSTEM ═════════════════════════ -->
+<section id="system">
+  <span class="tape" style="--c:var(--tape-blue)">10 · system</span>
+  <div class="card">
+    <h2 class="title">What it takes</h2>
+    <p class="point" style="--c:var(--tape-blue)">Mostly new chrome on existing pieces. There are five new
+    records (metrics, watches, links, integration events, rules) and four new WSX primitives. The C1 rule holds: everything
+    lives in the workspace file.</p>
+    <table class="doc">
+      <tr><th>Piece</th><th>Status</th><th>Shape</th></tr>
+      <tr><td>Tickets</td><td><span class="chip have">have</span></td><td>rows of <code>issues</code> + row pages. Add: <code>key</code> (project prefix + seq), the ticket frame in studio</td></tr>
+      <tr><td>Ticket frame</td><td><span class="chip new">new</span></td><td>studio chrome around a row page: header chips, rail cards, Relations, Activity (outside the sheet, like page chrome, Q18)</td></tr>
+      <tr><td>Peek</td><td><span class="chip have">have</span></td><td>row drawer exists; restyle to screen 4, add ↑↓ to walk the column</td></tr>
+      <tr><td>Typed links</td><td><span class="chip new">new</span></td><td><code>links(from, to, kind)</code>; kinds: from · blocks · related · follow-up · explores · implements · watches. Backlinks read the same table</td></tr>
+      <tr><td>Metrics</td><td><span class="chip new">new</span></td><td><code>metrics(id, name, def, unit, grain)</code>; def = ink aggregate or tsuru source; history via <code>record_changes</code>/snapshots</td></tr>
+      <tr><td>Watches</td><td><span class="chip new">new</span></td><td><code>watches(ticket, metric, op, target, days, started_at, state)</code>; the routine clock checks daily</td></tr>
+      <tr><td>Integration events</td><td><span class="chip new">new</span></td><td><code>integration_events(source, ref, kind, payload, at)</code> from webhooks; cards are a projection; Activity reads them</td></tr>
+      <tr><td>Rules</td><td><span class="chip new">new</span></td><td>per-project <code>event → status</code> map; moves logged <em>by rule</em></td></tr>
+      <tr><td>WSX</td><td><span class="chip new">new</span></td><td><code>&lt;Metric&gt;</code> · <code>&lt;MetricChart target markers&gt;</code> · <code>&lt;Finding ticket&gt;</code> · <code>&lt;Hypothesis state&gt;</code></td></tr>
+      <tr><td>Canvas votes + Chosen</td><td><span class="chip new">new</span></td><td><code>&lt;Node state="chosen|out"&gt;</code>; votes are ephemeral (runtime memory) until ended, then written as node props</td></tr>
+      <tr><td>Washi tools</td><td><span class="chip new">new</span></td><td><code>ticket_from_finding</code>, <code>link_add</code>, <code>metric_read</code>; all page/table writes, no new approval class</td></tr>
+    </table>
+    <details style="--c:var(--tape-blue)"><summary>Invariants this design keeps</summary>
+      <ul class="tight">
+        <li><strong>C1:</strong> metrics, links, watches and events are rows in the workspace SQLite file. Postgres stays identity-only.</li>
+        <li><strong>WSX stays inert:</strong> a metric is referenced by id; its definition is data, evaluated by the repository, never by the page.</li>
+        <li><strong>Q18:</strong> the ticket frame is studio chrome; the body is still a sheet authored by the sheet.</li>
+        <li><strong>The desk:</strong> integration reads are approved by connecting; anything outward (Slack post, Sentry write) asks.</li>
+        <li><strong>History:</strong> rule moves go through <code>updateRecords</code>, so charts replay them.</li>
+      </ul>
+    </details>
+  </div>
+</section>
+
+<!-- ═════════════════════════ BUILD ═════════════════════════ -->
+<section id="build">
+  <span class="tape" style="--c:var(--tape-mustard)">11 · build</span>
+  <div class="card">
+    <h2 class="title">Build order, one PR each</h2>
+    <p class="point" style="--c:var(--tape-mustard)">Ordered so each step ships something usable. Tickets
+    and links come first because every later screen hangs off them.</p>
+    <ol class="tight">
+      <li><strong>Keys + ticket frame</strong> — <code>WEB-142</code>, <code>/t/WEB-142</code>, header chips, Properties card, keyboard.</li>
+      <li><strong>Typed links + Relations</strong> — the <code>links</code> table, Relations section, backlinks on every page.</li>
+      <li><strong>Activity</strong> — one stream from record changes, comments and Washi actions, with filters and an inline ask.</li>
+      <li><strong>Board v2 + peek</strong> — signal row, verifying-aware progress, filters, the new peek.</li>
+      <li><strong>Investigation template</strong> — <code>Hypothesis</code>, <code>Finding</code>, Make ticket (single + batch).</li>
+      <li><strong>Metrics</strong> — definitions, <code>&lt;Metric&gt;</code>, <code>&lt;MetricChart&gt;</code> with target, stat page focus mode.</li>
+      <li><strong>Watches + bound Done-when</strong> — the daily check, verifying badge, the follow-up on a miss.</li>
+      <li><strong>GitHub integration</strong> — app, webhooks, events, Development card, deploy markers on charts.</li>
+      <li><strong>Rules</strong> — the per-project event → status map.</li>
+      <li><strong>Canvas: Chosen + votes</strong> — states, vote session, Approach write-back, node → ticket.</li>
+      <li><strong>Resolution + review</strong> — Washi's resolution draft, Inbox rows, the review routine line.</li>
+      <li><strong>Linear / Jira import</strong> — one-time, keys preserved as an alias.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ═════════════════════════ JUDGE ═════════════════════════ -->
+<section id="judge">
+  <span class="tape" style="--c:var(--hanko)">12 · judge it</span>
+  <div class="card">
+    <h2 class="title">What to look at before saying go</h2>
+    <p class="point" style="--c:var(--hanko)">These are the five calls most likely to be wrong. A yes or no
+    on each is enough to start step 1.</p>
+    <ol class="tight">
+      <li><strong>Rail of cards vs Linear's single property list.</strong> Cards make room for Watching and
+      Development, but cost density. Screen 5.</li>
+      <li><strong>Verifying as a badge on Done</strong> rather than its own column. Screen 3.</li>
+      <li><strong>Done-when bound to a metric can't be ticked by hand.</strong> This is strict on purpose; is it
+      too strict? Screen 5, note 3.</li>
+      <li><strong>Votes inform and a person chooses.</strong> Should <em>Choose top</em> exist at all? Screen 7.</li>
+      <li><strong>Metrics as their own object</strong> instead of an <code>expr</code> on a page. It adds a
+      concept and buys watches. §10.</li>
+    </ol>
+  </div>
+</section>
+
+<footer>
+  <span>washi · golden flow · design for review · 2026-10-21</span>
+  <span>docs/design.html · extends docs/washi.html §04</span>
+</footer>
+
+</main>
+</body>
+</html>
