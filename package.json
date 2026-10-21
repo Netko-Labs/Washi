@@ -24,7 +24,8 @@
     "test": "bun test",
     "prepare": "husky",
     "dev:studio": "bun run --cwd apps/studio dev",
-    "dev:mihon": "bun run --cwd apps/mihon dev"
+    "dev:mihon": "bun run --cwd apps/mihon dev",
+    "docs": "bun docs/serve.ts"
   },
   "packageManager": "bun@1.4.0",
   "devDependencies": {

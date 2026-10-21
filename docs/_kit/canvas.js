@@ -10,6 +10,8 @@
 // trackpad pinch zoom, shift+wheel pans sideways, any drag pans, a click selects a frame, a double-click or
 // the rail zooms to it, 0 fits all, 1 is 100%, and a hash `#frame=<slug>` opens zoomed on one frame.
 // Under 50% the notes hide and under 25% the frame labels go too — far out, the frames are the map.
+// Review mode (R, or the bar button): ✓ ok / ✎ fix per frame, N notes the selected frame, ] [ walk frames,
+// Copy notes puts the page's verdicts on the clipboard as Markdown; docs/serve.ts keeps them in a file.
 
 const GAP = 96
 const GROUP_GAP = 520
@@ -280,3 +282,195 @@ function init() {
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init)
 else init()
+
+function copyFailed() {
+  const copy = document.querySelector('.cv-bar .rv-toggle:last-of-type')
+  if (!copy) return
+  copy.textContent = 'Select the notes and copy'
+  setTimeout(() => (copy.textContent = 'Copy notes'), 2000)
+}
+
+function fallbackCopy(text, done) {
+  const ta = document.createElement('textarea')
+  ta.value = text
+  ta.style.position = 'fixed'
+  ta.style.opacity = '0'
+  document.body.appendChild(ta)
+  ta.select()
+  try {
+    if (document.execCommand('copy')) done()
+    else copyFailed()
+  } finally {
+    ta.remove()
+  }
+}
+
+// ── review mode: a verdict and a note per frame, kept by docs/serve.ts (falls back to localStorage) ──
+function initReview() {
+  const bar = document.querySelector('.cv-bar')
+  const world = document.querySelector('.cv-world')
+  const layers = document.querySelector('.cv-layers')
+  if (!bar || !world) return
+  const page = location.pathname
+    .split('/')
+    .pop()
+    .replace(/\.html$/, '')
+  const Key = `washi:review:${page}`
+  let notes = []
+  let current = null
+
+  const toggle = document.createElement('button')
+  toggle.className = 'rv-toggle'
+  toggle.textContent = 'Review'
+  const copy = document.createElement('button')
+  copy.className = 'rv-toggle'
+  copy.textContent = 'Copy notes'
+  const zoom = bar.querySelector('.zoom')
+  bar.insertBefore(copy, zoom)
+  bar.insertBefore(toggle, copy)
+
+  const panel = document.createElement('div')
+  panel.className = 'cv-note'
+  panel.innerHTML = `<div class="h"><span class="t"></span><small class="s"></small></div><textarea placeholder="What should change, or what works — one note per frame is plenty."></textarea><div class="prev"></div><div class="row"><span class="k" style="font:500 10.5px/1 var(--cv-mono);color:var(--cv-muted)">⌘↩ saves</span><span class="sp"></span><button class="x">Close</button><button class="primary save">Save note</button></div>`
+  document.body.appendChild(panel)
+  const ta = panel.querySelector('textarea')
+
+  const load = async () => {
+    try {
+      const r = await fetch('/_review')
+      if (r.ok) {
+        notes = (await r.json()).filter((n) => n.page === page)
+        return
+      }
+    } catch {}
+    notes = JSON.parse(localStorage.getItem(Key) || '[]')
+  }
+  const persist = async (note) => {
+    notes.push(note)
+    try {
+      const r = await fetch('/_review', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(note),
+      })
+      if (r.ok) return
+    } catch {}
+    localStorage.setItem(Key, JSON.stringify(notes))
+  }
+  const latest = (frame) => {
+    const own = notes.filter((n) => n.frame === frame.dataset.name)
+    const verdict = [...own].reverse().find((n) => n.verdict)?.verdict ?? null
+    return { own, verdict }
+  }
+  const paint = () => {
+    for (const frame of world.querySelectorAll('.frame')) {
+      const { own, verdict } = latest(frame)
+      frame.classList.toggle('rv-ok', verdict === 'ok')
+      frame.classList.toggle('rv-fix', verdict === 'fix')
+      let strip = frame.querySelector(':scope > .rv')
+      if (!strip) {
+        strip = document.createElement('div')
+        strip.className = 'rv'
+        strip.innerHTML = `<button data-v="ok" title="Looks right">✓ ok</button><button data-v="fix" title="Needs work — add a note">✎ fix</button><span class="n"></span>`
+        strip.addEventListener('pointerdown', (e) => e.stopPropagation())
+        strip.addEventListener('click', (e) => {
+          const v = e.target.closest('button')?.dataset.v
+          if (!v) return
+          e.stopPropagation()
+          if (v === 'ok') {
+            persist({ page, frame: frame.dataset.name, verdict: 'ok', note: '' }).then(paint)
+          } else open(frame, 'fix')
+        })
+        frame.appendChild(strip)
+      }
+      strip.querySelector('[data-v="ok"]').classList.toggle('on-ok', verdict === 'ok')
+      strip.querySelector('[data-v="fix"]').classList.toggle('on-fix', verdict === 'fix')
+      const texts = own.filter((n) => n.note).length
+      strip.querySelector('.n').textContent = texts ? `${texts} note${texts > 1 ? 's' : ''}` : ''
+      const b = layers?.querySelector(`button[data-for="${frame.id}"]`)
+      if (b) {
+        let dot = b.querySelector('.dot')
+        if (!dot) {
+          dot = document.createElement('span')
+          dot.className = 'dot'
+          b.appendChild(dot)
+        }
+        dot.className = `dot${verdict ? ` ${verdict}` : ''}`
+      }
+    }
+  }
+  const open = (frame, verdict) => {
+    current = { frame, verdict }
+    panel.querySelector('.t').textContent = frame.dataset.name
+    panel.querySelector('.s').textContent = `${page} · ${verdict === 'fix' ? 'needs work' : 'note'}`
+    const own = latest(frame).own.filter((n) => n.note)
+    panel.querySelector('.prev').innerHTML =
+      own
+        .map(
+          (n) =>
+            `<div><b>${n.verdict === 'fix' ? '✎' : '✓'}</b> ${n.note.replace(/</g, '&lt;')}</div>`,
+        )
+        .join('') || '<div>No notes yet.</div>'
+    panel.classList.add('open')
+    ta.value = ''
+    ta.focus()
+  }
+  const save = async () => {
+    if (!current) return
+    const text = ta.value.trim()
+    await persist({ page, frame: current.frame.dataset.name, verdict: current.verdict, note: text })
+    panel.classList.remove('open')
+    current = null
+    paint()
+  }
+  panel.querySelector('.save').addEventListener('click', save)
+  panel.querySelector('.x').addEventListener('click', () => panel.classList.remove('open'))
+  ta.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') save()
+    e.stopPropagation()
+  })
+  panel.addEventListener('pointerdown', (e) => e.stopPropagation())
+  panel.addEventListener('wheel', (e) => e.stopPropagation())
+
+  toggle.addEventListener('click', () => document.body.classList.toggle('reviewing'))
+  copy.addEventListener('click', () => {
+    const lines = [`# design review · ${page}`, '']
+    for (const frame of world.querySelectorAll('.frame')) {
+      const { own, verdict } = latest(frame)
+      if (!verdict) continue
+      lines.push(
+        `- ${verdict === 'ok' ? '✓' : '✎'} **${frame.dataset.name}**${own
+          .filter((n) => n.note)
+          .map((n) => `\n  - ${n.note}`)
+          .join('')}`,
+      )
+    }
+    const text = lines.join('\n')
+    const done = () => {
+      copy.textContent = 'Copied'
+      setTimeout(() => (copy.textContent = 'Copy notes'), 1200)
+    }
+    // Plain http on the LAN has no navigator.clipboard; a selected textarea + execCommand still copies.
+    if (navigator.clipboard)
+      navigator.clipboard.writeText(text).then(done, () => fallbackCopy(text, done))
+    else fallbackCopy(text, done)
+  })
+  document.addEventListener('keydown', (e) => {
+    if (e.target instanceof Element && e.target.matches('input, textarea')) return
+    if (e.key === 'r' && !e.metaKey && !e.ctrlKey) document.body.classList.toggle('reviewing')
+    if (e.key === ']' || e.key === '[') {
+      const frames = [...world.querySelectorAll('.frame')]
+      const on = frames.findIndex((f) => f.classList.contains('on'))
+      const next = frames[(on + (e.key === ']' ? 1 : -1) + frames.length) % frames.length]
+      layers?.querySelector(`button[data-for="${next.id}"]`)?.click()
+    }
+    if (e.key === 'n' && document.body.classList.contains('reviewing')) {
+      const on = world.querySelector('.frame.on')
+      if (on) open(on, 'fix')
+    }
+  })
+  load().then(paint)
+}
+
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initReview)
+else initReview()
