@@ -19,7 +19,7 @@ export function WorkspaceMenu({ currentId, onClose }: WorkspaceMenuProps) {
     <div
       role="dialog"
       aria-label="Switch workspace"
-      className="absolute top-full left-0 z-50 mt-1 w-[272px] rounded-xl border border-border bg-popover p-1.5 text-popover-foreground shadow-[0_16px_48px_rgb(0_0_0/0.18)]"
+      className="absolute bottom-full left-0 z-50 mb-2 w-[272px] rounded-xl border border-border bg-popover p-1.5 text-popover-foreground shadow-[0_16px_48px_rgb(0_0_0/0.18)]"
     >
       <div className="px-2 pt-1 pb-1.5 font-semibold text-[11px] text-muted-foreground uppercase tracking-[0.06em]">
         Workspaces
