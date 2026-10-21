@@ -164,12 +164,14 @@
 .app .side.sb.sbD .top .sp { flex: 1; }
 .app .side.sb.sbD .top .ib { position: relative; }
 .app .side.sb.sbD .top .ib .badge { position: absolute; top: -3px; right: -3px; margin: 0; min-width: 14px; height: 14px; font-size: 9px; line-height: 14px; }
-.app .side.sb.sbD .sa { display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 8px 0 10px; margin-bottom: 8px; border-radius: 9px; border: 1px solid var(--s-border); background: var(--s-card); font-size: 12.5px; color: var(--s-mfg); }
+.app .side.sb.sbD .sa { display: flex; align-items: center; gap: 8px; height: 34px; padding: 0 8px 0 8px; margin: 2px 0 6px; border-radius: 9px; border: 1px solid var(--s-border); background: var(--s-card); font-size: 12.5px; color: var(--s-mfg); }
+.app .side.sb.sbD .sa > i, .app .side.sb.sbD .sa > svg { flex: none; margin-left: -2px; }
 .app .side.sb.sbD .sa .k { margin-left: auto; font: 600 10px / 1 var(--s-mono); padding: 2px 5px; border-radius: 4px; background: var(--s-accent); color: var(--s-mfg); }
 .app .side.sb.sbD .hrow { display: flex; align-items: center; gap: 4px; margin-bottom: 2px; }
 .app .side.sb.sbD .hrow .it { flex: 1; height: 30px; margin: 0; }
 .app .side.sb.sbD .hrow .it.on { background: var(--s-accent); }
-.app .side.sb.sbD .hrow .ib { width: 30px; height: 30px; }
+.app .side.sb.sbD .hrow .ib { width: 30px; height: 30px; position: relative; border: 1px solid var(--s-border); background: var(--s-card); }
+.app .side.sb.sbD .hrow .ib .badge { position: absolute; top: -5px; right: -5px; margin: 0; min-width: 14px; height: 14px; font-size: 9px; line-height: 14px; }
 .app .side.sb.sbD .ask { height: 34px; margin: 2px 0; }
 .app .side.sb.sbD .lbl2 { padding: 12px 8px 4px; font: 500 11px / 1 var(--s-sans); color: var(--s-mfg); opacity: 0.85; }
 .app .side.sb.sbD .act { display: flex; align-items: center; gap: 8px; height: 28px; padding: 0 8px; border-radius: 7px; color: var(--s-mfg); font-size: 13px; }
@@ -1203,11 +1205,12 @@
       <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / netko-labs / p / wiki</span></div>
       <div class="shell">
         <aside class="side sb sbD">
-          <div class="top"><span class="ib">⊟</span><span class="sp"></span><span class="ib">◫<span class="badge">3</span></span><span class="ib">✎</span></div>
-          <div class="sa"><span class="g">⌕</span>Search or ask<span class="k">⌘K</span></div>
-          <div class="hrow"><div class="it on"><span class="g">⌂</span>Home</div><span class="ib" title="Routines">◷</span><span class="ib" title="Team">⚇</span></div>
-          <div class="ask"><i data-mascot="happy" data-size="22"></i><b>Washi</b><span class="st">Idle</span><span class="k">⌘J</span></div>
-          <div class="it"><span class="g">≡</span>Threads</div>
+          <div class="sa"><i data-mascot="happy" data-size="20"></i>Ask Washi or search<span class="k">⌘K</span></div>
+          <div class="hrow"><div class="it on"><span class="g">⌂</span>Home</div><span class="ib" title="Inbox">◫<span class="badge">3</span></span><span class="ib" title="Threads">≡</span><span class="ib" title="Routines">◷</span></div>
+          <div class="lbl2">Recents</div>
+          <div class="rec"><span class="g">▯</span>Wiki<span class="t">2h</span></div>
+          <div class="rec"><span class="g">▤</span>Backlog<span class="t">1d</span></div>
+          <div class="rec"><span class="g">◎</span>How we work<span class="t">3d</span></div>
           <div class="lbl2">Favorites</div>
           <div class="it"><span class="g">▥</span>Roadmap</div>
           <div class="it"><span class="g">☷</span>Weekly review</div>
@@ -1241,9 +1244,9 @@
           </div>
         </div>
       </div>
-      <span class="pin" style="left:238px;top:38px">1</span><span class="pin" style="left:238px;top:74px">2</span><span class="pin" style="left:238px;top:110px">3</span><span class="pin" style="left:238px;top:150px">4</span><span class="pin" style="left:238px;top:420px">5</span><span class="pin" style="left:238px;top:728px">6</span>
+      <span class="pin" style="left:238px;top:38px">1</span><span class="pin" style="left:238px;top:72px">2</span><span class="pin" style="left:238px;top:330px">3</span><span class="pin" style="left:238px;top:728px">4</span>
     </div>
-    <div class="fnote"><b>Notion's 2026 sidebar, read for Washi.</b> Notion put the assistant first: a <q>Search or ask</q> field, <q>New chat</q> and <q>Library</q> above the pages, section labels in plain grey with a <q>+ do the thing</q> row when a section is empty, and the workspace moved to the bottom beside the person. That is Washi's thesis, so D takes the shape and keeps A's quiet. <b>1</b> The top row is three icons: collapse, Inbox with its count, compose — no workspace name up here. <b>2</b> One field, <q>Search or ask</q>: a page title finds it, a sentence asks Washi; <code>⌘K</code> opens the same palette. <b>3</b> Home as a pill with two icon neighbours, Routines and Team — the three places that are not pages. <b>4</b> The Washi row stays A's bordered door with the state in words, now above the list, and <q>Threads</q> under it is the conversation history (Notion's Library). <b>5</b> Sections are a grey label, not a chevron group; an empty one shows its action as a row (<q>+ Schedule one</q>), and Pages ends with <q>+ New page</q>. <b>6</b> The workspace is the footer: mark + name is the switcher, <q>?</q> and the person's avatar beside it; settings, theme and sign out live under the avatar. Trash is still one faint row.</div>
+    <div class="fnote"><b>Notion's 2026 sidebar, read for Washi — compact top.</b> Notion put the assistant first: a <q>Search or ask</q> field, <q>New chat</q> and <q>Library</q> above the pages, plain grey section labels with a <q>+ do the thing</q> row when a section is empty, and the workspace at the bottom beside the person. D takes the shape and spends two rows on it, not five. <b>1</b> One field is the door: the mascot in it is Washi's state (face and border tint, as A's row had), the text asks or finds, <code>⌘K</code> opens the palette and <code>⌘J</code> the panel. No separate Washi row, no icon row above it — the sidebar toggle lives in the window chrome like Obsidian's, and compose is <q>+ New page</q> under Pages with <code>⌘N</code>. <b>2</b> Home as a pill with three icon neighbours: Inbox with its count, Threads (the conversation history, Notion's Library), Routines. The places that are not pages, in 30px. <b>3</b> Sections are a grey label; Recents comes first (what you touched, with an age — B's idea, one query over <code>sheets.list</code>), an empty section shows its action as a row (<q>+ Schedule one</q>), Pages ends with <q>+ New page</q>, Trash is one faint row. <b>4</b> The workspace is the footer: mark + name is the switcher, <q>?</q> and the person's avatar beside it; settings, theme and sign out live under the avatar. First page row at 92px instead of 190.</div>
   </article>
 
   <div class="sticky" style="left:5300px;top:0px"><b>references · mobbin</b><ol><li><a href="https://mobbin.com/screens/91bb1f70-f2a9-4c6b-b153-522c8b6a8d62">Linear</a> — one header row, Inbox with count, chevron groups, no footer noise</li><li><a href="https://mobbin.com/screens/e8fe60b4-6db4-4485-99b8-3395d69ea7db">Linear · workspace menu</a> — Settings, invite, switch, log out under the name</li><li><a href="https://mobbin.com/screens/a8c412e9-2b79-42db-8795-117e568e1dd5">Notion</a> — Recents · Favorites · Private · Teamspaces; Ask pill at the bottom</li><li><a href="https://mobbin.com/screens/427e3fb4-2eb1-496a-91a4-6d1e2527253a">Tana</a> — flat verbs, search at the bottom</li><li><a href="https://mobbin.com/screens/95802da6-cc05-4700-80ec-5fcf6714ecb5">Slack</a> — rail + panel</li></ol></div>
