@@ -25,3 +25,9 @@
   Deleting a base branch closes every PR on it, and a closed PR whose head was force-pushed
   cannot be reopened — the way back is pushing both heads to their pre-close commits, reopen,
   retarget, then push the rebase again.
+
+## 2026-10-21 — a checkout emptied Juan's review notes
+`tasks/design-review.jsonl` was committed empty in #58 before its ignore landed. `git rm --cached` on a
+branch, then `git checkout main`, restored the tracked empty file over 18 live rows. Rule: a file that
+holds local state must be untracked on **every** branch before switching; before any checkout or pull
+that touches it, copy it outside the repo. Restored from the transcript; two timestamps are approximate.
