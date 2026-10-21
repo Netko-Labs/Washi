@@ -8,3 +8,9 @@ export interface KnobFieldProps {
   onChange(value: WsxValue | null | undefined): void
   overridden: boolean
 }
+
+export interface SegmentsProps {
+  options: readonly (string | number)[]
+  active: WsxValue | undefined
+  onPick(value: string | number | null): void
+}

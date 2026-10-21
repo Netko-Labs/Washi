@@ -1,20 +1,12 @@
 import type { WsxValue } from '@washi/wsx'
 import { useState } from 'react'
-import type { KnobFieldProps } from '../lib'
+import type { KnobFieldProps, SegmentsProps } from '../lib'
 
 const INPUT =
   'h-7 w-full rounded-[8px] border border-border bg-background px-2 text-[12px] outline-none focus:border-ring'
 const SEG = 'h-6 rounded-[6px] px-1.5 text-[12px]'
 
-function Segments({
-  options,
-  active,
-  onPick,
-}: {
-  options: readonly (string | number)[]
-  active: WsxValue | undefined
-  onPick(value: string | number | null): void
-}) {
+function Segments({ options, active, onPick }: SegmentsProps) {
   return (
     <div className="flex flex-wrap gap-0.5">
       <button

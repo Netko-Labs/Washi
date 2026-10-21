@@ -55,3 +55,12 @@ describe('book host', () => {
     expect(said.at(-1)).toContain('sheet.open')
   })
 })
+
+test('a deleted row id is never reused', async () => {
+  const host = createBookHost(() => {})
+  await host.runAction({ verb: 'table.delete', table: 'tasks', row: 'tasks-7' })
+  await host.runAction({ verb: 'table.insert', table: 'tasks', data: { title: 'Fresh' } })
+  const ids = (await host.runQuery({ table: 'tasks' })).rows.map((row) => row.id)
+  expect(ids).toContain('tasks-8')
+  expect(ids).not.toContain('tasks-7')
+})

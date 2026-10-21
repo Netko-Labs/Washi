@@ -1,7 +1,7 @@
 import { paperRegistry, TONES, VARIANTS } from '@washi/paper/registry'
 import { parse, serialize, type WsxElement, type WsxNode, type WsxValue } from '@washi/wsx'
 import { z } from 'zod'
-import type { MatrixAxes, SpecimenInput } from './types'
+import type { MatrixAxes, PageInput, SpecimenInput } from './types'
 import { SPECIMEN_STATE, SPECIMENS } from './values'
 
 const BOUND_KEYS = ['bind', 'history', 'table']
@@ -96,9 +96,7 @@ export function matrixSource(input: SpecimenInput): string | null {
 }
 
 /** What the stage renders for the book's view: the specimen, its matrix, or the scratch text. */
-export function pageSource(
-  book: SpecimenInput & { view: 'single' | 'matrix' | 'scratch'; scratch: string | null },
-): string {
+export function pageSource(book: PageInput): string {
   if (book.view === 'scratch' && book.scratch !== null) return book.scratch
   if (book.view === 'matrix') return matrixSource(book) ?? specimenSource(book)
   return specimenSource(book)

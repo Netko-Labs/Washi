@@ -1,7 +1,8 @@
 import { useNoticeStore } from '@washi/ui'
 import { useBookStore } from '@/components/shared/book'
+import type { ActionProps, SourceProps } from './lib'
 
-function Action({ children, onClick }: { children: string; onClick: () => void }) {
+function Action({ children, onClick }: ActionProps) {
   return (
     <button
       type="button"
@@ -14,10 +15,14 @@ function Action({ children, onClick }: { children: string; onClick: () => void }
 }
 
 /** The page's WSX: read it, copy it, or step into scratch and rewrite it by hand. */
-export function Source({ source }: { source: string }) {
+export function Source({ source }: SourceProps) {
   const book = useBookStore()
+  const say = (message: string) => useNoticeStore.getState().say(message)
   const copy = () =>
-    navigator.clipboard.writeText(source).then(() => useNoticeStore.getState().say('WSX copied'))
+    navigator.clipboard
+      .writeText(source)
+      .then(() => say('WSX copied'))
+      .catch(() => say('The clipboard said no — select the text instead'))
 
   return (
     <section className="grid h-56 grid-rows-[28px_minmax(0,1fr)]">

@@ -1,5 +1,5 @@
 import type { WsxValue } from '@washi/wsx'
-import type { Frame } from '../book'
+import type { Frame, View } from '../book'
 
 export interface Specimen {
   props?: Record<string, WsxValue>
@@ -13,6 +13,11 @@ export interface SpecimenInput extends Pick<Frame, 'theme' | 'feel' | 'accent'> 
   name: string
   knobs: Record<string, WsxValue>
   childrenText: string | null
+}
+
+export interface PageInput extends SpecimenInput {
+  view: View
+  scratch: string | null
 }
 
 export type MatrixAxes = readonly ['variant', 'tone'] | readonly ['variant'] | null

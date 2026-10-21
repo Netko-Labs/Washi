@@ -1,1 +1,1 @@
-export type { KnobFieldProps } from './types'
+export type { KnobFieldProps, SegmentsProps } from './types'

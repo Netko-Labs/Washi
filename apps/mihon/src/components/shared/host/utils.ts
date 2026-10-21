@@ -99,6 +99,7 @@ export function seedTables(seeds: SeedTable[] = SEED_TABLES): Map<string, Memory
       {
         spec: seed.spec,
         rows: seed.rows.map((row, i) => ({ id: `${seed.spec.name}-${i + 1}`, ...row })),
+        next: seed.rows.length + 1,
       },
     ]),
   )
@@ -135,7 +136,7 @@ export function createBookHost(say: Say, seeds?: SeedTable[]): PaperHost {
         case 'table.insert': {
           const table = need(action.table)
           table.rows.push({
-            id: `${table.spec.name}-${table.rows.length + 1}`,
+            id: `${table.spec.name}-${table.next++}`,
             ...(action.data as QueryRow),
           })
           break
