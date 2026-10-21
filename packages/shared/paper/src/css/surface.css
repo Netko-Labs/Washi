@@ -40,6 +40,26 @@
   position: relative;
   border-top-left-radius: var(--r-cell);
 }
+.wsx-card-tape {
+  position: absolute;
+  top: -12px;
+  left: 16px;
+  display: inline-block;
+  padding: 4px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  background: var(--t-fill);
+  color: var(--t-on);
+  transform: rotate(-1deg);
+  clip-path: polygon(2% 0, 98% 4%, 100% 92%, 1% 100%);
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgb(255 255 255 / 0.16) 0 6px,
+    transparent 6px 14px
+  );
+}
 .wsx-card[data-tone]:not([data-tone="neutral"]) {
   border-color: var(--t-line);
 }
@@ -59,8 +79,19 @@
   color: var(--ink);
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 4px 12px;
+  gap: 12px;
   align-items: start;
+}
+.wsx-callout[data-variant="plain"] {
+  background: transparent;
+  border-color: transparent;
+  padding-inline: 0;
+}
+.wsx-callout[data-variant="outline"] {
+  background: transparent;
+}
+.wsx-callout[data-variant="raised"] {
+  box-shadow: var(--shadow-card);
 }
 .wsx-callout-icon {
   color: var(--t-text);
@@ -68,12 +99,15 @@
   height: 18px;
   margin-top: 1px;
 }
+.wsx-callout-content {
+  min-width: 0;
+}
 .wsx-callout-title {
   font-weight: 700;
   color: var(--t-text);
+  margin-bottom: 4px;
 }
 .wsx-callout-body {
-  grid-column: 2;
   font-size: calc(var(--body) * var(--sz));
 }
 .wsx-callout-body > * + * {

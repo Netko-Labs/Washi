@@ -6,6 +6,15 @@ const INPUT =
   'h-7 w-full rounded-[8px] border border-border bg-background px-2 text-[12px] outline-none focus:border-ring'
 const SEG = 'h-6 rounded-[6px] px-1.5 text-[12px]'
 
+function isJson(text: string): boolean {
+  try {
+    JSON.parse(text)
+    return true
+  } catch {
+    return false
+  }
+}
+
 function Segments({ options, active, onPick }: SegmentsProps) {
   return (
     <div className="flex flex-wrap gap-0.5">
@@ -34,14 +43,11 @@ function Segments({ options, active, onPick }: SegmentsProps) {
 function Json({ value, onChange }: Pick<KnobFieldProps, 'value' | 'onChange'>) {
   const [draft, setDraft] = useState<string | null>(null)
   const text = draft ?? (value === undefined ? '' : JSON.stringify(value, null, 1))
+  const parses = draft === null || draft.trim() === '' || isJson(draft)
   const commit = () => {
-    if (draft === null) return
-    try {
-      onChange(draft.trim() === '' ? null : (JSON.parse(draft) as WsxValue))
-      setDraft(null)
-    } catch {
-      // keep the draft: a red border says it does not parse yet
-    }
+    if (draft === null || !parses) return
+    onChange(draft.trim() === '' ? null : (JSON.parse(draft) as WsxValue))
+    setDraft(null)
   }
   return (
     <textarea
@@ -50,7 +56,9 @@ function Json({ value, onChange }: Pick<KnobFieldProps, 'value' | 'onChange'>) {
       onBlur={commit}
       spellCheck={false}
       rows={Math.min(8, Math.max(2, text.split('\n').length))}
-      className={`${INPUT} h-auto resize-y py-1 font-mono text-[11px] leading-[1.4] ${draft !== null && draft !== text ? '' : ''}`}
+      aria-invalid={!parses}
+      title={parses ? undefined : 'not JSON yet — the knob keeps the last good value'}
+      className={`${INPUT} h-auto resize-y py-1 font-mono text-[11px] leading-[1.4] ${parses ? '' : 'border-destructive focus:border-destructive'}`}
     />
   )
 }

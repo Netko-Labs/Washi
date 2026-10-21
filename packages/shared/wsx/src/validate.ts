@@ -49,9 +49,10 @@ function propIssue(
       .join('; ')
   }
   const legal = legalValues(issue)
-  if (legal)
-    return `prop ${prop}: ${JSON.stringify(valueAt(props, issue.path))} is not one of ${legal}`
-  return `prop ${prop || '(root)'}: ${issue.message}`
+  const value = valueAt(props, issue.path)
+  if (legal && value === undefined) return `prop ${prop} is required — one of ${legal}`
+  if (legal) return `prop ${prop}: ${JSON.stringify(value)} is not one of ${legal}`
+  return prop ? `prop ${prop}: ${issue.message}` : issue.message
 }
 
 function checkChildren(node: WsxElement, spec: ComponentSpec, path: string, out: Diagnostic[]) {

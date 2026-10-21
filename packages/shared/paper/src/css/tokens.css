@@ -142,8 +142,6 @@
   --k-text: var(--tone-danger-text);
   --k-on: var(--tone-danger-on);
 }
-.wsx .wsx-tape:not([data-tone]),
-.wsx .wsx-stamp:not([data-tone]),
 .wsx .wsx-chip:not([data-tone]),
 .wsx .wsx-quote:not([data-tone]),
 .wsx .wsx-progress:not([data-tone]),

@@ -32,7 +32,7 @@ Progress(value|expr) Badge Avatar Schema(table) · Data in: Field(field kind tab
 groupBy groups rank kicker badge meta avatar onAdd onOpen) Button(action) Compose(action label —
 $value and $now supplied) Task(row) Switch(state) Slider(state) · Flow: Show(expr) Tabs(labels
 state)/Tab Reveal(label) Drawer(state bind title — opens when the key is truthy; with bind the key is
-a row id and children get $row) · Kit: Tape Stamp Chip Mascot(mood) · Missing(kind reason) for anything the registry
+a row id and children get $row) · Kit: Chip Mascot(mood) · Missing(kind reason) for anything the registry
 lacks — it renders as a labelled placeholder and files a request; never fake a capability.
 
 State: <Sheet state={{ local: { tab: 'a' }, stored: { mine: false } }}>. Controls write keys;

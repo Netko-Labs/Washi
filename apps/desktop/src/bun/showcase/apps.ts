@@ -112,7 +112,7 @@ export const SPLIT = `<Sheet title="Hakone trip" icon="money" theme="kraft" tags
 const SET_ROW = `<Row align="center"><Task>Set $row.set_no</Task><Field field="weight" kind="number" label="kg" table="sets" size="sm" /><Field field="reps" kind="number" label="reps" table="sets" size="sm" /><Text size="sm" emphasis="quiet">$row.volume kg</Text></Row>`
 
 export const WORKOUT = `<Sheet title="Session 34 · Pull" icon="target" theme="aizome" feel="board" tags={['workout']} state={{ local: { rest: 120 } }} wsx="1">
-  <Row align="center"><Tape>session 34</Tape><Text emphasis="quiet" size="sm">Thursday, heavy</Text></Row>
+  <Row align="center"><Chip>session 34</Chip><Text emphasis="quiet" size="sm">Thursday, heavy</Text></Row>
   <Row>
     <Stat label="kg volume" expr="sum(sets.volume where done = true)" hint="done sets" />
     <Stat label="sets" expr="count(sets where done = true)" hint="of 8" />

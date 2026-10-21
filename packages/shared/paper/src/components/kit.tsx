@@ -11,18 +11,6 @@ const MASCOT_FACES: Record<string, string> = {
 }
 const MASCOT_SIZES: Record<Size, number> = { sm: 40, md: 72, lg: 120 }
 
-export function Tape({ children, ...rest }: BlockProps) {
-  return <span {...styled(rest, 'wsx-tape')}>{children}</span>
-}
-
-export function Stamp({ label, ...rest }: BlockProps & { label: string }) {
-  return (
-    <span {...styled(rest, 'wsx-stamp')} role="img" aria-label={label}>
-      {label}
-    </span>
-  )
-}
-
 export function Chip({ children, ...rest }: BlockProps) {
   return <span {...styled(rest, 'wsx-chip')}>{children}</span>
 }

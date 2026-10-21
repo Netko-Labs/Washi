@@ -346,8 +346,6 @@ const flow: Record<string, ComponentSpec> = {
 }
 
 const kit: Record<string, ComponentSpec> = {
-  Tape: p({}, 'text'),
-  Stamp: p({ label: z.string().min(1).max(8) }, 'none'),
   Chip: p({}, 'text'),
   Mascot: p(
     {

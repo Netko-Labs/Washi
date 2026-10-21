@@ -825,7 +825,15 @@ source/scratch · matrix. Host in memory.
       synthetic history, hanko verbs land in memory, toggles, people
 - [x] 5 · UI: topbar (theme · mode · feel · accent · width · view), rail with search, knobs with
       reset, source with copy + scratch, diagnostics strip; `#Name` deep links
-- [ ] 6 · refine primitives from what the book shows (next: list findings per primitive)
+- [x] 6 · first refine pass (branch `refactor/drop-tape-stamp`): Tape + Stamp dropped (kit = Chip ·
+      Mascot · Missing) · Callout: icon on the text line when untitled, variant honoured
+      (plain · outline · raised) · line/area chart: headroom so the peak label is not clipped ·
+      Roadmap: a single day is a dot, every other tick under 560px · validate: "is required — one
+      of …" for a missing enum, no "(root)" · book: pick leaves scratch, invalid JSON knob shows
+      red, paper sizes to content
+- [ ] 7 · later: Board/Table/Tabs scroll sideways under 400 with no affordance (fade or arrows) ·
+      info Callout tint reads grey next to the other tones · Chart with no bind renders
+      "Loading…" (only reachable on an invalid page) · React Flow attribution badge on Canvas
 
 Acceptance: pick any primitive, turn every knob, the WSX below is what a page would carry and it
 validates; matrix shows variant × tone with no budget error; dark + every theme render.

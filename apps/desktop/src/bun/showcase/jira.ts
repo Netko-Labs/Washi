@@ -13,7 +13,7 @@ const ISSUE_FIELDS = `<Grid gap="tight">
 
 export const JIRA = `<Sheet title="WSX · Sprint 12" icon="kanban" feel="board" tags={['jira', 'sprint']} visibility="shared" state={{ local: { view: 'Board', issue: null, schema: null } }} wsx="1">
   <Row align="center">
-    <Tape>sprint 12</Tape>
+    <Chip>sprint 12</Chip>
     <Text emphasis="quiet" size="sm" class="grow">WSX project · 8–19 Sep 2026 · goal: land the query scope</Text>
     <Avatar label="Mira Kaneko" size="sm" tone="info" /><Avatar label="Peje" size="sm" tone="accent" /><Avatar label="Awa" size="sm" tone="success" />
     <Button variant="outline" tone="neutral" size="sm" action={{ verb: 'state.set', key: 'schema', value: true }}>Fields</Button>

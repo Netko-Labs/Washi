@@ -5,6 +5,13 @@
   border-radius: var(--r-input);
   background: var(--card);
   overflow: hidden;
+  container-type: inline-size;
+}
+/* Weekly ticks collide under a narrow measure: show every other one. */
+@container (max-width: 560px) {
+  .wsx-roadmap-tick:nth-child(even) {
+    display: none;
+  }
 }
 .wsx-roadmap-row {
   display: grid;
@@ -77,6 +84,19 @@
   cursor: grab;
   touch-action: none;
   user-select: none;
+}
+.wsx-roadmap-bar[data-single] {
+  top: 50%;
+  bottom: auto;
+  width: 14px;
+  height: 14px;
+  min-width: 14px;
+  padding: 0;
+  margin: -7px 0 0 -7px;
+  border-radius: 999px;
+  background: var(--accent);
+  border-color: transparent;
+  color: transparent;
 }
 .wsx-roadmap-bar[data-dragging] {
   cursor: grabbing;

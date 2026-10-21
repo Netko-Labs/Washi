@@ -27,7 +27,7 @@ export function Stage() {
     <main className="grid min-h-0 grid-rows-[minmax(0,1fr)_auto] bg-background">
       <div className="min-h-0 overflow-auto p-6">
         <div
-          className="mx-auto min-h-full rounded-[19px] shadow-[0_1px_0_rgb(0_0_0/0.04),0_12px_40px_rgb(34_31_26/0.08)] transition-[max-width]"
+          className="mx-auto rounded-[19px] shadow-[0_1px_0_rgb(0_0_0/0.04),0_12px_40px_rgb(34_31_26/0.08)] transition-[max-width]"
           style={{ maxWidth: WIDTH_PX[book.width] ?? '100%' }}
         >
           {page.root ? (
