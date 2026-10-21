@@ -159,6 +159,25 @@
 .app .rail .sp { flex: 1; }
 .app .rail .m .sdot { position: absolute; right: 2px; bottom: 2px; box-sizing: content-box; border: 2px solid #e3ddd1; }
 .app .rail .av { width: 26px; height: 26px; font-size: 10px; }
+/* Sidebar D · Ask first (Notion's 2026 sidebar, read for Washi) */
+.app .side.sb.sbD .top { display: flex; align-items: center; height: 30px; padding: 0 2px; margin-bottom: 4px; }
+.app .side.sb.sbD .top .sp { flex: 1; }
+.app .side.sb.sbD .top .ib { position: relative; }
+.app .side.sb.sbD .top .ib .badge { position: absolute; top: -3px; right: -3px; margin: 0; min-width: 14px; height: 14px; font-size: 9px; line-height: 14px; }
+.app .side.sb.sbD .sa { display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 8px 0 10px; margin-bottom: 8px; border-radius: 9px; border: 1px solid var(--s-border); background: var(--s-card); font-size: 12.5px; color: var(--s-mfg); }
+.app .side.sb.sbD .sa .k { margin-left: auto; font: 600 10px / 1 var(--s-mono); padding: 2px 5px; border-radius: 4px; background: var(--s-accent); color: var(--s-mfg); }
+.app .side.sb.sbD .hrow { display: flex; align-items: center; gap: 4px; margin-bottom: 2px; }
+.app .side.sb.sbD .hrow .it { flex: 1; height: 30px; margin: 0; }
+.app .side.sb.sbD .hrow .it.on { background: var(--s-accent); }
+.app .side.sb.sbD .hrow .ib { width: 30px; height: 30px; }
+.app .side.sb.sbD .ask { height: 34px; margin: 2px 0; }
+.app .side.sb.sbD .lbl2 { padding: 12px 8px 4px; font: 500 11px / 1 var(--s-sans); color: var(--s-mfg); opacity: 0.85; }
+.app .side.sb.sbD .act { display: flex; align-items: center; gap: 8px; height: 28px; padding: 0 8px; border-radius: 7px; color: var(--s-mfg); font-size: 13px; }
+.app .side.sb.sbD .act .g { opacity: 0.7; }
+.app .side.sb.sbD .wsb { display: flex; align-items: center; gap: 8px; height: 38px; padding: 0 6px; margin-top: auto; border-top: 1px solid var(--s-border); font-weight: 600; font-size: 13px; }
+.app .side.sb.sbD .wsb .car { color: var(--s-mfg); font-size: 11px; margin-left: -2px; }
+.app .side.sb.sbD .wsb .sp { flex: 1; }
+.app .side.sb.sbD .wsb .av { width: 22px; height: 22px; font-size: 9.5px; }
 .app .side.sb.panel { width: 212px; }
 .app .side.sb.panel .ph { display: flex; align-items: center; height: 36px; padding: 0 6px; font-weight: 600; font-size: 13.5px; margin-bottom: 4px; }
 .app .states { display: flex; height: 100%; }
@@ -944,7 +963,7 @@
 </section>
 
 
-<section class="cv-group" data-name="Sidebar · proposed" data-note="three directions · A is the call · Latin only, no kanji anywhere">
+<section class="cv-group" data-name="Sidebar · proposed" data-note="four directions · A was the call, D is Notion's 2026 shape read for Washi · Latin only">
 
   <article class="frame" data-name="Sidebar A · Quiet · proposed" data-w="1280" data-h="800">
     <div class="app">
@@ -1179,7 +1198,57 @@
     <div class="fnote">The same sidebar four ways. Groups remember their open state per workspace, beside the tab strip in <code>localStorage</code>. The Washi row tints its border: amber while a turn runs, the primary orange when something waits on a person, plain when asleep — and asleep says why in two words, because that row is the shortest path to the fix. Dark wears the same shapes.</div>
   </article>
 
+  <article class="frame" data-name="Sidebar D · Ask first · proposed" data-w="1280" data-h="800">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / netko-labs / p / wiki</span></div>
+      <div class="shell">
+        <aside class="side sb sbD">
+          <div class="top"><span class="ib">⊟</span><span class="sp"></span><span class="ib">◫<span class="badge">3</span></span><span class="ib">✎</span></div>
+          <div class="sa"><span class="g">⌕</span>Search or ask<span class="k">⌘K</span></div>
+          <div class="hrow"><div class="it on"><span class="g">⌂</span>Home</div><span class="ib" title="Routines">◷</span><span class="ib" title="Team">⚇</span></div>
+          <div class="ask"><i data-mascot="happy" data-size="22"></i><b>Washi</b><span class="st">Idle</span><span class="k">⌘J</span></div>
+          <div class="it"><span class="g">≡</span>Threads</div>
+          <div class="lbl2">Favorites</div>
+          <div class="it"><span class="g">▥</span>Roadmap</div>
+          <div class="it"><span class="g">☷</span>Weekly review</div>
+          <div class="lbl2">Pages</div>
+          <div class="it"><span class="tw">›</span><span class="g">▤</span>Backlog</div>
+          <div class="it on"><span class="tw">⌄</span><span class="g">▯</span>Wiki</div>
+          <div class="it ind"><span class="g">◎</span>How we work</div>
+          <div class="it ind"><span class="g">◎</span>Release checklist</div>
+          <div class="it"><span class="tw">›</span><span class="g">❧</span>Ideas</div>
+          <div class="act"><span class="g">+</span>New page</div>
+          <div class="lbl2">Routines</div>
+          <div class="act"><span class="g">+</span>Schedule one</div>
+          <div class="it faint" style="margin-top:6px"><span class="g">⌫</span>Trash</div>
+          <div class="wsb"><span class="wsav">N</span>Netko Labs<span class="car">⌄</span><span class="sp"></span><span class="ib">?</span><span class="av" style="--c:#c25f2c">JV</span></div>
+        </aside>
+        <div class="content">
+          <div class="tabs"><span>▤ Backlog <span class="x">×</span></span><span class="on">▯ Wiki <span class="x">×</span></span><span>☷ Weekly review <span class="x">×</span></span><span class="plus">+</span></div>
+          <div class="hdr">
+            <span class="crumb">Netko Labs <span style="opacity:.5">/</span> <b>Wiki</b> · edited 2 hours ago</span>
+            <span class="btn ghost icon">☆</span>
+            <span class="sp"></span>
+            <span class="apill"><i data-mascot="happy" data-size="17"></i>Washi watching</span>
+            <span class="btn ghost icon">💬</span><span class="btn">✎ Edit</span><span class="btn">⧉ Copy link</span><span class="btn ghost icon">⋯</span>
+          </div>
+          <div class="sheet">
+            <div class="ctop"><span class="pres"><span class="av">RK</span></span><span class="wmark">✦ Washi wrote this 2 hours ago</span></div>
+            <div class="chrome quiet" style="margin-top:18px"><span>☺ Add icon</span><span>▭ Add cover</span><span>💬 Add comment</span></div>
+            <h1>Wiki</h1>
+            <p class="lead">What the team knows. Each page nests under the one above it.</p>
+            <div class="bl"><div class="h">Linked from</div><div class="pills"><span>☷ Weekly review</span><span>◎ How we work</span></div></div>
+          </div>
+        </div>
+      </div>
+      <span class="pin" style="left:238px;top:38px">1</span><span class="pin" style="left:238px;top:74px">2</span><span class="pin" style="left:238px;top:110px">3</span><span class="pin" style="left:238px;top:150px">4</span><span class="pin" style="left:238px;top:420px">5</span><span class="pin" style="left:238px;top:728px">6</span>
+    </div>
+    <div class="fnote"><b>Notion's 2026 sidebar, read for Washi.</b> Notion put the assistant first: a <q>Search or ask</q> field, <q>New chat</q> and <q>Library</q> above the pages, section labels in plain grey with a <q>+ do the thing</q> row when a section is empty, and the workspace moved to the bottom beside the person. That is Washi's thesis, so D takes the shape and keeps A's quiet. <b>1</b> The top row is three icons: collapse, Inbox with its count, compose — no workspace name up here. <b>2</b> One field, <q>Search or ask</q>: a page title finds it, a sentence asks Washi; <code>⌘K</code> opens the same palette. <b>3</b> Home as a pill with two icon neighbours, Routines and Team — the three places that are not pages. <b>4</b> The Washi row stays A's bordered door with the state in words, now above the list, and <q>Threads</q> under it is the conversation history (Notion's Library). <b>5</b> Sections are a grey label, not a chevron group; an empty one shows its action as a row (<q>+ Schedule one</q>), and Pages ends with <q>+ New page</q>. <b>6</b> The workspace is the footer: mark + name is the switcher, <q>?</q> and the person's avatar beside it; settings, theme and sign out live under the avatar. Trash is still one faint row.</div>
+  </article>
+
   <div class="sticky" style="left:5300px;top:0px"><b>references · mobbin</b><ol><li><a href="https://mobbin.com/screens/91bb1f70-f2a9-4c6b-b153-522c8b6a8d62">Linear</a> — one header row, Inbox with count, chevron groups, no footer noise</li><li><a href="https://mobbin.com/screens/e8fe60b4-6db4-4485-99b8-3395d69ea7db">Linear · workspace menu</a> — Settings, invite, switch, log out under the name</li><li><a href="https://mobbin.com/screens/a8c412e9-2b79-42db-8795-117e568e1dd5">Notion</a> — Recents · Favorites · Private · Teamspaces; Ask pill at the bottom</li><li><a href="https://mobbin.com/screens/427e3fb4-2eb1-496a-91a4-6d1e2527253a">Tana</a> — flat verbs, search at the bottom</li><li><a href="https://mobbin.com/screens/95802da6-cc05-4700-80ec-5fcf6714ecb5">Slack</a> — rail + panel</li></ol></div>
+  <div class="sticky" style="left:5300px;top:470px"><b>notion · 2026-10-21</b><ol><li>Assistant first: <q>Search or ask</q>, New chat, Library sit above the pages.</li><li>Section labels are plain grey; an empty section is a <q>+ action</q> row, never blank.</li><li>Workspace switcher at the bottom with the person; the top row is three icons.</li><li>Read for Washi as D. A vs D is Juan's call: A is quieter, D says what Washi is.</li></ol></div>
+  <div class="sticky" style="left:5560px;top:470px"><b>obsidian · 2026-10-21</b><ol><li>A 48px icon ribbon on the far edge holds the places (files, graph, canvas, calendar, terminal); the panel beside it collapses with one toggle. That is C's lineage, done right: the ribbon is per-plugin, the panel is per-place.</li><li>Tabs carry a pin; the header is the page title centred with <q>⋯</q> at the edge — no breadcrumb.</li><li>Each view brings its own toolbar on the right edge (zoom, fit, grid, undo) and an add-palette at the bottom; the shell stays the same.</li><li>For the sidebar call: D for what is in the panel, Obsidian for where tools go — on the view, never in the sidebar.</li></ol></div>
   <div class="sticky" style="left:5300px;top:260px"><b>decided</b><ol><li>A. Quiet. Steal Recents from B once the list outgrows a screen.</li><li>Settings and Trash leave the nav list.</li><li>One Washi row with the state in words; spend goes to Home.</li><li>Latin only: the W mark, the WASHI wordmark, no kanji.</li></ol></div>
 </section>
 
