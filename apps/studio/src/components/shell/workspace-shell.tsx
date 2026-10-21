@@ -1,12 +1,12 @@
 import { IconMenu2 } from '@tabler/icons-react'
-import { CommandPalette, Header, MascotDefs, Notice, TabStrip } from '@washi/ui'
+import { CommandPalette, Header, MascotDefs, Notice } from '@washi/ui'
 import { useState } from 'react'
 import { Sidebar } from '@/components/sidebar'
 import { AgentLayer } from './agent-layer'
 import { HeaderActions } from './header-actions'
 import { useTabNavigation, useWorkspaceBoot, type WorkspaceShellProps } from './lib'
 
-/** The desktop's rev-2 shell on the web: the same components, real addresses, a drawer under `md`. */
+/** The shell on the web: Sidebar D, the header, the page. No tab strip (D58) — a page is its URL. */
 export function WorkspaceShell({ workspace, children }: WorkspaceShellProps) {
   useWorkspaceBoot(workspace.id)
   useTabNavigation(workspace.id)
@@ -17,9 +17,6 @@ export function WorkspaceShell({ workspace, children }: WorkspaceShellProps) {
       <MascotDefs />
       <Sidebar workspace={workspace} open={navOpen} onClose={() => setNavOpen(false)} />
       <main className="flex min-w-0 flex-1 flex-col">
-        <div className="hidden md:block">
-          <TabStrip />
-        </div>
         <Header
           leading={
             <button

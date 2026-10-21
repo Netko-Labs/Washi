@@ -1,10 +1,13 @@
+export { useRecents } from './hooks/use-recents'
 export { useTheme } from './hooks/use-theme'
 export type {
-  NavEntry,
+  PlaceEntry,
+  RecentEntry,
+  RecentSheet,
   SidebarPageRowProps,
   SidebarProps,
   SidebarSectionProps,
   Theme,
 } from './types'
-export { openInPlace } from './utils'
-export { NAV } from './values'
+export { openInPlace, pushRecent, readRecents, relativeAge, writeRecents } from './utils'
+export { LABEL, ROW, ROW_ON } from './values'

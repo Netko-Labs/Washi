@@ -54,12 +54,16 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   boots the runtime at start (so the routine clock ticks unvisited) and drains sockets on SIGTERM.
   Pages are routes: `/sign-in?redirect=`, `/workspaces?invite=`, `/w/$workspaceId` (dashboard),
   `/p/$pageId`, `/inbox`, `/settings?tab=`, `/trash`. The workspace loader resets the shared stores (child
-  effects run before the layout's); routes mark their tab open, a tab chosen anywhere pushes its
-  URL (`useTabNavigation`), and the strip is saved per workspace in localStorage. The sidebar's
-  workspace name switches workspaces in place: the shell is keyed by workspace id and the route
-  has `gcTime: 0`, so every switch (and every return) reruns the loader and the route effects.
-  The sidebar's Pages section is the page tree (native drag and drop; `placementFor` in
-  `@washi/ui` decides where a drop lands and refuses a page into its own subtree).
+  effects run before the layout's); routes mark their view active, and a page chosen anywhere
+  pushes its URL (`useTabNavigation`). **No tab strip on the web (D58)** — the URL is the whole
+  state; `TabStrip` is the desktop's. The sidebar is **Sidebar D (D57)**: the ask field (the
+  mascot is Washi's state and opens the panel, the text opens the palette), Home with Inbox ·
+  Threads · Routines as icons, Recents (last three pages opened, per workspace in localStorage),
+  Favorites, the page tree (native drag and drop; `placementFor` in `@washi/ui` decides where a
+  drop lands and refuses a page into its own subtree), Routines, Trash, and the workspace footer:
+  the name switches workspaces in place (the shell is keyed by workspace id and the route has
+  `gcTime: 0`, so every switch reruns the loader and the route effects), the avatar holds theme ·
+  settings · sign out.
 - `apps/desktop` — mirin shell: window, menu, icon, Develop menu. `src/bun/` (main) boots the
   embedded runtime and serves `appRouter` via `createMirinBridge`; the renderer's `api` is a tRPC
   client over `mirinLink`. No port, no token.

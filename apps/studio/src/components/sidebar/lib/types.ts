@@ -5,10 +5,20 @@ import type { WorkspaceSummary } from '@/lib/types'
 
 export type Theme = 'light' | 'dark'
 
-export interface NavEntry {
+export interface PlaceEntry {
   tab: TabKey
   label: string
   icon: Icon
+}
+
+export interface RecentEntry {
+  id: string
+  at: number
+}
+
+export interface RecentSheet {
+  sheet: SheetSummary
+  age: string
 }
 
 export interface SidebarProps {
