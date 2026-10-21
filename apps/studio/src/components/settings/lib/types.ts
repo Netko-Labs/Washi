@@ -8,6 +8,18 @@ export interface KeyState {
   updatedAt: string
 }
 
+export interface SearchKeyState {
+  last4: string
+  updatedAt: string
+}
+
+export interface SearchKeyFormProps {
+  hasKey: boolean
+  onSave: (key: string) => Promise<boolean>
+}
+
+export type ApprovalMode = 'ask' | 'auto'
+
 export interface SpendState {
   day: string
   costUsd: number

@@ -48,6 +48,10 @@ export interface AgentCredentialInput {
   model?: string | null
 }
 
+/** Services Washi reaches out to with a key of its own. Exa searches the web. */
+export const INTEGRATIONS = ['exa'] as const
+export type Integration = (typeof INTEGRATIONS)[number]
+
 export interface SecretStore {
   info(
     workspaceId: string,
@@ -56,6 +60,16 @@ export interface SecretStore {
     workspaceId: string,
     actorId: string,
     credential: AgentCredentialInput,
+  ): Promise<{ last4: string }>
+  integrationInfo(
+    workspaceId: string,
+    integration: Integration,
+  ): Promise<{ last4: string; updatedAt: Date } | null>
+  setIntegration(
+    workspaceId: string,
+    actorId: string,
+    integration: Integration,
+    key: string,
   ): Promise<{ last4: string }>
 }
 
@@ -183,3 +197,20 @@ export const workspaceProcedure = t.procedure
     }
     return result
   })
+
+/** Roles that may change what the workspace lets its agent do. Embedded's one person is the owner. */
+const STEWARD_ROLES: ReadonlySet<string> = new Set(['owner', 'admin'])
+
+/**
+ * A member runs the workspace; an owner or admin shapes it. Settings that
+ * widen what Washi may do unasked — the approval mode, the keys it reaches
+ * out with — are theirs alone, so one member cannot lower the whole team's guard.
+ */
+export const ownerProcedure = workspaceProcedure.use(async ({ ctx, next }) => {
+  const workspaces = await ctx.runtime.control.listWorkspaces(ctx.actorId)
+  const role = workspaces.find((entry) => entry.id === ctx.workspaceId)?.role
+  if (!role || !STEWARD_ROLES.has(role)) {
+    throw new TRPCError({ code: 'FORBIDDEN', message: 'only a workspace owner can change this' })
+  }
+  return next()
+})

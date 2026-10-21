@@ -21,11 +21,13 @@ import type {
   AgentHostEvents,
   AgentKeySource,
   AgentSpendReport,
+  ApprovalMode,
   BreakerState,
   Caller,
   InferencePreference,
   InferenceStatus,
   LocalModel,
+  SearchKeyLookup,
   TodayReport,
 } from './lib'
 import { SYSTEM_INSTRUCTIONS } from './lib'
@@ -37,6 +39,7 @@ import { recentTurns } from './today'
 export class AgentHost {
   private events: AgentHostEvents | null = null
   private people: (() => Promise<Member[]>) | null = null
+  private search: SearchKeyLookup | null = null
   /** One per running turn, keyed by session — Stop aborts exactly that turn. */
   private readonly turns = new Map<string, AbortController>()
 
@@ -69,6 +72,7 @@ export class AgentHost {
     const runHankoAction = (action: unknown) => this.desk.execute(action)
     const openSheet = (id: string) => this.events?.openSheet(id)
     const listPeople = () => this.people?.() ?? Promise.resolve([])
+    const searchKey = () => this.search?.() ?? Promise.resolve(null)
     const models = catalogue ?? createModelCatalogue()
     this.claudePort = createClaudeSdkPort({
       ws,
@@ -77,6 +81,7 @@ export class AgentHost {
       runHankoAction,
       openSheet,
       listPeople,
+      searchKey,
       canUseTool: (sessionId, name, input) => this.approvals.gateSdkTool(sessionId, name, input),
     })
     this.aiSdkPort = createAiSdkPort({
@@ -85,6 +90,7 @@ export class AgentHost {
       runHankoAction,
       openSheet,
       listPeople,
+      searchKey,
       gate: this.approvals,
       catalogue: models,
     })
@@ -109,6 +115,14 @@ export class AgentHost {
           ? 'idle'
           : 'paused'
     return { state, ...this.spend() }
+  }
+
+  approvalMode(): ApprovalMode {
+    return this.approvals.mode()
+  }
+
+  setApprovalMode(mode: ApprovalMode): ApprovalMode {
+    return this.approvals.setMode(mode)
   }
 
   setDailyCap(capUsd: number): AgentSpendReport {
@@ -153,6 +167,10 @@ export class AgentHost {
   /** The runtime knows the members; the host only asks when Washi needs a name. */
   setPeople(people: () => Promise<Member[]>): void {
     this.people = people
+  }
+
+  setSearchKey(lookup: SearchKeyLookup): void {
+    this.search = lookup
   }
 
   pendingApprovals(): ApprovalRequest[] {

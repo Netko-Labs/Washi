@@ -1,6 +1,12 @@
 import { RowButton, SegmentedControl, SettingsCard, SettingsRow, usd } from '@washi/ui'
 import { DailyStopInput } from './DailyStopInput'
-import { type InferenceWire, LOCAL_MODEL_LABELS, PREFERENCE_LABELS, useAgentRuntime } from './lib'
+import {
+  APPROVAL_MODE_LABELS,
+  type InferenceWire,
+  LOCAL_MODEL_LABELS,
+  PREFERENCE_LABELS,
+  useAgentRuntime,
+} from './lib'
 import { RoutinesCard } from './RoutinesCard'
 
 function cliLine(cli: InferenceWire['localCli']): string {
@@ -27,7 +33,9 @@ function InUse({ on }: { on: boolean }) {
  * beats a key that bills per token.
  */
 export function SettingsAgentsTab() {
-  const { inference, spend, error, prefer, pickLocalModel, setDailyCap, resume } = useAgentRuntime()
+  const runtime = useAgentRuntime()
+  const { inference, spend, approvalMode, error, prefer, pickLocalModel, setDailyCap, resume } =
+    runtime
   if (!inference || !spend) {
     return <p className="text-muted-foreground">{error ?? 'Checking this computer…'}</p>
   }
@@ -111,6 +119,26 @@ export function SettingsAgentsTab() {
             <RowButton onClick={() => void resume()}>Resume</RowButton>
           </SettingsRow>
         )}
+      </SettingsCard>
+
+      <SettingsCard>
+        <SettingsRow
+          title="Approvals"
+          sub="Ask: fetches, searches and actions wait for you. Auto: a standing yes, still in the ledger."
+          wrap
+          last
+        >
+          <SegmentedControl
+            options={APPROVAL_MODE_LABELS.map((entry) => entry.label)}
+            active={
+              APPROVAL_MODE_LABELS.find((entry) => entry.value === approvalMode)?.label ?? 'Ask'
+            }
+            onSelect={(label) => {
+              const choice = APPROVAL_MODE_LABELS.find((entry) => entry.label === label)
+              if (choice) void runtime.pickApprovalMode(choice.value)
+            }}
+          />
+        </SettingsRow>
       </SettingsCard>
 
       <RoutinesCard />

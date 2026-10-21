@@ -14,6 +14,7 @@ import {
   IconTool,
   IconUsers,
   IconWorld,
+  IconWorldSearch,
 } from '@tabler/icons-react'
 import type { TitleOf, ToolDescription } from './types'
 
@@ -114,6 +115,14 @@ export function describeTool(name: string, input: unknown, titleOf: TitleOf): To
         action: 'Visit',
         subject: hostOf(text(args.url)),
         details: text(args.url) ? [String(args.url)] : [],
+        outbound: true,
+      })
+    case 'web_search':
+      return base({
+        icon: IconWorldSearch,
+        action: 'Search the web for',
+        subject: text(args.query) ? `“${String(args.query)}”` : null,
+        details: ['Through Exa'],
         outbound: true,
       })
     case 'action_run': {

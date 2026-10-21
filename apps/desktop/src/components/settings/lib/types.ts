@@ -12,3 +12,5 @@ export interface RoutineDraft {
   /** HH:MM on this computer's clock. */
   time: string
 }
+
+export type ApprovalMode = 'ask' | 'auto'

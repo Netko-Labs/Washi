@@ -39,6 +39,7 @@ export function createRuntime(options: RuntimeOptions): Runtime {
       openSheet: (id) => events.emit('openSheetRequested', { workspaceId, id }),
     })
     host.setPeople(() => options.control.listMembers(workspaceId))
+    host.setSearchKey(() => options.searchKey?.(workspaceId) ?? Promise.resolve(null))
     return { workspace, host }
   }
 

@@ -14,6 +14,8 @@ export {
   type AgentHostEvents,
   type AgentKeySource,
   type AgentSpendReport,
+  APPROVAL_MODES,
+  type ApprovalMode,
   agentEnv,
   type BreakerState,
   type Caller,

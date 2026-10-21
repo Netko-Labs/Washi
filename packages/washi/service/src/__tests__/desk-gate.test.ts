@@ -26,9 +26,38 @@ describe('changes land; only what leaves the server asks', () => {
     expect(desk.list()).toHaveLength(0)
   })
 
-  test('a fetch or an action still asks', async () => {
+  test('a fetch, a search or an action still asks', async () => {
     expect(await within(desk.approve('s1', 'fetch_url', { url: 'https://x.dev' }))).toBe('waiting')
+    expect(await within(desk.approve('s1', 'web_search', { query: 'loro' }))).toBe('waiting')
     expect(await within(desk.approve('s1', 'action_run', { action: {} }))).toBe('waiting')
-    expect(desk.list()).toHaveLength(2)
+    expect(desk.list()).toHaveLength(3)
+  })
+
+  test('a host nobody can allow is refused, not asked', async () => {
+    expect(await within(desk.approve('s1', 'fetch_url', { url: 'http://x.dev' }))).toBe(false)
+    expect(desk.list()).toHaveLength(0)
+  })
+
+  test('auto mode is a standing yes for what leaves — refusals still refuse', async () => {
+    expect(desk.mode()).toBe('ask')
+    expect(desk.setMode('auto')).toBe('auto')
+    expect(await within(desk.approve('s1', 'fetch_url', { url: 'https://x.dev' }))).toBe(true)
+    expect(await within(desk.approve('s1', 'web_search', { query: 'loro' }))).toBe(true)
+    expect(await within(desk.approve('s1', 'action_run', { action: {} }))).toBe(true)
+    expect(await within(desk.approve('s1', 'fetch_url', { url: 'http://x.dev' }))).toBe(false)
+    expect(desk.list()).toHaveLength(0)
+    desk.setMode('ask')
+    expect(await within(desk.approve('s1', 'fetch_url', { url: 'https://x.dev' }))).toBe('waiting')
+  })
+
+  test('"always" on a search lists the Exa host, so the next one passes in any session', async () => {
+    const first = desk.approve('s1', 'web_search', { query: 'loro' })
+    await within(first)
+    const [request] = desk.list()
+    if (!request) throw new Error('nothing pending')
+    desk.resolve(request.id, 'allow_always')
+    expect(await first).toBe(true)
+    expect(await within(desk.approve('s2', 'web_search', { query: 'yjs' }))).toBe(true)
+    expect(await within(desk.approve('s2', 'fetch_url', { url: 'https://x.dev' }))).toBe('waiting')
   })
 })

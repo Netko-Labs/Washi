@@ -1,3 +1,10 @@
+export {
+  EXA_SEARCH_URL,
+  type ExaResult,
+  type ExaSearchInput,
+  exaResultSchema,
+  exaSearch,
+} from './exa'
 export { guardedFetch, TsuruError } from './fetch'
 export {
   checkUrl,

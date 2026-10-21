@@ -11,6 +11,8 @@ export interface RuntimeOptions {
   dataDir: string
   /** Hosted only: the organization's decrypted key, for the agent and nothing else. */
   storedAgentKey?: (workspaceId: string) => Promise<StoredKey | null>
+  /** The Exa key a workspace searches the web with. Hosted stores one; embedded reads the env. */
+  searchKey?: (workspaceId: string) => Promise<string | null>
 }
 
 export interface HostedSecrets {

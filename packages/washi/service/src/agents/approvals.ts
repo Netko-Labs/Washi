@@ -1,9 +1,19 @@
 import type { ApprovalDecision, ApprovalRequest } from '@washi/domain'
-import { createApproval, resolveApproval, type Workspace } from '@washi/repository'
-import { checkUrl } from '@washi/tsuru'
+import {
+  createApproval,
+  getAppMeta,
+  recordCapability,
+  resolveApproval,
+  setAppMeta,
+  type Workspace,
+} from '@washi/repository'
+import { checkUrl, EXA_SEARCH_URL, type PolicyVerdict } from '@washi/tsuru'
 import type { CapabilityDesk } from './desk'
 import {
+  APPROVAL_MODE_KEY,
+  APPROVAL_MODES,
   APPROVAL_TIMEOUT_MS,
+  type ApprovalMode,
   CHANGE_TOOLS,
   type EventsRef,
   READ_TOOLS,
@@ -12,6 +22,13 @@ import {
 import { shortToolName } from './normalize'
 import type { ToolGate, ToolVerdict } from './ports'
 import { currentFetchPolicy } from './tools'
+
+/** A search always goes to the one Exa host; "always" on it lists that host, like any fetch. */
+function outboundUrl(toolName: string, input: unknown): string | null {
+  if (toolName === 'web_search') return EXA_SEARCH_URL
+  const url = (input as { url?: unknown } | null)?.url
+  return toolName === 'fetch_url' && typeof url === 'string' ? url : null
+}
 
 /**
  * Where an agent's writes wait for a person. Both ports reach it: the Claude
@@ -44,6 +61,16 @@ export class ApprovalDesk implements ToolGate {
     return READ_TOOLS.has(toolName)
   }
 
+  mode(): ApprovalMode {
+    const stored = getAppMeta(this.ws, APPROVAL_MODE_KEY)
+    return APPROVAL_MODES.find((mode) => mode === stored) ?? 'ask'
+  }
+
+  setMode(mode: ApprovalMode): ApprovalMode {
+    setAppMeta(this.ws, APPROVAL_MODE_KEY, mode)
+    return this.mode()
+  }
+
   hasPending(): boolean {
     return this.pending.size > 0
   }
@@ -70,6 +97,13 @@ export class ApprovalDesk implements ToolGate {
 
   async approve(sessionId: string, toolName: string, input: unknown): Promise<boolean> {
     if (CHANGE_TOOLS.has(toolName)) return true
+    const verdict = this.policyVerdict(toolName, input)
+    if (verdict?.ok) return true
+    if (verdict && !verdict.needsApproval) return false
+    if (this.mode() === 'auto') {
+      recordCapability(this.ws, { origin: 'agent', subject: toolName, input, decision: 'auto' })
+      return true
+    }
     if (this.alwaysAllowed.get(sessionId)?.has(toolName)) return true
     const decision = await this.request(sessionId, toolName, input)
     if (decision === 'allow_always') this.remember(sessionId, toolName, input)
@@ -88,10 +122,9 @@ export class ApprovalDesk implements ToolGate {
     const name = shortToolName(fullName)
     if (this.isRead(name)) return { behavior: 'allow', updatedInput: input }
 
-    if (name === 'fetch_url' && typeof input.url === 'string') {
-      const verdict = checkUrl(input.url, currentFetchPolicy(this.ws))
-      if (verdict.ok) return { behavior: 'allow', updatedInput: input }
-      if (!verdict.needsApproval) return { behavior: 'deny', message: verdict.reason }
+    const verdict = this.policyVerdict(name, input)
+    if (verdict && !verdict.ok && !verdict.needsApproval) {
+      return { behavior: 'deny', message: verdict.reason }
     }
 
     return (await this.approve(sessionId, name, input))
@@ -99,9 +132,15 @@ export class ApprovalDesk implements ToolGate {
       : { behavior: 'deny', message: 'the user declined this action' }
   }
 
+  /** What leaves the server, judged by the fetch policy: a listed host passes, an unknown one asks. */
+  private policyVerdict(toolName: string, input: unknown): PolicyVerdict | null {
+    const url = outboundUrl(toolName, input)
+    return url ? checkUrl(url, currentFetchPolicy(this.ws)) : null
+  }
+
   private remember(sessionId: string, toolName: string, input: unknown) {
-    const url = (input as { url?: unknown } | null)?.url
-    if (toolName === 'fetch_url' && typeof url === 'string') {
+    const url = outboundUrl(toolName, input)
+    if (url) {
       this.desk.allowFetchHost(url)
       return
     }

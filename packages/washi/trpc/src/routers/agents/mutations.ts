@@ -1,8 +1,8 @@
 import { TRPCError } from '@trpc/server'
 import { createSession } from '@washi/repository'
-import { INFERENCE_PREFERENCES, LOCAL_MODELS } from '@washi/service'
+import { APPROVAL_MODES, INFERENCE_PREFERENCES, LOCAL_MODELS } from '@washi/service'
 import { z } from 'zod'
-import { router, workspaceProcedure } from '../../init'
+import { ownerProcedure, router, workspaceProcedure } from '../../init'
 
 const decisionSchema = z.enum(['allow_once', 'allow_always', 'reject_once'])
 
@@ -35,6 +35,10 @@ export const agentMutations = router({
     ctx.host.resume()
     return ctx.host.spend()
   }),
+  /** Auto is a standing yes for fetches, searches and actions — the ledger still records each. */
+  setApprovalMode: ownerProcedure
+    .input(z.object({ mode: z.enum(APPROVAL_MODES) }))
+    .mutation(({ ctx, input }) => ({ mode: ctx.host.setApprovalMode(input.mode) })),
   /** The daily stop. A person sets it; the breaker reads it before every turn. */
   setDailyCap: workspaceProcedure
     .input(z.object({ capUsd: z.number().positive().max(10_000) }))

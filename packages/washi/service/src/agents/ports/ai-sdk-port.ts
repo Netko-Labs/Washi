@@ -4,6 +4,7 @@ import type { AgentUpdate, Member } from '@washi/domain'
 import { type ModelCatalogue, priceTurn } from '@washi/models'
 import type { Workspace } from '@washi/repository'
 import { type LanguageModel, stepCountIs, ToolLoopAgent } from 'ai'
+import type { SearchKeyLookup } from '../lib'
 import { createAiTools, isReadTool } from './ai-sdk-tools'
 import { MAX_STEPS } from './constants'
 import { defaultModelFor } from './defaults'
@@ -15,6 +16,7 @@ export interface AiSdkPortDeps {
   runHankoAction: (input: unknown) => Promise<void>
   openSheet?: (id: string) => void
   listPeople?: () => Promise<Member[]>
+  searchKey?: SearchKeyLookup
   instructions: string
   /** Prices the turn, so the daily breaker works on a provider that bills tokens. */
   catalogue: ModelCatalogue
@@ -36,6 +38,7 @@ export function createAiSdkPort({
   runHankoAction,
   openSheet,
   listPeople,
+  searchKey,
   instructions,
   catalogue,
 }: AiSdkPortDeps): AgentPort {
@@ -47,7 +50,7 @@ export function createAiSdkPort({
       if (credential.kind !== 'api_key') {
         throw new Error('the AI SDK port runs on an API key, never a local CLI login')
       }
-      const tools = createAiTools({ ws, runHankoAction, openSheet, listPeople })
+      const tools = createAiTools({ ws, runHankoAction, openSheet, listPeople, searchKey })
       const model =
         request.model.model ?? (await defaultModelFor(catalogue, request.model.provider))
 

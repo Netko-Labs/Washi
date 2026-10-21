@@ -3,6 +3,7 @@ import { query } from '@anthropic-ai/claude-agent-sdk'
 import type { AgentUpdate, Member, TurnBilling } from '@washi/domain'
 import { type ModelCatalogue, priceTurn } from '@washi/models'
 import type { Workspace } from '@washi/repository'
+import type { SearchKeyLookup } from '../lib'
 import { agentEnv, MAX_PLAN_TURN_BUDGET_USD, MAX_TURN_BUDGET_USD, sessionConfigDir } from '../lib'
 import { normalizeMessage } from '../normalize'
 import { createWashiTools } from '../tools'
@@ -23,6 +24,7 @@ export interface ClaudeSdkPortDeps {
   runHankoAction: (input: unknown) => Promise<void>
   openSheet?: (id: string) => void
   listPeople?: () => Promise<Member[]>
+  searchKey?: SearchKeyLookup
   canUseTool: (
     sessionId: string,
     toolName: string,
@@ -83,6 +85,7 @@ export function createClaudeSdkPort(deps: ClaudeSdkPortDeps): AgentPort {
                 runHankoAction: deps.runHankoAction,
                 openSheet: deps.openSheet,
                 listPeople: deps.listPeople,
+                searchKey: deps.searchKey,
               }),
             },
             strictMcpConfig: true,

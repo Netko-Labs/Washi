@@ -1,4 +1,6 @@
 export {
+  APPROVAL_MODE_KEY,
+  APPROVAL_MODES,
   APPROVAL_TIMEOUT_MS,
   CHANGE_TOOLS,
   DAILY_CAP_USD_KEY,
@@ -20,6 +22,7 @@ export type {
   AgentHostEvents,
   AgentKeySource,
   AgentSpendReport,
+  ApprovalMode,
   BreakerState,
   Caller,
   EventsRef,
@@ -27,7 +30,8 @@ export type {
   InferenceStatus,
   LocalCliStatus,
   LocalModel,
+  SearchKeyLookup,
   TodayReport,
   TurnSummary,
 } from './types'
-export { SYSTEM_INSTRUCTIONS } from './values'
+export { SEARCH_NOT_SET, SYSTEM_INSTRUCTIONS } from './values'

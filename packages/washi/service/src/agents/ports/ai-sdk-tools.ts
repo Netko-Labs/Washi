@@ -15,6 +15,8 @@ import { z } from 'zod'
 import { checkSource, createSheetFromSource, updateSheetFromSource } from '../../sheets/service'
 import { runHistory } from '../../tables/history'
 import { defineUserTable, runMutation, runQuery } from '../../tables/service'
+import type { SearchKeyLookup } from '../lib'
+import { webSearch } from '../search'
 import { currentFetchPolicy } from '../tools'
 
 /** Same surface the Claude port exposes — one capability set, two ports (§05). */
@@ -40,6 +42,7 @@ export interface AiToolDeps {
   openSheet?: (id: string) => void
   /** Who is on the team, for person cells — the control plane knows; the workspace file does not. */
   listPeople?: () => Promise<Member[]>
+  searchKey?: SearchKeyLookup
 }
 
 /**
@@ -47,7 +50,13 @@ export interface AiToolDeps {
  * flag is deprecated. The port passes one `toolApproval` function and decides
  * there, using `isReadTool` below, so both ports gate on the same list.
  */
-export function createAiTools({ ws, runHankoAction, openSheet, listPeople }: AiToolDeps) {
+export function createAiTools({
+  ws,
+  runHankoAction,
+  openSheet,
+  listPeople,
+  searchKey,
+}: AiToolDeps) {
   return {
     sheet_list: tool({
       description:
@@ -145,6 +154,15 @@ export function createAiTools({ ws, runHankoAction, openSheet, listPeople }: AiT
       inputSchema: z.object({ url: z.url() }),
       execute: async ({ url }) =>
         (await guardedFetch(url, currentFetchPolicy(ws))).slice(0, 100_000),
+    }),
+    web_search: tool({
+      description:
+        'Search the web through Exa: title, url, date and a short text per result. Read one in full with fetch_url.',
+      inputSchema: z.object({
+        query: z.string().min(1).max(400),
+        count: z.number().int().min(1).max(10).optional(),
+      }),
+      execute: async ({ query, count }) => webSearch(searchKey, query, count),
     }),
     action_run: tool({
       description: 'Run a stamped hanko action: sheet.open, sheet.create, table.insert, url.open.',

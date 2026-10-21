@@ -53,3 +53,10 @@ export const PROMPT_PREVIEW_CHARS = 140
 
 /** A routine runs unattended: its questions wait for the morning, not five minutes. */
 export const ROUTINE_APPROVAL_TIMEOUT_MS = 12 * 60 * 60_000
+
+/**
+ * Whether what leaves the server waits for a person. `ask` is the law (A2);
+ * `auto` is a workspace's standing yes, every call still in the ledger.
+ */
+export const APPROVAL_MODE_KEY = 'agent_approval_mode'
+export const APPROVAL_MODES = ['ask', 'auto'] as const

@@ -38,6 +38,9 @@ describe('tool calls read like a person asked', () => {
   test('what leaves the workspace says so', () => {
     const fetch = describeTool('fetch_url', { url: 'https://kyoto.travel/en' }, titles)
     expect(`${fetch.action} ${fetch.subject}`).toBe('Visit kyoto.travel')
+    const search = describeTool('web_search', { query: 'loro 1.0 release' }, titles)
+    expect(`${search.action} ${search.subject}`).toBe('Search the web for “loro 1.0 release”')
+    expect(search.outbound).toBe(true)
     expect(fetch.outbound).toBe(true)
     expect(describeTool('sheet_create', {}, titles).outbound).toBe(false)
   })

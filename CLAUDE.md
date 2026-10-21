@@ -170,10 +170,17 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
 - **Approvals.** Reads pass; page and table writes (`CHANGE_TOOLS`) land without asking, marked
   `edited_by = 'washi'`. Each Washi write pushes the page's prior state onto `sheet_revisions` —
   its undo stack, cleared the moment a person changes the page, so Undo never erases their words.
-  `fetch_url` and `action_run` always stop at the `ApprovalDesk`: nothing leaves without a person.
+  `fetch_url`, `web_search` and `action_run` always stop at the `ApprovalDesk`: nothing leaves
+  without a person. "Always" on a fetch or a search lists its host on the workspace allowlist
+  (tsuru), so a search allowed always is `api.exa.ai` on that list. A workspace may set
+  approvals to `auto` (`agents.setApprovalMode`, Settings → Agent on both hosts): a standing yes
+  for what leaves, each call ledgered as `auto`; policy refusals still refuse. Owner or admin
+  only (`ownerProcedure`), as is setting an integration key.
   The UI says every tool in words (`describeTool` in `@washi/ui`) — never a tool name or JSON.
 - Agent tools are the ONLY capability surface: ink (data), tsuru (network), hanko (actions).
-  Never hand agents fs/shell/raw SQL.
+  Never hand agents fs/shell/raw SQL. `web_search` is tsuru's `exaSearch`: hosted runs on the
+  workspace's Exa key (`organization_integration`, sealed like BYOK, `Settings → Agent → Web
+  search`); embedded reads `EXA_API_KEY`. No key → the tool answers with where one goes.
 - WSX is inert data: registry primitives, literal props, the closed `expr` grammar only. Components
   own appearance (four enums: `variant tone size emphasis`); pages own content. Validation before
   persist and before render. Format reference: `docs/wsx-primitives.html`.

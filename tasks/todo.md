@@ -784,3 +784,23 @@ Juan's call: drop the old doc set and rework it: `brand.html` `mascot.html` `prd
 - [x] 1 · brand.html · 2 · mascot.html · 3 · prd.html · 4 · wsx-primitives.html
 - [x] 5 · design/{shell,pages,data,work,agent,account,desktop}.html + design/index.html overview
 - [x] 6 · retire old docs, point CLAUDE.md + memory at the new set, PR
+
+# Exa web search (2026-10-21) — branch `feat/exa-search`
+
+Washi can search the web through Exa. Network stays tsuru's; the desk stays the only gate.
+
+- [x] 1 · tsuru `exaSearch` (POST api.exa.ai/search, x-api-key, text contents, size cap) + test
+- [x] 2 · control: `organization_integration` (org × integration, sealed like BYOK) · SecretStore
+      `integrationInfo`/`setIntegration` · trpc `workspaces.integrationKey` / `setIntegrationKey`
+- [x] 3 · runtime `searchKey` option: hosted → stored `exa`, embedded → `EXA_API_KEY`
+- [x] 4 · service: `web_search` tool on both ports (`searchKey` dep), `toolKind: search`,
+      desk: policy verdict shared by both ports, "always" = api.exa.ai on the allowlist · tests
+- [x] 5 · ui `describeTool('web_search')` + studio Settings → Agent "Web search" section
+- [x] 6 · docs: prd A2/D55, design account+agent settings frames, CLAUDE.md, .env.example
+
+- [x] 7 · approvals `auto` mode: workspace setting (`agent_approval_mode`), both settings UIs,
+      ledgered as `auto`, refusals unchanged · D56
+
+Acceptance: a turn asking "what's new in Loro 1.x" calls `web_search`, the panel asks in words
+("Search the web for …"), Allow always puts `api.exa.ai` on the allowlist and the next search
+passes; no key → the tool says where to add one.

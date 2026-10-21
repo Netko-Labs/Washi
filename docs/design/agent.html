@@ -430,7 +430,7 @@
     </div></div>
     <div class="fnote"><b>Proposed, not built.</b> An <code>ask_person</code> tool would park the turn like an approval does and render choices as chips; the kit's <code>.ask</code> already exists for it. Until then Washi guesses and writes, and Undo is the answer.</div>
   </article>
-  <div class="sticky" style="left:4440px;top:60px"><b>decided</b><ol><li>Reads pass. Page and table writes land, marked. <code>fetch_url</code> and <code>action_run</code> stop at the desk — always.</li><li>Undo belongs to the page, and a person's edit empties it. Washi never erases their words.</li><li>Stop is honoured and still charged.</li></ol></div>
+  <div class="sticky" style="left:4440px;top:60px"><b>decided</b><ol><li>Reads pass. Page and table writes land, marked. <code>fetch_url</code>, <code>web_search</code> and <code>action_run</code> stop at the desk; "always" lists the host, and a workspace in <em>auto</em> (D56) says yes standing, ledgered.</li><li>Undo belongs to the page, and a person's edit empties it. Washi never erases their words.</li><li>Stop is honoured and still charged.</li></ol></div>
 </section>
 
 <!-- ───────────────────────── 3 · THE DESK ───────────────────────── -->
@@ -689,13 +689,21 @@
             <div class="fld"><span class="l">API key</span><span class="in">sk-ant-…</span><span class="h">Encrypted on your server. You will see the last four and never the rest.</span></div>
             <div class="fld"><span class="l">Model <em>— optional; a sensible one is chosen otherwise</em></span><span class="in sans" style="color:#a39b8d">Search 48 models…</span></div>
             <span class="bigbtn dis">Replace key</span>
+            <h2 style="margin-top:28px">Approvals</h2>
+            <p class="p">Reads pass and page edits land either way. This is about what leaves the server.</p>
+            <div class="prov"><span class="on">Ask</span><span>Auto</span></div>
+            <h2 style="margin-top:28px">Web search</h2>
+            <p class="p">With an Exa key Washi can search the web. Every search still stops at the desk until someone allows it always.</p>
+            <div class="keyline">exa · ••••m4Tq</div>
+            <div class="fld"><span class="l">Exa API key</span><span class="in">exa-…</span><span class="h">Encrypted on your server, like the agent key. Keys come from exa.ai.</span></div>
+            <span class="bigbtn dis">Replace key</span>
           </div>
         </div>
       </div>
       <span class="pin" style="left:1040px;top:324px">1</span>
       <span class="pin" style="left:1040px;top:466px">2</span>
     </div>
-    <div class="fnote">Hosted settings have no credential picker: a team server runs the workspace's key and nothing else (<code>setInference</code> is embedded-only and answers 412 here). 1 — the stored key shows as provider · last four · model. 2 — the key is encrypted with a per-workspace key derived from <code>WASHI_SECRET_KEY</code>; rotate that and every stored key is unreadable. The Daily stop section (previous group) follows below the fold; the turn cap (200) has no field — it is the backstop for unpriced models.</div>
+    <div class="fnote">Hosted settings have no credential picker: a team server runs the workspace's key and nothing else (<code>setInference</code> is embedded-only and answers 412 here). 1 — the stored key shows as provider · last four · model. 2 — the key is encrypted with a per-workspace key derived from <code>WASHI_SECRET_KEY</code>; rotate that and every stored key is unreadable. Web search is the same shape one section down: an Exa key in <code>organization_integration</code>, last four back, <code>web_search</code> at the desk (D55). The Daily stop section (previous group) follows below the fold; the turn cap (200) has no field — it is the backstop for unpriced models.</div>
   </article>
 
   <article class="frame" data-name="Key form · states" data-w="1180" data-h="480">

@@ -16,6 +16,8 @@ import { z } from 'zod'
 import { checkSource, createSheetFromSource, updateSheetFromSource } from '../sheets/service'
 import { runHistory } from '../tables/history'
 import { defineUserTable, runMutation, runQuery } from '../tables/service'
+import type { SearchKeyLookup } from './lib'
+import { webSearch } from './search'
 
 export const TSURU_HOSTS_KEY = 'tsuru_allowed_hosts'
 
@@ -34,6 +36,8 @@ export interface ToolContext {
   openSheet?: (id: string) => void
   /** Who is on the team, for person cells — the control plane knows; the workspace file does not. */
   listPeople?: () => Promise<Member[]>
+  /** The workspace's Exa key, resolved per call so a key set mid-session counts. */
+  searchKey?: SearchKeyLookup
 }
 
 /**
@@ -150,6 +154,12 @@ export function createWashiTools(ws: Workspace, context: ToolContext) {
           const body = await guardedFetch(url, currentFetchPolicy(ws))
           return { content: [{ type: 'text' as const, text: body.slice(0, 100_000) }] }
         },
+      ),
+      tool(
+        'web_search',
+        'Search the web through Exa: title, url, date and a short text per result. Read one in full with fetch_url.',
+        { query: z.string().min(1).max(400), count: z.number().int().min(1).max(10).optional() },
+        async ({ query, count }) => text(await webSearch(context.searchKey, query, count)),
       ),
       tool(
         'action_run',

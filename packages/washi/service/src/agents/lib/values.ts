@@ -51,3 +51,6 @@ Budget: ~400 nodes, 8 binds, 24 expressions per sheet — over it, split into li
 Always run sheet_check before sheet_create or sheet_replace and fix every diagnostic. Structured
 data lives in typed tables via db_* tools; sheets bind to them. You have no filesystem or shell —
 the washi tools are your entire world.`
+
+export const SEARCH_NOT_SET =
+  'Web search is not set up. An owner adds an Exa key under Settings → Agent → Web search; on the desktop, set EXA_API_KEY.'
