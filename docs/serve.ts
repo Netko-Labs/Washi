@@ -41,10 +41,8 @@ Bun.serve({
       if (request.method === 'POST') {
         const note = await request.json()
         const row = { ...note, at: new Date().toISOString() }
-        await Bun.write(
-          NOTES,
-          `${(await Bun.file(NOTES).exists()) ? await Bun.file(NOTES).text() : ''}${JSON.stringify(row)}\n`,
-        )
+        await appendFile(NOTES, `${JSON.stringify(row)}
+`)
         return json(JSON.stringify(row), 201)
       }
       return new Response('method', { status: 405 })
