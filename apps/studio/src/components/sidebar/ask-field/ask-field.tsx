@@ -1,13 +1,6 @@
 import { AgentMascot, usd, useAgentStore, useSheetsStore } from '@washi/ui'
 import { STATE_LABEL } from '@/components/agent-status'
-import { type AskFieldProps, useAskMood } from './lib'
-
-const TINT = {
-  none: '',
-  busy: 'border-[#e8b36a]/70',
-  need: 'border-primary',
-  off: 'opacity-70',
-}
+import { type AskFieldProps, TINT, useAskMood } from './lib'
 
 /** The door: text finds a page or asks Washi (⌘K), the face is Washi's state, and it opens the panel (⌘J). */
 export function AskField({ onNavigate }: AskFieldProps) {
