@@ -1,13 +1,11 @@
-import { IconEdit, IconX } from '@tabler/icons-react'
-import { useAgentStore, useSheetsStore, useViewStore } from '@washi/ui'
-import { AgentStatus } from '@/components/agent-status'
+import { IconX } from '@tabler/icons-react'
+import { AskField } from './ask-field'
 import type { SidebarProps } from './lib'
-import { SidebarNav } from './sidebar-nav'
 import { SidebarPages } from './sidebar-pages'
-import { UserRow } from './user-row'
-import { WorkspaceSwitcher } from './workspace-switcher'
+import { SidebarPlaces } from './sidebar-places'
+import { WorkspaceFooter } from './workspace-footer'
 
-/** The desktop's 248px sidebar, as a drawer under `md` — same nav, same tree, web chrome. */
+/** Sidebar D (D57): the ask field, the places row, Recents · Favorites · Pages · Routines, the workspace footer. A drawer under `md`. */
 export function Sidebar({ workspace, open, onClose }: SidebarProps) {
   return (
     <>
@@ -25,20 +23,10 @@ export function Sidebar({ workspace, open, onClose }: SidebarProps) {
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="flex h-12 shrink-0 items-center gap-1 px-2">
-          <WorkspaceSwitcher workspace={workspace} onNavigate={onClose} />
-          <button
-            type="button"
-            aria-label="New page"
-            title="New page"
-            onClick={() => {
-              void useSheetsStore.getState().createSheet()
-              onClose()
-            }}
-            className="grid size-8 shrink-0 place-items-center rounded-lg text-muted-foreground hover:bg-accent"
-          >
-            <IconEdit className="size-[15px]" />
-          </button>
+        <div className="flex shrink-0 items-center gap-1 px-2 pt-2 pb-1.5">
+          <div className="min-w-0 flex-1">
+            <AskField onNavigate={onClose} />
+          </div>
           <button
             type="button"
             aria-label="Close the sidebar"
@@ -48,24 +36,11 @@ export function Sidebar({ workspace, open, onClose }: SidebarProps) {
             <IconX className="size-[15px]" />
           </button>
         </div>
-
-        <SidebarNav workspaceId={workspace.id} onNavigate={onClose} />
-
-        <SidebarPages workspaceId={workspace.id} onNavigate={onClose} />
-
-        <div className="border-border border-t px-2 py-1.5">
-          <AgentStatus
-            onOpenAgent={() => {
-              useAgentStore.getState().togglePanel()
-              onClose()
-            }}
-            onOpenSettings={() => {
-              useViewStore.getState().openTab('view:settings')
-              onClose()
-            }}
-          />
+        <div className="shrink-0 px-2 pb-1">
+          <SidebarPlaces workspaceId={workspace.id} onNavigate={onClose} />
         </div>
-        <UserRow />
+        <SidebarPages workspaceId={workspace.id} onNavigate={onClose} />
+        <WorkspaceFooter workspace={workspace} onNavigate={onClose} />
       </aside>
     </>
   )

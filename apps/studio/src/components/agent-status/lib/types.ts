@@ -10,9 +10,4 @@ export interface AgentStatusView {
   turns: number
 }
 
-export interface AgentStatusProps {
-  onOpenAgent: () => void
-  onOpenSettings: () => void
-}
-
 export type AgentActivityWire = Awaited<ReturnType<typeof api.agents.status.query>>

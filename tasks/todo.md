@@ -812,12 +812,15 @@ passes; no key → the tool says where to add one.
 - [x] 3 · Juan picked D · Ask first (2026-10-21, after Notion and Obsidian reads): every design frame
       now wears it (shell · pages · data · work · agent · account · desktop), D's CSS moved into
       the kit, PRD D57, switcher and user menu redrawn from the footer
-- [ ] 4 · implement D in the studio sidebar (next PR): ask field (palette + panel), Home row with
-      Inbox · Threads · Routines, Recents (`sheets.list` by touched), grey labels with empty-state
-      actions, workspace footer with the avatar menu; `agents.threads` query for Threads
-- [ ] 5 · studio: drop the tab strip (D58, 2026-10-21) — routes stop marking tabs open,
-      `useTabNavigation` and the per-workspace strip in localStorage go; the desktop keeps
-      `TabStrip` from `@washi/ui`. Frames and PRD already show it.
+- [x] 4 · Sidebar D in the studio (branch `feat/sidebar-d`): ask field (mascot = state + panel,
+      text = palette, spend in the tooltip), Home with Inbox · Threads · Routines, Recents (last
+      three opened, `washi:recents:<ws>`), Favorites, tree, + New page, Routines, Trash, workspace
+      footer with the avatar menu (theme · settings · sign out). Threads opens the panel, whose
+      Conversations menu is the history — no new query needed.
+- [x] 5 · no tab strip on the web (D58): `TabStrip` left the studio shell, the per-workspace strip
+      in localStorage and `savedTabs`/`saveTabs` went with it; the desktop keeps the component.
+- [ ] 6 · design review: Juan marks frames in review mode (`bun run docs`); act on
+      `tasks/design-review.jsonl` page by page
 
 # Mihon — the WSX sample book (2026-10-21) — branch `feat/mihon`
 
