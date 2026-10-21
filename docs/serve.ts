@@ -1,6 +1,7 @@
 // The docs on the LAN, plus the review loop: GET /_review lists notes, POST /_review appends one.
 // `bun run docs` — port 8765, every interface. Notes land in tasks/design-review.jsonl.
-import { resolve } from 'node:path'
+import { appendFile } from 'node:fs/promises'
+import { resolve, sep } from 'node:path'
 
 const ROOT = resolve(import.meta.dir)
 const NOTES = resolve(import.meta.dir, '../tasks/design-review.jsonl')
@@ -15,6 +16,19 @@ async function notes(): Promise<string> {
 
 function json(body: string, status = 200): Response {
   return new Response(body, { status, headers: { 'content-type': 'application/json' } })
+}
+
+/** Decode, resolve, then refuse anything that does not sit under docs/ — `..` and `%2f` alike. */
+function fileFor(pathname: string): string | null {
+  let path: string
+  try {
+    path = decodeURIComponent(pathname)
+  } catch {
+    return null
+  }
+  if (path.endsWith('/')) path += 'index.html'
+  const target = resolve(ROOT, `.${path}`)
+  return target === ROOT || target.startsWith(ROOT + sep) ? target : null
 }
 
 Bun.serve({
@@ -35,9 +49,9 @@ Bun.serve({
       }
       return new Response('method', { status: 405 })
     }
-    let path = decodeURIComponent(url.pathname)
-    if (path.endsWith('/')) path += 'index.html'
-    const file = Bun.file(resolve(ROOT, `.${path}`))
+    const target = fileFor(url.pathname)
+    if (!target) return new Response('not found', { status: 404 })
+    const file = Bun.file(target)
     if (!(await file.exists())) return new Response('not found', { status: 404 })
     return new Response(file, { headers: { 'cache-control': 'no-cache' } })
   },

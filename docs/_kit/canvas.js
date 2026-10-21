@@ -283,6 +283,21 @@ function init() {
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init)
 else init()
 
+function fallbackCopy(text, done) {
+  const ta = document.createElement('textarea')
+  ta.value = text
+  ta.style.position = 'fixed'
+  ta.style.opacity = '0'
+  document.body.appendChild(ta)
+  ta.select()
+  try {
+    document.execCommand('copy')
+    done()
+  } finally {
+    ta.remove()
+  }
+}
+
 // ── review mode: a verdict and a note per frame, kept by docs/serve.ts (falls back to localStorage) ──
 function initReview() {
   const bar = document.querySelector('.cv-bar')
@@ -423,10 +438,15 @@ function initReview() {
           .join('')}`,
       )
     }
-    navigator.clipboard.writeText(lines.join('\n')).then(() => {
+    const text = lines.join('\n')
+    const done = () => {
       copy.textContent = 'Copied'
       setTimeout(() => (copy.textContent = 'Copy notes'), 1200)
-    })
+    }
+    // Plain http on the LAN has no navigator.clipboard; a selected textarea + execCommand still copies.
+    if (navigator.clipboard)
+      navigator.clipboard.writeText(text).then(done, () => fallbackCopy(text, done))
+    else fallbackCopy(text, done)
   })
   document.addEventListener('keydown', (e) => {
     if (e.target instanceof Element && e.target.matches('input, textarea')) return
