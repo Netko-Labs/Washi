@@ -30,7 +30,7 @@ export function WorkspacePicker({ onOpen }: { onOpen: (id: string) => void }) {
     <main className="mx-auto flex min-h-dvh max-w-lg flex-col justify-center px-6 py-12">
       <div className="flex items-center gap-2.5">
         <AgentMascot state={workspaces.length ? 'idle' : 'suggesting'} size={44} />
-        <p className="font-semibold text-[15px] tracking-[0.18em] uppercase">和紙 washi</p>
+        <p className="font-semibold text-[15px] tracking-[0.18em] uppercase">washi</p>
       </div>
       <h1 className="mt-6 font-semibold text-[26px] tracking-[-0.02em]">
         {workspaces.length ? 'Your workspaces' : 'Make your first workspace'}

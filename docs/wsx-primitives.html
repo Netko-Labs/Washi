@@ -798,7 +798,7 @@
 <body>
 <div class="doc">
   <aside class="rail">
-    <a class="home" href="index.html"><i></i>和紙 <em>WASHI</em></a>
+    <a class="home" href="index.html"><i></i><em>WASHI</em></a>
     <div class="set">WSX primitives</div>
     <nav>
       <a href="#page"><span class="n">01</span>What a page is</a>
@@ -833,7 +833,7 @@
   <main class="column">
     <header class="head">
       <div class="eyebrow">Netko Labs · Washi · 04 · format</div>
-      <h1>WSX primitives<span class="dot">。</span></h1>
+      <h1>WSX primitives</h1>
       <p class="lead">The page format Washi writes and renders, and the closed registry it may use: 56 primitives in seven groups, their props from the zod specs, what each looks like, and the four small languages a page speaks — state, expr, bind and action.</p>
       <div class="facts"><span>generated against <code>@washi/paper</code> · 2026-10-21</span><span>56 primitives · 7 groups</span><span>replaces docs/wsx.md</span><span>registry is the truth: <code>packages/shared/paper/src/registry/specs.ts</code></span></div>
       <div class="tldr">
@@ -1815,8 +1815,8 @@ bun run typecheck</div></div></div><figcaption><b>Code</b> — muted background,
         <tr><td><code>label</code><span class="req">required</span></td><td>string 1–8</td><td>Also the accessible name.</td></tr>
       </tbody></table>
       <p class="pol">children <b>none</b> · inline</p>
-<pre><span class="t">&lt;Stamp</span> <span class="a">label</span>=<span class="v">"済"</span> <span class="t">/&gt;</span> <span class="t">&lt;Stamp</span> <span class="a">label</span>=<span class="v">"OK"</span> <span class="a">tone</span>=<span class="v">"success"</span> <span class="t">/&gt;</span></pre>
-      <figure class="plate"><div class="inner"><div class="app flat sk"><span class="stamp">済</span> <span class="stamp" style="border-color:#94a06b;color:#5a6638">OK</span></div></div><figcaption><b>Stamp</b> — accent, then success.</figcaption></figure>
+<pre><span class="t">&lt;Stamp</span> <span class="a">label</span>=<span class="v">"done"</span> <span class="t">/&gt;</span> <span class="t">&lt;Stamp</span> <span class="a">label</span>=<span class="v">"OK"</span> <span class="a">tone</span>=<span class="v">"success"</span> <span class="t">/&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><span class="stamp">done</span> <span class="stamp" style="border-color:#94a06b;color:#5a6638">OK</span></div></div><figcaption><b>Stamp</b> — accent, then success.</figcaption></figure>
 
       <h4 id="p-Chip">Chip</h4>
       <p>A dotted status pill: card background, dotted tone line, a tone dot before the text.</p>

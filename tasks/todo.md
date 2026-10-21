@@ -804,3 +804,9 @@ Washi can search the web through Exa. Network stays tsuru's; the desk stays the 
 Acceptance: a turn asking "what's new in Loro 1.x" calls `web_search`, the panel asks in words
 ("Search the web for …"), Allow always puts `api.exa.ai` on the allowlist and the next search
 passes; no key → the tool says where to add one.
+
+# Latin only + a better sidebar (2026-10-21) — branch `design/sidebar-latin`
+
+- [x] 1 · no CJK anywhere: docs, kit, app copy, showcases, tests (WASHI wordmark, W agent mark, "done" stamps)
+- [x] 2 · design/shell.html "Sidebar · proposed": A Quiet (the call) · B Home first · C Rail + panel · A states, mobbin refs
+- [ ] 3 · implement A in the studio sidebar once Juan picks (next PR)

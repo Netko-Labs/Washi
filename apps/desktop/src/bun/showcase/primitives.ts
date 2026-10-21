@@ -152,7 +152,7 @@ export const primitivesSheet = (
   </Section>
 
   <Section title="09 · Washi kit — Tape · Stamp · Chip · Mascot">
-    <Row align="center"><Tape>tape</Tape><Stamp label="済" /><Chip>chip</Chip><Chip tone="success">shipped</Chip><Chip tone="warning">in review</Chip><Mascot mood="wink" size="sm" /></Row>
+    <Row align="center"><Tape>tape</Tape><Stamp label="done" /><Chip>chip</Chip><Chip tone="success">shipped</Chip><Chip tone="warning">in review</Chip><Mascot mood="wink" size="sm" /></Row>
     <Text size="sm" emphasis="quiet">The only decorative primitives. They take tone from the sheet accent, so a page cannot assemble a rainbow. One mascot per page.</Text>
   </Section>
 </Sheet>

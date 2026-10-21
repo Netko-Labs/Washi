@@ -14,9 +14,9 @@ Shared pieces every doc under `docs/` loads. Nothing here is app code.
 ```html
 <link rel="stylesheet" href="_kit/doc.css" />
 <body><div class="doc">
-  <aside class="rail"> <a class="home" href="index.html"><i></i>和紙 <em>WASHI</em></a> <nav>…</nav> </aside>
+  <aside class="rail"> <a class="home" href="index.html"><i></i><em>WASHI</em></a> <nav>…</nav> </aside>
   <main class="column">
-    <header class="head"> <div class="eyebrow">…</div> <h1>…<span class="dot">。</span></h1> <p class="lead">…</p> <div class="facts">…</div>
+    <header class="head"> <div class="eyebrow">…</div> <h1>…</h1> <p class="lead">…</p> <div class="facts">…</div>
       <div class="tldr"><h2>30-second version</h2><ol><li>…</li></ol></div> </header>
     <section class="s" id="…"> <div class="num">01</div> <h2>…</h2> <p class="point">…</p> … </section>
     <footer class="foot">…</footer>
