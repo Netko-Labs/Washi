@@ -1,0 +1,396 @@
+/* Washi docs — the design canvas. A Figma-like page: pages rail, infinite world, frames with labels. */
+
+:root {
+  --cv-bg: #e8e4dc;
+  --cv-rail: #f6f3ee;
+  --cv-line: #d8d1c5;
+  --cv-fg: #221f1a;
+  --cv-muted: #6f685d;
+  --cv-accent: #c25f2c;
+  --cv-mono: "JetBrains Mono", ui-monospace, monospace;
+  --cv-sans: "Karla", system-ui, sans-serif;
+  --cv-display: "Zen Kaku Gothic New", "Karla", sans-serif;
+}
+html,
+body {
+  height: 100%;
+}
+body.cv {
+  margin: 0;
+  overflow: hidden;
+  background: var(--cv-bg);
+  color: var(--cv-fg);
+  font: 400 13px / 1.4 var(--cv-sans);
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+body.cv.grabbing,
+body.cv.grabbing * {
+  cursor: grabbing !important;
+}
+
+.cv-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 44px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  background: var(--cv-rail);
+  border-bottom: 1px solid var(--cv-line);
+}
+.cv-bar .brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: 900 13px / 1 var(--cv-display);
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  color: inherit;
+}
+.cv-bar .brand i {
+  width: 16px;
+  height: 16px;
+  border-radius: 5px;
+  background: var(--cv-accent);
+  display: inline-block;
+}
+.cv-bar .brand em {
+  font-style: normal;
+  color: var(--cv-accent);
+}
+.cv-bar .crumb {
+  color: var(--cv-muted);
+  font-size: 12.5px;
+}
+.cv-bar .crumb b {
+  color: var(--cv-fg);
+  font-weight: 600;
+}
+.cv-bar .sp {
+  flex: 1;
+}
+.cv-bar .pages {
+  display: flex;
+  gap: 2px;
+}
+.cv-bar .pages a {
+  text-decoration: none;
+  color: var(--cv-muted);
+  font-size: 12px;
+  padding: 5px 9px;
+  border-radius: 7px;
+}
+.cv-bar .pages a:hover {
+  background: #0000000a;
+  color: var(--cv-fg);
+}
+.cv-bar .pages a.on {
+  background: #0000000f;
+  color: var(--cv-fg);
+  font-weight: 600;
+}
+.cv-bar .zoom {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--cv-line);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+}
+.cv-bar .zoom button {
+  all: unset;
+  cursor: pointer;
+  width: 28px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  font: 600 13px / 1 var(--cv-mono);
+  color: var(--cv-muted);
+}
+.cv-bar .zoom button:hover {
+  background: #0000000a;
+  color: var(--cv-fg);
+}
+.cv-bar .zoom .pct {
+  width: 54px;
+  text-align: center;
+  font: 600 11.5px / 1 var(--cv-mono);
+  border-left: 1px solid var(--cv-line);
+  border-right: 1px solid var(--cv-line);
+  height: 26px;
+  line-height: 26px;
+}
+.cv-bar .hint {
+  font: 500 11px / 1 var(--cv-mono);
+  color: var(--cv-muted);
+}
+.cv-bar kbd {
+  font: 600 10px / 1 var(--cv-mono);
+  padding: 2px 5px;
+  border: 1px solid var(--cv-line);
+  border-radius: 4px;
+  background: #fff;
+  color: var(--cv-muted);
+}
+
+.cv-layers {
+  position: fixed;
+  top: 44px;
+  left: 0;
+  bottom: 0;
+  width: 240px;
+  z-index: 20;
+  overflow-y: auto;
+  background: var(--cv-rail);
+  border-right: 1px solid var(--cv-line);
+  padding: 10px 8px 20px;
+}
+.cv-layers .set {
+  font: 600 10px / 1 var(--cv-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cv-muted);
+  padding: 10px 8px 6px;
+}
+.cv-layers button {
+  all: unset;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: calc(100% - 16px);
+  padding: 5px 8px;
+  border-radius: 7px;
+  font-size: 12.5px;
+  color: var(--cv-fg);
+}
+.cv-layers button:hover {
+  background: #0000000a;
+}
+.cv-layers button.on {
+  background: #0000000f;
+  font-weight: 600;
+}
+.cv-layers button .g {
+  color: var(--cv-muted);
+  font-size: 11px;
+  width: 12px;
+}
+.cv-layers button .sz {
+  margin-left: auto;
+  font: 500 10px / 1 var(--cv-mono);
+  color: var(--cv-muted);
+}
+.cv-layers .intro {
+  font-size: 12px;
+  color: var(--cv-muted);
+  padding: 8px 8px 4px;
+  line-height: 1.45;
+}
+
+.cv-viewport {
+  position: fixed;
+  inset: 44px 0 0 240px;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+}
+.cv-world {
+  --k: 1;
+  --inv: 1;
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+.cv-group {
+  position: absolute;
+}
+.cv-group > .gname {
+  position: absolute;
+  left: 0;
+  top: calc(-58px * var(--inv));
+  font: 600 11px / 1 var(--cv-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--cv-muted);
+  white-space: nowrap;
+  transform-origin: 0 100%;
+  transform: scale(var(--inv));
+}
+.cv-group > .gnote {
+  position: absolute;
+  left: 0;
+  top: calc(-38px * var(--inv));
+  font-size: 12px;
+  color: var(--cv-muted);
+  white-space: nowrap;
+  transform-origin: 0 100%;
+  transform: scale(var(--inv));
+}
+.frame {
+  position: absolute;
+  background: #fff;
+  box-shadow:
+    0 1px 2px #0000001a,
+    0 8px 30px -12px #3b2f1c44;
+}
+.frame > .fname {
+  position: absolute;
+  left: 0;
+  top: calc(-8px * var(--inv));
+  transform: translateY(-100%) scale(var(--inv));
+  font-size: 12px;
+  color: var(--cv-muted);
+  white-space: nowrap;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  transform-origin: 0 100%;
+}
+.frame > .fname b {
+  font-weight: 600;
+  color: var(--cv-fg);
+}
+.frame > .fname .k {
+  font: 500 10px / 1 var(--cv-mono);
+  color: var(--cv-muted);
+}
+.frame.on {
+  outline: 2px solid var(--cv-accent);
+  outline-offset: 2px;
+}
+.frame.on > .fname b {
+  color: var(--cv-accent);
+}
+.frame > .fnote {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -10px;
+  transform-origin: 0 0;
+  font-size: 12px;
+  color: var(--cv-muted);
+  line-height: 1.45;
+  width: calc(100% * var(--k));
+  max-width: none;
+  transform: translateY(100%) scale(var(--inv));
+}
+.frame .app {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  box-shadow: none;
+  border: 0;
+}
+.frame .app .shell,
+.frame .app .settings,
+.frame .app .auth {
+  min-height: calc(100% - 30px);
+  height: calc(100% - 30px);
+}
+.frame .app .content {
+  height: 100%;
+}
+
+/* annotation pins and sticky notes on the canvas */
+.pin {
+  position: absolute;
+  z-index: 5;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--cv-accent);
+  color: #fff;
+  font: 800 11px / 22px var(--cv-mono);
+  text-align: center;
+  box-shadow:
+    0 0 0 3px #fff,
+    0 2px 6px #0003;
+}
+.sticky {
+  position: absolute;
+  width: 220px;
+  padding: 12px 14px;
+  background: #fff3b0;
+  color: #4a3c10;
+  font-size: 12.5px;
+  line-height: 1.45;
+  box-shadow:
+    0 2px 0 #0000000f,
+    0 10px 20px -12px #0005;
+  transform: rotate(-1deg);
+}
+.sticky b {
+  display: block;
+  font: 600 10px / 1 var(--cv-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  color: #8a6414;
+}
+.sticky ol {
+  margin: 0;
+  padding-left: 16px;
+}
+.sticky li {
+  margin: 3px 0;
+}
+
+/* overview tiles (design/index.html) */
+.tile-frame {
+  position: absolute;
+  background: #fff;
+  box-shadow:
+    0 1px 2px #0000001a,
+    0 8px 30px -12px #3b2f1c44;
+  overflow: hidden;
+}
+.tile-frame iframe {
+  border: 0;
+  transform-origin: 0 0;
+  pointer-events: none;
+  display: block;
+}
+.tile-frame .open {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: end start;
+  padding: 14px;
+  text-decoration: none;
+  color: var(--cv-fg);
+  background: linear-gradient(180deg, transparent 60%, #fffdf8ee);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.tile-frame:hover .open {
+  opacity: 1;
+}
+.tile-frame .open span {
+  font: 600 12px / 1 var(--cv-sans);
+  background: var(--cv-accent);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+@media (max-width: 900px) {
+  .cv-layers {
+    display: none;
+  }
+  .cv-viewport {
+    left: 0;
+  }
+  .cv-bar .hint,
+  .cv-bar .crumb {
+    display: none;
+  }
+}
