@@ -1,0 +1,1992 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Washi — WSX primitives</title>
+<link rel="stylesheet" href="_kit/doc.css" />
+<link rel="stylesheet" href="_kit/app.css" />
+<style>
+  pre,
+  code {
+    font-variant-ligatures: none;
+  }
+  /* app.css ships an unscoped .side (the app sidebar) that outranks doc.css's note; restore the note here */
+  .column .side {
+    display: block;
+    min-height: 0;
+    background: transparent;
+    border-right: 0;
+    border-left: 2px solid var(--line);
+    padding: 0 0 0 0.8rem;
+    margin: 0.8rem 0;
+    font-size: 0.86rem;
+    color: var(--muted);
+  }
+  .req {
+    font: 600 0.62rem / 1 var(--mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin-left: 0.35rem;
+  }
+  .pol {
+    font: 500 0.78rem / 1.5 var(--mono);
+    color: var(--muted);
+    margin: 0.3rem 0 0.4rem;
+  }
+  .pol b {
+    color: var(--fg);
+    font-weight: 600;
+  }
+  .group-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    margin-top: 2.6rem;
+  }
+  .group-head .count {
+    font: 600 0.7rem / 1 var(--mono);
+    color: var(--muted);
+  }
+  section.s h4 {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px dashed var(--line);
+    font-family: var(--mono);
+    font-size: 0.95rem;
+  }
+  section.s h4::before {
+    content: "<";
+    color: var(--muted);
+  }
+  section.s h4::after {
+    content: ">";
+    color: var(--muted);
+  }
+  table.index td:first-child {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+  }
+  table.index td,
+  table.index th {
+    padding: 0.32rem 0.5rem;
+  }
+  .yes {
+    color: var(--ok);
+    font-weight: 700;
+  }
+  .no {
+    color: var(--muted);
+  }
+
+  /* sketches: static renderings of a primitive, wearing the paper's look */
+  .app.flat.sk {
+    box-shadow: none;
+    border: 0;
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 13.5px;
+    line-height: 1.55;
+    max-width: 100%;
+  }
+  .sk .serif {
+    font-family: var(--s-serif);
+    font-weight: 400;
+  }
+  .sk .t1 {
+    font: 400 26px / 1.15 var(--s-serif);
+    margin: 0 0 6px;
+  }
+  .sk .t2 {
+    font: 400 20px / 1.2 var(--s-serif);
+    margin: 0 0 6px;
+  }
+  .sk .t3 {
+    font: 700 15px / 1.3 var(--s-sans);
+    margin: 0 0 6px;
+  }
+  .sk p {
+    margin: 0 0 8px;
+  }
+  .sk .muted {
+    color: var(--s-mfg);
+  }
+  .sk .sec {
+    font: 700 11px / 1 var(--s-sans);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--s-mfg);
+    padding-bottom: 7px;
+    border-bottom: 1px solid var(--s-border);
+    margin-bottom: 10px;
+  }
+  .sk .flex {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .sk .stack {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .sk .g12 {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .sk .box {
+    background: var(--s-card);
+    border: 1.5px dashed var(--s-border);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font: 600 11px / 1 var(--s-mono);
+    color: var(--s-mfg);
+    text-align: center;
+  }
+  .sk hr {
+    border: 0;
+    border-top: 1px solid var(--s-border);
+    margin: 6px 0;
+  }
+  .sk hr.strong {
+    border-top: 2px solid var(--s-fg);
+  }
+  .sk .quote {
+    padding: 4px 0 4px 16px;
+    border-left: 2px solid var(--s-primary);
+    font: 400 16px / 1.4 var(--s-serif);
+  }
+  .sk .code {
+    background: var(--s-muted);
+    border: 1px solid var(--s-border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font: 400 12px / 1.55 var(--s-mono);
+    white-space: pre-wrap;
+  }
+  .sk .code .lang {
+    float: right;
+    font: 700 10px / 1 var(--s-sans);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--s-mfg);
+  }
+  .sk .pair {
+    display: grid;
+    grid-template-columns: 96px 1fr;
+    gap: 4px 14px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--s-border);
+  }
+  .sk .pair b {
+    color: var(--s-mfg);
+    font-size: 13px;
+  }
+  .sk .note {
+    display: flex;
+    gap: 8px;
+    color: var(--s-mfg);
+    font-size: 13px;
+  }
+  .sk .note i {
+    font: 400 11px / 1.6 var(--s-mono);
+    color: var(--s-primary);
+    font-style: normal;
+  }
+  .sk .money {
+    font-variant-numeric: tabular-nums;
+  }
+  .sk .money.neg {
+    color: var(--s-bad);
+  }
+  .sk mark {
+    background: #c25f2c38;
+    color: inherit;
+    padding: 0 3px;
+    border-radius: 3px;
+  }
+  .sk kbd {
+    font: 400 0.85em var(--s-mono);
+    padding: 1px 6px;
+    border: 1px solid var(--s-border);
+    border-bottom-width: 2px;
+    border-radius: 5px;
+    background: var(--s-card);
+  }
+  .sk .ref {
+    color: var(--s-kraft);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .sk .tag {
+    display: inline-flex;
+    font: 700 11.5px / 1.6 var(--s-sans);
+    letter-spacing: 0.04em;
+    padding: 1px 7px;
+    border-radius: 7px;
+    background: var(--s-muted);
+    color: var(--s-mfg);
+    vertical-align: middle;
+  }
+  .sk .tag.tone {
+    background: #3d5a7324;
+    color: #2f4a61;
+  }
+  .sk .pcard {
+    background: var(--s-card);
+    border: 1.5px solid var(--s-border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    position: relative;
+    min-width: 0;
+  }
+  .sk .pcard.outline {
+    background: transparent;
+  }
+  .sk .pcard.filled {
+    background: var(--s-muted);
+    border-color: transparent;
+  }
+  .sk .pcard.raised {
+    border-color: transparent;
+    box-shadow: 0 8px 18px #221f1a29;
+  }
+  .sk .pcard.tape {
+    border-top-left-radius: 4px;
+  }
+  .sk .pcard .ct {
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .sk .tape {
+    display: inline-block;
+    padding: 4px 16px;
+    font: 700 11px / 1.4 var(--s-sans);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    background: var(--s-primary);
+    color: #fbf9f4;
+    transform: rotate(-1deg);
+    clip-path: polygon(2% 0, 98% 4%, 100% 92%, 1% 100%);
+  }
+  .sk .tape.on {
+    position: absolute;
+    top: -12px;
+    left: 16px;
+  }
+  .sk .stamp {
+    display: inline-grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border: 2px solid var(--s-primary);
+    border-radius: 999px;
+    color: var(--s-primary);
+    font: 400 12px / 1 var(--s-serif);
+    transform: rotate(-6deg);
+    opacity: 0.85;
+  }
+  .sk .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 22px;
+    padding: 0 9px;
+    border-radius: 999px;
+    border: 1px dotted #c25f2c88;
+    background: var(--s-card);
+    font: 700 11.5px / 1 var(--s-sans);
+  }
+  .sk .chip::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: var(--s-primary);
+  }
+  .sk .badge {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 9px;
+    border-radius: 999px;
+    font: 700 11.5px / 1 var(--s-sans);
+    background: #6f685d24;
+    color: #5c564c;
+  }
+  .sk .badge.danger {
+    background: #b5543c24;
+    color: #9a4530;
+  }
+  .sk .badge.success {
+    background: #94a06b2e;
+    color: #5a6638;
+  }
+  .sk .badge.filled {
+    background: var(--s-primary);
+    color: #fbf9f4;
+  }
+  .sk .av {
+    display: inline-grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    background: var(--s-muted);
+    font: 700 11px / 1 var(--s-sans);
+    letter-spacing: 0.04em;
+  }
+  .sk .av.tone {
+    background: var(--s-primary);
+    color: #fbf9f4;
+  }
+  .sk .hero {
+    padding: 6px 0 12px;
+  }
+  .sk .hero h1 {
+    font: 400 34px / 1.08 var(--s-serif);
+    margin: 0;
+  }
+  .sk .hero p {
+    margin: 10px 0 0;
+    font-size: 15px;
+    color: var(--s-mfg);
+  }
+  .sk .pcallout {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 4px 12px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: #3d5a7324;
+    border: 1px solid #3d5a7366;
+  }
+  .sk .pcallout.warn {
+    background: #c08a2e24;
+    border-color: #c08a2e66;
+  }
+  .sk .pcallout .ic {
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    border: 2px solid #2f4a61;
+    display: grid;
+    place-items: center;
+    font: 700 11px / 1 var(--s-sans);
+    color: #2f4a61;
+  }
+  .sk .pcallout.warn .ic {
+    border-color: #7a5612;
+    color: #7a5612;
+  }
+  .sk .pcallout b {
+    color: #2f4a61;
+  }
+  .sk .pcallout.warn b {
+    color: #7a5612;
+  }
+  .sk .pcallout .body {
+    grid-column: 2;
+  }
+  .sk .fig {
+    border: 1px solid var(--s-border);
+    border-radius: 14px;
+    background: repeating-linear-gradient(-45deg, var(--s-muted) 0 10px, var(--s-card) 10px 20px);
+    aspect-ratio: 16 / 9;
+    display: grid;
+    place-items: center;
+    font: 600 11px / 1 var(--s-mono);
+    color: var(--s-mfg);
+  }
+  .sk .ptable {
+    width: 100%;
+    border: 1px solid var(--s-border);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--s-card);
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 13px;
+    margin: 0;
+  }
+  .sk .ptable th {
+    font: 700 10.5px / 1.4 var(--s-sans);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--s-mfg);
+    background: var(--s-muted);
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--s-border);
+    text-align: left;
+  }
+  .sk .ptable td {
+    padding: 7px 12px;
+    border-bottom: 1px solid var(--s-border);
+  }
+  .sk .ptable tr:last-child td {
+    border-bottom: 0;
+  }
+  .sk .ptable td.num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .sk .stat .v {
+    font: 400 34px / 1.05 var(--s-serif);
+    font-variant-numeric: tabular-nums;
+  }
+  .sk .stat .v small {
+    font: 700 12px / 1 var(--s-sans);
+    color: #5a6638;
+    margin-left: 8px;
+  }
+  .sk .stat .k {
+    font: 700 11px / 1.6 var(--s-sans);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--s-mfg);
+  }
+  .sk .stat .h {
+    font-size: 12.5px;
+    color: var(--s-mfg);
+  }
+  .sk .bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+    height: 110px;
+    padding: 0 8px;
+  }
+  .sk .bars i {
+    flex: 1;
+    display: block;
+    border-radius: 4px 4px 0 0;
+    background: var(--c, var(--s-primary));
+    position: relative;
+  }
+  .sk .bars i::after {
+    content: attr(data-l);
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font: 400 9px / 2 var(--s-sans);
+    color: var(--s-mfg);
+  }
+  .sk .bars i::before {
+    content: attr(data-v);
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font: 600 9px / 1.6 var(--s-sans);
+  }
+  .sk .area {
+    height: 110px;
+    display: block;
+    width: 100%;
+  }
+  .sk .timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .sk .step {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 12px;
+  }
+  .sk .step .m {
+    height: 26px;
+    display: grid;
+    place-items: center;
+    border-radius: 7px;
+    background: var(--s-primary);
+    color: #fbf9f4;
+    font: 700 11px / 1 var(--s-sans);
+    letter-spacing: 0.06em;
+    transform: rotate(-2deg);
+  }
+  .sk .step .b {
+    color: var(--s-mfg);
+    font-size: 13px;
+  }
+  .sk .progress .lbl {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--s-mfg);
+  }
+  .sk .progress .track {
+    height: 8px;
+    border-radius: 999px;
+    background: var(--s-muted);
+    overflow: hidden;
+    margin-top: 5px;
+  }
+  .sk .progress .fill {
+    height: 100%;
+    width: 62%;
+    background: var(--s-primary);
+  }
+  .sk .pfield .k {
+    font: 700 11px / 1.6 var(--s-sans);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--s-mfg);
+  }
+  .sk .pfield .in {
+    height: 34px;
+    padding: 0 11px;
+    border-radius: 10px;
+    border: 1.5px solid var(--s-border);
+    background: var(--s-card);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .sk .pfield .help {
+    font-size: 12px;
+    color: var(--s-mfg);
+  }
+  .sk .pbtn {
+    display: inline-flex;
+    align-items: center;
+    height: 34px;
+    padding: 0 14px;
+    border-radius: 10px;
+    font: 700 13.5px / 1 var(--s-sans);
+    background: var(--s-primary);
+    color: #fbf9f4;
+  }
+  .sk .pbtn.outline {
+    background: transparent;
+    border: 1.5px solid #c25f2c88;
+    color: #9e4a20;
+  }
+  .sk .pbtn.neutral {
+    background: var(--s-fg);
+    color: var(--s-bg);
+  }
+  .sk .pbtn.sm {
+    height: 30px;
+    font-size: 12px;
+  }
+  .sk .task {
+    display: flex;
+    gap: 9px;
+    align-items: flex-start;
+  }
+  .sk .task i {
+    width: 16px;
+    height: 16px;
+    margin-top: 3px;
+    border: 1.5px solid var(--s-border);
+    border-radius: 4px;
+    background: var(--s-card);
+    flex: none;
+  }
+  .sk .task.done i {
+    background: var(--s-primary);
+    border-color: var(--s-primary);
+  }
+  .sk .done span {
+    color: var(--s-mfg);
+    text-decoration: line-through;
+  }
+  .sk .switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+  }
+  .sk .switch i {
+    width: 36px;
+    height: 20px;
+    border-radius: 999px;
+    background: var(--s-primary);
+    padding: 2px;
+    display: block;
+  }
+  .sk .switch i::after {
+    content: "";
+    display: block;
+    width: 16px;
+    height: 16px;
+    border-radius: 999px;
+    background: var(--s-card);
+    transform: translateX(16px);
+  }
+  .sk .slider .h {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--s-mfg);
+  }
+  .sk .slider .r {
+    height: 4px;
+    border-radius: 999px;
+    background: var(--s-border);
+    position: relative;
+    margin: 10px 0;
+  }
+  .sk .slider .r::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    width: 40%;
+    height: 100%;
+    background: var(--s-primary);
+    border-radius: inherit;
+  }
+  .sk .slider .r::after {
+    content: "";
+    position: absolute;
+    left: 40%;
+    top: -6px;
+    width: 16px;
+    height: 16px;
+    border-radius: 999px;
+    background: var(--s-primary);
+  }
+  .sk .ptabs {
+    display: flex;
+    gap: 2px;
+    border-bottom: 1px solid var(--s-border);
+    margin-bottom: 10px;
+  }
+  .sk .ptabs span {
+    padding: 8px 12px;
+    margin-bottom: -1px;
+    border-bottom: 2px solid transparent;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--s-mfg);
+  }
+  .sk .ptabs span.on {
+    color: var(--s-fg);
+    border-bottom-color: var(--s-primary);
+  }
+  .sk .ptabs.ink span.on {
+    border-bottom-color: var(--s-fg);
+  }
+  .sk .reveal {
+    border: 1px solid var(--s-border);
+    border-radius: 10px;
+    background: var(--s-card);
+  }
+  .sk .reveal .sum {
+    padding: 10px 14px;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .sk .reveal .sum::before {
+    content: "▾ ";
+    color: var(--s-mfg);
+  }
+  .sk .reveal .bd {
+    padding: 0 14px 12px;
+    color: var(--s-mfg);
+  }
+  .sk .pdrawer {
+    position: relative;
+    height: 200px;
+    background: #26241f44;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .sk .pdrawer .panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 60%;
+    background: var(--s-card);
+    border-left: 1px solid var(--s-border);
+    box-shadow: 0 20px 60px #221f1a40;
+  }
+  .sk .pdrawer .hd {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--s-border);
+    font: 400 18px / 1.2 var(--s-serif);
+  }
+  .sk .pdrawer .hd span {
+    color: var(--s-mfg);
+    font: 400 20px / 1 var(--s-sans);
+  }
+  .sk .pdrawer .bd {
+    padding: 14px;
+  }
+  .sk .missing {
+    border: 1.5px dashed var(--s-border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 13px;
+    color: var(--s-mfg);
+    background: repeating-linear-gradient(-45deg, transparent 0 8px, var(--s-muted) 8px 9px);
+  }
+  .sk .missing b {
+    font: 400 13px / 1 var(--s-mono);
+    color: var(--s-fg);
+  }
+  .sk .pempty {
+    padding: 18px;
+    border: 1.5px dashed var(--s-border);
+    border-radius: 10px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--s-mfg);
+  }
+  .sk .rf {
+    height: 190px;
+    border-radius: 10px;
+    border: 1px solid var(--s-border);
+  }
+  .sk .rf .node {
+    width: 150px;
+    background: var(--s-bg);
+    border: 1.5px solid var(--s-border);
+    border-radius: 10px;
+    box-shadow: none;
+    font-size: 12.5px;
+  }
+  .sk .rf .node.accent {
+    border-color: var(--s-primary);
+  }
+  .sk .rf .node.info {
+    border-color: var(--s-agent);
+  }
+  .sk .rf .add {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 5px 10px;
+    border: 1px solid var(--s-border);
+    border-radius: 7px;
+    background: var(--s-card);
+    font-size: 12px;
+  }
+  .sk .rf svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .sk .gantt .gh {
+    font: 700 10.5px / 1 var(--s-sans);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--s-mfg);
+    background: var(--s-muted);
+    padding: 9px 10px;
+  }
+  .sk .gantt .gt .tick {
+    position: absolute;
+    top: 6px;
+    font: 400 10px / 1 var(--s-sans);
+    color: var(--s-mfg);
+    border-left: 1px solid var(--s-border);
+    padding-left: 4px;
+  }
+</style>
+</head>
+<body>
+<div class="doc">
+  <aside class="rail">
+    <a class="home" href="index.html"><i></i>和紙 <em>WASHI</em></a>
+    <div class="set">WSX primitives</div>
+    <nav>
+      <a href="#page"><span class="n">01</span>What a page is</a>
+      <a href="#sheet"><span class="n">02</span>The Sheet</a>
+      <a href="#styling"><span class="n">03</span>The styling surface</a>
+      <a href="#state"><span class="n">04</span>State</a>
+      <a href="#expr"><span class="n">05</span>Expressions</a>
+      <a href="#bind"><span class="n">06</span>Live data: bind</a>
+      <a href="#actions"><span class="n">07</span>Actions</a>
+      <a href="#registry"><span class="n">08</span>The registry</a>
+      <a href="#g-frame" style="padding-left:1.6rem">frame · 6</a>
+      <a href="#g-text" style="padding-left:1.6rem">text · 14</a>
+      <a href="#g-surface" style="padding-left:1.6rem">surface · 4</a>
+      <a href="#g-dataOut" style="padding-left:1.6rem">data out · 14</a>
+      <a href="#g-dataIn" style="padding-left:1.6rem">data in · 8</a>
+      <a href="#g-flow" style="padding-left:1.6rem">flow · 5</a>
+      <a href="#g-kit" style="padding-left:1.6rem">kit · 5</a>
+      <a href="#missing"><span class="n">09</span>Missing and requests</a>
+      <a href="#validation"><span class="n">10</span>Validation</a>
+      <a href="#editing"><span class="n">11</span>How a page is edited</a>
+      <a href="#index"><span class="n">12</span>Index</a>
+    </nav>
+    <div class="set">Docs</div>
+    <nav>
+      <a href="prd.html">PRD</a>
+      <a href="brand.html">Brand</a>
+      <a href="mascot.html">Mascot</a>
+      <a href="design/index.html">Design canvas</a>
+    </nav>
+  </aside>
+
+  <main class="column">
+    <header class="head">
+      <div class="eyebrow">Netko Labs · Washi · 04 · format</div>
+      <h1>WSX primitives<span class="dot">。</span></h1>
+      <p class="lead">The page format Washi writes and renders, and the closed registry it may use: 56 primitives in seven groups, their props from the zod specs, what each looks like, and the four small languages a page speaks — state, expr, bind and action.</p>
+      <div class="facts"><span>generated against <code>@washi/paper</code> · 2026-10-21</span><span>56 primitives · 7 groups</span><span>replaces docs/wsx.md</span><span>registry is the truth: <code>packages/shared/paper/src/registry/specs.ts</code></span></div>
+      <div class="tldr">
+        <h2>30-second version</h2>
+        <ol>
+          <li><strong>JSX as data.</strong> A page is one JSX element tree stored as text. It is parsed, validated and rendered; nothing in it executes.</li>
+          <li><strong>One root Sheet.</strong> <code>&lt;Sheet title wsx="1"&gt;</code> is the page. No fragments, no second root.</li>
+          <li><strong>Registry only.</strong> Capitalised names from the 56 below. No <code>&lt;div&gt;</code>, no custom components; an unknown name is written as <code>&lt;Missing kind reason /&gt;</code>.</li>
+          <li><strong>Props are JSON literals.</strong> Strings, numbers, booleans, <code>null</code>, arrays, objects. Anything executable is refused at parse.</li>
+          <li><strong>Four enums.</strong> <code>variant tone size emphasis</code> are the whole visual API. No hex, no px, no font. Plus <code>span</code> and a layout-only <code>class</code>.</li>
+          <li><strong>state · expr · bind · action are a page's whole behaviour.</strong> Controls write state keys; <code>expr</code> computes from them and from tables; <code>bind</code> reads a table live; <code>action</code> names a hanko verb. There are no handlers.</li>
+        </ol>
+      </div>
+    </header>
+
+    <section class="s" id="page">
+      <div class="num">01</div>
+      <h2>What a page is</h2>
+      <p class="point">A page looks like React and is not React. It is data: an element tree with literal props, checked against a closed registry before it is saved and again before it is drawn. The grammar is small enough to list in full.</p>
+
+      <h3>The grammar</h3>
+      <p>Every rule below is enforced by <code>parse</code> (<code>@washi/wsx</code>) or by <code>validate</code> against <code>paperRegistry</code>. Breaking one is an error, not a warning — except the complexity budget (§10).</p>
+      <table>
+        <thead><tr><th>Rule</th><th>Detail</th><th>Refused with</th></tr></thead>
+        <tbody>
+          <tr><td>One root</td><td>Exactly one <code>&lt;Sheet&gt;</code>. No fragments, no sibling roots, no empty source.</td><td><code>fragments are not allowed — a sheet has one root element</code> · <code>a sheet must be a single JSX element</code> · <code>the root element must be &lt;Sheet&gt;</code></td></tr>
+          <tr><td>Registry primitives only</td><td>Capitalised names from §8. No host elements, no member or namespaced names.</td><td><code>host element &lt;div&gt; is not allowed — WSX uses registry components only</code> · <code>&lt;Box&gt; is not a registry primitive — write &lt;Missing kind="Box" reason="…" /&gt;</code></td></tr>
+          <tr><td>Props are JSON literals</td><td>Strings, numbers (negative too), booleans, <code>null</code>, arrays, objects with plain <code>key: value</code> entries. A bare attribute is <code>true</code>. No spreads, no element-valued props, no namespaced props.</td><td><code>`CallExpression` is not allowed in WSX — props are JSON literals only</code> · <code>prop spreads are not allowed</code></td></tr>
+          <tr><td>No expressions in props</td><td>Only the <code>expr</code> prop carries computation, as a string in the closed grammar of §5.</td><td>the literal rule above</td></tr>
+          <tr><td>No handlers</td><td>There is no <code>onClick</code>. A side effect is an <code>action</code> object (§7) or a control writing state (§4).</td><td><code>prop onClick is not addressable on &lt;Button&gt; — interaction is a prop, not a handler — use action</code></td></tr>
+          <tr><td>Children by policy</td><td>Each primitive declares <b>none</b> (self-closing), <b>text</b> (text only) or <b>nodes</b> (elements and text). A <code>{literal}</code> child renders as text; object and array children are refused.</td><td><code>&lt;Figure&gt; does not take children</code> · <code>&lt;Code&gt; takes text children only</code></td></tr>
+          <tr><td>Placement</td><td><code>Item</code> only inside <code>List</code>; <code>Step</code> inside <code>Timeline</code>; <code>Tab</code> inside <code>Tabs</code>; <code>Node</code> and <code>Edge</code> inside <code>Canvas</code>. <code>Repeat</code> and <code>Drawer</code> never nest in themselves. <code>Mascot</code> once per sheet.</td><td><code>&lt;Repeat&gt; cannot contain another &lt;Repeat&gt; — a second view is a second sheet</code> · <code>&lt;Item&gt; is only legal inside &lt;List&gt;</code></td></tr>
+          <tr><td>Unknown props teach</td><td>Every spec is <code>strict()</code>. An unknown prop names the legal alternative from the spec's hints or <code>STYLE_PROP_HINTS</code> (§3).</td><td><code>prop color is not addressable on &lt;Text&gt; — use tone</code></td></tr>
+        </tbody>
+      </table>
+
+      <h3>A whole page</h3>
+<pre><span class="t">&lt;Sheet</span> <span class="a">title</span>=<span class="v">"Sprint 12"</span> <span class="a">icon</span>=<span class="v">"kanban"</span> <span class="a">feel</span>=<span class="v">"board"</span> <span class="a">theme</span>=<span class="v">"aizome"</span> <span class="a">wsx</span>=<span class="v">"1"</span>
+  <span class="a">state</span>={<span class="v">{ local: { tab: 'Board' }, stored: { mine: false } }</span>}<span class="t">&gt;</span>
+  <span class="t">&lt;Hero</span> <span class="a">title</span>=<span class="v">"Sprint 12"</span> <span class="a">subtitle</span>=<span class="v">"Two weeks, one demo."</span> <span class="a">size</span>=<span class="v">"md"</span> <span class="t">/&gt;</span>
+  <span class="t">&lt;Grid&gt;</span>
+    <span class="t">&lt;Card</span> <span class="a">span</span>={<span class="v">4</span>}<span class="t">&gt;&lt;Stat</span> <span class="a">label</span>=<span class="v">"open"</span> <span class="a">expr</span>=<span class="v">"count(issues where status != 'Done')"</span> <span class="t">/&gt;&lt;/Card&gt;</span>
+    <span class="t">&lt;Card</span> <span class="a">span</span>={<span class="v">4</span>}<span class="t">&gt;&lt;Stat</span> <span class="a">label</span>=<span class="v">"points"</span> <span class="a">expr</span>=<span class="v">"sum(issues.points)"</span> <span class="a">trend</span>=<span class="v">"up"</span> <span class="t">/&gt;&lt;/Card&gt;</span>
+    <span class="t">&lt;Card</span> <span class="a">span</span>={<span class="v">4</span>}<span class="t">&gt;&lt;Progress</span> <span class="a">label</span>=<span class="v">"done"</span> <span class="a">expr</span>=<span class="v">"count(issues where status = 'Done') / count(issues)"</span> <span class="t">/&gt;&lt;/Card&gt;</span>
+  <span class="t">&lt;/Grid&gt;</span>
+  <span class="t">&lt;Switch</span> <span class="a">state</span>=<span class="v">"mine"</span> <span class="a">label</span>=<span class="v">"Only mine"</span> <span class="t">/&gt;</span>
+  <span class="t">&lt;Section</span> <span class="a">title</span>=<span class="v">"By status"</span><span class="t">&gt;</span>
+    <span class="t">&lt;Board</span> <span class="a">bind</span>={<span class="v">{ table: 'issues' }</span>} <span class="a">groupBy</span>=<span class="v">"status"</span> <span class="a">rank</span>=<span class="v">"rank"</span> <span class="a">badge</span>=<span class="v">"priority"</span> <span class="a">meta</span>=<span class="v">"points"</span> <span class="t">/&gt;</span>
+  <span class="t">&lt;/Section&gt;</span>
+  <span class="t">&lt;Button</span> <span class="a">action</span>={<span class="v">{ verb: 'table.insert', table: 'issues', data: { name: 'New issue', status: 'Not started' } }</span>}<span class="t">&gt;</span>
+    Add issue
+  <span class="t">&lt;/Button&gt;</span>
+  <span class="t">&lt;Chart</span> <span class="a">kind</span>=<span class="v">"area"</span> <span class="a">history</span>={<span class="v">{ table: 'issues', where: [{ column: 'status', op: 'eq', value: 'Done' }], range: '30d' }</span>} <span class="t">/&gt;</span>
+<span class="t">&lt;/Sheet&gt;</span></pre>
+
+      <h3>Serialization</h3>
+      <p><code>serialize(tree)</code> is the canonical text, and <code>parse(serialize(tree))</code> round-trips. The parser collapses runs of whitespace in JSX text to one space and trims each run, so typed text with real spacing has to go in as a string literal — the serializer decides that per text node.</p>
+      <table>
+        <thead><tr><th>Input</th><th>Written as</th></tr></thead>
+        <tbody>
+          <tr><td>a <code>true</code> prop</td><td>the bare attribute: <code>&lt;Item done&gt;</code></td></tr>
+          <tr><td>a string prop</td><td><code>key="…"</code>, JSON-escaped (so an inner <code>"</code> survives)</td></tr>
+          <tr><td>any other prop</td><td><code>key={json}</code> — numbers, booleans, null, arrays, objects</td></tr>
+          <tr><td>plain text</td><td>bare, when it has no leading/trailing whitespace, no newline, no double space and none of <code>&lt; &gt; { } &amp;</code></td></tr>
+          <tr><td>any other text</td><td><code>{"…"}</code> — a JSON string literal child, so <code>a &lt; b</code>, two spaces, or a newline all come back byte-for-byte</td></tr>
+          <tr><td>one text child</td><td>inline: <code>&lt;Text&gt;hello&lt;/Text&gt;</code></td></tr>
+          <tr><td>several children</td><td>one per line, two-space indent, closing tag on its own line; the file ends with a newline</td></tr>
+          <tr><td>no children</td><td>self-closing <code>&lt;Divider /&gt;</code> regardless of policy</td></tr>
+        </tbody>
+      </table>
+      <div class="side">The parser also reads <code>&#123;123}</code> and <code>&#123;true}</code> children as text, skips empty <code>&#123;}</code> expressions, and refuses <code>&#123;[…]}</code> / <code>&#123;&#123;…}}</code> children: <em>object and array literals are not allowed as children</em>.</div>
+    </section>
+
+    <section class="s" id="sheet">
+      <div class="num">02</div>
+      <h2>The Sheet</h2>
+      <p class="point">The Sheet owns paper, ink, measure, padding and rhythm. A page picks a <code>feel</code> and a <code>theme</code>; it never sets a width, a margin or a mode. It is the one primitive without the four enums and without <code>class</code>.</p>
+      <table>
+        <thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><code>title</code><span class="req">required</span></td><td>string 1–200</td><td>Sidebar, tabs, breadcrumb, search. Also indexed as text.</td></tr>
+          <tr><td><code>icon</code></td><td>one of <code>SHEET_ICONS</code></td><td><code>notebook book bookmark calendar chart checklist clock compass flag flask heart home inbox kanban leaf map money music pen plane rocket sparkles star sun tag target tools user</code>. Never an emoji here.</td></tr>
+          <tr><td><code>tags</code></td><td>string[] ≤32, each 1–64</td><td></td></tr>
+          <tr><td><code>feel</code></td><td><code>note</code> <code>editorial</code> <code>board</code> <code>deck</code></td><td>Reproportions every primitive at once (table below). Default <code>note</code>.</td></tr>
+          <tr><td><code>theme</code></td><td><code>washi</code> <code>sumi</code> <code>aizome</code> <code>matcha</code> <code>kobai</code> <code>kraft</code> <code>yukiwa</code> <code>yozora</code></td><td>Eight designed pairs, each 8 tokens × light/dark (<code>bg card ink muted border mutedBg accent accentInk</code>), tested for ink ≥ 7:1 and muted ≥ 4.5:1 on card. Default <code>washi</code>.</td></tr>
+          <tr><td><code>accent</code></td><td><code>accent</code> <code>info</code> <code>success</code> <code>warning</code> <code>danger</code></td><td>Which tone the kit takes (Tape, Stamp, Chip, and a tone-less Quote, Progress or Step). Not <code>neutral</code>.</td></tr>
+          <tr><td><code>state</code></td><td><code>{ local?, stored? }</code></td><td>Declared keys with their initial scalars (§4). Keys 1–64 chars.</td></tr>
+          <tr><td><code>visibility</code></td><td><code>private</code> <code>shared</code> <code>public</code></td><td>Carried, not yet enforced by the renderer. <span class="chip later">later</span></td></tr>
+          <tr><td><code>wsx</code></td><td><code>"1"</code></td><td>Format version. Always write it.</td></tr>
+        </tbody>
+      </table>
+      <div class="side">The Sheet's <code>icon</code> is this enum. The page chrome the studio draws <em>above</em> the sheet (icon, cover, full width, rename) is metadata set by <code>sheets.updateMeta</code> and never touches the source — there an icon may be an emoji, and a cover is a preset key. Two different fields.</div>
+
+      <h3>What feel sets</h3>
+      <p>Measures are the design's page frames. Fonts, radii and spacing belong here; a theme only recolours.</p>
+      <table>
+        <thead><tr><th>feel</th><th>measure</th><th>padding</th><th>rhythm</th><th>body</th><th>t1 / t2 / t3</th><th>hero</th><th>card border</th></tr></thead>
+        <tbody>
+          <tr><td><code>note</code></td><td>760px</td><td>40 / 32</td><td>18</td><td>15</td><td>32 / 22 / 17</td><td>46</td><td>1.5px</td></tr>
+          <tr><td><code>editorial</code></td><td>700px</td><td>56 / 40</td><td>22</td><td>16</td><td>40 / 24 / 17</td><td>58</td><td>0</td></tr>
+          <tr><td><code>board</code></td><td>1180px</td><td>26</td><td>16</td><td>14</td><td>28 / 20 / 15</td><td>34</td><td>1.5px</td></tr>
+          <tr><td><code>deck</code></td><td>960px</td><td>56 / 48</td><td>32</td><td>17</td><td>46 / 28 / 20</td><td>58</td><td>0, text centred</td></tr>
+        </tbody>
+      </table>
+      <p><strong>Panel contract.</strong> The sheet is a container (<code>container: wsx / inline-size</code>) and measures itself, never the window. Under 400px padding drops to 20/16, rhythm to 14, t1 to 26 and hero to 32; every Grid is one column. Under 720px the hero caps at 40. The same tree renders at 320, 400, 720 and full.</p>
+      <p><strong>The only ways to a different look</strong> are <code>feel</code> inside the sheet and <em>full width</em> outside it — a page-chrome flag that lets the sheet fill the pane. Light and dark are the reader's; a page cannot pin a mode.</p>
+    </section>
+
+    <section class="s" id="styling">
+      <div class="num">03</div>
+      <h2>The styling surface</h2>
+      <p class="point">Every primitive takes four enums and two layout tokens — <code>styledSchema</code>, extended per primitive. CSS decides what each enum means for each family. A page cannot express a colour, a font size, a margin or a radius.</p>
+      <table>
+        <thead><tr><th>Prop</th><th>Values</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td><code>variant</code></td><td><code>plain</code> <code>outline</code> <code>filled</code> <code>raised</code> <code>tape</code></td><td>Surface and border treatment. Card: plain is bare, outline 1.5px, filled is the muted bg (or the tone tint), raised casts the drag shadow, tape pins a washi label to the corner. Button: plain is text, outline a tone border, filled the tone tint. Badge: filled is the tone fill, outline a tone line. Never padding or radius.</td></tr>
+          <tr><td><code>tone</code></td><td><code>neutral</code> <code>accent</code> <code>info</code> <code>success</code> <code>warning</code> <code>danger</code></td><td>Meaning. Each is a pre-checked triplet — <code>--t-fill</code>, <code>--t-text</code> (on tint), <code>--t-on</code> (on fill) — plus a derived tint (14 % fill) and line (40 % fill into border). Text, Stat and Callout colour their ink; Card its border; Button its fill; Quote and Progress their bar. Contrast cannot fail.</td></tr>
+          <tr><td><code>size</code></td><td><code>sm</code> <code>md</code> <code>lg</code></td><td>One multiplier, <code>--sz</code> = 0.88 / 1 / 1.18, scaling type and space together: Text body, Card padding, Button height, Badge, Avatar, Stat figure, Table type. Hero <code>md</code> drops the title to t1. Mascot: 40 / 72 / 120px.</td></tr>
+          <tr><td><code>emphasis</code></td><td><code>quiet</code> <code>normal</code> <code>strong</code></td><td>Hierarchy within the current tone: quiet is alpha 0.72 (Text goes muted), strong is weight 700 (Money too). Divider <code>strong</code> is a 2px rule in ink.</td></tr>
+          <tr><td><code>span</code></td><td>integer 1–12</td><td>Columns inside <code>Grid</code>. Ignored elsewhere; collapses to 12 under 400px.</td></tr>
+          <tr><td><code>class</code></td><td>≤400 chars of allowlisted tokens</td><td>Layout only — the table below. Refused tokens name the prop to use instead.</td></tr>
+        </tbody>
+      </table>
+      <p><code>gap</code> (<code>tight</code> <code>normal</code> <code>loose</code> = 7 / 14 / 26px) is a prop on Section, Row, Stack and Grid only — the one spacing a page can name.</p>
+
+      <h3>The <code>class</code> allowlist</h3>
+      <table>
+        <thead><tr><th>Group</th><th>Tokens</th></tr></thead>
+        <tbody>
+          <tr><td>flow</td><td><code>row col wrap nowrap grid-2 grid-3 grid-4</code></td></tr>
+          <tr><td>spacing</td><td><code>gap-0 gap-tight gap-normal gap-loose p-0 p-1 p-2 p-3 p-4 p-6 p-8</code> (4px scale)</td></tr>
+          <tr><td>alignment</td><td><code>items-start items-center items-end items-stretch items-baseline justify-start justify-center justify-end justify-between text-left text-center text-right</code></td></tr>
+          <tr><td>sizing</td><td><code>grow none full</code></td></tr>
+          <tr><td>container</td><td><code>@sm:row @sm:col @sm:grid-2 @sm:grid-3 @md:row @md:col @md:grid-2 @md:grid-3 @md:grid-4 @lg:row @lg:grid-3 @lg:grid-4</code> — sm ≥ 400, md ≥ 720, lg ≥ 960, measured on the sheet</td></tr>
+        </tbody>
+      </table>
+      <p><code>classProblems(value)</code> splits on whitespace and reports every token off the list, with a hint by pattern:</p>
+      <table>
+        <thead><tr><th>Token looks like</th><th>Hint</th></tr></thead>
+        <tbody>
+          <tr><td><code>font-* text-xs…text-[…] leading-* tracking-* uppercase italic</code></td><td>type is not addressable in class — use size or emphasis</td></tr>
+          <tr><td><code>bg-* text-* border-* from-* to-* via-* fill-* stroke-*</code></td><td>colour is not addressable in class — use tone</td></tr>
+          <tr><td><code>rounded* shadow* ring*</code></td><td>radius and shadow belong to variant</td></tr>
+          <tr><td><code>m-* mt-* mx-* … space-*</code></td><td>rhythm belongs to the parent — use Section, Stack or gap</td></tr>
+          <tr><td><code>w-* h-* max-w* min-w* max-h* min-h*</code></td><td>measure belongs to the Sheet — use span inside Grid</td></tr>
+          <tr><td><code>sm: md: lg: xl: 2xl:</code></td><td>viewport breakpoints are banned — use @sm: @md: @lg: (the page measures itself)</td></tr>
+          <tr><td>anything with <code>[…]</code></td><td>arbitrary values are not addressable</td></tr>
+          <tr><td>else</td><td>not a layout token</td></tr>
+        </tbody>
+      </table>
+
+      <h3><code>STYLE_PROP_HINTS</code> — props that live one level up</h3>
+      <p>When a page reaches for one of these on any primitive, validation names the alternative instead of just refusing.</p>
+      <table>
+        <thead><tr><th>Prop</th><th>Hint</th></tr></thead>
+        <tbody>
+          <tr><td><code>color</code> <code>colour</code></td><td>use tone</td></tr>
+          <tr><td><code>bg</code> <code>background</code></td><td>use variant or tone</td></tr>
+          <tr><td><code>style</code></td><td>style is not addressable — use variant · tone · size · emphasis</td></tr>
+          <tr><td><code>className</code></td><td>the prop is class, and it takes layout tokens only</td></tr>
+          <tr><td><code>font</code></td><td>type is selected by role — Title level, Text size</td></tr>
+          <tr><td><code>fontSize</code> / <code>weight</code></td><td>use size / use emphasis</td></tr>
+          <tr><td><code>width</code> / <code>height</code></td><td>measure belongs to the Sheet — use span inside Grid / not addressable</td></tr>
+          <tr><td><code>margin</code> / <code>padding</code></td><td>rhythm belongs to the parent — use Section, Stack or gap / padding belongs to the component — use size</td></tr>
+          <tr><td><code>radius</code> / <code>shadow</code></td><td>radius belongs to variant / elevation belongs to variant</td></tr>
+          <tr><td><code>onClick</code> / <code>onChange</code></td><td>interaction is a prop, not a handler — use action / use action or state</td></tr>
+          <tr><td><code>when</code> <code>equals</code></td><td>use expr</td></tr>
+          <tr><td><code>preset</code></td><td>use theme</td></tr>
+          <tr><td><code>accent</code></td><td>use tone (accent is a Sheet prop)</td></tr>
+        </tbody>
+      </table>
+      <p>The Sheet adds three of its own: <code>class</code> → <em>the Sheet owns measure and padding — pick a feel</em>; <code>mood</code> → <em>light/dark is the reader's — never pinned by a page</em>; <code>preset</code> → <em>use theme</em>.</p>
+    </section>
+
+    <section class="s" id="state">
+      <div class="num">04</div>
+      <h2>State</h2>
+      <p class="point">A page declares its state on the Sheet. Controls write keys; <code>expr</code> reads them. Values are scalars. Nothing else in a page remembers anything.</p>
+<pre><span class="t">&lt;Sheet</span> <span class="a">title</span>=<span class="v">"Kit"</span> <span class="a">state</span>={<span class="v">{ local: { tab: 'Board', open: null }, stored: { mine: false, budget: 40 } }</span>}<span class="t">&gt;</span>
+  <span class="t">&lt;Switch</span> <span class="a">state</span>=<span class="v">"mine"</span> <span class="a">label</span>=<span class="v">"Only mine"</span> <span class="t">/&gt;</span>
+  <span class="t">&lt;Slider</span> <span class="a">state</span>=<span class="v">"budget"</span> <span class="a">min</span>={<span class="v">0</span>} <span class="a">max</span>={<span class="v">100</span>} <span class="a">step</span>={<span class="v">5</span>} <span class="a">label</span>=<span class="v">"Budget"</span> <span class="t">/&gt;</span>
+  <span class="t">&lt;Show</span> <span class="a">expr</span>=<span class="v">"mine = true and budget &gt; 20"</span><span class="t">&gt;</span>…<span class="t">&lt;/Show&gt;</span>
+  <span class="t">&lt;Tabs</span> <span class="a">labels</span>={<span class="v">['Board', 'List']</span>} <span class="a">state</span>=<span class="v">"tab"</span><span class="t">&gt;</span>…<span class="t">&lt;/Tabs&gt;</span>
+  <span class="t">&lt;Drawer</span> <span class="a">state</span>=<span class="v">"open"</span> <span class="a">bind</span>={<span class="v">{ table: 'issues' }</span>} <span class="a">title</span>=<span class="v">"$row.name"</span><span class="t">&gt;</span>…<span class="t">&lt;/Drawer&gt;</span>
+<span class="t">&lt;/Sheet&gt;</span></pre>
+      <table>
+        <thead><tr><th>Scope</th><th>Lifetime</th><th>Use</th></tr></thead>
+        <tbody>
+          <tr><td><code>local</code></td><td>The open tab. Resets on reopen, never syncs.</td><td>Tab selection, an open disclosure, the row a drawer shows.</td></tr>
+          <tr><td><code>stored</code></td><td>Meant to persist per reader. <strong>Today it behaves as <code>local</code></strong> — both bags merge into one in-memory store (<code>SheetStateProvider</code>), <code>local</code> winning on a duplicate key. <span class="chip later">later</span></td><td>Filters, toggles.</td></tr>
+          <tr><td>records</td><td>Persistent, shared, in the workspace file.</td><td>Table rows — through <code>bind</code> and verbs, never through state.</td></tr>
+        </tbody>
+      </table>
+      <h3>Who writes, who reads</h3>
+      <table>
+        <thead><tr><th>Primitive</th><th>Writes</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td><code>Switch state</code></td><td>on click</td><td>boolean (reads <code>=== true</code>)</td></tr>
+          <tr><td><code>Slider state</code></td><td>on input</td><td>number; shows <code>min</code> until the key holds a number</td></tr>
+          <tr><td><code>Tabs state?</code></td><td>on select</td><td>the chosen <strong>label string</strong>, not an index; an unknown value selects the first tab</td></tr>
+          <tr><td><code>Reveal state?</code></td><td>on toggle</td><td>boolean</td></tr>
+          <tr><td><code>Drawer state</code></td><td>close (scrim, ×, Escape) sets <code>null</code></td><td>open while the value is not <code>null</code>, <code>false</code> or <code>''</code>; with <code>bind</code> the value is a row id</td></tr>
+          <tr><td>any <code>action=&#123;&#123; verb: 'state.set', key, value }}</code></td><td>on run</td><td>scalar; a non-scalar becomes <code>null</code>. Handled on the client; never reaches the desk.</td></tr>
+          <tr><td><code>Show</code> <code>Stat</code> <code>Progress</code> <code>Badge</code> <code>Money</code> <code>expr</code></td><td colspan="2">read any key by its bare name</td></tr>
+        </tbody>
+      </table>
+      <p><strong>The scalar rule.</strong> A state value is <code>string | number | boolean | null</code> — the same <code>scalarSchema</code> as a table cell. No arrays, no objects: a key that needs a list is a table.</p>
+    </section>
+
+    <section class="s" id="expr">
+      <div class="num">05</div>
+      <h2>Expressions</h2>
+      <p class="point">A closed grammar, tokenized and parsed to an AST by <code>@washi/wsx</code>, evaluated by the renderer with a depth cap of 24 and a step budget of 2000, from source of at most 512 characters. It computes a value. It cannot define, loop, or format.</p>
+      <div class="cols">
+        <div>
+          <h3>In</h3>
+          <ul class="tight">
+            <li>numbers (<code>3</code>, <code>0.5</code>), strings in <code>'</code> or <code>"</code> with <code>\n</code> <code>\t</code> escapes, <code>true</code> <code>false</code> <code>null</code></li>
+            <li>arithmetic <code>+ - * /</code>, unary <code>-</code></li>
+            <li>comparison <code>= != &lt; &lt;= &gt; &gt;=</code> (<code>==</code> reads as <code>=</code>)</li>
+            <li><code>and</code> <code>or</code> <code>not</code>, parentheses</li>
+            <li>a state key by bare name</li>
+            <li><code>$row.column</code> inside <code>Repeat</code> or a bound <code>Drawer</code></li>
+            <li>aggregates <code>count sum avg min max</code> over a table, with an optional <code>where</code></li>
+            <li><code>now()</code> and <code>days(a, b)</code></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Out — and the message</h3>
+          <ul class="tight">
+            <li><code>%</code> — <em>not in the grammar</em>; <code>? :</code> — <em>ternaries are not allowed</em></li>
+            <li><code>[ ]</code> <code>{ }</code> — <em>array literals and indexing / object literals are not allowed</em></li>
+            <li><code>` </code> template strings, <code>&amp; | ^ ~</code> bitwise (<em>use and / or</em>), <code>;</code> statements, <code>!</code> (<em>use not</em>), <code>=&gt;</code> lambdas</li>
+            <li>reserved words <code>function new if else for while do return let const var class this import export typeof in of yield async await</code> — <em>expr has no definitions, loops, or assignment</em></li>
+            <li>unknown calls — <em>only count, sum, avg, min, max, now, days</em>; method calls; property chains longer than one segment; <code>.</code> on anything but <code>$row</code> or a table inside an aggregate</li>
+            <li>nested aggregates, and <code>where</code> outside an aggregate</li>
+            <li>joining a number into a string: <code>'Total: ' + n</code> → <em>`+` cannot join string and number: expr may compute a value, never format it — use Money/Text</em></li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Aggregates</h3>
+      <p>Form: <code>fn(source)</code> or <code>fn(source.column)</code>, optionally <code>where …</code> before the closing paren. <code>source</code> is a table name. <code>count</code> takes no column; the others need one. Inside <code>where</code> a bare name is the row's column first, then a state key (a clash is reported as a shadowing warning). Rows whose <code>where</code> is not exactly <code>true</code> are skipped; non-numeric cells are skipped by <code>sum avg min max</code>.</p>
+      <table>
+        <thead><tr><th>fn</th><th>Result</th><th>Of no rows</th></tr></thead>
+        <tbody>
+          <tr><td><code>count(t)</code></td><td>rows kept by <code>where</code></td><td><code>0</code></td></tr>
+          <tr><td><code>sum(t.c)</code></td><td>sum of numeric cells</td><td><code>0</code></td></tr>
+          <tr><td><code>avg(t.c)</code></td><td>mean of numeric cells</td><td><code>null</code></td></tr>
+          <tr><td><code>min(t.c)</code> <code>max(t.c)</code></td><td>extreme numeric cell</td><td><code>null</code></td></tr>
+        </tbody>
+      </table>
+      <div class="side"><code>$scope</code> is reserved as an aggregate source (<code>count($scope)</code>, the rows of the enclosing Repeat) but the renderer passes no scope rows today, so it evaluates to <em>`$scope` has no rows in this context</em>. <span class="chip later">later</span></div>
+
+      <h3>Semantics</h3>
+      <ul class="tight">
+        <li><code>+</code> adds two numbers or joins two strings; <code>- * /</code> need numbers. Either side <code>null</code> → <code>null</code>.</li>
+        <li><strong>Division by zero is <code>null</code></strong>, never an error or Infinity.</li>
+        <li><code>=</code> and <code>!=</code> are strict. Ordering compares two numbers or two strings; mixed types compare <code>false</code>.</li>
+        <li><code>and</code> / <code>or</code> short-circuit and want booleans: <code>null</code> reads as <code>false</code>; a number or string there is an error.</li>
+        <li><code>now()</code> is milliseconds, <strong>frozen per render pass</strong> — two reads in one page agree. <code>days(a, b)</code> is <code>trunc((b − a) / 86 400 000)</code>; each side an ISO date string or a number of ms; <code>null</code> in → <code>null</code> out.</li>
+        <li>Tables an expression aggregates over are prefetched once per sheet (<code>limit: 1000</code>) and again after every verb or remote change, so evaluation is synchronous.</li>
+        <li>At render a bad expression — syntax, unknown name, type error, budget — <strong>renders as <code>null</code></strong>; <code>useExprValue</code> never throws. Stat shows <code>—</code>, Show hides, Progress shows 0 %.</li>
+      </ul>
+
+      <h3>Budgets and errors</h3>
+      <table>
+        <thead><tr><th>Limit</th><th>Value</th><th>Thrown</th></tr></thead>
+        <tbody>
+          <tr><td>source length</td><td><code>EXPR_MAX_SOURCE_LENGTH</code> = 512</td><td><code>ExprSyntaxError</code> (<code>offset</code> 512)</td></tr>
+          <tr><td>AST depth</td><td><code>EXPR_LIMITS.depth</code> = 24</td><td><code>ExprBudgetError</code> <code>limit: 'depth'</code> — at parse, and again at eval</td></tr>
+          <tr><td>evaluation steps</td><td><code>EXPR_LIMITS.budget</code> = 2000 — every node visit and every aggregated row spends one</td><td><code>ExprBudgetError</code> <code>limit: 'budget'</code></td></tr>
+          <tr><td>grammar</td><td>any token or shape above</td><td><code>ExprSyntaxError</code> with the character <code>offset</code></td></tr>
+          <tr><td>runtime</td><td>unknown identifier / table / argument, type mismatch</td><td><code>ExprEvalError</code></td></tr>
+        </tbody>
+      </table>
+      <div class="side"><code>validateExpr(ast, shape)</code> checks names against declared state keys, event args and table columns and returns readable problems — but nothing calls it yet outside tests. The persist gate only checks that <code>expr</code> is a string ≤512; the expression itself is first parsed at render. <span class="chip open">open</span></div>
+
+      <h3>Six</h3>
+<pre><span class="t">&lt;Stat</span> <span class="a">label</span>=<span class="v">"remaining"</span> <span class="a">expr</span>=<span class="v">"budget - sum(issues.points)"</span> <span class="t">/&gt;</span>
+<span class="t">&lt;Progress</span> <span class="a">label</span>=<span class="v">"shipped"</span> <span class="a">expr</span>=<span class="v">"count(issues where status = 'Done') / count(issues)"</span> <span class="t">/&gt;</span>
+<span class="t">&lt;Show</span> <span class="a">expr</span>=<span class="v">"mine = true and budget &gt; 20"</span><span class="t">&gt;</span>…<span class="t">&lt;/Show&gt;</span>
+<span class="t">&lt;Money</span> <span class="a">currency</span>=<span class="v">"EUR"</span> <span class="a">expr</span>=<span class="v">"max(expenses.amount where paid_by = 'me')"</span> <span class="t">/&gt;</span>
+<span class="t">&lt;Repeat</span> <span class="a">bind</span>={<span class="v">{ table: 'issues' }</span>}<span class="t">&gt;</span>
+  <span class="t">&lt;Badge</span> <span class="a">tone</span>=<span class="v">"warning"</span> <span class="a">expr</span>=<span class="v">"days(now(), $row.due)"</span> <span class="t">/&gt;</span>        <span class="c">// days until due, negative when late</span>
+<span class="t">&lt;/Repeat&gt;</span>
+<span class="t">&lt;Stat</span> <span class="a">label</span>=<span class="v">"avg open"</span> <span class="a">expr</span>=<span class="v">"avg(issues.points where not (status = 'Done'))"</span> <span class="t">/&gt;</span></pre>
+    </section>
+
+    <section class="s" id="bind">
+      <div class="num">06</div>
+      <h2>Live data: bind</h2>
+      <p class="point">A <code>bind</code> is an ink query descriptor against a table in the workspace file — the same shape everywhere. The host runs it; the primitive draws the rows; every verb and every remote change makes it run again.</p>
+<pre><span class="a">bind</span>={<span class="v">{
+  table: 'issues',
+  where: [{ column: 'status', op: 'ne', value: 'Done' }, { column: 'labels', op: 'contains', value: 'bug' }],
+  orderBy: { column: 'points', direction: 'desc' },
+  limit: 50,
+}</span>}</pre>
+      <table>
+        <thead><tr><th>Field</th><th>Shape</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><code>table</code><span class="req">required</span></td><td>string</td><td>A table name: snake_case identifier when defined.</td></tr>
+          <tr><td><code>where</code></td><td>≤16 × <code>{ column, op, value }</code></td><td>ANDed. <code>op</code>: <code>eq ne gt gte lt lte contains in</code>. <code>value</code> a scalar or a list (≤100) for <code>in</code>. <code>id</code> is always filterable. A comparison against <code>null</code> is never true (SQL); <code>contains</code> is a case-insensitive substring. On a list column (<code>multi_select</code>, <code>relation</code>) <code>eq contains in</code> mean <em>holds any of</em> and <code>ne</code> <em>holds none of</em>.</td></tr>
+          <tr><td><code>orderBy</code></td><td><code>{ column, direction }</code></td><td><code>asc</code> (default) or <code>desc</code>.</td></tr>
+          <tr><td><code>limit</code></td><td>integer 1–1000</td><td></td></tr>
+          <tr><td><code>groupBy</code></td><td><code>{ column, aggregates: [{ fn, column? }] }</code></td><td>1–8 aggregates, <code>fn</code> <code>count sum avg min max</code>. Returns one row per group — feeds a <code>Chart</code> directly (label = the group column, value = the first numeric column).</td></tr>
+        </tbody>
+      </table>
+      <p>Every column named must exist on the table (<code>unknownQueryColumns</code>). Cells arrive typed as the column; a list cell reads on the page as its items, comma-joined (<code>toRows</code>), so <code>$row.labels</code> is a string.</p>
+
+      <h3>Column types</h3>
+      <table>
+        <thead><tr><th>Type</th><th>Cell</th><th>Spec needs</th></tr></thead>
+        <tbody>
+          <tr><td><code>text</code> <code>number</code> <code>boolean</code></td><td>scalar</td><td>—</td></tr>
+          <tr><td><code>date</code></td><td>ISO date, or <code>start/end</code> for a range (end not before start)</td><td>—</td></tr>
+          <tr><td><code>select</code></td><td>one of <code>options</code></td><td><code>options</code></td></tr>
+          <tr><td><code>status</code></td><td>one option; options sit in <code>groups.todo</code> · <code>doing</code> · <code>done</code> (todo and done non-empty)</td><td><code>groups</code></td></tr>
+          <tr><td><code>multi_select</code></td><td>list of <code>options</code>, no repeats</td><td><code>options</code></td></tr>
+          <tr><td><code>person</code></td><td>a member id (<code>ControlPlane.listMembers</code>)</td><td>—</td></tr>
+          <tr><td><code>url</code></td><td>http(s) URL</td><td>—</td></tr>
+          <tr><td><code>relation</code></td><td>list of record ids in <code>table</code></td><td><code>table</code></td></tr>
+        </tbody>
+      </table>
+
+      <h3>Over time — <code>history</code></h3>
+      <p><code>Chart history=&#123;&#123; table, where?, range }}</code> answers <em>how many rows matched <code>where</code> when each day closed</em> (UTC), for <code>range</code> <code>7d 14d 30d 90d</code> (default <code>30d</code>). Every row write appends what the row became to <code>record_changes</code>; history replays that log day by day with <code>matchesFilters</code> — the executor's own filter semantics, in memory. A burn-up is <code>where</code> on the done status; a backlog is <code>ne</code>. The host returns <code>&#123; day, count }</code> rows; the chart labels them <em>Oct 1</em>.</p>
+
+      <h3>Who binds</h3>
+      <table>
+        <thead><tr><th>Primitive</th><th>Takes</th><th>Draws</th></tr></thead>
+        <tbody>
+          <tr><td><code>Repeat</code></td><td><code>bind</code></td><td>its children once per row, <code>$row</code> in scope</td></tr>
+          <tr><td><code>Table</code></td><td><code>bind</code> <code>columns?</code></td><td>rows; a click opens the row page</td></tr>
+          <tr><td><code>Chart</code></td><td><code>bind</code> <em>or</em> <code>history</code></td><td>bar · line · area · donut</td></tr>
+          <tr><td><code>Board</code></td><td><code>bind</code> <code>groupBy</code></td><td>columns of draggable cards</td></tr>
+          <tr><td><code>Roadmap</code></td><td><code>bind</code> <code>date</code></td><td>one bar per row on a calendar</td></tr>
+          <tr><td><code>Drawer</code></td><td><code>bind?</code></td><td>the one row whose id the state key holds</td></tr>
+          <tr><td><code>Database</code></td><td><code>table</code> (binds itself per view)</td><td>table · board · timeline tabs</td></tr>
+          <tr><td><code>Stat</code> <code>Progress</code> <code>Badge</code> <code>Money</code> <code>Show</code></td><td><code>expr</code> aggregates</td><td>a number from the prefetched tables — not a bind, but the same refetch</td></tr>
+          <tr><td><code>Schema</code></td><td><code>table</code></td><td>the spec, not rows</td></tr>
+        </tbody>
+      </table>
+      <p>Validation counts a node with a <code>bind</code> prop toward the budget of 8 per sheet; <code>expr</code> toward 24.</p>
+
+      <h3>Refetch rules</h3>
+      <ol class="steps">
+        <li><strong>Once per sheet.</strong> On mount, every bind runs (<code>useBind</code>), and every table an <code>expr</code> aggregates over is fetched whole (<code>useDataTables</code>).</li>
+        <li><strong>After every verb.</strong> <code>useRunAction</code> bumps the data <code>version</code> after the host's <code>runAction</code> resolves; Field, Board, Roadmap and Database do the same after their own writes. Every bind and prefetch re-runs.</li>
+        <li><strong>On <code>workspaceChanged</code>.</strong> The host's <code>onDataChange</code> (the studio's <code>live.onChange</code> subscription) bumps the same version, so a teammate's or Washi's write redraws the page.</li>
+      </ol>
+
+      <h3><code>Bound</code> and <code>cell()</code></h3>
+      <p>Empty, loading and error ship with every bound primitive, designed once in <code>Bound</code>: <em>Loading…</em> (pulsing), <em>This block could not load — reason</em> (danger), and the empty sentence — <em>Nothing here yet.</em> unless the page sets <code>empty="…"</code>. That sentence is the only override. <code>cell(value)</code> is how any primitive prints a cell: <code>null</code> → nothing, booleans → <code>✓</code> / <code>—</code>, everything else <code>String()</code>.</p>
+    </section>
+
+    <section class="s" id="actions">
+      <div class="num">07</div>
+      <h2>Actions</h2>
+      <p class="point">Interaction is a prop, not a handler. An <code>action</code> is <code>{ verb, …payload }</code> with scalar, list or record values; the hanko registry validates it server-side and the capability desk decides whether a click is consent. Every outcome, run or refused, lands in the capabilities ledger.</p>
+      <table>
+        <thead><tr><th>Verb</th><th>Payload</th><th>Runs</th><th>From a page click</th><th>From Washi (<code>action_run</code>)</th></tr></thead>
+        <tbody>
+          <tr><td><code>state.set</code></td><td><code>{ key, value }</code></td><td>client only — page state</td><td>always; never leaves the page</td><td>n/a</td></tr>
+          <tr><td><code>sheet.open</code></td><td><code>{ sheet }</code></td><td>server, then the host opens the page</td><td>runs</td><td>asks at the desk</td></tr>
+          <tr><td><code>sheet.create</code></td><td><code>{ title }</code> 1–200</td><td>server: a new page with a <code>Title</code>, then opens it</td><td>runs</td><td>asks</td></tr>
+          <tr><td><code>table.insert</code></td><td><code>{ table, data }</code></td><td>server, <code>runMutation</code></td><td>runs</td><td>asks</td></tr>
+          <tr><td><code>table.update</code></td><td><code>{ table, row, set }</code> — <code>set</code> patches ≥1 column</td><td>server, <code>updateRecord</code> (history appended)</td><td>runs — Field, Roadmap, Database write it</td><td>asks</td></tr>
+          <tr><td><code>table.reorder</code></td><td><code>{ table, row, set }</code> — same shape</td><td>server, <code>updateRecord</code></td><td>runs — Board writes the group column and a fractional rank</td><td>asks</td></tr>
+          <tr><td><code>table.delete</code></td><td><code>{ table, row }</code></td><td>server, <code>deleteRecord</code></td><td>runs</td><td>asks</td></tr>
+          <tr><td><code>table.column</code></td><td><code>{ table, column: { name, type, options?, groups?, table? } }</code></td><td>server, <code>addColumn</code>; the whole spec re-validates</td><td>runs — Database's header writes it</td><td>asks</td></tr>
+          <tr><td><code>url.open</code></td><td><code>{ url }</code> public https</td><td>the host machine's opener</td><td><strong>denied</strong>: <em>"url.open" leaves this machine — a sheet cannot run it without a stamp</em></td><td>asks</td></tr>
+        </tbody>
+      </table>
+      <p><code>REVERSIBLE_VERBS</code> — every verb except <code>url.open</code> — stay inside the workspace and can be undone, so a person clicking one in a sheet is consent (<code>decision: auto</code>). Anything that leaves the machine needs a stamp every time.</p>
+      <div class="side"><code>state.set</code> is not in <code>VERBS</code>; <code>useRunAction</code> intercepts it before the host sees it. wsx.md listed it beside the server verbs — same behaviour, now said plainly.</div>
+
+      <h3>The primitives that carry one</h3>
+      <table>
+        <thead><tr><th>Primitive</th><th>Prop</th><th>Args filled in</th></tr></thead>
+        <tbody>
+          <tr><td><code>Button</code></td><td><code>action</code></td><td><code>$row.*</code> when inside Repeat or a bound Drawer (resolved through strings, arrays and objects)</td></tr>
+          <tr><td><code>Compose</code></td><td><code>action</code></td><td><code>$value</code> (the trimmed text) and <code>$now</code> (ISO timestamp), then the box clears</td></tr>
+          <tr><td><code>Board</code></td><td><code>onAdd</code> per column with <code>$group</code>; <code>onOpen</code> per card with <code>$row.*</code></td><td>and a drop writes <code>table.reorder</code> on its own</td></tr>
+          <tr><td><code>Task</code></td><td>—</td><td>a checkbox that calls the host's <code>toggleTask(rowId, done)</code>, no action object</td></tr>
+          <tr><td><code>Field</code> <code>Roadmap</code> <code>Database</code></td><td>—</td><td>write <code>table.update</code> / <code>table.column</code> themselves</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Approvals — what Washi may do without asking</h3>
+      <table>
+        <thead><tr><th>Tools</th><th>At the desk</th></tr></thead>
+        <tbody>
+          <tr><td><code>READ_TOOLS</code>: <code>sheet_list sheet_get sheet_check sheet_backlinks search db_list_tables db_query db_history people_list</code></td><td>pass</td></tr>
+          <tr><td><code>CHANGE_TOOLS</code>: <code>sheet_create sheet_replace db_define db_mutate</code></td><td>land without asking, marked <code>edited_by = 'washi'</code>; each page write pushes the prior state onto <code>sheet_revisions</code></td></tr>
+          <tr><td><code>fetch_url</code>, <code>action_run</code></td><td>always stop at the <code>ApprovalDesk</code>; unanswered for 5 minutes is a denial (12 hours for a routine). "Always" on a fetch adds the host to the allowlist, not a blank cheque.</td></tr>
+        </tbody>
+      </table>
+      <p>The UI says every tool in words (<code>describeTool</code>) — never a tool name or JSON.</p>
+    </section>
+
+    <section class="s" id="registry">
+      <div class="num">08</div>
+      <h2>The registry</h2>
+      <p class="point">Fifty-six primitives in seven groups — <code>PRIMITIVE_GROUPS</code>: frame 6 · text 14 · surface 4 · data out 14 · data in 8 · flow 5 · kit 5. Each block below is read off its zod spec: props, children policy, placement. Every primitive takes the four enums, <code>span</code> and <code>class</code> (§3) unless it says otherwise; the tables list only its own props.</p>
+      <p class="pol">Children: <b>none</b> self-closing · <b>text</b> text only · <b>nodes</b> elements and text. A sketch shows the primitive as paper draws it — static HTML, not the renderer.</p>
+
+      <div class="group-head" id="g-frame"><h3>Frame</h3><span class="count">6 · owns rhythm</span></div>
+      <p>The sheet and its flows. A frame supplies the spacing its children cannot set: <code>Section</code> and the page put <code>--rhythm</code> between blocks; Row, Stack and Grid put <code>--gap</code>.</p>
+
+      <h4 id="p-Sheet">Sheet</h4>
+      <p>The page. Props in §2; no enums, no <code>class</code>. Renders <code>&lt;article class="wsx" data-feel data-theme data-accent&gt;</code> with the theme's sixteen tokens inlined, and a <code>.wsx-page</code> at the feel's measure.</p>
+      <p class="pol">children <b>nodes</b> · the root, once</p>
+<pre><span class="t">&lt;Sheet</span> <span class="a">title</span>=<span class="v">"Weekly review"</span> <span class="a">icon</span>=<span class="v">"calendar"</span> <span class="a">feel</span>=<span class="v">"note"</span> <span class="a">theme</span>=<span class="v">"washi"</span> <span class="a">accent</span>=<span class="v">"info"</span> <span class="a">wsx</span>=<span class="v">"1"</span><span class="t">&gt;</span>
+  …
+<span class="t">&lt;/Sheet&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="t1">Weekly review</div><p class="muted">paper at 760px, 40 × 32 padding, 18px rhythm between blocks — the note feel</p><div class="box">block</div><div class="box" style="margin-top:18px">block</div></div></div><figcaption><b>Sheet</b> — the frame every other primitive sits in.</figcaption></figure>
+
+      <h4 id="p-Section">Section</h4>
+      <p>A band with a small uppercase label and a rule; the rhythm between its children is <code>gap</code>. Two sections in a row sit two rhythms apart.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>title</code></td><td>string ≤120</td><td>The label. Omit for an unlabelled band.</td></tr>
+        <tr><td><code>gap</code></td><td><code>tight</code> <code>normal</code> <code>loose</code></td><td>Between children.</td></tr>
+      </tbody></table>
+      <p class="pol">children <b>nodes</b></p>
+<pre><span class="t">&lt;Section</span> <span class="a">title</span>=<span class="v">"This week"</span> <span class="a">gap</span>=<span class="v">"tight"</span><span class="t">&gt;</span>
+  <span class="t">&lt;Text&gt;</span>Three issues shipped, one slipped.<span class="t">&lt;/Text&gt;</span>
+<span class="t">&lt;/Section&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="sec">This week</div><p>Three issues shipped, one slipped.</p></div></div><figcaption><b>Section</b> — label, rule, children.</figcaption></figure>
+
+      <h4 id="p-Row">Row</h4>
+      <p>Horizontal flow that wraps. <code>--align</code> is always written so a nested flow never inherits its parent's.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>gap</code></td><td><code>tight</code> <code>normal</code> <code>loose</code></td><td></td></tr>
+        <tr><td><code>align</code></td><td><code>start</code> <code>center</code> <code>end</code> <code>baseline</code> <code>stretch</code></td><td>Cross-axis; default <code>start</code>.</td></tr>
+      </tbody></table>
+      <p class="pol">children <b>nodes</b></p>
+<pre><span class="t">&lt;Row</span> <span class="a">align</span>=<span class="v">"center"</span> <span class="a">gap</span>=<span class="v">"tight"</span><span class="t">&gt;</span>
+  <span class="t">&lt;Avatar</span> <span class="a">label</span>=<span class="v">"Juan"</span> <span class="t">/&gt;&lt;Text&gt;</span>Juan<span class="t">&lt;/Text&gt;&lt;Chip&gt;</span>owner<span class="t">&lt;/Chip&gt;</span>
+<span class="t">&lt;/Row&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="flex" style="align-items:center;gap:7px"><span class="av">J</span><span>Juan</span><span class="chip">owner</span></div></div></div><figcaption><b>Row</b> — wraps when the measure runs out.</figcaption></figure>
+
+      <h4 id="p-Stack">Stack</h4>
+      <p>Vertical flow. Children stretch by default.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>gap</code></td><td><code>tight</code> <code>normal</code> <code>loose</code></td><td></td></tr>
+        <tr><td><code>align</code></td><td><code>start</code> <code>center</code> <code>end</code> <code>stretch</code></td><td>Default <code>stretch</code>. No <code>baseline</code> — a column has none.</td></tr>
+      </tbody></table>
+      <p class="pol">children <b>nodes</b></p>
+<pre><span class="t">&lt;Stack</span> <span class="a">gap</span>=<span class="v">"loose"</span><span class="t">&gt;</span>
+  <span class="t">&lt;Card</span> <span class="a">title</span>=<span class="v">"One"</span> <span class="t">/&gt;&lt;Card</span> <span class="a">title</span>=<span class="v">"Two"</span> <span class="t">/&gt;</span>
+<span class="t">&lt;/Stack&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="stack" style="gap:26px"><div class="pcard"><div class="ct">One</div></div><div class="pcard"><div class="ct">Two</div></div></div></div></div><figcaption><b>Stack</b> with <code>gap="loose"</code> — 26px.</figcaption></figure>
+
+      <h4 id="p-Grid">Grid</h4>
+      <p>A twelve-column field. Children take <code>span</code> (default 12). <strong>Always one column under 400px.</strong></p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>gap</code></td><td><code>tight</code> <code>normal</code> <code>loose</code></td><td></td></tr>
+      </tbody></table>
+      <p class="pol">children <b>nodes</b></p>
+<pre><span class="t">&lt;Grid&gt;</span>
+  <span class="t">&lt;Card</span> <span class="a">span</span>={<span class="v">8</span>}<span class="t">&gt;</span>…<span class="t">&lt;/Card&gt;</span>
+  <span class="t">&lt;Card</span> <span class="a">span</span>={<span class="v">4</span>}<span class="t">&gt;</span>…<span class="t">&lt;/Card&gt;</span>
+<span class="t">&lt;/Grid&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="g12"><div class="box" style="grid-column:span 8">span 8</div><div class="box" style="grid-column:span 4">span 4</div><div class="box" style="grid-column:span 4">4</div><div class="box" style="grid-column:span 4">4</div><div class="box" style="grid-column:span 4">4</div></div></div></div><figcaption><b>Grid</b> — twelve columns, spans add up.</figcaption></figure>
+
+      <h4 id="p-Divider">Divider</h4>
+      <p>A rule. Takes the enums only; <code>emphasis="strong"</code> is 2px in ink.</p>
+      <p class="pol">children <b>none</b></p>
+<pre><span class="t">&lt;Divider</span> <span class="t">/&gt;</span>
+<span class="t">&lt;Divider</span> <span class="a">emphasis</span>=<span class="v">"strong"</span> <span class="t">/&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><hr /><hr class="strong" /></div></div><figcaption><b>Divider</b> — normal, then strong.</figcaption></figure>
+
+      <div class="group-head" id="g-text"><h3>Text</h3><span class="count">14 · 10 block + 4 inline</span></div>
+      <p>Type is selected by role, never by px: Title level picks t1 / t2 / t3 from the feel; Text picks body × size. Mark, Kbd, Ref and Tag are inline and take text only.</p>
+
+      <h4 id="p-Title">Title</h4>
+      <p>A heading. Levels 1 and 2 are Young Serif; 3 is Karla bold. The scale belongs to <code>feel</code>.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>level</code></td><td><code>1</code> <code>2</code> <code>3</code> (number)</td><td>Default 1 → <code>h1</code> / <code>h2</code> / <code>h3</code>. Written <code>level={2}</code>.</td></tr>
+      </tbody></table>
+      <p class="pol">children <b>nodes</b></p>
+<pre><span class="t">&lt;Title&gt;</span>Weekly review<span class="t">&lt;/Title&gt;</span>
+<span class="t">&lt;Title</span> <span class="a">level</span>={<span class="v">2</span>}<span class="t">&gt;</span>This week<span class="t">&lt;/Title&gt;</span>
+<span class="t">&lt;Title</span> <span class="a">level</span>={<span class="v">3</span>}<span class="t">&gt;</span>Blockers<span class="t">&lt;/Title&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="t1">Weekly review</div><div class="t2">This week</div><div class="t3">Blockers</div></div></div><figcaption><b>Title</b> at levels 1, 2, 3 in the note feel: 32 / 22 / 17.</figcaption></figure>
+
+      <h4 id="p-Text">Text</h4>
+      <p>The paragraph. <code>emphasis="quiet"</code> is muted ink; a tone colours it; <code>lead</code> is the opener at 1.2× body, muted.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>lead</code></td><td>boolean</td><td>The opening paragraph.</td></tr>
+      </tbody></table>
+      <p class="pol">children <b>nodes</b> — inline primitives allowed</p>
+<pre><span class="t">&lt;Text</span> <span class="a">lead</span><span class="t">&gt;</span>Two weeks, one demo.<span class="t">&lt;/Text&gt;</span>
+<span class="t">&lt;Text&gt;</span>Press <span class="t">&lt;Kbd&gt;</span>⌘K<span class="t">&lt;/Kbd&gt;</span> to ask <span class="t">&lt;Mark&gt;</span>Washi<span class="t">&lt;/Mark&gt;</span>.<span class="t">&lt;/Text&gt;</span>
+<span class="t">&lt;Text</span> <span class="a">emphasis</span>=<span class="v">"quiet"</span><span class="t">&gt;</span>Last edited by Washi.<span class="t">&lt;/Text&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><p class="muted" style="font-size:16px">Two weeks, one demo.</p><p>Press <kbd>⌘K</kbd> to ask <mark>Washi</mark>.</p><p class="muted">Last edited by Washi.</p></div></div><figcaption><b>Text</b> — lead, body with inline marks, quiet.</figcaption></figure>
+
+      <h4 id="p-List">List</h4>
+      <p>Holds <code>Item</code>s. <code>check</code> draws a box per item and strikes the done ones.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>marker</code></td><td><code>bullet</code> <code>number</code> <code>check</code></td><td>Default <code>bullet</code>; <code>number</code> renders an <code>ol</code>.</td></tr>
+      </tbody></table>
+      <p class="pol">children <b>nodes</b> — Items</p>
+<pre><span class="t">&lt;List</span> <span class="a">marker</span>=<span class="v">"check"</span><span class="t">&gt;</span>
+  <span class="t">&lt;Item</span> <span class="a">done</span><span class="t">&gt;</span>Ship the roadmap<span class="t">&lt;/Item&gt;</span>
+  <span class="t">&lt;Item&gt;</span>Write the review<span class="t">&lt;/Item&gt;</span>
+<span class="t">&lt;/List&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="stack" style="gap:5px"><div class="task done"><i></i><span>Ship the roadmap</span></div><div class="task"><i></i><span>Write the review</span></div></div></div></div><figcaption><b>List</b> with <code>marker="check"</code>. Bullet and number use the browser's markers in muted ink.</figcaption></figure>
+
+      <h4 id="p-Item">Item</h4>
+      <p>One entry. Only legal inside <code>List</code>.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>done</code></td><td>boolean</td><td>Ticks the box in a <code>check</code> list; strikes the text.</td></tr>
+      </tbody></table>
+      <p class="pol">children <b>nodes</b> · within <b>List</b></p>
+<pre><span class="t">&lt;Item</span> <span class="a">done</span><span class="t">&gt;</span>Ship the roadmap<span class="t">&lt;/Item&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="task done"><i></i><span>Ship the roadmap</span></div></div></div><figcaption><b>Item</b> — done.</figcaption></figure>
+
+      <h4 id="p-Quote">Quote</h4>
+      <p>Serif at 1.25× body with a tone rule on the left; a tone-less quote takes the sheet accent, <code>neutral</code> the border colour.</p>
+      <p class="pol">children <b>nodes</b></p>
+<pre><span class="t">&lt;Quote&gt;</span>Pages are living, not finished.<span class="t">&lt;/Quote&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="quote">Pages are living, not finished.</div></div></div><figcaption><b>Quote</b>.</figcaption></figure>
+
+      <h4 id="p-Code">Code</h4>
+      <p>Preformatted text that wraps and scrolls. Text children only — write multi-line code as a <code>{"…"}</code> string so the newlines survive the parser.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>lang</code></td><td>string ≤32</td><td>A small uppercase label, top right. No highlighting.</td></tr>
+      </tbody></table>
+      <p class="pol">children <b>text</b></p>
+<pre><span class="t">&lt;Code</span> <span class="a">lang</span>=<span class="v">"sh"</span><span class="t">&gt;</span>{<span class="v">"bun dev\nbun run typecheck"</span>}<span class="t">&lt;/Code&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="code"><span class="lang">sh</span>bun dev
+bun run typecheck</div></div></div><figcaption><b>Code</b> — muted background, mono, lang label.</figcaption></figure>
+
+      <h4 id="p-Pair">Pair</h4>
+      <p>Term / definition — the spec-table workhorse. A row of a <code>dl</code>: term in muted bold at 30 %, definition beside; stacks under 400px.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>term</code><span class="req">required</span></td><td>string 1–120</td><td></td></tr>
+      </tbody></table>
+      <p class="pol">children <b>nodes</b> — the definition</p>
+<pre><span class="t">&lt;Pair</span> <span class="a">term</span>=<span class="v">"Owner"</span><span class="t">&gt;</span>Juan<span class="t">&lt;/Pair&gt;</span>
+<span class="t">&lt;Pair</span> <span class="a">term</span>=<span class="v">"Due"</span><span class="t">&gt;</span>Friday<span class="t">&lt;/Pair&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="pair"><b>Owner</b><span>Juan</span></div><div class="pair"><b>Due</b><span>Friday</span></div></div></div><figcaption><b>Pair</b> — two rows.</figcaption></figure>
+
+      <h4 id="p-Note">Note</h4>
+      <p>A footnote, numbered automatically in document order (the renderer counts Notes before drawing).</p>
+      <p class="pol">children <b>nodes</b></p>
+<pre><span class="t">&lt;Note&gt;</span>Points are Fibonacci; 13 means split it.<span class="t">&lt;/Note&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="note"><i>1</i><span>Points are Fibonacci; 13 means split it.</span></div></div></div><figcaption><b>Note</b> — the first on its page.</figcaption></figure>
+
+      <h4 id="p-Source">Source</h4>
+      <p>An attribution, numbered <code>§1 §2…</code> in its own sequence, in small muted type.</p>
+      <p class="pol">children <b>nodes</b></p>
+<pre><span class="t">&lt;Source&gt;</span>Sprint retro, 14 Oct<span class="t">&lt;/Source&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="note" style="font-size:12px"><i>§1</i><span>Sprint retro, 14 Oct</span></div></div></div><figcaption><b>Source</b>.</figcaption></figure>
+
+      <h4 id="p-Money">Money</h4>
+      <p>An amount formatted at render from the <strong>host locale</strong> — symbol, grouping and negative form are never in the page. <code>expr</code> may compute the number, never build the string. Negative amounts go danger.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>currency</code><span class="req">required</span></td><td>ISO 4217 <code>/^[A-Z]{3}$/</code></td><td></td></tr>
+        <tr><td><code>value</code></td><td>number</td><td>Used when <code>expr</code> is absent or not a number; default 0.</td></tr>
+        <tr><td><code>expr</code></td><td>string 1–512</td><td>§5.</td></tr>
+      </tbody></table>
+      <p class="pol">children <b>none</b> · inline</p>
+<pre><span class="t">&lt;Money</span> <span class="a">value</span>={<span class="v">1240.5</span>} <span class="a">currency</span>=<span class="v">"EUR"</span> <span class="t">/&gt;</span>
+<span class="t">&lt;Money</span> <span class="a">expr</span>=<span class="v">"sum(expenses.amount where paid_by = 'me')"</span> <span class="a">currency</span>=<span class="v">"USD"</span> <span class="a">emphasis</span>=<span class="v">"strong"</span> <span class="t">/&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><span class="money">€1,240.50</span> · <span class="money" style="font-weight:700">$3,180.00</span> · <span class="money neg">-$42.00</span></div></div><figcaption><b>Money</b> in an en locale; a de locale would print 1.240,50 €.</figcaption></figure>
+
+      <h4 id="p-Mark">Mark</h4>
+      <p>An accent highlight on a phrase, 22 % of the accent behind the text.</p>
+      <p class="pol">children <b>text</b> · inline</p>
+<pre><span class="t">&lt;Text&gt;</span>Ask <span class="t">&lt;Mark&gt;</span>Washi<span class="t">&lt;/Mark&gt;</span> anything.<span class="t">&lt;/Text&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk">Ask <mark>Washi</mark> anything.</div></div><figcaption><b>Mark</b>.</figcaption></figure>
+
+      <h4 id="p-Kbd">Kbd</h4>
+      <p>A key cap.</p>
+      <p class="pol">children <b>text</b> · inline</p>
+<pre><span class="t">&lt;Kbd&gt;</span>⌘K<span class="t">&lt;/Kbd&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk">Press <kbd>⌘K</kbd> then <kbd>Enter</kbd>.</div></div><figcaption><b>Kbd</b>.</figcaption></figure>
+
+      <h4 id="p-Ref">Ref</h4>
+      <p>A link to another page by id. Empty children show the target's title (the host resolves it); the id itself until then. Also feeds the link graph (<code>extractRefs</code>) and backlinks.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>sheet</code><span class="req">required</span></td><td>string</td><td>A page id.</td></tr>
+      </tbody></table>
+      <p class="pol">children <b>text</b> · inline</p>
+<pre><span class="t">&lt;Ref</span> <span class="a">sheet</span>=<span class="v">"0199c1a4-…"</span> <span class="t">/&gt;</span>
+<span class="t">&lt;Ref</span> <span class="a">sheet</span>=<span class="v">"0199c1a4-…"</span><span class="t">&gt;</span>the roadmap<span class="t">&lt;/Ref&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk">See <span class="ref">Roadmap</span> and <span class="ref">the roadmap</span>.</div></div><figcaption><b>Ref</b> — kraft underline; the first shows the resolved title.</figcaption></figure>
+
+      <h4 id="p-Tag">Tag</h4>
+      <p>A small label in the muted background; a tone tints it.</p>
+      <p class="pol">children <b>text</b> · inline</p>
+<pre><span class="t">&lt;Tag&gt;</span>design<span class="t">&lt;/Tag&gt;</span> <span class="t">&lt;Tag</span> <span class="a">tone</span>=<span class="v">"info"</span><span class="t">&gt;</span>agent<span class="t">&lt;/Tag&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><span class="tag">design</span> <span class="tag tone">agent</span></div></div><figcaption><b>Tag</b> — neutral and info.</figcaption></figure>
+
+      <div class="group-head" id="g-surface"><h3>Surface</h3><span class="count">4</span></div>
+      <p>Containers with a face. <code>variant</code> does most of the work here.</p>
+
+      <h4 id="p-Card">Card</h4>
+      <p>A box. The default face is card background with the feel's border and a faint shadow; <code>variant</code> swaps it (§3). <code>variant="tape"</code> pins a Tape in the top-left corner reading the <code>title</code> (or <em>note</em>) instead of a heading. A tone colours the border.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>title</code></td><td>string ≤120</td><td>Bold heading, or the tape label.</td></tr>
+      </tbody></table>
+      <p class="pol">children <b>nodes</b></p>
+<pre><span class="t">&lt;Card</span> <span class="a">title</span>=<span class="v">"Blockers"</span> <span class="a">variant</span>=<span class="v">"outline"</span><span class="t">&gt;</span>…<span class="t">&lt;/Card&gt;</span>
+<span class="t">&lt;Card</span> <span class="a">title</span>=<span class="v">"idea"</span> <span class="a">variant</span>=<span class="v">"tape"</span> <span class="a">tone</span>=<span class="v">"warning"</span><span class="t">&gt;</span>…<span class="t">&lt;/Card&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="g12"><div class="pcard" style="grid-column:span 4"><div class="ct">default</div><span class="muted">1.5px border</span></div><div class="pcard outline" style="grid-column:span 4"><div class="ct">outline</div><span class="muted">no fill</span></div><div class="pcard filled" style="grid-column:span 4"><div class="ct">filled</div><span class="muted">muted bg</span></div><div class="pcard raised" style="grid-column:span 6"><div class="ct">raised</div><span class="muted">drag shadow</span></div><div class="pcard tape" style="grid-column:span 6;margin-top:10px"><span class="tape on" style="background:#c08a2e;color:#221f1a">idea</span><span class="muted">tape · tone warning</span></div></div></div></div><figcaption><b>Card</b> — the five variants.</figcaption></figure>
+
+      <h4 id="p-Callout">Callout</h4>
+      <p>An aside that means something. Default tone <code>info</code>; every tone carries its own icon beside the text, so colour is never the only signal. <code>warning</code> and <code>danger</code> are <code>role="alert"</code>.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>title</code></td><td>string ≤120</td><td>Bold, in the tone's text colour.</td></tr>
+      </tbody></table>
+      <p class="pol">children <b>nodes</b></p>
+<pre><span class="t">&lt;Callout</span> <span class="a">title</span>=<span class="v">"This week"</span><span class="t">&gt;</span>Three shipped, one slipped.<span class="t">&lt;/Callout&gt;</span>
+<span class="t">&lt;Callout</span> <span class="a">tone</span>=<span class="v">"warning"</span><span class="t">&gt;</span>The demo moved to Thursday.<span class="t">&lt;/Callout&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="stack"><div class="pcallout"><span class="ic">i</span><b>This week</b><div class="body">Three shipped, one slipped.</div></div><div class="pcallout warn"><span class="ic">!</span><span></span><div class="body">The demo moved to Thursday.</div></div></div></div></div><figcaption><b>Callout</b> — info with a title, warning without.</figcaption></figure>
+
+      <h4 id="p-Hero">Hero</h4>
+      <p>The page opener: serif title at the feel's hero size (58 in editorial and deck), muted subtitle at 60ch. Default <code>size="lg"</code>; <code>size="md"</code> drops the title to t1 for a working page.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>title</code><span class="req">required</span></td><td>string 1–200</td><td></td></tr>
+        <tr><td><code>subtitle</code></td><td>string ≤500</td><td></td></tr>
+        <tr><td><code>align</code></td><td><code>left</code> <code>center</code></td><td>Default <code>left</code>.</td></tr>
+      </tbody></table>
+      <p class="pol">children <b>none</b></p>
+<pre><span class="t">&lt;Hero</span> <span class="a">title</span>=<span class="v">"Sprint 12"</span> <span class="a">subtitle</span>=<span class="v">"Two weeks, one demo."</span> <span class="a">size</span>=<span class="v">"md"</span> <span class="t">/&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="hero"><h1>Sprint 12</h1><p>Two weeks, one demo.</p></div></div></div><figcaption><b>Hero</b> at <code>size="md"</code>.</figcaption></figure>
+
+      <h4 id="p-Figure">Figure</h4>
+      <p>An image, https only, with the aspect held so text never jumps while it loads. Lazy.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>src</code><span class="req">required</span></td><td>URL, <code>https:</code> only</td><td>No data: or http:.</td></tr>
+        <tr><td><code>alt</code><span class="req">required</span></td><td>string 1–300</td><td></td></tr>
+        <tr><td><code>caption</code></td><td>string ≤300</td><td></td></tr>
+        <tr><td><code>ratio</code></td><td><code>16:9</code> <code>4:3</code> <code>3:2</code> <code>1:1</code></td><td>Omitted: the image's own.</td></tr>
+      </tbody></table>
+      <p class="pol">children <b>none</b></p>
+<pre><span class="t">&lt;Figure</span> <span class="a">src</span>=<span class="v">"https://…/demo.png"</span> <span class="a">alt</span>=<span class="v">"The demo screen"</span> <span class="a">ratio</span>=<span class="v">"16:9"</span> <span class="a">caption</span>=<span class="v">"Thursday's build"</span> <span class="t">/&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="fig">16:9 · object-fit cover</div><div class="muted" style="font-size:12.5px;margin-top:8px">Thursday's build</div></div></div><figcaption><b>Figure</b> — frame, image, caption.</figcaption></figure>
+
+      <div class="group-head" id="g-dataOut"><h3>Data out</h3><span class="count">14 · reads</span></div>
+      <p>Rows and numbers onto the page. A bound primitive shows <code>Bound</code>'s loading, error and empty states; only the empty sentence is a page's to set.</p>
+
+      <h4 id="p-Repeat">Repeat</h4>
+      <p>Renders its children once per row with <code>$row.column</code> in scope — in text, in string props, and inside <code>action</code> and <code>bind</code> objects (<code>resolveRowDeep</code>); <code>expr</code> props see the row through <code>$row.column</code> instead. The power multiplier. Cannot contain another Repeat.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>bind</code><span class="req">required</span></td><td>ink query</td><td>§6.</td></tr>
+        <tr><td><code>as</code></td><td>string ≤32</td><td>Accepted by the spec, <strong>ignored by the renderer</strong> — the row is always <code>$row</code>. <span class="chip open">open</span></td></tr>
+        <tr><td><code>empty</code></td><td>string ≤160</td><td>The sentence when no row matches.</td></tr>
+      </tbody></table>
+      <p class="pol">children <b>nodes</b> · noNest</p>
+<pre><span class="t">&lt;Repeat</span> <span class="a">bind</span>={<span class="v">{ table: 'issues', where: [{ column: 'status', op: 'ne', value: 'Done' }], limit: 5 }</span>} <span class="a">empty</span>=<span class="v">"Nothing open."</span><span class="t">&gt;</span>
+  <span class="t">&lt;Row</span> <span class="a">align</span>=<span class="v">"center"</span><span class="t">&gt;&lt;Task&gt;</span>$row.name<span class="t">&lt;/Task&gt;&lt;Badge</span> <span class="a">size</span>=<span class="v">"sm"</span><span class="t">&gt;</span>$row.priority<span class="t">&lt;/Badge&gt;&lt;/Row&gt;</span>
+<span class="t">&lt;/Repeat&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="stack"><div class="flex" style="align-items:center"><div class="task"><i></i><span>Roadmap drag</span></div><span class="badge">high</span></div><div class="flex" style="align-items:center"><div class="task"><i></i><span>Inbox polling</span></div><span class="badge">medium</span></div><div class="flex" style="align-items:center"><div class="task done"><i></i><span>Source mode</span></div><span class="badge">low</span></div></div></div></div><figcaption><b>Repeat</b> — one Row per row.</figcaption></figure>
+
+      <h4 id="p-Table">Table</h4>
+      <p>Rows as a table. Headers are column names with underscores as spaces; numbers right-align in tabular figures; a row click opens its page when the host has <code>openRow</code>.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>bind</code><span class="req">required</span></td><td>ink query</td><td></td></tr>
+        <tr><td><code>columns</code></td><td>string[] ≤16</td><td>Which columns, in order. Omitted: every key of the first row except <code>id</code>.</td></tr>
+        <tr><td><code>empty</code></td><td>string ≤160</td><td></td></tr>
+      </tbody></table>
+      <p class="pol">children <b>none</b></p>
+<pre><span class="t">&lt;Table</span> <span class="a">bind</span>={<span class="v">{ table: 'issues', orderBy: { column: 'points', direction: 'desc' } }</span>} <span class="a">columns</span>={<span class="v">['name', 'status', 'points']</span>} <span class="t">/&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><table class="ptable"><thead><tr><th>name</th><th>status</th><th>points</th></tr></thead><tbody><tr><td>Roadmap drag</td><td>In progress</td><td class="num">8</td></tr><tr><td>Inbox polling</td><td>Not started</td><td class="num">5</td></tr><tr><td>Source mode</td><td>Done</td><td class="num">3</td></tr></tbody></table></div></div><figcaption><b>Table</b>.</figcaption></figure>
+
+      <h4 id="p-Stat">Stat</h4>
+      <p>One big figure in serif, a small uppercase label, an optional hint and trend arrow. A number formats from the host locale with ≤2 decimals; <code>null</code> shows <code>—</code>.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>label</code><span class="req">required</span></td><td>string 1–80</td><td></td></tr>
+        <tr><td><code>value</code></td><td>string ≤32 or number</td><td>Used when there is no <code>expr</code>.</td></tr>
+        <tr><td><code>expr</code></td><td>string 1–512</td><td>Wins over <code>value</code>.</td></tr>
+        <tr><td><code>hint</code></td><td>string ≤80</td><td>A line under the label.</td></tr>
+        <tr><td><code>trend</code></td><td><code>up</code> <code>down</code> <code>flat</code></td><td>↑ success · ↓ danger · → muted.</td></tr>
+      </tbody></table>
+      <p class="pol">children <b>none</b></p>
+<pre><span class="t">&lt;Stat</span> <span class="a">label</span>=<span class="v">"open"</span> <span class="a">expr</span>=<span class="v">"count(issues where status != 'Done')"</span> <span class="a">trend</span>=<span class="v">"down"</span> <span class="a">hint</span>=<span class="v">"vs 14 last week"</span> <span class="t">/&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="stat"><div class="v">9<small style="color:#9a4530">↓</small></div><div class="k">open</div><div class="h">vs 14 last week</div></div></div></div><figcaption><b>Stat</b>.</figcaption></figure>
+
+      <h4 id="p-Chart">Chart</h4>
+      <p>Bar, line, area or donut, drawn as SVG from the chart ramp (<code>--chart-1…5</code>); series colours are never a page's. Takes <code>bind</code> (now) <em>or</em> <code>history</code> (one point per day) — exactly one, enforced by a refine. Bars print their value above each bar; lines label first, middle and last, and mark the latest and the peak; a donut gets a legend. A label that is a bare ISO day reads as <em>Oct 3</em>; a <code>null</code> label reads <em>None</em>.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>kind</code><span class="req">required</span></td><td><code>bar</code> <code>line</code> <code>area</code> <code>donut</code></td><td></td></tr>
+        <tr><td><code>bind</code></td><td>ink query</td><td>Usually with <code>groupBy</code>.</td></tr>
+        <tr><td><code>history</code></td><td><code>{ table, where?, range }</code></td><td>§6. Label <code>day</code>, value <code>count</code>.</td></tr>
+        <tr><td><code>label</code></td><td>column</td><td>Default: the <code>groupBy</code> column, else the first string column, else <code>id</code>.</td></tr>
+        <tr><td><code>value</code></td><td>column</td><td>Default: the first numeric column, else <code>count</code>.</td></tr>
+        <tr><td><code>empty</code></td><td>string ≤160</td><td></td></tr>
+      </tbody></table>
+      <p class="pol">children <b>none</b></p>
+<pre><span class="t">&lt;Chart</span> <span class="a">kind</span>=<span class="v">"bar"</span> <span class="a">bind</span>={<span class="v">{ table: 'issues', groupBy: { column: 'status', aggregates: [{ fn: 'sum', column: 'points' }] } }</span>} <span class="t">/&gt;</span>
+<span class="t">&lt;Chart</span> <span class="a">kind</span>=<span class="v">"area"</span> <span class="a">history</span>={<span class="v">{ table: 'issues', where: [{ column: 'status', op: 'in', value: ['Done'] }], range: '30d' }</span>} <span class="t">/&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="g12"><div style="grid-column:span 6"><div class="bars"><i style="height:38%;--c:#c25f2c" data-l="Not started" data-v="12"></i><i style="height:72%;--c:#3d5a73" data-l="In progress" data-v="23"></i><i style="height:100%;--c:#94a06b" data-l="Done" data-v="31"></i></div></div><div style="grid-column:span 6"><svg class="area" viewBox="0 0 320 110" role="img" aria-label="area chart"><path d="M8 92 L60 84 L112 80 L164 60 L216 48 L268 30 L312 22 L312 92 L8 92 Z" fill="#c25f2c" opacity="0.18"/><path d="M8 92 L60 84 L112 80 L164 60 L216 48 L268 30 L312 22" fill="none" stroke="#c25f2c" stroke-width="2"/><text x="312" y="14" font-size="9" font-weight="600" text-anchor="end" fill="#221f1a">31</text><text x="8" y="106" font-size="9" fill="#6f685d">Sep 21</text><text x="160" y="106" font-size="9" text-anchor="middle" fill="#6f685d">Oct 6</text><text x="312" y="106" font-size="9" text-anchor="end" fill="#6f685d">Oct 21</text></svg></div></div></div></div><figcaption><b>Chart</b> — bar by status, area over 30 days.</figcaption></figure>
+
+      <h4 id="p-Timeline">Timeline</h4>
+      <p>A vertical list of <code>Step</code>s, <code>gap</code> apart. Enums only.</p>
+      <p class="pol">children <b>nodes</b> — Steps</p>
+<pre><span class="t">&lt;Timeline&gt;</span>
+  <span class="t">&lt;Step</span> <span class="a">marker</span>=<span class="v">"W1"</span> <span class="a">title</span>=<span class="v">"Design"</span><span class="t">&gt;</span>Flows on the canvas.<span class="t">&lt;/Step&gt;</span>
+  <span class="t">&lt;Step</span> <span class="a">marker</span>=<span class="v">"W2"</span> <span class="a">title</span>=<span class="v">"Build"</span><span class="t">&gt;</span>Studio first.<span class="t">&lt;/Step&gt;</span>
+<span class="t">&lt;/Timeline&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="timeline"><div class="step"><span class="m">W1</span><div><b>Design</b><div class="b">Flows on the canvas.</div></div></div><div class="step"><span class="m">W2</span><div><b>Build</b><div class="b">Studio first.</div></div></div></div></div></div><figcaption><b>Timeline</b> with two Steps.</figcaption></figure>
+
+      <h4 id="p-Step">Step</h4>
+      <p>One entry: a tilted marker chip in the tone fill (the sheet accent when tone-less), a bold title, a muted body. Only inside <code>Timeline</code>.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>marker</code><span class="req">required</span></td><td>string 1–8</td><td>A week, a date, a number.</td></tr>
+        <tr><td><code>title</code></td><td>string ≤120</td><td></td></tr>
+      </tbody></table>
+      <p class="pol">children <b>nodes</b> · within <b>Timeline</b></p>
+<pre><span class="t">&lt;Step</span> <span class="a">marker</span>=<span class="v">"Oct 21"</span> <span class="a">tone</span>=<span class="v">"success"</span><span class="t">&gt;</span>Shipped.<span class="t">&lt;/Step&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="step"><span class="m" style="background:#94a06b;color:#221f1a">Oct 21</span><div class="b">Shipped.</div></div></div></div><figcaption><b>Step</b> in success.</figcaption></figure>
+
+      <h4 id="p-Progress">Progress</h4>
+      <p>A bar filled to a ratio, clamped to 0–1, with the percentage on the right of the label. Tone fills it; tone-less takes the sheet accent.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>value</code></td><td>number 0–1</td><td>Used when <code>expr</code> is absent or not a number.</td></tr>
+        <tr><td><code>expr</code></td><td>string 1–512</td><td>A ratio.</td></tr>
+        <tr><td><code>label</code></td><td>string ≤80</td><td>Also the accessible name.</td></tr>
+      </tbody></table>
+      <p class="pol">children <b>none</b></p>
+<pre><span class="t">&lt;Progress</span> <span class="a">label</span>=<span class="v">"Sprint"</span> <span class="a">expr</span>=<span class="v">"count(issues where status = 'Done') / count(issues)"</span> <span class="t">/&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="progress"><div class="lbl"><span>Sprint</span><span>62%</span></div><div class="track"><div class="fill"></div></div></div></div></div><figcaption><b>Progress</b>.</figcaption></figure>
+
+      <h4 id="p-Badge">Badge</h4>
+      <p>A pill in the tone tint. With <code>expr</code>, the computed value replaces the text (<code>null</code> prints nothing). <code>variant="filled"</code> is the tone fill, <code>outline</code> a tone line.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>expr</code></td><td>string 1–512</td><td></td></tr>
+      </tbody></table>
+      <p class="pol">children <b>text</b> · inline</p>
+<pre><span class="t">&lt;Badge</span> <span class="a">tone</span>=<span class="v">"danger"</span><span class="t">&gt;</span>blocked<span class="t">&lt;/Badge&gt;</span>
+<span class="t">&lt;Badge</span> <span class="a">variant</span>=<span class="v">"filled"</span> <span class="a">tone</span>=<span class="v">"accent"</span> <span class="a">expr</span>=<span class="v">"count(issues where status != 'Done')"</span> <span class="t">/&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><span class="badge danger">blocked</span> <span class="badge success">story</span> <span class="badge filled">9</span></div></div><figcaption><b>Badge</b> — danger, success, filled accent with an expr.</figcaption></figure>
+
+      <h4 id="p-Avatar">Avatar</h4>
+      <p>Initials — the first letter of each word, two at most, uppercased — in a circle; a tone fills it.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>label</code><span class="req">required</span></td><td>string 1–80</td><td>The name; also the accessible label.</td></tr>
+      </tbody></table>
+      <p class="pol">children <b>none</b> · inline</p>
+<pre><span class="t">&lt;Avatar</span> <span class="a">label</span>=<span class="v">"Juan Camilo"</span> <span class="t">/&gt;</span> <span class="t">&lt;Avatar</span> <span class="a">label</span>=<span class="v">"Washi"</span> <span class="a">tone</span>=<span class="v">"info"</span> <span class="a">size</span>=<span class="v">"sm"</span> <span class="t">/&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><span class="av">JC</span> <span class="av tone" style="background:#3d5a73;width:24px;height:24px;font-size:9.5px">W</span></div></div><figcaption><b>Avatar</b>.</figcaption></figure>
+
+      <h4 id="p-Canvas">Canvas</h4>
+      <p>Ideas and the lines between them, on React Flow. Holds <code>Node</code>s and <code>Edge</code>s and reads them itself, because it has to write the same markup back: when the host offers <code>replaceNode</code> people drag, connect, add (<code>+ Idea</code> → <code>idea-n</code>), rename (double-click) and delete (Backspace / Delete), and every hand edit calls <code>replaceNode(from, to)</code> with positions rounded and dangling edges dropped. Without it the canvas is still. 420px tall.</p>
+      <p class="pol">children <b>nodes</b> — Node and Edge only · hint: <em>children are &lt;Node id x y tone? page?&gt;label&lt;/Node&gt; and &lt;Edge from to label? /&gt;</em></p>
+<pre><span class="t">&lt;Canvas&gt;</span>
+  <span class="t">&lt;Node</span> <span class="a">id</span>=<span class="v">"local"</span> <span class="a">x</span>={<span class="v">40</span>} <span class="a">y</span>={<span class="v">60</span>} <span class="a">tone</span>=<span class="v">"accent"</span><span class="t">&gt;</span>Local mode<span class="t">&lt;/Node&gt;</span>
+  <span class="t">&lt;Node</span> <span class="a">id</span>=<span class="v">"sync"</span> <span class="a">x</span>={<span class="v">300</span>} <span class="a">y</span>={<span class="v">60</span>} <span class="a">page</span>=<span class="v">"0199c1a4-…"</span><span class="t">&gt;</span>Binary sync<span class="t">&lt;/Node&gt;</span>
+  <span class="t">&lt;Edge</span> <span class="a">from</span>=<span class="v">"local"</span> <span class="a">to</span>=<span class="v">"sync"</span> <span class="a">label</span>=<span class="v">"needs"</span> <span class="t">/&gt;</span>
+<span class="t">&lt;/Canvas&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="rf"><svg aria-hidden="true"><line x1="178" y1="62" x2="250" y2="62" stroke="#6f685d" stroke-width="1.5"/><text x="214" y="56" font-size="10" text-anchor="middle" fill="#6f685d">needs</text></svg><div class="node accent" style="left:28px;top:42px">Local mode</div><div class="node" style="left:250px;top:42px">Binary sync <span style="float:right;color:#6f685d">↗</span></div><span class="add">+ Idea</span></div></div></div><figcaption><b>Canvas</b> — two Nodes, one labelled Edge, the add button an editable host shows.</figcaption></figure>
+
+      <h4 id="p-Node">Node</h4>
+      <p>One idea on a Canvas: its label is the text child; a tone colours the border; <code>page</code> links a page (↗ opens it) and counts as a ref in the link graph. Only inside <code>Canvas</code>.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>id</code><span class="req">required</span></td><td><code>/^[a-z0-9][a-z0-9_-]{0,63}$/</code></td><td><em>node ids are short lowercase slugs</em>. Edges name them.</td></tr>
+        <tr><td><code>x</code> <code>y</code><span class="req">required</span></td><td>number</td><td>Canvas coordinates.</td></tr>
+        <tr><td><code>page</code></td><td>string 1–80</td><td>A page id.</td></tr>
+      </tbody></table>
+      <p class="pol">children <b>text</b> · within <b>Canvas</b></p>
+<pre><span class="t">&lt;Node</span> <span class="a">id</span>=<span class="v">"idea-3"</span> <span class="a">x</span>={<span class="v">120</span>} <span class="a">y</span>={<span class="v">200</span>} <span class="a">tone</span>=<span class="v">"info"</span><span class="t">&gt;</span>Routines at 17:00<span class="t">&lt;/Node&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="rf" style="height:90px"><div class="node info" style="left:20px;top:22px">Routines at 17:00</div></div></div></div><figcaption><b>Node</b> in info.</figcaption></figure>
+
+      <h4 id="p-Edge">Edge</h4>
+      <p>A line between two Node ids, optionally labelled. Only inside <code>Canvas</code>; an edge whose end is gone is dropped on the next write.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>from</code> <code>to</code><span class="req">required</span></td><td>string 1–64</td><td>Node ids.</td></tr>
+        <tr><td><code>label</code></td><td>string ≤60</td><td></td></tr>
+      </tbody></table>
+      <p class="pol">children <b>none</b> · within <b>Canvas</b></p>
+<pre><span class="t">&lt;Edge</span> <span class="a">from</span>=<span class="v">"idea-1"</span> <span class="a">to</span>=<span class="v">"idea-3"</span> <span class="a">label</span>=<span class="v">"blocks"</span> <span class="t">/&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="rf" style="height:70px"><svg aria-hidden="true"><line x1="20" y1="35" x2="300" y2="35" stroke="#6f685d" stroke-width="1.5"/><text x="160" y="28" font-size="10" text-anchor="middle" fill="#6f685d">blocks</text></svg></div></div></div><figcaption><b>Edge</b> — muted stroke, label on the line.</figcaption></figure>
+
+      <h4 id="p-Roadmap">Roadmap</h4>
+      <p>Notion's timeline: one bar per row from <code>date</code> (a day, or <code>start/end</code>) on a shared calendar — every bar plus three days' air each side, never under four weeks, ticks on Mondays (the 1st when over 120 days), a today line. Drag a bar to reschedule (<code>table.update</code>, length kept); click an empty track to date an undated row; the name opens the row page.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>bind</code><span class="req">required</span></td><td>ink query</td><td></td></tr>
+        <tr><td><code>date</code><span class="req">required</span></td><td>column</td><td>The date column. Hint: <em>one date column holds the range: date="when" with start/end values</em>.</td></tr>
+        <tr><td><code>title</code></td><td>column</td><td>Default <code>title</code>.</td></tr>
+        <tr><td><code>empty</code></td><td>string ≤160</td><td></td></tr>
+      </tbody></table>
+      <p class="pol">children <b>none</b></p>
+<pre><span class="t">&lt;Roadmap</span> <span class="a">bind</span>={<span class="v">{ table: 'projects' }</span>} <span class="a">date</span>=<span class="v">"when"</span> <span class="a">title</span>=<span class="v">"name"</span> <span class="t">/&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="gantt"><div class="gh">&nbsp;</div><div class="gt" style="border-top:0;min-height:30px"><span class="tick" style="left:4%">Oct 6</span><span class="tick" style="left:29%">Oct 13</span><span class="tick" style="left:54%">Oct 20</span><span class="tick" style="left:79%">Oct 27</span><i class="today" style="left:58%"></i></div><div class="gl">Studio shell</div><div class="gt"><div class="bar" style="left:4%;width:38%">Studio shell</div><i class="today" style="left:58%"></i></div><div class="gl">Source mode</div><div class="gt"><div class="bar" style="left:40%;width:30%;--c:#3d5a73">Source mode</div><i class="today" style="left:58%"></i></div><div class="gl">Binary sync</div><div class="gt"><i class="today" style="left:58%"></i></div></div></div></div><figcaption><b>Roadmap</b> — two dated rows, one waiting for a click on its track.</figcaption></figure>
+
+      <h4 id="p-Schema">Schema</h4>
+      <p>A table's columns from its spec — field, type, options — the schema the page is a view of. Reads <code>describeTable</code>, never rows.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>table</code><span class="req">required</span></td><td>string 1–64</td><td></td></tr>
+      </tbody></table>
+      <p class="pol">children <b>none</b></p>
+<pre><span class="t">&lt;Schema</span> <span class="a">table</span>=<span class="v">"issues"</span> <span class="t">/&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><table class="ptable"><thead><tr><th>field</th><th>type</th><th>options</th></tr></thead><tbody><tr><td>name</td><td>text</td><td></td></tr><tr><td>status</td><td>status</td><td>Not started · In progress · Done</td></tr><tr><td>points</td><td>number</td><td></td></tr></tbody></table></div></div><figcaption><b>Schema</b> of <code>issues</code>.</figcaption></figure>
+
+      <div class="group-head" id="g-dataIn"><h3>Data in</h3><span class="count">8 · writes</span></div>
+      <p>What a person touches. Field, Board, Roadmap and Database write verbs themselves; Button and Compose carry one; Switch and Slider write state; Task flips a row's <code>done</code>.</p>
+
+      <h4 id="p-Field">Field</h4>
+      <p>One primitive over the column types. Label, help and error are structural. Writes <code>table.update</code> on blur (select and boolean on change) — when it knows a row: <code>row</code>, or <code>$row.id</code> inside Repeat; otherwise the error reads <em>this field is not bound to a row</em>. A <code>select</code> offers the column's options from the table spec (a status column's three groups too); a page never enumerates them.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>field</code><span class="req">required</span></td><td>column</td><td></td></tr>
+        <tr><td><code>kind</code><span class="req">required</span></td><td><code>text</code> <code>number</code> <code>date</code> <code>select</code> <code>boolean</code></td><td>The input drawn.</td></tr>
+        <tr><td><code>label</code></td><td>string ≤120</td><td></td></tr>
+        <tr><td><code>help</code></td><td>string ≤200</td><td>Shown until an error replaces it.</td></tr>
+        <tr><td><code>table</code></td><td>string 1–64</td><td>Needed to write and to list options.</td></tr>
+        <tr><td><code>row</code></td><td>string 1–80</td><td>Record id; defaults to the row in scope.</td></tr>
+      </tbody></table>
+      <p class="pol">children <b>none</b></p>
+<pre><span class="t">&lt;Repeat</span> <span class="a">bind</span>={<span class="v">{ table: 'issues', limit: 1 }</span>}<span class="t">&gt;</span>
+  <span class="t">&lt;Field</span> <span class="a">table</span>=<span class="v">"issues"</span> <span class="a">field</span>=<span class="v">"status"</span> <span class="a">kind</span>=<span class="v">"select"</span> <span class="a">label</span>=<span class="v">"Status"</span> <span class="a">help</span>=<span class="v">"Saves on change"</span> <span class="t">/&gt;</span>
+<span class="t">&lt;/Repeat&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="pfield" style="max-width:280px"><div class="k">Status</div><div class="in"><span>In progress</span><span class="muted">▾</span></div><div class="help">Saves on change</div></div></div></div><figcaption><b>Field</b> as a select.</figcaption></figure>
+
+      <h4 id="p-Board">Board</h4>
+      <p>Grouped, draggable records. Columns come from <code>groups</code> or the distinct values of <code>groupBy</code>, each dotted in a ramp colour; a drop is one <code>table.reorder</code> with the group column and a fractional <code>rank</code> between its neighbours, so two people dragging converge. With <code>rank=""</code> a drop only changes the group. The title column is <code>title</code>, else the first string column named <code>title</code> or <code>name</code>. A numeric <code>meta</code> totals per column (<em>3 · 13 pts</em>). Badge values that carry meaning take a tone: <code>highest high bug blocked</code> → danger, <code>medium</code> → warning, <code>story</code> → success, <code>task</code> → info, <code>epic</code> → accent. A card click runs <code>onOpen</code> with <code>$row</code>, else the host's <code>openRow</code>.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>bind</code><span class="req">required</span></td><td>ink query</td><td></td></tr>
+        <tr><td><code>groupBy</code><span class="req">required</span></td><td>column</td><td>The column a drop writes.</td></tr>
+        <tr><td><code>groups</code></td><td>string[] 1–12, each ≤40</td><td>Fixes column order (and shows empty ones).</td></tr>
+        <tr><td><code>rank</code></td><td>column</td><td>Default <code>rank</code>.</td></tr>
+        <tr><td><code>title</code> <code>kicker</code> <code>badge</code> <code>meta</code> <code>avatar</code></td><td>column</td><td>What a card shows: title line, mono kicker above, badge / note / initials below.</td></tr>
+        <tr><td><code>onAdd</code></td><td>action</td><td>A <em>+ Add card</em> per column; <code>$group</code> is substituted with the column name.</td></tr>
+        <tr><td><code>onOpen</code></td><td>action</td><td>Per card, <code>$row.*</code> resolved.</td></tr>
+        <tr><td><code>empty</code></td><td>string ≤160</td><td></td></tr>
+      </tbody></table>
+      <p class="pol">children <b>none</b> · hint <code>onMove</code>: <em>drag writes table.reorder on its own — set rank and groupBy</em></p>
+<pre><span class="t">&lt;Board</span> <span class="a">bind</span>={<span class="v">{ table: 'issues' }</span>} <span class="a">groupBy</span>=<span class="v">"status"</span> <span class="a">groups</span>={<span class="v">['Not started', 'In progress', 'Done']</span>}
+  <span class="a">badge</span>=<span class="v">"priority"</span> <span class="a">meta</span>=<span class="v">"points"</span> <span class="a">avatar</span>=<span class="v">"owner"</span>
+  <span class="a">onAdd</span>={<span class="v">{ verb: 'table.insert', table: 'issues', data: { name: 'Untitled', status: '$group' } }</span>} <span class="t">/&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="cols" style="--n:3;padding:0"><div class="col" style="min-height:0"><div class="ch">Not started <span class="n">1 · 5 pts</span></div><div class="card"><div class="t">Inbox polling</div><div class="sig"><span class="badge" style="height:18px;font-size:10.5px">medium</span><span>5</span><span class="av" style="margin-left:auto;width:19px;height:19px;font-size:8.5px">JC</span></div></div><div class="muted" style="font-size:12px;padding:4px">+ Add card</div></div><div class="col" style="min-height:0"><div class="ch">In progress <span class="n">1 · 8 pts</span></div><div class="card"><div class="t">Roadmap drag</div><div class="sig"><span class="badge danger" style="height:18px;font-size:10.5px">high</span><span>8</span></div></div><div class="muted" style="font-size:12px;padding:4px">+ Add card</div></div><div class="col" style="min-height:0"><div class="ch">Done <span class="n">1 · 3 pts</span></div><div class="card"><div class="t">Source mode</div><div class="sig"><span class="badge" style="height:18px;font-size:10.5px">low</span><span>3</span></div></div><div class="muted" style="font-size:12px;padding:4px">+ Add card</div></div></div></div></div><figcaption><b>Board</b> — three fixed groups, points totalled per column.</figcaption></figure>
+
+      <h4 id="p-Database">Database</h4>
+      <p>Notion's database on the page: views as tabs, rows edited in place. A table view edits every cell (<code>table.update</code>), <em>+ New</em> inserts a row named <em>Untitled</em> in the first to-do status, the header's <code>+</code> adds a property (<code>table.column</code>), and the title cell opens the row as its page. A board view is a <code>Board</code> grouped by the view's column with the spec's choices as groups and a number column named <code>rank</code> as the rank; a timeline view is a <code>Roadmap</code> on the view's date column. The title column is the first text column.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>table</code><span class="req">required</span></td><td>string 1–64</td><td>A missing table reads <em>There is no table called “…”.</em></td></tr>
+        <tr><td><code>views</code></td><td>1–8 × <code>{ name, kind, groupBy?, date?, where?, columns? }</code></td><td><code>name</code> 1–40; <code>kind</code> <code>table</code> <code>board</code> <code>timeline</code>; <code>where</code> ≤16 filters; <code>columns</code> ≤16. Omitted: <em>Table</em>, plus <em>Board</em> on the first status (else select) column, plus <em>Timeline</em> on the first date column.</td></tr>
+        <tr><td><code>empty</code></td><td>string ≤160</td><td></td></tr>
+      </tbody></table>
+      <p class="pol">children <b>none</b></p>
+<pre><span class="t">&lt;Database</span> <span class="a">table</span>=<span class="v">"issues"</span> <span class="t">/&gt;</span>
+<span class="t">&lt;Database</span> <span class="a">table</span>=<span class="v">"issues"</span> <span class="a">views</span>={<span class="v">[
+  { name: 'Open', kind: 'table', where: [{ column: 'status', op: 'ne', value: 'Done' }], columns: ['name', 'status', 'points'] },
+  { name: 'Board', kind: 'board', groupBy: 'status' },
+  { name: 'Plan', kind: 'timeline', date: 'when' },
+]</span>} <span class="t">/&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="ptabs ink"><span class="on">Table</span><span>Board</span><span>Timeline</span></div><div class="grid" style="--cols:2fr 1fr 1fr 32px"><div class="gr"><div class="gc gh">name</div><div class="gc gh">status</div><div class="gc gh">points</div><div class="gc gh">+</div></div><div class="gr"><div class="gc">Roadmap drag</div><div class="gc"><span class="pill prog"><span class="dot"></span>In progress</span></div><div class="gc ed">8</div><div class="gc"></div></div><div class="gr"><div class="gc">Inbox polling</div><div class="gc"><span class="pill todo"><span class="dot"></span>Not started</span></div><div class="gc">5</div><div class="gc"></div></div><div class="add">+ New</div></div></div></div><figcaption><b>Database</b> — the default views; a cell mid-edit.</figcaption></figure>
+
+      <h4 id="p-Button">Button</h4>
+      <p>Runs one action on click, disabled while it runs. Default tone <code>accent</code>; <code>neutral</code> is ink on paper. Variants in §3.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>action</code><span class="req">required</span></td><td><code>{ verb, … }</code></td><td>§7. <code>$row.*</code> resolved in scope.</td></tr>
+      </tbody></table>
+      <p class="pol">children <b>text</b></p>
+<pre><span class="t">&lt;Button</span> <span class="a">action</span>={<span class="v">{ verb: 'sheet.create', title: 'Retro' }</span>}<span class="t">&gt;</span>New retro<span class="t">&lt;/Button&gt;</span>
+<span class="t">&lt;Button</span> <span class="a">variant</span>=<span class="v">"outline"</span> <span class="a">action</span>={<span class="v">{ verb: 'state.set', key: 'open', value: '$row.id' }</span>}<span class="t">&gt;</span>Details<span class="t">&lt;/Button&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="flex" style="gap:8px"><span class="pbtn">New retro</span><span class="pbtn outline">Details</span><span class="pbtn neutral">Neutral</span></div></div></div><figcaption><b>Button</b> — accent, outline, neutral.</figcaption></figure>
+
+      <h4 id="p-Compose">Compose</h4>
+      <p>A text box that runs one verb with <code>$value</code> (the trimmed text) and <code>$now</code> (ISO timestamp) filled in, then clears — the comment box. Enter submits a single line; Shift+Enter or <code>multiline</code> for a textarea.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>action</code><span class="req">required</span></td><td><code>{ verb, … }</code></td><td>Usually <code>table.insert</code>.</td></tr>
+        <tr><td><code>label</code></td><td>string ≤40</td><td>The button; default <em>Post</em>.</td></tr>
+        <tr><td><code>placeholder</code></td><td>string ≤120</td><td></td></tr>
+        <tr><td><code>multiline</code></td><td>boolean</td><td>Three rows.</td></tr>
+      </tbody></table>
+      <p class="pol">children <b>none</b></p>
+<pre><span class="t">&lt;Compose</span> <span class="a">placeholder</span>=<span class="v">"Leave a note"</span> <span class="a">action</span>={<span class="v">{ verb: 'table.insert', table: 'notes', data: { body: '$value', at: '$now' } }</span>} <span class="t">/&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="flex" style="gap:8px;flex-wrap:nowrap"><div class="pfield" style="flex:1"><div class="in"><span class="muted">Leave a note</span></div></div><span class="pbtn sm" style="opacity:.5">Post</span></div></div></div><figcaption><b>Compose</b> — empty, so Post waits.</figcaption></figure>
+
+      <h4 id="p-Task">Task</h4>
+      <p>A checkbox bound to a row's <code>done</code> column through the host's <code>toggleTask</code>. Disabled without a row id.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>row</code></td><td>string 1–80</td><td>Record id; defaults to <code>$row.id</code> inside Repeat.</td></tr>
+        <tr><td><code>done</code></td><td>boolean</td><td>Initial state; defaults to the row's <code>done</code>.</td></tr>
+      </tbody></table>
+      <p class="pol">children <b>text</b></p>
+<pre><span class="t">&lt;Task</span> <span class="a">row</span>=<span class="v">"0199c2…"</span><span class="t">&gt;</span>Write the review<span class="t">&lt;/Task&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="task"><i></i><span>Write the review</span></div></div></div><figcaption><b>Task</b>.</figcaption></figure>
+
+      <h4 id="p-Switch">Switch</h4>
+      <p>Writes a boolean to a state key.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>state</code><span class="req">required</span></td><td>key 1–64</td><td></td></tr>
+        <tr><td><code>label</code></td><td>string ≤120</td><td></td></tr>
+      </tbody></table>
+      <p class="pol">children <b>none</b></p>
+<pre><span class="t">&lt;Switch</span> <span class="a">state</span>=<span class="v">"mine"</span> <span class="a">label</span>=<span class="v">"Only mine"</span> <span class="t">/&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="switch"><i></i>Only mine</div></div></div><figcaption><b>Switch</b> on.</figcaption></figure>
+
+      <h4 id="p-Slider">Slider</h4>
+      <p>Writes a number to a state key; shows the label (or the key) and the value above a range input.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>state</code><span class="req">required</span></td><td>key 1–64</td><td></td></tr>
+        <tr><td><code>min</code> <code>max</code></td><td>number</td><td>Defaults 0 and 100.</td></tr>
+        <tr><td><code>step</code></td><td>number &gt; 0</td><td>Default 1.</td></tr>
+        <tr><td><code>label</code></td><td>string ≤120</td><td></td></tr>
+      </tbody></table>
+      <p class="pol">children <b>none</b></p>
+<pre><span class="t">&lt;Slider</span> <span class="a">state</span>=<span class="v">"budget"</span> <span class="a">min</span>={<span class="v">0</span>} <span class="a">max</span>={<span class="v">100</span>} <span class="a">step</span>={<span class="v">5</span>} <span class="a">label</span>=<span class="v">"Budget"</span> <span class="t">/&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="slider" style="max-width:280px"><div class="h"><span>Budget</span><span>40</span></div><div class="r"></div></div></div></div><figcaption><b>Slider</b> at 40.</figcaption></figure>
+
+      <div class="group-head" id="g-flow"><h3>Flow</h3><span class="count">5 · no cosmetics</span></div>
+      <p>What shows when. Show is the one primitive with no enums and no <code>class</code> — it renders nothing of its own.</p>
+
+      <h4 id="p-Show">Show</h4>
+      <p>Renders its children when the expression is <code>true</code>, a non-zero number, or a non-empty string. Anything else — <code>false</code>, <code>0</code>, <code>''</code>, <code>null</code>, an error — hides them.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>expr</code><span class="req">required</span></td><td>string 1–512</td><td>The only prop. Hints: <code>when</code> <code>equals</code> <code>not</code> → <em>use expr</em>.</td></tr>
+      </tbody></table>
+      <p class="pol">children <b>nodes</b> · no enums, no class</p>
+<pre><span class="t">&lt;Show</span> <span class="a">expr</span>=<span class="v">"count(issues where status != 'Done') = 0"</span><span class="t">&gt;</span>
+  <span class="t">&lt;Callout</span> <span class="a">tone</span>=<span class="v">"success"</span><span class="t">&gt;</span>Nothing open. Go outside.<span class="t">&lt;/Callout&gt;</span>
+<span class="t">&lt;/Show&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="pcallout" style="background:#94a06b2e;border-color:#94a06b88"><span class="ic" style="border-color:#5a6638;color:#5a6638">✓</span><span></span><div class="body" style="color:#5a6638">Nothing open. Go outside.</div></div></div></div><figcaption><b>Show</b> — the Callout appears only when the count is zero.</figcaption></figure>
+
+      <h4 id="p-Tabs">Tabs</h4>
+      <p>One <code>Tab</code> per label; the active panel is the child at the selected index. With <code>state</code> the chosen label is written to the key (and read from it); without, the selection is the component's own.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>labels</code><span class="req">required</span></td><td>string[] 1–12, each 1–60</td><td></td></tr>
+        <tr><td><code>state</code></td><td>key 1–64</td><td>Holds the label string.</td></tr>
+      </tbody></table>
+      <p class="pol">children <b>nodes</b> — Tabs</p>
+<pre><span class="t">&lt;Tabs</span> <span class="a">labels</span>={<span class="v">['Board', 'List']</span>} <span class="a">state</span>=<span class="v">"tab"</span><span class="t">&gt;</span>
+  <span class="t">&lt;Tab&gt;&lt;Board</span> <span class="a">bind</span>={<span class="v">{ table: 'issues' }</span>} <span class="a">groupBy</span>=<span class="v">"status"</span> <span class="t">/&gt;&lt;/Tab&gt;</span>
+  <span class="t">&lt;Tab&gt;&lt;Table</span> <span class="a">bind</span>={<span class="v">{ table: 'issues' }</span>} <span class="t">/&gt;&lt;/Tab&gt;</span>
+<span class="t">&lt;/Tabs&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="ptabs"><span class="on">Board</span><span>List</span></div><div class="box">the Board tab's panel</div></div></div><figcaption><b>Tabs</b> — accent underline on the active one.</figcaption></figure>
+
+      <h4 id="p-Tab">Tab</h4>
+      <p>A panel. Only inside <code>Tabs</code>; its position pairs it with a label.</p>
+      <p class="pol">children <b>nodes</b> · within <b>Tabs</b></p>
+<pre><span class="t">&lt;Tab&gt;</span>…<span class="t">&lt;/Tab&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="box">a Tab's children, one gap below the strip</div></div></div><figcaption><b>Tab</b>.</figcaption></figure>
+
+      <h4 id="p-Reveal">Reveal</h4>
+      <p>A disclosure — a bordered <code>details</code> with a chevron. With <code>state</code> the open flag lives in the key.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>label</code><span class="req">required</span></td><td>string 1–120</td><td>The summary.</td></tr>
+        <tr><td><code>state</code></td><td>key 1–64</td><td>Boolean.</td></tr>
+      </tbody></table>
+      <p class="pol">children <b>nodes</b></p>
+<pre><span class="t">&lt;Reveal</span> <span class="a">label</span>=<span class="v">"How we work"</span><span class="t">&gt;</span>
+  <span class="t">&lt;Text&gt;</span>Ship on Thursdays. Review on Fridays.<span class="t">&lt;/Text&gt;</span>
+<span class="t">&lt;/Reveal&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="reveal"><div class="sum">How we work</div><div class="bd">Ship on Thursdays. Review on Fridays.</div></div></div></div><figcaption><b>Reveal</b>, open.</figcaption></figure>
+
+      <h4 id="p-Drawer">Drawer</h4>
+      <p>A side panel whose openness is a state key. With <code>bind</code> the key holds a row id: the drawer fetches that one row (<code>where id eq</code>, <code>limit 1</code>) and renders its children with <code>$row</code> in scope — <code>title</code> included, so <code>title="$row.name"</code> works; a vanished row reads <em>That row is gone.</em> Without <code>bind</code> any truthy value opens it. Scrim, × and Escape set the key to <code>null</code>. Cannot nest.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>state</code><span class="req">required</span></td><td>key 1–64</td><td></td></tr>
+        <tr><td><code>bind</code></td><td>ink query</td><td>The table (and filters) the id is looked up in.</td></tr>
+        <tr><td><code>title</code></td><td>string ≤120</td><td>Serif head; <code>$row.*</code> resolved.</td></tr>
+      </tbody></table>
+      <p class="pol">children <b>nodes</b> · noNest</p>
+<pre><span class="t">&lt;Drawer</span> <span class="a">state</span>=<span class="v">"open"</span> <span class="a">bind</span>={<span class="v">{ table: 'issues' }</span>} <span class="a">title</span>=<span class="v">"$row.name"</span><span class="t">&gt;</span>
+  <span class="t">&lt;Pair</span> <span class="a">term</span>=<span class="v">"Status"</span><span class="t">&gt;</span>$row.status<span class="t">&lt;/Pair&gt;</span>
+  <span class="t">&lt;Field</span> <span class="a">table</span>=<span class="v">"issues"</span> <span class="a">field</span>=<span class="v">"points"</span> <span class="a">kind</span>=<span class="v">"number"</span> <span class="a">label</span>=<span class="v">"Points"</span> <span class="t">/&gt;</span>
+<span class="t">&lt;/Drawer&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk" style="padding:0"><div class="pdrawer"><div class="panel"><div class="hd">Roadmap drag <span>×</span></div><div class="bd"><div class="pair"><b>Status</b><span>In progress</span></div><div class="pfield" style="margin-top:10px"><div class="k">Points</div><div class="in">8</div></div></div></div></div></div></div><figcaption><b>Drawer</b> open on a row — scrim on the left, panel at 440px max.</figcaption></figure>
+
+      <div class="group-head" id="g-kit"><h3>Washi kit</h3><span class="count">5 · 4 + Missing</span></div>
+      <p>The house marks. Tape, Stamp and Chip take their tone from the sheet's <code>accent</code> unless given one, so a page cannot assemble a rainbow.</p>
+
+      <h4 id="p-Tape">Tape</h4>
+      <p>A torn washi-tape label: uppercase, tracked, tilted one degree, clipped at the edges, striped.</p>
+      <p class="pol">children <b>text</b> · inline</p>
+<pre><span class="t">&lt;Tape&gt;</span>draft<span class="t">&lt;/Tape&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><span class="tape">draft</span></div></div><figcaption><b>Tape</b>.</figcaption></figure>
+
+      <h4 id="p-Stamp">Stamp</h4>
+      <p>A hanko mark: a 42px ring in the tone, serif, tilted six degrees, slightly faded.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>label</code><span class="req">required</span></td><td>string 1–8</td><td>Also the accessible name.</td></tr>
+      </tbody></table>
+      <p class="pol">children <b>none</b> · inline</p>
+<pre><span class="t">&lt;Stamp</span> <span class="a">label</span>=<span class="v">"済"</span> <span class="t">/&gt;</span> <span class="t">&lt;Stamp</span> <span class="a">label</span>=<span class="v">"OK"</span> <span class="a">tone</span>=<span class="v">"success"</span> <span class="t">/&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><span class="stamp">済</span> <span class="stamp" style="border-color:#94a06b;color:#5a6638">OK</span></div></div><figcaption><b>Stamp</b> — accent, then success.</figcaption></figure>
+
+      <h4 id="p-Chip">Chip</h4>
+      <p>A dotted status pill: card background, dotted tone line, a tone dot before the text.</p>
+      <p class="pol">children <b>text</b> · inline</p>
+<pre><span class="t">&lt;Chip&gt;</span>in review<span class="t">&lt;/Chip&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><span class="chip">in review</span></div></div><figcaption><b>Chip</b>.</figcaption></figure>
+
+      <h4 id="p-Mascot">Mascot</h4>
+      <p>Washi-chan. Geometry comes from the host's <code>&lt;MascotDefs /&gt;</code> symbols (<code>#wBody</code>, <code>#fHappy</code>…), so the page only names a face. <strong>One per sheet.</strong></p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>mood</code></td><td><code>happy</code> <code>sleep</code> <code>curious</code> <code>sad</code> <code>dizzy</code> <code>wink</code></td><td>Default <code>happy</code>.</td></tr>
+        <tr><td><code>size</code></td><td><code>sm</code> <code>md</code> <code>lg</code></td><td>40 / 72 / 120px wide.</td></tr>
+      </tbody></table>
+      <p class="pol">children <b>none</b> · unique</p>
+<pre><span class="t">&lt;Mascot</span> <span class="a">mood</span>=<span class="v">"wink"</span> <span class="a">size</span>=<span class="v">"sm"</span> <span class="t">/&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="flex" style="align-items:flex-end;gap:18px"><i data-mascot="happy" data-size="40"></i><i data-mascot="wink" data-size="72"></i><i data-mascot="sleep" data-size="40"></i></div></div></div><figcaption><b>Mascot</b> — happy at sm, wink at md, sleep at sm.</figcaption></figure>
+
+      <h4 id="p-Missing">Missing</h4>
+      <p>A capability the registry lacks. Renders a dashed, hatched placeholder that says so; leaves the page valid; files a registry request (§9). No enums, no <code>class</code>.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>kind</code><span class="req">required</span></td><td>string 1–40</td><td>The primitive wanted.</td></tr>
+        <tr><td><code>reason</code><span class="req">required</span></td><td>string 1–200</td><td>Why, in a sentence.</td></tr>
+      </tbody></table>
+      <p class="pol">children <b>none</b></p>
+<pre><span class="t">&lt;Missing</span> <span class="a">kind</span>=<span class="v">"Calendar"</span> <span class="a">reason</span>=<span class="v">"a month view of the issues' due dates"</span> <span class="t">/&gt;</span></pre>
+      <figure class="plate"><div class="inner"><div class="app flat sk"><div class="missing"><b>Calendar</b> is not in the registry yet — a month view of the issues' due dates</div></div></div><figcaption><b>Missing</b>.</figcaption></figure>
+    </section>
+
+    <section class="s" id="missing">
+      <div class="num">09</div>
+      <h2>Missing and requests</h2>
+      <p class="point">There is no escape hatch. A design that needs something not in the registry writes <code>&lt;Missing kind reason /&gt;</code>: the page stays valid, the reader sees a labelled gap, and the registry hears about it.</p>
+      <ol class="steps">
+        <li><strong>The validator says so.</strong> An unknown name fails with <em>&lt;Matrix&gt; is not a registry primitive — write &lt;Missing kind="Matrix" reason="…" /&gt; and the registry hears about it</em>. Washi's <code>sheet_check</code> returns the same.</li>
+        <li><strong>The gate collects them.</strong> <code>checkSource</code> returns <code>{ ok, diagnostics, missing }</code>; <code>missing</code> is <code>extractMissing(root)</code> — <code>{ kind, reason, path }</code> per element, <code>path</code> like <code>Sheet &gt; Section &gt; Missing</code>. That list is the registry request.</li>
+        <li><strong>At render</strong> the <code>Missing</code> component draws <em>Kind is not in the registry yet — reason</em> in a dashed, hatched box. The renderer also falls back to it for any element name it has no component for, so a page never goes blank.</li>
+      </ol>
+      <p>Known gaps, to be written as Missing until they land: <code>Matrix</code> · <code>Calendar</code> · <code>Timer</code> · <code>Scene</code> / <code>Beat</code> / <code>Stepper</code> · <code>Filter</code> / <code>Facet</code> / <code>Search</code> / <code>Sort</code> / <code>Segment</code>. <span class="chip later">later</span></p>
+    </section>
+
+    <section class="s" id="validation">
+      <div class="num">10</div>
+      <h2>Validation</h2>
+      <p class="point">Two gates, one check. <code>checkSource</code> — parse, then validate against <code>paperRegistry</code> — runs in the service before any persist and in the client before render. Errors name the element path, the prop and the legal alternative.</p>
+      <h3>The gates</h3>
+      <table>
+        <thead><tr><th>Where</th><th>What</th><th>On failure</th></tr></thead>
+        <tbody>
+          <tr><td><code>createSheetFromSource</code> / <code>updateSheetFromSource</code> (service)</td><td><code>checkSource(write.source)</code>; warnings never block</td><td>throws <code>SheetValidationError</code> with <code>diagnostics</code> → 400</td></tr>
+          <tr><td>the same update, with <code>baseVersion</code></td><td>replays the write on a fork at that version and merges it into the present (<code>mergeSheetSource</code>); if the merged text differs it is re-checked</td><td>a merge that will not apply, or breaks WSX, throws <code>SheetConflictError</code>: <em>page … changed under this edit and the two do not fit together; reload it</em></td></tr>
+          <tr><td><code>sheets.check</code> (tRPC) and <code>sheet_check</code> (Washi's tool)</td><td><code>checkSource</code> on demand</td><td>returns <code>{ ok, diagnostics, missing }</code></td></tr>
+          <tr><td>before render (<code>SheetView</code>, source mode)</td><td><code>parse</code> + <code>validate</code> client-side with the same registry</td><td>the page is not drawn; <code>WsxView</code> trusts its input</td></tr>
+        </tbody>
+      </table>
+      <h3>A diagnostic</h3>
+<pre><span class="c">// Diagnostic</span>
+{ severity: <span class="v">'error'</span> | <span class="v">'warning'</span>, message, line?, column?, path? }
+<span class="c">// parse errors carry line/column (1-based line); schema errors carry a path</span>
+Sheet &gt; Card: prop tone: "purple" is not one of neutral · accent · info · success · warning · danger
+Sheet &gt; Text: prop color is not addressable on &lt;Text&gt; — use tone
+Sheet &gt; Figure: prop src: Invalid URL
+Sheet &gt; Chart: prop (root): a Chart takes bind (now) or history (over time), exactly one
+Sheet &gt; Box: &lt;Box&gt; is not a registry primitive — write &lt;Missing kind="Box" reason="…" /&gt; and the registry hears about it
+Sheet &gt; Repeat &gt; Repeat: &lt;Repeat&gt; cannot contain another &lt;Repeat&gt; — a second view is a second sheet
+Sheet &gt; Mascot: &lt;Mascot&gt; may appear once per sheet
+Sheet: over the complexity budget — 412 nodes (budget 400). Split into linked sheets (&lt;Ref&gt;).   <span class="c">// warning</span></pre>
+      <p>Parse stops at the first problem and throws <code>WsxParseError</code> (one diagnostic, with the location when Babel can attribute it). Validation walks the whole tree and reports everything.</p>
+      <h3>Budgets</h3>
+      <p><code>paperRegistry.budget</code> = <strong>400 nodes · 8 binds · 24 expressions</strong> per sheet, counted on elements with a <code>bind</code> / <code>expr</code> prop. Over any of them is one <em>warning</em> on <code>Sheet</code> — a prompt to split into linked sheets via <code>Ref</code>, never an error, and never a blocked save.</p>
+      <h3>Source mode in the studio</h3>
+      <p>The <code>&lt;/&gt;</code> toggle while editing (or <em>Edit source</em> in the page menu) opens the raw WSX in CodeMirror. It runs the server's own check client-side on every keystroke — parse, then validate against <code>paperRegistry</code> — lists the problems under the editor, autosaves only a valid draft through <code>sheets.update</code> with <code>baseVersion</code>, and holds <em>Done</em> while the draft has errors (<em>Not saved — the source has errors</em>).</p>
+    </section>
+
+    <section class="s" id="editing">
+      <div class="num">11</div>
+      <h2>How a page is edited</h2>
+      <p class="point">Four hands write the same text: a person typing blocks, a person in source mode, Washi through <code>sheet_replace</code>, and a canvas rewriting itself. All of them go through <code>sheets.update</code> and the same gate; the Loro doc merges them.</p>
+      <h3>Typed blocks</h3>
+      <p>The page editor (<code>apps/studio/src/components/page-editor</code>) edits the sheet's <strong>top level</strong> as blocks. A top-level element becomes a typed block when it is plain text — one text run, or one plain <code>Text</code> inside:</p>
+      <table>
+        <thead><tr><th>Block</th><th>WSX</th><th>Shortcut</th></tr></thead>
+        <tbody>
+          <tr><td>Heading 1 / 2 / 3</td><td><code>Title</code>, <code>level</code> 1 / 2 / 3</td><td><code># </code> <code>## </code> <code>### </code></td></tr>
+          <tr><td>Text</td><td><code>Text</code></td><td></td></tr>
+          <tr><td>Bulleted / Numbered / To-do</td><td><code>List marker</code> + <code>Item</code> (<code>done</code>); neighbours of one kind share a List</td><td><code>- </code> <code>* </code> <code>1. </code> <code>[] </code></td></tr>
+          <tr><td>Quote · Callout</td><td><code>Quote</code> · <code>Callout</code></td><td><code>&gt; </code> · <code>! </code></td></tr>
+          <tr><td>Code</td><td><code>Code</code> (its text joined)</td><td><code>```</code></td></tr>
+          <tr><td>Divider</td><td><code>Divider</code></td><td><code>---</code></td></tr>
+        </tbody>
+      </table>
+      <p>Everything else — any other primitive, text with inline marks, a List with a non-plain Item — is a <strong>locked block</strong>, kept byte-for-byte and rendered by paper in place. A block's own props (a tone, a size) survive the round-trip. Typing pauses 700ms, then the sheet is rebuilt (<code>toSheet</code>) and saved through <code>sheets.update</code> with <code>baseVersion</code> — the same validation as Washi's. Empty text blocks are dropped. The first block, when it is a level-1 heading, names the page.</p>
+      <h3><code>/</code> live blocks</h3>
+      <p>Besides the text kinds, the slash menu drops live blocks in as locked blocks: <strong>New database</strong> (<code>/database Bugs</code> defines table <code>bugs</code> with <code>name</code> text and a three-step <code>status</code>, then inserts <code>&lt;Database table="bugs" /&gt;</code>), <strong>Linked view</strong> of any existing table (<code>&lt;Database table="…" /&gt;</code>), and <strong>Progress</strong> for any table with a done group — <code>&lt;Chart kind="area" history=&#123;&#123; table, where: [&#123; column: status, op: 'in', value: doneValues }], range: '30d' }} /&gt;</code>.</p>
+      <h3>Washi's writes</h3>
+      <p><code>sheet_create</code> and <code>sheet_replace</code> are <code>CHANGE_TOOLS</code>: they land without asking, marked <code>edited_by = 'washi'</code>, and each pushes the page's prior state onto <code>sheet_revisions</code> — the undo stack, cleared the moment a person changes the page so Undo never erases their words (<code>undoWashiWrite</code>; <code>SheetUndoError</code> when there is nothing of Washi's left). <code>sheet_replace</code> sends the <code>version</code> it read as <code>baseVersion</code>, so a person typing meanwhile merges rather than loses. Washi shows on the page for 20s after each rewrite.</p>
+      <h3>Canvas self-edits</h3>
+      <p>A hand edit on a <code>Canvas</code> calls <code>PaperHost.replaceNode(from, to)</code>. In view mode <code>SheetView</code>'s host swaps the element in the tree and saves through <code>sheets.update</code>; in the page editor <code>LockedBlock</code> routes the swap into the editor store instead (<code>swapNode</code>, keeping untouched elements' identity), so autosave never writes a stale canvas over a fresh one.</p>
+    </section>
+
+    <section class="s" id="index">
+      <div class="num">12</div>
+      <h2>Index</h2>
+      <p class="point">All 56, alphabetically. <em>binds</em>: takes <code>bind</code>, <code>history</code> or a table. <em>state</em>: reads or writes a state key (an <code>expr</code> reads them). <em>actions</em>: carries an action prop or writes a verb itself.</p>
+      <table class="index">
+        <thead><tr><th>Primitive</th><th>Group</th><th>binds</th><th>state</th><th>actions</th><th></th></tr></thead>
+        <tbody>
+          <tr><td>Avatar</td><td>data out</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Avatar">§</a></td></tr>
+          <tr><td>Badge</td><td>data out</td><td class="no">—</td><td class="yes">expr</td><td class="no">—</td><td><a href="#p-Badge">§</a></td></tr>
+          <tr><td>Board</td><td>data in</td><td class="yes">bind</td><td class="no">—</td><td class="yes">onAdd · onOpen · reorder</td><td><a href="#p-Board">§</a></td></tr>
+          <tr><td>Button</td><td>data in</td><td class="no">—</td><td class="yes">state.set</td><td class="yes">action</td><td><a href="#p-Button">§</a></td></tr>
+          <tr><td>Callout</td><td>surface</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Callout">§</a></td></tr>
+          <tr><td>Canvas</td><td>data out</td><td class="no">—</td><td class="no">—</td><td class="yes">replaceNode</td><td><a href="#p-Canvas">§</a></td></tr>
+          <tr><td>Card</td><td>surface</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Card">§</a></td></tr>
+          <tr><td>Chart</td><td>data out</td><td class="yes">bind · history</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Chart">§</a></td></tr>
+          <tr><td>Chip</td><td>kit</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Chip">§</a></td></tr>
+          <tr><td>Code</td><td>text</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Code">§</a></td></tr>
+          <tr><td>Compose</td><td>data in</td><td class="no">—</td><td class="no">—</td><td class="yes">action</td><td><a href="#p-Compose">§</a></td></tr>
+          <tr><td>Database</td><td>data in</td><td class="yes">table</td><td class="no">—</td><td class="yes">update · insert · column</td><td><a href="#p-Database">§</a></td></tr>
+          <tr><td>Divider</td><td>frame</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Divider">§</a></td></tr>
+          <tr><td>Drawer</td><td>flow</td><td class="yes">bind?</td><td class="yes">state</td><td class="no">—</td><td><a href="#p-Drawer">§</a></td></tr>
+          <tr><td>Edge</td><td>data out</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Edge">§</a></td></tr>
+          <tr><td>Field</td><td>data in</td><td class="no">—</td><td class="no">—</td><td class="yes">table.update</td><td><a href="#p-Field">§</a></td></tr>
+          <tr><td>Figure</td><td>surface</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Figure">§</a></td></tr>
+          <tr><td>Grid</td><td>frame</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Grid">§</a></td></tr>
+          <tr><td>Hero</td><td>surface</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Hero">§</a></td></tr>
+          <tr><td>Item</td><td>text</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Item">§</a></td></tr>
+          <tr><td>Kbd</td><td>text</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Kbd">§</a></td></tr>
+          <tr><td>List</td><td>text</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td><a href="#p-List">§</a></td></tr>
+          <tr><td>Mark</td><td>text</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Mark">§</a></td></tr>
+          <tr><td>Mascot</td><td>kit</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Mascot">§</a></td></tr>
+          <tr><td>Missing</td><td>kit</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Missing">§</a></td></tr>
+          <tr><td>Money</td><td>text</td><td class="no">—</td><td class="yes">expr</td><td class="no">—</td><td><a href="#p-Money">§</a></td></tr>
+          <tr><td>Node</td><td>data out</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Node">§</a></td></tr>
+          <tr><td>Note</td><td>text</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Note">§</a></td></tr>
+          <tr><td>Pair</td><td>text</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Pair">§</a></td></tr>
+          <tr><td>Progress</td><td>data out</td><td class="no">—</td><td class="yes">expr</td><td class="no">—</td><td><a href="#p-Progress">§</a></td></tr>
+          <tr><td>Quote</td><td>text</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Quote">§</a></td></tr>
+          <tr><td>Ref</td><td>text</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Ref">§</a></td></tr>
+          <tr><td>Repeat</td><td>data out</td><td class="yes">bind</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Repeat">§</a></td></tr>
+          <tr><td>Reveal</td><td>flow</td><td class="no">—</td><td class="yes">state?</td><td class="no">—</td><td><a href="#p-Reveal">§</a></td></tr>
+          <tr><td>Roadmap</td><td>data out</td><td class="yes">bind</td><td class="no">—</td><td class="yes">table.update</td><td><a href="#p-Roadmap">§</a></td></tr>
+          <tr><td>Row</td><td>frame</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Row">§</a></td></tr>
+          <tr><td>Schema</td><td>data out</td><td class="yes">table (spec)</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Schema">§</a></td></tr>
+          <tr><td>Section</td><td>frame</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Section">§</a></td></tr>
+          <tr><td>Sheet</td><td>frame</td><td class="no">—</td><td class="yes">declares</td><td class="no">—</td><td><a href="#p-Sheet">§</a></td></tr>
+          <tr><td>Show</td><td>flow</td><td class="no">—</td><td class="yes">expr</td><td class="no">—</td><td><a href="#p-Show">§</a></td></tr>
+          <tr><td>Slider</td><td>data in</td><td class="no">—</td><td class="yes">state</td><td class="no">—</td><td><a href="#p-Slider">§</a></td></tr>
+          <tr><td>Source</td><td>text</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Source">§</a></td></tr>
+          <tr><td>Stack</td><td>frame</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Stack">§</a></td></tr>
+          <tr><td>Stamp</td><td>kit</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Stamp">§</a></td></tr>
+          <tr><td>Stat</td><td>data out</td><td class="no">—</td><td class="yes">expr</td><td class="no">—</td><td><a href="#p-Stat">§</a></td></tr>
+          <tr><td>Step</td><td>data out</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Step">§</a></td></tr>
+          <tr><td>Switch</td><td>data in</td><td class="no">—</td><td class="yes">state</td><td class="no">—</td><td><a href="#p-Switch">§</a></td></tr>
+          <tr><td>Tab</td><td>flow</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Tab">§</a></td></tr>
+          <tr><td>Table</td><td>data out</td><td class="yes">bind</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Table">§</a></td></tr>
+          <tr><td>Tabs</td><td>flow</td><td class="no">—</td><td class="yes">state?</td><td class="no">—</td><td><a href="#p-Tabs">§</a></td></tr>
+          <tr><td>Tag</td><td>text</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Tag">§</a></td></tr>
+          <tr><td>Tape</td><td>kit</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Tape">§</a></td></tr>
+          <tr><td>Task</td><td>data in</td><td class="no">—</td><td class="no">—</td><td class="yes">toggleTask</td><td><a href="#p-Task">§</a></td></tr>
+          <tr><td>Text</td><td>text</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Text">§</a></td></tr>
+          <tr><td>Timeline</td><td>data out</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Timeline">§</a></td></tr>
+          <tr><td>Title</td><td>text</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Title">§</a></td></tr>
+        </tbody>
+      </table>
+      <div class="side">Against <code>docs/wsx.md</code>: its group counts (data out 10, data in 7, kit 4 + Missing, 49 total) were stale — the tables already listed Roadmap, Canvas, Node, Edge, Schema and Database; the registry has 56. <code>state.set</code> is page-side, not a hanko verb. <code>Repeat as</code> is in the spec but unused. Every other prop here is read from <code>specs.ts</code>.</div>
+    </section>
+
+    <footer class="foot"><span>washi · wsx primitives · 2026-10-21</span><span>docs/wsx-primitives.html</span></footer>
+  </main>
+</div>
+<script src="_kit/mascot.js"></script>
+</body>
+</html>

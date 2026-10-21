@@ -1,0 +1,700 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Washi — PRD</title>
+<link rel="stylesheet" href="_kit/doc.css" />
+<link rel="stylesheet" href="_kit/app.css" />
+<style>
+  /* page-local: diagrams, nouns, flows, laws, open-question checklist */
+  .dg { display: grid; gap: 0.6rem; font-size: 0.82rem; }
+  .dg .lane { border: 1px solid var(--line); border-radius: 10px; padding: 0.7rem 0.8rem; background: var(--pop); }
+  .dg .lane > .lbl { font: 600 0.64rem / 1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.55rem; }
+  .dg .row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: stretch; }
+  .dg .bx { flex: 1 1 10rem; border: 1px solid var(--line); border-top: 3px solid var(--c, var(--agent)); border-radius: 8px; padding: 0.45rem 0.65rem; background: var(--card); font: 600 0.76rem / 1.35 var(--mono); }
+  .dg .bx small { display: block; font: 400 0.74rem / 1.35 var(--sans); color: var(--muted); margin-top: 0.15rem; }
+  .dg .arr { text-align: center; font: 600 0.72rem / 1.2 var(--mono); color: var(--muted); }
+  .dg .split { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 0.6rem; }
+  .flow { margin-top: 2rem; padding-top: 1.2rem; border-top: 1px dashed var(--line); }
+  .flow h3 { margin-top: 0; }
+  .flow .done { font-size: 0.9rem; padding: 0.55rem 0.8rem; border-radius: 8px; background: color-mix(in oklab, var(--matcha) 16%, var(--card)); border: 1px solid color-mix(in oklab, var(--matcha) 50%, transparent); }
+  .flow .done b { font: 600 0.66rem / 1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ok); margin-right: 0.5rem; }
+  .flow .frames { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.6rem; }
+  .flow .frames a { font: 600 0.68rem / 1 var(--mono); text-decoration: none; padding: 0.32rem 0.5rem; border-radius: 6px; border: 1px solid var(--line); background: var(--card); color: var(--muted); }
+  .flow .frames a:hover { border-color: var(--primary); color: var(--fg); }
+  .callout.law { align-items: flex-start; }
+  .callout.law .ic { min-width: 2.2rem; }
+  .callout.law b { display: block; }
+  .callout.law .why { display: block; color: var(--muted); font-size: 0.88rem; margin-top: 0.15rem; }
+  .noun td:first-child { font-weight: 700; white-space: nowrap; }
+  .noun td:last-child { font-family: var(--mono); font-size: 0.78rem; color: var(--muted); }
+  table.surf td:nth-child(2) { font-family: var(--mono); font-size: 0.78rem; white-space: nowrap; }
+  table.surf td:last-child { white-space: nowrap; }
+  ul.oq { list-style: none; padding: 0; margin: 0.6rem 0 1rem; display: grid; gap: 0.45rem; }
+  ul.oq li { position: relative; padding-left: 1.7rem; font-size: 0.94rem; }
+  ul.oq li::before { content: ""; position: absolute; left: 0; top: 0.3rem; width: 0.95rem; height: 0.95rem; border: 1.5px solid var(--warn); border-radius: 4px; background: color-mix(in oklab, var(--warn) 10%, transparent); }
+  ul.oq li .src { font: 500 0.7rem / 1 var(--mono); color: var(--muted); margin-left: 0.4rem; }
+  .decision .call .was { color: var(--muted); font-size: 0.86rem; display: block; margin-top: 0.15rem; }
+  .cast { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 0.8rem; margin: 0.8rem 0 1rem; }
+  .cast > div { border: 1px solid var(--line); border-radius: 10px; padding: 0.8rem 0.9rem; background: var(--card); font-size: 0.9rem; }
+  .cast .name { display: flex; align-items: center; gap: 0.5rem; font-family: var(--display); font-size: 1rem; }
+  .cast .role { display: block; font: 600 0.66rem / 1 var(--mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--primary); margin-bottom: 0.35rem; font-style: normal; }
+</style>
+</head>
+<body>
+<div class="doc">
+  <aside class="rail">
+    <a class="home" href="index.html"><i></i>和紙 <em>WASHI</em></a>
+    <div class="set">PRD</div>
+    <nav>
+      <a href="#what"><span class="n">01</span>What Washi is</a>
+      <a href="#who"><span class="n">02</span>Who it is for</a>
+      <a href="#nouns"><span class="n">03</span>Nouns</a>
+      <a href="#flows"><span class="n">04</span>Jobs and golden flows</a>
+      <a href="#surfaces"><span class="n">05</span>Surfaces</a>
+      <a href="#laws"><span class="n">06</span>Rules that cannot bend</a>
+      <a href="#arch"><span class="n">07</span>Architecture</a>
+      <a href="#status"><span class="n">08</span>Status and roadmap</a>
+      <a href="#decisions"><span class="n">09</span>Decisions log</a>
+      <a href="#open"><span class="n">10</span>Open questions</a>
+      <a href="#supersedes"><span class="n">11</span>What this supersedes</a>
+    </nav>
+    <div class="set">Docs</div>
+    <nav>
+      <a href="brand.html">Brand</a>
+      <a href="mascot.html">Mascot</a>
+      <a href="wsx-primitives.html">WSX primitives</a>
+      <a href="design/index.html">Design canvas</a>
+    </nav>
+  </aside>
+
+  <main class="column">
+    <header class="head">
+      <div class="eyebrow">Netko Labs · Washi · PRD</div>
+      <h1>Washi<span class="dot">。</span></h1>
+      <p class="lead">A team workspace of living pages. People and Washi, the agent, write them together; Washi keeps them true, and the team's work — tickets, metrics, the weekly review — lives on the same pages.</p>
+      <div class="facts"><span>v1 · 2026-10-21</span><span>supersedes washi.html · spec.html · server.html · features.md</span><span>teams first</span><span>self-hosted</span></div>
+      <div class="tldr">
+        <h2>30-second version</h2>
+        <ol>
+          <li><strong>One product.</strong> Living pages a small team and its agent keep together. Not a chat app, not a code reviewer, not a blank canvas, not a personal vault.</li>
+          <li><strong>Both write, as equals.</strong> Type into a page or ask for one. Washi's edits land marked as its own and undo as one change; only what leaves the workspace stops at the desk.</li>
+          <li><strong>One runtime, two hosts.</strong> The studio (hosted, a team server) and the desktop (embedded, offline, one person) serve the same <code>appRouter</code>. Mode is asserted once at boot.</li>
+          <li><strong>Two planes.</strong> Postgres holds identity only. One SQLite file per workspace holds everything else, same code hosted and local. This is C1, and it is what makes local mode a redeployment instead of a second product.</li>
+          <li><strong>Pages are WSX.</strong> Inert data from a closed registry: literal props, four enums, a closed <code>expr</code> grammar, validated before persist and before render. Nothing in a page executes.</li>
+          <li><strong>Tables are Notion databases with history.</strong> Every row is a page; every write is appended to a change log charts replay day by day. The team's week — backlog, roadmap, wiki, ideas, review — is a starter on top, not a built-in model.</li>
+          <li><strong>Next is the golden flow.</strong> Investigations, tickets with keys, metrics with targets, a GitHub app and workflow rules — twelve PRs, in <a href="#status">§08</a>.</li>
+        </ol>
+      </div>
+    </header>
+
+    <!-- ═══════════════════════ 01 WHAT ═══════════════════════ -->
+    <section class="s" id="what">
+      <div class="num">01</div>
+      <h2>What Washi is</h2>
+      <p class="point">Washi was a designed canvas, a Notion clone, an ops desk and a personal vault at once. It is one thing: living pages a team and its agent keep together.</p>
+      <table>
+        <tr><th>Is</th><th>Is not</th></tr>
+        <tr><td>A shared workspace of pages, tables, boards and canvases</td><td>A chat app — Washi is a popover behind the mascot, never a docked chat</td></tr>
+        <tr><td>Co-authored: typing and asking are equal verbs</td><td>Edit-by-asking only — the cursor is in</td></tr>
+        <tr><td>Pages that stay current on their own: bound to tables, refreshed by routines, marked live</td><td>A blank canvas — every page wears one house style (WSX 0.4)</td></tr>
+        <tr><td>Where the team's work lives: tickets, roadmap, wiki, investigations, metrics, review</td><td>A second tool beside Linear and Notion</td></tr>
+        <tr><td>Context from docs, tables, sprint ops and read-only PR cards</td><td>A code reviewer — Washi never comments on a diff</td></tr>
+        <tr><td>Self-hosted by every team that runs it</td><td>A SaaS, a plan, a quota, a pitch</td></tr>
+      </table>
+      <h3>In plain words</h3>
+      <p>A small team opens one workspace. They write pages the way they would in Notion, and they ask Washi for pages the way they would ask a colleague. Some pages are tables that behave like trackers; some pull live views and charts out of those tables; some are canvases of ideas. Washi files tickets, triages, writes the weekly review on a schedule, answers "what shipped this month" from the tables rather than memory, and says every time it touched something. When a person returns, the Inbox says what moved and what needs them.</p>
+      <h3>The bet</h3>
+      <p><strong>Living pages a team and its agent keep together.</strong> Not a prettier document, not a smarter chat: pages that are bound to data, kept current by routines and an agent, edited live by people and Washi at once, with nothing on them invented. Every flow in this document is designed against that sentence, and every rule in <a href="#laws">§06</a> exists to keep it true.</p>
+    </section>
+
+    <!-- ═══════════════════════ 02 WHO ═══════════════════════ -->
+    <section class="s" id="who">
+      <div class="num">02</div>
+      <h2>Who it is for</h2>
+      <p class="point">Small teams on one workspace. A workspace is a team's — one Better Auth organization, one SQLite file — and the desktop is either a client of that team's server or a workspace of one, offline.</p>
+      <p>Audience first: teams of two to twenty who already keep docs, a backlog and a weekly ritual somewhere, and want one place where the agent is a teammate rather than a sidebar. Solo use works and is not the design target; phase 7 makes it a first-class deployment of the same code.</p>
+      <h3>The cast</h3>
+      <p>Every doc and every design frame uses these four. Keep the names.</p>
+      <div class="cast">
+        <div><i class="role">owner</i><b class="name">Mika</b>Product engineer. Owns the workspace, the key, the question. Opens investigations, closes them, approves what leaves the workspace.</div>
+        <div><i class="role">engineer</i><b class="name">Rin</b>Owns email. Takes tickets, opens PRs, moves cards, types into pages between turns.</div>
+        <div><i class="role">designer</i><b class="name">Kai</b>Keeps the canvases, the dashboards and the alerts. Works mostly in the ideas canvas and the stat pages.</div>
+        <div><i class="role">the agent</i><b class="name"><i data-mascot="happy" data-size="22"></i>Washi</b>A teammate, not a tool. Writes, files, refreshes and triages; marked in indigo on every page it touches; never reviews code; never leaves the workspace without a person.</div>
+      </div>
+      <h3>Team server first, offline desktop always</h3>
+      <table>
+        <tr><th>For</th><th>Studio · hosted</th><th>Desktop · embedded</th></tr>
+        <tr><td>Mika</td><td>Signs in, creates the workspace, pastes the key once, invites by link, sets the daily stop. Routines run on the server clock whether anyone is looking.</td><td>Runs offline as a workspace of one on her own Claude login. Can upload that file to a team later (phase 7, one-way).</td></tr>
+        <tr><td>Rin</td><td>Lives in the board and the ticket; sees presence, comments, PR cards. Same URL from any machine.</td><td>Same screens in a mirin window over IPC: no port, no token. A client of the team server, or solo.</td></tr>
+        <tr><td>Kai</td><td>Canvas, votes, stat pages. Hand edits write the page's own markup.</td><td>Same; the desktop has no native-only data path (C4).</td></tr>
+        <tr><td>Washi</td><td>Runs on the workspace's stored key; a team server never bills one person's plan.</td><td>Runs the person's installed <code>claude</code> with no key in the env, so their own login pays. Routines run while the app is open.</td></tr>
+      </table>
+    </section>
+
+    <!-- ═══════════════════════ 03 NOUNS ═══════════════════════ -->
+    <section class="s" id="nouns">
+      <div class="num">03</div>
+      <h2>Nouns</h2>
+      <p class="point">The vocabulary every screen must use. If a screen needs a word that is not here, the screen is wrong or this list is.</p>
+      <table class="noun">
+        <tr><th>Noun</th><th>Is</th><th>Lives in</th></tr>
+        <tr><td>Workspace</td><td>A team's space: members, pages, tables, Washi. One Better Auth organization, one SQLite file. "Vault" is the old word.</td><td>control plane row → &lt;id&gt;.db</td></tr>
+        <tr><td>Member</td><td>A person in the workspace: owner · admin · member. A <code>person</code> property holds a member id.</td><td>Postgres (hosted) · stub (embedded)</td></tr>
+        <tr><td>Page</td><td>Doc, tracker, dashboard, canvas. Nests Notion-style, trashes as a subtree, carries chrome (icon, cover, width). Typed or asked into being. <code>sheet</code> in code.</td><td>sheets · Loro snapshot + source cache</td></tr>
+        <tr><td>Block</td><td>A top-level element of a page. Plain Title/Text/List/Quote/Callout/Code/Divider are typed in place; anything else is a locked block kept byte for byte.</td><td>inside the page's WSX</td></tr>
+        <tr><td>Table <span class="side" style="display:inline;border:0;padding:0">(database)</span></td><td>Records with typed properties, Notion-style. Pages read and write it; every write is appended to its history.</td><td>tables · table_columns · records · record_changes</td></tr>
+        <tr><td>Property</td><td>A typed column: text · number · boolean · date (start/end) · select · status (todo · doing · done) · multi_select · person · url · relation.</td><td>table_columns</td></tr>
+        <tr><td>Row page</td><td>The page every row can open as. Out of the tree, renamed with its row, commented on.</td><td>sheets.row_id</td></tr>
+        <tr><td>View</td><td>A bound primitive placed on a page — Table, Board, Roadmap, Chart, or a tab of a <code>Database</code>. Never a separate object; a table's own page and a review doc use the same Board.</td><td>the page's WSX (bind)</td></tr>
+        <tr><td>Canvas</td><td>Nodes and edges on a page, drawn by React Flow. A hand edit rewrites the same markup.</td><td>&lt;Canvas&gt; in the page's WSX</td></tr>
+        <tr><td>Metric <span class="chip new">new</span></td><td>A named number with a definition, a unit and a grain, over a table (ink) or a fetched source (tsuru). Tickets watch it with a target and a window; stat pages chart it with deploy markers.</td><td>metrics · watches</td></tr>
+        <tr><td>Ticket <span class="chip new">new</span></td><td>A row of <code>issues</code> with a key per project (<code>WEB-142</code>), framed by the studio: header chips, rail cards, relations, activity. Its body is a row page.</td><td>issues row + row page · links</td></tr>
+        <tr><td>Investigation <span class="chip new">new</span></td><td>A page template with four typed parts: question · evidence · hypotheses (open · confirmed · ruled out) · findings. A finding becomes a ticket in place and then shows that ticket's status.</td><td>a page · links(from)</td></tr>
+        <tr><td>Link <span class="chip new">new</span></td><td>A typed relation between two things: from · blocks · related · follow-up · explores · implements · watches. Backlinks read the same table.</td><td>links(from, to, kind)</td></tr>
+        <tr><td>Integration <span class="chip new">new</span></td><td>A connected source (GitHub first) whose events arrive by webhook and are shown as cards — a projection, never a copy. Rules map an event to a status move, logged <em>by rule</em>.</td><td>integration_events · rules</td></tr>
+        <tr><td>Routine</td><td>A prompt and a wall-clock minute in an IANA zone. Runs on the server's clock as an ordinary turn in a fresh session; keeps living pages current.</td><td>routines</td></tr>
+        <tr><td>Comment</td><td>A thread on a page, authored by the session's actor. An @mention is an unread Inbox row for that person.</td><td>comments · mention_inbox</td></tr>
+        <tr><td>Inbox</td><td>What moved, what needs a person, who mentioned you. One queue; a trashed page hides its mentions.</td><td>mention_inbox · approvals · transcript</td></tr>
+        <tr><td>Approval</td><td>A stop at the desk: <code>fetch_url</code> and <code>action_run</code> wait for a person. Who said yes is stamped from the session.</td><td>approvals(resolved_by) · capability_calls</td></tr>
+        <tr><td>Washi</td><td>The agent. One host per workspace, one session per conversation, a receipt per turn. Appears on a page for 20 s after each rewrite; its writes are marked <code>edited_by = 'washi'</code>.</td><td>agent_sessions · agent_turns · sheet_revisions</td></tr>
+      </table>
+      <p class="side">Words that are not nouns here and must not appear on a screen: vault, folder (a folder is a page with children), sheet (user-facing), view as an object, tool names (<code>sheet_replace</code>) — the UI says every tool in words through <code>describeTool</code>.</p>
+    </section>
+
+    <!-- ═══════════════════════ 04 FLOWS ═══════════════════════ -->
+    <section class="s" id="flows">
+      <div class="num">04</div>
+      <h2>Jobs and golden flows</h2>
+      <p class="point">Make it, wire it, let it live, work it together, come back to what moved. Five flows cover the product; every screen in <code>design/</code> is a moment in one of them.</p>
+
+      <div class="flow" id="flow-page">
+        <h3>A · Ask for a page, type a page</h3>
+        <ol class="steps">
+          <li>Mika presses <kbd>⌘J</kbd> and asks: "track our Q4 hires". Washi's turn streams in the popover; <code>sheet_check</code> passes once because the instructions say a <code>&lt;Sheet&gt;</code> takes a title.</li>
+          <li><code>sheet_create</code> is a change tool: it lands without asking, the page opens, and the turn ends in a receipt — where it ran, how long, what it cost or what the plan saved.</li>
+          <li>Rin opens the same page and types. Plain blocks become typed blocks; the Database Washi made stays a locked block, byte for byte. <code>/</code> drops in a new database, a linked view or a progress chart. Saves go through <code>sheets.update</code> with <code>baseVersion</code>.</li>
+          <li>Washi rewrites a paragraph mid-edit. Rin's editor absorbs it only while it has nothing unsaved; otherwise the next save merges on the Loro fork and re-validates.</li>
+          <li>Washi's blocks carry the indigo bar, name their source and offer Undo. Each Washi write pushed the prior page onto <code>sheet_revisions</code>; the stack clears the moment a person edits, so Undo never erases their words.</li>
+          <li>The <code>&lt;/&gt;</code> toggle opens source mode: raw WSX in CodeMirror, checked client-side exactly as the server checks it, autosaved only while valid.</li>
+        </ol>
+        <p class="done"><b>done when</b>a page asked for and a page typed are the same kind of page, and nobody's save wins over anyone else's.</p>
+        <div class="frames"><a href="design/pages.html#frame=page-editor">Page · editor</a><a href="design/pages.html#frame=source-mode">Source mode</a><a href="design/agent.html#frame=agent-panel">Agent panel</a><a href="design/agent.html#frame=receipt">Receipt</a></div>
+      </div>
+
+      <div class="flow" id="flow-living">
+        <h3>B · A living page</h3>
+        <ol class="steps">
+          <li>A page binds a view: <code>&lt;Board bind=&#123;&#123; table: 'issues', where: [...] &#125;&#125; groupBy="status" /&gt;</code>. Bound primitives ship empty, loading and error states; the page may override only the empty sentence.</li>
+          <li>The header says <em>live</em>, who is on the page, and when it last moved. A bound page always says one of: live · updated n ago · cached · stale · failed.</li>
+          <li>Every mutation under <code>sheets.*</code>, <code>tables.*</code>, <code>capabilities.*</code> emits <code>workspaceChanged</code> on one bus; so does each finished Washi write. Clients hold one <code>live.onChange</code> subscription: pages refetch the list, data refetches through <code>PaperHost.onDataChange</code>.</li>
+          <li>A routine at 17:00 in the asker's zone rewrites only the review's "This week" callout. It is an ordinary turn: daily stop, desk and receipt apply; its questions wait 12 h.</li>
+          <li>A drag on the Board is <code>table.reorder</code>; a cell edit is <code>table.update</code>. Both go through <code>updateRecords</code>, so <code>record_changes</code> remembers and a <code>Chart history</code> replays the day.</li>
+          <li>Presence is a 15 s heartbeat in memory, never a record. Washi appears for 20 s after each rewrite of the page.</li>
+        </ol>
+        <p class="done"><b>done when</b>a page bound to a table never shows a stale row to anyone, and says when it last moved without being asked.</p>
+        <div class="frames"><a href="design/pages.html#frame=live-marker">Live marker</a><a href="design/data.html#frame=database-page">Database page</a><a href="design/data.html#frame=roadmap">Roadmap</a><a href="design/work.html#frame=weekly-review">Weekly review</a></div>
+      </div>
+
+      <div class="flow" id="flow-work">
+        <h3>C · Team work — the golden flow</h3>
+        <p>Mika asks why signups stalled; Rin fixes it; a week later the number confirms the fix. Nobody writes a status update. Condensed from <code>design/work.html</code>; the six calls below are decided.</p>
+        <ol class="steps">
+          <li><strong>Investigation.</strong> Mika opens the template: question, evidence, hypotheses, findings. <code>/stat</code> drops in a live metric chart; Washi annotates the drop with the deploy that caused it, from events, not hand-drawn lines.</li>
+          <li><strong>Make ticket.</strong> <kbd>⌘⇧T</kbd> on a finding. Washi pre-fills project, sprint, assignee and a <em>Done when</em> bound to the metric already in the evidence; the person checks it. Batch: "turn these into tickets". Escape keeps nothing.</li>
+          <li><strong>Sprint board.</strong> Four columns. The card's signal row shows only what exists: PR dot, metric against target, canvas node count, source investigation, estimate. Progress counts verifying apart from done.</li>
+          <li><strong>Ticket, peek and full.</strong> <kbd>Space</kbd> peeks over the board; <kbd>↵</kbd> opens the tab. Centre: problem, approach (from the canvas), Done when, relations, one activity stream. Rail: Properties always; Watching, Development, Canvas only when they exist. Development is read-only.</li>
+          <li><strong>Stat page, focused.</strong> From the ticket, the metric opens focused: value now, delta since the event that matters, target line, deploy diamonds, the shaded watch window, and <em>Watched by</em> — every ticket and investigation pointing at it.</li>
+          <li><strong>Ideas canvas.</strong> A ribbon names the ticket it serves. Options are nodes; a timed vote informs; <em>Choose</em> writes the ticket's Approach and greys the rejected options with their reasons. Washi lays out and clusters when asked, never adds options of its own.</li>
+          <li><strong>PR card and rules.</strong> The GitHub app attaches PRs by key in branch, title or body. One card through draft → open → merged → deployed. On failing checks Washi says which and what that blocks — no diff critique, no merge button. Rules move the ticket: PR opened → In review; deployed to production → Done + start watches; moves are logged <em>by rule</em>.</li>
+          <li><strong>The loop closes.</strong> The 7-day watch holds: the bound Done-when ticks itself, Washi drafts a Resolution and proposes Resolved, Mika flips it, Rin's Inbox says so, Friday's review reports it in one line. A miss makes a linked follow-up ticket and reopens the finding; the original stays closed.</li>
+        </ol>
+        <table>
+          <tr><th>Call</th><th></th><th>Why</th></tr>
+          <tr><td>Metrics are their own object, not an <code>expr</code></td><td><span class="chip decided">decided</span></td><td>Watches, targets and deploy markers need a stable id. Pages show one through <code>&lt;Metric&gt;</code> / <code>&lt;MetricChart&gt;</code> and stay inert.</td></tr>
+          <tr><td>Ticket keys per project — <code>WEB-142</code>, <code>API-31</code></td><td><span class="chip decided">decided</span></td><td>Linear and Jira do it; keys stay short. The starter makes one project named after the workspace.</td></tr>
+          <tr><td>Done = deployed (merged when there is no deploy feed) + a <em>verifying</em> badge</td><td><span class="chip decided">decided</span></td><td>"Shipped" means users have it. A badge keeps the board at four columns.</td></tr>
+          <tr><td>GitHub App + webhooks per workspace; the desktop polls</td><td><span class="chip decided">decided</span></td><td>Events in seconds. Connecting is the approval for reads; outward writes still stop at the desk.</td></tr>
+          <tr><td>Linear / Jira: one-time import, no two-way sync</td><td><span class="chip decided">decided</span></td><td>A sync locks Washi to their model; an import lets a team move in. Keys survive as an alias.</td></tr>
+          <tr><td>A missed target makes a follow-up ticket; the finding reopens</td><td><span class="chip decided">decided</span></td><td>Reopening would rewrite sprint history. A follow-up keeps the record honest and puts the work back where the question lives.</td></tr>
+        </table>
+        <p class="done"><b>done when</b>a question becomes tickets, tickets gather evidence, options and code, and the work is finished when a live number says so — with every page in between keeping itself current.</p>
+        <div class="frames"><a href="design/work.html#frame=investigation">Investigation</a><a href="design/work.html#frame=make-ticket">Make ticket</a><a href="design/work.html#frame=sprint-board">Sprint board</a><a href="design/work.html#frame=ticket-peek">Ticket · peek</a><a href="design/work.html#frame=ticket-full">Ticket · full</a><a href="design/work.html#frame=stat-page-focused">Stat page · focused</a><a href="design/work.html#frame=ideas-canvas">Ideas canvas</a><a href="design/work.html#frame=pr-card">PR card</a><a href="design/work.html#frame=the-loop-closes">The loop closes</a></div>
+      </div>
+
+      <div class="flow" id="flow-review">
+        <h3>D · Review and approval</h3>
+        <ol class="steps">
+          <li>Reads pass: <code>sheet_list</code> · <code>sheet_get</code> · <code>sheet_check</code> · <code>sheet_backlinks</code> · <code>search</code> · <code>db_list_tables</code> · <code>db_query</code> · <code>db_history</code> · <code>people_list</code>.</li>
+          <li>Page and table writes land without asking — <code>sheet_create</code> · <code>sheet_replace</code> · <code>db_define</code> · <code>db_mutate</code> — marked <code>edited_by = 'washi'</code>, each with the prior state on the undo stack. The open page reloads under the reader; the live marker says Washi was here.</li>
+          <li><code>fetch_url</code> and <code>action_run</code> always stop at the <code>ApprovalDesk</code>. The prompt is inline in the panel and in words, never a tool name or JSON. A panel opened late still answers: <code>agents.pendingApprovals</code> lists the live ones; boot expires rows a dead process left.</li>
+          <li>An unanswered approval is a denial after 5 min (12 h for a routine). Stop answers its open approvals "no" and ends the turn <code>cancelled</code>, priced from the first stream event.</li>
+          <li>The daily stop: one workspace-wide cap in metered dollars (default $25) and a turn cap (default 200). A plan turn lands in <code>saved_usd</code>, counts as a turn, never toward the dollars. Tripped, nothing runs until a person presses Resume, which grants one more cap of headroom, not amnesty.</li>
+          <li>Who said yes is stamped from the session (<code>approvals.resolved_by</code>); every capability call, allowed or refused, is a ledger row with its actor.</li>
+          <li>The Inbox is the return: mentions, what moved, what needs you. Today (the dashboard) retells the last day from the transcript and the desk — nothing new stored, nothing invented.</li>
+        </ol>
+        <p class="done"><b>done when</b>nothing leaves the workspace without a person, every change inside it is marked and undoable, and the Inbox is the only place anyone has to look.</p>
+        <div class="frames"><a href="design/agent.html#frame=approval-desk">Approval desk</a><a href="design/agent.html#frame=daily-stop">Daily stop</a><a href="design/shell.html#frame=inbox">Inbox</a><a href="design/shell.html#frame=dashboard">Today</a></div>
+      </div>
+
+      <div class="flow" id="flow-first">
+        <h3>E · First run</h3>
+        <ol class="steps">
+          <li><strong>Studio.</strong> <code>/sign-in</code> (email + password; <code>?redirect=</code> only to a same-origin path). A new account lands on <code>/workspaces</code>; <code>?invite=&lt;id&gt;</code> is the invitation and only the invited address can accept it — no SMTP is assumed.</li>
+          <li>Create a workspace: a Better Auth organization and a fresh SQLite file. The dashboard opens on starter prompts, not zeros.</li>
+          <li>"Give Washi a key": the workspace key, stored encrypted and write-only (<code>••••last4</code> + Replace), with the daily stop beside it. Skip leaves Washi asleep; the chip says <em>Asleep · no key</em>.</li>
+          <li>Invite the team: Settings › People — invite by email, pending invitations with Copy link / Cancel.</li>
+          <li>Seed the team space: <code>tables.seedTeamSpace</code> makes <code>projects</code> + <code>issues</code>, the Backlog, Roadmap, Wiki (+ How we work), Ideas canvas, Weekly review, and the 17:00 routine. It refuses a workspace that already has either table.</li>
+          <li><strong>Desktop.</strong> Onboarding names the person (name, accent) and finds their installed <code>claude</code> — PATH is empty for a GUI app, so known install paths too. <code>auto</code> prefers it over <code>ANTHROPIC_API_KEY</code>. No account required is true here, and only here.</li>
+        </ol>
+        <p class="done"><b>done when</b>a new team is inside with a key, a teammate and a living review page in under five minutes, and a solo person is writing offline in one.</p>
+        <div class="frames"><a href="design/account.html#frame=sign-in">Sign in</a><a href="design/account.html#frame=workspaces">Workspaces</a><a href="design/account.html#frame=first-run">First run</a><a href="design/account.html#frame=people">People</a><a href="design/desktop.html#frame=onboarding">Onboarding</a></div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════ 05 SURFACES ═══════════════════════ -->
+    <section class="s" id="surfaces">
+      <div class="num">05</div>
+      <h2>Surfaces</h2>
+      <p class="point">Every screen, its route, one line, and where it is drawn. The shared chrome — tabs, header, sheet view, agent panel, palette, inbox, dashboard — lives in <code>@washi/ui</code> and both hosts wear it; only the shells differ.</p>
+
+      <h3>Studio</h3>
+      <table class="surf">
+        <tr><th>Screen</th><th>Route</th><th>One line</th><th>Drawn in</th></tr>
+        <tr><td>Sign in</td><td>/sign-in?redirect=</td><td>Email + password. Redirect only to a same-origin path.</td><td><a href="design/account.html#frame=sign-in">account</a></td></tr>
+        <tr><td>Workspaces</td><td>/workspaces?invite=</td><td>Pick or create a workspace; an invite link lands here and only its address can accept.</td><td><a href="design/account.html#frame=workspaces">account</a></td></tr>
+        <tr><td>Dashboard · Today</td><td>/w/$workspaceId</td><td>What happened in the last day (each turn's ask, tools, receipt), Needs you, today's money. Empty workspace: starter prompts.</td><td><a href="design/shell.html#frame=dashboard">shell</a></td></tr>
+        <tr><td>Workspace shell</td><td>/w/$workspaceId/*</td><td>Sidebar (switcher, Search, Dashboard, Inbox badge, Settings, page tree, Trash, Washi status, account), tab strip per workspace, header. Shell keyed by workspace id; the route has <code>gcTime: 0</code>.</td><td><a href="design/shell.html#frame=workspace-shell">shell</a></td></tr>
+        <tr><td>Workspace switcher</td><td>sidebar header</td><td>Every workspace with its mascot tile, ✓ on the current, inline New workspace. Switching closes the socket and reruns the loader.</td><td><a href="design/shell.html#frame=workspace-switcher">shell</a></td></tr>
+        <tr><td>Page</td><td>/w/$workspaceId/p/$pageId</td><td>Chrome above the sheet (icon, cover, title, width, ⋯ menu), the sheet below, presence and the live marker in the header. Loading, missing and failed states are real.</td><td><a href="design/pages.html#frame=page">pages</a></td></tr>
+        <tr><td>Page editor</td><td>same, Edit</td><td>Typed blocks over WSX; <code>/</code> for blocks, databases, linked views and charts; locked blocks for everything else.</td><td><a href="design/pages.html#frame=page-editor">pages</a></td></tr>
+        <tr><td>Source mode</td><td>same, &lt;/&gt;</td><td>Raw WSX in CodeMirror, checked like the server checks it, Done held while invalid.</td><td><a href="design/pages.html#frame=source-mode">pages</a></td></tr>
+        <tr><td>Comments panel</td><td>page · Comments</td><td>Threads on the page, @mentions, authored by the session's actor. Unread count polled every 30 s.</td><td><a href="design/pages.html#frame=comments">pages</a></td></tr>
+        <tr><td>Backlinks · search</td><td>⌘K · page footer</td><td>Search across pages; backlinks as a list, never a graph.</td><td><a href="design/pages.html#frame=backlinks">pages</a></td></tr>
+        <tr><td>Database page</td><td>/p/$pageId</td><td>Views as tabs: table (cells edit in place, + New, + property), board (drag writes rank), timeline. The title opens the row page.</td><td><a href="design/data.html#frame=database-page">data</a></td></tr>
+        <tr><td>Row page · properties</td><td>/p/$pageId</td><td>A row opened full: properties rail, body, comments. Renames follow the row.</td><td><a href="design/data.html#frame=row-page">data</a></td></tr>
+        <tr><td>Roadmap</td><td>a page</td><td>One bar per row from a date range; drag reschedules (length kept); an empty track dates a row.</td><td><a href="design/data.html#frame=roadmap">data</a></td></tr>
+        <tr><td>Chart history</td><td>a page</td><td>A 30-day replay of a status's done group from <code>record_changes</code>.</td><td><a href="design/data.html#frame=chart-history">data</a></td></tr>
+        <tr><td>Sprint board · Backlog</td><td>a page</td><td>The team space's boards; the golden flow's signal row and verifying badge.</td><td><a href="design/work.html#frame=sprint-board">work</a></td></tr>
+        <tr><td>Ticket <span class="chip new">new</span></td><td>/w/$workspaceId/t/$key</td><td>Peek over the board or a full tab; keys, rail cards, relations, activity.</td><td><a href="design/work.html#frame=ticket-full">work</a></td></tr>
+        <tr><td>Investigation <span class="chip new">new</span></td><td>a page</td><td>Question · evidence · hypotheses · findings; Make ticket in place.</td><td><a href="design/work.html#frame=investigation">work</a></td></tr>
+        <tr><td>Stat page <span class="chip new">new</span></td><td>/p/$pageId?focus=&amp;from=</td><td>A metric with target, markers, watch window and Watched by.</td><td><a href="design/work.html#frame=stat-page-focused">work</a></td></tr>
+        <tr><td>Ideas canvas</td><td>a page</td><td>React Flow over <code>&lt;Canvas&gt;</code>; drag, connect, rename, delete write the markup; votes and Chosen are new.</td><td><a href="design/work.html#frame=ideas-canvas">work</a></td></tr>
+        <tr><td>Agent panel</td><td>⌘J · the mascot</td><td>A popover, expandable to centre: transcript, tool activity in words, approvals inline, Stop, model (Default · Opus · Sonnet · Haiku), receipts, conversation switcher.</td><td><a href="design/agent.html#frame=agent-panel">agent</a></td></tr>
+        <tr><td>Agent status</td><td>sidebar foot</td><td>Idle · Working · Needs you · Asleep, today $x of $cap, turns.</td><td><a href="design/agent.html#frame=agent-status">agent</a></td></tr>
+        <tr><td>Inbox</td><td>/w/$workspaceId/inbox</td><td>Mentions and what needs a person; a trashed page hides its rows.</td><td><a href="design/shell.html#frame=inbox">shell</a></td></tr>
+        <tr><td>Palette</td><td>⌘K</td><td>Pages, views, actions and asks in one surface; recent first.</td><td><a href="design/shell.html#frame=palette">shell</a></td></tr>
+        <tr><td>Settings · Agent</td><td>/w/$workspaceId/settings?tab=agent</td><td>The workspace key (last4 + Replace), provider and model picker off <code>models.list</code>, daily stop, spend, Resume.</td><td><a href="design/account.html#frame=settings-agent">account</a></td></tr>
+        <tr><td>Settings · People</td><td>?tab=people</td><td>Members, invite by email, pending invitations with Copy link / Cancel.</td><td><a href="design/account.html#frame=settings-people">account</a></td></tr>
+        <tr><td>Settings · Routines</td><td>?tab=routines</td><td>Prompt + time + zone; Run now; last run with its badge in Today.</td><td><a href="design/agent.html#frame=routines">agent</a></td></tr>
+        <tr><td>Settings · Integrations <span class="chip new">new</span></td><td>?tab=integrations</td><td>GitHub app: repos, key match, deploy environment, workflow rules per project.</td><td><a href="design/work.html#frame=pr-card">work</a></td></tr>
+        <tr><td>First run</td><td>after workspace creation</td><td>"Give Washi a key" with the daily stop; skip leaves it asleep.</td><td><a href="design/account.html#frame=first-run">account</a></td></tr>
+        <tr><td>Trash</td><td>/w/$workspaceId/trash</td><td>Subtrees under one <code>deleted_at</code> stamp; Restore and Purge act on the batch; Empty.</td><td><a href="design/pages.html#frame=trash">pages</a></td></tr>
+      </table>
+
+      <h3>Desktop</h3>
+      <p>The same <code>@washi/ui</code> screens in a mirin window, bound to <code>appRouter</code> over IPC. App-only chrome is below; everything else is the studio's frame.</p>
+      <table class="surf">
+        <tr><th>Screen</th><th>Where</th><th>One line</th><th>Drawn in</th></tr>
+        <tr><td>Onboarding</td><td>first boot</td><td>Who you are (name, accent), what Washi writes and what it may touch, the local CLI found on this machine. "No account required" is true here.</td><td><a href="design/desktop.html#frame=onboarding">desktop</a></td></tr>
+        <tr><td>Sidebar</td><td>left, 248 px</td><td>One workspace; Dashboard · Inbox · Daily note; page tree with drag; Recent and Favorites; New page.</td><td><a href="design/desktop.html#frame=sidebar">desktop</a></td></tr>
+        <tr><td>Daily note</td><td>sidebar</td><td>Today's page, kept by Washi, navigable to previous days. Waits on real data; never static copy.</td><td><a href="design/desktop.html#frame=daily-note">desktop</a></td></tr>
+        <tr><td>Settings · General</td><td>tab</td><td>Appearance (light · dark · system), identity.</td><td><a href="design/desktop.html#frame=settings-general">desktop</a></td></tr>
+        <tr><td>Settings · Agents</td><td>tab</td><td>Inference source (Claude Code <em>In use</em>, version and plan, or a key), spend, saved, Resume. No control that lies.</td><td><a href="design/desktop.html#frame=settings-agents">desktop</a></td></tr>
+        <tr><td>Settings · Account</td><td>tab</td><td>The person; later, the team server this desktop joins.</td><td><a href="design/desktop.html#frame=settings-account">desktop</a></td></tr>
+        <tr><td>Settings · Sync</td><td>tab</td><td>Phase 7: solo ↔ server. Honest about not existing yet.</td><td><a href="design/desktop.html#frame=settings-sync">desktop</a></td></tr>
+        <tr><td>Share</td><td>header</td><td>Copy link; later, publish a page.</td><td><a href="design/desktop.html#frame=share">desktop</a></td></tr>
+        <tr><td>Develop menu</td><td>menu bar</td><td>mirin's Develop menu; nothing product-facing.</td><td>—</td></tr>
+      </table>
+    </section>
+
+    <!-- ═══════════════════════ 06 LAWS ═══════════════════════ -->
+    <section class="s" id="laws">
+      <div class="num">06</div>
+      <h2>Rules that cannot bend</h2>
+      <p class="point">Law, not guidance. A design or a PR that breaks one of these does not ship, however good the reason sounds. Each carries its one-line why.</p>
+
+      <h3>Constraints — what keeps phase 7 a redeployment</h3>
+      <div class="callout law"><span class="ic">C1</span><div><b>A workspace is one SQLite file, hosted too. Postgres holds identity only.</b><span class="why">Accounts, organizations, members, invitations, encrypted keys — nothing else. Content in Postgres rows keyed by org means a second repository, which is the same as never shipping local mode.</span></div></div>
+      <div class="callout law"><span class="ic">C2</span><div><b>One binary, <code>mode: hosted | embedded</code> asserted once at boot. Never per request.</b><span class="why">Hosted refuses to boot without its secrets; embedded binds nothing and answers "one actor, one workspace, no auth". Auth decisions scattered as implicit truths are where an auth bypass ships.</span></div></div>
+      <div class="callout law"><span class="ic">C3</span><div><b><code>repository</code> and <code>service</code> never see a request, a user or the network.</b><span class="why">They take a resolved <code>Workspace</code> and an actor. No session, no Better Auth, no Postgres import below <code>trpc</code>. <code>contextFromRequest</code> is the one place a header or a socket is read.</span></div></div>
+      <div class="callout law"><span class="ic">C4</span><div><b>The desktop is the web client in a mirin window.</b><span class="why">Same <code>appRouter</code> over IPC, no native-only data paths, no desktop-only procedures. Special cases here make local mode a third implementation.</span></div></div>
+
+      <h3>WSX — what a page may be</h3>
+      <div class="callout law"><span class="ic">W1</span><div><b>WSX is inert data: registry primitives, literal props, the closed <code>expr</code> grammar. Validated before persist and before render.</b><span class="why">A hallucinated or prompt-injected page is wrong content, never code. On a shared workspace this is the reason it is safe at all. <code>state</code>, <code>expr</code>, <code>bind</code>, <code>action</code> are a page's whole behaviour.</span></div></div>
+      <div class="callout law"><span class="ic">W2</span><div><b>The registry is closed and additive. Components own appearance — four enums (<code>variant tone size emphasis</code>) — pages own content and meaning.</b><span class="why">No hex, no font size, no margin in a page. A capability the registry lacks is <code>&lt;Missing kind reason /&gt;</code>, never an escape hatch. See <a href="wsx-primitives.html">wsx-primitives.html</a>.</span></div></div>
+      <div class="callout law"><span class="ic">W3</span><div><b>Pages size to their container, never the window.</b><span class="why">The same tree renders at 320, 400, 720 and full width; <code>@sm:</code> <code>@md:</code> <code>@lg:</code> only. The sheet is a bare surface (Q18): page chrome is drawn above it, outside the paper.</span></div></div>
+
+      <h3>Agent — what Washi may do</h3>
+      <div class="callout law"><span class="ic">A1</span><div><b>Agent tools are the only capability surface: ink (data) · tsuru (network) · hanko (actions). Never fs, shell or raw SQL.</b><span class="why">Every identifier in an ink descriptor is membership-checked and bound as a parameter. Default SDK tools are off (<code>tools: []</code>). Power grows by adding tools and primitives, never a scripting hatch.</span></div></div>
+      <div class="callout law"><span class="ic">A2</span><div><b>Reads pass. Page and table writes land, marked <code>edited_by = 'washi'</code>, with an undo stack. <code>fetch_url</code> and <code>action_run</code> always stop at the desk.</b><span class="why">Nothing leaves the workspace without a person. A click in a page is consent for reversible in-workspace verbs only; <code>url.open</code> from a page is refused until its consent UI exists. The ledger records both origins, allowed and refused.</span></div></div>
+      <div class="callout law"><span class="ic">A3</span><div><b>A team server never bills one person's plan.</b><span class="why">Hosted runs on the workspace's stored key and has no local branch. Embedded runs the person's own <code>claude</code> with no key in the env. The subprocess env is built from an allowlist, never inherited — <code>WASHI_SECRET_KEY</code> must not reach the agent.</span></div></div>
+      <div class="callout law"><span class="ic">A4</span><div><b>Washi never reviews code.</b><span class="why">PRs are read-only context: linked to tickets by key, checks and deploys shown, status moved by rule. No diff critique, no review comments, no merge button. Asks come from docs, tables and sprint ops.</span></div></div>
+
+      <h3>Persistence — what the file promises</h3>
+      <div class="callout law"><span class="ic">P1</span><div><b>Every record write goes through <code>insertRecord</code> · <code>updateRecords</code> · <code>deleteRecords</code>.</b><span class="why">Each appends what the row became to <code>record_changes</code>. Charts, burn-ups and "done this month" replay it; a write around it makes history silently forget.</span></div></div>
+      <div class="callout law"><span class="ic">P2</span><div><b>Writes merge. The Loro doc is the source of truth; <code>source</code> is a cache; <code>baseVersion</code> replays a write on a fork and merges it into the present.</b><span class="why">A merge that breaks WSX is <code>SheetConflictError</code>, never a silent save. Without <code>baseVersion</code> a write still replaces — the editor and <code>sheet_replace</code> always send it.</span></div></div>
+      <div class="callout law"><span class="ic">P3</span><div><b>Nothing on screen is invented. Empty states are the honest default.</b><span class="why">A product whose promise is "see what the agent did" cannot show placeholder history. Today reads the transcript; the Daily note waits for real data; a control that does nothing is removed, not styled.</span></div></div>
+
+      <h3>Brand and stance</h3>
+      <div class="callout law"><span class="ic">B1</span><div><b>One house style. Keep the brand: the chibi sheet, warm persimmon on cream paper, washi-chan.</b><span class="why">The app frames; pages carry the house style through <code>feel</code> and <code>theme</code>. Mascot moods map to real agent states only. Source and rules in <a href="brand.html">brand.html</a> and <a href="mascot.html">mascot.html</a>.</span></div></div>
+      <div class="callout law"><span class="ic">S1</span><div><b>Always self-hosted. The badge shows the host only; the product never pitches self-hosting.</b><span class="why">OSS, no pricing, no plans, no seats — now or later. Each team holds its own keys in its own Postgres; the bar is "a database dump must not leak it", not an escrow.</span></div></div>
+    </section>
+
+    <!-- ═══════════════════════ 07 ARCHITECTURE ═══════════════════════ -->
+    <section class="s" id="arch">
+      <div class="num">07</div>
+      <h2>Architecture</h2>
+      <p class="point">One runtime, two hosts. <code>@washi/runtime</code> boots in <code>embedded</code> (the desktop's main process) or <code>hosted</code> (the studio); both serve the same <code>appRouter</code> — the studio over HTTP + <code>/trpc-ws</code>, the desktop over mirin IPC.</p>
+
+      <figure class="plate wide"><div class="inner">
+        <div class="dg">
+          <div class="lane"><div class="lbl">clients — same router, different link</div>
+            <div class="row">
+              <div class="bx" style="--c:var(--primary)">apps/studio<small>TanStack Start on Nitro (bun preset). SSR, <code>/api/auth/*</code>, <code>/api/trpc/*</code>, <code>/trpc-ws</code>, <code>/api/health</code>. A Nitro plugin boots the runtime so the clock ticks unvisited.</small></div>
+              <div class="bx" style="--c:var(--kraft)">apps/desktop<small>mirin shell: window, menu, icon, Develop menu. Renderer's <code>api</code> is a tRPC client over <code>mirinLink</code>. No port, no token.</small></div>
+              <div class="bx" style="--c:var(--agent)">@washi/ui<small>Tokens, fonts, mascot, stores, agent panel, palette, inbox, dashboard, tabs, header, sheet view. <code>bindHost({ client, place })</code> once at boot.</small></div>
+            </div>
+          </div>
+          <div class="arr">httpBatchLink + wsLink (cookie on the upgrade) · tracked() subscriptions ⇅ mirin IPC · mirin events</div>
+          <div class="lane"><div class="lbl">@washi/runtime — bootRuntime(env) / startRuntime(options)</div>
+            <div class="row">
+              <div class="bx" style="--c:var(--agent)">mode<small><code>assertMode</code> once; hosted asserts <code>DATABASE_URL</code> + <code>WASHI_SECRET_KEY</code>.</small></div>
+              <div class="bx" style="--c:var(--agent)">control plane<small>Hosted: Postgres + Better Auth (<code>@washi/control</code>). Embedded: the stub (<code>@washi/control/embedded</code>).</small></div>
+              <div class="bx" style="--c:var(--agent)">workspace registry<small><code>openWorkspace({ id, path })</code> → <code>Workspace</code>; one AgentHost per workspace.</small></div>
+              <div class="bx" style="--c:var(--agent)">clock + watch<small><code>clock.ts</code> runs routines each minute; <code>agent-watch.ts</code> turns finished Washi writes into <code>workspaceChanged</code> + presence.</small></div>
+            </div>
+          </div>
+          <div class="arr">↓ one-way</div>
+          <div class="lane"><div class="lbl">packages/washi — domain → repository → service → trpc → ui</div>
+            <div class="row">
+              <div class="bx" style="--c:var(--matcha)">domain<small>Entities, workspace tables, HLC, <code>positionBetween</code>, Zod at every boundary.</small></div>
+              <div class="bx" style="--c:var(--matcha)">repository<small>The only DB access. bun:sqlite + Drizzle as query builder; hand-written idempotent DDL; ink executed here.</small></div>
+              <div class="bx" style="--c:var(--matcha)">service<small>Business logic: sheets (merge, move, trash), tables (history), agents (host, desk, budget), comments.</small></div>
+              <div class="bx" style="--c:var(--matcha)">trpc<small><code>routers/{agents, capabilities, comments, live, models, routines, sheets, system, tables, workspaces, dev}</code>; <code>init.ts</code>; <code>contextFromRequest</code>.</small></div>
+            </div>
+          </div>
+          <div class="arr">↓</div>
+          <div class="lane"><div class="lbl">packages/shared — isomorphic, no DOM</div>
+            <div class="row">
+              <div class="bx" style="--c:var(--warn)">wsx<small>parse · validate · serialize · expr</small></div>
+              <div class="bx" style="--c:var(--warn)">paper<small><code>./registry</code> zod-only (main-process safe) · root React · <code>./css</code></small></div>
+              <div class="bx" style="--c:var(--warn)">ink<small>typed table DSL — descriptors</small></div>
+              <div class="bx" style="--c:var(--warn)">tsuru<small>fetch policy + guarded client</small></div>
+              <div class="bx" style="--c:var(--warn)">hanko<small>verb registry</small></div>
+            </div>
+          </div>
+        </div>
+      </div><figcaption><b>One runtime, two hosts.</b> Agent subscriptions are workspaceProcedures and filter on <code>workspaceId</code>: one bus serves every workspace. HTTP names the workspace in <code>x-washi-workspace</code>; a socket in <code>connectionParams</code>. Switching workspace closes the socket.</figcaption></figure>
+
+      <h3>Packages and layering</h3>
+      <ul class="tight">
+        <li><strong>Client code imports <code>@washi/trpc/client</code>, never the barrel.</strong> The barrel carries the router, the service layer and the Agent SDK into the browser bundle.</li>
+        <li><strong>Import <code>@washi/control/embedded</code> for the stub.</strong> The root barrel pulls Better Auth and a Postgres driver into the desktop main process.</li>
+        <li><strong>One React repo-wide</strong> (root <code>overrides</code>): Bun's isolated linker would otherwise hand workspace packages a second copy — an invalid hook call.</li>
+        <li><strong><code>loro-crdt</code> and the Agent SDK stay external</strong> in Vite's SSR build; Nitro traces them into <code>.output</code> (<code>RUNTIME_FILE_DEPS</code>). Inline them and SSR dies on ENOENT. The build drops the <code>-musl</code> binaries; both hosts are glibc.</li>
+        <li><strong>Shared stores are SSR-safe</strong>: nothing touches <code>localStorage</code>/<code>navigator</code> at module scope. Host persistence lives in the app (desktop <code>profile-store</code>; the studio takes identity from the session).</li>
+        <li><strong>Vite runs under Bun</strong> (<code>--bun</code>): Node cannot load <code>bun:</code> modules and the error looks like a 500 on every route.</li>
+        <li>Ids are <code>Bun.randomUUIDv7()</code>; timestamps are HLC strings from domain. <code>mirin.config.ts</code> is pure data.</li>
+      </ul>
+
+      <h3>Data — two planes</h3>
+      <figure class="plate wide"><div class="inner">
+        <div class="dg split">
+          <div class="lane"><div class="lbl">control plane · Postgres · hosted only · zero content</div>
+            <div class="row">
+              <div class="bx" style="--c:var(--bad)">accounts · sessions<small>Better Auth, email + password</small></div>
+              <div class="bx" style="--c:var(--bad)">organizations · members · invitations<small>organization plugin; teams skipped</small></div>
+              <div class="bx" style="--c:var(--bad)">workspace registry<small>id → file, org owner</small></div>
+              <div class="bx" style="--c:var(--bad)">organization_secret<small>BYOK, AES-256-GCM, per-org key via HKDF from <code>WASHI_SECRET_KEY</code>; write-only, <code>last4</code></small></div>
+            </div>
+          </div>
+          <div class="lane"><div class="lbl">data plane · &lt;workspace&gt;.db · SQLite WAL · both modes, identical code</div>
+            <div class="row">
+              <div class="bx" style="--c:var(--warn)">sheets · sheet_links · sheet_revisions · FTS5<small>Loro snapshot blob, source cache, parent_id + position, deleted_at, row_id, chrome</small></div>
+              <div class="bx" style="--c:var(--warn)">tables · table_columns · records · record_changes<small>Notion properties; append-only history</small></div>
+              <div class="bx" style="--c:var(--warn)">agent_sessions · agent_turns · approvals · capability_calls<small>transcripts, receipts, who said yes, the ledger with its actor</small></div>
+              <div class="bx" style="--c:var(--warn)">routines · comments · mention_inbox · spend · app_meta<small>everything that travels with the workspace</small></div>
+              <div class="bx" style="--c:var(--agent)">metrics · watches · links · integration_events · rules <span class="chip new">new</span><small>the golden flow's five records — rows in the same file (C1)</small></div>
+            </div>
+          </div>
+        </div>
+      </div><figcaption><b>C1 is the one-way door.</b> Backups are per file (<code>VACUUM INTO</code>). Rotating <code>WASHI_SECRET_KEY</code> signs everyone out and makes every stored key unreadable. A keyed turn's Claude session lives in <code>&lt;dataDir&gt;/&lt;workspace&gt;.claude/</code> beside the <code>.db</code>, on the volume, so a redeploy cannot orphan it.</figcaption></figure>
+
+      <h3>The sheet — source of truth</h3>
+      <ul class="tight">
+        <li>A Loro text doc, snapshot blob in SQLite; <code>source</code> is a cache. <code>sheets.get</code> hands out <code>version</code> (encoded frontiers).</li>
+        <li>A write that sends it back as <code>baseVersion</code> is replayed on a fork at that version and merged into the present (<code>mergeSheetSource</code>), then re-validated. A merge that breaks WSX is <code>SheetConflictError</code>; a stale editor merges on its next save rather than overwriting.</li>
+        <li>An open editor takes a remote change in only while it has nothing unsaved (<code>absorb</code>, ids kept per row). A canvas hand edit goes through <code>PaperHost.replaceNode(from, to)</code>; in the editor it routes into the editor store, so autosave never writes a stale canvas over a fresh one. One writer per loaded page.</li>
+        <li>Chrome — icon, <code>cover</code> (a preset key, never a URL), <code>full_width</code>, rename — is metadata: <code>sheets.updateMeta</code> never touches the doc, and width alone is not an edit.</li>
+        <li>Nesting: <code>parent_id</code> + fractional <code>position</code>; a move rewrites one row; a move into its own subtree is <code>SheetMoveError</code> → 400. Delete trashes the subtree under one <code>deleted_at</code>; a restored page whose parent is gone comes back at the top.</li>
+        <li><code>serialize</code> writes text with <code>&lt;{}&gt;&amp;</code>, runs of spaces or newlines as a string literal, so typed text round-trips. Invalid WSX is a 400, never a 500.</li>
+      </ul>
+
+      <h3>Live</h3>
+      <ul class="tight">
+        <li>One bus. Every mutation under <code>sheets.*</code>, <code>tables.*</code>, <code>capabilities.*</code> emits <code>workspaceChanged { workspaceId, kind: page | data, id }</code>; <code>agent-watch</code> emits it for each finished Washi write.</li>
+        <li>Clients hold one <code>live.onChange</code>; pages refetch the list, data refetches through <code>PaperHost.onDataChange</code>. Subscriptions yield <code>tracked()</code> and resume from <code>lastEventId</code>; the bus survives a slow consumer (the 256-event deafness and the lost wake-up both have tests).</li>
+        <li>Presence: <code>live.here</code> every 15 s, in the runtime's memory, never a record. Washi is on the page for <code>AGENT_PRESENCE_TTL_MS</code> (20 s) after each rewrite.</li>
+        <li>Comments and mentions still poll (30 s). Keystroke-level sync is phase 8's raw-binary <code>/sync</code>; Loro deltas have no business in JSON.</li>
+      </ul>
+
+      <h3>The agent host</h3>
+      <ul class="tight">
+        <li><strong>Two ports, one vocabulary.</strong> <code>AgentPort</code> — prompt · cancel · resume — normalizes into one <code>AgentUpdate</code> shape. <code>ClaudeSdkPort</code> (Claude Agent SDK, in-process MCP tools) and <code>AiSdkPort</code> (AI SDK 7 <code>ToolLoopAgent</code>, OpenRouter first; <code>toolApproval</code> on the agent, not the deprecated <code>needsApproval</code>). Both stay. The catalogue is <code>models.dev</code> (317 tool-capable models, daily refresh, bundled floor); an unpriced model yields null cost, not zero.</li>
+        <li><strong>Credential kinds:</strong> <code>api_key</code> | <code>local_cli</code>. Embedded <code>auto</code> finds <code>claude</code> and runs it via <code>pathToClaudeCodeExecutable</code> with no key in the env; hosted is <code>api_key</code> only, asserted at construction. <code>init.apiKeySource</code> is <code>none</code> for a claude.ai login — the binary, not the docs, set that rule.</li>
+        <li><strong>Plan vs metered.</strong> A plan turn lands in <code>saved_usd</code> (a $25 notional ceiling, never absent); a keyed turn in <code>cost_usd</code> with a $5 turn ceiling. The daily stop counts metered dollars (default $25) and every turn counts toward the turn cap (default 200). Resume grants one more cap of headroom.</li>
+        <li><strong>Sessions.</strong> One in flight per session; <code>agents.cancel</code> aborts and answers its approvals "no"; a resume the CLI no longer knows retries once, fresh; a session left <code>running</code> by a killed process is <code>error</code> at boot.</li>
+        <li><strong>Routines</strong> run on the minute clock over the workspaces the control plane knows that already have a file — never a stray, a deleted one or a conjured <code>default</code>. One in flight per workspace, parked or not; marked run before it runs; a scheduled run's questions wait 12 h; at the daily stop nothing is marked and the day catches up after Resume; times are wall-clock minute + IANA zone. <code>routines</code> is the only caller-free path into a turn — keep it that way.</li>
+        <li><strong>Every turn ends in a receipt:</strong> where it ran, model, duration, cost or saved. Instructions name the tools in words; the UI never shows a tool name or JSON.</li>
+      </ul>
+
+      <h3>Capabilities</h3>
+      <table>
+        <tr><th>Gate</th><th>What it is</th><th>Under a network boundary</th></tr>
+        <tr><td><strong>ink</strong></td><td>Typed table DSL. One grammar for <code>bind</code> props, agent tools and the UI: filters (≤16, ANDed), order, limit, groupBy aggregates, <code>history</code>. Executed in repository behind membership checks; paths bound as parameters.</td><td>Unchanged — which is the proof C3 is the right rule.</td></tr>
+        <tr><td><strong>tsuru</strong></td><td>https-only, allowlist with per-host prompts, private and loopback ranges blocked, size and time caps, redirects re-checked hop by hop (≤4).</td><td>SSRF by construction on a hosted server. Owed: the private-range check runs on the hostname today, not post-DNS; pin the resolved address (<a href="#open">open</a>).</td></tr>
+        <tr><td><strong>hanko</strong></td><td>Closed verb registry: <code>sheet.open</code> · <code>sheet.create</code> · <code>table.insert</code> · <code>table.update</code> · <code>table.reorder</code> · <code>table.delete</code> · <code>table.column</code> · <code>url.open</code>; plus page-only <code>state.set</code>. <code>executeAction</code> takes an origin the route stamps.</td><td>Server verbs run server-side; <code>url.open</code> is a client verb — refused from a page until its consent UI ships. Ledger rows are written server-side with the actor.</td></tr>
+      </table>
+
+      <h3>Integrations <span class="chip new">new</span></h3>
+      <ul class="tight">
+        <li>A GitHub App per workspace (hosted); the desktop polls. Webhooks land in <code>integration_events(source, ref, kind, payload, at)</code> in the workspace file. Cards (Development, later Sentry · Slack · Figma) are projections of events — a snapshot plus a link, never a copy.</li>
+        <li>Match by key in branch, title or body. Deploys from GitHub Deployments, one environment named production. Connecting the app is the approval for these reads; anything outward still stops at the desk.</li>
+        <li>Rules are a per-project <code>event → status</code> map. Moves go through <code>updateRecords</code> and are logged <em>by rule</em>, so history and charts see them.</li>
+        <li>Metric history comes from <code>record_changes</code> for ink-defined metrics; tsuru-defined metrics snapshot on the clock. Watches are checked daily by the routine clock.</li>
+      </ul>
+
+      <h3>Deferred, not cut</h3>
+      <ul class="tight">
+        <li><span class="chip later">phase 7</span> <strong>Local mode proper.</strong> Flip C2's flag, the stub control plane, a solo desktop that joins a team by uploading its one file (one-way). Three days if C1–C4 held; the phase that never ships if they did not.</li>
+        <li><span class="chip later">phase 8</span> <strong>Peer sync.</strong> Stable peer id, delta log, version vectors, raw-binary <code>/sync</code> beside the tRPC handler on the same port. The server is a peer, not a merge brain. Also desktop presence and keystroke-level co-editing.</li>
+        <li><span class="chip later">unscheduled</span> ACP as a third port; mobile as the companion (read · search · approve) over the server; private-mode workspaces, if ever.</li>
+      </ul>
+    </section>
+
+    <!-- ═══════════════════════ 08 STATUS ═══════════════════════ -->
+    <section class="s" id="status">
+      <div class="num">08</div>
+      <h2>Status and roadmap</h2>
+      <p class="point">Phases 1–6, the MLP+1, the eleven-step definition and Notion parity are on prod at washi.netko.dev. The studio architecture block is the current one; the golden flow's twelve PRs are next.</p>
+
+      <h3>Shipped</h3>
+      <table>
+        <tr><th>When</th><th>What</th><th>Note</th></tr>
+        <tr><td>2026-08-12</td><td>M0 scaffold · M1 sheets core · M2 embedded Claude</td><td>Loro-backed store, <code>@washi/wsx</code>, FTS5, HLC; agent host with in-process tools; approvals; design rev 2 (tabs, popover, mascot, icon).</td></tr>
+        <tr><td>2026-08-14</td><td>Audit P0–P8; P0 and P4 closed</td><td>Ink SQL hole closed in two layers; sheets through the desk; <code>capability_calls</code> ledger. P1 (live) · P2 (merge) · P5 (desk timeouts) · P6 (ports, cancel) · P7 (workspace handle) · P8 (render validates) all landed later under other names.</td></tr>
+        <tr><td>2026-09-08</td><td>WSX 0.4</td><td>49 primitives in seven groups, four enums, eight themes, closed <code>expr</code>, state bags, validation that names path + prop + alternatives. <code>@tailwindcss/browser</code> gone. Merged to main 2026-10-12.</td></tr>
+        <tr><td>2026-09-17</td><td>Phase 1 · server + transport</td><td><code>packages/server/*</code>, tRPC in conventions §3 shape, <code>openWorkspace</code> kills the singleton, <code>actor_id</code> on the ledger.</td></tr>
+        <tr><td>2026-09-17</td><td>Phase 2 · auth + control plane</td><td>Better Auth + organizations on Postgres via <code>Bun.SQL</code>; BYOK AES-256-GCM/HKDF, write-only; <code>ControlPlane</code> implemented twice; <code>docker-compose.yml</code>.</td></tr>
+        <tr><td>2026-09-20</td><td>Phase 3 · web client MVP</td><td>Sign up → workspace → sheet at 1024 and 375 px; onboarding rewritten, not patched.</td></tr>
+        <tr><td>2026-09-20</td><td>Phase 4 · agent server-side on a leash</td><td>Key resolution, a built subprocess env, the daily breaker with a Resume that actually resumes.</td></tr>
+        <tr><td>2026-09-20</td><td>Phase 5 · two ports</td><td><code>AgentPort</code>; AI SDK not Eve; OpenRouter; models.dev catalogue; a default model is a product decision, not arithmetic.</td></tr>
+        <tr><td>2026-09-21</td><td>Phase 6 · the web can ask</td><td>Settings with a real picker, agent panel, approvals inline, new page.</td></tr>
+        <tr><td>2026-10-08</td><td>MLP+1</td><td>Credential kinds, local CLI discovery, plan vs metered, receipts, Stop, <code>check:live</code>, invite the team, Today, who said yes, routines (reviewed four times), Claude Code model per workspace.</td></tr>
+        <tr><td>2026-10-12</td><td>Studio architecture</td><td><code>packages/washi/*</code>, <code>@washi/runtime</code>, <code>apps/studio</code> on TanStack Start, the mirin link; <code>apps/server</code> and <code>apps/web</code> deleted.</td></tr>
+        <tr><td>2026-10-14</td><td>Studio rev 2 · overnight UX · switcher</td><td><code>@washi/ui</code>; #14 safety, #15 favorites, #16 page states, #17 starters; workspace switcher in place.</td></tr>
+        <tr><td>2026-10-14</td><td>Notion parity #20–#24</td><td>Nesting + Trash, sidebar tree, page chrome, the block editor over WSX, comments + @mentions.</td></tr>
+        <tr><td>2026-10-14 →</td><td>The definition, built: #27–#37</td><td>Desk lets go (#28) · properties (#29) · rows are pages (#30) · Database (#31) · history (#32) · linked views (#33) · Roadmap (#34) · Canvas (#35) · team space + <code>people_list</code> (#36) · find (#37); merge on Loro + <code>/trpc-ws</code> + presence. Fixes #41 · #43.</td></tr>
+        <tr><td>2026-10-21</td><td>Source mode #44 · golden flow designed #45 · docs from the ground up</td><td>This document and its siblings replace the old set.</td></tr>
+      </table>
+
+      <h3>Now</h3>
+      <ul class="tight">
+        <li><strong>Studio architecture, last step:</strong> Coolify Railpack app for the studio at washi.netko.dev (<code>RAILPACK_CONFIG_FILE=apps/studio/railpack.json</code>); retire washi-server and washi-web.</li>
+        <li><strong>Docs:</strong> brand · mascot · prd · wsx-primitives · the design canvas per area; retire the old set; point <code>CLAUDE.md</code> and memory at the new one.</li>
+      </ul>
+
+      <h3>Next — the golden flow, one PR each</h3>
+      <ol class="tight">
+        <li><strong>Keys + ticket frame</strong> — <code>WEB-142</code>, <code>/t/WEB-142</code>, header chips, Properties card, keyboard.</li>
+        <li><strong>Typed links + Relations</strong> — the <code>links</code> table, the Relations section, backlinks on every page.</li>
+        <li><strong>Activity</strong> — one stream from record changes, comments and Washi actions, with filters and an inline ask.</li>
+        <li><strong>Board v2 + peek</strong> — signal row, verifying-aware progress, filters, the new peek with ↑↓.</li>
+        <li><strong>Investigation template</strong> — <code>Hypothesis</code>, <code>Finding</code>, Make ticket (single + batch).</li>
+        <li><strong>Metrics</strong> — definitions, <code>&lt;Metric&gt;</code>, <code>&lt;MetricChart&gt;</code> with target, stat page focus mode.</li>
+        <li><strong>Watches + bound Done-when</strong> — the daily check, the verifying badge, the follow-up on a miss.</li>
+        <li><strong>GitHub integration</strong> — app, webhooks, events, Development card, deploy markers on charts.</li>
+        <li><strong>Rules</strong> — the per-project event → status map, logged <em>by rule</em>.</li>
+        <li><strong>Canvas: Chosen + votes</strong> — <code>&lt;Node state&gt;</code>, vote session, Approach write-back, node → ticket.</li>
+        <li><strong>Resolution + review</strong> — Washi's resolution draft, Inbox rows, the review routine line.</li>
+        <li><strong>Linear / Jira import</strong> — one-time, keys preserved as an alias.</li>
+      </ol>
+
+      <h3>Later</h3>
+      <ul class="tight">
+        <li><span class="chip later">phase 7</span> Local mode proper; solo → team upload (washi Q4); desktop Sync tab becomes real.</li>
+        <li><span class="chip later">phase 8</span> Raw-binary <code>/sync</code> deltas; keystroke co-editing; desktop presence.</li>
+        <li><span class="chip later">pages</span> Drawer peek for rows; saving view filters from the UI; resizing roadmap bars; an Undo for table writes (the change log can replay it); inline marks (bold, <code>@page</code> via <code>Ref</code>); comments anchored to blocks and pushed over the socket; duplicate with sub-pages; Trash auto-purge; custom covers and attachments once there is an asset story; <code>sheet_move</code> so Washi can file existing pages; nested primitives in canvas nodes.</li>
+        <li><span class="chip later">agent</span> Favorites server-side per member; the 500 → 400 middleware for table validation errors; ACP as a port; more integration cards (Sentry · Slack · Figma).</li>
+        <li><span class="chip later">reach</span> Mobile as the companion over the server. Parked, not cut: pages stay fluid so the door stays open; touch targets ride along.</li>
+      </ul>
+
+      <h3>Cut</h3>
+      <ul class="tight">
+        <li><span class="chip cut">cut</span> Graph view — backlinks stay a list.</li>
+        <li><span class="chip cut">cut</span> Formulas or scripts in pages — capability grows by adding primitives; <code>expr</code> is the closed grammar, not a formula language.</li>
+        <li><span class="chip cut">cut</span> Edit by asking, no house style, review as the primary verb, multiplayer-is-review, local-first first — see <a href="#decisions">§09</a> for what replaced each.</li>
+        <li><span class="chip cut">cut</span> E2EE (Q26), quotas and pricing (Q25), Better Auth teams (Q23), Elysia + Eden (Q22), a docked chat, a <code>Fetch</code> primitive in pages (Q10).</li>
+      </ul>
+    </section>
+
+    <!-- ═══════════════════════ 09 DECISIONS ═══════════════════════ -->
+    <section class="s" id="decisions">
+      <div class="num">09</div>
+      <h2>Decisions log</h2>
+      <p class="point">Every call still in force, renumbered in one series. The original id is in brackets. A superseded call is kept, marked <span class="chip cut">cut</span>, with what replaced it — a divergence you cannot find later is a decision you did not make.</p>
+
+      <h3>Product</h3>
+      <div class="decision"><span class="id">D01</span><span class="q">What is Washi? <span class="chip decided">decided</span> <small class="mono">[washi.html · 2026-10-14]</small></span><span></span><span class="call">A team workspace of living pages, co-authored by people and the agent. One product, not four. Teams first; the desktop runs offline as a workspace of one.</span></div>
+      <div class="decision"><span class="id">D02</span><span class="q">Edit by asking — no cursor in a page <span class="chip cut">cut</span> <small class="mono">[features.md §1 · spec §06]</small></span><span></span><span class="call">Both write, as equals. The editor is a first-class surface (#23), source mode included (#44). <span class="was">Was: "if a screen's answer to how do I change this is type here, it is fighting the product." Teams were the pressure; the bet changed.</span></span></div>
+      <div class="decision"><span class="id">D03</span><span class="q">Pages have no house style <span class="chip cut">cut</span> <small class="mono">[features.md §2 · spec Q15 v1]</small></span><span></span><span class="call">One house style: components own appearance, pages own content (WSX 0.4). <span class="was">Was: every page a blank canvas the agent designs. Zero cosmetics made every page an unstyled-HTML trap.</span></span></div>
+      <div class="decision"><span class="id">D04</span><span class="q">Review is the primary human verb <span class="chip cut">cut</span> <small class="mono">[features.md §2]</small></span><span></span><span class="call">The loop is make · wire · live · together · return. Review remains the desk for what leaves the workspace.</span></div>
+      <div class="decision"><span class="id">D05</span><span class="q">Multiplayer is review, not co-editing <span class="chip cut">cut</span> <small class="mono">[server.html ④]</small></span><span></span><span class="call">Live co-editing: writes merge on Loro, presence shows who is on the page, Washi is a collaborator in the doc (#10). <span class="was">Was: "do not build presence."</span></span></div>
+      <div class="decision"><span class="id">D06</span><span class="q">Local by default; local-first first <span class="chip cut">cut</span> <small class="mono">[features.md §2 · server Q20]</small></span><span></span><span class="call">Hosted first; local mode deferred to phase 7, not repealed. C1–C4 are the price of the deferral and are law. The desktop already runs offline and solo in embedded mode.</span></div>
+      <div class="decision"><span class="id">D07</span><span class="q">Does any page write still stop at the desk? <span class="chip decided">decided</span> <small class="mono">[washi Q1]</small></span><span></span><span class="call">No. Page and table writes land, marked and undoable; the desk keeps <code>fetch_url</code> and <code>action_run</code>. A2.</span></div>
+      <div class="decision"><span class="id">D08</span><span class="q">Is Washi visible while it writes? <span class="chip decided">decided</span> <small class="mono">[washi Q3]</small></span><span></span><span class="call">Presence while writing (20 s after each rewrite), an authorship mark after — the indigo bar with source and Undo.</span></div>
+      <div class="decision"><span class="id">D09</span><span class="q">Washi and code <span class="chip decided">decided</span> <small class="mono">[Juan]</small></span><span></span><span class="call">Washi never reviews code. PRs are read-only context linked by key; it shows checks and deploys and moves status by rule. A4.</span></div>
+      <div class="decision"><span class="id">D10</span><span class="q">Hosting stance <span class="chip decided">decided</span> <small class="mono">[Juan · server.html]</small></span><span></span><span class="call">Always self-hosted, OSS, no pricing ever. The badge shows the host; the product never pitches self-hosting. S1.</span></div>
+      <div class="decision"><span class="id">D11</span><span class="q">Where the agent lives on screen <span class="chip decided">decided</span> <small class="mono">[design rev 2 · overnight UX 2026-10-14]</small></span><span></span><span class="call">A popover behind the mascot (⌘J), expandable to centre. A docked chat was declined.</span></div>
+      <div class="decision"><span class="id">D12</span><span class="q">Brand <span class="chip decided">decided</span> <small class="mono">[washi §08]</small></span><span></span><span class="call">Keep it, tighten it: the chibi sheet, persimmon on cream, washi-chan. One sheet every screen answers to (<a href="brand.html">brand.html</a>). Mascot moods map to real agent states only. B1.</span></div>
+      <div class="decision"><span class="id">D13</span><span class="q">Nothing on screen may be invented <span class="chip decided">decided</span> <small class="mono">[features.md §2]</small></span><span></span><span class="call">Still law. Empty states are the honest default; design copy that does nothing is removed. P3.</span></div>
+
+      <h3>WSX and Paper</h3>
+      <div class="decision"><span class="id">D14</span><span class="q">WSX expressiveness <span class="chip decided">decided</span> <small class="mono">[spec Q1]</small></span><span></span><span class="call">Closed, additive registry — forever. Power grows by adding primitives and verbs, never a scripting escape hatch. W2.</span></div>
+      <div class="decision"><span class="id">D15</span><span class="q">Sheet granularity: whole-doc source, humans edit thin <span class="chip cut">cut</span> <small class="mono">[spec Q2 · washi §05]</small></span><span></span><span class="call">One Loro text doc, merged at <code>baseVersion</code>; the editor edits the top level as blocks and keeps ids per row. <span class="was">Was: whole-doc replace; agents rewrite cheap, humans edit thin.</span></span></div>
+      <div class="decision"><span class="id">D16</span><span class="q"><code>sheet_patch</code> semantics <span class="chip decided">decided</span> <small class="mono">[spec Q3]</small></span><span></span><span class="call">Replace, merged: <code>sheet_replace</code> with <code>baseVersion</code>. No AST patch ops; the merge does the work.</span></div>
+      <div class="decision"><span class="id">D17</span><span class="q">CRDT now or later <span class="chip decided">decided</span> <small class="mono">[spec Q4 · server Q27]</small></span><span></span><span class="call">Loro from day 1 (diverged from the rec). The merge machinery is earned now (#10); delta sync over <code>/sync</code> waits for phase 8.</span></div>
+      <div class="decision"><span class="id">D18</span><span class="q">Naming <span class="chip decided">decided</span> <small class="mono">[spec Q5 · server Q23]</small></span><span></span><span class="call">Keep sheet (code) · .wsx · paper · ink · tsuru · hanko. <code>vault</code> → <code>workspace</code>. The user-facing word for a sheet is page.</span></div>
+      <div class="decision"><span class="id">D19</span><span class="q">Files-on-disk export <span class="chip later">later</span> <small class="mono">[spec Q6]</small></span><span></span><span class="call">SQLite stays the single source of truth; export/import later. The workspace file is already the backup and (phase 7) the upload unit.</span></div>
+      <div class="decision"><span class="id">D20</span><span class="q">Tables scope <span class="chip decided">decided</span> <small class="mono">[spec Q8 · washi Q5]</small></span><span></span><span class="call">As Notion does: a table is a database of pages with typed properties — status · select · multi_select · person · date (start/end) · url · relation — and views as tabs. Group-by aggregates in <code>bind</code>. No formulas. The team space is a starter, not a built-in Issues model.</span></div>
+      <div class="decision"><span class="id">D21</span><span class="q">Tailwind in WSX <span class="chip decided">decided</span> <small class="mono">[spec Q9 · revised twice]</small></span><span></span><span class="call">Neither allowlist nor runtime compiler: four enums, <code>span</code> + <code>gap</code>, a ~40-token layout-only <code>class</code>; <code>feel</code> is the only way to a materially different look. <code>@tailwindcss/browser</code> is gone.</span></div>
+      <div class="decision"><span class="id">D22</span><span class="q">Network in sheets — a <code>Fetch</code> primitive <span class="chip cut">cut</span> <small class="mono">[spec Q10]</small></span><span></span><span class="call">No fetch or embed primitive in WSX 0.4; <code>Figure</code> is https-only. The network is the agent's <code>fetch_url</code> through the desk. A tsuru-defined metric (new) is the way live external numbers reach a page — by id, evaluated by the repository.</span></div>
+      <div class="decision"><span class="id">D23</span><span class="q">Executable sheets <span class="chip decided">decided</span> <small class="mono">[spec Q11 · reopened 0.4]</small></span><span></span><span class="call">A closed <code>expr</code> grammar: arithmetic, comparison, and/or/not, string join, aggregates with <code>where</code>, <code>now()</code>, <code>days()</code>; AST-validated, depth 24, 2000 steps, ≤512 chars. No functions, loops, regex, formatting. Never raw JS.</span></div>
+      <div class="decision"><span class="id">D24</span><span class="q">Is a click consent? <span class="chip decided">decided</span> <small class="mono">[spec Q13]</small></span><span></span><span class="call">Split by reversibility: a click is consent for in-workspace, undoable verbs; anything leaving (<code>url.open</code>) prompts every time with the full destination — and is refused from a page until that UI exists. The ledger is the record, not the gate.</span></div>
+      <div class="decision"><span class="id">D25</span><span class="q">State-parameterized binds <code>{ $state }</code> <span class="chip later">later</span> <small class="mono">[spec Q14]</small></span><span></span><span class="call">Not shipped. <code>Database views[].where</code> and <code>expr</code> + <code>Show</code> cover the cases it was asked for. If it returns, <code>$state</code> values pass the same column/type check as literals, or P0 quietly reopens.</span></div>
+      <div class="decision"><span class="id">D26</span><span class="q">Container queries or breakpoints <span class="chip decided">decided</span> <small class="mono">[spec Q16]</small></span><span></span><span class="call">Container queries only; <code>sm: md: lg:</code> are banned mechanically. A page is a component, never the window. W3.</span></div>
+      <div class="decision"><span class="id">D27</span><span class="q">Sheet chrome <span class="chip decided">decided</span> <small class="mono">[spec Q18 · Notion parity #22]</small></span><span></span><span class="call">The sheet is a bare surface. Page chrome (icon, cover, title, width) is drawn above it, outside the paper; the ticket frame will be studio chrome the same way. Everything on the sheet is authored by the sheet.</span></div>
+      <div class="decision"><span class="id">D28</span><span class="q">Canvas <span class="chip decided">decided</span> <small class="mono">[washi §07 · Q2]</small></span><span></span><span class="call">A primitive: <code>Canvas</code> · <code>Node</code> · <code>Edge</code> on React Flow (renderer only). A node holds a label, a tone, a page link; nested primitives later. Hand edits rewrite the same markup. Design adds <code>state="chosen|out"</code> and a metric chip.</span></div>
+      <div class="decision"><span class="id">D29</span><span class="q">A view is a primitive, not a noun <span class="chip decided">decided</span> <small class="mono">[washi §04]</small></span><span></span><span class="call">A table's own page and a review doc use the same Board. Linked views are inserted with <code>/</code>; live, never a copy.</span></div>
+      <div class="decision"><span class="id">D30</span><span class="q">Is a row a page? <span class="chip decided">decided</span> <small class="mono">[washi Q6]</small></span><span></span><span class="call">Yes. Every row carries a body page (<code>sheets.row_id</code>, out of the tree), opened full and commented on; the drawer peek is later and becomes the ticket peek.</span></div>
+      <div class="decision"><span class="id">D31</span><span class="q">How charts learn the past <span class="chip decided">decided</span> <small class="mono">[washi Q7]</small></span><span></span><span class="call">An append-only change log per table in the workspace file; ink gains a closed <code>history</code> query. Not nightly snapshots — they leave gaps and cost turns. P1.</span></div>
+
+      <h3>Server and identity</h3>
+      <div class="decision"><span class="id">D32</span><span class="q">Hosted data plane <span class="chip decided">decided</span> <small class="mono">[spec Q12 · server Q21]</small></span><span></span><span class="call">One SQLite file per workspace on a volume; Postgres is control plane only. One repository implementation, forever. C1.</span></div>
+      <div class="decision"><span class="id">D33</span><span class="q">Transport <span class="chip decided">decided</span> <small class="mono">[server Q22 · studio 2026-10-12]</small></span><span></span><span class="call">tRPC v11 (zod is the boundary rule; Elysia wants TypeBox). Studio: HTTP + <code>/trpc-ws</code> with the cookie on the upgrade. Desktop: the same router over mirin IPC. Peer sync stays off it: <code>/sync</code> is raw binary WS.</span></div>
+      <div class="decision"><span class="id">D34</span><span class="q">Workspace model <span class="chip decided">decided</span> <small class="mono">[server Q23]</small></span><span></span><span class="call">Organization = workspace = one file. Better Auth teams skipped — a second nesting level before there are two users is cost without use. Roles: owner · admin · member.</span></div>
+      <div class="decision"><span class="id">D35</span><span class="q">BYOK custody <span class="chip decided">decided</span> <small class="mono">[server Q24 · MLP+1]</small></span><span></span><span class="call">Org-level, stored server-side, encrypted at rest, write-only to clients; each team is its own custodian. Embedded adds the person's local CLI as a credential kind, preferred under <code>auto</code>. A3.</span></div>
+      <div class="decision"><span class="id">D36</span><span class="q">Budgets <span class="chip decided">decided</span> <small class="mono">[server Q25 · phase 4 · MLP+1]</small></span><span></span><span class="call">No quotas. One workspace-wide daily circuit breaker in metered dollars plus a turn cap, with a Resume that grants one more cap. Plan turns are <code>saved_usd</code>. A safety stop, not a tier.</span></div>
+      <div class="decision"><span class="id">D37</span><span class="q">E2EE follows sync <span class="chip cut">cut</span> <small class="mono">[spec Q19 → server Q26]</small></span><span></span><span class="call">No E2EE. A server that runs the agent must read plaintext; blind-by-construction and cloud agent cannot both be true. Private-mode workspaces are a question after phase 7, if ever.</span></div>
+      <div class="decision"><span class="id">D38</span><span class="q">Onboarding <span class="chip decided">decided</span> <small class="mono">[server Q28 · phase 3 · MLP+1]</small></span><span></span><span class="call">Rewritten, not patched: sign in → workspace → first run ("Give Washi a key", daily stop beside it) → invite by link. Desktop onboarding keeps "no account required" because there it is true.</span></div>
+      <div class="decision"><span class="id">D39</span><span class="q">Auth method <span class="chip decided">decided</span> <small class="mono">[studio 2026-10-12]</small></span><span></span><span class="call">Email + password + invite links. No SMTP assumed: <code>?invite=&lt;id&gt;</code> is the invitation and only the invited address can accept it.</span></div>
+      <div class="decision"><span class="id">D40</span><span class="q">The client's origin <span class="chip decided">decided</span> <small class="mono">[server ① · studio 2026-10-12]</small></span><span></span><span class="call">One runtime, two hosts. <code>@washi/runtime</code> boots embedded in the desktop's main process or hosted in the studio's Nitro plugin; the desktop has no port and no token. The old "desktop spawns a sidecar" is gone.</span></div>
+      <div class="decision"><span class="id">D41</span><span class="q">Nesting and trash <span class="chip decided">decided</span> <small class="mono">[Notion parity 2026-10-14]</small></span><span></span><span class="call">Notion-style: a folder is a page with children; <code>parent_id</code> + fractional <code>position</code>; a subtree trashes under one stamp; restore and purge act on the batch.</span></div>
+      <div class="decision"><span class="id">D42</span><span class="q">Where comments live <span class="chip decided">decided</span> <small class="mono">[#24]</small></span><span></span><span class="call">In the workspace file, so they travel with it (C1). The author is the session's actor, never the request body; embedded signs as <em>You</em>.</span></div>
+
+      <h3>Agent</h3>
+      <div class="decision"><span class="id">D43</span><span class="q">Second port: ACP at M4 <span class="chip decided">decided</span> <small class="mono">[spec Q7 → phase 5]</small></span><span></span><span class="call">Embedded Claude first held. The second port is the AI SDK (OpenRouter), not Eve and not ACP: Eve wants to own the agent's shape; Washi already owns the desk, the ledger, the transcript. ACP is unscheduled.</span></div>
+      <div class="decision"><span class="id">D44</span><span class="q">Default model <span class="chip decided">decided</span> <small class="mono">[phase 5]</small></span><span></span><span class="call">A product decision, not arithmetic: an ordered preference list validated against the catalogue. Cheapest was a free preview that would write terrible pages.</span></div>
+      <div class="decision"><span class="id">D45</span><span class="q">Routines <span class="chip decided">decided</span> <small class="mono">[MLP+1, four reviews]</small></span><span></span><span class="call">A prompt and a daily minute, run by the server clock as an ordinary turn in a fresh session. One in flight per workspace, parked or not; marked before it runs; 12 h for its questions; wall-clock minute + IANA zone; the daily stop checked at start and charged at end.</span></div>
+      <div class="decision"><span class="id">D46</span><span class="q">Tool classification <span class="chip decided">decided</span> <small class="mono">[#28]</small></span><span></span><span class="call"><code>READ_TOOLS</code> never stop; <code>CHANGE_TOOLS</code> (<code>sheet_create</code> · <code>sheet_replace</code> · <code>db_define</code> · <code>db_mutate</code>) land marked with an undo stack; everything else asks. The golden flow's new tools (<code>ticket_from_finding</code>, <code>link_add</code>, <code>metric_read</code>) are page/table writes — no new approval class.</span></div>
+      <div class="decision"><span class="id">D47</span><span class="q">Who said yes <span class="chip decided">decided</span> <small class="mono">[server §04 · MLP+1]</small></span><span></span><span class="call"><code>actor_id</code> on the ledger and <code>resolved_by</code> on approvals, stamped from the session. Brutal to retrofit against a populated ledger, so it landed in phase 1.</span></div>
+
+      <h3>The golden flow</h3>
+      <div class="decision"><span class="id">D48</span><span class="q">Metric: own object or an <code>expr</code>? <span class="chip decided">decided</span> <small class="mono">[design call 1]</small></span><span></span><span class="call">Own object: a <code>metrics</code> table in the workspace file, defined over a table (ink) or a fetched source (tsuru). Watches, targets and deploy markers need a stable id; pages reference it by id and stay inert.</span></div>
+      <div class="decision"><span class="id">D49</span><span class="q">Ticket keys <span class="chip decided">decided</span> <small class="mono">[design call 2]</small></span><span></span><span class="call">Per project: <code>WEB-142</code>, <code>API-31</code>. The starter makes one project named after the workspace. Imported keys survive as an alias.</span></div>
+      <div class="decision"><span class="id">D50</span><span class="q">Done = merged or deployed? <span class="chip decided">decided</span> <small class="mono">[design call 3]</small></span><span></span><span class="call">Deployed (merged when no deploy feed exists), plus a <em>verifying</em> badge while a watch runs. A badge, not a column: the board stays four columns and the progress bar cannot show success that has not happened.</span></div>
+      <div class="decision"><span class="id">D51</span><span class="q">How integrations connect <span class="chip decided">decided</span> <small class="mono">[design call 4]</small></span><span></span><span class="call">A GitHub App + webhooks per workspace (hosted); the desktop polls. Connecting is the approval for reads; outward writes still stop at the desk. Cards are projections of events, never copies.</span></div>
+      <div class="decision"><span class="id">D52</span><span class="q">Linear / Jira <span class="chip decided">decided</span> <small class="mono">[design call 5]</small></span><span></span><span class="call">One-time import, no two-way sync. A sync locks Washi to their data model; a later sync can be added if teams ask.</span></div>
+      <div class="decision"><span class="id">D53</span><span class="q">A metric misses its target <span class="chip decided">decided</span> <small class="mono">[design call 6]</small></span><span></span><span class="call">A linked follow-up ticket (<em>follow-up of</em>); the finding reopens; the original stays closed. Reopening would rewrite sprint history.</span></div>
+      <div class="decision"><span class="id">D54</span><span class="q">Mobile <span class="chip later">later</span> <small class="mono">[spec Q17 · server]</small></span><span></span><span class="call">Parked, not cut. The agent cannot run on-device, so mobile is a client of the server; it returns as the companion (read · search · approve). Fluid pages and touch targets keep the door open.</span></div>
+    </section>
+
+    <!-- ═══════════════════════ 10 OPEN ═══════════════════════ -->
+    <section class="s" id="open">
+      <div class="num">10</div>
+      <h2>Open questions</h2>
+      <p class="point">Everything still open across the retired docs, the task log and the design. A box is closed by a decision in §09 or a PR; nothing here blocks step 1 of the golden flow.</p>
+      <h3>Security and the desk</h3>
+      <ul class="oq">
+        <li>tsuru's private-range block runs on the hostname. Move it post-DNS and pin the resolved address, or a rebind walks into the control plane.<span class="src">server §06</span></li>
+        <li>A page's <code>url.open</code> is refused outright. Build the consent UI that shows the full destination, or keep refusing on purpose.<span class="src">spec Q13 · P4</span></li>
+        <li>Agent autonomy as a control a person can set confidently — per capability, per session or workspace. Today: reads pass, changes land, fetch/action ask, nothing configurable. Is that the whole answer?<span class="src">features §6 · spec P5</span></li>
+        <li>One review model: Inbox, Today and the panel are three doors into one job. Does Today fold into the Inbox once "while you slept" is real?<span class="src">features §6</span></li>
+        <li>A scheduled run with no credential is marked and lost for the day; a turn whose port hangs without asking holds the next routine until someone presses Stop.<span class="src">MLP+1</span></li>
+        <li>The AI SDK port prices only finished steps — an OpenRouter turn stopped mid-step undercounts that step.<span class="src">MLP+1</span></li>
+      </ul>
+      <h3>Pages and data</h3>
+      <ul class="oq">
+        <li>Where do local files live? Covers are preset keys and <code>Figure</code> is https-only because there is no asset story. Needs a design before custom covers or attachments.<span class="src">features §5 · M2 gaps</span></li>
+        <li><code>stored</code> state behaves as <code>local</code> until per-reader persistence lands.<span class="src">WSX 0.4 gaps</span></li>
+        <li>Theme acceptance thresholds: the design's own values sit at 4.02 accent-on-card and 1.25 border against rules of 4.5 / 1.4; tests hold at 4.0 / 1.2. Flag to design.<span class="src">WSX 0.4 gaps</span></li>
+        <li>What a canvas node can hold beyond label, tone and page link (a stat, a table row).<span class="src">washi Q2</span></li>
+        <li>History for a tsuru-defined metric: snapshots on the clock, at what grain, kept how long?<span class="src">design §10</span></li>
+        <li>Votes are ephemeral runtime memory until ended. On the desktop, embedded, is a vote meaningful at all?<span class="src">design §10</span></li>
+      </ul>
+      <h3>Design calls not yet confirmed by Juan</h3>
+      <ul class="oq">
+        <li>A rail of cards on the ticket (room for Watching and Development) versus Linear's single property list (density).<span class="src">design §12</span></li>
+        <li>A Done-when bound to a metric cannot be ticked by hand. Strict on purpose; too strict?<span class="src">design §12</span></li>
+        <li>Should <em>Choose top</em> exist, or only <em>Choose</em> on a node a person picked?<span class="src">design §12</span></li>
+      </ul>
+      <h3>Hosts and the road</h3>
+      <ul class="oq">
+        <li>Phase 7's upload: what a solo file keeps when it joins a team (its routines, its sessions, its spend) and who it signs as.<span class="src">washi Q4</span></li>
+        <li>Private-mode workspaces after phase 7 — if ever.<span class="src">server Q26</span></li>
+        <li>Coolify: the studio as one Railpack app; retiring washi-server and washi-web.<span class="src">studio 5b</span></li>
+        <li>Favorites and Recent are per browser; do they follow a person across devices?<span class="src">overnight UX</span></li>
+        <li>Remove <code>sheets.activeId</code> — nothing renders from it; <code>select</code> is its last reader.<span class="src">overnight UX</span></li>
+      </ul>
+    </section>
+
+    <!-- ═══════════════════════ 11 SUPERSEDES ═══════════════════════ -->
+    <section class="s" id="supersedes">
+      <div class="num">11</div>
+      <h2>What this supersedes</h2>
+      <p class="point">The four retired docs and where each part lives now. Nothing in them is authoritative any more; history stays in git.</p>
+      <table>
+        <tr><th>Retired</th><th>Section</th><th>Now in</th></tr>
+        <tr><td rowspan="9"><code>washi.html</code> (2026-10-14)</td><td>01 what · one product</td><td><a href="#what">§01</a></td></tr>
+        <tr><td>02 seven nouns</td><td><a href="#nouns">§03</a> (now twenty, with storage)</td></tr>
+        <tr><td>03 the loop</td><td><a href="#flows">§04</a> A, B, D</td></tr>
+        <tr><td>04 the team's week · starter</td><td><a href="#flows">§04</a> C, E · <a href="#status">§08</a> · <a href="design/work.html">design/work</a></td></tr>
+        <tr><td>05 together · live co-editing</td><td><a href="#arch">§07</a> sheet + live · D05</td></tr>
+        <tr><td>06 hosts</td><td><a href="#who">§02</a> · <a href="#arch">§07</a></td></tr>
+        <tr><td>07 canvas is a primitive</td><td>D28 · <a href="wsx-primitives.html">wsx-primitives</a></td></tr>
+        <tr><td>08 brand · 09 retires · 10 called · 11 build order</td><td><a href="brand.html">brand</a> · <a href="mascot.html">mascot</a> · D02–D06 · D07 D08 D20 D28 D30 D31 · <a href="#status">§08</a> shipped</td></tr>
+        <tr><td>Q1–Q7</td><td>D07 D28 D08 D54/§07 deferred D20 D30 D31</td></tr>
+        <tr><td rowspan="8"><code>spec.html</code> v0.5</td><td>00 status · 08 milestones M0–M5</td><td><a href="#status">§08</a> shipped</td></tr>
+        <tr><td>01 eight nouns · 02 WSX format</td><td><a href="#nouns">§03</a> · <a href="#laws">W1–W3</a> · <a href="wsx-primitives.html">wsx-primitives</a> (the format in depth; <code>docs/wsx.md</code> folds into it)</td></tr>
+        <tr><td>03 architecture · 04 data layer</td><td><a href="#arch">§07</a></td></tr>
+        <tr><td>05 agent layer · trust model</td><td><a href="#laws">A1–A3</a> · <a href="#arch">§07</a> agent host</td></tr>
+        <tr><td>06 ui surfaces</td><td><a href="#surfaces">§05</a> · <a href="design/index.html">design/</a></td></tr>
+        <tr><td>07 sync · 09 hardening P0–P8 · 10 canvas sweep and mobile</td><td><a href="#arch">§07</a> deferred · <a href="#status">§08</a> 2026-08-14 row · D21 D26 D27 D54</td></tr>
+        <tr><td>11 decisions Q1–Q19</td><td>D14–D27 · D32 · D37 · D43 · D54</td></tr>
+        <tr><td>the P0–P8 narrative, the L1–L3 diagnosis</td><td>dropped — history, not rules; the fixes are facts in §07 and laws in §06</td></tr>
+        <tr><td rowspan="7"><code>server.html</code> v0.6</td><td>00 the trade · 01 C1–C4</td><td><a href="#laws">C1–C4</a> · D06</td></tr>
+        <tr><td>02 the shape · workspace layout</td><td><a href="#arch">§07</a> diagram (apps/server and apps/web are gone; the runtime replaced them)</td></tr>
+        <tr><td>03 two planes · 04 workspace model</td><td><a href="#arch">§07</a> data · D32 D34 D47</td></tr>
+        <tr><td>04 "multiplayer is review"</td><td>D05 <span class="chip cut">cut</span></td></tr>
+        <tr><td>05 agent server-side · BYOK · circuit breaker</td><td><a href="#arch">§07</a> agent host · D35 D36 · <a href="#laws">A3</a></td></tr>
+        <tr><td>06 capabilities under a network boundary · 07 phases</td><td><a href="#arch">§07</a> capabilities · <a href="#status">§08</a> · <a href="#open">§10</a> tsuru</td></tr>
+        <tr><td>08 decisions Q20–Q28 · 09 supersedes</td><td>D06 D32–D38 · this table</td></tr>
+        <tr><td rowspan="5"><code>features.md</code></td><td>§1 what · §2 design rules</td><td>D02 D03 D04 D06 D13 · <a href="#laws">W3 · P3</a></td></tr>
+        <tr><td>§3 surfaces</td><td><a href="#surfaces">§05</a> · <a href="design/index.html">design/</a></td></tr>
+        <tr><td>§4 coming later</td><td>structured data shipped (§08); external agents D43; sync §07 deferred</td></tr>
+        <tr><td>§5 out of scope</td><td><a href="#status">§08</a> cut (inline editing and slash menus are in, not cut)</td></tr>
+        <tr><td>§6 open design questions</td><td>1 · 2 · 4 · 6 closed by starters, Washi's marks, the live marker, honest empty states; 3 · 5 in <a href="#open">§10</a></td></tr>
+        <tr><td><code>design.html</code> (2026-10-21)</td><td>the nine screens · six calls · system · build</td><td><a href="design/work.html">design/work</a> · D48–D53 · <a href="#nouns">§03</a> new nouns · <a href="#status">§08</a> next</td></tr>
+        <tr><td><code>wsx.md</code></td><td>the format summary</td><td><a href="wsx-primitives.html">wsx-primitives</a>; <a href="#laws">W1–W3</a> here</td></tr>
+      </table>
+      <p class="side">Deliberately dropped: spec.html's M3–M5 plan, its Anko-on-mirin diagram and the Elysia relay; server.html's week estimates and the "three screens are lying" warning (onboarding was rewritten); features.md's edit-by-asking surfaces (Daily note "must not offer a typing affordance", inline accept/reject of suggested edits). Each was either shipped under another name or contradicted by a decision above.</p>
+    </section>
+
+    <footer class="foot"><span>washi · prd · v1 · 2026-10-21</span><span>docs/prd.html</span></footer>
+  </main>
+</div>
+<script src="_kit/mascot.js"></script>
+</body>
+</html>

@@ -104,10 +104,7 @@
       "!**/src/components/ui",
       "!**/.claude",
       "!**/design",
-      "!**/icon.icon",
-      "!**/docs/spec.html",
-      "!**/docs/server.html",
-      "!**/docs/washi.html"
+      "!**/icon.icon"
     ]
   }
 }

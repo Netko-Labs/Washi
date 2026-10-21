@@ -772,3 +772,15 @@ seed or scaffold.
   "ENOENT chdir" — always check the log, not the exit code.
 - zod 4 `issue.input` is undefined on enum failures; read the value from the props by `issue.path`.
 - `mirin check` and `mirin dev` can't run simultaneously — CDP 9222 collides.
+
+# Docs, from the ground up (2026-10-21) — one branch `docs/ground-up`, PR when whole
+
+Juan's call: drop the old doc set and rework it: `brand.html` `mascot.html` `prd.html`
+`wsx-primitives.html` and a Figma-like canvas of every screen (`design/`, split per area).
+`conventions.md` stays. Old docs (washi · spec · server · design · features · wsx.md) retire once
+`prd.html` carries their decisions.
+
+- [x] 0 · foundation: `docs/_kit` (doc.css · app.css · mascot.js · canvas.css/js), `docs/index.html`
+- [x] 1 · brand.html · 2 · mascot.html · 3 · prd.html · 4 · wsx-primitives.html
+- [x] 5 · design/{shell,pages,data,work,agent,account,desktop}.html + design/index.html overview
+- [x] 6 · retire old docs, point CLAUDE.md + memory at the new set, PR
