@@ -810,3 +810,22 @@ passes; no key → the tool says where to add one.
 - [x] 1 · no CJK anywhere: docs, kit, app copy, showcases, tests (WASHI wordmark, W agent mark, "done" stamps)
 - [x] 2 · design/shell.html "Sidebar · proposed": A Quiet (the call) · B Home first · C Rail + panel · A states, mobbin refs
 - [ ] 3 · implement A in the studio sidebar once Juan picks (next PR)
+
+# Mihon — the WSX sample book (2026-10-21) — branch `feat/mihon`
+
+Storybook was the ask; the registry is zod, so the knobs derive from the spec instead and no
+dependency lands. `apps/mihon`: rail (7 groups) · stage (parse + validate + WsxView) · knobs ·
+source/scratch · matrix. Host in memory.
+
+- [x] 1 · scaffold: Vite + React + Tailwind over `@washi/ui/css`, `bun run dev:mihon` (3200)
+- [x] 2 · `shared/knobs`: zod → KnobDef (enum · boolean · number · text · json), required, styled
+- [x] 3 · `shared/specimen`: one default per primitive, `within` wraps, `pageSource` for the views;
+      every specimen and matrix validates against `paperRegistry` (test)
+- [x] 4 · `shared/host`: `createBookHost` — ink executor over rows (filter · order · limit · group),
+      synthetic history, hanko verbs land in memory, toggles, people
+- [x] 5 · UI: topbar (theme · mode · feel · accent · width · view), rail with search, knobs with
+      reset, source with copy + scratch, diagnostics strip; `#Name` deep links
+- [ ] 6 · refine primitives from what the book shows (next: list findings per primitive)
+
+Acceptance: pick any primitive, turn every knob, the WSX below is what a page would carry and it
+validates; matrix shows variant × tone with no budget error; dark + every theme render.

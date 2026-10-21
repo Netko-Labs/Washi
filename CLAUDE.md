@@ -32,6 +32,9 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   Node can't load `bun:` modules, and the error looks like a 500 on every route.
 - `bun run --cwd apps/studio build` — `.output/`, what Railpack ships; `bun --no-install
   apps/studio/.output/server/index.mjs` runs it.
+- `bun run dev:mihon` — the sample book (`apps/mihon`, port 3200): every paper primitive, knobs
+  read off its zod spec, a variant × tone matrix, a scratch editor, all over an in-memory host.
+  No Postgres, no login. Open it to refine a primitive; the real check is the sheet it writes.
 - `bun run typecheck` — tsgo across all workspaces (turbo)
 - `bun run check` — biome check
 - `bun test` — unit tests across workspaces
@@ -60,6 +63,10 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
 - `apps/desktop` — mirin shell: window, menu, icon, Develop menu. `src/bun/` (main) boots the
   embedded runtime and serves `appRouter` via `createMirinBridge`; the renderer's `api` is a tRPC
   client over `mirinLink`. No port, no token.
+- `apps/mihon` — the WSX sample book: a Vite SPA over `@washi/paper` with a `PaperHost` in memory
+  (`tasks` seeded, verbs land, binds refetch). Knobs come from `paperRegistry` (`knobsFor`), one
+  specimen per primitive (`SPECIMENS`, tested to validate), and the stage runs the server's gates
+  client-side. Not a host of the runtime; never shipped.
 - `packages/washi/ui` — the UI both hosts wear: tokens + fonts + mascot keyframes
   (`@washi/ui/css`, which `@source`s itself), the mascot, stores (view/sheets/agent), agent panel,
   palette, inbox, dashboard, tabs, header, sheet view, markdown. Each app calls
