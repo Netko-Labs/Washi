@@ -28,6 +28,7 @@
 .dside .it { height: 29px; font-size: 13px; }
 .dside .lbl { padding: 18px 8px 6px; font: 600 11px / 1 var(--s-sans); letter-spacing: 0.06em; }
 .dside .foot { margin: auto -8px 0; }
+.dside .foot .wsbtn { margin: 6px 8px 4px; }
 .status { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-top: 1px solid var(--s-border); font-size: 11.5px; color: var(--s-mfg); }
 .status i { margin-left: auto; width: 6px; height: 6px; border-radius: 50%; background: var(--s-mfg); }
 .userrow { display: flex; align-items: center; gap: 9px; padding: 10px 12px; border-top: 1px solid var(--s-border); }
@@ -42,7 +43,7 @@
 .sheet .hero p { color: var(--s-mfg); font-size: 14.5px; }
 .sheet .reveal { display: flex; gap: 8px; font-weight: 600; padding: 8px 0; }
 .sheet hr { border: 0; border-top: 1px solid var(--s-border); margin: 14px 0; }
-.drop { position: absolute; left: 8px; right: 8px; top: 84px; z-index: 6; background: var(--s-pop); border: 1px solid var(--s-border); border-radius: 12px; padding: 5px; box-shadow: 0 8px 28px #00000029; font-size: 13px; }
+.drop { position: absolute; left: 8px; right: 8px; bottom: 112px; z-index: 6; background: var(--s-pop); border: 1px solid var(--s-border); border-radius: 12px; padding: 5px; box-shadow: 0 8px 28px #00000029; font-size: 13px; }
 .drop .grp { padding: 6px 8px 3px; font: 600 11px / 1 var(--s-sans); letter-spacing: 0.06em; text-transform: uppercase; color: var(--s-mfg); }
 .drop .mi { display: flex; align-items: center; gap: 9px; height: 34px; padding: 0 8px; border-radius: 8px; }
 .drop .mi .ck { margin-left: auto; font-size: 12px; }
@@ -313,15 +314,13 @@
     <div class="app">
       <div class="bar"><i></i><i></i><i></i><span class="ttl">Washi</span></div>
       <div class="shell">
-        <aside class="side dside">
-          <div class="stop"><span>⌕</span><span>✎</span><span>⇤</span></div>
-          <div class="wsbtn"><span class="vault" style="--c:#DF8552"><i data-mascot="happy" data-size="30"></i></span><span class="tx"><b>Personal vault</b><em>13 pages · local</em></span><span class="sel">⇅</span></div>
-          <div class="it"><span class="g">⌂</span>Dashboard</div>
-          <div class="it"><span class="g">◫</span>Inbox<span class="badge">1</span></div>
+        <aside class="side dside sb sbD">
+          <div class="sa"><i data-mascot="happy" data-size="20"></i>Ask Washi or search<span class="k">⌘K</span></div>
+          <div class="hrow"><div class="it"><span class="g">⌂</span>Home</div><span class="ib" title="Inbox">◫<span class="badge">1</span></span><span class="ib" title="Threads">≡</span><span class="ib" title="Routines">◷</span></div>
           <div class="it"><span class="g">▦</span>Daily note</div>
-          <div class="lbl">Favorites</div>
+          <div class="lbl2">Favorites</div>
           <div class="it on"><span class="g">✦</span>Welcome to Washi</div>
-          <div class="lbl">Pages</div>
+          <div class="lbl2">Pages</div>
           <div class="it on"><span class="g">✦</span>Welcome to Washi</div>
           <div class="it"><span class="g">▤</span>WSX · Sprint 12</div>
           <div class="it"><span class="g">▥</span>Registry build</div>
@@ -335,8 +334,11 @@
           <div class="it"><span class="g">▣</span>Reading room</div>
           <div class="it"><span class="g">$</span>Hakone trip</div>
           <div class="it"><span class="g">✦</span>WSX Primitives</div>
-          <div class="it"><span class="g">+</span>New page</div>
+          <div class="act"><span class="g">+</span>New page</div>
+          <div class="lbl2">Routines</div>
+          <div class="act"><span class="g">+</span>Schedule one</div>
           <div class="foot">
+            <div class="wsbtn"><span class="vault" style="--c:#DF8552"><i data-mascot="happy" data-size="30"></i></span><span class="tx"><b>Personal vault</b><em>13 pages · local</em></span><span class="sel">⇅</span></div>
             <div class="status"><span class="g">⊘</span>Offline · this device only<i></i></div>
             <div class="userrow"><span class="av lg" style="--c:#cf6b36">MK</span><span class="tx"><b>Mira Kaneko</b><em>Local account</em></span><span class="sel">⇅</span></div>
           </div>
@@ -356,21 +358,22 @@
       </div>
       <div class="fab"><i data-mascot="happy bob" data-size="40" class="m"></i></div>
       <span class="pin" style="left:150px;top:36px">1</span>
-      <span class="pin" style="left:236px;top:84px">2</span>
+      <span class="pin" style="left:238px;top:640px">2</span>
       <span class="pin" style="left:236px;top:694px">3</span>
       <span class="pin" style="left:262px;top:110px">4</span>
       <span class="pin" style="left:1086px;top:76px">5</span>
     </div>
-    <div class="fnote">What <code>bun dev</code> opens: 1280×820 window, min 880×600, title bar <code>hiddenInset</code> with the lights at (13, 13) — in the real window they sit inline with 1 · the sidebar's 36px drag row (search ⌘K, new page, collapse). 2 · <code>WorkspaceSwitcher</code>: VaultIcon + "N pages · local". 3 · The status row reads "Offline · this device only" and opens Settings; the shell's "Washi · Awake" row from shell.html is not on the desktop yet. 4 · Crumb says "Workspace": nothing on the desktop calls <code>setWorkspaceName</code>, so the header and the switcher disagree. 5 · <code>Header actions</code> is the desktop's Share button; the dashed pill is <code>STATE_LABELS</code>. Pages list is <code>byRecent</code>, no tree — the Notion nesting lives in the studio sidebar only.</div>
+    <div class="fnote">What <code>bun dev</code> opens: 1280×820 window, min 880×600, title bar <code>hiddenInset</code> with the lights at (13, 13) — in the real window they sit inline with 1 · the ask field (Sidebar D, D57): the mascot is Washi's state, <code>⌘K</code> the palette; Home · Inbox · Threads · Routines sit under it, Daily note below. 2 · <code>WorkspaceSwitcher</code>, now in the footer: VaultIcon + "N pages · local". 3 · The status row reads "Offline · this device only" and opens Settings; the shell's "Washi · Awake" row from shell.html is not on the desktop yet. 4 · Crumb says "Workspace": nothing on the desktop calls <code>setWorkspaceName</code>, so the header and the switcher disagree. 5 · <code>Header actions</code> is the desktop's Share button; the dashed pill is <code>STATE_LABELS</code>. Pages list is <code>byRecent</code>, no tree — the Notion nesting lives in the studio sidebar only.</div>
   </article>
 
   <article class="frame" data-name="Workspace switcher" data-w="1280" data-h="800">
     <div class="app">
       <div class="bar"><i></i><i></i><i></i><span class="ttl">Washi</span></div>
       <div class="shell">
-        <aside class="side dside" style="position:relative">
-          <div class="stop"><span>⌕</span><span>✎</span><span>⇤</span></div>
-          <div class="wsbtn open"><span class="vault" style="--c:#DF8552"><i data-mascot="happy" data-size="30"></i></span><span class="tx"><b>Personal vault</b><em>13 pages · local</em></span><span class="sel">⇅</span></div>
+        <aside class="side dside sb sbD" style="position:relative">
+          <div class="sa"><i data-mascot="happy" data-size="20"></i>Ask Washi or search<span class="k">⌘K</span></div>
+          <div class="hrow"><div class="it"><span class="g">⌂</span>Home</div><span class="ib" title="Inbox">◫<span class="badge">1</span></span><span class="ib" title="Threads">≡</span><span class="ib" title="Routines">◷</span></div>
+          <div class="it"><span class="g">▦</span>Daily note</div>
           <div class="drop">
             <div class="grp">Workspaces</div>
             <div class="mi"><span class="vault sm" style="--c:#DF8552"><i data-mascot="happy" data-size="24"></i></span>Personal vault<span class="ck">✓</span></div>
@@ -378,17 +381,17 @@
             <div class="sep"></div>
             <div class="mi new"><span class="g">+</span>Create workspace</div>
           </div>
-          <div class="it"><span class="g">⌂</span>Dashboard</div>
-          <div class="it"><span class="g">◫</span>Inbox<span class="badge">1</span></div>
-          <div class="it"><span class="g">▦</span>Daily note</div>
-          <div class="lbl">Pages</div>
+          <div class="lbl2">Pages</div>
           <div class="it on"><span class="g">✦</span>Welcome to Washi</div>
           <div class="it"><span class="g">▤</span>WSX · Sprint 12</div>
           <div class="it"><span class="g">▥</span>Registry build</div>
           <div class="it"><span class="g">☀</span>Daily practice</div>
           <div class="it"><span class="g">✈</span>Kyoto in October</div>
-          <div class="it"><span class="g">+</span>New page</div>
+          <div class="act"><span class="g">+</span>New page</div>
+          <div class="lbl2">Routines</div>
+          <div class="act"><span class="g">+</span>Schedule one</div>
           <div class="foot">
+            <div class="wsbtn open"><span class="vault" style="--c:#DF8552"><i data-mascot="happy" data-size="30"></i></span><span class="tx"><b>Personal vault</b><em>13 pages · local</em></span><span class="sel">⇅</span></div>
             <div class="status"><span class="g">⊘</span>Offline · this device only<i></i></div>
             <div class="userrow"><span class="av lg" style="--c:#cf6b36">MK</span><span class="tx"><b>Mira Kaneko</b><em>Local account</em></span><span class="sel">⇅</span></div>
           </div>
@@ -408,18 +411,19 @@
     <div class="app">
       <div class="bar"><i></i><i></i><i></i><span class="ttl">Washi</span></div>
       <div class="shell">
-        <aside class="side dside">
-          <div class="stop"><span>⌕</span><span>✎</span><span>⇤</span></div>
-          <div class="wsbtn"><span class="vault" style="--c:#DF8552"><i data-mascot="happy" data-size="30"></i></span><span class="tx"><b>Personal vault</b><em>13 pages · local</em></span><span class="sel">⇅</span></div>
-          <div class="it"><span class="g">⌂</span>Dashboard</div>
-          <div class="it"><span class="g">◫</span>Inbox<span class="badge">1</span></div>
+        <aside class="side dside sb sbD">
+          <div class="sa"><i data-mascot="happy" data-size="20"></i>Ask Washi or search<span class="k">⌘K</span></div>
+          <div class="hrow"><div class="it"><span class="g">⌂</span>Home</div><span class="ib" title="Inbox">◫<span class="badge">1</span></span><span class="ib" title="Threads">≡</span><span class="ib" title="Routines">◷</span></div>
           <div class="it"><span class="g">▦</span>Daily note</div>
-          <div class="lbl">Pages</div>
+          <div class="lbl2">Pages</div>
           <div class="it on"><span class="g">✦</span>Welcome to Washi</div>
           <div class="it"><span class="g">▤</span>WSX · Sprint 12</div>
           <div class="it"><span class="g">▥</span>Registry build</div>
-          <div class="it"><span class="g">+</span>New page</div>
+          <div class="act"><span class="g">+</span>New page</div>
+          <div class="lbl2">Routines</div>
+          <div class="act"><span class="g">+</span>Schedule one</div>
           <div class="foot">
+            <div class="wsbtn"><span class="vault" style="--c:#DF8552"><i data-mascot="happy" data-size="30"></i></span><span class="tx"><b>Personal vault</b><em>13 pages · local</em></span><span class="sel">⇅</span></div>
             <div class="status"><span class="g">⊘</span>Offline · this device only<i></i></div>
             <div class="userrow"><span class="av lg" style="--c:#cf6b36">MK</span><span class="tx"><b>Mira Kaneko</b><em>Local account</em></span><span class="sel">⇅</span></div>
           </div>
@@ -450,19 +454,20 @@
     <div class="app">
       <div class="bar"><i></i><i></i><i></i><span class="ttl">Washi</span></div>
       <div class="shell">
-        <aside class="side dside">
-          <div class="stop"><span>⌕</span><span>✎</span><span>⇤</span></div>
-          <div class="wsbtn"><span class="vault" style="--c:#DF8552"><i data-mascot="happy" data-size="30"></i></span><span class="tx"><b>Personal vault</b><em>13 pages · local</em></span><span class="sel">⇅</span></div>
-          <div class="it"><span class="g">⌂</span>Dashboard</div>
-          <div class="it"><span class="g">◫</span>Inbox</div>
+        <aside class="side dside sb sbD">
+          <div class="sa"><i data-mascot="happy" data-size="20"></i>Ask Washi or search<span class="k">⌘K</span></div>
+          <div class="hrow"><div class="it"><span class="g">⌂</span>Home</div><span class="ib" title="Inbox">◫</span><span class="ib" title="Threads">≡</span><span class="ib" title="Routines">◷</span></div>
           <div class="it"><span class="g">▦</span>Daily note</div>
-          <div class="lbl">Pages</div>
+          <div class="lbl2">Pages</div>
           <div class="it"><span class="g">✦</span>Welcome to Washi</div>
           <div class="it on"><span class="g">▤</span>WSX · Sprint 12</div>
           <div class="it"><span class="g">▥</span>Registry build</div>
           <div class="it"><span class="g">☀</span>Daily practice</div>
-          <div class="it"><span class="g">+</span>New page</div>
+          <div class="act"><span class="g">+</span>New page</div>
+          <div class="lbl2">Routines</div>
+          <div class="act"><span class="g">+</span>Schedule one</div>
           <div class="foot">
+            <div class="wsbtn"><span class="vault" style="--c:#DF8552"><i data-mascot="happy" data-size="30"></i></span><span class="tx"><b>Personal vault</b><em>13 pages · local</em></span><span class="sel">⇅</span></div>
             <div class="status"><span class="g">⊘</span>Offline · this device only<i></i></div>
             <div class="userrow"><span class="av lg" style="--c:#cf6b36">MK</span><span class="tx"><b>Mira Kaneko</b><em>Local account</em></span><span class="sel">⇅</span></div>
           </div>
@@ -508,19 +513,20 @@
     <div class="app">
       <div class="bar"><i></i><i></i><i></i><span class="ttl">Washi</span></div>
       <div class="shell">
-        <aside class="side dside">
-          <div class="stop"><span>⌕</span><span>✎</span><span>⇤</span></div>
-          <div class="wsbtn"><span class="vault" style="--c:#DF8552"><i data-mascot="happy" data-size="30"></i></span><span class="tx"><b>Personal vault</b><em>13 pages · local</em></span><span class="sel">⇅</span></div>
-          <div class="it"><span class="g">⌂</span>Dashboard</div>
-          <div class="it"><span class="g">◫</span>Inbox<span class="badge">1</span></div>
+        <aside class="side dside sb sbD">
+          <div class="sa"><i data-mascot="happy" data-size="20"></i>Ask Washi or search<span class="k">⌘K</span></div>
+          <div class="hrow"><div class="it"><span class="g">⌂</span>Home</div><span class="ib" title="Inbox">◫<span class="badge">1</span></span><span class="ib" title="Threads">≡</span><span class="ib" title="Routines">◷</span></div>
           <div class="it on"><span class="g">▦</span>Daily note</div>
-          <div class="lbl">Pages</div>
+          <div class="lbl2">Pages</div>
           <div class="it"><span class="g">✦</span>Welcome to Washi</div>
           <div class="it"><span class="g">▤</span>WSX · Sprint 12</div>
           <div class="it"><span class="g">▥</span>Registry build</div>
           <div class="it"><span class="g">☀</span>Daily practice</div>
-          <div class="it"><span class="g">+</span>New page</div>
+          <div class="act"><span class="g">+</span>New page</div>
+          <div class="lbl2">Routines</div>
+          <div class="act"><span class="g">+</span>Schedule one</div>
           <div class="foot">
+            <div class="wsbtn"><span class="vault" style="--c:#DF8552"><i data-mascot="happy" data-size="30"></i></span><span class="tx"><b>Personal vault</b><em>13 pages · local</em></span><span class="sel">⇅</span></div>
             <div class="status"><span class="g">⊘</span>Offline · this device only<i></i></div>
             <div class="userrow"><span class="av lg" style="--c:#cf6b36">MK</span><span class="tx"><b>Mira Kaneko</b><em>Local account</em></span><span class="sel">⇅</span></div>
           </div>
@@ -548,17 +554,18 @@
     <div class="app">
       <div class="bar"><i></i><i></i><i></i><span class="ttl">Washi</span></div>
       <div class="shell">
-        <aside class="side dside">
-          <div class="stop"><span>⌕</span><span>✎</span><span>⇤</span></div>
-          <div class="wsbtn"><span class="vault" style="--c:#DF8552"><i data-mascot="happy" data-size="30"></i></span><span class="tx"><b>Personal vault</b><em>13 pages · local</em></span><span class="sel">⇅</span></div>
-          <div class="it"><span class="g">⌂</span>Dashboard</div>
-          <div class="it"><span class="g">◫</span>Inbox<span class="badge">1</span></div>
+        <aside class="side dside sb sbD">
+          <div class="sa"><i data-mascot="happy" data-size="20"></i>Ask Washi or search<span class="k">⌘K</span></div>
+          <div class="hrow"><div class="it"><span class="g">⌂</span>Home</div><span class="ib" title="Inbox">◫<span class="badge">1</span></span><span class="ib" title="Threads">≡</span><span class="ib" title="Routines">◷</span></div>
           <div class="it on"><span class="g">▦</span>Daily note</div>
-          <div class="lbl">Pages</div>
+          <div class="lbl2">Pages</div>
           <div class="it"><span class="g">✦</span>Welcome to Washi</div>
           <div class="it"><span class="g">▤</span>WSX · Sprint 12</div>
-          <div class="it"><span class="g">+</span>New page</div>
+          <div class="act"><span class="g">+</span>New page</div>
+          <div class="lbl2">Routines</div>
+          <div class="act"><span class="g">+</span>Schedule one</div>
           <div class="foot">
+            <div class="wsbtn"><span class="vault" style="--c:#DF8552"><i data-mascot="happy" data-size="30"></i></span><span class="tx"><b>Personal vault</b><em>13 pages · local</em></span><span class="sel">⇅</span></div>
             <div class="status"><span class="g">⊘</span>Offline · this device only<i></i></div>
             <div class="userrow"><span class="av lg" style="--c:#cf6b36">MK</span><span class="tx"><b>Mira Kaneko</b><em>Local account</em></span><span class="sel">⇅</span></div>
           </div>
@@ -586,16 +593,17 @@
     <div class="app">
       <div class="bar"><i></i><i></i><i></i><span class="ttl">Washi</span></div>
       <div class="shell">
-        <aside class="side dside">
-          <div class="stop"><span>⌕</span><span>✎</span><span>⇤</span></div>
-          <div class="wsbtn"><span class="vault" style="--c:#DF8552"><i data-mascot="happy" data-size="30"></i></span><span class="tx"><b>Personal vault</b><em>13 pages · local</em></span><span class="sel">⇅</span></div>
-          <div class="it"><span class="g">⌂</span>Dashboard</div>
-          <div class="it"><span class="g">◫</span>Inbox</div>
+        <aside class="side dside sb sbD">
+          <div class="sa"><i data-mascot="happy" data-size="20"></i>Ask Washi or search<span class="k">⌘K</span></div>
+          <div class="hrow"><div class="it"><span class="g">⌂</span>Home</div><span class="ib" title="Inbox">◫</span><span class="ib" title="Threads">≡</span><span class="ib" title="Routines">◷</span></div>
           <div class="it on"><span class="g">▦</span>Daily note</div>
-          <div class="lbl">Pages</div>
+          <div class="lbl2">Pages</div>
           <div class="it"><span class="g">✦</span>Welcome to Washi</div>
-          <div class="it"><span class="g">+</span>New page</div>
+          <div class="act"><span class="g">+</span>New page</div>
+          <div class="lbl2">Routines</div>
+          <div class="act"><span class="g">+</span>Schedule one</div>
           <div class="foot">
+            <div class="wsbtn"><span class="vault" style="--c:#DF8552"><i data-mascot="happy" data-size="30"></i></span><span class="tx"><b>Personal vault</b><em>13 pages · local</em></span><span class="sel">⇅</span></div>
             <div class="status"><span class="g">⊘</span>Offline · this device only<i></i></div>
             <div class="userrow"><span class="av lg" style="--c:#cf6b36">MK</span><span class="tx"><b>Mira Kaneko</b><em>Local account</em></span><span class="sel">⇅</span></div>
           </div>
@@ -632,17 +640,18 @@
     <div class="app">
       <div class="bar"><i></i><i></i><i></i><span class="ttl">Washi</span></div>
       <div class="shell">
-        <aside class="side dside">
-          <div class="stop"><span>⌕</span><span>✎</span><span>⇤</span></div>
-          <div class="wsbtn"><span class="vault" style="--c:#DF8552"><i data-mascot="happy" data-size="30"></i></span><span class="tx"><b>Personal vault</b><em>13 pages · local</em></span><span class="sel">⇅</span></div>
-          <div class="it"><span class="g">⌂</span>Dashboard</div>
-          <div class="it"><span class="g">◫</span>Inbox<span class="badge">1</span></div>
+        <aside class="side dside sb sbD">
+          <div class="sa"><i data-mascot="happy" data-size="20"></i>Ask Washi or search<span class="k">⌘K</span></div>
+          <div class="hrow"><div class="it"><span class="g">⌂</span>Home</div><span class="ib" title="Inbox">◫<span class="badge">1</span></span><span class="ib" title="Threads">≡</span><span class="ib" title="Routines">◷</span></div>
           <div class="it"><span class="g">▦</span>Daily note</div>
-          <div class="lbl">Pages</div>
+          <div class="lbl2">Pages</div>
           <div class="it"><span class="g">✦</span>Welcome to Washi</div>
           <div class="it"><span class="g">▤</span>WSX · Sprint 12</div>
-          <div class="it"><span class="g">+</span>New page</div>
+          <div class="act"><span class="g">+</span>New page</div>
+          <div class="lbl2">Routines</div>
+          <div class="act"><span class="g">+</span>Schedule one</div>
           <div class="foot">
+            <div class="wsbtn"><span class="vault" style="--c:#DF8552"><i data-mascot="happy" data-size="30"></i></span><span class="tx"><b>Personal vault</b><em>13 pages · local</em></span><span class="sel">⇅</span></div>
             <div class="status" style="background:var(--s-accent);color:var(--s-fg)"><span class="g">⊘</span>Offline · this device only<i></i></div>
             <div class="userrow"><span class="av lg" style="--c:#cf6b36">MK</span><span class="tx"><b>Mira Kaneko</b><em>Local account</em></span><span class="sel">⇅</span></div>
           </div>
@@ -670,17 +679,18 @@
     <div class="app">
       <div class="bar"><i></i><i></i><i></i><span class="ttl">Washi</span></div>
       <div class="shell">
-        <aside class="side dside">
-          <div class="stop"><span>⌕</span><span>✎</span><span>⇤</span></div>
-          <div class="wsbtn"><span class="vault" style="--c:#DF8552"><i data-mascot="happy" data-size="30"></i></span><span class="tx"><b>Personal vault</b><em>13 pages · local</em></span><span class="sel">⇅</span></div>
-          <div class="it"><span class="g">⌂</span>Dashboard</div>
-          <div class="it"><span class="g">◫</span>Inbox<span class="badge">1</span></div>
+        <aside class="side dside sb sbD">
+          <div class="sa"><i data-mascot="happy" data-size="20"></i>Ask Washi or search<span class="k">⌘K</span></div>
+          <div class="hrow"><div class="it"><span class="g">⌂</span>Home</div><span class="ib" title="Inbox">◫<span class="badge">1</span></span><span class="ib" title="Threads">≡</span><span class="ib" title="Routines">◷</span></div>
           <div class="it"><span class="g">▦</span>Daily note</div>
-          <div class="lbl">Pages</div>
+          <div class="lbl2">Pages</div>
           <div class="it"><span class="g">✦</span>Welcome to Washi</div>
           <div class="it"><span class="g">▤</span>WSX · Sprint 12</div>
-          <div class="it"><span class="g">+</span>New page</div>
+          <div class="act"><span class="g">+</span>New page</div>
+          <div class="lbl2">Routines</div>
+          <div class="act"><span class="g">+</span>Schedule one</div>
           <div class="foot">
+            <div class="wsbtn"><span class="vault" style="--c:#DF8552"><i data-mascot="happy" data-size="30"></i></span><span class="tx"><b>Personal vault</b><em>13 pages · local</em></span><span class="sel">⇅</span></div>
             <div class="status" style="background:var(--s-accent);color:var(--s-fg)"><span class="g">⊘</span>Offline · this device only<i></i></div>
             <div class="userrow"><span class="av lg" style="--c:#cf6b36">MK</span><span class="tx"><b>Mira Kaneko</b><em>Local account</em></span><span class="sel">⇅</span></div>
           </div>
@@ -727,17 +737,18 @@
     <div class="app">
       <div class="bar"><i></i><i></i><i></i><span class="ttl">Washi</span></div>
       <div class="shell">
-        <aside class="side dside">
-          <div class="stop"><span>⌕</span><span>✎</span><span>⇤</span></div>
-          <div class="wsbtn"><span class="vault" style="--c:#DF8552"><i data-mascot="happy" data-size="30"></i></span><span class="tx"><b>Personal vault</b><em>13 pages · local</em></span><span class="sel">⇅</span></div>
-          <div class="it"><span class="g">⌂</span>Dashboard</div>
-          <div class="it"><span class="g">◫</span>Inbox<span class="badge">1</span></div>
+        <aside class="side dside sb sbD">
+          <div class="sa"><i data-mascot="happy" data-size="20"></i>Ask Washi or search<span class="k">⌘K</span></div>
+          <div class="hrow"><div class="it"><span class="g">⌂</span>Home</div><span class="ib" title="Inbox">◫<span class="badge">1</span></span><span class="ib" title="Threads">≡</span><span class="ib" title="Routines">◷</span></div>
           <div class="it"><span class="g">▦</span>Daily note</div>
-          <div class="lbl">Pages</div>
+          <div class="lbl2">Pages</div>
           <div class="it"><span class="g">✦</span>Welcome to Washi</div>
           <div class="it"><span class="g">▤</span>WSX · Sprint 12</div>
-          <div class="it"><span class="g">+</span>New page</div>
+          <div class="act"><span class="g">+</span>New page</div>
+          <div class="lbl2">Routines</div>
+          <div class="act"><span class="g">+</span>Schedule one</div>
           <div class="foot">
+            <div class="wsbtn"><span class="vault" style="--c:#DF8552"><i data-mascot="happy" data-size="30"></i></span><span class="tx"><b>Personal vault</b><em>13 pages · local</em></span><span class="sel">⇅</span></div>
             <div class="status" style="background:var(--s-accent);color:var(--s-fg)"><span class="g">⊘</span>Offline · this device only<i></i></div>
             <div class="userrow"><span class="av lg" style="--c:#cf6b36">MK</span><span class="tx"><b>Mira Kaneko</b><em>Local account</em></span><span class="sel">⇅</span></div>
           </div>
@@ -771,17 +782,18 @@
     <div class="app">
       <div class="bar"><i></i><i></i><i></i><span class="ttl">Washi</span></div>
       <div class="shell">
-        <aside class="side dside">
-          <div class="stop"><span>⌕</span><span>✎</span><span>⇤</span></div>
-          <div class="wsbtn"><span class="vault" style="--c:#DF8552"><i data-mascot="happy" data-size="30"></i></span><span class="tx"><b>Personal vault</b><em>13 pages · local</em></span><span class="sel">⇅</span></div>
-          <div class="it"><span class="g">⌂</span>Dashboard</div>
-          <div class="it"><span class="g">◫</span>Inbox<span class="badge">1</span></div>
+        <aside class="side dside sb sbD">
+          <div class="sa"><i data-mascot="happy" data-size="20"></i>Ask Washi or search<span class="k">⌘K</span></div>
+          <div class="hrow"><div class="it"><span class="g">⌂</span>Home</div><span class="ib" title="Inbox">◫<span class="badge">1</span></span><span class="ib" title="Threads">≡</span><span class="ib" title="Routines">◷</span></div>
           <div class="it"><span class="g">▦</span>Daily note</div>
-          <div class="lbl">Pages</div>
+          <div class="lbl2">Pages</div>
           <div class="it"><span class="g">✦</span>Welcome to Washi</div>
           <div class="it"><span class="g">▤</span>WSX · Sprint 12</div>
-          <div class="it"><span class="g">+</span>New page</div>
+          <div class="act"><span class="g">+</span>New page</div>
+          <div class="lbl2">Routines</div>
+          <div class="act"><span class="g">+</span>Schedule one</div>
           <div class="foot">
+            <div class="wsbtn"><span class="vault" style="--c:#DF8552"><i data-mascot="happy" data-size="30"></i></span><span class="tx"><b>Personal vault</b><em>13 pages · local</em></span><span class="sel">⇅</span></div>
             <div class="status" style="background:var(--s-accent);color:var(--s-fg)"><span class="g">⊘</span>Offline · this device only<i></i></div>
             <div class="userrow"><span class="av lg" style="--c:#cf6b36">MK</span><span class="tx"><b>Mira Kaneko</b><em>Local account</em></span><span class="sel">⇅</span></div>
           </div>
@@ -824,18 +836,19 @@
     <div class="app">
       <div class="bar"><i></i><i></i><i></i><span class="ttl">Washi</span></div>
       <div class="shell">
-        <aside class="side dside">
-          <div class="stop"><span>⌕</span><span>✎</span><span>⇤</span></div>
-          <div class="wsbtn"><span class="vault" style="--c:#DF8552"><i data-mascot="happy" data-size="30"></i></span><span class="tx"><b>Personal vault</b><em>13 pages · local</em></span><span class="sel">⇅</span></div>
-          <div class="it"><span class="g">⌂</span>Dashboard</div>
-          <div class="it"><span class="g">◫</span>Inbox<span class="badge">1</span></div>
+        <aside class="side dside sb sbD">
+          <div class="sa"><i data-mascot="happy" data-size="20"></i>Ask Washi or search<span class="k">⌘K</span></div>
+          <div class="hrow"><div class="it"><span class="g">⌂</span>Home</div><span class="ib" title="Inbox">◫<span class="badge">1</span></span><span class="ib" title="Threads">≡</span><span class="ib" title="Routines">◷</span></div>
           <div class="it"><span class="g">▦</span>Daily note</div>
-          <div class="lbl">Pages</div>
+          <div class="lbl2">Pages</div>
           <div class="it"><span class="g">✦</span>Welcome to Washi</div>
           <div class="it on"><span class="g">✈</span>Kyoto in October</div>
           <div class="it"><span class="g">▤</span>WSX · Sprint 12</div>
-          <div class="it"><span class="g">+</span>New page</div>
+          <div class="act"><span class="g">+</span>New page</div>
+          <div class="lbl2">Routines</div>
+          <div class="act"><span class="g">+</span>Schedule one</div>
           <div class="foot">
+            <div class="wsbtn"><span class="vault" style="--c:#DF8552"><i data-mascot="happy" data-size="30"></i></span><span class="tx"><b>Personal vault</b><em>13 pages · local</em></span><span class="sel">⇅</span></div>
             <div class="status"><span class="g">⊘</span>Offline · this device only<i></i></div>
             <div class="userrow"><span class="av lg" style="--c:#cf6b36">MK</span><span class="tx"><b>Mira Kaneko</b><em>Local account</em></span><span class="sel">⇅</span></div>
           </div>
@@ -878,7 +891,7 @@
         <div class="mi">Log Vault Stats</div>
       </div>
       <div class="shell" style="opacity:.55;height:calc(100% - 28px)">
-        <aside class="side dside" style="width:200px"><div class="stop"></div><div class="wsbtn"><span class="vault" style="--c:#DF8552"><i data-mascot="happy" data-size="30"></i></span><span class="tx"><b>Personal vault</b><em>13 pages · local</em></span></div><div class="it"><span class="g">⌂</span>Dashboard</div><div class="it"><span class="g">◫</span>Inbox</div><div class="it"><span class="g">▦</span>Daily note</div></aside>
+        <aside class="side dside sb sbD" style="width:200px"><div class="sa"><i data-mascot="happy" data-size="20"></i>Ask Washi<span class="k">⌘K</span></div><div class="hrow"><div class="it"><span class="g">⌂</span>Home</div><span class="ib" title="Inbox">◫</span><span class="ib" title="Threads">≡</span><span class="ib" title="Routines">◷</span></div><div class="it"><span class="g">▦</span>Daily note</div><div class="foot"><div class="wsbtn"><span class="vault" style="--c:#DF8552"><i data-mascot="happy" data-size="30"></i></span><span class="tx"><b>Personal vault</b><em>13 pages · local</em></span></div></div></aside>
         <div class="content"><div class="tabs"><span class="on">✦ Welcome to Washi</span></div><div class="hdr"><span class="crumb">Workspace / <b>Welcome to Washi</b></span></div></div>
       </div>
       <span class="pin" style="left:548px;top:84px">1</span>

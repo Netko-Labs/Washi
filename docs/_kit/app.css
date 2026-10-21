@@ -257,6 +257,349 @@
   border-radius: 8px;
 }
 
+.app .side.sb {
+  padding: 6px 8px 8px;
+  gap: 1px;
+}
+.app .side.sb .ws2 {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 36px;
+  padding: 0 4px 0 6px;
+  margin-bottom: 4px;
+  font-weight: 600;
+  font-size: 13.5px;
+}
+.app .side.sb .wsav {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  background: var(--s-primary);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font: 700 11px / 1 var(--s-sans);
+  flex: none;
+}
+.app .side.sb .ws2 .car {
+  color: var(--s-mfg);
+  font-size: 11px;
+  margin-left: -2px;
+}
+.app .side.sb .ib {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  display: grid;
+  place-items: center;
+  color: var(--s-mfg);
+  font-size: 13px;
+  font-weight: 400;
+}
+.app .side.sb .it {
+  height: 28px;
+  font-size: 13px;
+}
+.app .side.sb .it.faint {
+  color: var(--s-mfg);
+  opacity: 0.7;
+}
+.app .side.sb .grp {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 26px;
+  padding: 0 6px 0 4px;
+  margin-top: 10px;
+  font: 600 11px / 1 var(--s-sans);
+  color: var(--s-mfg);
+  border-radius: 7px;
+}
+.app .side.sb .grp .ch {
+  width: 14px;
+  text-align: center;
+  font-size: 10px;
+  display: inline-block;
+}
+.app .side.sb .grp .ga {
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 400;
+  opacity: 0.6;
+}
+.app .side.sb .grp.closed .ch {
+  transform: rotate(-90deg);
+}
+.app .side.sb .foot {
+  margin-top: auto;
+  padding-top: 6px;
+}
+.app .side.sb .ask {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 10px 0 8px;
+  border-radius: 10px;
+  border: 1px solid var(--s-border);
+  background: var(--s-card);
+  font-size: 12.5px;
+}
+.app .side.sb .ask .st {
+  color: var(--s-mfg);
+}
+.app .side.sb .ask .k {
+  margin-left: auto;
+  font: 600 10.5px / 1 var(--s-mono);
+  color: var(--s-mfg);
+}
+.app .side.sb .ask.busy {
+  border-color: #e8b36a99;
+}
+.app .side.sb .ask.need {
+  border-color: var(--s-primary);
+}
+.app .side.sb .me {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 6px;
+  margin-top: 6px;
+  border-radius: 8px;
+  font-size: 12.5px;
+}
+.app .side.sb .me .av.lg {
+  width: 24px;
+  height: 24px;
+  font-size: 10px;
+}
+.app .side.sb .me .dots {
+  margin-left: auto;
+  color: var(--s-mfg);
+}
+.app .side.sb .rec {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 26px;
+  padding: 0 8px;
+  border-radius: 7px;
+  color: var(--s-mfg);
+  font-size: 12.5px;
+}
+.app .side.sb .rec .t {
+  margin-left: auto;
+  font: 500 10.5px / 1 var(--s-mono);
+  opacity: 0.8;
+}
+.app .side.sb .irow {
+  display: flex;
+  gap: 4px;
+  padding: 0 0 6px;
+}
+.app .side.sb .irow span {
+  flex: 1;
+  height: 30px;
+  border-radius: 8px;
+  border: 1px solid var(--s-border);
+  background: var(--s-card);
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  color: var(--s-mfg);
+  position: relative;
+}
+.app .side.sb .irow span.on {
+  color: var(--s-fg);
+  background: var(--s-accent);
+}
+.app .side.sb .irow span .badge {
+  position: absolute;
+  top: -6px;
+  right: -4px;
+  margin: 0;
+}
+.app .side.sb .askpill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 12px 0 8px;
+  border-radius: 99px;
+  background: var(--s-fg);
+  color: var(--s-bg);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.app .side.sb .askpill .k {
+  margin-left: auto;
+  font: 600 10.5px / 1 var(--s-mono);
+  opacity: 0.7;
+}
+.app .side.sb .tiny {
+  display: flex;
+  gap: 2px;
+  padding: 6px 0 0;
+}
+.app .side.sb .tiny span {
+  flex: 1;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--s-mfg);
+  border-radius: 7px;
+}
+/* Sidebar D — the studio sidebar (decided 2026-10-21): the ask field is the door, places in one row, grey labels, workspace footer */
+.app .side.sb.sbD .top {
+  display: flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 2px;
+  margin-bottom: 4px;
+}
+.app .side.sb.sbD .top .sp {
+  flex: 1;
+}
+.app .side.sb.sbD .top .ib {
+  position: relative;
+}
+.app .side.sb.sbD .top .ib .badge {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  margin: 0;
+  min-width: 14px;
+  height: 14px;
+  font-size: 9px;
+  line-height: 14px;
+}
+.app .side.sb.sbD .sa {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 8px 0 8px;
+  margin: 2px 0 6px;
+  border-radius: 9px;
+  border: 1px solid var(--s-border);
+  background: var(--s-card);
+  font-size: 12.5px;
+  color: var(--s-mfg);
+}
+.app .side.sb.sbD .sa > i,
+.app .side.sb.sbD .sa > svg {
+  flex: none;
+  margin-left: -2px;
+}
+.app .side.sb.sbD .sa .k {
+  margin-left: auto;
+  font: 600 10px / 1 var(--s-mono);
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: var(--s-accent);
+  color: var(--s-mfg);
+}
+.app .side.sb.sbD .hrow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 2px;
+}
+.app .side.sb.sbD .hrow .it {
+  flex: 1;
+  height: 30px;
+  margin: 0;
+}
+.app .side.sb.sbD .hrow .it.on {
+  background: var(--s-accent);
+}
+.app .side.sb.sbD .hrow .ib {
+  width: 30px;
+  height: 30px;
+  position: relative;
+  border: 1px solid var(--s-border);
+  background: var(--s-card);
+}
+.app .side.sb.sbD .hrow .ib .badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  margin: 0;
+  min-width: 14px;
+  height: 14px;
+  font-size: 9px;
+  line-height: 14px;
+}
+.app .side.sb.sbD .ask {
+  height: 34px;
+  margin: 2px 0;
+}
+.app .side.sb.sbD .lbl2 {
+  padding: 12px 8px 4px;
+  font: 500 11px / 1 var(--s-sans);
+  color: var(--s-mfg);
+  opacity: 0.85;
+}
+.app .side.sb.sbD .act {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 7px;
+  color: var(--s-mfg);
+  font-size: 13px;
+}
+.app .side.sb.sbD .act .g {
+  opacity: 0.7;
+}
+.app .side.sb.sbD .wsb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 6px;
+  margin-top: auto;
+  border-top: 1px solid var(--s-border);
+  font-weight: 600;
+  font-size: 13px;
+}
+.app .side.sb.sbD .wsb .car {
+  color: var(--s-mfg);
+  font-size: 11px;
+  margin-left: -2px;
+}
+.app .side.sb.sbD .wsb .sp {
+  flex: 1;
+}
+.app .side.sb.sbD .wsb .av {
+  width: 22px;
+  height: 22px;
+  font-size: 9.5px;
+}
+.app .side.sb.sbD .sa.busy {
+  border-color: #e8b36a99;
+}
+.app .side.sb.sbD .sa.need {
+  border-color: var(--s-primary);
+}
+.app .side.sb.sbD .sa.off {
+  opacity: 0.7;
+}
+.app .side.sb.sbD .wsb.on {
+  background: var(--s-accent);
+  border-radius: 8px;
+}
+
 .content {
   min-width: 0;
   display: flex;
