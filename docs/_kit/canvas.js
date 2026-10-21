@@ -199,7 +199,6 @@ function init() {
     const onFrame = e.target.closest('.frame, .tile-frame, .sticky')
     if (e.button === 1 || space || !onFrame || e.button === 0) {
       drag = { x: e.clientX, y: e.clientY, sx: state.x, sy: state.y, moved: false, frame: onFrame }
-      viewport.setPointerCapture(e.pointerId)
       document.body.classList.add('grabbing')
     }
   })
@@ -207,7 +206,11 @@ function init() {
     if (!drag) return
     const dx = e.clientX - drag.x
     const dy = e.clientY - drag.y
-    if (Math.abs(dx) + Math.abs(dy) > 3) drag.moved = true
+    if (!drag.moved && Math.abs(dx) + Math.abs(dy) > 3) {
+      // Capture only once a drag is real, so a plain click on a link or frame still lands on it.
+      drag.moved = true
+      viewport.setPointerCapture(e.pointerId)
+    }
     state.x = drag.sx + dx
     state.y = drag.sy + dy
     apply()
