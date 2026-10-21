@@ -144,8 +144,10 @@ body.cv.grabbing * {
   left: 0;
   bottom: 0;
   width: 240px;
+  box-sizing: border-box;
   z-index: 20;
   overflow-y: auto;
+  overscroll-behavior: contain;
   background: var(--cv-rail);
   border-right: 1px solid var(--cv-line);
   padding: 10px 8px 20px;
@@ -208,6 +210,20 @@ body.cv.grabbing * {
   top: 0;
   transform-origin: 0 0;
   will-change: transform;
+}
+/* Far out, the frames are the map: notes go under 50%, frame labels under 25%, group names stay. */
+.cv-world[data-zoom="mid"] .frame > .fnote,
+.cv-world[data-zoom="far"] .frame > .fnote,
+.cv-world[data-zoom="far"] .frame > .fname,
+.cv-world[data-zoom="far"] .cv-group > .gnote {
+  display: none;
+}
+.cv-world[data-zoom="far"] .cv-group > .gname {
+  top: calc(-22px * var(--inv));
+}
+.cv-world[data-zoom="far"] .sticky {
+  transform: rotate(-1deg) scale(min(var(--inv), 4));
+  transform-origin: 0 0;
 }
 
 .cv-group {
@@ -282,6 +298,11 @@ body.cv.grabbing * {
   width: calc(100% * var(--k));
   max-width: none;
   transform: translateY(100%) scale(var(--inv));
+  pointer-events: none;
+}
+.frame > .fnote a,
+.frame > .fnote code {
+  pointer-events: auto;
 }
 .frame .app {
   width: 100%;

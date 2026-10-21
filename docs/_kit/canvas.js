@@ -6,11 +6,13 @@
 //         <article class="frame" data-name="Dashboard" data-w="1280" data-h="800"> <div class="app">…</div> </article>
 //       </section>
 //     </div></main>
-// Groups stack vertically; frames flow left to right inside their group. Wheel pans, ⌘/ctrl+wheel zooms,
-// space+drag or middle-drag pans, 0 fits all, 1 is 100%, and a hash `#frame=<slug>` opens zoomed on one frame.
+// Groups stack vertically; frames flow left to right inside their group. Wheel pans, ⌘/ctrl+wheel and a
+// trackpad pinch zoom, shift+wheel pans sideways, any drag pans, a click selects a frame, a double-click or
+// the rail zooms to it, 0 fits all, 1 is 100%, and a hash `#frame=<slug>` opens zoomed on one frame.
+// Under 50% the notes hide and under 25% the frame labels go too — far out, the frames are the map.
 
 const GAP = 96
-const GROUP_GAP = 220
+const GROUP_GAP = 520
 const PAD = 160
 const MIN = 0.05
 const MAX = 4
@@ -75,6 +77,7 @@ function init() {
     world.style.transform = `translate(${state.x}px, ${state.y}px) scale(${state.k})`
     world.style.setProperty('--k', String(state.k))
     world.style.setProperty('--inv', String(1 / state.k))
+    world.dataset.zoom = state.k < 0.25 ? 'far' : state.k < 0.5 ? 'mid' : 'near'
     if (pct) pct.textContent = `${Math.round(state.k * 100)}%`
   }
 
@@ -118,9 +121,18 @@ function init() {
     state.k = next
     apply()
   }
-  const focus = (frame) => {
+  const select = (frame) => {
     for (const f of world.querySelectorAll('.frame.on')) f.classList.remove('on')
     frame.classList.add('on')
+    history.replaceState(null, '', `#frame=${frame.id.replace(/^frame-/, '')}`)
+    for (const b of layers?.querySelectorAll('button') ?? []) {
+      const on = b.dataset.for === frame.id
+      b.classList.toggle('on', on)
+      if (on) b.scrollIntoView({ block: 'nearest' })
+    }
+  }
+  const focus = (frame) => {
+    select(frame)
     const group = frame.parentElement
     const gx = group.classList.contains('cv-group') ? group.offsetLeft : 0
     const gy = group.classList.contains('cv-group') ? group.offsetTop : 0
@@ -131,9 +143,6 @@ function init() {
       frame.offsetHeight + 30,
       120,
     )
-    history.replaceState(null, '', `#frame=${frame.id.replace(/^frame-/, '')}`)
-    for (const b of layers?.querySelectorAll('button') ?? [])
-      b.classList.toggle('on', b.dataset.for === frame.id)
   }
 
   // layers rail
@@ -152,29 +161,49 @@ function init() {
     }
   }
 
-  // wheel: pan; with ⌘/ctrl: zoom around the cursor
+  // wheel: pan; with ⌘/ctrl (or a trackpad pinch, which arrives as ctrl+wheel): zoom around the cursor.
+  // A mouse wheel reports lines, not pixels, on some platforms; shift turns its one axis sideways.
   viewport.addEventListener(
     'wheel',
     (e) => {
       e.preventDefault()
       const rect = viewport.getBoundingClientRect()
+      const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? viewport.clientHeight : 1
+      let dx = e.deltaX * unit
+      let dy = e.deltaY * unit
       if (e.ctrlKey || e.metaKey) {
-        const factor = Math.exp(-e.deltaY * 0.0022)
+        const factor = Math.exp(-Math.max(-120, Math.min(120, dy)) * 0.0022)
         zoomTo(state.k * factor, e.clientX - rect.left, e.clientY - rect.top)
-      } else {
-        state.x -= e.deltaX
-        state.y -= e.deltaY
-        apply()
+        return
       }
+      if (e.shiftKey && dx === 0) {
+        dx = dy
+        dy = 0
+      }
+      state.x -= dx
+      state.y -= dy
+      apply()
     },
     { passive: false },
   )
+  // Safari sends a trackpad pinch as gesture events, not ctrl+wheel.
+  let pinchFrom = 1
+  viewport.addEventListener('gesturestart', (e) => {
+    e.preventDefault()
+    pinchFrom = state.k
+  })
+  viewport.addEventListener('gesturechange', (e) => {
+    e.preventDefault()
+    const rect = viewport.getBoundingClientRect()
+    zoomTo(pinchFrom * e.scale, e.clientX - rect.left, e.clientY - rect.top)
+  })
+  viewport.addEventListener('gestureend', (e) => e.preventDefault())
 
   // drag to pan: space held, middle button, or any drag on the background
   let drag = null
   let space = false
   document.addEventListener('keydown', (e) => {
-    if (e.target.matches('input, textarea')) return
+    if (e.target instanceof Element && e.target.matches('input, textarea')) return
     if (e.code === 'Space') {
       space = true
       document.body.classList.add('grabbing')
@@ -221,13 +250,15 @@ function init() {
         drag = null
         return
       }
-      focus(drag.frame)
+      select(drag.frame)
     }
     drag = null
     document.body.classList.remove('grabbing')
   })
   viewport.addEventListener('dblclick', (e) => {
-    if (!e.target.closest('.frame')) fitAll()
+    const frame = e.target.closest('.frame')
+    if (frame) focus(frame)
+    else fitAll()
   })
 
   for (const b of document.querySelectorAll('[data-zoom]')) {
