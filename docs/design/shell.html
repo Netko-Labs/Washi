@@ -151,11 +151,11 @@
   <span class="hint"><kbd>wheel</kbd> pan · <kbd>⌘</kbd>+wheel zoom · <kbd>0</kbd> fit</span>
   <span class="zoom"><button data-zoom="out">−</button><span class="pct">100%</span><button data-zoom="in">+</button><button data-zoom="fit" title="fit">⤢</button></span>
 </header>
-<aside class="cv-layers" data-intro="The studio's frame around every page: sidebar, tabs, header, and the places you land. Every frame is the code as it is unless its name ends in · proposed."></aside>
+<aside class="cv-layers" data-intro="The studio's frame around every page: sidebar, header, and the places you land — no tab strip on the web (D58). Every frame is the code as it is unless its name ends in · proposed."></aside>
 <main class="cv-viewport"><div class="cv-world">
 
 <!-- ───────────────────────── SHELL ───────────────────────── -->
-<section class="cv-group" data-name="Shell" data-note="248px sidebar — D: ask field · Home row · Recents · Favorites · Pages · Routines · workspace footer (a 280px drawer under md) · 31px tabs on md+ · 48px header · the page below">
+<section class="cv-group" data-name="Shell" data-note="248px sidebar — D: ask field · Home row · Recents · Favorites · Pages · Routines · workspace footer (a 280px drawer under md) · no tab strip in the studio (D58) · 48px header · the page below">
 
   <article class="frame" data-name="Workspace shell · a page open" data-w="1280" data-h="800">
     <div class="app">
@@ -182,7 +182,6 @@
           <div class="wsb"><span class="wsav">N</span>Netko Labs<span class="car">⌄</span><span class="sp"></span><span class="ib">?</span><span class="av" style="--c:#c25f2c">JV</span></div>
         </aside>
         <div class="content">
-          <div class="tabs"><span>▤ Backlog <span class="x">×</span></span><span class="on">▯ Wiki <span class="x">×</span></span><span>☷ Weekly review <span class="x">×</span></span><span class="plus">+</span></div>
           <div class="hdr">
             <span class="crumb">Netko Labs <span style="opacity:.5">/</span> <b>Wiki</b> · edited 2 hours ago</span>
             <span class="btn ghost icon">☆</span>
@@ -206,7 +205,7 @@
       <span class="pin" style="left:238px;top:680px">4</span>
       <span class="pin" style="left:1215px;top:720px">5</span>
     </div>
-    <div class="fnote">The reference frame — every other frame in this folder is a variation. Sidebar D (decided 2026-10-21): 1 the ask field is the door — the mascot in it is Washi's state, text asks or finds, <code>⌘K</code> the palette, <code>⌘J</code> the panel; Home sits in one row with Inbox, Threads and Routines. 2 the strip is per workspace, saved in <code>localStorage</code> under <code>washi:tabs:&lt;workspaceId&gt;</code>. 3 the header carries crumbs + star, then the dashed agent pill (<code>Washi watching</code>, @xl only), Comments, Edit, Copy link and the page menu. 4 the footer is the workspace: mark + name switches, <q>?</q> and the person's avatar beside it (theme · settings · sign out under the avatar); spend moved to Home. 5 the mascot FAB is the other door to Washi.</div>
+    <div class="fnote">The reference frame — every other frame in this folder is a variation. Sidebar D (decided 2026-10-21): 1 the ask field is the door — the mascot in it is Washi's state, text asks or finds, <code>⌘K</code> the palette, <code>⌘J</code> the panel; Home sits in one row with Inbox, Threads and Routines. 2 no tab strip in the studio (D58): a page is its URL and the browser's tabs are the tabs; the desktop keeps its strip. The header sits right under the title bar. 3 the header carries crumbs + star, then the dashed agent pill (<code>Washi watching</code>, @xl only), Comments, Edit, Copy link and the page menu. 4 the footer is the workspace: mark + name switches, <q>?</q> and the person's avatar beside it (theme · settings · sign out under the avatar); spend moved to Home. 5 the mascot FAB is the other door to Washi.</div>
   </article>
 
   <article class="frame" data-name="Dashboard" data-w="1280" data-h="800">
@@ -233,7 +232,6 @@
           <div class="wsb"><span class="wsav">N</span>Netko Labs<span class="car">⌄</span><span class="sp"></span><span class="ib">?</span><span class="av" style="--c:#c25f2c">JV</span></div>
         </aside>
         <div class="content">
-          <div class="tabs"><span class="on">▦ Dashboard <span class="x">×</span></span><span>▯ Wiki <span class="x">×</span></span><span class="plus">+</span></div>
           <div class="hdr"><span class="crumb">Netko Labs <span style="opacity:.5">/</span> <b>Dashboard</b></span><span class="sp"></span><span class="btn">⧉ Copy link</span></div>
           <div class="page w940">
             <h1>Good morning, Juan</h1>
@@ -294,7 +292,6 @@
           <div class="wsb"><span class="wsav">N</span>Netko Labs<span class="car">⌄</span><span class="sp"></span><span class="ib">?</span><span class="av" style="--c:#c25f2c">JV</span></div>
         </aside>
         <div class="content">
-          <div class="tabs"><span class="on">▦ Dashboard <span class="x">×</span></span><span class="plus">+</span></div>
           <div class="hdr"><span class="crumb">Netko Labs <span style="opacity:.5">/</span> <b>Dashboard</b></span><span class="sp"></span><span class="btn">⧉ Copy link</span></div>
           <div class="page w940">
             <h1>Good morning, Juan</h1>
@@ -359,54 +356,6 @@
     <div class="fnote">Under <code>md</code> the same sidebar is a 280px drawer over a black/30 scrim, opened by the ≡ in the header's leading slot. 1 a close × joins the top row; every nav click also closes it. 2 rows grow to 36px for thumbs, the ⌘K hint hides, and there is no tab strip — the URL is the only tab.</div>
   </article>
 
-  <article class="frame" data-name="Tab strip · many tabs" data-w="1280" data-h="800">
-    <div class="app">
-      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / 0192… / p / 0192…</span></div>
-      <div class="shell">
-        <aside class="side sb sbD">
-          <div class="sa"><i data-mascot="happy" data-size="20"></i>Ask Washi or search<span class="k">⌘K</span></div>
-          <div class="hrow"><div class="it"><span class="g">⌂</span>Home</div><span class="ib" title="Inbox">◫<span class="badge">3</span></span><span class="ib" title="Threads">≡</span><span class="ib" title="Routines">◷</span></div>
-          <div class="lbl2">Favorites</div>
-          <div class="it"><span class="g">☷</span>Weekly review</div>
-          <div class="lbl2">Pages</div>
-          <div class="it"><span class="g">▤</span>Backlog</div>
-          <div class="it"><span class="g">▥</span>Roadmap</div>
-          <div class="it"><span class="g">▯</span>Wiki</div>
-          <div class="it ind on"><span class="g">◎</span>How we work</div>
-          <div class="it"><span class="g">❧</span>Ideas</div>
-          <div class="it"><span class="g">☷</span>Weekly review</div>
-          <div class="act"><span class="g">+</span>New page</div>
-          <div class="lbl2">Routines</div>
-          <div class="act"><span class="g">+</span>Schedule one</div>
-          <div class="wsb"><span class="wsav">N</span>Netko Labs<span class="car">⌄</span><span class="sp"></span><span class="ib">?</span><span class="av" style="--c:#c25f2c">JV</span></div>
-          <div class="it faint" style="margin-top:6px"><span class="g">⌫</span>Trash</div>
-          <div class="wsb"><span class="wsav">N</span>Netko Labs<span class="car">⌄</span><span class="sp"></span><span class="ib">?</span><span class="av" style="--c:#c25f2c">JV</span></div>
-        </aside>
-        <div class="content">
-          <div class="tabs many"><span>▦ Dashboard <span class="x">×</span></span><span>▤ Backlog <span class="x">×</span></span><span>▥ Roadmap <span class="x">×</span></span><span>▯ Wiki <span class="x">×</span></span><span class="on">◎ How we work <span class="x">×</span></span><span>❧ Ideas <span class="x">×</span></span><span>☷ Weekly review <span class="x">×</span></span><span>◫ Inbox <span class="x">×</span></span><span>▤ WASHI-213 · Sign-in redirect loses the invite token on Safari <span class="x">×</span></span><span>⚙ Settings <span class="x">×</span></span><span class="plus">+</span></div>
-          <div class="hdr">
-            <span class="crumb">Netko Labs <span style="opacity:.5">/</span> Wiki <span style="opacity:.5">/</span> <b>How we work</b> · edited yesterday</span>
-            <span class="btn ghost icon">☆</span>
-            <span class="sp"></span>
-            <span class="apill"><i data-mascot="happy" data-size="17"></i>Washi writing</span>
-            <span class="btn ghost icon">💬</span><span class="btn">✎ Edit</span><span class="btn">⧉ Copy link</span><span class="btn ghost icon">⋯</span>
-          </div>
-          <div class="sheet">
-            <h1 style="margin-top:40px">How we work</h1>
-            <p>• Issues live in the Backlog; anything in flight has an owner.</p>
-            <p>• Projects live on the Roadmap, with dates.</p>
-            <p>• Washi refreshes the Weekly review every evening.</p>
-          </div>
-        </div>
-      </div>
-      <div class="fab"><i data-mascot="happy bob" data-size="40" class="m"></i></div>
-      <span class="pin" style="left:1180px;top:48px">1</span>
-      <span class="pin" style="left:590px;top:48px">2</span>
-      <span class="pin" style="left:238px;top:238px">3</span>
-    </div>
-    <div class="fnote">Ten tabs. 1 the strip scrolls horizontally (<code>overflow-x-auto</code>) — there is no overflow menu, no pinning and no cap; a tab is at most 190px and truncates. 2 the active tab is the page in the URL; drag reorders, middle-click closes, × closes, + makes a page. 3 Favorites appear above Pages only when a page is starred. Views (Dashboard, Inbox, Settings, Trash) are tabs too.</div>
-  </article>
-
   <article class="frame" data-name="Dark mode" data-w="1280" data-h="800">
     <div class="app dark">
       <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / 0192… / p / 0192…</span></div>
@@ -432,7 +381,6 @@
           <div class="wsb"><span class="wsav">N</span>Netko Labs<span class="car">⌄</span><span class="sp"></span><span class="ib">?</span><span class="av" style="--c:#c25f2c">JV</span></div>
         </aside>
         <div class="content">
-          <div class="tabs"><span>▤ Backlog <span class="x">×</span></span><span class="on">▯ Wiki <span class="x">×</span></span><span>☷ Weekly review <span class="x">×</span></span><span class="plus">+</span></div>
           <div class="hdr">
             <span class="crumb">Netko Labs <span style="opacity:.5">/</span> <b>Wiki</b> · edited 2 hours ago</span>
             <span class="btn ghost icon">☆</span>
@@ -491,7 +439,6 @@
           <div class="wsb"><span class="wsav">N</span>Netko Labs<span class="car">⌄</span><span class="sp"></span><span class="ib">?</span><span class="av" style="--c:#c25f2c">JV</span></div>
         </aside>
         <div class="content">
-          <div class="tabs"><span class="on">▯ Wiki <span class="x">×</span></span><span class="plus">+</span></div>
           <div class="hdr"><span class="crumb">Netko Labs <span style="opacity:.5">/</span> <b>Wiki</b> · edited 2 hours ago</span><span class="btn ghost icon">☆</span><span class="sp"></span><span class="btn ghost icon">💬</span><span class="btn">✎ Edit</span><span class="btn">⧉ Copy link</span><span class="btn ghost icon">⋯</span></div>
           <div class="sheet"><h1 style="margin-top:40px">Wiki</h1><p class="lead">What the team knows. Each page nests under the one above it.</p></div>
         </div>
@@ -540,7 +487,6 @@
           <div class="wsb"><span class="wsav">N</span>Netko Labs<span class="car">⌄</span><span class="sp"></span><span class="ib">?</span><span class="av" style="--c:#c25f2c">JV</span></div>
         </aside>
         <div class="content">
-          <div class="tabs"><span class="on">▯ Wiki <span class="x">×</span></span><span class="plus">+</span></div>
           <div class="hdr"><span class="crumb">Netko Labs <span style="opacity:.5">/</span> <b>Wiki</b> · edited 2 hours ago</span><span class="btn ghost icon">☆</span><span class="sp"></span><span class="btn ghost icon">💬</span><span class="btn">✎ Edit</span><span class="btn">⧉ Copy link</span><span class="btn ghost icon">⋯</span></div>
           <div class="sheet"><h1 style="margin-top:40px">Wiki</h1><p class="lead">What the team knows. Each page nests under the one above it.</p></div>
         </div>
@@ -585,7 +531,6 @@
           <div class="wsb"><span class="wsav">N</span>Netko Labs<span class="car">⌄</span><span class="sp"></span><span class="ib">?</span><span class="av" style="--c:#c25f2c">JV</span></div>
         </aside>
         <div class="content">
-          <div class="tabs"><span class="on">▤ Backlog <span class="x">×</span></span><span class="plus">+</span></div>
           <div class="hdr"><span class="crumb">Netko Labs <span style="opacity:.5">/</span> <b>Backlog</b> · edited yesterday</span><span class="btn ghost icon">☆</span><span class="sp"></span><span class="apill"><i data-mascot="happy" data-size="17"></i>Washi watching</span><span class="btn ghost icon">💬</span><span class="btn">✎ Edit</span><span class="btn">⧉ Copy link</span><span class="btn ghost icon">⋯</span></div>
           <div class="sheet">
             <h1 style="margin-top:40px">Backlog</h1>
@@ -610,7 +555,7 @@
   <div class="sticky" style="left:4140px;top:0">
     <b>Decisions</b>
     <ol>
-      <li>One palette, three groups: Pages is the whole list (cmdk filters), Inside pages is a server search, Agents is two verbs. No recent — the tab strip already is the recent list.</li>
+      <li>One palette, three groups: Pages is the whole list (cmdk filters), Inside pages is a server search, Agents is two verbs. Recent is the sidebar's Recents (D57), not the palette's.</li>
       <li>Backlinks are a footer, not a sidebar: they are a property of the page you are reading, and the sidebar is the tree, not a graph.</li>
     </ol>
   </div>
@@ -643,7 +588,6 @@
           <div class="wsb"><span class="wsav">N</span>Netko Labs<span class="car">⌄</span><span class="sp"></span><span class="ib">?</span><span class="av" style="--c:#c25f2c">JV</span></div>
         </aside>
         <div class="content">
-          <div class="tabs"><span>▯ Wiki <span class="x">×</span></span><span class="on">◫ Inbox <span class="x">×</span></span><span class="plus">+</span></div>
           <div class="hdr"><span class="crumb">Netko Labs <span style="opacity:.5">/</span> <b>Inbox</b></span><span class="sp"></span><span class="btn">⧉ Copy link</span></div>
           <div style="overflow:hidden">
             <div class="page w760" style="padding:32px 24px 0">
@@ -700,7 +644,6 @@
           <div class="wsb"><span class="wsav">N</span>Netko Labs<span class="car">⌄</span><span class="sp"></span><span class="ib">?</span><span class="av" style="--c:#c25f2c">JV</span></div>
         </aside>
         <div class="content">
-          <div class="tabs"><span class="on">◫ Inbox <span class="x">×</span></span><span class="plus">+</span></div>
           <div class="hdr"><span class="crumb">Netko Labs <span style="opacity:.5">/</span> <b>Inbox</b></span><span class="sp"></span><span class="btn">⧉ Copy link</span></div>
           <div class="page w680">
             <h1 class="sm">Inbox</h1>
@@ -742,7 +685,6 @@
           <div class="wsb"><span class="wsav">N</span>Netko Labs<span class="car">⌄</span><span class="sp"></span><span class="ib">?</span><span class="av" style="--c:#c25f2c">JV</span></div>
         </aside>
         <div class="content">
-          <div class="tabs"><span class="on">☷ Weekly review <span class="x">×</span></span><span class="plus">+</span></div>
           <div class="hdr"><span class="crumb">Netko Labs <span style="opacity:.5">/</span> <b>Weekly review</b> · edited just now</span><span class="btn ghost icon">☆</span><span class="sp"></span><span class="stat">Saved</span><span class="btn ghost icon">‹/›</span><span class="btn pri">✓ Done</span><span class="btn">⧉ Copy link</span><span class="btn ghost icon">⋯</span></div>
           <div class="sheet">
             <h1 style="margin-top:40px">Weekly review</h1>
@@ -777,7 +719,6 @@
           <div class="wsb"><span class="wsav">N</span>Netko Labs<span class="car">⌄</span><span class="sp"></span><span class="ib">?</span><span class="av" style="--c:#c25f2c">JV</span></div>
         </aside>
         <div class="content">
-          <div class="tabs"><span class="on">▦ Dashboard <span class="x">×</span></span><span class="plus">+</span></div>
           <div class="hdr"><span class="crumb">Netko Labs <span style="opacity:.5">/</span> <b>Dashboard</b></span><span class="sp"></span><span class="btn">⧉ Copy link</span></div>
           <div class="gate">
             <div>
@@ -847,7 +788,6 @@
           <div class="wsb"><span class="wsav">N</span>Netko Labs<span class="car">⌄</span><span class="sp"></span><span class="ib">?</span><span class="av" style="--c:#c25f2c">JV</span></div>
         </aside>
         <div class="content">
-          <div class="tabs"><span>▯ Wiki <span class="x">×</span></span><span class="on">🗑 Trash <span class="x">×</span></span><span class="plus">+</span></div>
           <div class="hdr"><span class="crumb">Netko Labs <span style="opacity:.5">/</span> <b>Trash</b></span><span class="sp"></span><span class="btn">⧉ Copy link</span></div>
           <div class="page w760" style="padding:40px 24px">
             <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px">
@@ -881,7 +821,7 @@
     <b>Decisions</b>
     <ol>
       <li>Two-click arm over typed confirm: it is reversible until the second click and fails safe on mouse-leave; typing a phrase punishes the person who meant it.</li>
-      <li>The trash is a tab like any view, so it has an address and sits in the strip; it never nests under Settings.</li>
+      <li>The trash is a route like any view, so it has an address; it never nests under Settings.</li>
     </ol>
   </div>
 </section>
@@ -915,7 +855,6 @@
           </div>
         </aside>
         <div class="content">
-          <div class="tabs"><span>▤ Backlog <span class="x">×</span></span><span class="on">▯ Wiki <span class="x">×</span></span><span>☷ Weekly review <span class="x">×</span></span><span class="plus">+</span></div>
           <div class="hdr">
             <span class="crumb">Netko Labs <span style="opacity:.5">/</span> <b>Wiki</b> · edited 2 hours ago</span>
             <span class="btn ghost icon">☆</span>
@@ -966,7 +905,6 @@
           </div>
         </aside>
         <div class="content">
-          <div class="tabs"><span>▤ Backlog <span class="x">×</span></span><span class="on">▯ Wiki <span class="x">×</span></span><span>☷ Weekly review <span class="x">×</span></span><span class="plus">+</span></div>
           <div class="hdr">
             <span class="crumb">Netko Labs <span style="opacity:.5">/</span> <b>Wiki</b> · edited 2 hours ago</span>
             <span class="btn ghost icon">☆</span>
@@ -1017,7 +955,6 @@
           <div class="it faint" style="margin-top:6px"><span class="g">⌫</span>Trash</div>
         </aside>
         <div class="content">
-          <div class="tabs"><span>▤ Backlog <span class="x">×</span></span><span class="on">▯ Wiki <span class="x">×</span></span><span>☷ Weekly review <span class="x">×</span></span><span class="plus">+</span></div>
           <div class="hdr">
             <span class="crumb">Netko Labs <span style="opacity:.5">/</span> <b>Wiki</b> · edited 2 hours ago</span>
             <span class="btn ghost icon">☆</span>
@@ -1122,7 +1059,7 @@
         </aside></div></div>
       </div>
     </div>
-    <div class="fnote">The same sidebar four ways. Groups remember their open state per workspace, beside the tab strip in <code>localStorage</code>. The Washi row tints its border: amber while a turn runs, the primary orange when something waits on a person, plain when asleep — and asleep says why in two words, because that row is the shortest path to the fix. Dark wears the same shapes.</div>
+    <div class="fnote">The same sidebar four ways. Groups remember their open state per workspace in <code>localStorage</code>. The Washi row tints its border: amber while a turn runs, the primary orange when something waits on a person, plain when asleep — and asleep says why in two words, because that row is the shortest path to the fix. Dark wears the same shapes.</div>
   </article>
 
   <article class="frame" data-name="Sidebar D · Ask first · proposed" data-w="1280" data-h="800">
@@ -1152,7 +1089,6 @@
           <div class="wsb"><span class="wsav">N</span>Netko Labs<span class="car">⌄</span><span class="sp"></span><span class="ib">?</span><span class="av" style="--c:#c25f2c">JV</span></div>
         </aside>
         <div class="content">
-          <div class="tabs"><span>▤ Backlog <span class="x">×</span></span><span class="on">▯ Wiki <span class="x">×</span></span><span>☷ Weekly review <span class="x">×</span></span><span class="plus">+</span></div>
           <div class="hdr">
             <span class="crumb">Netko Labs <span style="opacity:.5">/</span> <b>Wiki</b> · edited 2 hours ago</span>
             <span class="btn ghost icon">☆</span>
