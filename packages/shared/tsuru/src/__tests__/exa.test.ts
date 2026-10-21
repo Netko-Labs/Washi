@@ -36,6 +36,13 @@ describe('exa search', () => {
     })
   })
 
+  test('an oversized body stops at the cap instead of being read whole', async () => {
+    const huge = `{"results":[{"url":"https://x.dev","text":"${'x'.repeat(1_100_000)}"}]}`
+    await expect(
+      exaSearch({ query: 'x', apiKey: 'k', fetchImpl: reply(200, JSON.parse(huge)) }),
+    ).rejects.toThrow('exceeds')
+  })
+
   test('a bad key and a broken shape fail loudly', async () => {
     await expect(exaSearch({ query: 'x', apiKey: 'k', fetchImpl: reply(401, {}) })).rejects.toThrow(
       TsuruError,

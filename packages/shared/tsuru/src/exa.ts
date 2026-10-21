@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { TsuruError } from './fetch'
+import { readCapped, TsuruError } from './fetch'
 
 export const EXA_SEARCH_URL = 'https://api.exa.ai/search'
 const RESULT_TEXT_CHARS = 1_500
@@ -42,8 +42,7 @@ export async function exaSearch(input: ExaSearchInput): Promise<ExaResult[]> {
     throw new TsuruError('Exa rejected this API key')
   }
   if (!response.ok) throw new TsuruError(`Exa responded ${response.status}`)
-  const raw = await response.text()
-  if (raw.length > MAX_RESPONSE_BYTES) throw new TsuruError('Exa response too large')
+  const raw = await readCapped(response, MAX_RESPONSE_BYTES)
   const parsed = responseSchema.safeParse(JSON.parse(raw))
   if (!parsed.success) throw new TsuruError('Exa response had an unexpected shape')
   return parsed.data.results.map((result) => ({
