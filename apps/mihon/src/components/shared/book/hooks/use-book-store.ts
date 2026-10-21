@@ -4,7 +4,14 @@ import { BOOK_DEFAULTS } from '../values'
 
 export const useBookStore = create<BookStore>((set) => ({
   ...BOOK_DEFAULTS,
-  pick: (primitive) => set({ primitive, knobs: {}, childrenText: null, scratch: null }),
+  pick: (primitive) =>
+    set((state) => ({
+      primitive,
+      knobs: {},
+      childrenText: null,
+      scratch: null,
+      view: state.view === 'scratch' ? 'single' : state.view,
+    })),
   setKnob: (key, value) =>
     set((state) => {
       const knobs = { ...state.knobs }

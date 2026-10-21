@@ -79,8 +79,19 @@
   color: var(--ink);
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 4px 12px;
+  gap: 12px;
   align-items: start;
+}
+.wsx-callout[data-variant="plain"] {
+  background: transparent;
+  border-color: transparent;
+  padding-inline: 0;
+}
+.wsx-callout[data-variant="outline"] {
+  background: transparent;
+}
+.wsx-callout[data-variant="raised"] {
+  box-shadow: var(--shadow-card);
 }
 .wsx-callout-icon {
   color: var(--t-text);
@@ -88,12 +99,15 @@
   height: 18px;
   margin-top: 1px;
 }
+.wsx-callout-content {
+  min-width: 0;
+}
 .wsx-callout-title {
   font-weight: 700;
   color: var(--t-text);
+  margin-bottom: 4px;
 }
 .wsx-callout-body {
-  grid-column: 2;
   font-size: calc(var(--body) * var(--sz));
 }
 .wsx-callout-body > * + * {

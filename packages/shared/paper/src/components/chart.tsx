@@ -86,7 +86,8 @@ function Lines({ points, area, locale }: { points: Point[]; area: boolean; local
   const max = Math.max(1, ...points.map((point) => point.value))
   const step = points.length > 1 ? (W - PAD * 2) / (points.length - 1) : 0
   const coords = points.map(
-    (point, index) => [PAD + step * index, H - 20 - ((H - 28) * point.value) / max] as const,
+    // 12px of headroom: the peak's value label sits above its point, inside the box.
+    (point, index) => [PAD + step * index, H - 20 - ((H - 40) * point.value) / max] as const,
   )
   const last = points.length - 1
   const ticks = [...new Set([0, Math.floor(last / 2), last])].filter((index) => index >= 0)

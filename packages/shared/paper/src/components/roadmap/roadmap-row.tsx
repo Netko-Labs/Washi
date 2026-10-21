@@ -6,6 +6,7 @@ export function RoadmapRow({ span, calendar, title, onMove, onPlace, onOpen }: R
   const track = useRef<HTMLDivElement>(null)
   const dayWidth = () => (track.current?.clientWidth ?? 0) / calendar.days
   const drag = useBarDrag(dayWidth, span?.start ?? null, onMove)
+  const single = span !== null && span.end === span.start
 
   return (
     <div className="wsx-roadmap-row">
@@ -17,10 +18,11 @@ export function RoadmapRow({ span, calendar, title, onMove, onPlace, onOpen }: R
           <div
             className="wsx-roadmap-bar"
             data-dragging={drag.shift !== 0 || undefined}
-            title="Drag to reschedule"
+            data-single={single || undefined}
+            title={single ? `${title} — drag to reschedule` : 'Drag to reschedule'}
             style={{
               left: percent(span.start + drag.shift, calendar),
-              width: `${((span.end - span.start + 1) / calendar.days) * 100}%`,
+              width: single ? undefined : `${((span.end - span.start + 1) / calendar.days) * 100}%`,
             }}
             onPointerDown={drag.onPointerDown}
           >

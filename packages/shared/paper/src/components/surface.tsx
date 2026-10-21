@@ -53,8 +53,10 @@ export function Callout({ title, children, ...rest }: BlockProps & { title?: str
       >
         <path d={CALLOUT_ICONS[tone]} />
       </svg>
-      {title ? <div className="wsx-callout-title">{title}</div> : <div />}
-      <div className="wsx-callout-body">{children}</div>
+      <div className="wsx-callout-content">
+        {title && <div className="wsx-callout-title">{title}</div>}
+        <div className="wsx-callout-body">{children}</div>
+      </div>
     </aside>
   )
 }
