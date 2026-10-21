@@ -13,7 +13,7 @@ export function AuthScreen({ onDone }: { onDone: () => void }) {
   return (
     <main className="grid min-h-dvh grid-cols-1 lg:grid-cols-[1.1fr_1fr]">
       <section className="paper-canvas hidden flex-col justify-between border-border border-r bg-muted px-12 py-14 lg:flex">
-        <p className="font-semibold text-[15px] tracking-[0.18em] uppercase">和紙 washi</p>
+        <p className="font-semibold text-[15px] tracking-[0.18em] uppercase">washi</p>
         <div className="max-w-md">
           <AgentMascot state="writing" size={88} className="mb-8" />
           <h1 className="font-serif font-semibold text-5xl leading-[1.1] tracking-[-0.02em]">
@@ -42,7 +42,7 @@ export function AuthScreen({ onDone }: { onDone: () => void }) {
         >
           <div className="flex items-center gap-2.5 lg:hidden">
             <AgentMascot state="idle" size={36} />
-            <p className="font-semibold text-[15px] tracking-[0.18em] uppercase">和紙 washi</p>
+            <p className="font-semibold text-[15px] tracking-[0.18em] uppercase">washi</p>
           </div>
           <h2 className="mt-6 font-semibold text-[26px] tracking-[-0.02em] lg:mt-0">
             {signingUp ? 'Create your account' : 'Welcome back'}

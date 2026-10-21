@@ -337,7 +337,7 @@ li::marker {
   border-color: color-mix(in oklab, var(--matcha) 55%, transparent);
 }
 .chip.decided::before {
-  content: "決";
+  content: "✓";
   font-weight: 400;
   font-size: 0.8rem;
 }

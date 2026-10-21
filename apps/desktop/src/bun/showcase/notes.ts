@@ -100,7 +100,7 @@ export const ESSAY = `<Sheet title="On Paper" icon="pen" feel="editorial" theme=
 `
 
 export const POSTMORTEM = `<Sheet title="Postmortem: stored keys" icon="flag" feel="editorial" theme="kobai" wsx="1">
-  <Row align="center"><Stamp label="済" /><Tape tone="danger">incident</Tape></Row>
+  <Row align="center"><Stamp label="done" /><Tape tone="danger">incident</Tape></Row>
   <Title>A rename garbage-collected stored state on 41 sheets</Title>
   <Text lead>No data was lost for good — the action log had every write — but 41 readers opened a page that had forgotten their filters.</Text>
   <Grid>
