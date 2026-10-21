@@ -11,7 +11,9 @@
 // the rail zooms to it, 0 fits all, 1 is 100%, and a hash `#frame=<slug>` opens zoomed on one frame.
 // Under 50% the notes hide and under 25% the frame labels go too — far out, the frames are the map.
 // Review mode (R, or the bar button): ✓ ok / ✎ fix per frame, N notes the selected frame, ] [ walk frames,
-// Copy notes puts the page's verdicts on the clipboard as Markdown; docs/serve.ts keeps them in a file.
+// Copy notes puts the page's verdicts on the clipboard as Markdown; the store is docs/_kit/review.js.
+// Walk mode (W) is docs/_kit/tour.js, over the view API this file leaves on `washi.canvas`.
+// conventions: >300 lines — one canvas, one input model; review and tour already live beside it
 
 const GAP = 96
 const GROUP_GAP = 520
@@ -277,7 +279,15 @@ function init() {
   const target = wanted && document.getElementById(`frame-${wanted}`)
   if (target) focus(target)
   else fitAll()
-  window.addEventListener('resize', () => (target ? focus(target) : fitAll()))
+  window.addEventListener('resize', () => {
+    if (document.body.classList.contains('touring')) return
+    if (target) focus(target)
+    else fitAll()
+  })
+
+  window.washi = Object.assign(window.washi || {}, {
+    canvas: { viewport, world, state, apply, fitAll, fitRect, zoomTo, select, focus },
+  })
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init)
@@ -311,12 +321,9 @@ function initReview() {
   const world = document.querySelector('.cv-world')
   const layers = document.querySelector('.cv-layers')
   if (!bar || !world) return
-  const page = location.pathname
-    .split('/')
-    .pop()
-    .replace(/\.html$/, '')
-  const Key = `washi:review:${page}`
-  let notes = []
+  const review = window.washi?.review
+  if (!review) return
+  const { page, persist, latest } = review
   let current = null
 
   const toggle = document.createElement('button')
@@ -335,36 +342,10 @@ function initReview() {
   document.body.appendChild(panel)
   const ta = panel.querySelector('textarea')
 
-  const load = async () => {
-    try {
-      const r = await fetch('/_review')
-      if (r.ok) {
-        notes = (await r.json()).filter((n) => n.page === page)
-        return
-      }
-    } catch {}
-    notes = JSON.parse(localStorage.getItem(Key) || '[]')
-  }
-  const persist = async (note) => {
-    notes.push(note)
-    try {
-      const r = await fetch('/_review', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify(note),
-      })
-      if (r.ok) return
-    } catch {}
-    localStorage.setItem(Key, JSON.stringify(notes))
-  }
-  const latest = (frame) => {
-    const own = notes.filter((n) => n.frame === frame.dataset.name)
-    const verdict = [...own].reverse().find((n) => n.verdict)?.verdict ?? null
-    return { own, verdict }
-  }
+  const verdictOf = (frame) => latest(frame.dataset.name)
   const paint = () => {
     for (const frame of world.querySelectorAll('.frame')) {
-      const { own, verdict } = latest(frame)
+      const { own, verdict } = verdictOf(frame)
       frame.classList.toggle('rv-ok', verdict === 'ok')
       frame.classList.toggle('rv-fix', verdict === 'fix')
       let strip = frame.querySelector(':scope > .rv')
@@ -378,7 +359,7 @@ function initReview() {
           if (!v) return
           e.stopPropagation()
           if (v === 'ok') {
-            persist({ page, frame: frame.dataset.name, verdict: 'ok', note: '' }).then(paint)
+            persist({ frame: frame.dataset.name, verdict: 'ok', note: '' })
           } else open(frame, 'fix')
         })
         frame.appendChild(strip)
@@ -403,7 +384,7 @@ function initReview() {
     current = { frame, verdict }
     panel.querySelector('.t').textContent = frame.dataset.name
     panel.querySelector('.s').textContent = `${page} · ${verdict === 'fix' ? 'needs work' : 'note'}`
-    const own = latest(frame).own.filter((n) => n.note)
+    const own = verdictOf(frame).own.filter((n) => n.note)
     panel.querySelector('.prev').innerHTML =
       own
         .map(
@@ -418,10 +399,9 @@ function initReview() {
   const save = async () => {
     if (!current) return
     const text = ta.value.trim()
-    await persist({ page, frame: current.frame.dataset.name, verdict: current.verdict, note: text })
+    await persist({ frame: current.frame.dataset.name, verdict: current.verdict, note: text })
     panel.classList.remove('open')
     current = null
-    paint()
   }
   panel.querySelector('.save').addEventListener('click', save)
   panel.querySelector('.x').addEventListener('click', () => panel.classList.remove('open'))
@@ -436,7 +416,7 @@ function initReview() {
   copy.addEventListener('click', () => {
     const lines = [`# design review · ${page}`, '']
     for (const frame of world.querySelectorAll('.frame')) {
-      const { own, verdict } = latest(frame)
+      const { own, verdict } = verdictOf(frame)
       if (!verdict) continue
       lines.push(
         `- ${verdict === 'ok' ? '✓' : '✎'} **${frame.dataset.name}**${own
@@ -469,7 +449,8 @@ function initReview() {
       if (on) open(on, 'fix')
     }
   })
-  load().then(paint)
+  review.subscribe(paint)
+  review.load()
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initReview)

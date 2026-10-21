@@ -819,8 +819,8 @@ passes; no key → the tool says where to add one.
       Conversations menu is the history — no new query needed.
 - [x] 5 · no tab strip on the web (D58): `TabStrip` left the studio shell, the per-workspace strip
       in localStorage and `savedTabs`/`saveTabs` went with it; the desktop keeps the component.
-- [ ] 6 · design review: Juan marks frames in review mode (`bun run docs`); act on
-      `tasks/design-review.jsonl` page by page
+- [ ] 6 · design review: Juan walks each page (`W` on `bun run docs` — a slideshow, frame → pin →
+      pin → verdict, the frame's note split per pin); act on `tasks/design-review.jsonl` page by page
 
 # Mihon — the WSX sample book (2026-10-21) — branch `feat/mihon`
 
