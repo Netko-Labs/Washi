@@ -44,4 +44,4 @@ Chips: `decided` `open` `later` `have` `new` `cut`. A figure is `<figure class="
   <script src="../_kit/mascot.js"></script><script src="../_kit/canvas.js"></script>
 ```
 
-Groups stack; frames flow left to right (wrap width `data-wrap`, default 5200). The layers rail and frame labels are generated. Pins (`.pin`) and sticky notes (`.sticky`) sit anywhere in the world with inline `left/top`. Never edit `_kit/*` from a design page; page-specific CSS goes in that page's own `<style>`.
+Groups stack; frames flow left to right (wrap width `data-wrap`, default 5200). The layers rail and frame labels are generated. Input: wheel pans, ⌘/ctrl+wheel or a pinch zooms at the cursor, shift+wheel pans sideways, any drag pans, a click selects a frame, a double-click or the rail zooms to it, `0` fits all, `1` is 100%. Under 50% the frame notes hide; under 25% the frame labels go too. Pins (`.pin`) and sticky notes (`.sticky`) sit anywhere in the world with inline `left/top`. Never edit `_kit/*` from a design page; page-specific CSS goes in that page's own `<style>`.
