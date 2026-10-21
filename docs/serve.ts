@@ -50,7 +50,11 @@ Bun.serve({
     if (!target) return new Response('not found', { status: 404 })
     const file = Bun.file(target)
     if (!(await file.exists())) return new Response('not found', { status: 404 })
-    return new Response(file, { headers: { 'cache-control': 'no-cache' } })
+    // `no-cache` only works with something to revalidate: an edit changes size or mtime, so the
+    // browser refetches it and keeps everything else.
+    const etag = `"${file.size}-${file.lastModified}"`
+    if (request.headers.get('if-none-match') === etag) return new Response(null, { status: 304 })
+    return new Response(file, { headers: { 'cache-control': 'no-cache', etag } })
   },
 })
 console.log(`docs on http://localhost:${PORT}/ — review notes → tasks/design-review.jsonl`)
