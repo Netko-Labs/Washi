@@ -781,6 +781,6 @@ Juan's call: drop the old doc set and rework it: `brand.html` `mascot.html` `prd
 `prd.html` carries their decisions.
 
 - [x] 0 · foundation: `docs/_kit` (doc.css · app.css · mascot.js · canvas.css/js), `docs/index.html`
-- [ ] 1 · brand.html · 2 · mascot.html · 3 · prd.html · 4 · wsx-primitives.html
-- [ ] 5 · design/{shell,pages,data,work,agent,account,desktop}.html + design/index.html overview
-- [ ] 6 · retire old docs, point CLAUDE.md + memory at the new set, PR
+- [x] 1 · brand.html · 2 · mascot.html · 3 · prd.html · 4 · wsx-primitives.html
+- [x] 5 · design/{shell,pages,data,work,agent,account,desktop}.html + design/index.html overview
+- [x] 6 · retire old docs, point CLAUDE.md + memory at the new set, PR

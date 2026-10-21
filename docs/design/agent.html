@@ -1,0 +1,902 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Washi design — agent</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@700;900&family=Karla:ital,wght@0,400;0,500;0,600;0,800;1,400&family=JetBrains+Mono:wght@400;600&family=Young+Serif&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../_kit/app.css" />
+<link rel="stylesheet" href="../_kit/canvas.css" />
+<style>
+/* page-only: the studio's real agent chrome, which app.css only sketches */
+.app .srow2{display:flex;flex-direction:column;gap:2px;padding:6px 8px;border-top:1px solid var(--s-border);margin-top:4px}
+.app .srow2 .l1{display:flex;align-items:center;gap:8px;font-size:12.5px}
+.app .srow2 .st{color:var(--s-mfg)}
+.app .srow2 .sub{padding-left:16px;font:400 10.5px/1.3 var(--s-mono);color:var(--s-mfg)}
+.app .dot8{width:8px;height:8px;border-radius:50%;background:#aebb9a;flex:none;display:inline-block}
+.app .dot8.work{background:#e8b36a}.app .dot8.need{background:var(--s-primary)}.app .dot8.pause{background:#7f3f2c}.app .dot8.sleep{background:#b8b0a2}
+.app.solo{display:flex;background:var(--s-bg)}
+.app.solo .agent{position:relative;inset:auto;transform:none;width:100%;max-height:none;border:0;border-radius:0;box-shadow:none;flex:1}
+.app .pad{padding:18px;display:grid;gap:10px;align-content:start}
+.app .cols2{display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:18px;align-items:start}
+.app .cols3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;padding:18px;align-items:start}
+.app .lbl2{font:600 11px/1 var(--s-sans);text-transform:uppercase;letter-spacing:.06em;color:var(--s-mfg)}
+.app .note{font-size:12px;color:var(--s-mfg);line-height:1.5}
+.fabs{display:flex;gap:22px;align-items:flex-start}
+.fabs div{display:grid;justify-items:center;gap:8px;font:600 10.5px/1 var(--s-mono);color:var(--s-mfg)}
+.fabs i.c{width:52px;height:52px;border-radius:50%;background:#DF8552;border:2px solid var(--s-card);display:grid;place-items:center;overflow:hidden;box-shadow:0 8px 28px -8px #0004}
+.fabs i.c svg{width:40px;margin-top:8px}
+.app .agent .ah .ttl{display:grid;line-height:1.25}.app .agent .ah .ttl small{font-weight:400;font-size:11px;color:var(--s-mfg)}
+.app .agent .tool{border-radius:99px;border:0;background:var(--s-muted);width:max-content;max-width:100%;height:24px;padding:0 10px;font-size:11px;font-weight:500}
+.app .agent .tool.bad{color:var(--s-bad)}
+.app .agent .tool .out{display:block}
+.app .tout{margin:-4px 0 0;padding:8px;border-radius:8px;background:var(--s-muted);font:400 11px/1.5 var(--s-mono);color:var(--s-mfg);white-space:pre-wrap}
+.app .rec{font:400 11px/1.5 var(--s-mono);color:var(--s-mfg)}
+.app .err{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--s-bad)}
+.app .apill{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:99px;border:1px dashed var(--s-agent);font-size:12px;color:var(--s-mfg)}
+.app .wmark{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--s-mfg);margin:6px 0 2px}
+.app .wmark .sp2{color:var(--s-agent)}.app .wmark .u{margin-left:4px;color:var(--s-fg)}
+.app .starter{border:1px solid var(--s-border);background:var(--s-bg);border-radius:11px;padding:9px 11px;font-size:12.5px}
+.app .hi{font-weight:600;font-size:15px;letter-spacing:-.01em}
+.app .me{justify-self:end;max-width:85%;background:var(--s-muted);border-radius:16px 16px 6px 16px;padding:8px 14px;font-size:13px;line-height:1.5}
+.app .wtxt{font-size:13.5px;line-height:1.7}
+.app .working{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--s-mfg)}
+.app .cbox{border:1px solid var(--s-border);border-radius:16px;background:var(--s-bg);padding:10px 12px 8px;display:grid;gap:6px}
+.app .cbox .ph{font-size:13px;color:#a39b8d;min-height:38px}.app .cbox .ph.v{color:var(--s-fg)}
+.app .cbox .row{display:flex;align-items:center;gap:8px;font:400 11px/1 var(--s-mono);color:var(--s-mfg)}
+.app .cbox .plus{width:26px;height:26px;border-radius:50%;border:1px solid var(--s-border);display:grid;place-items:center;font-size:13px}
+.app .cbox .send{margin-left:auto;width:28px;height:28px;border-radius:50%;background:var(--s-primary);color:#fff;display:grid;place-items:center;font-size:14px}
+.app .cbox .send.stop{background:var(--s-fg);font-size:10px}.app .cbox .send.dim{opacity:.4}
+.app .dv{border:1px solid var(--s-agent);border-radius:12px;overflow:hidden;font-size:12px}
+.app .dv .h{background:var(--s-muted);border-bottom:1px solid var(--s-border);padding:6px 12px;font-weight:500}
+.app .dv .in{display:grid;gap:4px;padding:10px}
+.app .dv pre{margin:0;padding:4px 8px;border-radius:6px;white-space:pre-wrap;font:400 11.5px/1.5 var(--s-mono)}
+.app .dv .old{background:#e7000b14;color:var(--s-mfg);text-decoration:line-through}.app .dv .new{background:#22c55e1f}
+.app .ac{border:1px solid var(--s-agent);border-radius:12px;background:var(--s-card);overflow:hidden;font-size:12.5px}
+.app .ac .hd{display:flex;gap:10px;padding:12px 12px 0}
+.app .ac .ic{width:32px;height:32px;border-radius:8px;background:var(--s-muted);display:grid;place-items:center;color:var(--s-agent);flex:none;font-size:15px}
+.app .ac .lead{font-size:11.5px;color:var(--s-mfg)}.app .ac .what{font-size:13.5px;line-height:1.35}
+.app .ac .det{font-size:12px;color:var(--s-mfg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.app .ac .out{margin:10px 12px 0;padding:6px 10px;border-radius:8px;background:var(--s-muted);font-size:12px;color:var(--s-mfg);display:flex;gap:6px;align-items:center}
+.app .ac .prev{margin:10px 12px 0;border:1px solid var(--s-border);border-radius:8px;background:var(--s-bg);padding:10px 12px;font-size:12px;max-height:96px;overflow:hidden;position:relative}
+.app .ac .prev::after{content:"";position:absolute;inset:auto 0 0;height:40px;background:linear-gradient(transparent,var(--s-bg))}
+.app .ac .pv{display:flex;align-items:center;gap:4px;margin:10px 12px 0;font-size:12px;color:var(--s-mfg)}
+.app .ac .acts{display:flex;align-items:center;gap:6px;padding:10px 12px}
+.app .ac .acts .always{font-size:12px;color:var(--s-mfg);text-decoration:underline;text-underline-offset:3px;padding:0 6px}
+.app .ac .acts .sp{flex:1}
+.settings2{max-width:680px;margin:0 auto;padding:44px 40px 60px}
+.settings2 h1{font:600 24px/1.2 var(--s-sans);letter-spacing:-.02em;margin:0 0 4px}
+.settings2 .lead{color:var(--s-mfg);margin:0 0 22px}
+.settings2 .stabs{display:flex;gap:4px;border-bottom:1px solid var(--s-border);margin-bottom:26px}
+.settings2 .stabs span{height:36px;display:inline-flex;align-items:center;gap:7px;padding:0 12px;font-size:13px;font-weight:500;color:var(--s-mfg);border-bottom:2px solid transparent;margin-bottom:-1px}
+.settings2 .stabs span.on{color:var(--s-fg);border-color:var(--s-primary)}
+.settings2 h2{font:600 15px/1.3 var(--s-sans);margin:0}
+.settings2 .p{font-size:13.5px;color:var(--s-mfg);line-height:1.5;margin:4px 0 0}
+.settings2 .sec2{margin-top:40px;padding-top:32px;border-top:1px solid var(--s-border)}
+.settings2 .keyline{margin-top:16px;padding:10px 12px;border-radius:12px;background:var(--s-accent);font:400 12.5px/1 var(--s-mono)}
+.prov{display:flex;gap:8px;margin-top:20px}
+.prov span{flex:1;height:44px;display:grid;place-items:center;border:1px solid var(--s-border);border-radius:12px;font-weight:600;font-size:13.5px}
+.prov span.on{border-color:var(--s-primary);background:var(--s-accent)}
+.fld{display:grid;gap:6px;margin-top:16px}
+.fld .l{font-size:13px;font-weight:600}.fld .l em{font-style:normal;font-weight:400;color:var(--s-mfg)}
+.fld .in{height:44px;border:1px solid var(--s-border);border-radius:12px;background:var(--s-card);padding:0 12px;display:flex;align-items:center;font:400 13px/1 var(--s-mono);color:#a39b8d}
+.fld .in.v{color:var(--s-fg)}.fld .in.sans{font:400 14px/1 var(--s-sans)}
+.fld .h{font-size:12px;color:var(--s-mfg)}.fld .h.bad{color:var(--s-bad)}
+.mp{border:1px solid var(--s-border);border-radius:12px;overflow:hidden}
+.mp .r{display:flex;align-items:center;gap:12px;padding:10px 12px;border-top:1px solid var(--s-border)}
+.mp .r:first-child{border-top:0}.mp .r.on{background:var(--s-accent)}
+.mp .r .n{font-weight:600;font-size:13.5px;display:block}.mp .r .id{font:400 11px/1.4 var(--s-mono);color:var(--s-mfg);display:block}
+.mp .r .pr{margin-left:auto;text-align:right;font-size:11px;color:var(--s-mfg);line-height:1.3;flex:none}
+.mp .r .pr.un{color:#b7832a}
+.bigbtn{display:inline-flex;align-items:center;height:44px;padding:0 20px;border-radius:12px;background:var(--s-primary);color:#fff;font-weight:600;font-size:14px;margin-top:20px}
+.bigbtn.dis{opacity:.5}.bigbtn.ghost{background:transparent;color:var(--s-fg);border:1px solid var(--s-border);font-size:13px;padding:0 16px;margin:0}
+.stoprow{display:flex;align-items:center;gap:8px;margin-top:16px}
+.stoprow .d{font:400 14px/1 var(--s-mono)}.stoprow .in{width:96px;height:44px;border:1px solid var(--s-border);border-radius:12px;background:var(--s-card);display:flex;align-items:center;padding:0 12px;font:400 14px/1 var(--s-mono)}
+.stoprow .a{font-size:13.5px;color:var(--s-mfg)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px}
+.stats div{border:1px solid var(--s-border);border-radius:12px;padding:10px 12px}
+.stats dt{font-size:11px;color:var(--s-mfg);text-transform:uppercase;letter-spacing:.04em}
+.stats dd{margin:2px 0 0;font:600 16px/1.3 var(--s-mono)}
+.paused{margin-top:16px;border:1px solid #f5d28a;background:#fdf3dc;border-radius:12px;padding:12px 16px}
+.paused b{display:block;font-size:13.5px;color:#6b4a0a}.paused p{margin:4px 0 0;font-size:13px;color:#7a5a12;line-height:1.5}
+.paused .bigbtn{background:#6b4a0a;margin-top:12px;font-size:13.5px;padding:0 16px}
+.err2{margin-top:24px;font-size:13px;color:var(--s-bad)}
+.rt{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--s-border)}
+.rt.first{border-top:0}
+.rt .tm{width:56px;flex:none;font:400 12px/1 var(--s-mono);color:var(--s-mfg)}
+.rt .mid{min-width:0;flex:1}
+.rt .t,.rt .pr,.rt .last{display:block}
+.rt .t{font-size:14px}.rt .t.off{color:var(--s-mfg)}
+.rt .pr{font-size:12.5px;color:var(--s-mfg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rt .last{font:400 11px/1.6 var(--s-mono);color:var(--s-mfg)}
+.rt .ops{display:flex;align-items:center;gap:14px;color:var(--s-mfg);flex:none;font-size:14px}
+.rt .tg{width:36px;height:20px;border-radius:99px;background:var(--s-primary);position:relative;display:inline-block}
+.rt .tg::after{content:"";position:absolute;right:2px;top:2px;width:16px;height:16px;border-radius:50%;background:var(--s-card)}
+.rt .tg.off{background:var(--s-border)}.rt .tg.off::after{right:auto;left:2px}
+.rform{margin-top:16px;border:1px solid var(--s-border);background:var(--s-card);border-radius:16px;padding:16px;display:grid;gap:8px}
+.rform .row{display:flex;gap:8px}
+.rform .in{height:44px;border:1px solid var(--s-border);border-radius:12px;background:var(--s-bg);padding:0 12px;display:flex;align-items:center;font-size:14px;color:#a39b8d;flex:1;min-width:0}
+.rform .in.v{color:var(--s-fg)}
+.rform .in.ta{height:auto;padding:10px 12px;font-size:13.5px;align-items:flex-start;min-height:62px}
+.rform .in.mono{font:400 13px/1 var(--s-mono);color:var(--s-fg);width:112px;flex:none}
+.rform .ft{display:flex;align-items:center;gap:12px}.rform .ft span{font-size:12px;color:var(--s-mfg);line-height:1.4}
+.ibx{max-width:680px;margin:0 auto;padding:44px 40px 60px}
+.ibx h1{font:600 24px/1.2 var(--s-sans);letter-spacing:-.02em;margin:0 0 4px}
+.ibx .lead{color:var(--s-mfg);margin:0 0 22px}
+.ibx .lbl2{margin:26px 0 10px;display:block}
+.turn{display:flex;gap:10px;margin-bottom:14px}.turn i{width:6px;height:6px;border-radius:50%;background:var(--s-agent);margin-top:7px;flex:none}
+.turn .q{font-size:13px;line-height:1.5}
+.zero{display:flex;align-items:center;gap:10px;border:1px solid var(--s-border);border-radius:14px;background:var(--s-card);padding:16px;font-size:13px;color:var(--s-mfg)}
+.cvs{position:absolute;left:12px;top:50px;width:264px;z-index:4;padding:5px}
+.cvs .grp{padding:6px 8px 4px;font:600 10.5px/1 var(--s-sans);text-transform:uppercase;letter-spacing:.06em;color:var(--s-mfg)}
+.cvs .mi{height:auto;padding:7px 8px;font-size:12.5px}
+</style>
+</head>
+<body class="cv">
+<header class="cv-bar">
+  <a class="brand" href="../index.html"><i></i>和紙 <em>WASHI</em></a>
+  <span class="crumb">design / <b>agent</b></span>
+  <span class="sp"></span>
+  <nav class="pages">
+    <a href="index.html">overview</a><a href="shell.html">shell</a><a href="pages.html">pages</a><a href="data.html">data</a><a href="work.html">work</a><a class="on" href="agent.html">agent</a><a href="account.html">account</a><a href="desktop.html">desktop</a>
+  </nav>
+  <span class="sp"></span>
+  <span class="hint"><kbd>wheel</kbd> pan · <kbd>⌘</kbd>+wheel zoom · <kbd>0</kbd> fit</span>
+  <span class="zoom"><button data-zoom="out">−</button><span class="pct">100%</span><button data-zoom="in">+</button><button data-zoom="fit" title="fit">⤢</button></span>
+</header>
+<aside class="cv-layers" data-intro="Washi in the studio: the mascot door, a turn, the desk, status, settings, routines, conversations. Labels are the code's — describeTool phrases every tool, nothing shows a tool name."></aside>
+<main class="cv-viewport"><div class="cv-world">
+
+<!-- ───────────────────────── 1 · THE DOOR ───────────────────────── -->
+<section class="cv-group" data-name="The door" data-note="52px mascot FAB bottom-right · ⌘J · a 400px popover, or expanded to 720px centered">
+  <article class="frame" data-name="Mascot FAB · states" data-w="1280" data-h="800">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / netko-labs / p / wiki</span></div>
+      <div class="shell">
+        <aside class="side">
+          <div class="ws"><i></i>Netko Labs <span class="car">▾</span><span class="new">+</span></div>
+          <div class="it"><span class="g">⌕</span>Search<span class="n">⌘K</span></div>
+          <div class="it"><span class="g">⌂</span>Dashboard</div>
+          <div class="it"><span class="g">◫</span>Inbox</div>
+          <div class="it"><span class="g">⚙</span>Settings</div>
+          <div class="lbl">Pages</div>
+          <div class="it"><span class="tw">▸</span><span class="g">▤</span>Backlog</div>
+          <div class="it"><span class="tw">▸</span><span class="g">▥</span>Roadmap</div>
+          <div class="it on"><span class="tw">▸</span><span class="g">☰</span>Wiki</div>
+          <div class="it"><span class="tw">▸</span><span class="g">☷</span>Weekly review</div>
+          <div class="foot">
+            <div class="srow2"><span class="l1"><i class="dot8"></i><b>Washi</b><span class="st">· Idle</span></span><span class="sub">today $0.42 of $25 · 6 turns</span></div>
+            <div class="user"><span class="av lg" style="--c:#a97f52">JV</span><div><div>Juan</div><div class="em">juan@netko.dev</div></div></div>
+          </div>
+        </aside>
+        <div class="content">
+          <div class="tabs"><span class="on">☰ Wiki <span class="x">×</span></span><span class="plus">+</span></div>
+          <div class="hdr"><span class="crumb">Netko Labs / <b>Wiki</b></span><span class="sp"></span><span class="apill"><i data-mascot="happy" data-size="17"></i>Washi watching</span><span class="btn">Edit</span><span class="btn ghost icon">⋯</span></div>
+          <div class="sheet">
+            <h1>Wiki</h1>
+            <p>How Netko Labs works, in one place. Washi keeps it current from the tables and the week's work.</p>
+            <div class="pop" style="margin-top:28px">
+              <div class="ttl">The FAB, state by state</div>
+              <p class="note" style="margin:4px 0 14px">One SVG per state in <code>AgentMascot</code>, cropped 1.5× into the circle. Drawn here with the small rig's nearest face.</p>
+              <div class="fabs">
+                <div><i class="c"><i data-mascot="happy bob" data-size="40"></i></i>idle</div>
+                <div><i class="c"><i data-mascot="curious" data-size="40"></i></i>reading</div>
+                <div><i class="c"><i data-mascot="blank breathe" data-size="40"></i></i>thinking</div>
+                <div><i class="c"><i data-mascot="wink sway" data-size="40"></i></i>writing</div>
+                <div><i class="c"><i data-mascot="happy peek" data-size="40"></i></i>suggesting</div>
+                <div><i class="c"><i data-mascot="happy flip" data-size="40"></i></i>done</div>
+                <div><i class="c"><i data-mascot="dizzy sway" data-size="40"></i></i>flagged</div>
+                <div><i class="c"><i data-mascot="sleep breathe" data-size="40"></i></i>resting</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="fab"><i data-mascot="happy bob" data-size="40" class="m"></i></div>
+      <span class="pin" style="left:1216px;top:712px">1</span>
+      <span class="pin" style="left:960px;top:84px">2</span>
+    </div>
+    <div class="fnote">1 — the only door: <code>AgentFab</code>, 52px, <code>#DF8552</code>, title "Ask Washi (⌘J)". Its face is <code>mascotStateFor(transcript, running, approvals)</code>: approvals waiting → suggesting; running → reading / writing / thinking by the last tool's kind; otherwise done, flagged (error) or idle. 2 — the header pill repeats the state in words on a page view only; it is a mood, not a button. <code>resting</code> exists in the rig but nothing in the store returns it yet.</div>
+  </article>
+
+  <article class="frame" data-name="Agent panel · open" data-w="1280" data-h="800">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / netko-labs / p / wiki</span></div>
+      <div class="shell">
+        <aside class="side">
+          <div class="ws"><i></i>Netko Labs <span class="car">▾</span><span class="new">+</span></div>
+          <div class="it"><span class="g">⌕</span>Search<span class="n">⌘K</span></div>
+          <div class="it"><span class="g">⌂</span>Dashboard</div>
+          <div class="it"><span class="g">◫</span>Inbox</div>
+          <div class="it"><span class="g">⚙</span>Settings</div>
+          <div class="lbl">Pages</div>
+          <div class="it"><span class="tw">▸</span><span class="g">▤</span>Backlog</div>
+          <div class="it on"><span class="tw">▸</span><span class="g">☰</span>Wiki</div>
+          <div class="it"><span class="tw">▸</span><span class="g">☷</span>Weekly review</div>
+          <div class="foot">
+            <div class="srow2"><span class="l1"><i class="dot8"></i><b>Washi</b><span class="st">· Idle</span></span><span class="sub">today $0.42 of $25 · 6 turns</span></div>
+            <div class="user"><span class="av lg" style="--c:#a97f52">JV</span><div><div>Juan</div><div class="em">juan@netko.dev</div></div></div>
+          </div>
+        </aside>
+        <div class="content">
+          <div class="tabs"><span class="on">☰ Wiki <span class="x">×</span></span><span class="plus">+</span></div>
+          <div class="hdr"><span class="crumb">Netko Labs / <b>Wiki</b></span><span class="sp"></span><span class="apill"><i data-mascot="happy" data-size="17"></i>Washi watching</span><span class="btn">Edit</span></div>
+          <div class="sheet"><h1>Wiki</h1><p>How Netko Labs works, in one place.</p><h3>Pages</h3><p>→ <b>How we work</b> · meetings, review, shipping</p></div>
+        </div>
+      </div>
+      <div class="agent" style="max-height:620px">
+        <div class="ah"><i data-mascot="happy" data-size="26"></i><span class="ttl">Washi<small>watching this workspace</small></span><span style="color:var(--s-mfg);font-size:11px">▾</span><span class="x"><span>⌫</span><span>⤢</span><span>×</span></span></div>
+        <div class="body" style="padding:18px 16px 8px">
+          <i data-mascot="happy bob" data-size="52"></i>
+          <div class="hi">Hi Juan</div>
+          <div class="note" style="font-size:12.5px">I'm watching Wiki. Ask me anything, or start from one of these:</div>
+          <div class="starter">Summarize Wiki</div>
+          <div class="starter">Find contradictions with other pages</div>
+          <div class="starter">Tighten the intro paragraph</div>
+          <div class="note" style="font-size:11px">Toggle anytime with <span class="kbd">⌘J</span></div>
+        </div>
+        <div class="compose"><div class="cbox"><div class="ph">Ask, or tell Washi what to write…</div><div class="row"><span class="plus">+</span><span>API key</span><span class="send dim">↑</span></div></div></div>
+      </div>
+      <div class="fab"><i data-mascot="happy bob" data-size="40" class="m"></i></div>
+      <span class="pin" style="left:862px;top:160px">1</span>
+      <span class="pin" style="left:1050px;top:686px">2</span>
+    </div>
+    <div class="fnote">1 — the header is a button: the session title (or "Washi") over "watching this workspace" / "editing Wiki" while running; it opens the Conversations list. Clear, Expand, Close on the right. 2 — the composer: placeholder "Ask, or tell Washi what to write…", <b>Enter</b> sends (Shift+Enter breaks a line — there is no ⌘↵), and the mono label is what the turn will think with: "API key" on the studio, "Claude Code · max · sonnet" on the desktop, "Asleep · see Settings" when nothing can run.</div>
+  </article>
+
+  <article class="frame" data-name="Agent panel · expanded" data-w="1280" data-h="800">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / netko-labs / p / weekly-review</span></div>
+      <div class="shell" style="filter:brightness(.62)">
+        <aside class="side"><div class="ws"><i></i>Netko Labs <span class="car">▾</span></div><div class="lbl">Pages</div><div class="it"><span class="tw">▸</span><span class="g">▤</span>Backlog</div><div class="it on"><span class="tw">▸</span><span class="g">☷</span>Weekly review</div></aside>
+        <div class="content"><div class="tabs"><span class="on">☷ Weekly review <span class="x">×</span></span></div><div class="hdr"><span class="crumb">Netko Labs / <b>Weekly review</b></span></div><div class="sheet"><h1>Weekly review</h1></div></div>
+      </div>
+      <div class="agent center" style="width:720px;max-height:680px">
+        <div class="ah"><i data-mascot="wink" data-size="26"></i><span class="ttl">Session 3<small>editing Weekly review</small></span><span style="color:var(--s-mfg);font-size:11px">▾</span><span class="x"><span>⌫</span><span>⤡</span><span>×</span></span></div>
+        <div class="body" style="padding:16px">
+          <div class="me">Rewrite "This week" in the Weekly review from what moved in issues since Monday.</div>
+          <div class="tool">▦ Looked at your tables</div>
+          <div class="tool">◷ Looked back through issues</div>
+          <div class="tool">◉ Read Weekly review</div>
+          <div class="tool">✎ Update the page Weekly review</div>
+          <div class="dv">
+            <div class="h">Washi suggests an edit · Weekly review</div>
+            <div class="in"><pre class="old">&lt;Callout tone="info"&gt;This week: 3 issues moved to done. Auth refresh still in review.&lt;/Callout&gt;</pre><pre class="new">&lt;Callout tone="info"&gt;This week: 7 issues moved to done — auth refresh, presence heartbeat, trash restore. Two slipped: CSV import, cover presets.&lt;/Callout&gt;</pre></div>
+          </div>
+          <div class="wtxt">Rewrote the "This week" callout from 9 status changes since Monday. I left the rest of the page as it was.</div>
+          <div class="rec">ran on your server · 31.4s · $0.23 · claude-sonnet-4-5</div>
+        </div>
+        <div class="compose"><div class="cbox"><div class="ph">Ask, or tell Washi what to write…</div><div class="row"><span class="plus">+</span><span>API key</span><span class="send dim">↑</span></div></div></div>
+      </div>
+      <span class="pin" style="left:296px;top:258px">1</span>
+      <span class="pin" style="left:296px;top:390px">2</span>
+      <span class="pin" style="left:296px;top:588px">3</span>
+    </div>
+    <div class="fnote">Expand centers the same panel at 720px over a scrim. 1 — tool pills are <code>describeTool</code>'s phrases, a <code>details</code> you can open for the raw output. 2 — a <code>tool_call_update</code> with a diff draws "Washi suggests an edit · page", old struck through, new in green. 3 — <code>receiptLine</code>: where it ran, how long, what it cost, the model; a plan turn reads "on your Claude plan · … · saved $0.23" instead.</div>
+  </article>
+  <div class="sticky" style="left:4140px;top:60px"><b>decided</b><ol><li>One door. The FAB and ⌘J; the header pill only speaks.</li><li>Words, never tool names: <code>describeTool</code> is the only way a tool reaches the screen.</li><li>The receipt is on every turn, routine or not. A team sees what it cost.</li></ol></div>
+</section>
+
+<!-- ───────────────────────── 2 · A TURN ───────────────────────── -->
+<section class="cv-group" data-name="A turn" data-note="ask → tools in words → the page lands, marked · Send becomes Stop while it runs · the only questions are the desk's">
+  <article class="frame" data-name="Ask → page lands" data-w="1280" data-h="800">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / netko-labs / p / shipped-this-week</span></div>
+      <div class="shell">
+        <aside class="side">
+          <div class="ws"><i></i>Netko Labs <span class="car">▾</span><span class="new">+</span></div>
+          <div class="it"><span class="g">⌕</span>Search<span class="n">⌘K</span></div>
+          <div class="it"><span class="g">⌂</span>Dashboard</div>
+          <div class="it"><span class="g">◫</span>Inbox</div>
+          <div class="it"><span class="g">⚙</span>Settings</div>
+          <div class="lbl">Pages</div>
+          <div class="it"><span class="tw">▸</span><span class="g">▤</span>Backlog</div>
+          <div class="it"><span class="tw">▸</span><span class="g">▥</span>Roadmap</div>
+          <div class="it"><span class="tw">▸</span><span class="g">☰</span>Wiki</div>
+          <div class="it on"><span class="tw">▸</span><span class="g">☷</span>Shipped this week</div>
+          <div class="foot">
+            <div class="srow2"><span class="l1"><i class="dot8"></i><b>Washi</b><span class="st">· Idle</span></span><span class="sub">today $0.61 of $25 · 7 turns</span></div>
+            <div class="user"><span class="av lg" style="--c:#a97f52">JV</span><div><div>Juan</div><div class="em">juan@netko.dev</div></div></div>
+          </div>
+        </aside>
+        <div class="content">
+          <div class="tabs"><span>▤ Backlog <span class="x">×</span></span><span class="on">☷ Shipped this week <span class="x">×</span></span><span class="plus">+</span></div>
+          <div class="hdr"><span class="crumb">Netko Labs / <b>Shipped this week</b></span><span class="sp"></span><span class="live">live</span><span class="avs"><span class="av" style="--c:#a97f52">JV</span><span class="av w">和</span></span><span class="apill"><i data-mascot="happy" data-size="17"></i>Washi done</span><span class="btn">Edit</span></div>
+          <div class="sheet" style="max-width:none;padding-right:460px">
+            <div class="wmark"><span class="sp2">✦</span>Washi wrote this just now<span class="u">↶ Undo</span></div>
+            <h1>Shipped this week</h1>
+            <p>Seven issues moved to done between Monday and today, from <b>issues</b>.</p>
+            <h3>Done</h3>
+            <p>• Auth refresh on reconnect · R</p><p>• Presence heartbeat, 15s · JV</p><p>• Trash restores a subtree under one stamp · JV</p><p>• Row pages rename with the row · R</p>
+            <h3>Slipped</h3>
+            <p>• CSV import — blocked on column typing</p><p>• Cover presets</p>
+          </div>
+        </div>
+      </div>
+      <div class="agent" style="max-height:640px">
+        <div class="ah"><i data-mascot="happy" data-size="26"></i><span class="ttl">Session 4<small>watching this workspace</small></span><span style="color:var(--s-mfg);font-size:11px">▾</span><span class="x"><span>⌫</span><span>⤢</span><span>×</span></span></div>
+        <div class="body">
+          <div class="me">What shipped this week? Write it up as a page.</div>
+          <div class="tool">▦ Looked at your tables</div>
+          <div class="tool">▤ Read issues</div>
+          <div class="tool">◷ Looked back through issues</div>
+          <div class="tool">＋ Create a page Shipped this week</div>
+          <div class="wtxt">Seven issues moved to done since Monday; two slipped. I put them on <b>Shipped this week</b> and opened it for you.</div>
+          <div class="rec">ran on your server · 24.1s · $0.19 · claude-sonnet-4-5</div>
+        </div>
+        <div class="compose"><div class="cbox"><div class="ph">Ask, or tell Washi what to write…</div><div class="row"><span class="plus">+</span><span>API key</span><span class="send dim">↑</span></div></div></div>
+      </div>
+      <div class="fab"><i data-mascot="happy bob" data-size="40" class="m"></i></div>
+      <span class="pin" style="left:842px;top:298px">1</span>
+      <span class="pin" style="left:286px;top:130px">2</span>
+      <span class="pin" style="left:1046px;top:62px">3</span>
+    </div>
+    <div class="fnote">The golden path. 1 — reads pass, the write lands: <code>sheet_create</code> is a <code>CHANGE_TOOL</code>, so nothing asked. 2 — the page opens itself (<code>onOpenSheetRequested</code> → <code>openTab</code>) with the <code>WashiMark</code>: "Washi wrote this just now · Undo", because <code>edited_by = 'washi'</code>. 3 — Washi is in the presence row for 20s after a write, and the header pill says done.</div>
+  </article>
+
+  <article class="frame" data-name="Tool activity in words" data-w="560" data-h="680">
+    <div class="app solo"><div class="agent"><div class="body" style="padding:18px">
+      <div class="lbl2">describeTool · action + subject</div>
+      <div class="tool">▦ Looked at your tables</div>
+      <div class="tool">▤ Read issues</div>
+      <div class="tool">◉ Read How we work</div>
+      <div class="tool">⌕ Searched for retro</div>
+      <div class="tool">⚲ Found links to Wiki</div>
+      <div class="tool">☺ Looked at who is on the team</div>
+      <div class="tool">◷ Looked back through issues</div>
+      <div class="tool">＋ Create a page Trip to Kyoto</div>
+      <div class="tool">✎ Update the page Weekly review</div>
+      <div class="tool">▦ Create a table projects</div>
+      <div class="tool">✚ Add “Cover presets” to issues</div>
+      <div class="tool">✎ Update rows in issues</div>
+      <div class="tool">◍ Visit docs.anthropic.com <span>…</span></div>
+      <div class="tool">⚡ Run url.open <span>…</span></div>
+      <div class="tool bad">◍ Visit example.org</div>
+      <div class="tool">▤ Read issues</div>
+      <div class="tout">id        title                     status
+01J…9F   Auth refresh on reconnect  done
+01J…A2   Presence heartbeat         done</div>
+    </div></div></div>
+    <div class="fnote">Every row is <code>describeTool(name, input, titleOf)</code>: ids become titles through the sheets store, a URL becomes its host, a row insert names the row. "…" pulses while in progress; red is <code>failed</code>; an opened pill shows the raw output. An unknown tool falls back to its name de-snaked — the one place a name could leak.</div>
+  </article>
+
+  <article class="frame" data-name="Page diff" data-w="560" data-h="420">
+    <div class="app solo"><div class="agent"><div class="body" style="padding:18px">
+      <div class="tool">✎ Update the page How we work</div>
+      <div class="dv">
+        <div class="h">Washi suggests an edit · How we work</div>
+        <div class="in"><pre class="old">&lt;Text&gt;Standup is daily at 9:30.&lt;/Text&gt;</pre><pre class="new">&lt;Text&gt;Standup is Monday and Thursday at 9:30; the Weekly review replaces Friday's.&lt;/Text&gt;</pre></div>
+      </div>
+      <div class="wtxt">Matched "How we work" to what the Weekly review page already says.</div>
+      <div class="rec">ran on your server · 12.8s · $0.07 · claude-sonnet-4-5</div>
+      <div style="height:6px"></div>
+      <div class="lbl2">on the page</div>
+      <div class="wmark"><span class="sp2">✦</span>Washi wrote this 2 min ago<span class="u">↶ Undo</span></div>
+      <div class="wmark"><span class="sp2">✦</span>Could not undo — the page changed since.</div>
+    </div></div></div>
+    <div class="fnote">The diff in the transcript is the write that already landed, 600 chars each side. Undo lives on the page, not here: each Washi write pushed the prior state onto <code>sheet_revisions</code>; <code>undoWashi</code> pops it, and a person's edit clears the stack — hence "Could not undo — the page changed since."</div>
+  </article>
+
+  <article class="frame" data-name="Cancel a running turn" data-w="440" data-h="600">
+    <div class="app solo"><div class="agent">
+      <div class="ah"><i data-mascot="curious" data-size="26"></i><span class="ttl">Session 4<small>editing Roadmap</small></span><span class="x"><span>⌫</span><span>⤢</span><span>×</span></span></div>
+      <div class="body">
+        <div class="me">Reorder the Roadmap by what the Backlog says is blocked.</div>
+        <div class="tool">▤ Read issues</div>
+        <div class="tool">◉ Read Roadmap</div>
+        <div class="tool">✎ Update the page Roadmap <span>…</span></div>
+        <div class="working"><i data-mascot="wink" data-size="20"></i>Washi is working…</div>
+        <div style="height:40px"></div>
+        <div class="lbl2">after Stop</div>
+        <div class="rec">stopped · ran on your server · 8.2s · $0.04 · claude-sonnet-4-5</div>
+      </div>
+      <div class="compose"><div class="cbox"><div class="ph">Ask, or tell Washi what to write…</div><div class="row"><span class="plus">+</span><span>API key</span><span class="send stop">■</span></div></div></div>
+      <span class="pin" style="left:392px;top:548px">1</span>
+    </div></div>
+    <div class="fnote">1 — while a turn runs Send becomes Stop (<code>agents.cancel</code>). Open approvals are answered "no" on the way out, the receipt is prefixed "stopped", and a second prompt is refused with 409 "A turn is already running in this conversation. Stop it first." Stop is never a way around the daily stop: the turn is still charged.</div>
+  </article>
+
+  <article class="frame" data-name="Questions" data-w="560" data-h="560">
+    <div class="app solo"><div class="agent">
+      <div class="ah"><i data-mascot="happy" data-size="26"></i><span class="ttl">Routine · Weekly review<small>editing Weekly review</small></span><span class="x"><span>⌫</span><span>⤢</span><span>×</span></span></div>
+      <div class="body">
+        <div class="me" style="justify-self:start;background:transparent;padding:0;border-radius:0;font-style:italic;color:var(--s-mfg)">Rewrite only the "This week" callout from what moved in issues. Link each item to its row.</div>
+        <div class="tool">◷ Looked back through issues</div>
+        <div class="tool">◍ Visit github.com <span>…</span></div>
+        <div class="working"><i data-mascot="curious" data-size="20"></i>Washi is working…</div>
+      </div>
+      <div style="margin:0 12px 8px">
+        <div class="ac">
+          <div class="hd"><span class="ic">◍</span><div style="min-width:0;flex:1"><div class="lead">Washi wants to · 1 more waiting</div><div class="what">Visit <b>github.com</b></div><div class="det">https://github.com/Netko-Labs/Washi/pull/44</div></div></div>
+          <div class="out">◍ This reaches outside your workspace, so it always asks.</div>
+          <div class="acts"><span class="always">Always allow this site</span><span class="sp"></span><span class="btn">Not now</span><span class="btn pri">Allow</span></div>
+        </div>
+      </div>
+      <div class="compose"><div class="cbox"><div class="ph">Ask, or tell Washi what to write…</div><div class="row"><span class="plus">+</span><span>API key</span><span class="send stop">■</span></div></div></div>
+      <span class="pin" style="left:520px;top:300px">1</span>
+    </div></div>
+    <div class="fnote">Washi has exactly one kind of question: the desk's. There is no free-text ask tool and no answer chips — a question is an <code>ApprovalCard</code> above the composer, queued ("1 more waiting"). 1 — unanswered, a live turn's question is a denial after 5 minutes; a scheduled routine's waits 12 hours (<code>waitLonger</code>), so the morning finds it in the Inbox, not timed out.</div>
+  </article>
+
+  <article class="frame" data-name="Questions · answer chips · proposed" data-w="440" data-h="360">
+    <div class="app solo"><div class="agent">
+      <div class="body">
+        <div class="me">Plan the Kyoto offsite page.</div>
+        <div class="tool">◉ Read Ideas</div>
+        <div class="wtxt">Two options from Ideas — which do you want the page built around?</div>
+        <div class="ask"><span>Three days, one venue</span><span>Two days, two cities</span><span>Something else…</span></div>
+      </div>
+      <div class="compose"><div class="cbox"><div class="ph">Ask, or tell Washi what to write…</div><div class="row"><span class="plus">+</span><span>API key</span><span class="send dim">↑</span></div></div></div>
+    </div></div>
+    <div class="fnote"><b>Proposed, not built.</b> An <code>ask_person</code> tool would park the turn like an approval does and render choices as chips; the kit's <code>.ask</code> already exists for it. Until then Washi guesses and writes, and Undo is the answer.</div>
+  </article>
+  <div class="sticky" style="left:4440px;top:60px"><b>decided</b><ol><li>Reads pass. Page and table writes land, marked. <code>fetch_url</code> and <code>action_run</code> stop at the desk — always.</li><li>Undo belongs to the page, and a person's edit empties it. Washi never erases their words.</li><li>Stop is honoured and still charged.</li></ol></div>
+</section>
+
+<!-- ───────────────────────── 3 · THE DESK ───────────────────────── -->
+<section class="cv-group" data-name="The desk" data-note="ApprovalDesk: what leaves the server asks · the same card in the panel, the Dashboard's Needs you and the Inbox · the daily stop is a breaker, not a quota">
+  <article class="frame" data-name="Approval · fetch URL" data-w="1100" data-h="490">
+    <div class="app"><div class="cols2">
+      <div>
+        <div class="lbl2" style="margin-bottom:10px">in the panel · above the composer</div>
+        <div class="ac">
+          <div class="hd"><span class="ic">◍</span><div style="min-width:0;flex:1"><div class="lead">Washi wants to</div><div class="what">Visit <b>docs.anthropic.com</b></div><div class="det">https://docs.anthropic.com/en/docs/agent-sdk/overview</div></div></div>
+          <div class="out">◍ This reaches outside your workspace, so it always asks.</div>
+          <div class="acts"><span class="always">Always allow this site</span><span class="sp"></span><span class="btn">Not now</span><span class="btn pri">Allow</span></div>
+        </div>
+        <p class="note" style="margin-top:14px"><b>tsuru</b> gates the URL before the desk ever sees it: https only, port 443, no credentials, never loopback or a private range. <code>allowedHosts</code> takes exact names or <code>*.suffix</code>; "Always allow this site" writes the host there, so the next visit passes without a card.</p>
+      </div>
+      <div>
+        <div class="lbl2" style="margin-bottom:10px">in the Inbox · the same card</div>
+        <div class="ibx" style="padding:0;max-width:none">
+          <h1 style="font-size:20px">Inbox</h1>
+          <p class="lead" style="font-size:12.5px;margin-bottom:14px">Everything Washi wants you to look at, in one queue.</p>
+          <div class="ac">
+            <div class="hd"><span class="ic">◍</span><div style="min-width:0;flex:1"><div class="lead">Washi wants to</div><div class="what">Visit <b>docs.anthropic.com</b></div><div class="det">https://docs.anthropic.com/en/docs/agent-sdk/overview</div></div></div>
+            <div class="out">◍ This reaches outside your workspace, so it always asks.</div>
+            <div class="acts"><span class="always">Always allow this site</span><span class="sp"></span><span class="btn">Not now</span><span class="btn pri">Allow</span></div>
+          </div>
+          <span class="lbl2">Earlier</span>
+          <div class="turn"><i></i><div><div class="q">What shipped this week? Write it up as a page.</div><div class="rec">ran on your server · 24.1s · $0.19 · claude-sonnet-4-5</div></div></div>
+          <div class="turn"><i></i><div><div class="q">Routine · Weekly review</div><div class="rec">ran on your server · 31.4s · $0.23 · claude-sonnet-4-5</div></div></div>
+        </div>
+      </div>
+    </div></div>
+    <div class="fnote">One component, three places: the panel's <code>ApprovalBar</code> (first of the queue, "· N more waiting"), the Dashboard's Needs you box, and the Inbox, which lists every pending request then the last day's turns with their receipts. The buttons are <b>Allow</b> · <b>Not now</b> · <b>Always allow this site</b> — never Approve/Deny. <code>agents.pendingApprovals</code> means a panel opened late still sees the card.</div>
+  </article>
+
+  <article class="frame" data-name="Approval · action" data-w="560" data-h="420">
+    <div class="app"><div class="pad">
+      <div class="ac">
+        <div class="hd"><span class="ic">⚡</span><div style="min-width:0;flex:1"><div class="lead">Washi wants to</div><div class="what">Run <b>url.open</b></div></div></div>
+        <div class="out">◍ This reaches outside your workspace, so it always asks.</div>
+        <div class="acts"><span class="always">Allow for this chat</span><span class="sp"></span><span class="btn">Not now</span><span class="btn pri">Allow</span></div>
+      </div>
+      <p class="note"><b>hanko</b> is a closed registry of eight verbs: <code>sheet.open · sheet.create · table.insert · table.update · table.reorder · table.delete · table.column · url.open</code>. Seven are reversible and stay inside the workspace; <code>url.open</code> is the only one that leaves. <code>action_run</code> is outbound as a tool regardless, so Washi running any verb stops here; a person clicking one in a sheet is consent.</p>
+      <p class="note">"Always" reads <b>Allow for this chat</b> for an action — the grant is per session, not per site.</p>
+    </div></div>
+    <div class="fnote">An action card says the verb as its subject ("Run url.open"): verbs are the one vocabulary the page author also writes, so they stay literal. A <code>sheet_create</code> card would carry a "Show preview" of the page rendered inert — only reachable today when a write is parked behind an earlier outbound question.</div>
+  </article>
+
+  <article class="frame" data-name="Writes land, marked" data-w="1280" data-h="800">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / netko-labs / p / how-we-work</span></div>
+      <div class="shell">
+        <aside class="side">
+          <div class="ws"><i></i>Netko Labs <span class="car">▾</span><span class="new">+</span></div>
+          <div class="it"><span class="g">⌕</span>Search<span class="n">⌘K</span></div>
+          <div class="it"><span class="g">⌂</span>Dashboard</div>
+          <div class="it"><span class="g">◫</span>Inbox</div>
+          <div class="it"><span class="g">⚙</span>Settings</div>
+          <div class="lbl">Pages</div>
+          <div class="it"><span class="tw">▸</span><span class="g">▤</span>Backlog</div>
+          <div class="it"><span class="tw">▾</span><span class="g">☰</span>Wiki</div>
+          <div class="it ind on"><span class="tw"></span><span class="g">·</span>How we work</div>
+          <div class="it"><span class="tw">▸</span><span class="g">☷</span>Weekly review</div>
+          <div class="foot">
+            <div class="srow2"><span class="l1"><i class="dot8"></i><b>Washi</b><span class="st">· Idle</span></span><span class="sub">today $0.68 of $25 · 8 turns</span></div>
+            <div class="user"><span class="av lg" style="--c:#a97f52">JV</span><div><div>Juan</div><div class="em">juan@netko.dev</div></div></div>
+          </div>
+        </aside>
+        <div class="content">
+          <div class="tabs"><span class="on">· How we work <span class="x">×</span></span><span class="plus">+</span></div>
+          <div class="hdr"><span class="crumb">Netko Labs / Wiki / <b>How we work</b></span><span class="sp"></span><span class="live">live</span><span class="avs"><span class="av" style="--c:#7a6a9c">R</span><span class="av w">和</span></span><span class="apill"><i data-mascot="happy" data-size="17"></i>Washi done</span><span class="btn">Comments</span><span class="btn">Edit</span><span class="btn ghost icon">⋯</span></div>
+          <div class="sheet">
+            <div class="chrome"><span>☺ Add icon</span><span>▭ Add cover</span><span>💬 Add comment</span></div>
+            <div class="wmark"><span class="sp2">✦</span>Washi wrote this 2 min ago<span class="u">↶ Undo</span></div>
+            <h1>How we work</h1>
+            <p>Meetings, review, shipping. Short on purpose.</p>
+            <h3>Meetings</h3>
+            <p>Standup is Monday and Thursday at 9:30; the Weekly review replaces Friday's.</p>
+            <div class="washi"><div class="by"><i data-mascot="happy" data-size="16"></i>Washi · 2 min ago<span class="u">Undo</span></div>Review happens on the page, not in a meeting: comment, mention, resolve. Washi rewrites "This week" every day at 17:00 and nothing else.</div>
+            <h3>Shipping</h3>
+            <p>A PR is context for Washi, never a review. Asks come from pages, tables and the week's ops.</p>
+          </div>
+        </div>
+      </div>
+      <div class="fab"><i data-mascot="happy bob" data-size="40" class="m"></i></div>
+      <span class="pin" style="left:296px;top:174px">1</span>
+      <span class="pin" style="left:296px;top:384px">2</span>
+    </div>
+    <div class="fnote">1 — the whole-page mark: <code>WashiMark</code> in the page chrome, shown when the sheet's <code>edited_by = 'washi'</code>, with Undo while <code>undoable</code>. 2 — the kit's indigo-bar block is the <em>design</em> for a block-level mark; the studio marks the page, not the paragraph, today. Either way the undo stack is <code>sheet_revisions</code> and a person's edit clears it.</div>
+  </article>
+
+  <article class="frame" data-name="Daily stop reached" data-w="1280" data-h="800">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / netko-labs / settings?tab=agent</span></div>
+      <div class="shell">
+        <aside class="side">
+          <div class="ws"><i></i>Netko Labs <span class="car">▾</span><span class="new">+</span></div>
+          <div class="it"><span class="g">⌕</span>Search<span class="n">⌘K</span></div>
+          <div class="it"><span class="g">⌂</span>Dashboard</div>
+          <div class="it"><span class="g">◫</span>Inbox</div>
+          <div class="it on"><span class="g">⚙</span>Settings</div>
+          <div class="lbl">Pages</div>
+          <div class="it"><span class="tw">▸</span><span class="g">▤</span>Backlog</div>
+          <div class="it"><span class="tw">▸</span><span class="g">☰</span>Wiki</div>
+          <div class="it"><span class="tw">▸</span><span class="g">☷</span>Weekly review</div>
+          <div class="foot">
+            <div class="srow2"><span class="l1"><i class="dot8 pause"></i><b>Washi</b><span class="st">· Paused · daily stop</span></span><span class="sub">today $25.13 of $25 · 61 turns</span></div>
+            <div class="user"><span class="av lg" style="--c:#a97f52">JV</span><div><div>Juan</div><div class="em">juan@netko.dev</div></div></div>
+          </div>
+        </aside>
+        <div class="content">
+          <div class="tabs"><span class="on">⚙ Settings <span class="x">×</span></span><span class="plus">+</span></div>
+          <div class="hdr"><span class="crumb"><b>Settings</b></span></div>
+          <div class="settings2" style="padding-top:30px">
+            <h1>Settings</h1><p class="lead">What Washi thinks with, and what it cost today.</p>
+            <div class="stabs"><span class="on">⚙ Agent</span><span>☺ People</span><span>↻ Routines</span></div>
+            <div class="sec2" style="margin-top:0;padding-top:0;border:0">
+              <h2>Daily stop</h2>
+              <p class="p">At the daily stop Washi pauses until tomorrow. Anyone on the team can resume it. A safety stop, not a quota — Washi is open source and there is no plan to buy.</p>
+              <div class="stoprow"><span class="d">$</span><span class="in">25</span><span class="a">a day</span></div>
+              <dl class="stats"><div><dt>Today</dt><dd>$25.13</dd></div><div><dt>Turns</dt><dd>61 / 200</dd></div><div><dt>Stop</dt><dd>$25</dd></div></dl>
+              <div class="paused"><b>Washi is paused.</b><p>It reached today's stop. Resuming gives it one more day's worth of headroom.</p><span class="bigbtn">Resume</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="pop" style="position:absolute;right:24px;bottom:24px;width:400px;padding:12px">
+        <div class="lbl2" style="margin-bottom:8px">what the panel says</div>
+        <div class="err">⚠ This workspace has spent $25.13 of its $25 daily stop. Resume or raise it in settings.</div>
+        <div class="lbl2" style="margin:12px 0 6px">what Run now says</div>
+        <div class="err">⚠ Washi is at its daily stop. Resume it first.</div>
+      </div>
+      <span class="pin" style="left:220px;top:706px">1</span>
+      <span class="pin" style="left:776px;top:470px">2</span>
+    </div>
+    <div class="fnote">1 — the sidebar row goes dark and leads to Settings instead of the panel. 2 — <code>DailyBudget</code>: spend or turns past the cap since the last Resume trips the breaker; only a person clears it, and Resume grants a full day of headroom from that point. Metered dollars alone move the dollar line — a plan turn lands in <code>saved_usd</code> — but every turn counts toward 200.</div>
+  </article>
+  <div class="sticky" style="left:4540px;top:60px"><b>decided</b><ol><li>Nothing leaves without a person. The desk is for fetch and actions only; it is not a review queue for pages.</li><li>A team server never bills one person's plan: hosted has no local-CLI branch at all.</li><li>The stop is checked at start and charged at end. That is why one routine runs at a time.</li></ol></div>
+</section>
+
+<!-- ───────────────────────── 4 · STATUS ───────────────────────── -->
+<section class="cv-group" data-name="Status" data-note="agents.status polled every 5s, agents.inference every 15s · the sidebar row, the header pill, presence">
+  <article class="frame" data-name="Sidebar status row" data-w="1000" data-h="230">
+    <div class="app"><div class="cols3" style="grid-template-columns:repeat(4,1fr);padding:18px">
+      <aside class="side" style="border:1px solid var(--s-border);border-radius:10px;min-height:0;padding:8px 8px 4px">
+        <div class="srow2" style="border:0;margin:0"><span class="l1"><i class="dot8"></i><b>Washi</b><span class="st">· Idle</span></span><span class="sub">today $0.42 of $25 · 6 turns</span></div>
+        <div class="srow2" style="border:0;margin:0"><span class="l1"><i class="dot8 work"></i><b>Washi</b><span class="st">· Working</span></span><span class="sub">today $0.61 of $25 · 7 turns</span></div>
+        <div class="srow2" style="border:0;margin:0"><span class="l1"><i class="dot8 need"></i><b>Washi</b><span class="st">· Needs you</span></span><span class="sub">today $0.61 of $25 · 7 turns</span></div>
+      </aside>
+      <aside class="side" style="border:1px solid var(--s-border);border-radius:10px;min-height:0;padding:8px 8px 4px">
+        <div class="srow2" style="border:0;margin:0"><span class="l1"><i class="dot8 pause"></i><b>Washi</b><span class="st">· Paused · daily stop</span></span><span class="sub">today $25.13 of $25 · 61 turns</span></div>
+        <div class="srow2" style="border:0;margin:0"><span class="l1"><i class="dot8 sleep"></i><b>Washi</b><span class="st">· Asleep · no key</span></span><span class="sub">today $0.00 of $25 · 0 turns</span></div>
+      </aside>
+      <aside class="side" style="border:1px solid var(--s-border);border-radius:10px;min-height:0;padding:8px 8px 4px">
+        <div class="lbl2" style="padding:4px 8px">desktop · on a plan</div>
+        <div class="srow2" style="border:0;margin:0"><span class="l1"><i class="dot8"></i><b>Washi</b><span class="st">· Idle</span></span><span class="sub">today $0.00 of $25 · 6 turns · saved $1.10</span></div>
+      </aside>
+      <div class="note">Five states, one row (<code>AgentStatus</code>). <b>Needs you</b> wins over Working: a turn waiting on a person is stuck, not busy. Idle / Working / Needs you open the panel; Paused and Asleep open Settings, because a key or a Resume is what they need. The dot is the only colour — the signal orange is reserved for Washi asking.</div>
+    </div></div>
+    <div class="fnote">The second line is <code>today {cost} of ${cap} · {turns} turn(s)</code>, plus "· saved $x" when a plan paid for any of it. "Asleep" comes from a separate poll of <code>agents.inference</code> (<code>active === null</code>) and overrides whatever the activity poll says. The shell page's "Awake" is not a label the code has.</div>
+  </article>
+
+  <article class="frame" data-name="Header pill · flagged" data-w="1280" data-h="800">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / netko-labs / p / roadmap</span></div>
+      <div class="shell">
+        <aside class="side">
+          <div class="ws"><i></i>Netko Labs <span class="car">▾</span><span class="new">+</span></div>
+          <div class="it"><span class="g">⌕</span>Search<span class="n">⌘K</span></div>
+          <div class="it"><span class="g">⌂</span>Dashboard</div>
+          <div class="it"><span class="g">◫</span>Inbox</div>
+          <div class="it"><span class="g">⚙</span>Settings</div>
+          <div class="lbl">Pages</div>
+          <div class="it"><span class="tw">▸</span><span class="g">▤</span>Backlog</div>
+          <div class="it on"><span class="tw">▸</span><span class="g">▥</span>Roadmap</div>
+          <div class="it"><span class="tw">▸</span><span class="g">☰</span>Wiki</div>
+          <div class="foot">
+            <div class="srow2"><span class="l1"><i class="dot8"></i><b>Washi</b><span class="st">· Idle</span></span><span class="sub">today $0.66 of $25 · 8 turns</span></div>
+            <div class="user"><span class="av lg" style="--c:#a97f52">JV</span><div><div>Juan</div><div class="em">juan@netko.dev</div></div></div>
+          </div>
+        </aside>
+        <div class="content">
+          <div class="tabs"><span class="on">▥ Roadmap <span class="x">×</span></span><span class="plus">+</span></div>
+          <div class="hdr"><span class="crumb">Netko Labs / <b>Roadmap</b></span><span class="sp"></span><span class="apill"><i data-mascot="dizzy" data-size="17"></i>Washi flagged an issue</span><span class="btn">Edit</span><span class="btn ghost icon">⋯</span></div>
+          <div class="sheet"><h1>Roadmap</h1><p>Q4 by project, from <b>projects</b> and <b>issues</b>.</p><div class="gantt"><div class="gl">Studio shell</div><div class="gt"><span class="bar" style="left:4%;width:38%">shipped</span></div><div class="gl">Agent desk</div><div class="gt"><span class="bar" style="left:30%;width:40%;--c:#3d5a73">in progress</span></div><div class="gl">Local mode</div><div class="gt"><span class="bar" style="left:62%;width:34%;--c:#8f887c">phase 7</span></div></div></div>
+        </div>
+      </div>
+      <div class="agent" style="max-height:420px">
+        <div class="ah"><i data-mascot="dizzy" data-size="26"></i><span class="ttl">Session 5<small>watching this workspace</small></span><span class="x"><span>⌫</span><span>⤢</span><span>×</span></span></div>
+        <div class="body">
+          <div class="me">Move "Local mode" into Q4 on the Roadmap.</div>
+          <div class="tool">◉ Read Roadmap</div>
+          <div class="tool bad">✎ Update the page Roadmap</div>
+          <div class="err">⚠ the merge broke the page's WSX: &lt;Gantt&gt; needs a start on every &lt;Bar&gt;</div>
+        </div>
+        <div class="compose"><div class="cbox"><div class="ph">Ask, or tell Washi what to write…</div><div class="row"><span class="plus">+</span><span>API key</span><span class="send dim">↑</span></div></div></div>
+      </div>
+      <div class="pop" style="position:absolute;left:300px;bottom:24px;width:520px;padding:12px">
+        <div class="lbl2" style="margin-bottom:8px">Inbox · Earlier</div>
+        <div class="turn" style="margin:0"><i></i><div><div class="q">Move "Local mode" into Q4 on the Roadmap.</div><div class="rec" style="color:var(--s-bad)">the merge broke the page's WSX: &lt;Gantt&gt; needs a start on every &lt;Bar&gt;</div></div></div>
+      </div>
+      <span class="pin" style="left:1006px;top:84px">1</span>
+      <span class="pin" style="left:1232px;top:446px">2</span>
+    </div>
+    <div class="fnote">1 — <code>STATE_LABELS.flagged</code>: the pill is dashed in the agent colour and only rendered on a page view at <code>@xl</code>. It is the mascot's mood in words, not a link. 2 — flagged means the last <code>turn_done</code> was an error: the transcript shows the message in red, and the Inbox's Earlier list carries the same text where the receipt would be.</div>
+  </article>
+
+  <article class="frame" data-name="Presence · Washi on a page" data-w="1280" data-h="420">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / netko-labs / p / weekly-review</span></div>
+      <div class="content" style="height:calc(100% - 30px);min-height:0">
+        <div class="tabs"><span class="on">☷ Weekly review <span class="x">×</span></span><span class="plus">+</span></div>
+        <div class="hdr"><span class="crumb">Netko Labs / <b>Weekly review</b> · edited just now</span><span class="btn ghost icon">☆</span><span class="sp"></span><span class="live">live</span><span class="avs"><span class="av" style="--c:#7a6a9c">R</span><span class="av" style="--c:#a97f52">JV</span><span class="av w">和</span></span><span class="apill"><i data-mascot="wink" data-size="17"></i>Washi writing</span><span class="btn">Comments</span><span class="btn">Edit</span></div>
+        <div class="sheet">
+          <h1>Weekly review</h1>
+          <div class="callout"><span class="ic">◷</span><div><b>This week</b><br />7 issues moved to done — auth refresh, presence heartbeat, trash restore. Two slipped: CSV import, cover presets.</div></div>
+          <div class="cursor" style="left:560px;top:238px"><span style="color:#3d5a73">↖</span><span class="tag">Washi</span></div>
+        </div>
+      </div>
+      <span class="pin" style="left:1008px;top:84px">1</span>
+    </div>
+    <div class="fnote">1 — <code>watchAgentWrites</code> touches presence with <code>{ id: 'washi', name: 'Washi', agent: true, editing: true }</code> on every <code>sheet_replace</code>, TTL 20s (<code>AGENT_PRESENCE_TTL_MS</code>); people are a 15s heartbeat. The 和 avatar is the agent colour. The cursor tag is the kit's — the studio shows avatars, not a caret, for Washi.</div>
+  </article>
+  <div class="sticky" style="left:3870px;top:60px"><b>why polled</b><ol><li>Status is a glance; a stale second costs nothing. 5s for activity, 15s for inference because a hosted check decrypts the key.</li><li>Presence is memory, never a record. Nothing to migrate when it changes.</li></ol></div>
+</section>
+
+<!-- ───────────────────────── 5 · SETTINGS › AGENT ───────────────────────── -->
+<section class="cv-group" data-name="Settings › Agent" data-note="/settings?tab=agent · one workspace key for the whole team · the daily stop in USD · the turn cap behind it">
+  <article class="frame" data-name="Settings · Agent" data-w="1280" data-h="800">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / netko-labs / settings?tab=agent</span></div>
+      <div class="shell">
+        <aside class="side">
+          <div class="ws"><i></i>Netko Labs <span class="car">▾</span><span class="new">+</span></div>
+          <div class="it"><span class="g">⌕</span>Search<span class="n">⌘K</span></div>
+          <div class="it"><span class="g">⌂</span>Dashboard</div>
+          <div class="it"><span class="g">◫</span>Inbox</div>
+          <div class="it on"><span class="g">⚙</span>Settings</div>
+          <div class="lbl">Pages</div>
+          <div class="it"><span class="tw">▸</span><span class="g">▤</span>Backlog</div>
+          <div class="it"><span class="tw">▸</span><span class="g">☰</span>Wiki</div>
+          <div class="foot">
+            <div class="srow2"><span class="l1"><i class="dot8"></i><b>Washi</b><span class="st">· Idle</span></span><span class="sub">today $0.42 of $25 · 6 turns</span></div>
+            <div class="user"><span class="av lg" style="--c:#a97f52">JV</span><div><div>Juan</div><div class="em">juan@netko.dev</div></div></div>
+          </div>
+        </aside>
+        <div class="content">
+          <div class="tabs"><span class="on">⚙ Settings <span class="x">×</span></span><span class="plus">+</span></div>
+          <div class="hdr"><span class="crumb"><b>Settings</b></span></div>
+          <div class="settings2" style="padding-top:30px">
+            <h1>Settings</h1><p class="lead">What Washi thinks with, and what it cost today.</p>
+            <div class="stabs"><span class="on">⚙ Agent</span><span>☺ People</span><span>↻ Routines</span></div>
+            <h2>Agent key</h2>
+            <p class="p">Washi runs on your server with one model key for the whole workspace. Nobody on the team needs their own.</p>
+            <div class="keyline">anthropic · ••••k9Qz · claude-sonnet-4-5</div>
+            <div class="prov"><span class="on">Anthropic</span><span>OpenRouter</span></div>
+            <div class="fld"><span class="l">API key</span><span class="in">sk-ant-…</span><span class="h">Encrypted on your server. You will see the last four and never the rest.</span></div>
+            <div class="fld"><span class="l">Model <em>— optional; a sensible one is chosen otherwise</em></span><span class="in sans" style="color:#a39b8d">Search 48 models…</span></div>
+            <span class="bigbtn dis">Replace key</span>
+          </div>
+        </div>
+      </div>
+      <span class="pin" style="left:1040px;top:324px">1</span>
+      <span class="pin" style="left:1040px;top:466px">2</span>
+    </div>
+    <div class="fnote">Hosted settings have no credential picker: a team server runs the workspace's key and nothing else (<code>setInference</code> is embedded-only and answers 412 here). 1 — the stored key shows as provider · last four · model. 2 — the key is encrypted with a per-workspace key derived from <code>WASHI_SECRET_KEY</code>; rotate that and every stored key is unreadable. The Daily stop section (previous group) follows below the fold; the turn cap (200) has no field — it is the backstop for unpriced models.</div>
+  </article>
+
+  <article class="frame" data-name="Key form · states" data-w="1180" data-h="480">
+    <div class="app"><div class="cols3">
+      <div>
+        <div class="lbl2" style="margin-bottom:6px">empty · first key</div>
+        <div class="prov" style="margin-top:8px"><span class="on">Anthropic</span><span>OpenRouter</span></div>
+        <div class="fld"><span class="l">API key</span><span class="in">sk-ant-…</span><span class="h">Encrypted on your server. You will see the last four and never the rest.</span></div>
+        <span class="bigbtn dis" style="margin-top:14px">Save key</span>
+      </div>
+      <div>
+        <div class="lbl2" style="margin-bottom:6px">saved · replacing</div>
+        <div class="keyline" style="margin-top:8px">openrouter · ••••7Hx2 · anthropic/claude-sonnet-4.5</div>
+        <div class="prov" style="margin-top:8px"><span>Anthropic</span><span class="on">OpenRouter</span></div>
+        <div class="fld"><span class="l">API key</span><span class="in v">••••••••••••••••••••••••</span><span class="h">Encrypted on your server. You will see the last four and never the rest.</span></div>
+        <span class="bigbtn" style="margin-top:14px">Replace key</span>
+      </div>
+      <div>
+        <div class="lbl2" style="margin-bottom:6px">invalid · the server said no</div>
+        <div class="prov" style="margin-top:8px"><span class="on">Anthropic</span><span>OpenRouter</span></div>
+        <div class="fld"><span class="l">API key</span><span class="in v">sk-ant-api03-…</span><span class="h">Encrypted on your server. You will see the last four and never the rest.</span></div>
+        <span class="bigbtn" style="margin-top:14px">Save key</span>
+        <p class="err2" style="margin-top:14px">TRPCError: the key was refused by anthropic (401)</p>
+      </div>
+    </div></div>
+    <div class="fnote">Save is disabled under 8 characters and while busy; the secret is cleared only after a successful save. Picking the other provider resets key and model. Errors are the raw <code>String(cause)</code> under the form — a message in words would be an improvement. models.dev unreachable adds "models.dev is unreachable — showing a bundled list." in amber under the picker.</div>
+  </article>
+
+  <article class="frame" data-name="Model picker" data-w="560" data-h="560">
+    <div class="app"><div class="pad">
+      <div class="fld" style="margin-top:0"><span class="l">Model <em>— optional; a sensible one is chosen otherwise</em></span><span class="in sans v">son</span></div>
+      <div class="mp">
+        <div class="r on"><span style="min-width:0;flex:1"><span class="n">Claude Sonnet 4.5</span><span class="id">claude-sonnet-4-5</span></span><span class="pr">$3/$15<br />per MTok</span></div>
+        <div class="r"><span style="min-width:0;flex:1"><span class="n">Claude Sonnet 4</span><span class="id">claude-sonnet-4-20250514</span></span><span class="pr">$3/$15<br />per MTok</span></div>
+        <div class="r"><span style="min-width:0;flex:1"><span class="n">Claude 3.7 Sonnet</span><span class="id">claude-3-7-sonnet-20250219</span></span><span class="pr">$3/$15<br />per MTok</span></div>
+        <div class="r"><span style="min-width:0;flex:1"><span class="n">Claude Opus 4.1</span><span class="id">claude-opus-4-1</span></span><span class="pr">$15/$75<br />per MTok</span></div>
+        <div class="r"><span style="min-width:0;flex:1"><span class="n">Auto Router</span><span class="id">openrouter/auto</span></span><span class="pr un">unpriced</span></div>
+      </div>
+      <p class="note">Filtered to the chosen provider, then searched by name or id, capped at 60 rows. The price is shown because the daily stop is denominated in it; an <b>unpriced</b> model contributes $0 to that line forever, which is why the 200-turn cap exists.</p>
+    </div></div>
+    <div class="fnote">The catalogue is <code>models.list</code> (models.dev, bundled fallback). Empty states: "Loading models…" and "Nothing matches that." The desktop's local Claude Code has a separate four-way choice — default · opus · sonnet · haiku — that this picker never shows.</div>
+  </article>
+  <div class="sticky" style="left:3330px;top:60px"><b>decided</b><ol><li>BYOK per workspace, not per person. One key, the team's spend, one stop.</li><li>The secret never comes back: last four, provider, model.</li><li><code>WASHI_SECRET_KEY</code> is the session secret and the key root. One rotation, two consequences — written down.</li></ol></div>
+</section>
+
+<!-- ───────────────────────── 6 · ROUTINES ───────────────────────── -->
+<section class="cv-group" data-name="Routines" data-note="/settings?tab=routines · the server's minute clock · one run in flight per workspace · marked before it runs">
+  <article class="frame" data-name="Settings · Routines" data-w="1280" data-h="800">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / netko-labs / settings?tab=routines</span></div>
+      <div class="shell">
+        <aside class="side">
+          <div class="ws"><i></i>Netko Labs <span class="car">▾</span><span class="new">+</span></div>
+          <div class="it"><span class="g">⌕</span>Search<span class="n">⌘K</span></div>
+          <div class="it"><span class="g">⌂</span>Dashboard</div>
+          <div class="it"><span class="g">◫</span>Inbox</div>
+          <div class="it on"><span class="g">⚙</span>Settings</div>
+          <div class="lbl">Pages</div>
+          <div class="it"><span class="tw">▸</span><span class="g">▤</span>Backlog</div>
+          <div class="it"><span class="tw">▸</span><span class="g">☷</span>Weekly review</div>
+          <div class="foot">
+            <div class="srow2"><span class="l1"><i class="dot8"></i><b>Washi</b><span class="st">· Idle</span></span><span class="sub">today $0.65 of $25 · 7 turns</span></div>
+            <div class="user"><span class="av lg" style="--c:#a97f52">JV</span><div><div>Juan</div><div class="em">juan@netko.dev</div></div></div>
+          </div>
+        </aside>
+        <div class="content">
+          <div class="tabs"><span class="on">⚙ Settings <span class="x">×</span></span><span class="plus">+</span></div>
+          <div class="hdr"><span class="crumb"><b>Settings</b></span></div>
+          <div class="settings2" style="padding-top:12px">
+            <h1>Settings</h1><p class="lead">What Washi does while nobody is watching.</p>
+            <div class="stabs" style="margin-bottom:14px"><span>⚙ Agent</span><span>☺ People</span><span class="on">↻ Routines</span></div>
+            <h2 style="font-size:14px">Routines</h2>
+            <p class="p" style="font-size:13px">Prompts Washi runs on its own, once a day. What they write waits under Needs you.</p>
+            <div style="margin-top:8px">
+              <div class="rt first"><span class="tm">17:00</span><span class="mid"><span class="t">Weekly review</span><span class="pr">Rewrite only the "This week" callout in the Weekly review from what moved in issues. Link each item to its row.</span><span class="last">last ran 2026-10-20</span></span><span class="ops"><span class="tg"></span><span>▷</span><span>🗑</span></span></div>
+              <div class="rt"><span class="tm">07:00</span><span class="mid"><span class="t">Morning digest</span><span class="pr">Read the pages changed yesterday and update a page titled "Digest" with what moved.</span><span class="last">last ran 2026-10-21</span></span><span class="ops"><span class="tg"></span><span>▷</span><span>🗑</span></span></div>
+              <div class="rt"><span class="tm">09:30 Asia/Tokyo</span><span class="mid"><span class="t off">Standup notes</span><span class="pr">Summarise yesterday's comments on Backlog rows into the Wiki's Standup page.</span></span><span class="ops"><span class="tg off"></span><span>▷</span><span>🗑</span></span></div>
+            </div>
+            <div class="rform">
+              <div class="row"><span class="in">Morning digest</span><span class="in mono">07:00</span></div>
+              <span class="in ta">Read the pages changed yesterday and update a page titled "Digest" with what moved.</span>
+              <div class="ft"><span class="bigbtn dis" style="margin:0;height:44px;font-size:13.5px">Add routine</span><span>Runs daily at that time, on your clock. Anything it writes waits for you.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <span class="pin" style="left:452px;top:294px">1</span>
+      <span class="pin" style="left:1000px;top:294px">2</span>
+    </div>
+    <div class="fnote">1 — a row is time · title · prompt · "last ran YYYY-MM-DD". The zone is shown only when it is not this device's (<code>routineTime</code>); there is no "next run" column — next is simply that minute on the next day it has not run. 2 — toggle, Run now, delete. No editor: a routine is created once; to change it, delete and add. The seeded team space ships the 17:00 Weekly review routine in the asker's zone.</div>
+  </article>
+
+  <article class="frame" data-name="Routine · new" data-w="700" data-h="380">
+    <div class="app"><div class="pad">
+      <div class="rform" style="margin:0">
+        <div class="row"><span class="in v">Weekly review</span><span class="in mono">17:00</span></div>
+        <span class="in ta v" style="color:var(--s-fg)">Rewrite only the "This week" callout in the Weekly review from what moved in issues. Link each item to its row.</span>
+        <div class="ft"><span class="bigbtn" style="margin:0;height:44px;font-size:13.5px">Add routine</span><span>Runs daily at that time, on your clock. Anything it writes waits for you.</span></div>
+      </div>
+      <p class="note">Three fields: name, a native <code>time</code> input, the prompt. The zone is never typed — <code>deviceTimeZone()</code> travels with the minute, so 17:00 means 17:00 where the person sat when they wrote it. No "which page": the prompt names the page in words, like any turn.</p>
+    </div></div>
+    <div class="fnote">Saved with <code>lastRunDay</code> already set when today's minute has passed, so nothing fires on save — or on re-enable (<code>alreadyPassed</code>). Pausing then resuming later in the day likewise skips today. The helper copy under the button is slightly stale: page and table writes land marked; only a fetch or action waits.</div>
+  </article>
+
+  <article class="frame" data-name="Routine · run receipt" data-w="440" data-h="620">
+    <div class="app solo"><div class="agent">
+      <div class="ah"><i data-mascot="happy" data-size="26"></i><span class="ttl">Routine · Weekly review<small>watching this workspace</small></span><span class="x"><span>⌫</span><span>⤢</span><span>×</span></span></div>
+      <div class="body">
+        <div class="me" style="justify-self:start;background:transparent;padding:0;border-radius:0;font-style:italic;color:var(--s-mfg)">Rewrite only the "This week" callout in the Weekly review from what moved in issues. Link each item to its row.</div>
+        <div class="tool">◷ Looked back through issues</div>
+        <div class="tool">◉ Read Weekly review</div>
+        <div class="tool">✎ Update the page Weekly review</div>
+        <div class="wtxt">"This week" now lists the 7 issues that reached done since Monday, each linked to its row. Nothing else on the page changed.</div>
+        <div class="rec">ran on your server · 27.9s · $0.21 · claude-sonnet-4-5</div>
+        <div style="height:10px"></div>
+        <div class="lbl2">dashboard · agent activity</div>
+        <div class="turn" style="margin:0"><i></i><div><div class="q">Routine · Weekly review</div><div class="rec">7 hours ago · ran on your server · 27.9s · $0.21 · claude-sonnet-4-5</div></div></div>
+      </div>
+      <div class="compose"><div class="cbox"><div class="ph">Ask, or tell Washi what to write…</div><div class="row"><span class="plus">+</span><span>API key</span><span class="send dim">↑</span></div></div></div>
+    </div></div>
+    <div class="fnote">A run is an ordinary turn in a fresh session titled <code>Routine · {title}</code>, so day N never pays to re-read days 1 to N-1. Desk and receipt apply unchanged; Today retells it by the session title since there is no person's prompt. Run now is the same path with a person watching — its questions keep the 5-minute patience.</div>
+  </article>
+  <div class="sticky" style="left:2730px;top:60px"><b>decided</b><ol><li>Routines are the only caller-free path into a turn. Keep it that way.</li><li>The clock walks <code>ControlPlane.workspaceIds()</code> that have a file — never a stray .db, never a conjured <code>default</code>.</li><li>Marked before it runs: a crash mid-turn never runs it twice. Not marked when stopped: the day catches up after Resume.</li></ol></div>
+</section>
+
+<!-- ───────────────────────── 7 · CONVERSATIONS ───────────────────────── -->
+<section class="cv-group" data-name="Conversations" data-note="sessions per workspace · the header is the switcher · a Claude session lives in dataDir/{workspace}.claude beside the .db">
+  <article class="frame" data-name="History" data-w="440" data-h="600">
+    <div class="app solo"><div class="agent">
+      <div class="ah"><i data-mascot="happy" data-size="26"></i><span class="ttl">Session 4<small>watching this workspace</small></span><span style="color:var(--s-mfg);font-size:11px">▴</span><span class="x"><span>⌫</span><span>⤢</span><span>×</span></span></div>
+      <div class="menu cvs">
+        <div class="grp">Conversations</div>
+        <div class="mi">Session 4<span class="k">✓</span></div>
+        <div class="mi">Routine · Weekly review</div>
+        <div class="mi">Session 3</div>
+        <div class="mi">Routine · Morning digest</div>
+        <div class="mi">Session 2</div>
+        <div class="mi">Session 1</div>
+        <div class="sep"></div>
+        <div class="mi" style="color:var(--s-mfg)">＋ New conversation</div>
+      </div>
+      <div class="body" style="filter:brightness(.9)">
+        <div class="me">What shipped this week? Write it up as a page.</div>
+        <div class="tool">▦ Looked at your tables</div>
+        <div class="tool">＋ Create a page Shipped this week</div>
+        <div class="rec">ran on your server · 24.1s · $0.19 · claude-sonnet-4-5</div>
+      </div>
+      <div class="compose"><div class="cbox"><div class="ph">Ask, or tell Washi what to write…</div><div class="row"><span class="plus">+</span><span>API key</span><span class="send dim">↑</span></div></div></div>
+      <span class="pin" style="left:252px;top:122px">1</span>
+    </div></div>
+    <div class="fnote">1 — sessions are per workspace, newest first, titled "Session N" or "Routine · …"; picking one loads its transcript (<code>agents.transcript</code>). Resume is implicit: the next prompt continues the stored <code>sdkSessionId</code> from <code>&lt;dataDir&gt;/&lt;workspace&gt;.claude/</code>; a resume the CLI no longer knows is retried once, fresh, and the person sees nothing but the turn.</div>
+  </article>
+
+  <article class="frame" data-name="New conversation" data-w="1280" data-h="800">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / netko-labs / p / ideas</span></div>
+      <div class="shell">
+        <aside class="side">
+          <div class="ws"><i></i>Netko Labs <span class="car">▾</span><span class="new">+</span></div>
+          <div class="it"><span class="g">⌕</span>Search<span class="n">⌘K</span></div>
+          <div class="it"><span class="g">⌂</span>Dashboard</div>
+          <div class="it"><span class="g">◫</span>Inbox</div>
+          <div class="it"><span class="g">⚙</span>Settings</div>
+          <div class="lbl">Pages</div>
+          <div class="it"><span class="tw">▸</span><span class="g">▤</span>Backlog</div>
+          <div class="it"><span class="tw">▸</span><span class="g">☰</span>Wiki</div>
+          <div class="it on"><span class="tw">▸</span><span class="g">◇</span>Ideas</div>
+          <div class="foot">
+            <div class="srow2"><span class="l1"><i class="dot8"></i><b>Washi</b><span class="st">· Idle</span></span><span class="sub">today $0.00 of $25 · 0 turns</span></div>
+            <div class="user"><span class="av lg" style="--c:#a97f52">JV</span><div><div>Juan</div><div class="em">juan@netko.dev</div></div></div>
+          </div>
+        </aside>
+        <div class="content">
+          <div class="tabs"><span class="on">◇ Ideas <span class="x">×</span></span><span class="plus">+</span></div>
+          <div class="hdr"><span class="crumb">Netko Labs / <b>Ideas</b></span><span class="sp"></span><span class="apill"><i data-mascot="happy" data-size="17"></i>Washi watching</span><span class="btn">Edit</span></div>
+          <div class="rf" style="height:calc(100% - 87px)"><div class="node" style="left:60px;top:40px"><div class="nt">Offsite in Kyoto</div><div class="nc"><span>Q1</span></div></div><div class="node" style="left:300px;top:120px"><div class="nt">CSV import</div><div class="nc"><span>blocked</span></div></div></div>
+        </div>
+      </div>
+      <div class="agent" style="max-height:620px">
+        <div class="ah"><i data-mascot="happy" data-size="26"></i><span class="ttl">Session 5<small>watching this workspace</small></span><span style="color:var(--s-mfg);font-size:11px">▾</span><span class="x"><span>⌫</span><span>⤢</span><span>×</span></span></div>
+        <div class="body" style="padding:18px 16px 8px">
+          <i data-mascot="happy bob" data-size="52"></i>
+          <div class="hi">Hi Juan</div>
+          <div class="note" style="font-size:12.5px">I'm watching Ideas. Ask me anything, or start from one of these:</div>
+          <div class="starter">Summarize Ideas</div>
+          <div class="starter">Find contradictions with other pages</div>
+          <div class="starter">Tighten the intro paragraph</div>
+          <div class="note" style="font-size:11px">Toggle anytime with <span class="kbd">⌘J</span></div>
+        </div>
+        <div class="compose"><div class="cbox"><div class="ph">Ask, or tell Washi what to write…</div><div class="row"><span class="plus">+</span><span>API key</span><span class="send dim">↑</span></div></div></div>
+      </div>
+      <div class="fab"><i data-mascot="happy bob" data-size="40" class="m"></i></div>
+      <span class="pin" style="left:1070px;top:300px">1</span>
+    </div>
+    <div class="fnote">1 — <code>EmptyChat</code>: the idle mascot, "Hi {first name}", "I'm watching {page or this workspace}", and three starters — "Summarize {page}", "Find contradictions with other pages", "Tighten the intro paragraph". Clear (⌫) and "New conversation" both call <code>createSession</code>; a prompt sent while one is being created joins it instead of landing in the old one.</div>
+  </article>
+  <div class="sticky" style="left:1920px;top:60px"><b>decided</b><ol><li>Sessions are the workspace's, not the person's: a team sees what Washi was asked.</li><li>The Claude session dir sits on the volume beside the .db — a redeploy cannot orphan it.</li><li>Clear is "new", never "delete": the receipt trail stays.</li></ol></div>
+</section>
+
+</div></main>
+<script src="../_kit/mascot.js"></script>
+<script src="../_kit/canvas.js"></script>
+</body>
+</html>

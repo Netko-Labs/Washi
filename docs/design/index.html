@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Washi design — overview</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@700;900&family=Karla:ital,wght@0,400;0,500;0,600;0,800;1,400&family=JetBrains+Mono:wght@400;600&family=Young+Serif&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../_kit/app.css" />
+<link rel="stylesheet" href="../_kit/canvas.css" />
+<style>
+  .tile-frame { width: 1280px; height: 800px; overflow: visible; }
+  .tile-frame iframe { width: 2560px; height: 1600px; transform: scale(0.5); }
+  .tile-frame .tname { position: absolute; left: 0; top: 0; transform: translateY(-100%) scale(var(--inv)); transform-origin: 0 100%; padding-bottom: 8px; display: flex; gap: 10px; align-items: baseline; white-space: nowrap; }
+  .tile-frame .tname b { font: 900 15px/1 var(--cv-display); }
+  .tile-frame .tname span { font-size: 12px; color: var(--cv-muted); }
+  .legend { position: absolute; left: 0; top: 0; width: 520px; font-size: 13px; line-height: 1.5; color: var(--cv-fg); }
+  .legend h1 { font: 900 34px/1.1 var(--cv-display); margin: 0 0 10px; letter-spacing: -0.01em; }
+  .legend h1 em { font-style: normal; color: var(--cv-accent); }
+  .legend p { margin: 0 0 8px; color: var(--cv-muted); }
+  .legend .k { font: 600 10.5px/1 var(--cv-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--cv-accent); margin-bottom: 8px; }
+  .legend ol { margin: 8px 0 0; padding-left: 18px; }
+  .legend li { margin: 3px 0; }
+</style>
+</head>
+<body class="cv">
+<header class="cv-bar">
+  <a class="brand" href="../index.html"><i></i>和紙 <em>WASHI</em></a>
+  <span class="crumb">design / <b>overview</b></span>
+  <span class="sp"></span>
+  <nav class="pages">
+    <a class="on" href="index.html">overview</a><a href="shell.html">shell</a><a href="pages.html">pages</a><a href="data.html">data</a><a href="work.html">work</a><a href="agent.html">agent</a><a href="account.html">account</a><a href="desktop.html">desktop</a>
+  </nav>
+  <span class="sp"></span>
+  <span class="hint"><kbd>wheel</kbd> pan · <kbd>⌘</kbd>+wheel zoom · <kbd>0</kbd> fit</span>
+  <span class="zoom"><button data-zoom="out">−</button><span class="pct">100%</span><button data-zoom="in">+</button><button data-zoom="fit" title="fit">⤢</button></span>
+</header>
+<aside class="cv-layers" data-intro="Every area of the app as one page of frames. This overview shows each area's first screens; open an area to walk its frames.">
+</aside>
+<main class="cv-viewport"><div class="cv-world">
+
+  <div class="legend" style="left:0;top:0">
+    <div class="k">Netko Labs · Washi · design</div>
+    <h1>Every screen, on one canvas<em>。</em></h1>
+    <p>Seven pages of frames, one per area. Each frame is the studio or the desktop as the code has it today; a frame whose name ends in <b>· proposed</b> is a change, and its note says why.</p>
+    <p>The PRD links into these frames. When a frame and the PRD disagree, the PRD wins and the frame gets fixed.</p>
+    <ol>
+      <li><b>shell</b> — sidebar, tabs, header, dashboard, find, inbox, trash</li>
+      <li><b>pages</b> — reading, typing, source mode, chrome, together</li>
+      <li><b>data</b> — databases, rows as pages, charts, roadmap, canvas, the team space</li>
+      <li><b>work</b> — the golden flow: investigation → tickets → PR → the loop</li>
+      <li><b>agent</b> — the mascot door, the panel, the desk, routines</li>
+      <li><b>account</b> — sign in, workspaces, people, host</li>
+      <li><b>desktop</b> — onboarding, daily note, settings, offline</li>
+    </ol>
+  </div>
+
+  <a class="tile-frame" href="shell.html" style="left:640px;top:0"><div class="tname"><b>shell</b><span>sidebar · tabs · header · dashboard · find · inbox · trash</span></div><iframe src="shell.html" title="shell" loading="lazy"></iframe><div class="open"><span>Open shell →</span></div></a>
+  <a class="tile-frame" href="pages.html" style="left:2016px;top:0"><div class="tname"><b>pages</b><span>reading · typing · source · chrome · together</span></div><iframe src="pages.html" title="pages" loading="lazy"></iframe><div class="open"><span>Open pages →</span></div></a>
+  <a class="tile-frame" href="data.html" style="left:3392px;top:0"><div class="tname"><b>data</b><span>databases · rows · charts · roadmap · canvas · team space</span></div><iframe src="data.html" title="data" loading="lazy"></iframe><div class="open"><span>Open data →</span></div></a>
+  <a class="tile-frame" href="work.html" style="left:640px;top:1000px"><div class="tname"><b>work</b><span>investigation → tickets → board → ticket → stat → canvas → PR → loop</span></div><iframe src="work.html" title="work" loading="lazy"></iframe><div class="open"><span>Open work →</span></div></a>
+  <a class="tile-frame" href="agent.html" style="left:2016px;top:1000px"><div class="tname"><b>agent</b><span>the door · the panel · the desk · status · routines</span></div><iframe src="agent.html" title="agent" loading="lazy"></iframe><div class="open"><span>Open agent →</span></div></a>
+  <a class="tile-frame" href="account.html" style="left:3392px;top:1000px"><div class="tname"><b>account</b><span>sign in · workspaces · switching · people · host</span></div><iframe src="account.html" title="account" loading="lazy"></iframe><div class="open"><span>Open account →</span></div></a>
+  <a class="tile-frame" href="desktop.html" style="left:640px;top:2000px"><div class="tname"><b>desktop</b><span>onboarding · shell · daily note · settings · share</span></div><iframe src="desktop.html" title="desktop" loading="lazy"></iframe><div class="open"><span>Open desktop →</span></div></a>
+
+</div></main>
+<script src="../_kit/canvas.js"></script>
+</body>
+</html>

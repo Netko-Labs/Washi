@@ -10,16 +10,16 @@ server — Better Auth sessions, organizations, invitations, BYOK). Both serve t
 the studio over HTTP + `/trpc-ws`, the desktop over mirin IPC. Team collaboration ships first;
 local-only mode is deferred to phase 7, not cut.
 
-Specs (visual, canonical):
+Specs (visual, canonical — `docs/index.html` is the hub; all of them wear `docs/_kit`):
 
-- `docs/washi.html` (2026-10-14) — **what Washi is.** A team workspace of living pages; people and
-  the agent co-author, live. Overrules features.md §1 · §2 · §5, spec Q2 and server.html's
-  "multiplayer is review". Design every flow against it.
-- `docs/spec.html` (v0.5) — WSX, Paper, ink/tsuru/hanko, the P0–P8 audit. Still current.
-- `docs/server.html` (v0.6) — **the server pivot.** Supersedes v0.5 §03 · §04 · §07 · §08 and
-  Q12 · Q17 · Q19. Read it for anything about processes, storage topology, identity, or the road.
-  Its constraints **C1–C4** are law, not guidance — they are what keep phase 7 a redeployment
-  rather than a second implementation.
+- `docs/prd.html` — **what Washi is and what must be true.** Nouns, golden flows, the rules
+  that cannot bend (**C1–C4** are law, not guidance — they keep phase 7 a redeployment, not a
+  second implementation), architecture, status, the decisions log. Design every flow against it.
+- `docs/wsx-primitives.html` — the page format and the closed registry, primitive by primitive.
+- `docs/brand.html` · `docs/mascot.html` — identity and washi-chan (faces, motions, agent states).
+- `docs/design/` — every screen as a frame on a Figma-like canvas, one page per area
+  (shell · pages · data · work · agent · account · desktop). Real code is the truth; a frame
+  named `· proposed` is a change. When the canvas and the PRD disagree, the PRD wins.
 
 Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the studio architecture
 (template-based web, desktop over mirin IPC) is the current block.
@@ -176,7 +176,7 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   Never hand agents fs/shell/raw SQL.
 - WSX is inert data: registry primitives, literal props, the closed `expr` grammar only. Components
   own appearance (four enums: `variant tone size emphasis`); pages own content. Validation before
-  persist and before render. Format reference: `docs/wsx.md`.
+  persist and before render. Format reference: `docs/wsx-primitives.html`.
 - tRPC v11. Routers live in `packages/washi/trpc/src/routers/{entity}/` per conventions §3.
   Web subscriptions ride `/trpc-ws` (the template's crossws bridge, cookie on the upgrade); the
   desktop's ride mirin events. Both yield `tracked()` and arrive as `{ id, data }`. Phase 8's

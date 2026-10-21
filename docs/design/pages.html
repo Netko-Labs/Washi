@@ -1,0 +1,1184 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Washi design — pages</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@700;900&family=Karla:ital,wght@0,400;0,500;0,600;0,800;1,400&family=JetBrains+Mono:wght@400;600&family=Young+Serif&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../_kit/app.css" />
+<link rel="stylesheet" href="../_kit/canvas.css" />
+<style>
+/* pages.html — page-specific pieces the kit does not carry; all scoped under .app */
+.app .side .ws .car { font-size: 12px; }
+.app .side .ws .new { font-size: 13px; }
+.app .sdot { width: 8px; height: 8px; border-radius: 50%; background: #aebb9a; flex: none; }
+.app .sdot.work { background: #e8b36a; }
+.app .side .washi-row .mono { font: 500 10.5px / 1.3 var(--s-mono); color: var(--s-mfg); padding-left: 16px; }
+.app .hdr .apill { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 99px; border: 1px dashed var(--s-agent); font-size: 12px; color: var(--s-mfg); }
+.app .hdr .stat { font-size: 12px; color: var(--s-mfg); }
+.app .hdr .stat.bad { color: var(--s-bad); }
+.app .hdr .btn.cnt { gap: 4px; color: var(--s-mfg); }
+.app .hdr .btn.cnt b { font-size: 12px; color: var(--s-fg); }
+.app .btn.off { opacity: 0.5; }
+.app .btn.src.on { background: var(--s-accent); border-color: transparent; color: var(--s-fg); }
+.app .pv { display: flex; flex: 1; min-height: 0; }
+.app .pv .main { flex: 1; min-width: 0; position: relative; }
+.app .ctop { position: absolute; right: 32px; top: 8px; display: flex; align-items: center; gap: 12px; font-size: 12px; color: var(--s-mfg); }
+.app .ctop .pres { display: inline-flex; }
+.app .ctop .pres .av { width: 24px; height: 24px; margin-left: -6px; border: 2px solid var(--s-bg); background: var(--s-primary); }
+.app .ctop .pres .av.ed { box-shadow: 0 0 0 2px var(--s-agent); }
+.app .ctop .wpill { display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 8px; border-radius: 99px; background: #3d5a731a; color: var(--s-agent); font-size: 12px; }
+.app .ctop .wmark { display: inline-flex; align-items: center; gap: 6px; }
+.app .ctop .wmark .u { display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 6px; border-radius: 6px; margin-left: 4px; }
+.app .ctop .wmark .u.hov { background: var(--s-accent); color: var(--s-fg); }
+.app .sheet { position: relative; padding-top: 0; }
+.app .sheet.full { max-width: none; }
+.app .sheet .lead { font-size: 15px; color: var(--s-mfg); }
+.app .chrome.quiet { opacity: 0.55; }
+.app .chrome.hide { opacity: 0; }
+.app .cover { position: relative; height: 180px; background: linear-gradient(120deg, #aebb9a, #74866a); }
+.app .cover .chg { position: absolute; right: 16px; bottom: 12px; background: #fbf9f4d9; border-radius: 6px; padding: 4px 8px; font-size: 12px; }
+.app .bigicon { width: 72px; height: 72px; display: grid; place-items: center; font-size: 52px; line-height: 1; border-radius: 12px; margin-top: 32px; }
+.app .bigicon.over { margin-top: -36px; }
+.app .bl { padding: 24px 0 0; }
+.app .bl .h { font: 600 12px / 1 var(--s-sans); letter-spacing: 0.06em; text-transform: uppercase; color: var(--s-mfg); margin-bottom: 8px; }
+.app .bl .pills { display: flex; flex-wrap: wrap; gap: 6px; }
+.app .bl .pills span { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 10px; border-radius: 8px; border: 1px solid var(--s-border); font-size: 13px; }
+.app .rp .tbl { font-size: 12px; color: var(--s-mfg); margin-top: 24px; }
+.app .rp .ttl { font: 700 32px / 1.2 var(--s-sans); margin: 4px 0 10px; }
+.app .rp .ttl.ph { color: #a39b8d; }
+.app .rp dl { display: grid; grid-template-columns: 150px 1fr; margin: 0 0 8px; font-size: 13.5px; }
+.app .rp dt, .app .rp dd { display: flex; align-items: center; gap: 8px; height: 32px; margin: 0; }
+.app .rp dt { color: var(--s-mfg); font-size: 13px; }
+.app .rp dt i { font-style: normal; width: 16px; text-align: center; font-size: 12px; }
+.app .rp dd .ph { color: #a39b8d; }
+.app .ed { padding-top: 10px; }
+.app .blk { position: relative; padding: 3px 0; font-size: 15px; line-height: 1.55; }
+.app .blk.hov { background: #00000006; border-radius: 6px; }
+.app .blk .hd { position: absolute; left: -56px; top: 0; height: 28px; display: flex; align-items: center; gap: 2px; color: var(--s-mfg); opacity: 0; }
+.app .blk.hov .hd, .app .blk.menu-open .hd { opacity: 1; }
+.app .blk .hd span { width: 24px; height: 24px; display: grid; place-items: center; border-radius: 4px; font-size: 14px; }
+.app .blk .hd span.on { background: #0000000d; color: var(--s-fg); }
+.app .blk.h1 { font: 400 28px / 1.2 var(--s-serif); padding: 8px 0 6px; }
+.app .blk.h2 { font: 400 20px / 1.25 var(--s-serif); padding: 14px 0 4px; }
+.app .blk.li { display: flex; gap: 8px; }
+.app .blk.li .mk { color: var(--s-fg); flex: none; }
+.app .blk.todo { display: flex; gap: 8px; align-items: baseline; }
+.app .blk.todo .box { width: 16px; height: 16px; translate: 0 2px; }
+.app .blk.todo.done span:last-child { text-decoration: line-through; opacity: 0.5; }
+.app .blk.quote { border-left: 3px solid #221f1a4d; padding-left: 16px; }
+.app .blk.callout { display: flex; gap: 8px; border-radius: 12px; background: #0000000a; padding: 12px 16px; margin: 6px 0; }
+.app .blk.code { border-radius: 12px; background: #0000000d; padding: 12px 16px; font: 400 13px / 1.5 var(--s-mono); margin: 6px 0; white-space: pre; }
+.app .blk.divider { height: 1px; background: var(--s-border); margin: 14px 0; padding: 0; }
+.app .blk .ph { color: #a39b8d80; }
+.app .caret { display: inline-block; width: 1.5px; height: 1em; background: var(--s-fg); vertical-align: -0.15em; margin-left: 1px; }
+.app .lock { position: relative; outline: 1px solid var(--s-border); outline-offset: 6px; border-radius: 8px; margin: 10px 0; }
+.app .lock.rest { outline-color: transparent; }
+.app .tip { position: absolute; left: 0; bottom: -34px; background: #26241f; color: #f4efe6; font-size: 11.5px; padding: 4px 8px; border-radius: 6px; white-space: nowrap; }
+.app .menu.w220 { width: 220px; }
+.app .menu.w260 { width: 260px; }
+.app .menu.w280 { width: 280px; max-height: 320px; overflow: hidden; }
+.app .menu.w300 { width: 300px; padding: 12px; }
+.app .menu .mi { font-size: 13px; }
+.app .menu .mi.sm { height: 32px; }
+.app .menu .mi.cur { font-weight: 500; }
+.app .menu .mi .sw { margin-left: auto; }
+.app .menu .ph { color: #a39b8d; font-size: 12.5px; padding: 6px 8px; }
+.app .menu .ttl { display: flex; align-items: center; justify-content: space-between; font-weight: 600; font-size: 13px; margin-bottom: 10px; }
+.app .menu .ttl .rm { font-weight: 400; font-size: 12px; color: var(--s-mfg); }
+.app .emoji { display: grid; grid-template-columns: repeat(8, 1fr); gap: 2px; }
+.app .emoji span { height: 32px; display: grid; place-items: center; font-size: 18px; border-radius: 6px; }
+.app .emoji span.on { background: var(--s-accent); }
+.app .covers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.app .covers span { position: relative; height: 56px; border-radius: 8px; overflow: hidden; }
+.app .covers span.on { outline: 2px solid var(--s-primary); outline-offset: 1px; }
+.app .covers span i { position: absolute; left: 0; right: 0; bottom: 0; background: #00000059; color: #fff; font: 500 10.5px / 1 var(--s-sans); font-style: normal; padding: 4px 6px; }
+.app .menu .in { height: 32px; border-radius: 8px; border: 1px solid var(--s-border); background: var(--s-bg); padding: 0 10px; font: 400 13px / 32px var(--s-sans); color: #a39b8d; margin: 2px 2px 6px; }
+.app .menu .in b { color: var(--s-fg); font-weight: 400; }
+.app .abs { position: absolute; z-index: 4; }
+.app .cm { border: 1px solid var(--s-border); border-radius: 12px; background: var(--s-card); padding: 4px 0; font: 400 12.5px / 1.65 var(--s-mono); overflow: hidden; }
+.app .cm .ln { display: grid; grid-template-columns: 30px 16px 1fr; padding-right: 12px; white-space: pre; }
+.app .cm .ln.act { background: #e6e0d499; }
+.app .cm .ln .n { text-align: right; color: var(--s-mfg); padding-right: 6px; }
+.app .cm .ln .g { color: var(--s-bad); text-align: center; font-size: 10px; }
+.app .cm .t { color: #7a6a9c; }
+.app .cm .a { color: var(--s-kraft); }
+.app .cm .s { color: var(--s-ok); }
+.app .cm .bad { text-decoration: underline wavy var(--s-bad); text-underline-offset: 3px; }
+.app .srcwrap { max-width: 896px; margin: 0 auto; padding: 8px 32px 0; }
+.app .probs { margin-top: 12px; border: 1px solid var(--s-border); border-radius: 12px; background: var(--s-card); padding: 8px; font-size: 12.5px; }
+.app .probs div { display: flex; gap: 8px; align-items: flex-start; padding: 4px 8px; border-radius: 8px; }
+.app .probs div i { color: var(--s-bad); font-style: normal; flex: none; }
+.app .probs div .loc { margin-left: auto; font: 400 11.5px / 1.6 var(--s-mono); color: var(--s-mfg); white-space: nowrap; }
+.app .cpanel { width: 340px; flex: none; border-left: 1px solid var(--s-border); display: flex; flex-direction: column; background: var(--s-bg); }
+.app .cpanel .ch { height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; border-bottom: 1px solid var(--s-border); font-weight: 600; font-size: 13px; }
+.app .cpanel .ch .x { color: var(--s-mfg); font-weight: 400; }
+.app .cpanel .list { padding: 16px; display: grid; gap: 12px; flex: 1; align-content: start; }
+.app .thread { border: 1px solid var(--s-border); background: var(--s-card); border-radius: 12px; padding: 12px; display: grid; gap: 12px; }
+.app .thread.res { opacity: 0.6; }
+.app .cmt { display: flex; gap: 10px; }
+.app .cmt .av { width: 24px; height: 24px; background: var(--s-primary); font-size: 10px; }
+.app .cmt .who { display: flex; align-items: baseline; gap: 6px; font-size: 12.5px; font-weight: 600; }
+.app .cmt .who i { font: 400 11px / 1 var(--s-sans); color: var(--s-mfg); font-style: normal; }
+.app .cmt .who .del { margin-left: auto; font: 400 11px / 1 var(--s-sans); color: var(--s-mfg); }
+.app .cmt p { margin: 2px 0 0; font-size: 13px; line-height: 1.5; }
+.app .cmt .m { background: #c25f2c1f; color: var(--s-primary); border-radius: 3px; padding: 0 2px; font-weight: 500; }
+.app .thread .acts { display: flex; gap: 12px; padding-left: 34px; font-size: 12px; color: var(--s-mfg); }
+.app .cpanel .comp { border-top: 1px solid var(--s-border); padding: 12px; position: relative; }
+.app .cpanel .ta { border: 1px solid var(--s-border); border-radius: 12px; background: var(--s-bg); padding: 8px 12px; font-size: 13px; line-height: 1.5; min-height: 56px; color: #a39b8d; }
+.app .cpanel .ta.on { border-color: var(--s-primary); color: var(--s-fg); }
+.app .cpanel .mp { position: absolute; left: 12px; right: 12px; bottom: calc(100% - 8px); background: var(--s-pop); border: 1px solid var(--s-border); border-radius: 12px; padding: 4px; box-shadow: 0 16px 48px #0000002e; }
+.app .cpanel .mp div { display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 8px; border-radius: 8px; font-size: 13px; }
+.app .cpanel .mp div.on { background: var(--s-accent); }
+.app .cpanel .mp .av { width: 20px; height: 20px; background: var(--s-primary); }
+.app .cpanel .empty { padding: 48px 20px; }
+.app .cpanel .empty p { max-width: 224px; font-size: 13px; line-height: 1.5; margin: 8px 0 0; }
+.app .hdrs { padding: 24px 0; display: grid; gap: 22px; }
+.app .hdrs .hdr { border-top: 1px solid var(--s-border); background: var(--s-bg); }
+.app .wsxblk { border: 1px solid var(--s-border); border-radius: 12px; background: var(--s-card); overflow: hidden; }
+.app .wsxblk .tb { display: flex; gap: 6px; padding: 8px 10px; border-bottom: 1px solid var(--s-border); font-size: 12px; }
+.app .wsxblk .tb .seg span { padding: 3px 8px; }
+.app .wsxblk .tb .cnt { margin-left: auto; font: 600 10.5px / 24px var(--s-mono); color: var(--s-mfg); }
+.app .wsxblk .grid { border: 0; border-radius: 0; }
+.app .muted { color: var(--s-mfg); font-size: 13px; }
+.app .ghostline { color: #a39b8d; font-size: 15px; }
+.app .pin { z-index: 7; }
+</style>
+</head>
+<body class="cv">
+<header class="cv-bar">
+  <a class="brand" href="../index.html"><i></i>和紙 <em>WASHI</em></a>
+  <span class="crumb">design / <b>pages</b></span>
+  <span class="sp"></span>
+  <nav class="pages">
+    <a href="index.html">overview</a><a href="shell.html">shell</a><a class="on" href="pages.html">pages</a><a href="data.html">data</a><a href="work.html">work</a><a href="agent.html">agent</a><a href="account.html">account</a><a href="desktop.html">desktop</a>
+  </nav>
+  <span class="sp"></span>
+  <span class="hint"><kbd>wheel</kbd> pan · <kbd>⌘</kbd>+wheel zoom · <kbd>0</kbd> fit</span>
+  <span class="zoom"><button data-zoom="out">−</button><span class="pct">100%</span><button data-zoom="in">+</button><button data-zoom="fit" title="fit">⤢</button></span>
+</header>
+<aside class="cv-layers" data-intro="A page, read and typed: chrome, blocks, source, menus, and the people (and Washi) on it. Every frame is the code as it is unless its name ends in · proposed."></aside>
+<main class="cv-viewport"><div class="cv-world">
+
+<!-- ───────────────────────── READING ───────────────────────── -->
+<section class="cv-group" data-name="Reading" data-note="chrome above the paper · 760px measure, or none · a row is a page too">
+
+  <article class="frame" data-name="Page · view" data-w="1280" data-h="800">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / 0192… / p / 0192…</span></div>
+      <div class="shell">
+        <aside class="side">
+          <div class="ws"><i></i>Netko Labs <span class="car">⇅</span><span class="new">✎</span></div>
+          <div class="it"><span class="g">⌕</span>Search<span class="n">⌘K</span></div>
+          <div class="it"><span class="g">▦</span>Dashboard</div>
+          <div class="it"><span class="g">◫</span>Inbox<span class="badge">3</span></div>
+          <div class="it"><span class="g">⚙</span>Settings</div>
+          <div class="lbl">Pages</div>
+          <div class="it"><span class="g">▤</span>Backlog</div>
+          <div class="it"><span class="g">▥</span>Roadmap</div>
+          <div class="it"><span class="g">▯</span>Wiki</div>
+          <div class="it ind on"><span class="g">◎</span>How we work</div>
+          <div class="it"><span class="g">❧</span>Ideas</div>
+          <div class="it"><span class="g">☷</span>Weekly review</div>
+          <div class="it"><span class="g">+</span>New page</div>
+          <div class="it"><span class="g">🗑</span>Trash</div>
+          <div class="foot">
+            <div class="washi-row"><span class="sdot"></span><b>Washi</b><span class="st">· Idle</span></div>
+            <div class="washi-row" style="padding-top:0"><span class="mono">today $0.42 of $25 · 6 turns</span></div>
+            <div class="user"><span class="av lg" style="--c:#c25f2c">JV</span><div><div>Juan Villamizar</div><div class="em">juan@netko.dev</div></div><div class="ic"><span>☾</span><span>⇥</span></div></div>
+          </div>
+        </aside>
+        <div class="content">
+          <div class="tabs"><span>▯ Wiki <span class="x">×</span></span><span class="on">◎ How we work <span class="x">×</span></span><span class="plus">+</span></div>
+          <div class="hdr">
+            <span class="crumb">Netko Labs <span style="opacity:.5">/</span> Wiki <span style="opacity:.5">/</span> <b>How we work</b> · edited 25 min ago</span>
+            <span class="btn ghost icon" style="color:#e2a33b">★</span>
+            <span class="sp"></span>
+            <span class="apill"><i data-mascot="happy" data-size="17"></i>Washi watching</span>
+            <span class="btn ghost cnt">💬 <b>2</b></span><span class="btn">✎ Edit</span><span class="btn">⧉ Copy link</span><span class="btn ghost icon">⋯</span>
+          </div>
+          <div class="pv"><div class="main">
+            <div class="sheet">
+              <div class="ctop"><span class="pres"><span class="av ed" title="Rin Kobayashi · editing">RK</span><span class="av">MT</span></span><span class="wmark">✦ Washi wrote this yesterday<span class="u">↶ Undo</span></span></div>
+              <div class="bigicon">🧭</div>
+              <div class="chrome quiet"><span>▭ Add cover</span><span>💬 Add comment</span></div>
+              <h1>How we work</h1>
+              <p>• Issues live in the Backlog; anything in flight has an owner.</p>
+              <p>• Projects live on the Roadmap, with dates.</p>
+              <p>• Washi refreshes the Weekly review every evening.</p>
+              <div class="callout"><span class="ic">💡</span><div><b>Reviews</b><br />Every Friday at 17:00 Washi rewrites the "This week" callout on the Weekly review.</div></div>
+              <div class="bl"><div class="h">Linked from</div><div class="pills"><span>▯ Wiki</span><span>☷ Weekly review</span></div></div>
+            </div>
+          </div></div>
+        </div>
+      </div>
+      <div class="fab"><i data-mascot="happy bob" data-size="40" class="m"></i></div>
+      <span class="pin" style="left:238px;top:60px">1</span>
+      <span class="pin" style="left:520px;top:170px">2</span>
+      <span class="pin" style="left:1115px;top:150px">3</span>
+      <span class="pin" style="left:520px;top:330px">4</span>
+    </div>
+    <div class="fnote">A page read. 1 crumbs climb the tree (two ancestors shown, the rest fold into …), the star is filled when favorited, and Comments carries its open-thread count. 2 the chrome band is <code>SheetView</code>'s <code>chrome</code> slot, outside the paper: a 72px icon, and a quiet row (<code>Add cover · Add comment</code>) that shows on hover. 3 top-right of the column: who is here (a ring means editing) and <code>Washi wrote this yesterday · Undo</code> while the last writer was Washi. 4 everything below the band is authored by the sheet — Q18 holds.</div>
+  </article>
+
+  <article class="frame" data-name="Page · full width + cover" data-w="1280" data-h="800">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / 0192… / p / 0192…</span></div>
+      <div class="shell">
+        <aside class="side">
+          <div class="ws"><i></i>Netko Labs <span class="car">⇅</span><span class="new">✎</span></div>
+          <div class="it"><span class="g">⌕</span>Search<span class="n">⌘K</span></div>
+          <div class="it"><span class="g">▦</span>Dashboard</div>
+          <div class="it"><span class="g">◫</span>Inbox<span class="badge">3</span></div>
+          <div class="it"><span class="g">⚙</span>Settings</div>
+          <div class="lbl">Pages</div>
+          <div class="it on"><span class="g">▤</span>Backlog</div>
+          <div class="it"><span class="g">▥</span>Roadmap</div>
+          <div class="it"><span class="g">▯</span>Wiki</div>
+          <div class="it"><span class="g">❧</span>Ideas</div>
+          <div class="it"><span class="g">☷</span>Weekly review</div>
+          <div class="it"><span class="g">+</span>New page</div>
+          <div class="it"><span class="g">🗑</span>Trash</div>
+          <div class="foot">
+            <div class="washi-row"><span class="sdot"></span><b>Washi</b><span class="st">· Idle</span></div>
+            <div class="washi-row" style="padding-top:0"><span class="mono">today $0.42 of $25 · 6 turns</span></div>
+            <div class="user"><span class="av lg" style="--c:#c25f2c">JV</span><div><div>Juan Villamizar</div><div class="em">juan@netko.dev</div></div><div class="ic"><span>☾</span><span>⇥</span></div></div>
+          </div>
+        </aside>
+        <div class="content">
+          <div class="tabs"><span class="on">▤ Backlog <span class="x">×</span></span><span class="plus">+</span></div>
+          <div class="hdr">
+            <span class="crumb">Netko Labs <span style="opacity:.5">/</span> <b>Backlog</b> · edited yesterday</span>
+            <span class="btn ghost icon">☆</span>
+            <span class="sp"></span>
+            <span class="apill"><i data-mascot="happy" data-size="17"></i>Washi watching</span>
+            <span class="btn ghost cnt">💬</span><span class="btn">✎ Edit</span><span class="btn">⧉ Copy link</span><span class="btn ghost icon">⋯</span>
+          </div>
+          <div class="pv"><div class="main">
+            <div class="cover"><span class="chg">Change cover</span></div>
+            <div class="sheet full" style="padding-left:32px;padding-right:32px">
+              <div class="bigicon over">▤</div>
+              <div class="chrome quiet"><span>💬 Add comment</span></div>
+              <h1>Backlog</h1>
+              <p class="lead">Every issue, grouped by status. Drag a card to move it.</p>
+              <div class="wsxblk" style="margin-top:12px">
+                <div class="tb"><span class="seg"><span class="on">All</span><span>In flight</span><span>Shipped</span></span><span class="fchip">+ Filter</span><span class="cnt">12 rows</span></div>
+                <div class="grid" style="--cols:2.6fr 1.1fr 1fr 1fr 1fr 0.8fr">
+                  <div class="gr gh"><div class="gc">name</div><div class="gc">status</div><div class="gc">assignee</div><div class="gc">project</div><div class="gc">due</div><div class="gc">priority</div></div>
+                  <div class="gr"><div class="gc">Sign-in redirect loses the invite token on Safari</div><div class="gc"><span class="pill prog"><i class="dot"></i>In progress</span></div><div class="gc"><span class="av">RK</span> Rin</div><div class="gc">Onboarding</div><div class="gc">Oct 24</div><div class="gc"><span class="prio high"><i></i><i></i><i></i></span></div></div>
+                  <div class="gr"><div class="gc">Review the invite flow copy</div><div class="gc"><span class="pill todo"><i class="dot"></i>Not started</span></div><div class="gc"><span class="av">JV</span> Juan</div><div class="gc">Onboarding</div><div class="gc">Oct 28</div><div class="gc"><span class="prio med"><i></i><i></i><i></i></span></div></div>
+                  <div class="gr"><div class="gc">Weekly review routine skips an empty table</div><div class="gc"><span class="pill done"><i class="dot"></i>Done</span></div><div class="gc"><span class="av w">和</span> Washi</div><div class="gc">Routines</div><div class="gc">Oct 17</div><div class="gc"><span class="prio low"><i></i><i></i><i></i></span></div></div>
+                  <div class="gr"><div class="gc">Presence ring sticks after a tab is closed</div><div class="gc"><span class="pill todo"><i class="dot"></i>Not started</span></div><div class="gc"><span class="av">MT</span> Mika</div><div class="gc">Live</div><div class="gc">—</div><div class="gc"><span class="prio med"><i></i><i></i><i></i></span></div></div>
+                  <div class="add">+ New</div>
+                </div>
+              </div>
+            </div>
+          </div></div>
+        </div>
+      </div>
+      <div class="fab"><i data-mascot="happy bob" data-size="40" class="m"></i></div>
+      <span class="pin" style="left:1150px;top:255px">1</span>
+      <span class="pin" style="left:260px;top:300px">2</span>
+      <span class="pin" style="left:1215px;top:470px">3</span>
+    </div>
+    <div class="fnote">A database page, full width, with the Sage cover. 1 a cover is a 180px band and a preset key, never a URL; <code>Change cover</code> appears on hover. 2 the icon overlaps it by 36px, as in Notion. 3 <code>Full width</code> (the page menu's switch) sets <code>--measure: 100%</code> so the table takes the window; it is metadata — <code>sheets.updateMeta</code>, never the Loro doc — so toggling it is not an edit and no one's draft moves.</div>
+  </article>
+
+  <article class="frame" data-name="Row page" data-w="1280" data-h="800">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / 0192… / p / 0192…</span></div>
+      <div class="shell">
+        <aside class="side">
+          <div class="ws"><i></i>Netko Labs <span class="car">⇅</span><span class="new">✎</span></div>
+          <div class="it"><span class="g">⌕</span>Search<span class="n">⌘K</span></div>
+          <div class="it"><span class="g">▦</span>Dashboard</div>
+          <div class="it"><span class="g">◫</span>Inbox<span class="badge">3</span></div>
+          <div class="it"><span class="g">⚙</span>Settings</div>
+          <div class="lbl">Pages</div>
+          <div class="it"><span class="g">▤</span>Backlog</div>
+          <div class="it"><span class="g">▥</span>Roadmap</div>
+          <div class="it"><span class="g">▯</span>Wiki</div>
+          <div class="it"><span class="g">❧</span>Ideas</div>
+          <div class="it"><span class="g">☷</span>Weekly review</div>
+          <div class="it"><span class="g">+</span>New page</div>
+          <div class="it"><span class="g">🗑</span>Trash</div>
+          <div class="foot">
+            <div class="washi-row"><span class="sdot"></span><b>Washi</b><span class="st">· Idle</span></div>
+            <div class="washi-row" style="padding-top:0"><span class="mono">today $0.42 of $25 · 6 turns</span></div>
+            <div class="user"><span class="av lg" style="--c:#c25f2c">JV</span><div><div>Juan Villamizar</div><div class="em">juan@netko.dev</div></div><div class="ic"><span>☾</span><span>⇥</span></div></div>
+          </div>
+        </aside>
+        <div class="content">
+          <div class="tabs"><span>▤ Backlog <span class="x">×</span></span><span class="on">▤ Sign-in redirect loses the invite… <span class="x">×</span></span><span class="plus">+</span></div>
+          <div class="hdr">
+            <span class="crumb">Netko Labs <span style="opacity:.5">/</span> <b>Sign-in redirect loses the invite token on Safari</b> · edited 3 hours ago</span>
+            <span class="btn ghost icon">☆</span>
+            <span class="sp"></span>
+            <span class="btn ghost cnt">💬 <b>1</b></span><span class="btn">✎ Edit</span><span class="btn">⧉ Copy link</span><span class="btn ghost icon">⋯</span>
+          </div>
+          <div class="pv"><div class="main">
+            <div class="sheet rp">
+              <div class="chrome quiet" style="padding-top:16px"><span>☺ Add icon</span><span>▭ Add cover</span><span>💬 Add comment</span></div>
+              <div class="tbl">issues</div>
+              <div class="ttl">Sign-in redirect loses the invite token on Safari</div>
+              <dl>
+                <dt><i>◐</i>status</dt><dd><span class="pill prog"><i class="dot"></i>In progress</span></dd>
+                <dt><i>☺</i>assignee</dt><dd><span class="av">RK</span> Rin Kobayashi</dd>
+                <dt><i>⇗</i>project</dt><dd><span class="tchip">▥ Onboarding</span></dd>
+                <dt><i>▦</i>due</dt><dd>Oct 24, 2026</dd>
+                <dt><i>⌄</i>priority</dt><dd><span class="pill sel" style="--c:#e3a99c66">High</span></dd>
+                <dt><i>⌗</i>labels</dt><dd><span class="pill sel">auth</span> <span class="pill sel">safari</span></dd>
+                <dt><i>⌁</i>url</dt><dd><span class="ph">Empty</span></dd>
+              </dl>
+              <p style="margin-top:14px">Safari drops the <code>invite</code> query when Better Auth bounces through <code>/api/auth/callback</code>. Repro: open an invite link in a private window, sign in, land on <code>/workspaces</code> without the invite.</p>
+              <p>• Keep the token in the redirect param, not the query.</p>
+              <p>• Add a check to <code>check:live</code> once it lands.</p>
+            </div>
+          </div></div>
+        </div>
+      </div>
+      <div class="fab"><i data-mascot="happy bob" data-size="40" class="m"></i></div>
+      <span class="pin" style="left:520px;top:170px">1</span>
+      <span class="pin" style="left:520px;top:270px">2</span>
+      <span class="pin" style="left:238px;top:60px">3</span>
+    </div>
+    <div class="fnote">A database row opened as a page (<code>sheets.row_id</code>; out of the tree, so no crumbs above it). 1 the table's name, then the title bound to the row's text column — typing here renames the row. 2 <code>RowProperties</code>: a 150px label column with the type's icon, values drawn by the same <code>DatabaseCell</code> as the table, so a status here is the status there; every write goes through <code>updateRecords</code> and lands in <code>record_changes</code>. 3 the row's tab wears the table's icon. The body below is an ordinary sheet.</div>
+  </article>
+
+  <article class="frame" data-name="New page · blank" data-w="1280" data-h="800">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / 0192… / p / 0192…</span></div>
+      <div class="shell">
+        <aside class="side">
+          <div class="ws"><i></i>Netko Labs <span class="car">⇅</span><span class="new">✎</span></div>
+          <div class="it"><span class="g">⌕</span>Search<span class="n">⌘K</span></div>
+          <div class="it"><span class="g">▦</span>Dashboard</div>
+          <div class="it"><span class="g">◫</span>Inbox<span class="badge">3</span></div>
+          <div class="it"><span class="g">⚙</span>Settings</div>
+          <div class="lbl">Pages</div>
+          <div class="it"><span class="g">▤</span>Backlog</div>
+          <div class="it"><span class="g">▥</span>Roadmap</div>
+          <div class="it"><span class="g">▯</span>Wiki</div>
+          <div class="it"><span class="g">❧</span>Ideas</div>
+          <div class="it"><span class="g">☷</span>Weekly review</div>
+          <div class="it on"><span class="g">▤</span>Untitled</div>
+          <div class="it"><span class="g">+</span>New page</div>
+          <div class="it"><span class="g">🗑</span>Trash</div>
+          <div class="foot">
+            <div class="washi-row"><span class="sdot"></span><b>Washi</b><span class="st">· Idle</span></div>
+            <div class="washi-row" style="padding-top:0"><span class="mono">today $0.42 of $25 · 6 turns</span></div>
+            <div class="user"><span class="av lg" style="--c:#c25f2c">JV</span><div><div>Juan Villamizar</div><div class="em">juan@netko.dev</div></div><div class="ic"><span>☾</span><span>⇥</span></div></div>
+          </div>
+        </aside>
+        <div class="content">
+          <div class="tabs"><span>▯ Wiki <span class="x">×</span></span><span class="on">▤ Untitled <span class="x">×</span></span><span class="plus">+</span></div>
+          <div class="hdr">
+            <span class="crumb">Netko Labs <span style="opacity:.5">/</span> <b>Untitled</b> · edited just now</span>
+            <span class="btn ghost icon">☆</span>
+            <span class="sp"></span>
+            <span class="apill"><i data-mascot="happy" data-size="17"></i>Washi watching</span>
+            <span class="btn ghost cnt">💬</span><span class="stat">Saved</span><span class="btn ghost icon src">‹/›</span><span class="btn pri">✓ Done</span><span class="btn">⧉ Copy link</span><span class="btn ghost icon">⋯</span>
+          </div>
+          <div class="pv"><div class="main">
+            <div class="sheet ed">
+              <div class="chrome quiet" style="padding-top:16px"><span>☺ Add icon</span><span>▭ Add cover</span><span>💬 Add comment</span></div>
+              <div class="blk h1 hov"><div class="hd"><span>+</span><span>⋮⋮</span></div><span class="caret"></span><span class="ph">Heading 1</span></div>
+              <div style="height:96px"></div>
+            </div>
+          </div></div>
+        </div>
+      </div>
+      <div class="fab"><i data-mascot="happy bob" data-size="40" class="m"></i></div>
+      <span class="pin" style="left:520px;top:200px">1</span>
+      <span class="pin" style="left:985px;top:112px">2</span>
+      <span class="pin" style="left:238px;top:360px">3</span>
+    </div>
+    <div class="fnote"><code>New page</code> (sidebar, tab +, or the palette) saves <code>&lt;Sheet title="Untitled" icon="notebook"&gt;&lt;Title/&gt;</code>, marks it fresh and opens its tab; <code>PageBody</code> sees the fresh flag and starts block editing with the caret in the empty heading. 1 the ghost reads <code>Heading 1</code> only while the field is focused; the hover handles already sit at −56px. 2 the header is already in edit mode: <code>Saved</code>, the <code>‹/›</code> source toggle, <code>Done</code>. 3 the page is in the tree and the strip as <code>Untitled</code> until the first heading is typed — the title follows the first <code>h1</code>.</div>
+  </article>
+
+  <div class="sticky" style="left:4140px;top:0">
+    <b>Decisions</b>
+    <ol>
+      <li>Chrome is drawn by the host above the paper, never inside it: icon, cover, full width and rename are <code>updateMeta</code> rows, so a sheet's WSX stays the only author of what is on the sheet (Q18), and width alone is never an edit that bumps a version.</li>
+      <li>A row page is the row: title bound to the text column, properties drawn by the same cells as the table. No second truth, no sync.</li>
+      <li>760px measure by default because a page is read before it is scanned; full width is a per-page choice, remembered with the page, not the viewer.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ───────────────────────── TYPING ───────────────────────── -->
+<section class="cv-group" data-name="Typing" data-note="the top level as blocks · / for kinds and live data · what Washi made stays whole · source when you mean it">
+
+  <article class="frame" data-name="Editor · typing" data-w="1280" data-h="800">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / 0192… / p / 0192…</span></div>
+      <div class="shell">
+        <aside class="side">
+          <div class="ws"><i></i>Netko Labs <span class="car">⇅</span><span class="new">✎</span></div>
+          <div class="it"><span class="g">⌕</span>Search<span class="n">⌘K</span></div>
+          <div class="it"><span class="g">▦</span>Dashboard</div>
+          <div class="it"><span class="g">◫</span>Inbox<span class="badge">3</span></div>
+          <div class="it"><span class="g">⚙</span>Settings</div>
+          <div class="lbl">Pages</div>
+          <div class="it"><span class="g">▤</span>Backlog</div>
+          <div class="it"><span class="g">▥</span>Roadmap</div>
+          <div class="it"><span class="g">▯</span>Wiki</div>
+          <div class="it ind on"><span class="g">◎</span>How we work</div>
+          <div class="it"><span class="g">❧</span>Ideas</div>
+          <div class="it"><span class="g">☷</span>Weekly review</div>
+          <div class="it"><span class="g">+</span>New page</div>
+          <div class="it"><span class="g">🗑</span>Trash</div>
+          <div class="foot">
+            <div class="washi-row"><span class="sdot"></span><b>Washi</b><span class="st">· Idle</span></div>
+            <div class="washi-row" style="padding-top:0"><span class="mono">today $0.42 of $25 · 6 turns</span></div>
+            <div class="user"><span class="av lg" style="--c:#c25f2c">JV</span><div><div>Juan Villamizar</div><div class="em">juan@netko.dev</div></div><div class="ic"><span>☾</span><span>⇥</span></div></div>
+          </div>
+        </aside>
+        <div class="content">
+          <div class="tabs"><span>▯ Wiki <span class="x">×</span></span><span class="on">◎ How we work <span class="x">×</span></span><span class="plus">+</span></div>
+          <div class="hdr">
+            <span class="crumb">Netko Labs <span style="opacity:.5">/</span> Wiki <span style="opacity:.5">/</span> <b>How we work</b> · edited just now</span>
+            <span class="btn ghost icon">☆</span>
+            <span class="sp"></span>
+            <span class="apill"><i data-mascot="happy" data-size="17"></i>Washi watching</span>
+            <span class="btn ghost cnt">💬 <b>2</b></span><span class="stat">Saving…</span><span class="btn ghost icon src">‹/›</span><span class="btn pri">✓ Done</span><span class="btn">⧉ Copy link</span><span class="btn ghost icon">⋯</span>
+          </div>
+          <div class="pv"><div class="main">
+            <div class="sheet ed">
+              <div class="chrome hide" style="padding-top:16px"><span>☺ Add icon</span></div>
+              <div class="blk h1"><div class="hd"><span>+</span><span>⋮⋮</span></div>How we work</div>
+              <div class="blk li"><div class="hd"><span>+</span><span>⋮⋮</span></div><span class="mk">•</span><span>Issues live in the Backlog; anything in flight has an owner.</span></div>
+              <div class="blk li"><div class="hd"><span>+</span><span>⋮⋮</span></div><span class="mk">•</span><span>Projects live on the Roadmap, with dates.</span></div>
+              <div class="blk li hov"><div class="hd"><span>+</span><span>⋮⋮</span></div><span class="mk">•</span><span>Washi refreshes the Weekly review every evening<span class="caret"></span></span></div>
+              <div class="blk h2"><div class="hd"><span>+</span><span>⋮⋮</span></div>Shipping</div>
+              <div class="blk li"><div class="hd"><span>+</span><span>⋮⋮</span></div><span class="mk">1.</span><span>Open a PR against <code>main</code>; the bots review it.</span></div>
+              <div class="blk li"><div class="hd"><span>+</span><span>⋮⋮</span></div><span class="mk">2.</span><span>Squash-merge when clean; Coolify deploys the studio.</span></div>
+              <div class="blk todo done"><div class="hd"><span>+</span><span>⋮⋮</span></div><span class="box on"></span><span>Move the Friday review to 17:00</span></div>
+              <div class="blk todo"><div class="hd"><span>+</span><span>⋮⋮</span></div><span class="box"></span><span>Write down the on-call rota</span></div>
+              <div class="blk quote"><div class="hd"><span>+</span><span>⋮⋮</span></div>Nothing leaves the server without a person saying so.</div>
+              <div class="blk callout"><div class="hd"><span>+</span><span>⋮⋮</span></div><span>💡</span><span>Every Friday at 17:00 Washi rewrites the "This week" callout on the Weekly review.</span></div>
+              <div class="blk code"><div class="hd"><span>+</span><span>⋮⋮</span></div>bun run --cwd apps/desktop check:live</div>
+              <div class="blk divider"></div>
+              <div class="lock rest" style="margin-top:14px"><div class="wsxblk"><div class="tb"><span class="seg"><span class="on">In flight</span><span>Shipped</span></span><span class="cnt">issues · 4 rows</span></div><div class="grid" style="--cols:2.4fr 1fr 1fr"><div class="gr gh"><div class="gc">name</div><div class="gc">status</div><div class="gc">assignee</div></div><div class="gr"><div class="gc">Sign-in redirect loses the invite token on Safari</div><div class="gc"><span class="pill prog"><i class="dot"></i>In progress</span></div><div class="gc"><span class="av">RK</span> Rin</div></div></div></div></div>
+            </div>
+          </div></div>
+        </div>
+      </div>
+      <span class="pin" style="left:330px;top:275px">1</span>
+      <span class="pin" style="left:238px;top:470px">2</span>
+      <span class="pin" style="left:238px;top:655px">3</span>
+      <span class="pin" style="left:1035px;top:112px">4</span>
+    </div>
+    <div class="fnote">Edit turns the sheet's top level into blocks. 1 the hovered block grows a <code>+</code> and a <code>⋮⋮</code> grip at −56px. 2 each kind is a textarea wearing the paper's own type: Title → h1–h3, Text, List/Item → bullet · number · to-do, Quote, Callout (💡), Code (Enter stays inside), Divider. Markdown prefixes convert in place (<code># </code>, <code>- </code>, <code>1. </code>, <code>[] </code>, <code>&gt; </code>, <code>! </code>, <code>```</code>, <code>---</code>). 3 the <code>&lt;Database&gt;</code> Washi put here is a locked block: byte-for-byte, moved and deleted whole. 4 a 700ms pause saves through <code>sheets.update</code> with <code>baseVersion</code> — the same validation Washi gets.</div>
+  </article>
+
+  <article class="frame" data-name="Slash menu" data-w="1280" data-h="800">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / 0192… / p / 0192…</span></div>
+      <div class="shell">
+        <aside class="side">
+          <div class="ws"><i></i>Netko Labs <span class="car">⇅</span><span class="new">✎</span></div>
+          <div class="it"><span class="g">⌕</span>Search<span class="n">⌘K</span></div>
+          <div class="it"><span class="g">▦</span>Dashboard</div>
+          <div class="it"><span class="g">◫</span>Inbox<span class="badge">3</span></div>
+          <div class="it"><span class="g">⚙</span>Settings</div>
+          <div class="lbl">Pages</div>
+          <div class="it"><span class="g">▤</span>Backlog</div>
+          <div class="it"><span class="g">▥</span>Roadmap</div>
+          <div class="it"><span class="g">▯</span>Wiki</div>
+          <div class="it ind on"><span class="g">◎</span>How we work</div>
+          <div class="it"><span class="g">❧</span>Ideas</div>
+          <div class="it"><span class="g">☷</span>Weekly review</div>
+          <div class="it"><span class="g">+</span>New page</div>
+          <div class="it"><span class="g">🗑</span>Trash</div>
+          <div class="foot">
+            <div class="washi-row"><span class="sdot"></span><b>Washi</b><span class="st">· Idle</span></div>
+            <div class="washi-row" style="padding-top:0"><span class="mono">today $0.42 of $25 · 6 turns</span></div>
+            <div class="user"><span class="av lg" style="--c:#c25f2c">JV</span><div><div>Juan Villamizar</div><div class="em">juan@netko.dev</div></div><div class="ic"><span>☾</span><span>⇥</span></div></div>
+          </div>
+        </aside>
+        <div class="content">
+          <div class="tabs"><span>▯ Wiki <span class="x">×</span></span><span class="on">◎ How we work <span class="x">×</span></span><span class="plus">+</span></div>
+          <div class="hdr">
+            <span class="crumb">Netko Labs <span style="opacity:.5">/</span> Wiki <span style="opacity:.5">/</span> <b>How we work</b> · edited just now</span>
+            <span class="btn ghost icon">☆</span>
+            <span class="sp"></span>
+            <span class="btn ghost cnt">💬 <b>2</b></span><span class="stat">Saved</span><span class="btn ghost icon src">‹/›</span><span class="btn pri">✓ Done</span><span class="btn">⧉ Copy link</span><span class="btn ghost icon">⋯</span>
+          </div>
+          <div class="pv"><div class="main">
+            <div class="sheet ed">
+              <div class="chrome hide" style="padding-top:16px"><span>☺ Add icon</span></div>
+              <div class="blk h1"><div class="hd"><span>+</span><span>⋮⋮</span></div>How we work</div>
+              <div class="blk li"><div class="hd"><span>+</span><span>⋮⋮</span></div><span class="mk">•</span><span>Issues live in the Backlog; anything in flight has an owner.</span></div>
+              <div class="blk li"><div class="hd"><span>+</span><span>⋮⋮</span></div><span class="mk">•</span><span>Projects live on the Roadmap, with dates.</span></div>
+              <div class="blk hov" style="position:relative"><div class="hd"><span>+</span><span>⋮⋮</span></div>/<span class="caret"></span>
+                <div class="menu w280 abs" style="left:0;top:100%;margin-top:4px">
+                  <div class="mi sm on">Text<span class="k">Plain paragraph</span></div>
+                  <div class="mi sm">Heading 1<span class="k">#</span></div>
+                  <div class="mi sm">Heading 2<span class="k">##</span></div>
+                  <div class="mi sm">Heading 3<span class="k">###</span></div>
+                  <div class="mi sm">Bulleted list<span class="k">-</span></div>
+                  <div class="mi sm">Numbered list<span class="k">1.</span></div>
+                  <div class="mi sm">To-do<span class="k">[]</span></div>
+                  <div class="mi sm">Quote<span class="k">&gt;</span></div>
+                  <div class="mi sm">Callout<span class="k">!</span></div>
+                  <div class="mi sm">Code<span class="k">```</span></div>
+                </div>
+              </div>
+              <div style="height:360px"></div>
+            </div>
+            <div class="menu w280 abs" style="left:620px;top:30px">
+              <div class="mi sm" style="opacity:.6">Code<span class="k">```</span></div>
+              <div class="mi sm" style="opacity:.6">Divider<span class="k">---</span></div>
+              <div class="sep"></div>
+              <div class="mi sm">New database<span class="k">database</span></div>
+              <div class="mi sm">Linked view · issues<span class="k">live</span></div>
+              <div class="mi sm">Progress · issues<span class="k">30 days</span></div>
+              <div class="mi sm">Linked view · projects<span class="k">live</span></div>
+              <div class="mi sm">Progress · projects<span class="k">30 days</span></div>
+            </div>
+            <div class="menu w280 abs" style="left:620px;top:330px">
+              <div class="in" style="margin:2px 2px 4px;border-color:transparent;background:transparent;padding:0;color:var(--s-fg)">/database Bugs<span class="caret"></span></div>
+              <div class="mi sm on">New database<span class="k">bugs</span></div>
+            </div>
+          </div></div>
+        </div>
+      </div>
+      <span class="pin" style="left:520px;top:290px">1</span>
+      <span class="pin" style="left:845px;top:185px">2</span>
+      <span class="pin" style="left:845px;top:432px">3</span>
+    </div>
+    <div class="fnote">Typing <code>/</code> in an empty block. 1 one 280px list, label left and a mono hint right, the first row lit — Enter takes it, Escape clears the <code>/</code>. It is one list capped at 320px, so the live data sits below a rule after Divider (shown to the right, scrolled). 2 <code>New database</code> makes a table with <code>name</code> and a three-step <code>status</code>; <code>Linked view · table</code> drops a <code>&lt;Database&gt;</code>; <code>Progress · table</code> (only for tables with a done group) drops a 30-day history chart. 3 <code>/database Bugs</code> names it <code>bugs</code>; a taken name is suffixed. A refused insert leaves the <code>/</code> text so it can be retyped and says why in a notice.</div>
+  </article>
+
+  <article class="frame" data-name="Block menu" data-w="560" data-h="600">
+    <div class="app">
+      <div class="sheet ed" style="padding:40px 40px 0 90px">
+        <div class="blk li"><div class="hd"><span>+</span><span>⋮⋮</span></div><span class="mk">•</span><span>Projects live on the Roadmap, with dates.</span></div>
+        <div class="blk quote menu-open" style="position:relative"><div class="hd"><span>+</span><span class="on">⋮⋮</span></div>Nothing leaves the server without a person saying so.
+          <div class="menu w220 abs" style="left:-28px;top:30px">
+            <div class="grp">Turn into</div>
+            <div class="mi sm">Text</div><div class="mi sm">Heading 1</div><div class="mi sm">Heading 2</div><div class="mi sm">Heading 3</div><div class="mi sm">Bulleted list</div><div class="mi sm">Numbered list</div><div class="mi sm">To-do</div><div class="mi sm cur">Quote</div><div class="mi sm">Callout</div><div class="mi sm">Code</div><div class="mi sm">Divider</div>
+            <div class="sep"></div>
+            <div class="mi sm"><span class="g">↑</span>Move up</div>
+            <div class="mi sm"><span class="g">↓</span>Move down</div>
+            <div class="mi sm danger"><span class="g">🗑</span>Delete</div>
+          </div>
+        </div>
+      </div>
+      <span class="pin" style="left:34px;top:104px">1</span>
+      <span class="pin" style="left:290px;top:420px">2</span>
+    </div>
+    <div class="fnote">The <code>⋮⋮</code> grip's menu, 220px. 1 <code>Turn into</code> lists the eleven text kinds with the current one in medium weight — the element's own props (lead, tone, lang) survive while the kind stays. 2 then Move up · Move down · Delete. No Duplicate, no drag yet: the arrows are the move. A locked block gets only the bottom three.</div>
+  </article>
+
+  <article class="frame" data-name="Locked block" data-w="1280" data-h="800">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / 0192… / p / 0192…</span></div>
+      <div class="shell">
+        <aside class="side">
+          <div class="ws"><i></i>Netko Labs <span class="car">⇅</span><span class="new">✎</span></div>
+          <div class="it"><span class="g">⌕</span>Search<span class="n">⌘K</span></div>
+          <div class="it"><span class="g">▦</span>Dashboard</div>
+          <div class="it"><span class="g">◫</span>Inbox<span class="badge">3</span></div>
+          <div class="it"><span class="g">⚙</span>Settings</div>
+          <div class="lbl">Pages</div>
+          <div class="it"><span class="g">▤</span>Backlog</div>
+          <div class="it"><span class="g">▥</span>Roadmap</div>
+          <div class="it"><span class="g">▯</span>Wiki</div>
+          <div class="it"><span class="g">❧</span>Ideas</div>
+          <div class="it on"><span class="g">☷</span>Weekly review</div>
+          <div class="it"><span class="g">+</span>New page</div>
+          <div class="it"><span class="g">🗑</span>Trash</div>
+          <div class="foot">
+            <div class="washi-row"><span class="sdot"></span><b>Washi</b><span class="st">· Idle</span></div>
+            <div class="washi-row" style="padding-top:0"><span class="mono">today $0.42 of $25 · 6 turns</span></div>
+            <div class="user"><span class="av lg" style="--c:#c25f2c">JV</span><div><div>Juan Villamizar</div><div class="em">juan@netko.dev</div></div><div class="ic"><span>☾</span><span>⇥</span></div></div>
+          </div>
+        </aside>
+        <div class="content">
+          <div class="tabs"><span class="on">☷ Weekly review <span class="x">×</span></span><span class="plus">+</span></div>
+          <div class="hdr">
+            <span class="crumb">Netko Labs <span style="opacity:.5">/</span> <b>Weekly review</b> · edited 12 min ago</span>
+            <span class="btn ghost icon">☆</span>
+            <span class="sp"></span>
+            <span class="btn ghost cnt">💬</span><span class="stat">Saved</span><span class="btn ghost icon src">‹/›</span><span class="btn pri">✓ Done</span><span class="btn">⧉ Copy link</span><span class="btn ghost icon">⋯</span>
+          </div>
+          <div class="pv"><div class="main">
+            <div class="sheet ed">
+              <div class="chrome hide" style="padding-top:16px"><span>☺ Add icon</span></div>
+              <div class="blk h1"><div class="hd"><span>+</span><span>⋮⋮</span></div>Weekly review</div>
+              <div class="blk callout"><div class="hd"><span>+</span><span>⋮⋮</span></div><span>💡</span><span><b>This week</b> · 3 shipped, 2 in flight. The Safari invite bug moved to Rin; the routine fix landed Tuesday.</span></div>
+              <div class="blk h2"><div class="hd"><span>+</span><span>⋮⋮</span></div>Shipped, last 30 days</div>
+              <div class="blk menu-open" style="position:relative;padding:0"><div class="hd" style="top:12px"><span>+</span><span class="on">⋮⋮</span></div>
+                <div class="lock"><div class="chartcard"><div class="h"><b>issues</b> status in Done <span class="src">30d · history</span></div><svg viewBox="0 0 600 90" width="100%" height="90"><path d="M0 80 L60 76 L120 70 L180 71 L240 60 L300 58 L360 44 L420 40 L480 30 L540 24 L600 18 L600 90 L0 90Z" fill="#3d5a7322"/><path d="M0 80 L60 76 L120 70 L180 71 L240 60 L300 58 L360 44 L420 40 L480 30 L540 24 L600 18" fill="none" stroke="#3d5a73" stroke-width="2"/></svg></div><span class="tip">A live block: move or delete it here</span></div>
+                <div class="menu w220 abs" style="left:-28px;top:40px">
+                  <div class="mi sm"><span class="g">↑</span>Move up</div>
+                  <div class="mi sm"><span class="g">↓</span>Move down</div>
+                  <div class="mi sm danger"><span class="g">🗑</span>Delete</div>
+                </div>
+              </div>
+              <div class="blk h2" style="margin-top:30px"><div class="hd"><span>+</span><span>⋮⋮</span></div>Still open</div>
+              <div class="lock rest"><div class="wsxblk"><div class="tb"><span class="seg"><span class="on">Shipped</span><span>In flight</span></span><span class="cnt">issues · 4 rows</span></div><div class="grid" style="--cols:2.4fr 1fr 1fr 1fr"><div class="gr gh"><div class="gc">name</div><div class="gc">status</div><div class="gc">assignee</div><div class="gc">due</div></div><div class="gr"><div class="gc">Weekly review routine skips an empty table</div><div class="gc"><span class="pill done"><i class="dot"></i>Done</span></div><div class="gc"><span class="av w">和</span> Washi</div><div class="gc">Oct 17</div></div></div></div></div>
+            </div>
+          </div></div>
+        </div>
+      </div>
+      <span class="pin" style="left:1010px;top:300px">1</span>
+      <span class="pin" style="left:455px;top:375px">2</span>
+      <span class="pin" style="left:1010px;top:560px">3</span>
+    </div>
+    <div class="fnote">Anything whose children are not one plain text run — a chart, a database, a canvas, a callout with a title — is a locked block. 1 at rest it has no label and no border; hover draws a 1px ring 6px out and the title says <code>A live block: move or delete it here</code>. 2 its menu is the bottom three only. 3 what is inside stays alive and edits in place: rows edit through the table, a canvas writes into the editor store so autosave never overwrites a fresh canvas with a stale one. The block's WSX is kept byte-for-byte.</div>
+  </article>
+
+  <article class="frame" data-name="Save states" data-w="1280" data-h="360">
+    <div class="app">
+      <div class="hdrs">
+        <div class="hdr" style="border-top:0"><span class="crumb">Netko Labs <span style="opacity:.5">/</span> <b>How we work</b> · edited just now</span><span class="btn ghost icon">☆</span><span class="sp"></span><span class="btn ghost cnt">💬</span><span class="stat">Saved</span><span class="btn ghost icon src">‹/›</span><span class="btn pri">✓ Done</span><span class="btn">⧉ Copy link</span><span class="btn ghost icon">⋯</span></div>
+        <div class="hdr"><span class="crumb">Netko Labs <span style="opacity:.5">/</span> <b>How we work</b> · edited just now</span><span class="btn ghost icon">☆</span><span class="sp"></span><span class="btn ghost cnt">💬</span><span class="stat">Saving…</span><span class="btn ghost icon src">‹/›</span><span class="btn pri">✓ Done</span><span class="btn">⧉ Copy link</span><span class="btn ghost icon">⋯</span></div>
+        <div class="hdr"><span class="crumb">Netko Labs <span style="opacity:.5">/</span> <b>How we work</b> · edited 2 min ago</span><span class="btn ghost icon">☆</span><span class="sp"></span><span class="btn ghost cnt">💬</span><span class="stat bad">Couldn't save — keep typing to retry</span><span class="btn ghost icon src">‹/›</span><span class="btn pri">✓ Done</span><span class="btn">⧉ Copy link</span><span class="btn ghost icon">⋯</span></div>
+        <div class="hdr"><span class="crumb">Netko Labs <span style="opacity:.5">/</span> <b>How we work</b> · edited 2 min ago</span><span class="btn ghost icon">☆</span><span class="sp"></span><span class="btn ghost cnt">💬</span><span class="stat bad">Not saved — the source has errors</span><span class="btn ghost icon src on off">‹/›</span><span class="btn pri off">✓ Done</span><span class="btn">⧉ Copy link</span><span class="btn ghost icon">⋯</span></div>
+      </div>
+      <span class="pin" style="left:800px;top:38px">1</span>
+      <span class="pin" style="left:800px;top:108px">2</span>
+      <span class="pin" style="left:690px;top:178px">3</span>
+      <span class="pin" style="left:690px;top:248px">4</span>
+      <span class="pin" style="left:1012px;top:248px">5</span>
+    </div>
+    <div class="fnote">The header while a page is open for editing: the state word, the <code>‹/›</code> source toggle, <code>Done</code>. 1 <code>Saved</code>. 2 <code>Saving…</code> — 700ms after the last keystroke. 3 <code>Couldn't save — keep typing to retry</code>: the request failed (network, or a merge that broke WSX); the next pause retries with a fresh <code>baseVersion</code>. 4 <code>Not saved — the source has errors</code>: source mode only, a draft the checker refuses never leaves the browser. 5 that state holds both buttons (<code>Fix the errors to save first</code>) — leaving would drop the draft, because it never saved. The word hides under <code>sm</code>; the colour stays.</div>
+  </article>
+
+  <article class="frame" data-name="Source mode · valid" data-w="1280" data-h="800">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / 0192… / p / 0192…</span></div>
+      <div class="shell">
+        <aside class="side">
+          <div class="ws"><i></i>Netko Labs <span class="car">⇅</span><span class="new">✎</span></div>
+          <div class="it"><span class="g">⌕</span>Search<span class="n">⌘K</span></div>
+          <div class="it"><span class="g">▦</span>Dashboard</div>
+          <div class="it"><span class="g">◫</span>Inbox<span class="badge">3</span></div>
+          <div class="it"><span class="g">⚙</span>Settings</div>
+          <div class="lbl">Pages</div>
+          <div class="it"><span class="g">▤</span>Backlog</div>
+          <div class="it"><span class="g">▥</span>Roadmap</div>
+          <div class="it"><span class="g">▯</span>Wiki</div>
+          <div class="it ind on"><span class="g">◎</span>How we work</div>
+          <div class="it"><span class="g">❧</span>Ideas</div>
+          <div class="it"><span class="g">☷</span>Weekly review</div>
+          <div class="it"><span class="g">+</span>New page</div>
+          <div class="it"><span class="g">🗑</span>Trash</div>
+          <div class="foot">
+            <div class="washi-row"><span class="sdot"></span><b>Washi</b><span class="st">· Idle</span></div>
+            <div class="washi-row" style="padding-top:0"><span class="mono">today $0.42 of $25 · 6 turns</span></div>
+            <div class="user"><span class="av lg" style="--c:#c25f2c">JV</span><div><div>Juan Villamizar</div><div class="em">juan@netko.dev</div></div><div class="ic"><span>☾</span><span>⇥</span></div></div>
+          </div>
+        </aside>
+        <div class="content">
+          <div class="tabs"><span>▯ Wiki <span class="x">×</span></span><span class="on">◎ How we work <span class="x">×</span></span><span class="plus">+</span></div>
+          <div class="hdr">
+            <span class="crumb">Netko Labs <span style="opacity:.5">/</span> Wiki <span style="opacity:.5">/</span> <b>How we work</b> · edited just now</span>
+            <span class="btn ghost icon">☆</span>
+            <span class="sp"></span>
+            <span class="btn ghost cnt">💬 <b>2</b></span><span class="stat">Saved</span><span class="btn ghost icon src on">‹/›</span><span class="btn pri">✓ Done</span><span class="btn">⧉ Copy link</span><span class="btn ghost icon">⋯</span>
+          </div>
+          <div class="srcwrap"><div class="cm">
+            <div class="ln"><span class="n">1</span><span class="g"></span><span><span class="t">&lt;Sheet</span> <span class="a">title</span>=<span class="s">"How we work"</span> <span class="a">icon</span>=<span class="s">"compass"</span> <span class="a">wsx</span>=<span class="s">"1"</span><span class="t">&gt;</span></span></div>
+            <div class="ln"><span class="n">2</span><span class="g"></span><span>  <span class="t">&lt;Title&gt;</span>How we work<span class="t">&lt;/Title&gt;</span></span></div>
+            <div class="ln"><span class="n">3</span><span class="g"></span><span>  <span class="t">&lt;List</span> <span class="a">marker</span>=<span class="s">"bullet"</span><span class="t">&gt;</span></span></div>
+            <div class="ln"><span class="n">4</span><span class="g"></span><span>    <span class="t">&lt;Item&gt;</span>Issues live in the Backlog; anything in flight has an owner.<span class="t">&lt;/Item&gt;</span></span></div>
+            <div class="ln"><span class="n">5</span><span class="g"></span><span>    <span class="t">&lt;Item&gt;</span>Projects live on the Roadmap, with dates.<span class="t">&lt;/Item&gt;</span></span></div>
+            <div class="ln act"><span class="n">6</span><span class="g"></span><span>    <span class="t">&lt;Item&gt;</span>Washi refreshes the Weekly review every evening.<span class="t">&lt;/Item&gt;</span><span class="caret"></span></span></div>
+            <div class="ln"><span class="n">7</span><span class="g"></span><span>  <span class="t">&lt;/List&gt;</span></span></div>
+            <div class="ln"><span class="n">8</span><span class="g"></span><span>  <span class="t">&lt;Callout</span> <span class="a">title</span>=<span class="s">"Reviews"</span><span class="t">&gt;</span>Every Friday at 17:00 Washi rewrites the "This week" callout.<span class="t">&lt;/Callout&gt;</span></span></div>
+            <div class="ln"><span class="n">9</span><span class="g"></span><span>  <span class="t">&lt;Database</span> <span class="a">table</span>=<span class="s">"issues"</span> <span class="a">views</span>={[{ name: <span class="s">'In flight'</span>, kind: <span class="s">'board'</span>, groupBy: <span class="s">'status'</span> }]} <span class="t">/&gt;</span></span></div>
+            <div class="ln"><span class="n">10</span><span class="g"></span><span><span class="t">&lt;/Sheet&gt;</span></span></div>
+          </div></div>
+        </div>
+      </div>
+      <span class="pin" style="left:985px;top:112px">1</span>
+      <span class="pin" style="left:520px;top:160px">2</span>
+      <span class="pin" style="left:520px;top:400px">3</span>
+    </div>
+    <div class="fnote"><code>Edit source</code> (page menu) or 1 the <code>‹/›</code> toggle while editing. 2 CodeMirror with JSX highlighting, line wrap and a lint gutter, over the page's raw WSX. 3 there is nothing else to see: <code>state</code>, <code>expr</code>, <code>bind</code> and <code>action</code> are a page's whole behaviour and none of it executes. Each pause runs the server's own check client-side (parse, then validate against <code>paperRegistry</code>); a valid draft saves with <code>baseVersion</code> like any other edit.</div>
+  </article>
+
+  <article class="frame" data-name="Source mode · invalid" data-w="1280" data-h="800">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / 0192… / p / 0192…</span></div>
+      <div class="shell">
+        <aside class="side">
+          <div class="ws"><i></i>Netko Labs <span class="car">⇅</span><span class="new">✎</span></div>
+          <div class="it"><span class="g">⌕</span>Search<span class="n">⌘K</span></div>
+          <div class="it"><span class="g">▦</span>Dashboard</div>
+          <div class="it"><span class="g">◫</span>Inbox<span class="badge">3</span></div>
+          <div class="it"><span class="g">⚙</span>Settings</div>
+          <div class="lbl">Pages</div>
+          <div class="it"><span class="g">▤</span>Backlog</div>
+          <div class="it"><span class="g">▥</span>Roadmap</div>
+          <div class="it"><span class="g">▯</span>Wiki</div>
+          <div class="it ind on"><span class="g">◎</span>How we work</div>
+          <div class="it"><span class="g">❧</span>Ideas</div>
+          <div class="it"><span class="g">☷</span>Weekly review</div>
+          <div class="it"><span class="g">+</span>New page</div>
+          <div class="it"><span class="g">🗑</span>Trash</div>
+          <div class="foot">
+            <div class="washi-row"><span class="sdot"></span><b>Washi</b><span class="st">· Idle</span></div>
+            <div class="washi-row" style="padding-top:0"><span class="mono">today $0.42 of $25 · 6 turns</span></div>
+            <div class="user"><span class="av lg" style="--c:#c25f2c">JV</span><div><div>Juan Villamizar</div><div class="em">juan@netko.dev</div></div><div class="ic"><span>☾</span><span>⇥</span></div></div>
+          </div>
+        </aside>
+        <div class="content">
+          <div class="tabs"><span>▯ Wiki <span class="x">×</span></span><span class="on">◎ How we work <span class="x">×</span></span><span class="plus">+</span></div>
+          <div class="hdr">
+            <span class="crumb">Netko Labs <span style="opacity:.5">/</span> Wiki <span style="opacity:.5">/</span> <b>How we work</b> · edited 2 min ago</span>
+            <span class="btn ghost icon">☆</span>
+            <span class="sp"></span>
+            <span class="btn ghost cnt">💬 <b>2</b></span><span class="stat bad">Not saved — the source has errors</span><span class="btn ghost icon src on off">‹/›</span><span class="btn pri off">✓ Done</span><span class="btn">⧉ Copy link</span><span class="btn ghost icon">⋯</span>
+          </div>
+          <div class="srcwrap"><div class="cm">
+            <div class="ln"><span class="n">1</span><span class="g"></span><span><span class="t">&lt;Sheet</span> <span class="a">title</span>=<span class="s">"How we work"</span> <span class="a">icon</span>=<span class="s">"compass"</span> <span class="a">wsx</span>=<span class="s">"1"</span><span class="t">&gt;</span></span></div>
+            <div class="ln"><span class="n">2</span><span class="g"></span><span>  <span class="t">&lt;Title&gt;</span>How we work<span class="t">&lt;/Title&gt;</span></span></div>
+            <div class="ln"><span class="n">3</span><span class="g"></span><span>  <span class="t">&lt;List</span> <span class="a">marker</span>=<span class="s">"bullet"</span><span class="t">&gt;</span></span></div>
+            <div class="ln"><span class="n">4</span><span class="g"></span><span>    <span class="t">&lt;Item&gt;</span>Issues live in the Backlog; anything in flight has an owner.<span class="t">&lt;/Item&gt;</span></span></div>
+            <div class="ln"><span class="n">5</span><span class="g">●</span><span>    <span class="t">&lt;Item&gt;</span>Projects live on the Roadmap, with dates.<span class="bad">&lt;/Itme&gt;</span></span></div>
+            <div class="ln"><span class="n">6</span><span class="g"></span><span>    <span class="t">&lt;Item&gt;</span>Washi refreshes the Weekly review every evening.<span class="t">&lt;/Item&gt;</span></span></div>
+            <div class="ln"><span class="n">7</span><span class="g"></span><span>  <span class="t">&lt;/List&gt;</span></span></div>
+            <div class="ln act"><span class="n">8</span><span class="g"></span><span>  <span class="t">&lt;Hero</span> <span class="a">title</span>=<span class="s">"Reviews"</span><span class="t">&gt;</span>Every Friday at 17:00 Washi rewrites the "This week" callout.<span class="t">&lt;/Hero&gt;</span><span class="caret"></span></span></div>
+            <div class="ln"><span class="n">9</span><span class="g"></span><span>  <span class="t">&lt;Database</span> <span class="a">table</span>=<span class="s">"issues"</span> <span class="a">views</span>={[{ name: <span class="s">'In flight'</span>, kind: <span class="s">'board'</span>, groupBy: <span class="s">'status'</span> }]} <span class="t">/&gt;</span></span></div>
+            <div class="ln"><span class="n">10</span><span class="g"></span><span><span class="t">&lt;/Sheet&gt;</span></span></div>
+          </div>
+          <div class="probs">
+            <div><i>⊗</i><span>Expected corresponding JSX closing tag for &lt;Item&gt;</span><span class="loc">5:52</span></div>
+            <div><i>⊗</i><span>&lt;Hero&gt; is not a registry primitive — write &lt;Missing kind="Hero" reason="…" /&gt; and the registry hears about it</span><span class="loc">Sheet &gt; Hero</span></div>
+          </div></div>
+        </div>
+      </div>
+      <span class="pin" style="left:690px;top:112px">1</span>
+      <span class="pin" style="left:520px;top:272px">2</span>
+      <span class="pin" style="left:345px;top:345px">3</span>
+    </div>
+    <div class="fnote">Two kinds of wrong. 1 the header holds: <code>Not saved — the source has errors</code>, <code>‹/›</code> and <code>Done</code> disabled. 2 a parse error knows its line, so it marks the gutter and underlines; a schema error (an element the registry does not have, a prop it does not take) carries a path instead, so 3 the problems list shows <code>line:col</code> for the first and <code>Sheet &gt; Hero</code> for the second, and the gutter stays quiet for it. Fix both and the next pause saves. The parser's own sentence is shown as the parser says it; the registry message is the validator's template.</div>
+  </article>
+
+  <div class="sticky" style="left:4800px;top:0">
+    <b>Decisions</b>
+    <ol>
+      <li>Only the top level becomes blocks, and only plain-text kinds: a nested or marked-up element is locked rather than lossy. Typing can never silently flatten what Washi designed.</li>
+      <li>Autosave sends <code>baseVersion</code> so a person and Washi can write the same page in the same minute and the server merges on a fork; the editor only absorbs a remote change while it has nothing unsaved.</li>
+      <li>Source mode has no hooks tab, no preview pane: the WSX is the page, and the checker is the server's — so what saves here is exactly what Washi is held to.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ───────────────────────── CHROME AND MENUS ───────────────────────── -->
+<section class="cv-group" data-name="Chrome and menus" data-note="metadata, never the doc · one 300px picker for each · the ⋯ menu, 260px">
+
+  <article class="frame" data-name="Icon picker" data-w="560" data-h="440">
+    <div class="app">
+      <div class="sheet" style="padding:10px 40px 0;max-width:none">
+        <div class="bigicon" style="background:var(--s-accent)">🧭</div>
+        <div class="menu w300 abs" style="left:40px;top:120px">
+          <div class="ttl">Icon<span class="rm">Remove</span></div>
+          <div class="emoji"><span>📝</span><span>📚</span><span>📖</span><span>🗂️</span><span>📌</span><span>📎</span><span>✅</span><span>🗓️</span><span>💡</span><span>🚀</span><span>🎯</span><span class="on">🧭</span><span>🧪</span><span>🛠️</span><span>⚙️</span><span>🔒</span><span>📈</span><span>💰</span><span>🧾</span><span>🏷️</span><span>📦</span><span>🗺️</span><span>✈️</span><span>🏠</span><span>🌱</span><span>🌿</span><span>🍵</span><span>🍣</span><span>🍜</span><span>☕</span><span>🌸</span><span>🌙</span><span>☀️</span><span>⭐</span><span>🔥</span><span>🌊</span><span>🎨</span><span>🎵</span><span>🎮</span><span>📷</span><span>🧑‍💻</span><span>👥</span><span>💬</span><span>❤️</span><span>🙌</span><span>🧠</span><span>🐱</span><span>🦊</span></div>
+        </div>
+      </div>
+      <span class="pin" style="left:100px;top:50px">1</span>
+      <span class="pin" style="left:330px;top:130px">2</span>
+    </div>
+    <div class="fnote">1 the 72px icon is the button (<code>Change the icon</code>); <code>Add icon</code> in the quiet row opens the same picker. 2 a 300px dialog: <code>Icon</code>, <code>Remove</code> when one is set, and an 8-column grid of 48 emoji — no tabs, no search. <code>SheetIcon</code> also reads the registry names Washi uses (<code>notebook</code>, <code>compass</code>, <code>chart</code>…); people pick emoji, the agent picks names, both are one <code>icon</code> string.</div>
+  </article>
+
+  <article class="frame" data-name="Cover picker" data-w="560" data-h="440">
+    <div class="app">
+      <div class="cover" style="height:120px"><span class="chg" style="background:var(--s-accent)">Change cover</span></div>
+      <div class="sheet" style="padding:0 40px;max-width:none"><div class="bigicon over">🧭</div></div>
+      <div class="menu w300 abs" style="left:220px;top:150px">
+        <div class="ttl">Cover<span class="rm">Remove</span></div>
+        <div class="covers">
+          <span style="background:linear-gradient(120deg,#d4713f,#e9a066)"><i>Persimmon</i></span>
+          <span style="background:linear-gradient(120deg,#f7edd6,#e6d3ad)"><i>Paper</i></span>
+          <span class="on" style="background:linear-gradient(120deg,#aebb9a,#74866a)"><i>Sage</i></span>
+          <span style="background:linear-gradient(120deg,#c9d6a3,#8fa65c)"><i>Matcha</i></span>
+          <span style="background:linear-gradient(120deg,#f7d3c4,#f0a487)"><i>Sakura</i></span>
+          <span style="background:linear-gradient(120deg,#3d4f7c,#7a8cbf)"><i>Indigo</i></span>
+          <span style="background:linear-gradient(120deg,#bcd8e8,#f2e6c9)"><i>Sky</i></span>
+          <span style="background:linear-gradient(120deg,#31261e,#8a5a3c)"><i>Dusk</i></span>
+          <span style="background:linear-gradient(120deg,#221a14,#4a3a2e)"><i>Ink</i></span>
+        </div>
+      </div>
+      <span class="pin" style="left:420px;top:92px">1</span>
+      <span class="pin" style="left:200px;top:300px">2</span>
+    </div>
+    <div class="fnote">1 <code>Change cover</code> on hover over the band, or <code>Add cover</code> in the quiet row. 2 nine presets from Washi's own palette, each a key the page stores (<code>sheets.updateMeta { cover: 'sage' }</code>) — never a URL, never an upload, so a workspace file carries no blobs and a cover renders the same offline, hosted or embedded.</div>
+  </article>
+
+  <article class="frame" data-name="Page menu" data-w="560" data-h="440">
+    <div class="app">
+      <div class="hdr" style="border-bottom:1px solid var(--s-border)"><span class="crumb">Netko Labs <span style="opacity:.5">/</span> <b>How we work</b> · edited 25 min ago</span><span class="sp"></span><span class="btn ghost cnt">💬</span><span class="btn">✎ Edit</span><span class="btn">⧉ Copy link</span><span class="btn ghost icon" style="background:var(--s-accent)">⋯</span></div>
+      <div class="menu w260 abs" style="right:16px;top:56px">
+        <div class="mi">Rename</div>
+        <div class="mi">Full width<span class="sw toggle off"></span></div>
+        <div class="mi">Duplicate</div>
+        <div class="mi">Move to…</div>
+        <div class="mi">Edit source</div>
+        <div class="sep"></div>
+        <div class="mi danger">Move to Trash</div>
+      </div>
+      <span class="pin" style="left:270px;top:108px">1</span>
+      <span class="pin" style="left:270px;top:268px">2</span>
+    </div>
+    <div class="fnote">The <code>⋯</code> (<code>Page options</code>), 260px. 1 <code>Rename</code> and <code>Move to…</code> swap the list for an inline form in the same popover; <code>Full width</code> is a switch; <code>Duplicate</code> copies the source; <code>Edit source</code> opens the page in source mode. 2 <code>Move to Trash</code> trashes the subtree under one stamp. No shortcuts and no Copy link here — that is its own header button, always on.</div>
+  </article>
+
+  <article class="frame" data-name="Move to… panel" data-w="560" data-h="440">
+    <div class="app">
+      <div class="hdr" style="border-bottom:1px solid var(--s-border)"><span class="crumb">Netko Labs <span style="opacity:.5">/</span> Wiki <span style="opacity:.5">/</span> <b>How we work</b></span><span class="sp"></span><span class="btn ghost cnt">💬</span><span class="btn">✎ Edit</span><span class="btn">⧉ Copy link</span><span class="btn ghost icon" style="background:var(--s-accent)">⋯</span></div>
+      <div class="menu w260 abs" style="right:16px;top:56px">
+        <div class="in">Move to…</div>
+        <div class="mi"><span class="g">⤴</span>Top level</div>
+        <div class="mi"><span class="g">▤</span>Backlog</div>
+        <div class="mi"><span class="g">▥</span>Roadmap</div>
+        <div class="mi"><span class="g">❧</span>Ideas</div>
+        <div class="mi"><span class="g">☷</span>Weekly review</div>
+      </div>
+      <div class="menu w260 abs" style="left:16px;top:200px">
+        <div class="in"><b>ro</b><span class="caret"></span></div>
+        <div class="mi"><span class="g">▥</span>Roadmap</div>
+      </div>
+      <div class="menu w260 abs" style="left:16px;top:320px">
+        <div class="in"><b>zzz</b></div>
+        <div class="ph">No page by that name.</div>
+      </div>
+      <span class="pin" style="left:270px;top:150px">1</span>
+      <span class="pin" style="left:270px;top:190px">2</span>
+    </div>
+    <div class="fnote">A flat, filtered list — not a tree. 1 <code>Top level</code> appears only while the page has a parent and the box is empty. 2 the page's own subtree is missing from the list (it is also refused server-side, <code>SheetMoveError</code> → 400). Clicking a row moves at once: <code>parent_id</code> + a fractional <code>position</code>, one row rewritten. No confirm — Move to… again is the undo. Two more states at left: a match, and <code>No page by that name.</code></div>
+  </article>
+
+  <article class="frame" data-name="Rename" data-w="560" data-h="440">
+    <div class="app">
+      <div class="hdr" style="border-bottom:1px solid var(--s-border)"><span class="crumb">Netko Labs <span style="opacity:.5">/</span> <b>How we work</b></span><span class="sp"></span><span class="btn ghost cnt">💬</span><span class="btn">✎ Edit</span><span class="btn">⧉ Copy link</span><span class="btn ghost icon" style="background:var(--s-accent)">⋯</span></div>
+      <div class="menu w260 abs" style="right:16px;top:56px;padding:8px">
+        <div style="display:flex;gap:6px"><span class="in" style="flex:1;margin:0;border-color:var(--s-primary)"><b>How we ship</b><span class="caret"></span></span><span class="btn pri" style="height:32px">Rename</span></div>
+      </div>
+      <div class="sheet" style="padding:140px 40px 0;max-width:none"><h1>How we work</h1><p class="lead">Issues, projects, and the Friday review.</p></div>
+      <span class="pin" style="left:300px;top:60px">1</span>
+      <span class="pin" style="left:30px;top:150px">2</span>
+    </div>
+    <div class="fnote">1 Rename is an inline form in the menu's popover: one field (<code>Page name</code>, 200 chars), one button. 2 it writes the title only — the sheet's first <code>&lt;Title&gt;</code> is left alone, so the heading on the page can differ from the name in the tree, as in Notion. A page whose title comes from its first typed h1 keeps following it until renamed here.</div>
+  </article>
+
+  <div class="sticky" style="left:3300px;top:0">
+    <b>Decisions</b>
+    <ol>
+      <li>Icon, cover, width and name are rows in <code>sheets</code>, not WSX: a cover change by one person must not conflict with a paragraph typed by another, and Washi must never have to parse a cover to rewrite a list.</li>
+      <li>Presets over uploads: no blob store, no CDN, the same nine on every host — and a page cannot be made ugly in a way the kit did not foresee.</li>
+      <li>Move to… is flat search because the tree is already in the sidebar (drag works there); the panel is for when you know the name.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ───────────────────────── TOGETHER ───────────────────────── -->
+<section class="cv-group" data-name="Together" data-note="a discussion beside the page · who is here · Washi's writes are marked and undoable · when a merge cannot">
+
+  <article class="frame" data-name="Comments panel" data-w="1280" data-h="800">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / 0192… / p / 0192…</span></div>
+      <div class="shell">
+        <aside class="side">
+          <div class="ws"><i></i>Netko Labs <span class="car">⇅</span><span class="new">✎</span></div>
+          <div class="it"><span class="g">⌕</span>Search<span class="n">⌘K</span></div>
+          <div class="it"><span class="g">▦</span>Dashboard</div>
+          <div class="it"><span class="g">◫</span>Inbox<span class="badge">3</span></div>
+          <div class="it"><span class="g">⚙</span>Settings</div>
+          <div class="lbl">Pages</div>
+          <div class="it"><span class="g">▤</span>Backlog</div>
+          <div class="it"><span class="g">▥</span>Roadmap</div>
+          <div class="it"><span class="g">▯</span>Wiki</div>
+          <div class="it ind on"><span class="g">◎</span>How we work</div>
+          <div class="it"><span class="g">❧</span>Ideas</div>
+          <div class="it"><span class="g">☷</span>Weekly review</div>
+          <div class="it"><span class="g">+</span>New page</div>
+          <div class="it"><span class="g">🗑</span>Trash</div>
+          <div class="foot">
+            <div class="washi-row"><span class="sdot"></span><b>Washi</b><span class="st">· Idle</span></div>
+            <div class="washi-row" style="padding-top:0"><span class="mono">today $0.42 of $25 · 6 turns</span></div>
+            <div class="user"><span class="av lg" style="--c:#c25f2c">JV</span><div><div>Juan Villamizar</div><div class="em">juan@netko.dev</div></div><div class="ic"><span>☾</span><span>⇥</span></div></div>
+          </div>
+        </aside>
+        <div class="content">
+          <div class="tabs"><span>▯ Wiki <span class="x">×</span></span><span class="on">◎ How we work <span class="x">×</span></span><span class="plus">+</span></div>
+          <div class="hdr">
+            <span class="crumb">Netko Labs <span style="opacity:.5">/</span> Wiki <span style="opacity:.5">/</span> <b>How we work</b> · edited 25 min ago</span>
+            <span class="btn ghost icon">☆</span>
+            <span class="sp"></span>
+            <span class="btn ghost cnt" style="background:var(--s-accent);color:var(--s-fg)">💬 <b>2</b></span><span class="btn">✎ Edit</span><span class="btn">⧉ Copy link</span><span class="btn ghost icon">⋯</span>
+          </div>
+          <div class="pv">
+            <div class="main"><div class="sheet" style="max-width:620px">
+              <div class="bigicon">🧭</div>
+              <h1>How we work</h1>
+              <p>• Issues live in the Backlog; anything in flight has an owner.</p>
+              <p>• Projects live on the Roadmap, with dates.</p>
+              <p>• Washi refreshes the Weekly review every evening.</p>
+            </div></div>
+            <div class="cpanel">
+              <div class="ch">Comments<span class="x">×</span></div>
+              <div class="list">
+                <div class="thread">
+                  <div class="cmt"><span class="av">RK</span><div><div class="who">Rin Kobayashi<i>25 min ago</i></div><p><span class="m">@Juan Villamizar</span> can we say "owner" everywhere, not "assignee"? The Backlog column still says assignee.</p></div></div>
+                  <div class="cmt"><span class="av">JV</span><div><div class="who">Juan Villamizar<i>10 min ago</i><span class="del">Delete</span></div><p>Yes — I'll ask Washi to rename the column and sweep the wiki.</p></div></div>
+                  <div class="acts"><span>Reply</span><span>✓ Resolve</span></div>
+                </div>
+                <div class="thread">
+                  <div class="cmt"><span class="av">MT</span><div><div class="who">Mika Tanaka<i>yesterday</i></div><p>Should the Friday review move to 17:00 for the Tokyo folks?</p></div></div>
+                  <div class="acts"><span>Reply</span><span>✓ Resolve</span></div>
+                </div>
+                <div class="thread res">
+                  <div class="cmt"><span class="av">RK</span><div><div class="who">Rin Kobayashi<i>3 days ago</i></div><p>Add the on-call rota here?</p></div></div>
+                  <div class="acts"><span>↻ Reopen</span></div>
+                </div>
+              </div>
+              <div class="comp">
+                <div class="mp"><div class="on"><span class="av">MT</span>Mika Tanaka</div><div><span class="av">MK</span>Mina Kato</div></div>
+                <div class="ta on">Owner it is — <span class="m">@M</span><span class="caret"></span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <span class="pin" style="left:930px;top:112px">1</span>
+      <span class="pin" style="left:930px;top:190px">2</span>
+      <span class="pin" style="left:930px;top:505px">3</span>
+      <span class="pin" style="left:930px;top:690px">4</span>
+    </div>
+    <div class="fnote">1 the header's Comments (with its open count) or the chrome's <code>Add comment</code> opens 2 a 340px column beside the page — Dash-style, not a drawer over it; full screen on a phone. Threads are page-level (no block anchors), open first, 3 resolved after at 60% with <code>Reopen</code>. 4 the composer: Enter sends, Shift+Enter breaks, <code>@</code> after a space opens the member picker (six at most), Enter or Tab picks and inserts <code>@Name </code>; a mention still in the text when sent becomes an unread Inbox row for that person. Comments live in the workspace file, so they travel with it (C1).</div>
+  </article>
+
+  <article class="frame" data-name="Presence" data-w="1280" data-h="800">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / 0192… / p / 0192…</span></div>
+      <div class="shell">
+        <aside class="side">
+          <div class="ws"><i></i>Netko Labs <span class="car">⇅</span><span class="new">✎</span></div>
+          <div class="it"><span class="g">⌕</span>Search<span class="n">⌘K</span></div>
+          <div class="it"><span class="g">▦</span>Dashboard</div>
+          <div class="it"><span class="g">◫</span>Inbox<span class="badge">3</span></div>
+          <div class="it"><span class="g">⚙</span>Settings</div>
+          <div class="lbl">Pages</div>
+          <div class="it"><span class="g">▤</span>Backlog</div>
+          <div class="it"><span class="g">▥</span>Roadmap</div>
+          <div class="it"><span class="g">▯</span>Wiki</div>
+          <div class="it"><span class="g">❧</span>Ideas</div>
+          <div class="it on"><span class="g">☷</span>Weekly review</div>
+          <div class="it"><span class="g">+</span>New page</div>
+          <div class="it"><span class="g">🗑</span>Trash</div>
+          <div class="foot">
+            <div class="washi-row"><span class="sdot work"></span><b>Washi</b><span class="st">· Working</span></div>
+            <div class="washi-row" style="padding-top:0"><span class="mono">today $0.49 of $25 · 7 turns</span></div>
+            <div class="user"><span class="av lg" style="--c:#c25f2c">JV</span><div><div>Juan Villamizar</div><div class="em">juan@netko.dev</div></div><div class="ic"><span>☾</span><span>⇥</span></div></div>
+          </div>
+        </aside>
+        <div class="content">
+          <div class="tabs"><span class="on">☷ Weekly review <span class="x">×</span></span><span class="plus">+</span></div>
+          <div class="hdr">
+            <span class="crumb">Netko Labs <span style="opacity:.5">/</span> <b>Weekly review</b> · edited just now</span>
+            <span class="btn ghost icon">☆</span>
+            <span class="sp"></span>
+            <span class="apill"><i data-mascot="happy" data-size="17"></i>Washi writing</span>
+            <span class="btn ghost cnt">💬</span><span class="btn">✎ Edit</span><span class="btn">⧉ Copy link</span><span class="btn ghost icon">⋯</span>
+          </div>
+          <div class="pv"><div class="main">
+            <div class="sheet">
+              <div class="ctop"><span class="wpill">✦ Washi is writing</span><span class="pres"><span class="av ed" title="Rin Kobayashi · editing">RK</span><span class="av">MT</span><span class="av">MK</span></span></div>
+              <div class="chrome quiet" style="padding-top:16px"><span>☺ Add icon</span><span>▭ Add cover</span><span>💬 Add comment</span></div>
+              <h1>Weekly review</h1>
+              <div class="callout"><span class="ic">💡</span><div><b>This week</b> · 3 shipped, 2 in flight. The Safari invite bug moved to Rin; the routine fix landed Tuesday.</div></div>
+              <h2>Shipped, last 30 days</h2>
+              <div class="chartcard"><div class="h"><b>issues</b> status in Done <span class="src">30d · history</span></div><svg viewBox="0 0 600 90" width="100%" height="90"><path d="M0 80 L60 76 L120 70 L180 71 L240 60 L300 58 L360 44 L420 40 L480 30 L540 24 L600 18 L600 90 L0 90Z" fill="#3d5a7322"/><path d="M0 80 L60 76 L120 70 L180 71 L240 60 L300 58 L360 44 L420 40 L480 30 L540 24 L600 18" fill="none" stroke="#3d5a73" stroke-width="2"/></svg></div>
+            </div>
+          </div></div>
+        </div>
+      </div>
+      <div class="fab"><i data-mascot="happy bob" data-size="40" class="m"></i></div>
+      <span class="pin" style="left:885px;top:112px">1</span>
+      <span class="pin" style="left:1040px;top:112px">2</span>
+      <span class="pin" style="left:238px;top:655px">3</span>
+    </div>
+    <div class="fnote">Who is on the page, top-right of the column (not in the app header). 1 <code>Washi is writing</code> is a slate pill, not an avatar: it appears when Washi starts a <code>sheet_replace</code> here and stays 20s after its last write. 2 teammates are 24px initials, stacked; a slate ring means that person is editing (<code>Rin Kobayashi · editing</code> on hover). You are not in your own stack. Presence is a 15s <code>live.here</code> heartbeat kept in the runtime's memory — never a record, gone 40s after the last beat. 3 the sidebar foot and the header pill say the same thing from the agent's side. There are no in-page cursors: Washi shows where it wrote, not where it points.</div>
+  </article>
+
+  <article class="frame" data-name="Washi wrote here" data-w="1280" data-h="800">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / 0192… / p / 0192…</span></div>
+      <div class="shell">
+        <aside class="side">
+          <div class="ws"><i></i>Netko Labs <span class="car">⇅</span><span class="new">✎</span></div>
+          <div class="it"><span class="g">⌕</span>Search<span class="n">⌘K</span></div>
+          <div class="it"><span class="g">▦</span>Dashboard</div>
+          <div class="it"><span class="g">◫</span>Inbox<span class="badge">3</span></div>
+          <div class="it"><span class="g">⚙</span>Settings</div>
+          <div class="lbl">Pages</div>
+          <div class="it"><span class="g">▤</span>Backlog</div>
+          <div class="it"><span class="g">▥</span>Roadmap</div>
+          <div class="it"><span class="g">▯</span>Wiki</div>
+          <div class="it"><span class="g">❧</span>Ideas</div>
+          <div class="it on"><span class="g">☷</span>Weekly review</div>
+          <div class="it"><span class="g">+</span>New page</div>
+          <div class="it"><span class="g">🗑</span>Trash</div>
+          <div class="foot">
+            <div class="washi-row"><span class="sdot"></span><b>Washi</b><span class="st">· Idle</span></div>
+            <div class="washi-row" style="padding-top:0"><span class="mono">today $0.49 of $25 · 7 turns</span></div>
+            <div class="user"><span class="av lg" style="--c:#c25f2c">JV</span><div><div>Juan Villamizar</div><div class="em">juan@netko.dev</div></div><div class="ic"><span>☾</span><span>⇥</span></div></div>
+          </div>
+        </aside>
+        <div class="content">
+          <div class="tabs"><span class="on">☷ Weekly review <span class="x">×</span></span><span class="plus">+</span></div>
+          <div class="hdr">
+            <span class="crumb">Netko Labs <span style="opacity:.5">/</span> <b>Weekly review</b> · edited 5 min ago</span>
+            <span class="btn ghost icon">☆</span>
+            <span class="sp"></span>
+            <span class="apill"><i data-mascot="happy" data-size="17"></i>Washi done</span>
+            <span class="btn ghost cnt">💬</span><span class="btn">✎ Edit</span><span class="btn">⧉ Copy link</span><span class="btn ghost icon">⋯</span>
+          </div>
+          <div class="pv"><div class="main">
+            <div class="sheet">
+              <div class="ctop"><span class="wmark">✦ Washi wrote this 5 min ago<span class="u hov">↶ Undo</span></span></div>
+              <div class="chrome quiet" style="padding-top:16px"><span>☺ Add icon</span><span>▭ Add cover</span><span>💬 Add comment</span></div>
+              <h1>Weekly review</h1>
+              <div class="callout"><span class="ic">💡</span><div><b>This week</b> · 3 shipped, 2 in flight. The Safari invite bug moved to Rin; the routine fix landed Tuesday. Friday review moves to 17:00 Tokyo.</div></div>
+              <h2>Shipped, last 30 days</h2>
+              <div class="chartcard"><div class="h"><b>issues</b> status in Done <span class="src">30d · history</span></div><svg viewBox="0 0 600 90" width="100%" height="90"><path d="M0 80 L60 76 L120 70 L180 71 L240 60 L300 58 L360 44 L420 40 L480 30 L540 24 L600 18 L600 90 L0 90Z" fill="#3d5a7322"/><path d="M0 80 L60 76 L120 70 L180 71 L240 60 L300 58 L360 44 L420 40 L480 30 L540 24 L600 18" fill="none" stroke="#3d5a73" stroke-width="2"/></svg></div>
+              <h2>Still open</h2>
+              <div class="wsxblk"><div class="tb"><span class="seg"><span class="on">Shipped</span><span>In flight</span></span><span class="cnt">issues · 4 rows</span></div><div class="grid" style="--cols:2.4fr 1fr 1fr"><div class="gr gh"><div class="gc">name</div><div class="gc">status</div><div class="gc">assignee</div></div><div class="gr"><div class="gc">Weekly review routine skips an empty table</div><div class="gc"><span class="pill done"><i class="dot"></i>Done</span></div><div class="gc"><span class="av w">和</span> Washi</div></div></div></div>
+            </div>
+          </div></div>
+        </div>
+      </div>
+      <div class="fab"><i data-mascot="happy bob" data-size="40" class="m"></i></div>
+      <span class="pin" style="left:1040px;top:112px">1</span>
+      <span class="pin" style="left:520px;top:235px">2</span>
+      <span class="pin" style="left:1035px;top:68px">3</span>
+    </div>
+    <div class="fnote">The 17:00 routine just rewrote the <code>This week</code> callout. Page and table writes land without asking, marked <code>edited_by = 'washi'</code>. 1 so the page says it, in one line of the chrome: <code>Washi wrote this 5 min ago · Undo</code>. Each Washi write pushes the prior state onto <code>sheet_revisions</code> (last 20); Undo pops one and can be pressed again for the one before. 2 the moment a person changes the page the stack clears and the line goes — Undo never erases their words. If the page moved on underneath: <code>Could not undo — the page changed since.</code> 3 the header pill reads <code>Washi done</code>. There is no per-block bar: the unit of a Washi write is the page.</div>
+  </article>
+
+  <article class="frame" data-name="Conflict" data-w="1280" data-h="800">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / 0192… / p / 0192…</span></div>
+      <div class="shell">
+        <aside class="side">
+          <div class="ws"><i></i>Netko Labs <span class="car">⇅</span><span class="new">✎</span></div>
+          <div class="it"><span class="g">⌕</span>Search<span class="n">⌘K</span></div>
+          <div class="it"><span class="g">▦</span>Dashboard</div>
+          <div class="it"><span class="g">◫</span>Inbox<span class="badge">3</span></div>
+          <div class="it"><span class="g">⚙</span>Settings</div>
+          <div class="lbl">Pages</div>
+          <div class="it"><span class="g">▤</span>Backlog</div>
+          <div class="it"><span class="g">▥</span>Roadmap</div>
+          <div class="it"><span class="g">▯</span>Wiki</div>
+          <div class="it ind on"><span class="g">◎</span>How we work</div>
+          <div class="it"><span class="g">❧</span>Ideas</div>
+          <div class="it"><span class="g">☷</span>Weekly review</div>
+          <div class="it"><span class="g">+</span>New page</div>
+          <div class="it"><span class="g">🗑</span>Trash</div>
+          <div class="foot">
+            <div class="washi-row"><span class="sdot work"></span><b>Washi</b><span class="st">· Working</span></div>
+            <div class="washi-row" style="padding-top:0"><span class="mono">today $0.49 of $25 · 7 turns</span></div>
+            <div class="user"><span class="av lg" style="--c:#c25f2c">JV</span><div><div>Juan Villamizar</div><div class="em">juan@netko.dev</div></div><div class="ic"><span>☾</span><span>⇥</span></div></div>
+          </div>
+        </aside>
+        <div class="content">
+          <div class="tabs"><span>▯ Wiki <span class="x">×</span></span><span class="on">◎ How we work <span class="x">×</span></span><span class="plus">+</span></div>
+          <div class="hdr">
+            <span class="crumb">Netko Labs <span style="opacity:.5">/</span> Wiki <span style="opacity:.5">/</span> <b>How we work</b> · edited just now</span>
+            <span class="btn ghost icon">☆</span>
+            <span class="sp"></span>
+            <span class="btn ghost cnt">💬</span><span class="stat bad">Couldn't save — keep typing to retry</span><span class="btn ghost icon src">‹/›</span><span class="btn pri">✓ Done</span><span class="btn">⧉ Copy link</span><span class="btn ghost icon">⋯</span>
+          </div>
+          <div class="pv"><div class="main">
+            <div class="sheet ed">
+              <div class="ctop"><span class="wpill">✦ Washi is writing</span></div>
+              <div class="chrome hide" style="padding-top:16px"><span>☺ Add icon</span></div>
+              <div class="blk h1"><div class="hd"><span>+</span><span>⋮⋮</span></div>How we work</div>
+              <div class="blk li"><div class="hd"><span>+</span><span>⋮⋮</span></div><span class="mk">•</span><span>Issues live in the Backlog; anything in flight has an owner.</span></div>
+              <div class="blk li hov"><div class="hd"><span>+</span><span>⋮⋮</span></div><span class="mk">•</span><span>Projects live on the Roadmap, with dates — and a single owner each<span class="caret"></span></span></div>
+              <div class="blk li"><div class="hd"><span>+</span><span>⋮⋮</span></div><span class="mk">•</span><span>Washi refreshes the Weekly review every evening.</span></div>
+              <div class="lock rest"><div class="wsxblk"><div class="tb"><span class="seg"><span class="on">In flight</span></span><span class="cnt">issues · 4 rows</span></div><div class="grid" style="--cols:2.4fr 1fr 1fr"><div class="gr gh"><div class="gc">name</div><div class="gc">status</div><div class="gc">owner</div></div><div class="gr"><div class="gc">Sign-in redirect loses the invite token on Safari</div><div class="gc"><span class="pill prog"><i class="dot"></i>In progress</span></div><div class="gc"><span class="av">RK</span> Rin</div></div></div></div></div>
+            </div>
+          </div></div>
+        </div>
+      </div>
+      <span class="pin" style="left:690px;top:112px">1</span>
+      <span class="pin" style="left:885px;top:160px">2</span>
+    </div>
+    <div class="fnote">Juan is typing a bullet while Washi rewrites the same list. The save carried <code>baseVersion</code>; the server replayed it on a fork and merged — and the merge produced WSX that does not validate, so the service threw <code>SheetConflictError</code> (<code>page … changed under this edit and the two do not fit together; reload it</code>, a 400). 1 what the editor shows today is the generic <code>Couldn't save — keep typing to retry</code>: autosave catches every failure as <code>failed</code>. 2 the presence pill is the only hint of why. Nothing is lost — the draft stays in the editor and the next pause retries against the new version — but the person is not told what happened.</div>
+  </article>
+
+  <article class="frame" data-name="Conflict · proposed" data-w="1280" data-h="800">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / 0192… / p / 0192…</span></div>
+      <div class="shell">
+        <aside class="side">
+          <div class="ws"><i></i>Netko Labs <span class="car">⇅</span><span class="new">✎</span></div>
+          <div class="it"><span class="g">⌕</span>Search<span class="n">⌘K</span></div>
+          <div class="it"><span class="g">▦</span>Dashboard</div>
+          <div class="it"><span class="g">◫</span>Inbox<span class="badge">3</span></div>
+          <div class="it"><span class="g">⚙</span>Settings</div>
+          <div class="lbl">Pages</div>
+          <div class="it"><span class="g">▤</span>Backlog</div>
+          <div class="it"><span class="g">▥</span>Roadmap</div>
+          <div class="it"><span class="g">▯</span>Wiki</div>
+          <div class="it ind on"><span class="g">◎</span>How we work</div>
+          <div class="it"><span class="g">❧</span>Ideas</div>
+          <div class="it"><span class="g">☷</span>Weekly review</div>
+          <div class="it"><span class="g">+</span>New page</div>
+          <div class="it"><span class="g">🗑</span>Trash</div>
+          <div class="foot">
+            <div class="washi-row"><span class="sdot"></span><b>Washi</b><span class="st">· Idle</span></div>
+            <div class="washi-row" style="padding-top:0"><span class="mono">today $0.49 of $25 · 7 turns</span></div>
+            <div class="user"><span class="av lg" style="--c:#c25f2c">JV</span><div><div>Juan Villamizar</div><div class="em">juan@netko.dev</div></div><div class="ic"><span>☾</span><span>⇥</span></div></div>
+          </div>
+        </aside>
+        <div class="content">
+          <div class="tabs"><span>▯ Wiki <span class="x">×</span></span><span class="on">◎ How we work <span class="x">×</span></span><span class="plus">+</span></div>
+          <div class="hdr">
+            <span class="crumb">Netko Labs <span style="opacity:.5">/</span> Wiki <span style="opacity:.5">/</span> <b>How we work</b> · edited just now</span>
+            <span class="btn ghost icon">☆</span>
+            <span class="sp"></span>
+            <span class="btn ghost cnt">💬</span><span class="stat bad">Not saved — Washi changed this page under you</span><span class="btn ghost icon src">‹/›</span><span class="btn pri">✓ Done</span><span class="btn">⧉ Copy link</span><span class="btn ghost icon">⋯</span>
+          </div>
+          <div class="pv"><div class="main">
+            <div class="sheet ed">
+              <div class="ctop"><span class="wmark">✦ Washi wrote this just now</span></div>
+              <div class="chrome hide" style="padding-top:16px"><span>☺ Add icon</span></div>
+              <div class="callout" style="margin:18px 0 10px;border-color:#3d5a7355;background:#3d5a730d"><span class="ic">✦</span><div><b>Washi rewrote this list while you typed, and your bullet does not fit the new shape.</b><br /><span class="muted">Your words are still here. Take Washi's version and keep typing, or keep yours and Washi's write is undone.</span><div style="display:flex;gap:6px;margin-top:10px"><span class="btn pri">Take Washi's, keep my bullet</span><span class="btn">Keep mine, undo Washi's</span><span class="btn ghost">Show both</span></div></div></div>
+              <div class="blk h1"><div class="hd"><span>+</span><span>⋮⋮</span></div>How we work</div>
+              <div class="blk li"><div class="hd"><span>+</span><span>⋮⋮</span></div><span class="mk">•</span><span>Issues live in the Backlog; anything in flight has an owner.</span></div>
+              <div class="blk li hov"><div class="hd"><span>+</span><span>⋮⋮</span></div><span class="mk">•</span><span>Projects live on the Roadmap, with dates — and a single owner each<span class="caret"></span></span></div>
+              <div class="blk li"><div class="hd"><span>+</span><span>⋮⋮</span></div><span class="mk">•</span><span>Washi refreshes the Weekly review every evening.</span></div>
+            </div>
+          </div></div>
+        </div>
+      </div>
+      <span class="pin" style="left:690px;top:112px">1</span>
+      <span class="pin" style="left:520px;top:190px">2</span>
+    </div>
+    <div class="fnote">Proposed: name the conflict. 1 autosave distinguishes <code>SheetConflictError</code> from a plain failure and the label says who: <code>Not saved — Washi changed this page under you</code> (or the teammate's name from presence). 2 one card above the blocks with the two honest exits the data already allows — absorb the server's version and re-apply the typed block (<code>absorb</code> keeps ids under the caret), or keep the draft and pop Washi's write off <code>sheet_revisions</code>. Why: today the person sees a retry message for something that will never retry clean, and the only working fix is to reload. Nothing new on the server; the editor just stops swallowing the error's class.</div>
+  </article>
+
+  <div class="sticky" style="left:4140px;top:0">
+    <b>Decisions</b>
+    <ol>
+      <li>Comments beside, not over: a discussion about a page should be read with the page, and a 340px column costs the 760px measure nothing on a laptop.</li>
+      <li>Washi's writes land without asking but never silently: the mark + Undo is the approval, after the fact, and the stack clears on a human edit so Undo can never take a person's words.</li>
+      <li>Presence is memory, not rows (C1 and C3): a heartbeat is not content, and a workspace file must stay portable.</li>
+    </ol>
+  </div>
+</section>
+
+</div></main>
+<script src="../_kit/mascot.js"></script>
+<script src="../_kit/canvas.js"></script>
+</body>
+</html>

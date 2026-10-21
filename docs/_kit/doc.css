@@ -166,11 +166,15 @@ strong {
 .column {
   padding: 3rem clamp(1.2rem, 5vw, 5rem) 6rem;
 }
-.column > * {
+.column > *,
+section.s > * {
   max-width: var(--measure);
 }
+.column > section.s,
 .column > .wide,
-.column > .plate.wide {
+.column > .plate.wide,
+section.s > .wide,
+section.s > .plate.wide {
   max-width: min(72rem, 100%);
 }
 
