@@ -283,6 +283,13 @@ function init() {
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init)
 else init()
 
+function copyFailed() {
+  const copy = document.querySelector('.cv-bar .rv-toggle:last-of-type')
+  if (!copy) return
+  copy.textContent = 'Select the notes and copy'
+  setTimeout(() => (copy.textContent = 'Copy notes'), 2000)
+}
+
 function fallbackCopy(text, done) {
   const ta = document.createElement('textarea')
   ta.value = text
@@ -291,8 +298,8 @@ function fallbackCopy(text, done) {
   document.body.appendChild(ta)
   ta.select()
   try {
-    document.execCommand('copy')
-    done()
+    if (document.execCommand('copy')) done()
+    else copyFailed()
   } finally {
     ta.remove()
   }
