@@ -415,3 +415,161 @@ body.cv.grabbing * {
     display: none;
   }
 }
+
+/* review mode — a verdict and a note per frame, saved through /_review (docs/serve.ts) */
+.cv-bar .rv-toggle {
+  all: unset;
+  cursor: pointer;
+  font: 600 12px / 1 var(--cv-sans);
+  padding: 6px 10px;
+  border-radius: 7px;
+  border: 1px solid var(--cv-line);
+  background: #fff;
+  color: var(--cv-muted);
+}
+body.reviewing .cv-bar .rv-toggle {
+  background: var(--cv-accent);
+  border-color: var(--cv-accent);
+  color: #fff;
+}
+.frame > .rv {
+  position: absolute;
+  right: 0;
+  top: calc(-8px * var(--inv));
+  transform: translateY(-100%) scale(var(--inv));
+  transform-origin: 100% 100%;
+  display: none;
+  gap: 4px;
+  align-items: center;
+}
+body.reviewing .frame > .rv {
+  display: flex;
+}
+.cv-world[data-zoom="far"] .frame > .rv {
+  display: none;
+}
+.frame > .rv button {
+  all: unset;
+  cursor: pointer;
+  font: 600 11px / 1 var(--cv-mono);
+  padding: 5px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--cv-line);
+  background: #fff;
+  color: var(--cv-muted);
+}
+.frame > .rv button:hover {
+  color: var(--cv-fg);
+}
+.frame > .rv button.on-ok {
+  background: #94a06b;
+  border-color: #94a06b;
+  color: #fff;
+}
+.frame > .rv button.on-fix {
+  background: var(--cv-accent);
+  border-color: var(--cv-accent);
+  color: #fff;
+}
+.frame > .rv .n {
+  font: 600 10px / 1 var(--cv-mono);
+  color: var(--cv-muted);
+  padding: 0 4px;
+}
+.frame.rv-ok {
+  outline: 2px solid #94a06b;
+  outline-offset: 2px;
+}
+.frame.rv-fix {
+  outline: 2px solid var(--cv-accent);
+  outline-offset: 2px;
+}
+.cv-layers button .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex: none;
+  margin-left: 2px;
+}
+.cv-layers button .dot.ok {
+  background: #94a06b;
+}
+.cv-layers button .dot.fix {
+  background: var(--cv-accent);
+}
+.cv-note {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  width: 360px;
+  z-index: 30;
+  background: #fff;
+  border: 1px solid var(--cv-line);
+  border-radius: 12px;
+  box-shadow: 0 16px 48px #0000002e;
+  padding: 12px 12px 10px;
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+}
+.cv-note.open {
+  display: flex;
+}
+.cv-note .h {
+  font: 600 12px / 1.3 var(--cv-sans);
+}
+.cv-note .h small {
+  display: block;
+  font: 500 10.5px / 1.4 var(--cv-mono);
+  color: var(--cv-muted);
+  margin-top: 2px;
+}
+.cv-note textarea {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 84px;
+  resize: vertical;
+  font: 400 13px / 1.45 var(--cv-sans);
+  padding: 8px 10px;
+  border: 1px solid var(--cv-line);
+  border-radius: 8px;
+  outline: none;
+  user-select: text;
+}
+.cv-note textarea:focus {
+  border-color: var(--cv-accent);
+}
+.cv-note .row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.cv-note .row .sp {
+  flex: 1;
+}
+.cv-note .row button {
+  all: unset;
+  cursor: pointer;
+  font: 600 12px / 1 var(--cv-sans);
+  padding: 7px 10px;
+  border-radius: 7px;
+  border: 1px solid var(--cv-line);
+  color: var(--cv-muted);
+}
+.cv-note .row button.primary {
+  background: var(--cv-accent);
+  border-color: var(--cv-accent);
+  color: #fff;
+}
+.cv-note .prev {
+  font: 400 12px / 1.45 var(--cv-sans);
+  color: var(--cv-muted);
+  max-height: 120px;
+  overflow: auto;
+  border-top: 1px solid var(--cv-line);
+  padding-top: 6px;
+}
+.cv-note .prev b {
+  color: var(--cv-fg);
+  font-weight: 600;
+}
