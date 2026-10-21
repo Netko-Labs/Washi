@@ -56,6 +56,14 @@
 .hostline { margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--s-border); font: 500 11px / 1 var(--s-mono); color: var(--s-mfg); display: flex; align-items: center; gap: 6px; }
 .hostline::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--s-ok); }
 /* sidebar top row as the studio has it: switcher + pencil */
+.avmenu { position: absolute; left: 150px; bottom: 58px; width: 190px; padding: 6px; background: var(--s-pop); border: 1px solid var(--s-border); border-radius: 12px; box-shadow: 0 16px 48px #0000002e; z-index: 6; font-size: 13px; }
+.avmenu .row { display: flex; align-items: center; gap: 10px; height: 32px; padding: 0 8px; border-radius: 8px; }
+.avmenu .row.hover { background: var(--s-accent); }
+.avmenu .row .g { width: 16px; text-align: center; color: var(--s-mfg); }
+.avmenu .row .k { margin-left: auto; font: 600 10.5px / 1 var(--s-mono); color: var(--s-mfg); }
+.avmenu .who { padding: 6px 8px 8px; border-bottom: 1px solid var(--s-border); margin-bottom: 4px; }
+.avmenu .who b { display: block; font-weight: 600; }
+.avmenu .who em { font-style: normal; font-size: 11px; color: var(--s-mfg); }
 .side .top { display: flex; align-items: center; gap: 4px; height: 48px; padding: 0 0 0 2px; }
 .side .top .sw { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 6px; border-radius: 8px; font-weight: 600; font-size: 13px; }
 .side .top .sw.on { background: var(--s-accent); }
@@ -63,7 +71,7 @@
 .side .top .sw .car { margin-left: auto; color: var(--s-mfg); font-size: 11px; }
 .side .top .pen { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 8px; color: var(--s-mfg); font-size: 13px; }
 .side .user .ic span.hl { background: var(--s-accent); color: var(--s-fg); }
-.wsmenu { position: absolute; left: 10px; top: 80px; width: 272px; padding: 6px; background: var(--s-pop); border: 1px solid var(--s-border); border-radius: 12px; box-shadow: 0 16px 48px #0000002e; z-index: 6; }
+.wsmenu { position: absolute; left: 10px; bottom: 58px; width: 272px; padding: 6px; background: var(--s-pop); border: 1px solid var(--s-border); border-radius: 12px; box-shadow: 0 16px 48px #0000002e; z-index: 6; }
 .wsmenu .lbl { padding: 4px 8px 6px; font-weight: 600; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--s-mfg); }
 .wsmenu .row { display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 8px; border-radius: 8px; }
 .wsmenu .row.hover { background: var(--s-accent); }
@@ -346,24 +354,23 @@
     <div class="app">
       <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / netko-labs</span></div>
       <div class="shell">
-        <aside class="side">
-          <div class="top"><span class="sw"><i></i>Netko Labs<span class="car">⇅</span></span><span class="pen">✎</span></div>
-          <div class="it"><span class="g">⌕</span>Search<span class="n">⌘K</span></div>
-          <div class="it on"><span class="g">⌂</span>Dashboard</div>
-          <div class="it"><span class="g">◫</span>Inbox</div>
-          <div class="it"><span class="g">⚙</span>Settings</div>
-          <div class="lbl">Pages</div>
+        <aside class="side sb sbD">
+          <div class="sa"><i data-mascot="happy" data-size="20"></i>Ask Washi or search<span class="k">⌘K</span></div>
+          <div class="hrow"><div class="it on"><span class="g">⌂</span>Home</div><span class="ib" title="Inbox">◫</span><span class="ib" title="Threads">≡</span><span class="ib" title="Routines">◷</span></div>
+          <div class="lbl2">Recents</div>
+          <div class="rec"><span class="g">▯</span>Backlog<span class="t">2h</span></div>
+          <div class="rec"><span class="g">▯</span>Roadmap<span class="t">1d</span></div>
+          <div class="rec"><span class="g">▯</span>Wiki<span class="t">3d</span></div>
+          <div class="lbl2">Pages</div>
           <div class="it"><span class="tw">▸</span><span class="g">▤</span>Backlog</div>
           <div class="it"><span class="tw">▸</span><span class="g">▥</span>Roadmap</div>
           <div class="it"><span class="tw">▸</span><span class="g">☰</span>Wiki</div>
           <div class="it"><span class="tw">▸</span><span class="g">◇</span>Ideas</div>
           <div class="it"><span class="tw">▸</span><span class="g">☷</span>Weekly review</div>
-          <div class="it"><span class="g">🗑</span>Trash</div>
-          <div class="foot">
-            <div class="washi-row"><span class="sdot"></span><b>Washi</b><span class="st">· Idle</span></div>
-            <div class="washi-row" style="padding-top:0"><span class="sub">today $0.42 of $25 · 6 turns</span></div>
-            <div class="user"><span class="av lg" style="--c:#7a6a9c">R</span><div><div>Rin</div><div class="em">rin@netko.dev</div></div><div class="ic"><span>☾</span><span>⇥</span></div></div>
-          </div>
+          <div class="lbl2">Routines</div>
+          <div class="act"><span class="g">+</span>Schedule one</div>
+          <div class="it faint" style="margin-top:6px"><span class="g">⌫</span>Trash</div>
+          <div class="wsb"><span class="wsav">N</span>Netko Labs<span class="car">⌄</span><span class="sp"></span><span class="ib">?</span><span class="av" style="--c:#7a6a9c">R</span></div>
         </aside>
         <div class="content">
           <div class="tabs"><span class="on">⌂ Dashboard <span class="x">×</span></span><span class="plus">+</span></div>
@@ -416,25 +423,24 @@
     <div class="app">
       <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / netko-labs / p / wiki</span></div>
       <div class="shell">
-        <aside class="side">
-          <div class="top"><span class="sw on"><i></i>Netko Labs<span class="car">⇅</span></span><span class="pen">✎</span></div>
-          <div class="it"><span class="g">⌕</span>Search<span class="n">⌘K</span></div>
-          <div class="it"><span class="g">⌂</span>Dashboard</div>
-          <div class="it"><span class="g">◫</span>Inbox<span class="badge">3</span></div>
-          <div class="it"><span class="g">⚙</span>Settings</div>
-          <div class="lbl">Pages</div>
+        <aside class="side sb sbD">
+          <div class="sa"><i data-mascot="happy" data-size="20"></i>Ask Washi or search<span class="k">⌘K</span></div>
+          <div class="hrow"><div class="it"><span class="g">⌂</span>Home</div><span class="ib" title="Inbox">◫<span class="badge">3</span></span><span class="ib" title="Threads">≡</span><span class="ib" title="Routines">◷</span></div>
+          <div class="lbl2">Recents</div>
+          <div class="rec"><span class="g">▯</span>Wiki<span class="t">2h</span></div>
+          <div class="rec"><span class="g">▯</span>Backlog<span class="t">1d</span></div>
+          <div class="rec"><span class="g">▯</span>Roadmap<span class="t">3d</span></div>
+          <div class="lbl2">Pages</div>
           <div class="it"><span class="tw">▸</span><span class="g">▤</span>Backlog</div>
           <div class="it"><span class="tw">▸</span><span class="g">▥</span>Roadmap</div>
           <div class="it on"><span class="tw">▾</span><span class="g">☰</span>Wiki</div>
           <div class="it ind"><span class="tw"></span><span class="g">·</span>How we work</div>
           <div class="it"><span class="tw">▸</span><span class="g">◇</span>Ideas</div>
           <div class="it"><span class="tw">▸</span><span class="g">☷</span>Weekly review</div>
-          <div class="it"><span class="g">🗑</span>Trash</div>
-          <div class="foot">
-            <div class="washi-row"><span class="sdot"></span><b>Washi</b><span class="st">· Idle</span></div>
-            <div class="washi-row" style="padding-top:0"><span class="sub">today $0.42 of $25 · 6 turns</span></div>
-            <div class="user"><span class="av lg" style="--c:#a97f52">JV</span><div><div>Juan</div><div class="em">juan@netko.dev</div></div><div class="ic"><span>☾</span><span>⇥</span></div></div>
-          </div>
+          <div class="lbl2">Routines</div>
+          <div class="act"><span class="g">+</span>Schedule one</div>
+          <div class="it faint" style="margin-top:6px"><span class="g">⌫</span>Trash</div>
+          <div class="wsb on"><span class="wsav">N</span>Netko Labs<span class="car">⌄</span><span class="sp"></span><span class="ib">?</span><span class="av" style="--c:#a97f52">JV</span></div>
         </aside>
         <div class="content">
           <div class="tabs"><span>Backlog <span class="x">×</span></span><span class="on">☰ Wiki <span class="x">×</span></span><span>Weekly review <span class="x">×</span></span><span class="plus">+</span></div>
@@ -466,12 +472,10 @@
     <div class="app">
       <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / netko-labs</span></div>
       <div class="shell" style="grid-template-columns:248px 1fr">
-        <aside class="side">
-          <div class="top"><span class="sw on"><i></i>Netko Labs<span class="car">⇅</span></span><span class="pen">✎</span></div>
-          <div class="it"><span class="g">⌕</span>Search<span class="n">⌘K</span></div>
-          <div class="it"><span class="g">⌂</span>Dashboard</div>
-          <div class="it"><span class="g">◫</span>Inbox</div>
-          <div class="it"><span class="g">⚙</span>Settings</div>
+        <aside class="side sb sbD">
+          <div class="sa"><i data-mascot="happy" data-size="20"></i>Ask Washi or search<span class="k">⌘K</span></div>
+          <div class="hrow"><div class="it"><span class="g">⌂</span>Home</div><span class="ib" title="Inbox">◫</span><span class="ib" title="Threads">≡</span><span class="ib" title="Routines">◷</span></div>
+          <div class="wsb on"><span class="wsav">N</span>Netko Labs<span class="car">⌄</span><span class="sp"></span><span class="ib">?</span><span class="av" style="--c:#c25f2c">JV</span></div>
         </aside>
         <div class="content"></div>
       </div>
@@ -490,41 +494,36 @@
     <div class="app">
       <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / netko-labs</span></div>
       <div class="shell" style="grid-template-columns:248px 1fr">
-        <aside class="side">
-          <div class="top"><span class="sw"><i></i>Netko Labs<span class="car">⇅</span></span><span class="pen">✎</span></div>
-          <div class="it"><span class="g">⌕</span>Search<span class="n">⌘K</span></div>
-          <div class="it"><span class="g">⌂</span>Dashboard</div>
-          <div class="foot">
-            <div class="washi-row"><span class="sdot"></span><b>Washi</b><span class="st">· Idle</span></div>
-            <div class="washi-row" style="padding-top:0"><span class="sub">today $0.42 of $25 · 6 turns</span></div>
-            <div class="user"><span class="av lg" style="--c:#a97f52">JV</span><div><div>Juan</div><div class="em">juan@netko.dev</div></div><div class="ic"><span class="hl">☾</span><span>⇥</span></div></div>
-          </div>
+        <aside class="side sb sbD">
+          <div class="sa"><i data-mascot="happy" data-size="20"></i>Ask Washi or search<span class="k">⌘K</span></div>
+          <div class="hrow"><div class="it"><span class="g">⌂</span>Home</div><span class="ib" title="Inbox">◫</span><span class="ib" title="Threads">≡</span><span class="ib" title="Routines">◷</span></div>
+          <div class="wsb"><span class="wsav">N</span>Netko Labs<span class="car">⌄</span><span class="sp"></span><span class="ib">?</span><span class="av" style="--c:#a97f52">JV</span></div>
         </aside>
         <div class="content"></div>
       </div>
-      <span class="pin" style="left:18px;top:352px">1</span>
-      <span class="pin" style="left:196px;top:352px">2</span>
-      <span class="pin" style="left:236px;top:352px">3</span>
+      <div class="avmenu"><div class="who"><b>Juan</b><em>juan@netko.dev</em></div><div class="row"><span class="g">☾</span>Dark theme</div><div class="row"><span class="g">⚙</span>Settings<span class="k">⌘,</span></div><div class="row hover"><span class="g">⇥</span>Sign out</div></div>
+      <span class="pin" style="left:238px;top:383px">1</span>
+      <span class="pin" style="left:150px;top:318px">2</span>
+      <span class="pin" style="left:150px;top:350px">3</span>
     </div>
-    <div class="fnote"><b>1</b> Initials on <code>identity.color</code>; name and email are the session's. <b>2</b> Theme toggle: moon in light, sun in dark; stored under <code>THEME_KEY</code> in localStorage, applied as <code>html.dark</code>. Paper by default. <b>3</b> Sign out: <code>signOut()</code> then <code>window.location.assign('/sign-in')</code> — a hard navigation, so every store dies with the document. No confirm.</div>
+    <div class="fnote">Sidebar D: the person is the avatar in the workspace footer; the menu under it holds what the old row showed. <b>1</b> Initials on <code>identity.color</code>; name and email are the session's, in the menu head. <b>2</b> Theme toggle: moon in light, sun in dark; stored under <code>THEME_KEY</code> in localStorage, applied as <code>html.dark</code>. Paper by default. <b>3</b> Sign out: <code>signOut()</code> then <code>window.location.assign('/sign-in')</code> — a hard navigation, so every store dies with the document. No confirm.</div>
   </article>
 
   <article class="frame" data-name="User row · dark" data-w="640" data-h="420">
     <div class="app dark">
       <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / netko-labs</span></div>
       <div class="shell" style="grid-template-columns:248px 1fr">
-        <aside class="side">
-          <div class="top"><span class="sw"><i></i>Netko Labs<span class="car">⇅</span></span><span class="pen">✎</span></div>
-          <div class="it"><span class="g">⌕</span>Search<span class="n">⌘K</span></div>
-          <div class="it"><span class="g">⌂</span>Dashboard</div>
-          <div class="foot">
-            <div class="washi-row"><span class="sdot"></span><b>Washi</b><span class="st">· Idle</span></div>
-            <div class="washi-row" style="padding-top:0"><span class="sub">today $0.42 of $25 · 6 turns</span></div>
-            <div class="user"><span class="av lg" style="--c:#a97f52">JV</span><div><div>Juan</div><div class="em">juan@netko.dev</div></div><div class="ic"><span class="hl">☼</span><span>⇥</span></div></div>
-          </div>
+        <aside class="side sb sbD">
+          <div class="sa"><i data-mascot="happy" data-size="20"></i>Ask Washi or search<span class="k">⌘K</span></div>
+          <div class="hrow"><div class="it"><span class="g">⌂</span>Home</div><span class="ib" title="Inbox">◫</span><span class="ib" title="Threads">≡</span><span class="ib" title="Routines">◷</span></div>
+          <div class="wsb"><span class="wsav">N</span>Netko Labs<span class="car">⌄</span><span class="sp"></span><span class="ib">?</span><span class="av" style="--c:#a97f52">JV</span></div>
         </aside>
         <div class="content"></div>
       </div>
+      <div class="avmenu"><div class="who"><b>Juan</b><em>juan@netko.dev</em></div><div class="row"><span class="g">☾</span>Dark theme</div><div class="row"><span class="g">⚙</span>Settings<span class="k">⌘,</span></div><div class="row hover"><span class="g">⇥</span>Sign out</div></div>
+      <span class="pin" style="left:238px;top:383px">1</span>
+      <span class="pin" style="left:150px;top:318px">2</span>
+      <span class="pin" style="left:150px;top:350px">3</span>
     </div>
     <div class="fnote">After the toggle. The dark tokens were always in <code>ui.css</code>; the user row is the first thing that reaches them. The choice is per browser, not per account.</div>
   </article>
@@ -545,24 +544,23 @@
     <div class="app">
       <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / netko-labs / settings ?tab=agent</span></div>
       <div class="shell">
-        <aside class="side">
-          <div class="top"><span class="sw"><i></i>Netko Labs<span class="car">⇅</span></span><span class="pen">✎</span></div>
-          <div class="it"><span class="g">⌕</span>Search<span class="n">⌘K</span></div>
-          <div class="it"><span class="g">⌂</span>Dashboard</div>
-          <div class="it"><span class="g">◫</span>Inbox<span class="badge">3</span></div>
-          <div class="it on"><span class="g">⚙</span>Settings</div>
-          <div class="lbl">Pages</div>
+        <aside class="side sb sbD">
+          <div class="sa"><i data-mascot="happy" data-size="20"></i>Ask Washi or search<span class="k">⌘K</span></div>
+          <div class="hrow"><div class="it"><span class="g">⌂</span>Home</div><span class="ib" title="Inbox">◫<span class="badge">3</span></span><span class="ib" title="Threads">≡</span><span class="ib" title="Routines">◷</span></div>
+          <div class="lbl2">Recents</div>
+          <div class="rec"><span class="g">▯</span>Backlog<span class="t">2h</span></div>
+          <div class="rec"><span class="g">▯</span>Roadmap<span class="t">1d</span></div>
+          <div class="rec"><span class="g">▯</span>Wiki<span class="t">3d</span></div>
+          <div class="lbl2">Pages</div>
           <div class="it"><span class="tw">▸</span><span class="g">▤</span>Backlog</div>
           <div class="it"><span class="tw">▸</span><span class="g">▥</span>Roadmap</div>
           <div class="it"><span class="tw">▸</span><span class="g">☰</span>Wiki</div>
           <div class="it"><span class="tw">▸</span><span class="g">◇</span>Ideas</div>
           <div class="it"><span class="tw">▸</span><span class="g">☷</span>Weekly review</div>
-          <div class="it"><span class="g">🗑</span>Trash</div>
-          <div class="foot">
-            <div class="washi-row"><span class="sdot"></span><b>Washi</b><span class="st">· Idle</span></div>
-            <div class="washi-row" style="padding-top:0"><span class="sub">today $0.42 of $25 · 6 turns</span></div>
-            <div class="user"><span class="av lg" style="--c:#a97f52">JV</span><div><div>Juan</div><div class="em">juan@netko.dev</div></div><div class="ic"><span>☾</span><span>⇥</span></div></div>
-          </div>
+          <div class="lbl2">Routines</div>
+          <div class="act"><span class="g">+</span>Schedule one</div>
+          <div class="it faint" style="margin-top:6px"><span class="g">⌫</span>Trash</div>
+          <div class="wsb"><span class="wsav">N</span>Netko Labs<span class="car">⌄</span><span class="sp"></span><span class="ib">?</span><span class="av" style="--c:#a97f52">JV</span></div>
         </aside>
         <div class="content">
           <div class="tabs"><span>☰ Wiki <span class="x">×</span></span><span class="on">⚙ Settings <span class="x">×</span></span><span class="plus">+</span></div>
@@ -609,24 +607,23 @@
     <div class="app">
       <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / netko-labs / settings ?tab=people</span></div>
       <div class="shell">
-        <aside class="side">
-          <div class="top"><span class="sw"><i></i>Netko Labs<span class="car">⇅</span></span><span class="pen">✎</span></div>
-          <div class="it"><span class="g">⌕</span>Search<span class="n">⌘K</span></div>
-          <div class="it"><span class="g">⌂</span>Dashboard</div>
-          <div class="it"><span class="g">◫</span>Inbox<span class="badge">3</span></div>
-          <div class="it on"><span class="g">⚙</span>Settings</div>
-          <div class="lbl">Pages</div>
+        <aside class="side sb sbD">
+          <div class="sa"><i data-mascot="happy" data-size="20"></i>Ask Washi or search<span class="k">⌘K</span></div>
+          <div class="hrow"><div class="it"><span class="g">⌂</span>Home</div><span class="ib" title="Inbox">◫<span class="badge">3</span></span><span class="ib" title="Threads">≡</span><span class="ib" title="Routines">◷</span></div>
+          <div class="lbl2">Recents</div>
+          <div class="rec"><span class="g">▯</span>Backlog<span class="t">2h</span></div>
+          <div class="rec"><span class="g">▯</span>Roadmap<span class="t">1d</span></div>
+          <div class="rec"><span class="g">▯</span>Wiki<span class="t">3d</span></div>
+          <div class="lbl2">Pages</div>
           <div class="it"><span class="tw">▸</span><span class="g">▤</span>Backlog</div>
           <div class="it"><span class="tw">▸</span><span class="g">▥</span>Roadmap</div>
           <div class="it"><span class="tw">▸</span><span class="g">☰</span>Wiki</div>
           <div class="it"><span class="tw">▸</span><span class="g">◇</span>Ideas</div>
           <div class="it"><span class="tw">▸</span><span class="g">☷</span>Weekly review</div>
-          <div class="it"><span class="g">🗑</span>Trash</div>
-          <div class="foot">
-            <div class="washi-row"><span class="sdot"></span><b>Washi</b><span class="st">· Idle</span></div>
-            <div class="washi-row" style="padding-top:0"><span class="sub">today $0.42 of $25 · 6 turns</span></div>
-            <div class="user"><span class="av lg" style="--c:#a97f52">JV</span><div><div>Juan</div><div class="em">juan@netko.dev</div></div><div class="ic"><span>☾</span><span>⇥</span></div></div>
-          </div>
+          <div class="lbl2">Routines</div>
+          <div class="act"><span class="g">+</span>Schedule one</div>
+          <div class="it faint" style="margin-top:6px"><span class="g">⌫</span>Trash</div>
+          <div class="wsb"><span class="wsav">N</span>Netko Labs<span class="car">⌄</span><span class="sp"></span><span class="ib">?</span><span class="av" style="--c:#a97f52">JV</span></div>
         </aside>
         <div class="content">
           <div class="tabs"><span>☰ Wiki <span class="x">×</span></span><span class="on">⚙ Settings <span class="x">×</span></span><span class="plus">+</span></div>
@@ -658,20 +655,21 @@
     <div class="app">
       <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / netko-labs / settings ?tab=workspace</span></div>
       <div class="shell">
-        <aside class="side">
-          <div class="top"><span class="sw"><i></i>Netko Labs<span class="car">⇅</span></span><span class="pen">✎</span></div>
-          <div class="it"><span class="g">⌕</span>Search<span class="n">⌘K</span></div>
-          <div class="it"><span class="g">⌂</span>Dashboard</div>
-          <div class="it"><span class="g">◫</span>Inbox<span class="badge">3</span></div>
-          <div class="it on"><span class="g">⚙</span>Settings</div>
-          <div class="lbl">Pages</div>
+        <aside class="side sb sbD">
+          <div class="sa"><i data-mascot="happy" data-size="20"></i>Ask Washi or search<span class="k">⌘K</span></div>
+          <div class="hrow"><div class="it"><span class="g">⌂</span>Home</div><span class="ib" title="Inbox">◫<span class="badge">3</span></span><span class="ib" title="Threads">≡</span><span class="ib" title="Routines">◷</span></div>
+          <div class="lbl2">Recents</div>
+          <div class="rec"><span class="g">▯</span>Backlog<span class="t">2h</span></div>
+          <div class="rec"><span class="g">▯</span>Roadmap<span class="t">1d</span></div>
+          <div class="rec"><span class="g">▯</span>Wiki<span class="t">3d</span></div>
+          <div class="lbl2">Pages</div>
           <div class="it"><span class="tw">▸</span><span class="g">▤</span>Backlog</div>
           <div class="it"><span class="tw">▸</span><span class="g">▥</span>Roadmap</div>
           <div class="it"><span class="tw">▸</span><span class="g">☰</span>Wiki</div>
-          <div class="it"><span class="g">🗑</span>Trash</div>
-          <div class="foot">
-            <div class="user"><span class="av lg" style="--c:#a97f52">JV</span><div><div>Juan</div><div class="em">juan@netko.dev</div></div><div class="ic"><span>☾</span><span>⇥</span></div></div>
-          </div>
+          <div class="lbl2">Routines</div>
+          <div class="act"><span class="g">+</span>Schedule one</div>
+          <div class="it faint" style="margin-top:6px"><span class="g">⌫</span>Trash</div>
+          <div class="wsb"><span class="wsav">N</span>Netko Labs<span class="car">⌄</span><span class="sp"></span><span class="ib">?</span><span class="av" style="--c:#a97f52">JV</span></div>
         </aside>
         <div class="content">
           <div class="tabs"><span class="on">⚙ Settings <span class="x">×</span></span><span class="plus">+</span></div>

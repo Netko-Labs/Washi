@@ -809,7 +809,12 @@ passes; no key → the tool says where to add one.
 
 - [x] 1 · no CJK anywhere: docs, kit, app copy, showcases, tests (WASHI wordmark, W agent mark, "done" stamps)
 - [x] 2 · design/shell.html "Sidebar · proposed": A Quiet (the call) · B Home first · C Rail + panel · A states, mobbin refs
-- [ ] 3 · implement A in the studio sidebar once Juan picks (next PR)
+- [x] 3 · Juan picked D · Ask first (2026-10-21, after Notion and Obsidian reads): every design frame
+      now wears it (shell · pages · data · work · agent · account · desktop), D's CSS moved into
+      the kit, PRD D57, switcher and user menu redrawn from the footer
+- [ ] 4 · implement D in the studio sidebar (next PR): ask field (palette + panel), Home row with
+      Inbox · Threads · Routines, Recents (`sheets.list` by touched), grey labels with empty-state
+      actions, workspace footer with the avatar menu; `agents.threads` query for Threads
 
 # Mihon — the WSX sample book (2026-10-21) — branch `feat/mihon`
 
