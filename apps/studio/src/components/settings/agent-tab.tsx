@@ -2,10 +2,11 @@ import { usd as formatUsd } from '@washi/ui'
 import { DailyStop } from './daily-stop'
 import { KeyForm } from './key-form'
 import { useAgentSettings } from './lib'
+import { SearchKeyForm } from './search-key-form'
 
 export function AgentTab() {
   const settings = useAgentSettings()
-  const { key, spend, error, loading } = settings
+  const { key, searchKey, spend, error, loading } = settings
 
   return (
     <div>
@@ -32,6 +33,22 @@ export function AgentTab() {
             hasKey={Boolean(key)}
             onSave={settings.save}
           />
+        </div>
+      </section>
+
+      <section className="mt-10 border-border border-t pt-8">
+        <h2 className="font-semibold text-[15px]">Web search</h2>
+        <p className="mt-1 text-[13.5px] text-muted-foreground leading-relaxed">
+          With an Exa key Washi can search the web. Every search still stops at the desk until
+          someone allows it always.
+        </p>
+        {searchKey && (
+          <p className="mt-4 rounded-xl bg-accent px-3 py-2.5 font-mono text-[12.5px]">
+            exa · ••••{searchKey.last4}
+          </p>
+        )}
+        <div className="mt-5">
+          <SearchKeyForm hasKey={Boolean(searchKey)} onSave={settings.saveSearchKey} />
         </div>
       </section>
 

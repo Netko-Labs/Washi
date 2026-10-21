@@ -27,7 +27,8 @@ export type {
   InferenceStatus,
   LocalCliStatus,
   LocalModel,
+  SearchKeyLookup,
   TodayReport,
   TurnSummary,
 } from './types'
-export { SYSTEM_INSTRUCTIONS } from './values'
+export { SEARCH_NOT_SET, SYSTEM_INSTRUCTIONS } from './values'

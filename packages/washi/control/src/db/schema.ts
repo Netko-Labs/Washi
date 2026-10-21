@@ -1,4 +1,12 @@
-import { boolean, index, pgTable, text, timestamp, uniqueIndex } from 'drizzle-orm/pg-core'
+import {
+  boolean,
+  index,
+  pgTable,
+  primaryKey,
+  text,
+  timestamp,
+  uniqueIndex,
+} from 'drizzle-orm/pg-core'
 
 /**
  * The control plane, and nothing else (C1). Identity, membership and secrets
@@ -138,4 +146,25 @@ export const organizationSecret = pgTable(
     updatedAt: timestamp('updated_at').notNull().defaultNow(),
   },
   (table) => [index('organization_secret_provider_idx').on(table.provider)],
+)
+
+/**
+ * Keys for the services Washi reaches out to (Exa today), one per organization
+ * and integration, sealed exactly like the agent key: ciphertext, a display
+ * suffix, and nothing a client can read back.
+ */
+export const organizationIntegration = pgTable(
+  'organization_integration',
+  {
+    organizationId: text('organization_id')
+      .notNull()
+      .references(() => organization.id, { onDelete: 'cascade' }),
+    integration: text('integration').notNull(),
+    ciphertext: text('ciphertext').notNull(),
+    iv: text('iv').notNull(),
+    last4: text('last4').notNull(),
+    updatedBy: text('updated_by').references(() => user.id, { onDelete: 'set null' }),
+    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  },
+  (table) => [primaryKey({ columns: [table.organizationId, table.integration] })],
 )

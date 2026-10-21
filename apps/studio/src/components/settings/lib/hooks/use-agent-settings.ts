@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '@/integrations/trpc'
 import type { ModelOption } from '@/lib/types'
-import type { KeyInput, KeyState, SpendState } from '../types'
+import type { KeyInput, KeyState, SearchKeyState, SpendState } from '../types'
 
 /**
  * Everything the settings screen needs in one place: the stored key, what the
@@ -9,6 +9,7 @@ import type { KeyInput, KeyState, SpendState } from '../types'
  */
 export function useAgentSettings() {
   const [key, setKey] = useState<KeyState | null>(null)
+  const [searchKey, setSearchKey] = useState<SearchKeyState | null>(null)
   const [spend, setSpend] = useState<SpendState | null>(null)
   const [models, setModels] = useState<ModelOption[]>([])
   const [catalogueSource, setCatalogueSource] = useState<string | null>(null)
@@ -17,12 +18,14 @@ export function useAgentSettings() {
 
   const refresh = useCallback(async () => {
     try {
-      const [stored, today, catalogue] = await Promise.all([
+      const [stored, exa, today, catalogue] = await Promise.all([
         api.workspaces.agentKey.query(),
+        api.workspaces.integrationKey.query({ integration: 'exa' }),
         api.agents.spend.query(),
         api.models.list.query(),
       ])
       setKey(stored as KeyState | null)
+      setSearchKey(exa as SearchKeyState | null)
       setSpend(today as SpendState)
       setModels(catalogue.models as ModelOption[])
       setCatalogueSource(catalogue.source)
@@ -54,6 +57,18 @@ export function useAgentSettings() {
     }
   }
 
+  const saveSearchKey = async (secret: string) => {
+    setError(null)
+    try {
+      await api.workspaces.setIntegrationKey.mutate({ integration: 'exa', key: secret })
+      await refresh()
+      return true
+    } catch (cause) {
+      setError(String(cause))
+      return false
+    }
+  }
+
   const resume = async () => {
     setSpend((await api.agents.resume.mutate()) as SpendState)
   }
@@ -70,12 +85,14 @@ export function useAgentSettings() {
 
   return {
     key,
+    searchKey,
     spend,
     models,
     catalogueSource,
     error,
     loading,
     save,
+    saveSearchKey,
     resume,
     setDailyCap,
     refresh,

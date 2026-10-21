@@ -5,6 +5,8 @@ export type {
   KeyFormProps,
   KeyInput,
   KeyState,
+  SearchKeyFormProps,
+  SearchKeyState,
   SettingsScreenProps,
   SettingsTab,
   SpendState,

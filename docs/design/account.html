@@ -579,6 +579,13 @@
             <div class="fld" style="margin-top:16px"><span>Model <span class="opt">— optional; a sensible one is chosen otherwise</span></span><span class="in ph">Search 12 models…</span></div>
             <span class="pbtn dis" style="display:inline-flex;margin-top:20px">Replace key</span>
             <div class="sect">
+              <h2>Web search</h2>
+              <p class="p">With an Exa key Washi can search the web. Every search still stops at the desk until someone allows it always.</p>
+              <div class="chip">exa · ••••m4Tq</div>
+              <div class="fld" style="margin-top:16px"><span>Exa API key</span><span class="in ph mono">exa-…</span><span class="hint">Encrypted on your server, like the agent key. Keys come from exa.ai.</span></div>
+              <span class="pbtn dis" style="display:inline-flex;margin-top:20px">Replace key</span>
+            </div>
+            <div class="sect">
               <h2>Daily stop</h2>
               <p class="p">At the daily stop Washi pauses until tomorrow. Anyone on the team can resume it. A safety stop, not a quota — Washi is open source and there is no plan to buy.</p>
               <div style="display:flex;align-items:center;gap:8px;margin-top:16px"><span style="font:400 14px/1 var(--s-mono)">$</span><span class="in mono" style="width:96px;font-size:14px">25</span><span class="hint" style="font-size:13.5px">a day</span></div>
@@ -590,7 +597,7 @@
       <span class="pin" style="left:660px;top:212px">1</span>
       <span class="pin" style="left:990px;top:352px">2</span>
     </div>
-    <div class="fnote">The real rail: <b>1</b> three underlined tabs — Agent · People · Routines (<code>SETTINGS_TABS</code>), <code>?tab=</code> in the URL, replace-navigation, unknown tab → <code>agent</code>. The kit's <code>.settings .snav</code> side-nav is the desktop's shape, not the studio's. <b>2</b> BYOK is one key per organization in <code>organization_secret</code>, sealed under <code>WASHI_SECRET_KEY</code> + workspace id; only <code>last4</code> ever leaves the server. Defaults: $25 and 200 turns a day.</div>
+    <div class="fnote">The real rail: <b>1</b> three underlined tabs — Agent · People · Routines (<code>SETTINGS_TABS</code>), <code>?tab=</code> in the URL, replace-navigation, unknown tab → <code>agent</code>. The kit's <code>.settings .snav</code> side-nav is the desktop's shape, not the studio's. <b>2</b> BYOK is one key per organization in <code>organization_secret</code>, sealed under <code>WASHI_SECRET_KEY</code> + workspace id; only <code>last4</code> ever leaves the server. The Exa key below it is sealed the same way in <code>organization_integration</code> (D55). Defaults: $25 and 200 turns a day.</div>
   </article>
 
   <article class="frame" data-name="Settings · People" data-w="1280" data-h="800">

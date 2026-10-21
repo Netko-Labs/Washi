@@ -1,6 +1,6 @@
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import { router, workspaceProcedure } from '../../init'
+import { INTEGRATIONS, router, type SecretStore, workspaceProcedure } from '../../init'
 
 function requireSecrets(ctx: { runtime: { control: { secrets?: unknown } } }) {
   const { secrets } = ctx.runtime.control
@@ -10,7 +10,7 @@ function requireSecrets(ctx: { runtime: { control: { secrets?: unknown } } }) {
       message: 'this deployment has no key store — the agent uses this machine’s own key',
     })
   }
-  return secrets as NonNullable<typeof secrets>
+  return secrets as SecretStore
 }
 
 export const workspaceMutations = router({
@@ -29,7 +29,7 @@ export const workspaceMutations = router({
       }),
     )
     .mutation(({ ctx, input }) => {
-      const secrets = requireSecrets(ctx) as import('../../init').SecretStore
+      const secrets = requireSecrets(ctx)
       if (!ctx.actorId) {
         throw new TRPCError({ code: 'UNAUTHORIZED', message: 'sign in to set a key' })
       }
@@ -38,5 +38,15 @@ export const workspaceMutations = router({
         provider: input.provider,
         model: input.model ?? null,
       })
+    }),
+  /** Same shape as the agent key: write-only, `last4` back. */
+  setIntegrationKey: workspaceProcedure
+    .input(z.object({ integration: z.enum(INTEGRATIONS), key: z.string().min(8) }))
+    .mutation(({ ctx, input }) => {
+      const secrets = requireSecrets(ctx)
+      if (!ctx.actorId) {
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'sign in to set a key' })
+      }
+      return secrets.setIntegration(ctx.workspaceId, ctx.actorId, input.integration, input.key)
     }),
 })

@@ -39,6 +39,8 @@ export {
   type ContextInput,
   type ControlPlane,
   createContext,
+  INTEGRATIONS,
+  type Integration,
   type ResolvedWorkspace,
   type SecretStore,
   type ServerMode,

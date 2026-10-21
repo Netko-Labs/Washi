@@ -28,6 +28,7 @@ const booted = startRuntime({
   mode: 'embedded',
   dataDir: join(appDataDir, 'workspaces'),
   control: createEmbeddedControlPlane({ workspaceId: DEFAULT_WORKSPACE_ID }),
+  searchKey: async () => process.env.EXA_API_KEY ?? null,
 })
 const runtime = booted.runtime
 const { workspace } = runtime.resolve(DEFAULT_WORKSPACE_ID)

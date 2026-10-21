@@ -1,4 +1,5 @@
-import { publicProcedure, router, workspaceProcedure } from '../../init'
+import { z } from 'zod'
+import { INTEGRATIONS, publicProcedure, router, workspaceProcedure } from '../../init'
 
 export const workspaceQueries = router({
   /** What this actor may open. Embedded returns its single local workspace. */
@@ -13,4 +14,10 @@ export const workspaceQueries = router({
   agentKey: workspaceProcedure.query(
     ({ ctx }) => ctx.runtime.control.secrets?.info(ctx.workspaceId) ?? null,
   ),
+  integrationKey: workspaceProcedure
+    .input(z.object({ integration: z.enum(INTEGRATIONS) }))
+    .query(
+      ({ ctx, input }) =>
+        ctx.runtime.control.secrets?.integrationInfo(ctx.workspaceId, input.integration) ?? null,
+    ),
 })

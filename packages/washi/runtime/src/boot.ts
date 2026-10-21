@@ -37,10 +37,11 @@ export async function bootRuntime(env: Env): Promise<BootedRuntime> {
       control: hosted,
       dataDir,
       storedAgentKey: (workspaceId) => hosted.agentKey(workspaceId),
+      searchKey: (workspaceId) => hosted.integrationKey(workspaceId, 'exa'),
     }
   } else {
     const control = createEmbeddedControlPlane({ workspaceId: DEFAULT_WORKSPACE_ID })
-    options = { mode, control, dataDir }
+    options = { mode, control, dataDir, searchKey: async () => env.EXA_API_KEY ?? null }
   }
 
   return startRuntime(options, trustedOrigins)

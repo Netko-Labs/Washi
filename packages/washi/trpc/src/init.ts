@@ -48,6 +48,10 @@ export interface AgentCredentialInput {
   model?: string | null
 }
 
+/** Services Washi reaches out to with a key of its own. Exa searches the web. */
+export const INTEGRATIONS = ['exa'] as const
+export type Integration = (typeof INTEGRATIONS)[number]
+
 export interface SecretStore {
   info(
     workspaceId: string,
@@ -56,6 +60,16 @@ export interface SecretStore {
     workspaceId: string,
     actorId: string,
     credential: AgentCredentialInput,
+  ): Promise<{ last4: string }>
+  integrationInfo(
+    workspaceId: string,
+    integration: Integration,
+  ): Promise<{ last4: string; updatedAt: Date } | null>
+  setIntegration(
+    workspaceId: string,
+    actorId: string,
+    integration: Integration,
+    key: string,
   ): Promise<{ last4: string }>
 }
 

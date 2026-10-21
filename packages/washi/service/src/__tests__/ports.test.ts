@@ -23,6 +23,7 @@ describe('both ports agree on what a read is', () => {
 
   test('fetch_url is a write, because it leaves the machine', () => {
     expect(isReadTool('fetch_url')).toBe(false)
+    expect(isReadTool('web_search')).toBe(false)
   })
 
   test('an unknown tool is never a read — the default is to ask', () => {

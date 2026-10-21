@@ -2,6 +2,7 @@ import type {
   Actor,
   AgentCredentialInput,
   ControlPlane,
+  Integration,
   SecretStore,
   WorkspaceRef,
 } from '@washi/trpc'
@@ -13,7 +14,13 @@ export interface AgentCredentialOut {
 }
 
 import { and, eq } from 'drizzle-orm'
-import { member, organization, organizationSecret, user } from '../db/schema'
+import {
+  member,
+  organization,
+  organizationIntegration,
+  organizationSecret,
+  user,
+} from '../db/schema'
 import { createAuth } from './auth'
 import { type ControlDB, createControlDb } from './client'
 import { open, seal } from './crypto'
@@ -34,6 +41,18 @@ export interface HostedControlPlane extends ControlPlane {
   agentKeyInfo(
     workspaceId: string,
   ): Promise<{ last4: string; provider: string; model: string | null; updatedAt: Date } | null>
+  /** Decrypted, for the agent host only — never for a route. */
+  integrationKey(workspaceId: string, integration: Integration): Promise<string | null>
+  setIntegrationKey(
+    workspaceId: string,
+    actorId: string,
+    integration: Integration,
+    key: string,
+  ): Promise<{ last4: string }>
+  integrationKeyInfo(
+    workspaceId: string,
+    integration: Integration,
+  ): Promise<{ last4: string; updatedAt: Date } | null>
 }
 
 export function createHostedControlPlane(options: ControlPlaneOptions): HostedControlPlane {
@@ -46,6 +65,10 @@ export function createHostedControlPlane(options: ControlPlaneOptions): HostedCo
       info: (workspaceId) => plane.agentKeyInfo(workspaceId),
       set: (workspaceId, actorId, credential) =>
         plane.setAgentKey(workspaceId, actorId, credential),
+      integrationInfo: (workspaceId, integration) =>
+        plane.integrationKeyInfo(workspaceId, integration),
+      setIntegration: (workspaceId, actorId, integration, key) =>
+        plane.setIntegrationKey(workspaceId, actorId, integration, key),
     },
 
     async authenticate(request) {
@@ -140,6 +163,56 @@ export function createHostedControlPlane(options: ControlPlaneOptions): HostedCo
         })
         .from(organizationSecret)
         .where(eq(organizationSecret.organizationId, workspaceId))
+        .limit(1)
+      return row ?? null
+    },
+
+    async integrationKey(workspaceId, integration) {
+      const [row] = await db
+        .select()
+        .from(organizationIntegration)
+        .where(
+          and(
+            eq(organizationIntegration.organizationId, workspaceId),
+            eq(organizationIntegration.integration, integration),
+          ),
+        )
+        .limit(1)
+      return row ? open(options.masterKey, workspaceId, row) : null
+    },
+
+    async setIntegrationKey(workspaceId, actorId, integration, key) {
+      const sealed = await seal(options.masterKey, workspaceId, key)
+      const row = {
+        ciphertext: sealed.ciphertext,
+        iv: sealed.iv,
+        last4: sealed.last4,
+        updatedBy: actorId,
+        updatedAt: new Date(),
+      }
+      await db
+        .insert(organizationIntegration)
+        .values({ organizationId: workspaceId, integration, ...row })
+        .onConflictDoUpdate({
+          target: [organizationIntegration.organizationId, organizationIntegration.integration],
+          set: row,
+        })
+      return { last4: sealed.last4 }
+    },
+
+    async integrationKeyInfo(workspaceId, integration) {
+      const [row] = await db
+        .select({
+          last4: organizationIntegration.last4,
+          updatedAt: organizationIntegration.updatedAt,
+        })
+        .from(organizationIntegration)
+        .where(
+          and(
+            eq(organizationIntegration.organizationId, workspaceId),
+            eq(organizationIntegration.integration, integration),
+          ),
+        )
         .limit(1)
       return row ?? null
     },

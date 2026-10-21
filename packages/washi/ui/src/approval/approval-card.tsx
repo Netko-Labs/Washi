@@ -9,7 +9,12 @@ export function ApprovalCard({ toolName, input, onDecide, more = 0 }: ApprovalCa
   const [previewOpen, setPreviewOpen] = useState(true)
   const { icon: Icon, action, subject, details, outbound, preview } = describe(toolName, input)
 
-  const always = toolName === 'fetch_url' ? 'Always allow this site' : 'Allow for this chat'
+  const always =
+    toolName === 'fetch_url'
+      ? 'Always allow this site'
+      : toolName === 'web_search'
+        ? 'Always allow web search'
+        : 'Allow for this chat'
 
   return (
     <div className="overflow-hidden rounded-xl border border-agent bg-card" data-approval-card>

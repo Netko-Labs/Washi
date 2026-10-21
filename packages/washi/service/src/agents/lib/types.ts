@@ -120,3 +120,6 @@ export interface TodayReport {
   pending: ApprovalRequest[]
   spend: AgentSpendReport
 }
+
+/** The workspace's Exa key, or null when nobody has set one. */
+export type SearchKeyLookup = () => Promise<string | null>
