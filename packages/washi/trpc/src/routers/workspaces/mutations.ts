@@ -1,6 +1,12 @@
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import { INTEGRATIONS, router, type SecretStore, workspaceProcedure } from '../../init'
+import {
+  INTEGRATIONS,
+  ownerProcedure,
+  router,
+  type SecretStore,
+  workspaceProcedure,
+} from '../../init'
 
 function requireSecrets(ctx: { runtime: { control: { secrets?: unknown } } }) {
   const { secrets } = ctx.runtime.control
@@ -40,7 +46,7 @@ export const workspaceMutations = router({
       })
     }),
   /** Same shape as the agent key: write-only, `last4` back. */
-  setIntegrationKey: workspaceProcedure
+  setIntegrationKey: ownerProcedure
     .input(z.object({ integration: z.enum(INTEGRATIONS), key: z.string().min(8) }))
     .mutation(({ ctx, input }) => {
       const secrets = requireSecrets(ctx)
