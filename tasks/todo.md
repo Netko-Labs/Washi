@@ -829,8 +829,8 @@ passes; no key → the tool says where to add one.
       - [x] code: receipts leave the turn (#67)
       - [x] code: Settings · Agent as three cards, key dialog, model menu, turn cap · pause ·
             who resumes · default effort
-      - [ ] code: covers — pictures + upload + files store (D60)
-      - [ ] code: agent panel — attach · model and effort chips · conversations rename, delete,
+      - [x] code: covers — pictures + upload + files store (D60)
+      - [x] code: agent panel — attach · model and effort chips · conversations rename, delete,
             auto title · dock right (D61)
       - [ ] account · desktop — waiting on Juan's marks
 

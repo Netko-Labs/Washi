@@ -201,6 +201,17 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   approvals to `auto` (`agents.setApprovalMode`, Settings → Agent on both hosts): a standing yes
   for what leaves, each call ledgered as `auto`; policy refusals still refuse. Owner or admin
   only (`ownerProcedure`), as is setting an integration key.
+- **The agent panel (D61).** `AgentPanel` takes a `placement`: `float` (the popover), `dock` (a
+  flex sibling the studio's wide shell puts beside the page; remembered per workspace in
+  `washi:dock:<id>`, the FAB steps aside while it is open) or `sheet` (the whole screen under
+  `md`). The composer sets a conversation up: `+` attaches a page by id (Washi is told to read it
+  with `sheet_get`), a text file (inlined, 200 KB) or a picture (an image block on the Claude
+  port; the AI SDK path says it cannot see it yet) through the host's `uploadFile`; the model
+  and effort chips are per conversation (`agents.setSessionOptions`, null = the workspace
+  default; on the desktop the model chip is Claude Code's four). A conversation is titled from
+  its first ask, then by Washi through `set_conversation_title` (a tool both ports expose,
+  asked for in the instructions); `agents.renameSession` and `deleteSession` (refused while a
+  turn runs) are the person's. `onSessionChanged` tells the list to refetch.
 - **Settings → Agent (studio) is three cards (D63):** Model (a row per provider; `workspaces.
   setAgentModel` changes the default model without a new key, `removeAgentKey` puts Washi to
   sleep; the default effort — Quick · Balanced · Deep — is `agents.setDefaultEffort`, mapped to
