@@ -1,64 +1,90 @@
-import { receiptLine } from '../agent/lib'
-import { ApprovalCard } from '../approval'
 import { AgentMascot } from '../mascot'
 import { useAgentStore } from '../stores'
-import { useToday } from '../today'
+import { InboxChip } from './inbox-chip'
+import { InboxRow } from './inbox-row'
+import { EMPTY_LABELS, type InboxFilter, type InboxProps, useInbox } from './lib'
+import { NeedRow } from './need-row'
 
-/** Everything Washi is waiting on, answerable here, then what it did — nothing invented. */
-export function Inbox() {
-  const approvals = useAgentStore((state) => state.approvals)
-  const resolveApproval = useAgentStore((state) => state.resolveApproval)
-  const { today } = useToday()
-  const turns = today?.turns ?? []
+const LABEL =
+  'px-3 pt-5 pb-1.5 font-semibold text-[11px] text-muted-foreground uppercase tracking-[0.06em]'
+
+/** One list, one width, newest first, grouped by day; Needs you pinned on top, answered inline (D59). */
+export function Inbox({ rows }: InboxProps) {
+  const { approvals, groups, filter, setFilter, now, unread, mentions, hasMentions } =
+    useInbox(rows)
+  const count = approvals.length + unread
+  const chips: InboxFilter[] = hasMentions
+    ? ['all', 'needs', 'mentions', 'washi']
+    : ['all', 'needs', 'washi']
+  const showNeeds = filter === 'all' || filter === 'needs'
 
   return (
     <div className="flex-1 overflow-y-auto">
-      <section className="mx-auto max-w-[680px] px-10 pt-11 pb-[60px]">
-        <h1 className="font-semibold text-[24px] tracking-[-0.02em]">Inbox</h1>
-        <p className="mb-[22px] text-muted-foreground">
-          Everything Washi wants you to look at, in one queue.
-        </p>
-
-        <div className="mb-[26px] grid gap-3">
-          {approvals.map((request) => (
-            <ApprovalCard
-              key={request.id}
-              toolName={request.toolName}
-              input={request.input}
-              onDecide={(decision) => resolveApproval(request.id, decision)}
+      <section className="mx-auto max-w-[720px] px-6 pt-9 pb-[60px]">
+        <div className="flex items-baseline gap-2.5 px-3">
+          <h1 className="font-semibold text-[22px] tracking-[-0.02em]">Inbox</h1>
+          {count > 0 && (
+            <span className="rounded-full bg-primary px-2 py-0.5 font-mono font-semibold text-[11px] text-primary-foreground">
+              {count}
+            </span>
+          )}
+        </div>
+        <div className="mt-3 flex flex-wrap gap-1.5 px-3">
+          {chips.map((chip) => (
+            <InboxChip
+              key={chip}
+              filter={chip}
+              active={filter}
+              count={
+                chip === 'needs' ? approvals.length : chip === 'mentions' ? mentions : undefined
+              }
+              onPick={setFilter}
             />
           ))}
-          {approvals.length === 0 && (
-            <div className="flex items-center gap-2.5 rounded-[14px] border border-border bg-card p-4 text-[13px] text-muted-foreground">
-              <AgentMascot state="done" size={22} />
-              Inbox zero — Washi has nothing waiting on you.
-            </div>
-          )}
         </div>
 
-        <div className="mb-2.5 font-semibold text-[11px] text-muted-foreground uppercase tracking-[0.06em]">
-          Earlier
-        </div>
-        <div className="flex flex-col gap-3.5 pl-1">
-          {turns.length === 0 && (
-            <p className="text-[13px] text-muted-foreground">Nothing in the last day.</p>
-          )}
-          {turns.map((turn) => (
-            <div key={`${turn.sessionId}-${turn.at}`} className="flex gap-2.5">
-              <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-agent" />
-              <div className="min-w-0">
-                <div className="truncate text-[13px] leading-normal">
-                  {turn.prompt || turn.sessionTitle}
-                </div>
-                <div className="font-mono text-[11px] text-muted-foreground">
-                  {turn.receipt.stopReason === 'error'
-                    ? (turn.receipt.error ?? 'failed')
-                    : receiptLine(turn.receipt)}
-                </div>
-              </div>
+        {showNeeds && approvals.length > 0 && (
+          <>
+            <div className={LABEL}>Needs you</div>
+            <div className="space-y-1.5">
+              {approvals.map((request) => (
+                <NeedRow
+                  key={request.id}
+                  request={request}
+                  now={now}
+                  onDecide={(decision) =>
+                    useAgentStore.getState().resolveApproval(request.id, decision)
+                  }
+                />
+              ))}
             </div>
-          ))}
-        </div>
+          </>
+        )}
+        {showNeeds && approvals.length === 0 && (
+          <div className="mt-4 flex items-center gap-3 px-3 py-2.5 text-[13px]">
+            <span className="grid size-7 place-items-center">
+              <AgentMascot state="done" size={22} />
+            </span>
+            Nothing needs you.
+          </div>
+        )}
+
+        {groups.map((group) => (
+          <div key={group.label}>
+            <div className={LABEL}>{group.label}</div>
+            <div className="space-y-px">
+              {group.rows.map((row) => (
+                <InboxRow key={row.id} row={row} now={now} />
+              ))}
+            </div>
+          </div>
+        ))}
+        {groups.length === 0 && filter !== 'needs' && (
+          <>
+            {filter === 'all' && <div className={LABEL}>Today</div>}
+            <p className="px-3 pt-4 text-[13px] text-muted-foreground">{EMPTY_LABELS[filter]}</p>
+          </>
+        )}
       </section>
     </div>
   )
