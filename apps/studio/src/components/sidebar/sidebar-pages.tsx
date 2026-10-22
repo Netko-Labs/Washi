@@ -15,7 +15,7 @@ export function SidebarPages({ workspaceId, onNavigate }: SidebarSectionProps) {
   const favorites = sheets.filter((sheet) => favoriteIds.includes(sheet.id))
 
   return (
-    <div className="min-h-0 flex-1 space-y-px overflow-y-auto px-2 pb-2">
+    <div className="min-h-0 flex-1 space-y-px overflow-y-auto px-3 pb-2 md:px-2">
       <SidebarRecents workspaceId={workspaceId} onNavigate={onNavigate} />
       {favorites.length > 0 && (
         <>
@@ -32,7 +32,7 @@ export function SidebarPages({ workspaceId, onNavigate }: SidebarSectionProps) {
       )}
       <div className={LABEL}>Pages</div>
       {sheets.length === 0 && (
-        <p className="px-2 py-1 text-[12.5px] text-muted-foreground leading-relaxed">
+        <p className="px-2 py-1 text-[14px] text-muted-foreground leading-relaxed md:text-[12.5px]">
           No pages yet. Start one, or ask Washi to.
         </p>
       )}

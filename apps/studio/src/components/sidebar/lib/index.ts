@@ -1,6 +1,9 @@
 export { useRecents } from './hooks/use-recents'
 export { useTheme } from './hooks/use-theme'
 export type {
+  BackHomeProps,
+  MenuPlacement,
+  MobileHomeProps,
   PlaceEntry,
   RecentEntry,
   RecentSheet,

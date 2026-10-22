@@ -22,8 +22,10 @@ export function HeaderCrumbs() {
   return (
     <>
       <nav aria-label="Breadcrumb" className="flex min-w-0 items-center gap-1.5 text-[13px]">
-        <span className="shrink-0 text-muted-foreground">{workspaceName}</span>
-        {SLASH}
+        <span className="hidden shrink-0 items-center gap-1.5 @xl:flex">
+          <span className="text-muted-foreground">{workspaceName}</span>
+          {SLASH}
+        </span>
         {shown.length < ancestors.length && (
           <>
             <span className="text-muted-foreground">…</span>

@@ -7,30 +7,41 @@ import type { WorkspaceSwitcherProps } from './lib'
 import { WorkspaceMenu } from './workspace-menu'
 
 /** The workspace name, in the footer, opens every other workspace — no trip back through the picker. */
-export function WorkspaceSwitcher({ workspace, onNavigate }: WorkspaceSwitcherProps) {
+export function WorkspaceSwitcher({
+  workspace,
+  onNavigate,
+  compact = false,
+}: WorkspaceSwitcherProps) {
   const [isOpen, setOpen] = useState(false)
   const root = useRef<HTMLDivElement>(null)
   useDismiss(root, isOpen, () => setOpen(false))
 
   return (
-    <div ref={root} className="relative min-w-0 flex-1">
+    <div ref={root} className={`relative min-w-0 ${compact ? '' : 'flex-1'}`}>
       <button
         type="button"
         onClick={() => setOpen((current) => !current)}
         aria-haspopup="dialog"
         aria-expanded={isOpen}
         title="Switch workspace"
-        className={`flex h-8 w-full items-center gap-2 rounded-lg px-1.5 text-left hover:bg-accent ${
-          isOpen ? 'bg-accent' : ''
-        }`}
+        className={`flex items-center gap-2 rounded-lg text-left hover:bg-accent ${
+          compact ? 'size-9 justify-center' : 'h-8 w-full px-1.5'
+        } ${isOpen ? 'bg-accent' : ''}`}
       >
-        <VaultIcon topic={topicFor(workspace.id)} size={20} className="shrink-0" />
-        <span className="min-w-0 flex-1 truncate font-semibold text-[13px]">{workspace.name}</span>
-        <IconChevronDown className="size-3 shrink-0 text-muted-foreground" />
+        <VaultIcon topic={topicFor(workspace.id)} size={compact ? 26 : 20} className="shrink-0" />
+        {!compact && (
+          <>
+            <span className="min-w-0 flex-1 truncate font-semibold text-[13px]">
+              {workspace.name}
+            </span>
+            <IconChevronDown className="size-3 shrink-0 text-muted-foreground" />
+          </>
+        )}
       </button>
       {isOpen && (
         <WorkspaceMenu
           currentId={workspace.id}
+          placement={compact ? 'down' : 'up'}
           onClose={() => {
             setOpen(false)
             onNavigate()

@@ -33,7 +33,7 @@ export function SidebarTreeRow({
       aria-level={depth + 1}
       aria-expanded={hasChildren ? isExpanded : undefined}
       aria-selected={isActive}
-      className={`group relative flex h-9 items-center rounded-lg md:h-[29px] ${
+      className={`group relative flex h-12 items-center rounded-lg md:h-[29px] ${
         isActive ? 'bg-accent font-medium' : 'text-muted-foreground hover:bg-accent'
       } ${drop === 'inside' ? 'bg-primary/10 ring-1 ring-primary/40' : ''} ${
         isDragging ? 'opacity-40' : ''
@@ -47,14 +47,14 @@ export function SidebarTreeRow({
       >
         <SheetIcon
           name={sheet.icon}
-          className={`size-[15px] ${hasChildren ? 'group-focus-within:invisible group-hover:invisible' : ''}`}
+          className={`size-[18px] md:size-[15px] ${hasChildren ? 'max-md:invisible group-focus-within:invisible group-hover:invisible' : ''}`}
         />
         {hasChildren && (
           <button
             type="button"
             aria-label={isExpanded ? `Collapse ${sheet.title}` : `Expand ${sheet.title}`}
             onClick={() => useTreeStore.getState().toggle(sheet.id)}
-            className="absolute inset-0 hidden place-items-center rounded text-muted-foreground hover:bg-border group-focus-within:grid group-hover:grid"
+            className="absolute inset-0 hidden place-items-center rounded text-muted-foreground hover:bg-border group-focus-within:grid group-hover:grid max-md:grid"
           >
             <IconChevronRight
               className={`size-3.5 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
@@ -72,7 +72,7 @@ export function SidebarTreeRow({
             onNavigate()
           })
         }
-        className="flex h-full min-w-0 flex-1 items-center gap-2 pr-1 pl-1.5 text-left text-[13px]"
+        className="flex h-full min-w-0 flex-1 items-center gap-2 pr-1 pl-1.5 text-left text-[15px] md:text-[13px]"
       >
         <span className="truncate">{sheet.title}</span>
         {isActive && isRunning && (

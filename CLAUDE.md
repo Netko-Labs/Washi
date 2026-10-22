@@ -63,7 +63,11 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   drop lands and refuses a page into its own subtree), Routines, Trash, and the workspace footer:
   the name switches workspaces in place (the shell is keyed by workspace id and the route has
   `gcTime: 0`, so every switch reruns the loader and the route effects), the avatar holds theme ·
-  settings · sign out.
+  settings · sign out. The sidebar **folds** (D59): `⌘\`, a » in the header while folded, the
+  left edge peeks it as an overlay, remembered per workspace (`washi:fold:<id>`). Under `md` there
+  is no drawer: `NarrowShell` makes the sidebar the Home screen (places as top tabs, Recents as
+  cards, 48px rows) and the ask field a bottom bar whose ✎ is New page on Home and Edit on a page;
+  a page opens with ‹ back. `useIsNarrow` picks the shell; the workspace routes never SSR.
 - `apps/desktop` — mirin shell: window, menu, icon, Develop menu. `src/bun/` (main) boots the
   embedded runtime and serves `appRouter` via `createMirinBridge`; the renderer's `api` is a tRPC
   client over `mirinLink`. No port, no token.

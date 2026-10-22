@@ -14,7 +14,7 @@ export function SidebarPageRow({ sheet, workspaceId, onNavigate }: SidebarPageRo
 
   return (
     <div
-      className={`group flex h-9 items-center rounded-lg md:h-[29px] ${
+      className={`group flex h-12 items-center rounded-lg md:h-[29px] ${
         active ? 'bg-accent font-medium' : 'text-muted-foreground hover:bg-accent'
       }`}
     >
@@ -27,9 +27,9 @@ export function SidebarPageRow({ sheet, workspaceId, onNavigate }: SidebarPageRo
             onNavigate()
           })
         }
-        className="flex h-full min-w-0 flex-1 items-center gap-2 px-2 text-left text-[13px]"
+        className="flex h-full min-w-0 flex-1 items-center gap-2 px-2 text-left text-[15px] md:text-[13px]"
       >
-        <SheetIcon name={sheet.icon} className="size-[15px] shrink-0" />
+        <SheetIcon name={sheet.icon} className="size-[18px] shrink-0 md:size-[15px]" />
         <span className="truncate">{sheet.title}</span>
         {active && running && (
           <span

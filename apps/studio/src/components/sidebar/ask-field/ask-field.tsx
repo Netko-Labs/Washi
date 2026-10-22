@@ -3,7 +3,7 @@ import { STATE_LABEL } from '@/components/agent-status'
 import { type AskFieldProps, TINT, useAskMood } from './lib'
 
 /** The door: text finds a page or asks Washi (⌘K), the face is Washi's state, and it opens the panel (⌘J). */
-export function AskField({ onNavigate }: AskFieldProps) {
+export function AskField({ onNavigate, scoped = false }: AskFieldProps) {
   const { mascot, status, tint } = useAskMood()
   const title = status
     ? `${STATE_LABEL[status.state]} · today ${usd(status.costUsd)} of $${status.capUsd} · ${status.turns} ${status.turns === 1 ? 'turn' : 'turns'}${status.savedUsd > 0 ? ` · saved ${usd(status.savedUsd)}` : ''}`
@@ -11,7 +11,7 @@ export function AskField({ onNavigate }: AskFieldProps) {
 
   return (
     <div
-      className={`flex h-[34px] items-center gap-2 rounded-[9px] border border-border bg-card pr-2 pl-1.5 text-[12.5px] text-muted-foreground ${TINT[tint]}`}
+      className={`flex h-11 items-center gap-2 rounded-[9px] border border-border bg-card pr-2 pl-1.5 text-[14px] text-muted-foreground md:h-[34px] md:text-[12.5px] ${TINT[tint]}`}
     >
       <button
         type="button"
@@ -33,7 +33,9 @@ export function AskField({ onNavigate }: AskFieldProps) {
         }}
         className="flex h-full min-w-0 flex-1 items-center gap-2 text-left"
       >
-        <span className="flex-1 truncate">Ask Washi or search</span>
+        <span className="flex-1 truncate">
+          {scoped ? 'Ask Washi about this page' : 'Ask Washi or search'}
+        </span>
         <kbd className="hidden rounded bg-accent px-1 py-0.5 font-sans text-[10px] md:inline">
           ⌘K
         </kbd>

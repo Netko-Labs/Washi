@@ -6,7 +6,7 @@ import { pathFor } from '@/components/shell'
 import { openInPlace, type SidebarSectionProps } from './lib'
 
 const ICON =
-  'relative grid size-[30px] shrink-0 place-items-center rounded-lg border border-border bg-card text-muted-foreground hover:bg-accent hover:text-foreground'
+  'relative grid size-9 shrink-0 place-items-center rounded-lg border border-border bg-card text-muted-foreground hover:bg-accent hover:text-foreground md:size-[30px]'
 
 /** The places that are not pages, in one row: Home, then Inbox · Threads · Routines as icons. */
 export function SidebarPlaces({ workspaceId, onNavigate }: SidebarSectionProps) {
@@ -24,13 +24,13 @@ export function SidebarPlaces({ workspaceId, onNavigate }: SidebarSectionProps) 
       <a
         href={pathFor(workspaceId, 'view:dashboard')}
         onClick={(event) => openInPlace(event, place('view:dashboard'))}
-        className={`flex h-[30px] min-w-0 flex-1 items-center gap-2 rounded-lg px-2 text-[13px] ${
-          activeTab === 'view:dashboard'
+        className={`flex h-9 min-w-0 flex-1 items-center gap-2 rounded-lg px-2 text-[14px] md:h-[30px] md:text-[13px] ${
+          !activeTab || activeTab === 'view:dashboard'
             ? 'bg-accent font-medium text-foreground'
             : 'text-muted-foreground hover:bg-accent'
         }`}
       >
-        <IconHome className="size-[15px]" />
+        <IconHome className="size-[17px] md:size-[15px]" />
         Home
       </a>
       <a
@@ -40,7 +40,7 @@ export function SidebarPlaces({ workspaceId, onNavigate }: SidebarSectionProps) 
         title="Inbox"
         className={`${ICON} ${activeTab === 'view:inbox' ? 'bg-accent text-foreground' : ''}`}
       >
-        <IconInbox className="size-[15px]" />
+        <IconInbox className="size-[17px] md:size-[15px]" />
         {inboxCount > 0 && (
           <span className="absolute -top-1.5 -right-1.5 flex h-[15px] min-w-[15px] items-center justify-center rounded-full bg-primary px-1 font-semibold text-[9.5px] text-primary-foreground">
             {inboxCount}
@@ -57,7 +57,7 @@ export function SidebarPlaces({ workspaceId, onNavigate }: SidebarSectionProps) 
         title="Threads — the conversations with Washi"
         className={ICON}
       >
-        <IconMessages className="size-[15px]" />
+        <IconMessages className="size-[17px] md:size-[15px]" />
       </button>
       <Link
         to="/w/$workspaceId/settings"
@@ -68,7 +68,7 @@ export function SidebarPlaces({ workspaceId, onNavigate }: SidebarSectionProps) 
         title="Routines"
         className={ICON}
       >
-        <IconClock className="size-[15px]" />
+        <IconClock className="size-[17px] md:size-[15px]" />
       </Link>
     </div>
   )
