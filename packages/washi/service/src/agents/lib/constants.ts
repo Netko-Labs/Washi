@@ -60,3 +60,12 @@ export const ROUTINE_APPROVAL_TIMEOUT_MS = 12 * 60 * 60_000
  */
 export const APPROVAL_MODE_KEY = 'agent_approval_mode'
 export const APPROVAL_MODES = ['ask', 'auto'] as const
+
+/** Who may clear the breaker: anyone on the team (the default) or an owner. */
+export const RESUME_BY_KEY = 'agent_resume_by'
+export const RESUME_BY = ['anyone', 'owners'] as const
+
+/** What a new conversation and every routine start with. The SDK's effort, in words. */
+export const DEFAULT_EFFORT_KEY = 'agent_default_effort'
+export const EFFORTS = ['quick', 'balanced', 'deep'] as const
+export const SDK_EFFORT = { quick: 'low', balanced: 'medium', deep: 'high' } as const

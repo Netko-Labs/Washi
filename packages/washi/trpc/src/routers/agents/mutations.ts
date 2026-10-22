@@ -1,8 +1,14 @@
 import { TRPCError } from '@trpc/server'
 import { createSession } from '@washi/repository'
-import { APPROVAL_MODES, INFERENCE_PREFERENCES, LOCAL_MODELS } from '@washi/service'
+import {
+  APPROVAL_MODES,
+  EFFORTS,
+  INFERENCE_PREFERENCES,
+  LOCAL_MODELS,
+  RESUME_BY,
+} from '@washi/service'
 import { z } from 'zod'
-import { ownerProcedure, router, workspaceProcedure } from '../../init'
+import { isSteward, ownerProcedure, router, workspaceProcedure } from '../../init'
 
 const decisionSchema = z.enum(['allow_once', 'allow_always', 'reject_once'])
 
@@ -31,10 +37,29 @@ export const agentMutations = router({
     .input(z.object({ sessionId: z.string() }))
     .mutation(({ ctx, input }) => ({ cancelled: ctx.host.cancel(input.sessionId) })),
   /** Clearing the breaker is a person's decision — nothing clears it on a timer. */
-  resume: workspaceProcedure.mutation(({ ctx }) => {
+  resume: workspaceProcedure.mutation(async ({ ctx }) => {
+    if (ctx.host.settings().resumeBy === 'owners' && !(await isSteward(ctx))) {
+      throw new TRPCError({
+        code: 'FORBIDDEN',
+        message: 'this workspace lets only an owner resume Washi',
+      })
+    }
     ctx.host.resume()
     return ctx.host.spend()
   }),
+  /** A person's stop, held until a person resumes — the breaker, pulled by hand. */
+  pause: ownerProcedure.mutation(({ ctx }) => ctx.host.pause()),
+  /** The backstop for models with no price: every turn counts toward it. */
+  setTurnCap: ownerProcedure
+    .input(z.object({ turnCap: z.number().int().positive().max(100_000) }))
+    .mutation(({ ctx, input }) => ctx.host.setTurnCap(input.turnCap)),
+  setResumeBy: ownerProcedure
+    .input(z.object({ resumeBy: z.enum(RESUME_BY) }))
+    .mutation(({ ctx, input }) => ctx.host.setResumeBy(input.resumeBy)),
+  /** What a new conversation and every routine start with. */
+  setDefaultEffort: workspaceProcedure
+    .input(z.object({ effort: z.enum(EFFORTS) }))
+    .mutation(({ ctx, input }) => ctx.host.setDefaultEffort(input.effort)),
   /** Auto is a standing yes for fetches, searches and actions — the ledger still records each. */
   setApprovalMode: ownerProcedure
     .input(z.object({ mode: z.enum(APPROVAL_MODES) }))

@@ -824,7 +824,15 @@ passes; no key → the tool says where to add one.
       - [x] shell → #61 (D59: fold, mobile Home, Inbox list; A · B · C deleted)
       - [x] studio code for D59: sidebar fold (⌘\, », edge peek, per-workspace memory) + mobile Home
       - [x] studio code for D59: Inbox as one list (Needs you · days · rows · chips · zero row)
-      - [ ] pages · data · work · agent · account · desktop — waiting on Juan's marks
+      - [x] pages · data · work walked: one fix (covers) → design #64; data · work all ✓
+      - [x] agent walked: five fixes → design #66 (D61 · D62 · D63)
+      - [x] code: receipts leave the turn (#67)
+      - [x] code: Settings · Agent as three cards, key dialog, model menu, turn cap · pause ·
+            who resumes · default effort
+      - [ ] code: covers — pictures + upload + files store (D60)
+      - [ ] code: agent panel — attach · model and effort chips · conversations rename, delete,
+            auto title · dock right (D61)
+      - [ ] account · desktop — waiting on Juan's marks
 
 # Mihon — the WSX sample book (2026-10-21) — branch `feat/mihon`
 

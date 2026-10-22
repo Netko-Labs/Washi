@@ -6,6 +6,8 @@ export const agentQueries = router({
   listSessions: workspaceProcedure.query(({ ctx }) => listSessions(ctx.ws)),
   /** What today cost and whether the breaker is holding the next turn. */
   spend: workspaceProcedure.query(({ ctx }) => ctx.host.spend()),
+  /** The stop's settings and the workspace's standing choices: who resumes, the default effort. */
+  settings: workspaceProcedure.query(({ ctx }) => ctx.host.settings()),
   /** Ask (the default) or auto: whether what leaves the server waits for a person. */
   approvalMode: workspaceProcedure.query(({ ctx }) => ({ mode: ctx.host.approvalMode() })),
   /** Idle, working, waiting on a person, or paused — plus today's numbers. Cheap; poll it. */

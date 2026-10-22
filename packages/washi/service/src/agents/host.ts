@@ -20,19 +20,23 @@ import type {
   AgentCredential,
   AgentHostEvents,
   AgentKeySource,
+  AgentSettingsReport,
   AgentSpendReport,
   ApprovalMode,
   BreakerState,
   Caller,
+  Effort,
   InferencePreference,
   InferenceStatus,
   LocalModel,
+  ResumeBy,
   SearchKeyLookup,
   TodayReport,
 } from './lib'
-import { SYSTEM_INSTRUCTIONS } from './lib'
+import { SDK_EFFORT, SYSTEM_INSTRUCTIONS } from './lib'
 import { proposedDiff } from './normalize'
 import { type AgentPort, createAiSdkPort, createClaudeSdkPort, type TurnResult } from './ports'
+import { AgentPreferences } from './preferences'
 import { RoutineBook } from './routines'
 import { recentTurns } from './today'
 
@@ -48,6 +52,7 @@ export class AgentHost {
   private readonly desk: CapabilityDesk
   private readonly approvals: ApprovalDesk
   private readonly budget: DailyBudget
+  private readonly prefs: AgentPreferences
   readonly routines: RoutineBook
   private readonly claudePort: AgentPort
   private readonly aiSdkPort: AgentPort
@@ -60,6 +65,7 @@ export class AgentHost {
     this.desk = new CapabilityDesk(ws, events)
     this.approvals = new ApprovalDesk(ws, events, this.desk)
     this.budget = new DailyBudget(ws)
+    this.prefs = new AgentPreferences(ws)
     this.routines = new RoutineBook(ws, {
       prompt: (sessionId, text) => this.prompt(sessionId, text),
       isRunning: (sessionId) => this.isRunning(sessionId),
@@ -129,8 +135,36 @@ export class AgentHost {
     return this.budget.setCap(capUsd)
   }
 
+  setTurnCap(turnCap: number): AgentSpendReport {
+    return this.budget.setTurnCap(turnCap)
+  }
+
+  pause(): AgentSpendReport {
+    return this.budget.pause()
+  }
+
   resume(): void {
     this.budget.resume()
+  }
+
+  settings(): AgentSettingsReport {
+    return {
+      capUsd: this.budget.capUsd(),
+      turnCap: this.budget.turnCap(),
+      resumeBy: this.prefs.resumeBy(),
+      effort: this.prefs.effort(),
+      zone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    }
+  }
+
+  setResumeBy(resumeBy: ResumeBy): AgentSettingsReport {
+    this.prefs.setResumeBy(resumeBy)
+    return this.settings()
+  }
+
+  setDefaultEffort(effort: Effort): AgentSettingsReport {
+    this.prefs.setEffort(effort)
+    return this.settings()
   }
 
   /** Stop the session's running turn. Its open approvals are answered "no" on the way out. */
@@ -246,6 +280,7 @@ export class AgentHost {
           text,
           credential,
           model: { provider: credential.provider, model: credential.model },
+          effort: SDK_EFFORT[this.prefs.effort()],
           history: native ? [] : conversationHistory(getTranscript(this.ws, sessionId)),
           resumeToken: native ? getSdkSessionId(this.ws, sessionId) : null,
           signal: abort.signal,

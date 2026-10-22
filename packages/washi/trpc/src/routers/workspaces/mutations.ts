@@ -45,6 +45,28 @@ export const workspaceMutations = router({
         model: input.model ?? null,
       })
     }),
+  /** The default model, without typing the key again. Null takes the provider's default. */
+  setAgentModel: ownerProcedure
+    .input(z.object({ model: z.string().min(1).max(200).nullable() }))
+    .mutation(async ({ ctx, input }) => {
+      const secrets = requireSecrets(ctx)
+      if (!ctx.actorId) {
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'sign in to set a model' })
+      }
+      await secrets.setModel(ctx.workspaceId, ctx.actorId, input.model)
+      return { model: input.model }
+    }),
+  /** Washi falls asleep until another key is set. Nothing already written changes. */
+  removeAgentKey: ownerProcedure.mutation(async ({ ctx }) => {
+    await requireSecrets(ctx).remove(ctx.workspaceId)
+    return { removed: true }
+  }),
+  removeIntegrationKey: ownerProcedure
+    .input(z.object({ integration: z.enum(INTEGRATIONS) }))
+    .mutation(async ({ ctx, input }) => {
+      await requireSecrets(ctx).removeIntegration(ctx.workspaceId, input.integration)
+      return { removed: true }
+    }),
   /** Same shape as the agent key: write-only, `last4` back. */
   setIntegrationKey: ownerProcedure
     .input(z.object({ integration: z.enum(INTEGRATIONS), key: z.string().min(8) }))

@@ -86,6 +86,19 @@ export class DailyBudget {
     return this.report()
   }
 
+  setTurnCap(turnCap: number): AgentSpendReport {
+    if (!Number.isInteger(turnCap) || turnCap <= 0)
+      throw new Error('a turn cap must be a whole number above 0')
+    setAppMeta(this.ws, DAILY_TURN_CAP_KEY, String(turnCap))
+    return this.report()
+  }
+
+  /** A person's stop, held until a person resumes — the same breaker the cap trips. */
+  pause(): AgentSpendReport {
+    pauseAgent(this.ws)
+    return this.report()
+  }
+
   resume(): void {
     resumeAgent(this.ws)
   }
