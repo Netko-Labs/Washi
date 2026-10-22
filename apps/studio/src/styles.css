@@ -22,3 +22,18 @@ body {
   max-width: none;
   padding: 0;
 }
+
+/*
+ * iOS Safari zooms the page into any field under 16px when it focuses, and never zooms back.
+ * A floor on phones keeps the layout still; capping the viewport's scale would do the same but
+ * takes pinch-zoom from everyone. Unlayered, so it beats Tailwind's text-[…] utilities.
+ */
+@media (max-width: 767px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+  textarea,
+  select,
+  [contenteditable="true"],
+  .cm-editor .cm-content {
+    font-size: 16px;
+  }
+}
