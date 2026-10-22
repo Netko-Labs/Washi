@@ -1,13 +1,11 @@
 import { useState } from 'react'
+import type { KeySave } from '../types'
 
 /** Form state for one provider's key: the secret, whether it shows, whether a save is in flight. */
 export function useKeyDialog(onSave: (key: string) => Promise<string | null>, onClose: () => void) {
   const [secret, setSecret] = useState('')
   const [view, setView] = useState({ shown: false, replacing: false })
-  const [save, setSave] = useState<{ busy: boolean; error: string | null }>({
-    busy: false,
-    error: null,
-  })
+  const [save, setSave] = useState<KeySave>({ busy: false, error: null })
 
   const submit = async () => {
     setSave({ busy: true, error: null })

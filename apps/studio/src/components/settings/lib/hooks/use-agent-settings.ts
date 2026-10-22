@@ -84,7 +84,12 @@ export function useAgentSettings() {
       if (target === 'exa') {
         await api.workspaces.setIntegrationKey.mutate({ integration: 'exa', key: secret })
       } else {
-        await api.workspaces.setAgentKey.mutate({ key: secret, provider: target, model: null })
+        // Replacing a provider's key keeps its model; a new provider starts from its default.
+        await api.workspaces.setAgentKey.mutate({
+          key: secret,
+          provider: target,
+          model: key?.provider === target ? key.model : null,
+        })
       }
       await refresh()
       return null

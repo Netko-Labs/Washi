@@ -8,6 +8,7 @@ import {
   useMenu,
 } from '../lib'
 
+const focusOnMount = (node: HTMLInputElement | null) => node?.focus()
 const ROW = 'flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-accent'
 const GROUP =
   'bg-background px-3 pt-2 pb-1 font-semibold text-[10.5px] text-muted-foreground uppercase tracking-[0.06em]'
@@ -72,7 +73,7 @@ export function ModelMenu({ models, provider, value, catalogueSource, onPick }: 
           <label className="flex items-center gap-2 border-border border-b px-3">
             <IconSearch className="size-3.5 text-muted-foreground" />
             <input
-              ref={(node) => node?.focus()}
+              ref={focusOnMount}
               value={term}
               onChange={(event) => setTerm(event.target.value)}
               placeholder={`Search ${models.filter((m) => m.provider === provider).length} models…`}

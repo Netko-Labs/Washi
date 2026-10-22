@@ -3,6 +3,9 @@ import { Dialog } from '@/components/shared/dialog'
 import { type KeyDialogProps, PROVIDER_META, refusalFor, sinceLabel } from '../lib'
 import { useKeyDialog } from './lib'
 
+/** A stable ref callback: React runs it on mount only, so focus is taken once. */
+const focusOnMount = (node: HTMLInputElement | null) => node?.focus()
+
 const GHOST = 'h-[38px] rounded-xl border border-border px-4 text-[13.5px] hover:bg-accent'
 const PRIMARY =
   'h-[38px] rounded-xl bg-primary px-4 font-semibold text-[13.5px] text-primary-foreground disabled:opacity-50'
@@ -73,7 +76,7 @@ export function KeyDialog({ target, connected, onSave, onRemove, onClose }: KeyD
               type={form.shown ? 'text' : 'password'}
               value={form.secret}
               autoComplete="off"
-              ref={(node) => node?.focus()}
+              ref={focusOnMount}
               onChange={(event) => form.setSecret(event.target.value)}
               placeholder={meta.hint}
               className="w-full bg-transparent font-mono text-[13px] outline-none placeholder:text-muted-foreground"
