@@ -21,10 +21,22 @@ export interface RecentSheet {
   age: string
 }
 
+export type MenuPlacement = 'up' | 'down'
+
 export interface SidebarProps {
   workspace: WorkspaceSummary
-  open: boolean
-  onClose: () => void
+  folded: boolean
+  peeking: boolean
+  onFold: () => void
+  onPeekEnd: () => void
+}
+
+export interface MobileHomeProps {
+  workspace: WorkspaceSummary
+}
+
+export interface BackHomeProps {
+  workspaceId: string
 }
 
 export interface SidebarSectionProps {

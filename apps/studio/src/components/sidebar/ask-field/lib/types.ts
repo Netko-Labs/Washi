@@ -3,6 +3,8 @@ import type { AgentStatusView } from '@/components/agent-status'
 
 export interface AskFieldProps {
   onNavigate: () => void
+  /** On a page under `md`: the bar asks about this page. */
+  scoped?: boolean
 }
 
 export interface AskMood {

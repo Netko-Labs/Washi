@@ -821,6 +821,10 @@ passes; no key → the tool says where to add one.
       in localStorage and `savedTabs`/`saveTabs` went with it; the desktop keeps the component.
 - [ ] 6 · design review: Juan walks each page (`W` on `bun run docs` — a slideshow, frame → pin →
       pin → verdict, the frame's note split per pin); act on `tasks/design-review.jsonl` page by page
+      - [x] shell → #61 (D59: fold, mobile Home, Inbox list; A · B · C deleted)
+      - [x] studio code for D59: sidebar fold (⌘\, », edge peek, per-workspace memory) + mobile Home
+      - [ ] studio code for D59: Inbox as one list (Needs you · days · rows · chips · zero row)
+      - [ ] pages · data · work · agent · account · desktop — waiting on Juan's marks
 
 # Mihon — the WSX sample book (2026-10-21) — branch `feat/mihon`
 

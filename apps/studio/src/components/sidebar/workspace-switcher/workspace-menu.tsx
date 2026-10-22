@@ -10,7 +10,7 @@ const route = getRouteApi('/w/$workspaceId')
 const ROW = 'flex w-full items-center gap-2.5 rounded-lg px-2 text-left hover:bg-accent'
 
 /** Opens on the loader's list and refreshes it, so a workspace made in another tab shows up. */
-export function WorkspaceMenu({ currentId, onClose }: WorkspaceMenuProps) {
+export function WorkspaceMenu({ currentId, onClose, placement = 'up' }: WorkspaceMenuProps) {
   const { workspaces: known } = route.useLoaderData()
   const { workspaces, error, create } = useWorkspaces(known)
   const navigate = useNavigate()
@@ -19,7 +19,7 @@ export function WorkspaceMenu({ currentId, onClose }: WorkspaceMenuProps) {
     <div
       role="dialog"
       aria-label="Switch workspace"
-      className="absolute bottom-full left-0 z-50 mb-2 w-[272px] rounded-xl border border-border bg-popover p-1.5 text-popover-foreground shadow-[0_16px_48px_rgb(0_0_0/0.18)]"
+      className={`absolute left-0 z-50 w-[272px] rounded-xl border border-border bg-popover p-1.5 text-popover-foreground shadow-[0_16px_48px_rgb(0_0_0/0.18)] ${placement === 'up' ? 'bottom-full mb-2' : 'top-full mt-2'}`}
     >
       <div className="px-2 pt-1 pb-1.5 font-semibold text-[11px] text-muted-foreground uppercase tracking-[0.06em]">
         Workspaces
