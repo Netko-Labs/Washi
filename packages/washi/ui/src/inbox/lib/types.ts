@@ -14,7 +14,6 @@ export interface InboxRow {
   verb: string
   where: string | null
   detail: string | null
-  /** The second line is a receipt. */
   mono?: boolean
   unread?: boolean
   onOpen?: () => void

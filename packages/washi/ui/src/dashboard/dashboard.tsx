@@ -1,4 +1,4 @@
-import { receiptLine, usd } from '../agent/lib'
+import { usd } from '../agent/lib'
 import { ApprovalCard } from '../approval'
 import { byRecent, relativeMs, relativeTime } from '../page-time'
 import { SheetIcon } from '../sheet-icon'
@@ -143,11 +143,10 @@ export function Dashboard() {
                     <div className="truncate text-[13px] leading-[1.5]">
                       {turn.prompt || turn.sessionTitle}
                     </div>
-                    <div className="font-mono text-[11px] text-muted-foreground">
-                      {relativeMs(turn.at)} ·{' '}
-                      {turn.receipt.stopReason === 'error'
-                        ? (turn.receipt.error ?? 'failed')
-                        : receiptLine(turn.receipt)}
+                    <div className="text-[11.5px] text-muted-foreground">
+                      {relativeMs(turn.at)}
+                      {turn.receipt.stopReason === 'error' &&
+                        ` · ${turn.receipt.error ?? 'failed'}`}
                     </div>
                   </div>
                 </div>

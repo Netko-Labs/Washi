@@ -1,13 +1,11 @@
-import { AgentMascot, usd, useAgentStore, useSheetsStore } from '@washi/ui'
+import { AgentMascot, useAgentStore, useSheetsStore } from '@washi/ui'
 import { STATE_LABEL } from '@/components/agent-status'
 import { type AskFieldProps, TINT, useAskMood } from './lib'
 
 /** The door: text finds a page or asks Washi (⌘K), the face is Washi's state, and it opens the panel (⌘J). */
 export function AskField({ onNavigate, scoped = false }: AskFieldProps) {
   const { mascot, status, tint } = useAskMood()
-  const title = status
-    ? `${STATE_LABEL[status.state]} · today ${usd(status.costUsd)} of $${status.capUsd} · ${status.turns} ${status.turns === 1 ? 'turn' : 'turns'}${status.savedUsd > 0 ? ` · saved ${usd(status.savedUsd)}` : ''}`
-    : 'Washi'
+  const title = status ? STATE_LABEL[status.state] : 'Washi'
 
   return (
     <div
