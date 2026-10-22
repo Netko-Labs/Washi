@@ -1,3 +1,4 @@
+import type { BlobStoreFactory } from '@washi/repository'
 import type { StoredKey } from '@washi/service'
 import type { ControlPlane, ServerMode, ServerRuntime } from '@washi/trpc'
 
@@ -13,6 +14,8 @@ export interface RuntimeOptions {
   storedAgentKey?: (workspaceId: string) => Promise<StoredKey | null>
   /** The Exa key a workspace searches the web with. Hosted stores one; embedded reads the env. */
   searchKey?: (workspaceId: string) => Promise<string | null>
+  /** Where a workspace's files go. Absent: a folder beside its .db (D60). */
+  blobs?: BlobStoreFactory
 }
 
 export interface HostedSecrets {

@@ -1,5 +1,10 @@
 import { join } from 'node:path'
-import { createWorkspaceRegistry, type Workspace } from '@washi/repository'
+import {
+  createFileStore,
+  createWorkspaceRegistry,
+  localBlobStore,
+  type Workspace,
+} from '@washi/repository'
 import { AgentHost, createStoredKeySource } from '@washi/service'
 import { createEventBus, createPresenceBoard, type ResolvedWorkspace } from '@washi/trpc'
 import { watchAgentWrites } from './agent-watch'
@@ -16,6 +21,8 @@ export function createRuntime(options: RuntimeOptions): Runtime {
     events.emit('presenceChanged', { workspaceId, sheetId, people }),
   )
   const registry = createWorkspaceRegistry((id) => join(options.dataDir, `${id}.db`))
+  const blobs =
+    options.blobs ?? ((id: string) => localBlobStore(join(options.dataDir, `${id}.files`)))
   const hosts = new Map<string, ResolvedWorkspace>()
 
   const attachHost = (workspace: Workspace): ResolvedWorkspace => {
@@ -40,7 +47,7 @@ export function createRuntime(options: RuntimeOptions): Runtime {
     })
     host.setPeople(() => options.control.listMembers(workspaceId))
     host.setSearchKey(() => options.searchKey?.(workspaceId) ?? Promise.resolve(null))
-    return { workspace, host }
+    return { workspace, host, files: createFileStore(workspace, blobs(workspaceId)) }
   }
 
   return {

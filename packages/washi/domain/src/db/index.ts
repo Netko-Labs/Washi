@@ -6,6 +6,7 @@ export {
   approvalTable,
   capabilityCallTable,
   commentTable,
+  fileTable,
   mentionInboxTable,
   oplogTable,
   recordTable,

@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
-import { openWorkspace, type Workspace } from '@washi/repository'
+import { tmpdir } from 'node:os'
+import { createFileStore, localBlobStore, openWorkspace, type Workspace } from '@washi/repository'
 import { AgentHost } from '@washi/service'
 import {
   appRouter,
@@ -44,7 +45,7 @@ beforeEach(() => {
   runtime = {
     mode: 'hosted',
     events: createEventBus(),
-    resolve: () => ({ workspace: ws, host }),
+    resolve: () => ({ workspace: ws, host, files: createFileStore(ws, localBlobStore(tmpdir())) }),
     control,
     defaultWorkspaceId: WORKSPACE,
     presence: createPresenceBoard(() => {}),

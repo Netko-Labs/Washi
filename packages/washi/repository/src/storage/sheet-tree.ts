@@ -140,3 +140,27 @@ export function emptyTrash(ws: Workspace): number {
     rows.map((row) => row.id),
   )
 }
+
+/**
+ * The uploads a trash batch's covers point at and nothing live still uses — a purge frees them
+ * with the pages (D60). A duplicate shares its original's cover, so a live copy keeps the file.
+ */
+export function trashedFileCovers(ws: Workspace, id?: string): string[] {
+  const unused =
+    "cover NOT IN (SELECT cover FROM sheets WHERE deleted_at IS NULL AND cover LIKE 'file:%')"
+  const rows = id
+    ? ws.sqlite
+        .query(
+          `SELECT DISTINCT cover FROM sheets
+           WHERE deleted_at = (SELECT deleted_at FROM sheets WHERE id = ?)
+             AND cover LIKE 'file:%' AND ${unused}`,
+        )
+        .all(id)
+    : ws.sqlite
+        .query(
+          `SELECT DISTINCT cover FROM sheets
+           WHERE deleted_at IS NOT NULL AND cover LIKE 'file:%' AND ${unused}`,
+        )
+        .all()
+  return (rows as { cover: string }[]).map((row) => row.cover.slice('file:'.length))
+}

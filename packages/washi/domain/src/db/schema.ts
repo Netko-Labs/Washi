@@ -165,6 +165,15 @@ export const commentTable = sqliteTable('comments', {
   hlcCreated: text('hlc_created').notNull(),
 })
 
+/** A file the workspace holds — an uploaded cover today. The bytes live beside the .db, or in a bucket. */
+export const fileTable = sqliteTable('files', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  mime: text('mime').notNull(),
+  size: integer('size').notNull(),
+  hlcCreated: text('hlc_created').notNull(),
+})
+
 /** One row per person mentioned: their Inbox, read or not. */
 export const mentionInboxTable = sqliteTable(
   'mention_inbox',

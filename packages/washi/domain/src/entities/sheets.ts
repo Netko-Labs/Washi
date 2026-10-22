@@ -38,7 +38,12 @@ export type SheetWrite = z.infer<typeof sheetWriteSchema>
 export const sheetMetaPatchSchema = z.object({
   title: z.string().min(1).max(200).optional(),
   icon: z.string().max(16).nullable().optional(),
-  cover: z.string().max(32).nullable().optional(),
+  // `preset:sage` · `picture:kiso-valley` · `file:<id>` — a key, never a URL (D60).
+  cover: z
+    .string()
+    .regex(/^(preset|picture|file):[a-z0-9-]{1,48}$/)
+    .nullable()
+    .optional(),
   fullWidth: z.boolean().optional(),
 })
 export type SheetMetaPatch = z.infer<typeof sheetMetaPatchSchema>

@@ -1,4 +1,14 @@
 export {
+  type BlobStore,
+  type BlobStoreFactory,
+  createFileStore,
+  type FileStore,
+  localBlobStore,
+  type S3BlobOptions,
+  type StoredFile,
+  s3BlobStores,
+} from './files'
+export {
   appendTurn,
   createApproval,
   createSession,
@@ -59,6 +69,7 @@ export {
   moveSheet,
   purgeSheet,
   restoreSheet,
+  trashedFileCovers,
 } from './storage/sheet-tree'
 export {
   createSheet,

@@ -3,6 +3,7 @@ import { agentsRouter } from './routers/agents'
 import { capabilitiesRouter } from './routers/capabilities'
 import { commentsRouter } from './routers/comments'
 import { devRouter } from './routers/dev'
+import { filesRouter } from './routers/files'
 import { liveRouter } from './routers/live'
 import { modelsRouter } from './routers/models'
 import { routinesRouter } from './routers/routines'
@@ -19,6 +20,7 @@ export const appRouter = router({
   system: systemRouter,
   sheets: sheetsRouter,
   comments: commentsRouter,
+  files: filesRouter,
   tables: tablesRouter,
   agents: agentsRouter,
   capabilities: capabilitiesRouter,
