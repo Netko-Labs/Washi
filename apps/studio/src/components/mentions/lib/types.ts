@@ -8,7 +8,3 @@ export interface MentionsState {
   markRead: (target: { commentIds?: string[]; sheetId?: string }) => Promise<void>
   reset: () => void
 }
-
-export interface MentionRowProps {
-  item: MentionItem
-}

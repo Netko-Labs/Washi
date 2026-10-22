@@ -158,7 +158,10 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
 - Comments live in the workspace file (`comments`, `mention_inbox`), so they travel with it (C1).
   The author is the session's actor — never the request body; embedded mode signs as `You`. A
   mention is an unread Inbox row for that person; a trashed page hides its mentions, a purge
-  deletes its discussion. The studio polls the unread count every 30s (no socket yet).
+  deletes its discussion. The studio polls the unread count every 30s (no socket yet). The Inbox
+  (`@washi/ui`) is one list grouped by day (D59): Washi's questions pinned as rows with inline
+  answers, its turns from `agents.today`, and whatever rows the host adds — the studio passes its
+  mentions through `useMentionRows`; the desktop passes none. Mark all read is the studio header's.
 - Ids: `Bun.randomUUIDv7()`. Timestamps: HLC strings from domain.
 - **Who pays for a turn.** A credential is `api_key` or `local_cli`. Embedded finds the
   person's installed `claude` (PATH is empty for a GUI app — known install paths too) and runs
