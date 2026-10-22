@@ -1,5 +1,5 @@
 import type { AgentUpdate, TurnBilling } from '@washi/domain'
-import type { AgentCredential } from '../lib/types'
+import type { AgentCredential, SdkEffort } from '../lib/types'
 
 /** Every provider Washi can reach. `anthropic` is the native Claude Agent SDK path. */
 export type ProviderId = 'anthropic' | 'openrouter'
@@ -15,6 +15,8 @@ export interface PromptRequest {
   text: string
   credential: AgentCredential
   model: ModelChoice
+  /** The SDK's reasoning effort; the AI SDK path has no equivalent yet and ignores it. */
+  effort?: SdkEffort
   /** Prior turns, for ports that do not resume server-side. */
   history: { role: 'user' | 'assistant'; text: string }[]
   /** Opaque to Washi: the Claude SDK's own session id, when a port keeps one. */

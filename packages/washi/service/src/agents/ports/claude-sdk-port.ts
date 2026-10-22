@@ -79,6 +79,7 @@ export function createClaudeSdkPort(deps: ClaudeSdkPortDeps): AgentPort {
             abortController: abort,
             resume: resume ?? undefined,
             model: request.model.model,
+            effort: request.effort,
             pathToClaudeCodeExecutable: local ? credential.executable : undefined,
             mcpServers: {
               washi: createWashiTools(deps.ws, {

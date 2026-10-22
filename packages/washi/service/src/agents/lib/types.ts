@@ -1,6 +1,6 @@
 import type { AgentUpdate, ApprovalRequest, CapabilityOrigin, TranscriptEntry } from '@washi/domain'
 import type { ProviderId } from '../ports/types'
-import type { APPROVAL_MODES } from './constants'
+import type { APPROVAL_MODES, EFFORTS, RESUME_BY, SDK_EFFORT } from './constants'
 
 /**
  * Where a turn's inference comes from. `api_key` bills a key — the workspace's
@@ -126,3 +126,15 @@ export interface TodayReport {
 export type SearchKeyLookup = () => Promise<string | null>
 
 export type ApprovalMode = (typeof APPROVAL_MODES)[number]
+export type ResumeBy = (typeof RESUME_BY)[number]
+export type Effort = (typeof EFFORTS)[number]
+export type SdkEffort = (typeof SDK_EFFORT)[Effort]
+
+/** What Settings → Agent edits beside the stop. The zone is the server's: nothing to set yet. */
+export interface AgentSettingsReport {
+  capUsd: number
+  turnCap: number
+  resumeBy: ResumeBy
+  effort: Effort
+  zone: string
+}

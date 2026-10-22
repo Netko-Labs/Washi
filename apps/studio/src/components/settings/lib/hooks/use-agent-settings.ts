@@ -1,17 +1,27 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '@/integrations/trpc'
 import type { ModelOption } from '@/lib/types'
-import type { ApprovalMode, KeyInput, KeyState, SearchKeyState, SpendState } from '../types'
+import type {
+  AgentSettingsState,
+  ApprovalMode,
+  Effort,
+  KeyInput,
+  KeyState,
+  ResumeBy,
+  SearchKeyState,
+  SpendState,
+} from '../types'
 
 /**
- * Everything the settings screen needs in one place: the stored key, what the
- * agent has spent today, and the catalogue a picker chooses from.
+ * Everything the settings screen needs in one place: the stored keys, what the
+ * agent has spent today, its standing choices, and the catalogue a picker chooses from.
  */
 export function useAgentSettings() {
   const [key, setKey] = useState<KeyState | null>(null)
   const [searchKey, setSearchKey] = useState<SearchKeyState | null>(null)
   const [approvalMode, setApprovalModeState] = useState<ApprovalMode>('ask')
   const [spend, setSpend] = useState<SpendState | null>(null)
+  const [settings, setSettings] = useState<AgentSettingsState | null>(null)
   const [models, setModels] = useState<ModelOption[]>([])
   const [catalogueSource, setCatalogueSource] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -19,17 +29,19 @@ export function useAgentSettings() {
 
   const refresh = useCallback(async () => {
     try {
-      const [stored, exa, approvals, today, catalogue] = await Promise.all([
+      const [stored, exa, approvals, today, standing, catalogue] = await Promise.all([
         api.workspaces.agentKey.query(),
         api.workspaces.integrationKey.query({ integration: 'exa' }),
         api.agents.approvalMode.query(),
         api.agents.spend.query(),
+        api.agents.settings.query(),
         api.models.list.query(),
       ])
       setKey(stored as KeyState | null)
       setSearchKey(exa as SearchKeyState | null)
       setApprovalModeState(approvals.mode)
       setSpend(today as SpendState)
+      setSettings(standing as AgentSettingsState)
       setModels(catalogue.models as ModelOption[])
       setCatalogueSource(catalogue.source)
       setError(null)
@@ -44,72 +56,111 @@ export function useAgentSettings() {
     void refresh()
   }, [refresh])
 
-  const save = async (input: KeyInput) => {
+  // One shape for every write: the error is kept for the screen, the result says whether it took.
+  const attempt = async (run: () => Promise<void>) => {
     setError(null)
     try {
+      await run()
+      return true
+    } catch (cause) {
+      setError(String(cause))
+      return false
+    }
+  }
+
+  const save = (input: KeyInput) =>
+    attempt(async () => {
       await api.workspaces.setAgentKey.mutate({
         key: input.key,
         provider: input.provider as 'anthropic' | 'openrouter',
         model: input.model,
       })
       await refresh()
-      return true
-    } catch (cause) {
-      setError(String(cause))
-      return false
-    }
-  }
+    })
 
-  const saveSearchKey = async (secret: string) => {
-    setError(null)
-    try {
+  const removeKey = () =>
+    attempt(async () => {
+      await api.workspaces.removeAgentKey.mutate()
+      await refresh()
+    })
+
+  const setModel = (model: string | null) =>
+    attempt(async () => {
+      await api.workspaces.setAgentModel.mutate({ model })
+      setKey((current) => (current ? { ...current, model } : current))
+    })
+
+  const saveSearchKey = (secret: string) =>
+    attempt(async () => {
       await api.workspaces.setIntegrationKey.mutate({ integration: 'exa', key: secret })
       await refresh()
-      return true
-    } catch (cause) {
-      setError(String(cause))
-      return false
-    }
-  }
+    })
 
-  const setApprovalMode = async (mode: ApprovalMode) => {
-    try {
+  const removeSearchKey = () =>
+    attempt(async () => {
+      await api.workspaces.removeIntegrationKey.mutate({ integration: 'exa' })
+      await refresh()
+    })
+
+  const setApprovalMode = (mode: ApprovalMode) =>
+    attempt(async () => {
       setApprovalModeState((await api.agents.setApprovalMode.mutate({ mode })).mode)
-      return true
-    } catch (cause) {
-      setError(String(cause))
-      return false
-    }
-  }
+    })
 
-  const resume = async () => {
-    setSpend((await api.agents.resume.mutate()) as SpendState)
-  }
+  const resume = () =>
+    attempt(async () => {
+      setSpend((await api.agents.resume.mutate()) as SpendState)
+    })
 
-  const setDailyCap = async (capUsd: number) => {
-    try {
+  const pause = () =>
+    attempt(async () => {
+      setSpend((await api.agents.pause.mutate()) as SpendState)
+    })
+
+  const setDailyCap = (capUsd: number) =>
+    attempt(async () => {
       setSpend((await api.agents.setDailyCap.mutate({ capUsd })) as SpendState)
-      return true
-    } catch (cause) {
-      setError(String(cause))
-      return false
-    }
-  }
+      setSettings((current) => (current ? { ...current, capUsd } : current))
+    })
+
+  const setTurnCap = (turnCap: number) =>
+    attempt(async () => {
+      setSpend((await api.agents.setTurnCap.mutate({ turnCap })) as SpendState)
+      setSettings((current) => (current ? { ...current, turnCap } : current))
+    })
+
+  const setResumeBy = (resumeBy: ResumeBy) =>
+    attempt(async () => {
+      setSettings((await api.agents.setResumeBy.mutate({ resumeBy })) as AgentSettingsState)
+    })
+
+  const setDefaultEffort = (effort: Effort) =>
+    attempt(async () => {
+      setSettings((await api.agents.setDefaultEffort.mutate({ effort })) as AgentSettingsState)
+    })
 
   return {
     key,
     searchKey,
     approvalMode,
     spend,
+    settings,
     models,
     catalogueSource,
     error,
     loading,
     save,
+    removeKey,
+    setModel,
     saveSearchKey,
+    removeSearchKey,
     setApprovalMode,
     resume,
+    pause,
     setDailyCap,
+    setTurnCap,
+    setResumeBy,
+    setDefaultEffort,
     refresh,
   }
 }

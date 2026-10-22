@@ -194,6 +194,13 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   approvals to `auto` (`agents.setApprovalMode`, Settings → Agent on both hosts): a standing yes
   for what leaves, each call ledgered as `auto`; policy refusals still refuse. Owner or admin
   only (`ownerProcedure`), as is setting an integration key.
+- **Settings → Agent (studio) is three cards (D63):** Model (a row per provider; `workspaces.
+  setAgentModel` changes the default model without a new key, `removeAgentKey` puts Washi to
+  sleep; the default effort — Quick · Balanced · Deep — is `agents.setDefaultEffort`, mapped to
+  the SDK's `low · medium · high` on every turn), What leaves the server, Usage and the daily
+  stop (`setDailyCap`, `setTurnCap`, `pause`, `setResumeBy` — `owners` makes `resume` refuse a
+  member). All of it is app meta in the workspace file except the key, which is the control
+  plane's. The day resets on the server's clock; the zone is shown, not set.
   The UI says every tool in words (`describeTool` in `@washi/ui`) — never a tool name or JSON.
 - Agent tools are the ONLY capability surface: ink (data), tsuru (network), hanko (actions).
   Never hand agents fs/shell/raw SQL. `web_search` is tsuru's `exaSearch`: hosted runs on the

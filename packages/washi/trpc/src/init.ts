@@ -53,14 +53,22 @@ export const INTEGRATIONS = ['exa'] as const
 export type Integration = (typeof INTEGRATIONS)[number]
 
 export interface SecretStore {
-  info(
-    workspaceId: string,
-  ): Promise<{ last4: string; provider: string; model: string | null; updatedAt: Date } | null>
+  info(workspaceId: string): Promise<{
+    last4: string
+    provider: string
+    model: string | null
+    updatedAt: Date
+    updatedBy: string | null
+  } | null>
   set(
     workspaceId: string,
     actorId: string,
     credential: AgentCredentialInput,
   ): Promise<{ last4: string }>
+  /** The default model rides with the key; this changes it without a new secret. */
+  setModel(workspaceId: string, actorId: string, model: string | null): Promise<void>
+  /** Washi falls asleep until another key is set. */
+  remove(workspaceId: string): Promise<void>
   integrationInfo(
     workspaceId: string,
     integration: Integration,
@@ -71,6 +79,7 @@ export interface SecretStore {
     integration: Integration,
     key: string,
   ): Promise<{ last4: string }>
+  removeIntegration(workspaceId: string, integration: Integration): Promise<void>
 }
 
 export interface ControlPlane {
@@ -206,10 +215,18 @@ const STEWARD_ROLES: ReadonlySet<string> = new Set(['owner', 'admin'])
  * widen what Washi may do unasked — the approval mode, the keys it reaches
  * out with — are theirs alone, so one member cannot lower the whole team's guard.
  */
-export const ownerProcedure = workspaceProcedure.use(async ({ ctx, next }) => {
+export async function isSteward(ctx: {
+  runtime: { control: ControlPlane }
+  actorId: string | null
+  workspaceId: string
+}): Promise<boolean> {
   const workspaces = await ctx.runtime.control.listWorkspaces(ctx.actorId)
   const role = workspaces.find((entry) => entry.id === ctx.workspaceId)?.role
-  if (!role || !STEWARD_ROLES.has(role)) {
+  return Boolean(role && STEWARD_ROLES.has(role))
+}
+
+export const ownerProcedure = workspaceProcedure.use(async ({ ctx, next }) => {
+  if (!(await isSteward(ctx))) {
     throw new TRPCError({ code: 'FORBIDDEN', message: 'only a workspace owner can change this' })
   }
   return next()

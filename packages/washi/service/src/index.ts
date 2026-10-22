@@ -13,6 +13,7 @@ export {
   type AgentCredential,
   type AgentHostEvents,
   type AgentKeySource,
+  type AgentSettingsReport,
   type AgentSpendReport,
   APPROVAL_MODES,
   type ApprovalMode,
@@ -21,10 +22,14 @@ export {
   type Caller,
   DAILY_CAP_USD_KEY,
   DEFAULT_DAILY_CAP_USD,
+  EFFORTS,
+  type Effort,
   type InferencePreference,
   type InferenceStatus,
   type LocalCliStatus,
   type LocalModel,
+  RESUME_BY,
+  type ResumeBy,
 } from './agents/lib'
 export type { AgentPort, ModelChoice, ProviderId, ToolGate } from './agents/ports'
 export { defaultModelFor, LAST_RESORT_MODELS, PREFERRED_MODELS } from './agents/ports'

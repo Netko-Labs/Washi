@@ -38,9 +38,15 @@ export interface HostedControlPlane extends ControlPlane {
     actorId: string,
     credential: AgentCredentialInput,
   ): Promise<{ last4: string }>
-  agentKeyInfo(
-    workspaceId: string,
-  ): Promise<{ last4: string; provider: string; model: string | null; updatedAt: Date } | null>
+  setAgentModel(workspaceId: string, actorId: string, model: string | null): Promise<void>
+  removeAgentKey(workspaceId: string): Promise<void>
+  agentKeyInfo(workspaceId: string): Promise<{
+    last4: string
+    provider: string
+    model: string | null
+    updatedAt: Date
+    updatedBy: string | null
+  } | null>
   /** Decrypted, for the agent host only — never for a route. */
   integrationKey(workspaceId: string, integration: Integration): Promise<string | null>
   setIntegrationKey(
@@ -53,6 +59,7 @@ export interface HostedControlPlane extends ControlPlane {
     workspaceId: string,
     integration: Integration,
   ): Promise<{ last4: string; updatedAt: Date } | null>
+  removeIntegrationKey(workspaceId: string, integration: Integration): Promise<void>
 }
 
 export function createHostedControlPlane(options: ControlPlaneOptions): HostedControlPlane {
@@ -65,6 +72,10 @@ export function createHostedControlPlane(options: ControlPlaneOptions): HostedCo
       info: (workspaceId) => plane.agentKeyInfo(workspaceId),
       set: (workspaceId, actorId, credential) =>
         plane.setAgentKey(workspaceId, actorId, credential),
+      setModel: (workspaceId, actorId, model) => plane.setAgentModel(workspaceId, actorId, model),
+      remove: (workspaceId) => plane.removeAgentKey(workspaceId),
+      removeIntegration: (workspaceId, integration) =>
+        plane.removeIntegrationKey(workspaceId, integration),
       integrationInfo: (workspaceId, integration) =>
         plane.integrationKeyInfo(workspaceId, integration),
       setIntegration: (workspaceId, actorId, integration, key) =>
@@ -153,6 +164,17 @@ export function createHostedControlPlane(options: ControlPlaneOptions): HostedCo
       return { last4: sealed.last4 }
     },
 
+    async setAgentModel(workspaceId, actorId, model) {
+      await db
+        .update(organizationSecret)
+        .set({ model, updatedBy: actorId, updatedAt: new Date() })
+        .where(eq(organizationSecret.organizationId, workspaceId))
+    },
+
+    async removeAgentKey(workspaceId) {
+      await db.delete(organizationSecret).where(eq(organizationSecret.organizationId, workspaceId))
+    },
+
     async agentKeyInfo(workspaceId) {
       const [row] = await db
         .select({
@@ -160,8 +182,10 @@ export function createHostedControlPlane(options: ControlPlaneOptions): HostedCo
           provider: organizationSecret.provider,
           model: organizationSecret.model,
           updatedAt: organizationSecret.updatedAt,
+          updatedBy: user.name,
         })
         .from(organizationSecret)
+        .leftJoin(user, eq(user.id, organizationSecret.updatedBy))
         .where(eq(organizationSecret.organizationId, workspaceId))
         .limit(1)
       return row ?? null
@@ -215,6 +239,17 @@ export function createHostedControlPlane(options: ControlPlaneOptions): HostedCo
         )
         .limit(1)
       return row ?? null
+    },
+
+    async removeIntegrationKey(workspaceId, integration) {
+      await db
+        .delete(organizationIntegration)
+        .where(
+          and(
+            eq(organizationIntegration.organizationId, workspaceId),
+            eq(organizationIntegration.integration, integration),
+          ),
+        )
     },
 
     close,
