@@ -1,14 +1,29 @@
 import { z } from 'zod'
 
+/** How hard Washi thinks, in words; the SDK's low · medium · high behind them. */
+export const effortSchema = z.enum(['quick', 'balanced', 'deep'])
+export type Effort = z.infer<typeof effortSchema>
+
 export const agentSessionSchema = z.object({
   id: z.string(),
   provider: z.string(),
   title: z.string(),
   status: z.enum(['idle', 'running', 'error']),
   costUsd: z.number(),
+  /** A conversation's own choices; null takes the workspace default (D61). */
+  model: z.string().nullable(),
+  effort: effortSchema.nullable(),
   createdAt: z.string(),
   updatedAt: z.string(),
 })
+
+/** What rides with an ask: a page by id (Washi reads it), or a file from the files store. */
+export const attachmentRefSchema = z.object({
+  kind: z.enum(['page', 'file']),
+  id: z.string().min(1),
+  name: z.string().max(200),
+})
+export type AttachmentRef = z.infer<typeof attachmentRefSchema>
 export type AgentSession = z.infer<typeof agentSessionSchema>
 
 /**
@@ -23,7 +38,11 @@ export type TurnBilling = z.infer<typeof turnBillingSchema>
  * renders these, the repository persists them, the agent host emits them.
  */
 export const agentUpdateSchema = z.discriminatedUnion('kind', [
-  z.object({ kind: z.literal('user_message'), text: z.string() }),
+  z.object({
+    kind: z.literal('user_message'),
+    text: z.string(),
+    attachments: z.array(attachmentRefSchema).optional(),
+  }),
   z.object({ kind: z.literal('message_chunk'), text: z.string() }),
   z.object({
     kind: z.literal('tool_call'),

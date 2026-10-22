@@ -2,6 +2,8 @@ import type {
   AgentSession,
   ApprovalDecision,
   ApprovalRequest,
+  AttachmentRef,
+  Effort,
   TranscriptEntry,
 } from '@washi/domain'
 import { create } from 'zustand'
@@ -16,13 +18,18 @@ interface AgentState {
   running: boolean
   panelOpen: boolean
   togglePanel: () => void
-  chatExpanded: boolean
-  toggleExpanded: () => void
+  /** Docked beside the page instead of floating over it (D61). The host remembers it. */
+  docked: boolean
+  setDocked: (docked: boolean) => void
+  toggleDocked: () => void
   init: () => Promise<void>
   initialize: () => Promise<void>
   createSession: () => Promise<void>
   selectSession: (id: string) => Promise<void>
-  sendPrompt: (text: string) => Promise<void>
+  renameSession: (id: string, title: string) => Promise<void>
+  deleteSession: (id: string) => Promise<void>
+  setSessionOptions: (patch: { model?: string | null; effort?: Effort | null }) => Promise<void>
+  sendPrompt: (text: string, attachments?: AttachmentRef[]) => Promise<void>
   stopTurn: () => Promise<void>
   resolveApproval: (id: string, decision: ApprovalDecision) => Promise<void>
   reset: () => void
@@ -68,8 +75,9 @@ export const useAgentStore = create<AgentState>((set, get) => ({
   running: false,
   panelOpen: false,
   togglePanel: () => set((state) => ({ panelOpen: !state.panelOpen })),
-  chatExpanded: false,
-  toggleExpanded: () => set((state) => ({ chatExpanded: !state.chatExpanded })),
+  docked: false,
+  setDocked: (docked) => set({ docked }),
+  toggleDocked: () => set((state) => ({ docked: !state.docked })),
 
   init: () => {
     initializing ??= get()
@@ -114,7 +122,12 @@ export const useAgentStore = create<AgentState>((set, get) => ({
           void useSheetsStore.getState().refresh()
         },
       })
-      subscriptions.push(agentUpdates, approvalRequests, openSheetRequests)
+      const sessionChanges = api.agents.onSessionChanged.subscribe(undefined, {
+        onData: () => {
+          void api.agents.listSessions.query().then((sessions) => set({ sessions }))
+        },
+      })
+      subscriptions.push(agentUpdates, approvalRequests, openSheetRequests, sessionChanges)
     }
     const issued = generation
     const [sessions, pending] = await Promise.all([
@@ -161,7 +174,37 @@ export const useAgentStore = create<AgentState>((set, get) => ({
     if (get().activeSessionId === id) set({ transcript })
   },
 
-  sendPrompt: async (text) => {
+  renameSession: async (id, title) => {
+    const session = await api.agents.renameSession.mutate({ sessionId: id, title })
+    if (session)
+      set((state) => ({ sessions: state.sessions.map((s) => (s.id === id ? session : s)) }))
+  },
+
+  /** The next conversation in the list takes over; none left means a fresh one on the next ask. */
+  deleteSession: async (id) => {
+    await api.agents.deleteSession.mutate({ sessionId: id })
+    const sessions = get().sessions.filter((session) => session.id !== id)
+    set({ sessions })
+    if (get().activeSessionId === id) {
+      if (sessions[0]) await get().selectSession(sessions[0].id)
+      else set({ activeSessionId: null, transcript: [] })
+    }
+  },
+
+  setSessionOptions: async (patch) => {
+    if (creating) await creating
+    let id = get().activeSessionId
+    if (!id) {
+      await get().createSession()
+      id = get().activeSessionId
+    }
+    if (!id) return
+    const session = await api.agents.setSessionOptions.mutate({ sessionId: id, ...patch })
+    if (session)
+      set((state) => ({ sessions: state.sessions.map((s) => (s.id === id ? session : s)) }))
+  },
+
+  sendPrompt: async (text, attachments) => {
     if (creating) await creating
     let sessionId = get().activeSessionId
     if (!sessionId) {
@@ -171,7 +214,11 @@ export const useAgentStore = create<AgentState>((set, get) => ({
     if (!sessionId || !text.trim()) return
     set({ running: true })
     try {
-      await api.agents.prompt.mutate({ sessionId, text })
+      await api.agents.prompt.mutate({
+        sessionId,
+        text,
+        ...(attachments && attachments.length > 0 && { attachments }),
+      })
     } catch (error) {
       set({ running: false })
       throw error

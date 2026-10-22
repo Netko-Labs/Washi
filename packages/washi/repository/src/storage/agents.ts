@@ -10,6 +10,8 @@ function toSession(row: typeof agentSessionTable.$inferSelect): AgentSession {
     title: row.title,
     status: row.status as AgentSession['status'],
     costUsd: row.costUsd,
+    model: row.model,
+    effort: row.effort as AgentSession['effort'],
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
   }
@@ -36,13 +38,32 @@ export function createSession(ws: Workspace, title: string): AgentSession {
 export function updateSession(
   ws: Workspace,
   id: string,
-  patch: Partial<{ status: string; costUsd: number; sdkSessionId: string; title: string }>,
+  patch: Partial<{
+    status: string
+    costUsd: number
+    sdkSessionId: string
+    title: string
+    model: string | null
+    effort: string | null
+  }>,
 ): void {
   ws.db
     .update(agentSessionTable)
     .set({ ...patch, updatedAt: ws.now() })
     .where(eq(agentSessionTable.id, id))
     .run()
+}
+
+/** The conversation, its turns and its answered questions. A running one is refused upstream. */
+export function deleteSession(ws: Workspace, id: string): void {
+  ws.db.delete(agentTurnTable).where(eq(agentTurnTable.sessionId, id)).run()
+  ws.db.delete(approvalTable).where(eq(approvalTable.sessionId, id)).run()
+  ws.db.delete(agentSessionTable).where(eq(agentSessionTable.id, id)).run()
+}
+
+export function getSession(ws: Workspace, id: string): AgentSession | null {
+  const [row] = ws.db.select().from(agentSessionTable).where(eq(agentSessionTable.id, id)).all()
+  return row ? toSession(row) : null
 }
 
 export function getSdkSessionId(ws: Workspace, id: string): string | null {

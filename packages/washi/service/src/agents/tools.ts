@@ -38,6 +38,8 @@ export interface ToolContext {
   listPeople?: () => Promise<Member[]>
   /** The workspace's Exa key, resolved per call so a key set mid-session counts. */
   searchKey?: SearchKeyLookup
+  /** Names the conversation — Washi calls it once, at the start of its first reply (D61). */
+  setTitle?: (title: string) => void
 }
 
 /**
@@ -49,6 +51,15 @@ export function createWashiTools(ws: Workspace, context: ToolContext) {
     name: 'washi',
     version: '0.1.0',
     tools: [
+      tool(
+        'set_conversation_title',
+        'Name this conversation: at most four words, no quotes, no trailing period. Call once, at the start of your first reply.',
+        { title: z.string().min(1).max(60) },
+        async ({ title }) => {
+          context.setTitle?.(title.trim())
+          return text({ ok: true })
+        },
+      ),
       tool(
         'sheet_list',
         'List all sheets (id, title, icon, tags, parentId). A sheet with a parentId is a sub-page of that sheet.',

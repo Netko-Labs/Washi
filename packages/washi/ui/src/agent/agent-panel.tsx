@@ -1,18 +1,28 @@
 import {
-  IconCheck,
   IconChevronDown,
-  IconEraser,
-  IconMaximize,
-  IconMinimize,
+  IconLayoutSidebarRightCollapse,
+  IconLayoutSidebarRightExpand,
   IconPlus,
   IconX,
 } from '@tabler/icons-react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ApprovalCard } from '../approval'
 import { AgentMascot } from '../mascot'
 import { mascotStateFor, noteIdOf, useAgentStore, useSheetsStore, useViewStore } from '../stores'
 import { AgentComposer } from './agent-composer'
+import { ConversationsMenu } from './conversations-menu'
+import { type AgentPanelProps, usePanelFrame } from './lib'
 import { TranscriptView } from './transcript-view'
+
+const FRAME = {
+  float:
+    'fixed inset-x-3 bottom-[84px] z-50 h-[min(620px,calc(100dvh-110px))] rounded-2xl border border-border shadow-[0_24px_64px_rgb(0_0_0/0.22),0_4px_16px_rgb(0_0_0/0.10)] sm:inset-x-auto sm:right-6 sm:bottom-[92px] sm:h-[min(620px,calc(100dvh-130px))] sm:w-[400px]',
+  dock: 'relative z-20 h-full w-[420px] shrink-0 border-border border-l',
+  sheet: 'fixed inset-0 z-50',
+}
+
+const HEADER_BUTTON =
+  'grid size-7 place-items-center rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground'
 
 function ApprovalBar() {
   const approvals = useAgentStore((state) => state.approvals)
@@ -72,164 +82,98 @@ function EmptyChat({ onStarter }: { onStarter: (text: string) => void }) {
   )
 }
 
-export function AgentPanel() {
-  const {
-    sessions,
-    activeSessionId,
-    transcript,
-    approvals,
-    running,
-    init,
-    createSession,
-    selectSession,
-    sendPrompt,
-    togglePanel,
-    chatExpanded,
-    toggleExpanded,
-  } = useAgentStore()
-  const sheets = useSheetsStore((state) => state.sheets)
-  const pageId = useViewStore((state) => noteIdOf(state.activeTab))
+/** The door's room: a popover, a dock beside the page, or the whole screen on a phone (D61). */
+export function AgentPanel({ placement = 'float' }: AgentPanelProps) {
+  const { sessions, activeSessionId, transcript, approvals, running } = useAgentStore()
   const [convosOpen, setConvosOpen] = useState(false)
-  const scrollRef = useRef<HTMLDivElement>(null)
+  const { scrollRef, activeSheetTitle } = usePanelFrame(transcript.length)
+  const store = useAgentStore.getState
 
-  useEffect(() => {
-    void init()
-  }, [init])
-
-  useEffect(() => {
-    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight })
-  }, [transcript.length])
-
-  const activeSheet = sheets.find((sheet) => sheet.id === pageId)
   const mascotState = mascotStateFor(transcript, running, approvals)
   const activeSession = sessions.find((session) => session.id === activeSessionId)
 
-  const submit = (text: string) => {
-    if (!running) void sendPrompt(text)
-  }
-
   return (
-    <>
-      {chatExpanded && (
+    <aside
+      data-agent-panel
+      data-placement={placement}
+      className={`flex flex-col overflow-hidden bg-card ${FRAME[placement]}`}
+    >
+      <div className="relative flex h-[50px] shrink-0 items-center gap-0.5 border-border border-b pr-2 pl-3.5">
+        <AgentMascot state={mascotState} size={26} />
         <button
           type="button"
-          aria-label="Collapse chat"
-          onClick={toggleExpanded}
-          className="fixed inset-0 z-[49] cursor-default bg-black/40"
-        />
-      )}
-      <aside
-        data-agent-panel
-        className={`fixed z-50 flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-[0_24px_64px_rgb(0_0_0/0.22),0_4px_16px_rgb(0_0_0/0.10)] ${
-          chatExpanded
-            ? 'inset-0 m-auto h-[min(680px,calc(100dvh-24px))] w-[calc(100vw-24px)] sm:h-[min(680px,calc(100dvh-80px))] sm:w-[min(720px,calc(100vw-80px))]'
-            : 'inset-x-3 bottom-[84px] h-[min(620px,calc(100dvh-110px))] sm:inset-x-auto sm:right-6 sm:bottom-[92px] sm:h-[min(620px,calc(100dvh-130px))] sm:w-[400px]'
-        }`}
-      >
-        <div className="relative flex h-[50px] shrink-0 items-center gap-0.5 border-border border-b pr-2 pl-3.5">
-          <AgentMascot state={mascotState} size={26} />
+          onClick={() => setConvosOpen((open) => !open)}
+          aria-haspopup="menu"
+          aria-expanded={convosOpen}
+          className="-ml-1 flex h-[34px] min-w-0 items-center gap-1.5 rounded-[9px] px-2 text-left hover:bg-accent"
+        >
+          <span className="min-w-0">
+            <span className="block truncate font-medium text-[13px]">
+              {activeSession?.title ?? 'Washi'}
+            </span>
+            <span className="block truncate text-[11px] text-muted-foreground">
+              {running ? `editing ${activeSheetTitle ?? 'a page'}` : 'watching this workspace'}
+            </span>
+          </span>
+          <IconChevronDown className="size-[13px] shrink-0 text-muted-foreground" />
+        </button>
+        <div className="ml-auto flex gap-0.5">
           <button
             type="button"
-            onClick={() => setConvosOpen((open) => !open)}
-            className="-ml-1 flex h-[34px] items-center gap-1.5 rounded-[9px] px-2 text-left hover:bg-accent"
+            aria-label="New conversation"
+            title="New conversation"
+            onClick={() => void store().createSession()}
+            className={HEADER_BUTTON}
           >
-            <span className="min-w-0">
-              <span className="block truncate font-medium text-[13px]">
-                {activeSession?.title ?? 'Washi'}
-              </span>
-              <span className="block truncate text-[11px] text-muted-foreground">
-                {running ? `editing ${activeSheet?.title ?? 'a page'}` : 'watching this workspace'}
-              </span>
-            </span>
-            <IconChevronDown className="size-[13px] shrink-0 text-muted-foreground" />
+            <IconPlus className="size-[15px]" />
           </button>
-          <div className="ml-auto flex gap-0.5">
+          {placement !== 'sheet' && (
             <button
               type="button"
-              aria-label="Clear conversation"
-              title="Clear conversation"
-              onClick={() => void createSession()}
-              className="grid size-7 place-items-center rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground"
+              aria-label={
+                placement === 'dock' ? 'Float the panel' : 'Dock the panel beside the page'
+              }
+              title={placement === 'dock' ? 'Float' : 'Dock to the side'}
+              onClick={() => store().toggleDocked()}
+              className={HEADER_BUTTON}
             >
-              <IconEraser className="size-3.5" />
-            </button>
-            <button
-              type="button"
-              aria-label={chatExpanded ? 'Collapse' : 'Expand'}
-              title={chatExpanded ? 'Collapse' : 'Expand'}
-              onClick={toggleExpanded}
-              className="grid size-7 place-items-center rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground"
-            >
-              {chatExpanded ? (
-                <IconMinimize className="size-3.5" />
+              {placement === 'dock' ? (
+                <IconLayoutSidebarRightCollapse className="size-[15px]" />
               ) : (
-                <IconMaximize className="size-3.5" />
+                <IconLayoutSidebarRightExpand className="size-[15px]" />
               )}
             </button>
-            <button
-              type="button"
-              aria-label="Close agent panel"
-              onClick={togglePanel}
-              className="grid size-7 place-items-center rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground"
-            >
-              <IconX className="size-[15px]" />
-            </button>
+          )}
+          <button
+            type="button"
+            aria-label="Close agent panel"
+            onClick={() => store().togglePanel()}
+            className={HEADER_BUTTON}
+          >
+            <IconX className="size-[15px]" />
+          </button>
+        </div>
+        {convosOpen && <ConversationsMenu onClose={() => setConvosOpen(false)} />}
+      </div>
+
+      <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto">
+        {transcript.length === 0 && !running ? (
+          <EmptyChat onStarter={(text) => void store().sendPrompt(text)} />
+        ) : (
+          <TranscriptView transcript={transcript} />
+        )}
+        {running && (
+          <div className="flex items-center gap-2 px-4 pb-3 text-[12px] text-muted-foreground">
+            <AgentMascot state="writing" size={20} />
+            Washi is working…
           </div>
+        )}
+      </div>
 
-          {convosOpen && (
-            <div className="absolute top-12 left-3 z-[60] w-[264px] rounded-xl border border-border bg-popover p-[5px] shadow-[0_8px_28px_rgb(0_0_0/0.16)]">
-              <div className="px-2 pt-1.5 pb-1 font-semibold text-[10.5px] text-muted-foreground uppercase tracking-[0.06em]">
-                Conversations
-              </div>
-              {sessions.map((session) => (
-                <button
-                  key={session.id}
-                  type="button"
-                  onClick={() => {
-                    void selectSession(session.id)
-                    setConvosOpen(false)
-                  }}
-                  className="flex w-full items-center gap-2 rounded-lg px-2 py-[7px] text-left text-[12.5px] hover:bg-accent"
-                >
-                  <span className="min-w-0 flex-1 truncate font-medium">{session.title}</span>
-                  {session.id === activeSessionId && <IconCheck className="size-[13px]" />}
-                </button>
-              ))}
-              <div className="mx-1 my-1 h-px bg-border" />
-              <button
-                type="button"
-                onClick={() => {
-                  void createSession()
-                  setConvosOpen(false)
-                }}
-                className="flex w-full items-center gap-2 rounded-lg px-2 py-[7px] text-left text-[12.5px] text-muted-foreground hover:bg-accent"
-              >
-                <IconPlus className="size-[13px]" />
-                New conversation
-              </button>
-            </div>
-          )}
-        </div>
+      <ApprovalBar />
 
-        <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto">
-          {transcript.length === 0 && !running ? (
-            <EmptyChat onStarter={(text) => submit(text)} />
-          ) : (
-            <TranscriptView transcript={transcript} />
-          )}
-          {running && (
-            <div className="flex items-center gap-2 px-4 pb-3 text-[12px] text-muted-foreground">
-              <AgentMascot state="writing" size={20} />
-              Washi is working…
-            </div>
-          )}
-        </div>
-
-        <ApprovalBar />
-
-        <AgentComposer />
-      </aside>
-    </>
+      <AgentComposer />
+    </aside>
   )
 }
 

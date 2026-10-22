@@ -3,11 +3,12 @@ import { Header } from '@washi/ui'
 import { Sidebar } from '@/components/sidebar'
 import { AgentLayer } from './agent-layer'
 import { HeaderActions } from './header-actions'
-import { useFold, useShellStore, type WorkspaceShellProps } from './lib'
+import { useDock, useFold, useShellStore, type WorkspaceShellProps } from './lib'
 
 /** From `md` up: the sidebar beside the page, folding to nothing; the left edge peeks it back. */
 export function WideShell({ workspace, children }: WorkspaceShellProps) {
   const { folded, peeking } = useFold(workspace.id)
+  const docked = useDock(workspace.id)
   const shell = useShellStore.getState
 
   return (
@@ -46,7 +47,8 @@ export function WideShell({ workspace, children }: WorkspaceShellProps) {
         />
         {children}
       </main>
-      <AgentLayer />
+      {/* Docked, the panel is a flex sibling that pushes the page; floating, it is the popover over it. */}
+      {docked ? <AgentLayer placement="dock" /> : <AgentLayer />}
     </>
   )
 }

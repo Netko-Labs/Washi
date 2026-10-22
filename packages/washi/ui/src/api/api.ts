@@ -1,4 +1,4 @@
-import type { HostOptions, WashiClient } from './types'
+import type { HostOptions, UploadedFile, WashiClient } from './types'
 
 let bound: HostOptions | null = null
 
@@ -17,6 +17,10 @@ function host(): HostOptions {
 
 /** Where a turn ran, for receipts: "this computer" or "your server". */
 export const hostPlace = (): string => host().place
+
+/** Null where the host takes no uploads; the composer hides its file choices then. */
+export const hostUploadFile = (): ((file: File) => Promise<UploadedFile>) | null =>
+  host().uploadFile ?? null
 
 /**
  * The tRPC client every shared component calls, as `api.sheets.list.query()`.

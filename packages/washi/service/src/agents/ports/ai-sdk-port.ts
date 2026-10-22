@@ -50,7 +50,14 @@ export function createAiSdkPort({
       if (credential.kind !== 'api_key') {
         throw new Error('the AI SDK port runs on an API key, never a local CLI login')
       }
-      const tools = createAiTools({ ws, runHankoAction, openSheet, listPeople, searchKey })
+      const tools = createAiTools({
+        ws,
+        runHankoAction,
+        openSheet,
+        listPeople,
+        searchKey,
+        setTitle: request.setTitle,
+      })
       const model =
         request.model.model ?? (await defaultModelFor(catalogue, request.model.provider))
 
@@ -71,7 +78,12 @@ export function createAiSdkPort({
       const stream = await agent.stream({
         messages: [
           ...request.history.map((entry) => ({ role: entry.role, content: entry.text })),
-          { role: 'user' as const, content: request.text },
+          {
+            role: 'user' as const,
+            content: request.images?.length
+              ? `${request.text}\n\n(${request.images.length} picture(s) were attached, but this path cannot see pictures yet.)`
+              : request.text,
+          },
         ],
         abortSignal: request.signal,
       })

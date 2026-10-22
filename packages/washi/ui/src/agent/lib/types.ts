@@ -1,0 +1,61 @@
+import type { AgentSession, AttachmentRef, Effort } from '@washi/domain'
+import type { RefObject } from 'react'
+
+export type PanelPlacement = 'float' | 'dock' | 'sheet'
+
+export interface AgentPanelProps {
+  /** Float is the popover; dock is a flex sibling the host places beside the page; sheet fills a phone. */
+  placement?: PanelPlacement
+}
+
+export interface ConversationsMenuProps {
+  onClose: () => void
+}
+
+export interface ConversationRowState {
+  renamingId: string | null
+  confirmingId: string | null
+}
+
+export interface OptionChipsProps {
+  session: AgentSession | null
+  inference: InferenceView | null
+}
+
+export interface InferenceView {
+  active: 'local_cli' | 'api_key' | null
+  provider: string | null
+  localModel: string | null
+  plan: string | null
+}
+
+export interface ModelChoice {
+  id: string
+  label: string
+  desc: string
+}
+
+export interface EffortChoice {
+  id: Effort
+  label: string
+  desc: string
+}
+
+export interface AttachMenuProps {
+  onPage: (ref: AttachmentRef) => void
+  onFile: (file: File) => void
+  onClose: () => void
+  canUpload: boolean
+}
+
+export interface ComposerState {
+  draft: string
+  attachments: AttachmentRef[]
+  uploading: boolean
+  error: string | null
+}
+
+export interface PanelFrame {
+  scrollRef: RefObject<HTMLDivElement | null>
+  activeSheetTitle: string | null
+}

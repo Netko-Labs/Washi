@@ -181,6 +181,8 @@ function createTables(sqlite: Database) {
     )
   `)
   ensureColumn(sqlite, 'approvals', 'resolved_by', 'TEXT')
+  ensureColumn(sqlite, 'agent_sessions', 'model', 'TEXT')
+  ensureColumn(sqlite, 'agent_sessions', 'effort', 'TEXT')
 
   sqlite.exec(`
     CREATE TABLE IF NOT EXISTS capability_calls (

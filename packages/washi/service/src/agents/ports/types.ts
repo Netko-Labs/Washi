@@ -17,6 +17,10 @@ export interface PromptRequest {
   model: ModelChoice
   /** The SDK's reasoning effort; the AI SDK path has no equivalent yet and ignores it. */
   effort?: SdkEffort
+  /** Pictures attached to the ask. The Claude port sends them as image blocks; the AI SDK port cannot yet. */
+  images?: { mime: string; base64: string }[]
+  /** Washi names the conversation through a tool; the host stores what it says. */
+  setTitle?: (title: string) => void
   /** Prior turns, for ports that do not resume server-side. */
   history: { role: 'user' | 'assistant'; text: string }[]
   /** Opaque to Washi: the Claude SDK's own session id, when a port keeps one. */
