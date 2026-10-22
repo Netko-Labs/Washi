@@ -94,6 +94,19 @@
 .app .covers span { position: relative; height: 56px; border-radius: 8px; overflow: hidden; }
 .app .covers span.on { outline: 2px solid var(--s-primary); outline-offset: 1px; }
 .app .covers span i { position: absolute; left: 0; right: 0; bottom: 0; background: #00000059; color: #fff; font: 500 10.5px / 1 var(--s-sans); font-style: normal; padding: 4px 6px; }
+.app .menu .ptabs { display: flex; gap: 2px; margin: -4px 0 10px; border-bottom: 1px solid var(--s-border); }
+.app .menu .ptabs span { height: 30px; display: inline-flex; align-items: center; padding: 0 10px; font-size: 12.5px; font-weight: 500; color: var(--s-mfg); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.app .menu .ptabs span.on { color: var(--s-fg); border-color: var(--s-primary); }
+.app .covers.pics span { height: 64px; }
+.app .covers.pics span::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, #0000 0 3px, #ffffff08 3px 4px), repeating-linear-gradient(90deg, #0000 0 5px, #00000008 5px 6px); mix-blend-mode: overlay; }
+.app .upl { margin-top: 2px; border: 1.5px dashed var(--s-border); border-radius: 10px; background: var(--s-bg); padding: 22px 12px; display: grid; justify-items: center; gap: 6px; text-align: center; font-size: 12.5px; }
+.app .upl .ic { font-size: 20px; line-height: 1; }
+.app .upl .h { font-size: 11.5px; color: var(--s-mfg); }
+.app .upl .btn { margin-top: 4px; }
+.app .menu .foot { margin-top: 10px; font-size: 11.5px; color: var(--s-mfg); line-height: 1.45; }
+.app .cover.pic { background: linear-gradient(160deg, #2f4a5c 0%, #5f8aa3 35%, #b9c7b2 60%, #e5d7b8 100%); }
+.app .cover.pic::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, #0000 0 3px, #ffffff0a 3px 4px); }
+.app .cover .who { position: absolute; left: 16px; bottom: 12px; background: #fbf9f4d9; border-radius: 6px; padding: 4px 8px; font-size: 11.5px; color: var(--s-mfg); }
 .app .menu .in { height: 32px; border-radius: 8px; border: 1px solid var(--s-border); background: var(--s-bg); padding: 0 10px; font: 400 13px / 32px var(--s-sans); color: #a39b8d; margin: 2px 2px 6px; }
 .app .menu .in b { color: var(--s-fg); font-weight: 400; }
 .app .abs { position: absolute; z-index: 4; }
@@ -252,7 +265,7 @@
             <span class="btn ghost cnt">💬</span><span class="btn">✎ Edit</span><span class="btn">⧉ Copy link</span><span class="btn ghost icon">⋯</span>
           </div>
           <div class="pv"><div class="main">
-            <div class="cover"><span class="chg">Change cover</span></div>
+            <div class="cover pic"><span class="who">Kiso valley · one of Washi's pictures</span><span class="chg">Change cover</span></div>
             <div class="sheet full" style="padding-left:32px;padding-right:32px">
               <div class="bigicon over">▤</div>
               <div class="chrome quiet"><span>💬 Add comment</span></div>
@@ -278,7 +291,7 @@
       <span class="pin" style="left:260px;top:300px">2</span>
       <span class="pin" style="left:1215px;top:470px">3</span>
     </div>
-    <div class="fnote">A database page, full width, with the Sage cover. 1 a cover is a 180px band and a preset key, never a URL; <code>Change cover</code> appears on hover. 2 the icon overlaps it by 36px, as in Notion. 3 <code>Full width</code> (the page menu's switch) sets <code>--measure: 100%</code> so the table takes the window; it is metadata — <code>sheets.updateMeta</code>, never the Loro doc — so toggling it is not an edit and no one's draft moves.</div>
+    <div class="fnote">A database page, full width, with a picture for a cover. 1 a cover is a 180px band and a <em>key</em> the page stores — <code>preset:sage</code>, <code>picture:kiso-valley</code> (one of the dozen Washi ships) or <code>file:&lt;id&gt;</code> (an upload, D60); never a URL in the page. <code>Change cover</code> appears on hover and the band says which picture it is. 2 the icon overlaps it by 36px, as in Notion. 3 <code>Full width</code> (the page menu's switch) sets <code>--measure: 100%</code> so the table takes the window; it is metadata — <code>sheets.updateMeta</code>, never the Loro doc — so toggling it is not an edit and no one's draft moves.</div>
   </article>
 
   <article class="frame" data-name="Row page" data-w="1280" data-h="800">
@@ -771,28 +784,37 @@
     <div class="fnote">1 the 72px icon is the button (<code>Change the icon</code>); <code>Add icon</code> in the quiet row opens the same picker. 2 a 300px dialog: <code>Icon</code>, <code>Remove</code> when one is set, and an 8-column grid of 48 emoji — no tabs, no search. <code>SheetIcon</code> also reads the registry names Washi uses (<code>notebook</code>, <code>compass</code>, <code>chart</code>…); people pick emoji, the agent picks names, both are one <code>icon</code> string.</div>
   </article>
 
-  <article class="frame" data-name="Cover picker" data-w="560" data-h="440">
+  <article class="frame" data-name="Cover picker" data-w="560" data-h="520">
     <div class="app">
-      <div class="cover" style="height:120px"><span class="chg" style="background:var(--s-accent)">Change cover</span></div>
+      <div class="cover pic" style="height:120px"><span class="chg" style="background:var(--s-accent)">Change cover</span></div>
       <div class="sheet" style="padding:0 40px;max-width:none"><div class="bigicon over">🧭</div></div>
-      <div class="menu w300 abs" style="left:220px;top:150px">
+      <div class="menu w300 abs" style="left:220px;top:130px">
         <div class="ttl">Cover<span class="rm">Remove</span></div>
-        <div class="covers">
-          <span style="background:linear-gradient(120deg,#d4713f,#e9a066)"><i>Persimmon</i></span>
-          <span style="background:linear-gradient(120deg,#f7edd6,#e6d3ad)"><i>Paper</i></span>
-          <span class="on" style="background:linear-gradient(120deg,#aebb9a,#74866a)"><i>Sage</i></span>
-          <span style="background:linear-gradient(120deg,#c9d6a3,#8fa65c)"><i>Matcha</i></span>
-          <span style="background:linear-gradient(120deg,#f7d3c4,#f0a487)"><i>Sakura</i></span>
-          <span style="background:linear-gradient(120deg,#3d4f7c,#7a8cbf)"><i>Indigo</i></span>
-          <span style="background:linear-gradient(120deg,#bcd8e8,#f2e6c9)"><i>Sky</i></span>
-          <span style="background:linear-gradient(120deg,#31261e,#8a5a3c)"><i>Dusk</i></span>
-          <span style="background:linear-gradient(120deg,#221a14,#4a3a2e)"><i>Ink</i></span>
+        <div class="ptabs"><span>Presets</span><span class="on">Pictures</span><span>Upload</span></div>
+        <div class="covers pics">
+          <span class="on" style="background:linear-gradient(160deg,#2f4a5c,#5f8aa3 40%,#b9c7b2 65%,#e5d7b8)"><i>Kiso valley</i></span>
+          <span style="background:linear-gradient(170deg,#f3ead8,#e4d4b4 55%,#cdb894)"><i>Washi sheet</i></span>
+          <span style="background:linear-gradient(150deg,#1f2a44,#3d4f7c 50%,#8a9bc9)"><i>Indigo dye</i></span>
+          <span style="background:linear-gradient(160deg,#6b7f5a,#aebb9a 50%,#e2e6c9)"><i>Tea field</i></span>
+          <span style="background:linear-gradient(155deg,#d4713f,#e9a066 45%,#f7d3c4)"><i>Persimmons</i></span>
+          <span style="background:linear-gradient(165deg,#3a2a22,#8a5a3c 55%,#d9b48c)"><i>Cedar</i></span>
+          <span style="background:linear-gradient(160deg,#9db7cc,#dfe9ee 50%,#f5efe2)"><i>Morning fog</i></span>
+          <span style="background:linear-gradient(160deg,#5a3f5e,#a17ba3 50%,#f0d6e4)"><i>Plum blossom</i></span>
+          <span style="background:linear-gradient(165deg,#1a1611,#3b332a 60%,#6c5f4b)"><i>Ink stone</i></span>
         </div>
+        <div class="foot">Twelve pictures Washi ships with — scroll for the rest. Each is a key, and the same file on every install.</div>
+      </div>
+      <div class="menu w300 abs" style="left:20px;top:250px;width:190px">
+        <div class="ttl">Cover<span class="rm">Remove</span></div>
+        <div class="ptabs"><span>Presets</span><span>Pictures</span><span class="on">Upload</span></div>
+        <div class="upl"><span class="ic">⇪</span><b>Drop a picture here</b><span class="h">JPG · PNG · WebP · up to 5 MB</span><span class="btn">Browse…</span></div>
+        <div class="foot">Lands beside the workspace file, or in your bucket.</div>
       </div>
       <span class="pin" style="left:420px;top:92px">1</span>
-      <span class="pin" style="left:200px;top:300px">2</span>
+      <span class="pin" style="left:470px;top:160px">2</span>
+      <span class="pin" style="left:20px;top:262px">3</span>
     </div>
-    <div class="fnote">1 <code>Change cover</code> on hover over the band, or <code>Add cover</code> in the quiet row. 2 nine presets from Washi's own palette, each a key the page stores (<code>sheets.updateMeta { cover: 'sage' }</code>) — never a URL, never an upload, so a workspace file carries no blobs and a cover renders the same offline, hosted or embedded.</div>
+    <div class="fnote">1 <code>Change cover</code> on hover over the band, or <code>Add cover</code> in the quiet row. 2 three tabs. <b>Presets</b> are the nine gradients as before. <b>Pictures</b> are a dozen photographs shipped with Washi (<code>apps/studio/public/covers/</code>, Latin names, the same bytes on every install), chosen for the palette: paper, indigo, tea, persimmon. A picture is still a key — <code>picture:kiso-valley</code>. 3 <b>Upload</b> takes a JPG, PNG or WebP up to 5 MB, drag or browse. The file lands in the workspace's files store — a folder beside the <code>.db</code> by default (<code>&lt;dataDir&gt;/&lt;workspace&gt;.files/</code>, so C1 holds: the workspace travels as a folder), or S3 when <code>WASHI_FILES_S3_*</code> is set — and the page stores <code>file:&lt;id&gt;</code>. The studio serves it at <code>/api/files/&lt;id&gt;</code> for members only; the desktop reads the folder. Remove clears the key and leaves the file for the Trash's purge. (Mobbin: GitBook's <q>Select cover image</q> tabs, Kit's media gallery drop zone.)</div>
   </article>
 
   <article class="frame" data-name="Page menu" data-w="560" data-h="440">
