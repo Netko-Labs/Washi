@@ -2,15 +2,8 @@ import { AgentMascot } from '../mascot'
 import { useAgentStore } from '../stores'
 import { InboxChip } from './inbox-chip'
 import { InboxRow } from './inbox-row'
-import { type InboxFilter, type InboxProps, useInbox } from './lib'
+import { EMPTY_LABELS, type InboxFilter, type InboxProps, useInbox } from './lib'
 import { NeedRow } from './need-row'
-
-const EMPTY: Record<InboxFilter, string> = {
-  all: 'Nothing in the last day.',
-  needs: '',
-  mentions: 'No mentions.',
-  washi: 'Nothing from Washi in the last day.',
-}
 
 const LABEL =
   'px-3 pt-5 pb-1.5 font-semibold text-[11px] text-muted-foreground uppercase tracking-[0.06em]'
@@ -89,7 +82,7 @@ export function Inbox({ rows }: InboxProps) {
         {groups.length === 0 && filter !== 'needs' && (
           <>
             {filter === 'all' && <div className={LABEL}>Today</div>}
-            <p className="px-3 pt-4 text-[13px] text-muted-foreground">{EMPTY[filter]}</p>
+            <p className="px-3 pt-4 text-[13px] text-muted-foreground">{EMPTY_LABELS[filter]}</p>
           </>
         )}
       </section>
