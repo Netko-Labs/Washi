@@ -1,4 +1,10 @@
-import type { AgentUpdate, ApprovalRequest, CapabilityOrigin, TranscriptEntry } from '@washi/domain'
+import type {
+  AgentUpdate,
+  ApprovalRequest,
+  AttachmentRef,
+  CapabilityOrigin,
+  TranscriptEntry,
+} from '@washi/domain'
 import type { ProviderId } from '../ports/types'
 import type { APPROVAL_MODES, EFFORTS, RESUME_BY, SDK_EFFORT } from './constants'
 
@@ -96,8 +102,19 @@ export interface Caller {
   actorId?: string | null
 }
 
+export interface AskOptions {
+  attachments?: AttachmentRef[]
+}
+
+export interface SessionOptions {
+  model?: string | null
+  effort?: Effort | null
+}
+
 export interface AgentHostEvents {
   update: (sessionId: string, entry: TranscriptEntry) => void
+  /** Washi renamed the conversation; the list should refetch. */
+  sessionChanged?: (sessionId: string) => void
   approval: (request: ApprovalRequest) => void
   openSheet: (id: string) => void
 }

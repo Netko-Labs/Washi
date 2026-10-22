@@ -1,4 +1,5 @@
 import { TRPCError } from '@trpc/server'
+import { attachmentRefSchema, effortSchema } from '@washi/domain'
 import { createSession } from '@washi/repository'
 import {
   APPROVAL_MODES,
@@ -18,7 +19,13 @@ export const agentMutations = router({
     .mutation(({ ctx, input }) => createSession(ctx.ws, input.title)),
   // Fire-and-forget: updates stream back over the agentUpdate subscription.
   prompt: workspaceProcedure
-    .input(z.object({ sessionId: z.string(), text: z.string() }))
+    .input(
+      z.object({
+        sessionId: z.string(),
+        text: z.string(),
+        attachments: z.array(attachmentRefSchema).max(8).optional(),
+      }),
+    )
     .mutation(({ ctx, input }) => {
       // Refused here, before anything is recorded: a second prompt must not
       // touch the transcript or the session of the turn already running.
@@ -28,10 +35,38 @@ export const agentMutations = router({
           message: 'A turn is already running in this conversation. Stop it first.',
         })
       }
-      void ctx.host.prompt(input.sessionId, input.text).catch((error) => {
-        console.error('[washi] a turn crashed outside its own error handling', error)
-      })
+      void ctx.host
+        .prompt(input.sessionId, input.text, { attachments: input.attachments })
+        .catch((error) => {
+          console.error('[washi] a turn crashed outside its own error handling', error)
+        })
     }),
+  renameSession: workspaceProcedure
+    .input(z.object({ sessionId: z.string(), title: z.string().trim().min(1).max(120) }))
+    .mutation(({ ctx, input }) => ctx.host.renameSession(input.sessionId, input.title)),
+  /** Refused while it runs — Stop first. */
+  deleteSession: workspaceProcedure
+    .input(z.object({ sessionId: z.string() }))
+    .mutation(({ ctx, input }) => {
+      try {
+        ctx.host.deleteSession(input.sessionId)
+      } catch (error) {
+        throw new TRPCError({ code: 'CONFLICT', message: String(error) })
+      }
+      return { deleted: true }
+    }),
+  /** A conversation's own model and effort; null takes the workspace default (D61). */
+  setSessionOptions: workspaceProcedure
+    .input(
+      z.object({
+        sessionId: z.string(),
+        model: z.string().min(1).max(200).nullable().optional(),
+        effort: effortSchema.nullable().optional(),
+      }),
+    )
+    .mutation(({ ctx, input }) =>
+      ctx.host.setSessionOptions(input.sessionId, { model: input.model, effort: input.effort }),
+    ),
   /** Stop the running turn. Its open approvals are answered "no" on the way out. */
   cancel: workspaceProcedure
     .input(z.object({ sessionId: z.string() }))

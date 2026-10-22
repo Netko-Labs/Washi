@@ -9,6 +9,8 @@ export {
   DEFAULT_DAILY_TURN_CAP,
   DEFAULT_EFFORT_KEY,
   EFFORTS,
+  IMAGE_TYPES,
+  MAX_INLINE_FILE_BYTES,
   MAX_PLAN_TURN_BUDGET_USD,
   MAX_TURN_BUDGET_USD,
   PROMPT_PREVIEW_CHARS,
@@ -29,6 +31,7 @@ export type {
   AgentSettingsReport,
   AgentSpendReport,
   ApprovalMode,
+  AskOptions,
   BreakerState,
   Caller,
   Effort,
@@ -40,7 +43,9 @@ export type {
   ResumeBy,
   SdkEffort,
   SearchKeyLookup,
+  SessionOptions,
   TodayReport,
   TurnSummary,
 } from './types'
+export { titleFrom } from './utils'
 export { SEARCH_NOT_SET, SYSTEM_INSTRUCTIONS } from './values'

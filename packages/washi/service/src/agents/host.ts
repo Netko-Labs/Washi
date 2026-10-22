@@ -1,10 +1,20 @@
-import type { AgentUpdate, ApprovalDecision, ApprovalRequest, Member } from '@washi/domain'
+import type {
+  AgentSession,
+  AgentUpdate,
+  ApprovalDecision,
+  ApprovalRequest,
+  AttachmentRef,
+  Member,
+} from '@washi/domain'
 import { createModelCatalogue, type ModelCatalogue } from '@washi/models'
 import {
   appendTurn,
+  deleteSession,
   expirePendingApprovals,
+  type FileStore,
   failInterruptedSessions,
   getSdkSessionId,
+  getSession,
   getSheet,
   getTranscript,
   updateSession,
@@ -23,6 +33,7 @@ import type {
   AgentSettingsReport,
   AgentSpendReport,
   ApprovalMode,
+  AskOptions,
   BreakerState,
   Caller,
   Effort,
@@ -31,9 +42,16 @@ import type {
   LocalModel,
   ResumeBy,
   SearchKeyLookup,
+  SessionOptions,
   TodayReport,
 } from './lib'
-import { SDK_EFFORT, SYSTEM_INSTRUCTIONS } from './lib'
+import {
+  IMAGE_TYPES,
+  MAX_INLINE_FILE_BYTES,
+  SDK_EFFORT,
+  SYSTEM_INSTRUCTIONS,
+  titleFrom,
+} from './lib'
 import { proposedDiff } from './normalize'
 import { type AgentPort, createAiSdkPort, createClaudeSdkPort, type TurnResult } from './ports'
 import { AgentPreferences } from './preferences'
@@ -44,6 +62,7 @@ export class AgentHost {
   private events: AgentHostEvents | null = null
   private people: (() => Promise<Member[]>) | null = null
   private search: SearchKeyLookup | null = null
+  private files: FileStore | null = null
   /** One per running turn, keyed by session — Stop aborts exactly that turn. */
   private readonly turns = new Map<string, AbortController>()
 
@@ -236,12 +255,38 @@ export class AgentHost {
     return this.turns.has(sessionId)
   }
 
+  /** Uploads attached to an ask come from here; the runtime hands it over with the workspace. */
+  setFiles(files: FileStore): void {
+    this.files = files
+  }
+
+  setSessionOptions(sessionId: string, options: SessionOptions): AgentSession | null {
+    updateSession(this.ws, sessionId, {
+      model: options.model === undefined ? undefined : options.model,
+      effort: options.effort === undefined ? undefined : options.effort,
+    })
+    return getSession(this.ws, sessionId)
+  }
+
+  renameSession(sessionId: string, title: string): AgentSession | null {
+    updateSession(this.ws, sessionId, { title: title.trim().slice(0, 120) })
+    return getSession(this.ws, sessionId)
+  }
+
+  /** Refused while a turn runs: the transcript it is writing has nowhere to go. */
+  deleteSession(sessionId: string): void {
+    if (this.turns.has(sessionId)) {
+      throw new Error('This conversation is still running. Stop it first.')
+    }
+    deleteSession(this.ws, sessionId)
+  }
+
   /**
    * One user turn: persist, run it on whichever port the credential picks, close
    * it with a receipt. The turn is registered before anything awaits, so Stop
    * works from the first moment — including while the local CLI is probed.
    */
-  async prompt(sessionId: string, text: string): Promise<void> {
+  async prompt(sessionId: string, text: string, ask: AskOptions = {}): Promise<void> {
     if (this.turns.has(sessionId)) {
       throw new Error('A turn is already running in this conversation. Stop it first.')
     }
@@ -250,7 +295,22 @@ export class AgentHost {
     this.turns.set(sessionId, abort)
 
     try {
-      this.record(sessionId, { kind: 'user_message', text })
+      const attachments = ask.attachments ?? []
+      const session = getSession(this.ws, sessionId)
+      // A conversation is named by its first ask until Washi names it better.
+      if (
+        session &&
+        /^Session \d+$/.test(session.title) &&
+        getTranscript(this.ws, sessionId).length === 0
+      ) {
+        updateSession(this.ws, sessionId, { title: titleFrom(text) })
+      }
+      this.record(sessionId, {
+        kind: 'user_message',
+        text,
+        ...(attachments.length > 0 && { attachments }),
+      })
+      const { prompt, images } = await this.compose(text, attachments)
       const refusal = this.budget.refusal()
       if (refusal) {
         this.fail(sessionId, refusal)
@@ -277,10 +337,15 @@ export class AgentHost {
       const result = await port.prompt(
         {
           sessionId,
-          text,
+          text: prompt,
           credential,
-          model: { provider: credential.provider, model: credential.model },
-          effort: SDK_EFFORT[this.prefs.effort()],
+          model: { provider: credential.provider, model: session?.model ?? credential.model },
+          effort: SDK_EFFORT[session?.effort ?? this.prefs.effort()],
+          images,
+          setTitle: (title) => {
+            updateSession(this.ws, sessionId, { title })
+            this.events?.sessionChanged?.(sessionId)
+          },
           history: native ? [] : conversationHistory(getTranscript(this.ws, sessionId)),
           resumeToken: native ? getSdkSessionId(this.ws, sessionId) : null,
           signal: abort.signal,
@@ -301,6 +366,37 @@ export class AgentHost {
       // A turn that ended — however — has nobody left to hear its questions.
       this.approvals.dropSession(sessionId)
     }
+  }
+
+  /** Pages ride by id — Washi reads them; text files ride inline; pictures ride as image blocks. */
+  private async compose(text: string, attachments: AttachmentRef[]) {
+    const lines: string[] = []
+    const images: { mime: string; base64: string }[] = []
+    for (const attachment of attachments) {
+      if (attachment.kind === 'page') {
+        const sheet = getSheet(this.ws, attachment.id)
+        if (sheet)
+          lines.push(
+            `Attached page "${sheet.title}" (id ${sheet.id}): read it with sheet_get before answering.`,
+          )
+        continue
+      }
+      const found = await this.files?.get(attachment.id)
+      if (!found) continue
+      if (IMAGE_TYPES.has(found.file.mime)) {
+        images.push({ mime: found.file.mime, base64: Buffer.from(found.bytes).toString('base64') })
+        lines.push(`Attached picture "${found.file.name}".`)
+      } else if (found.bytes.byteLength <= MAX_INLINE_FILE_BYTES) {
+        lines.push(
+          `Attached file "${found.file.name}":\n\`\`\`\n${new TextDecoder().decode(found.bytes)}\n\`\`\``,
+        )
+      } else {
+        lines.push(
+          `Attached file "${found.file.name}" is too large to read here (${found.file.size} bytes).`,
+        )
+      }
+    }
+    return { prompt: lines.length > 0 ? `${lines.join('\n')}\n\n${text}` : text, images }
   }
 
   private close(

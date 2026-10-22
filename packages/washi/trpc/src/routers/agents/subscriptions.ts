@@ -38,6 +38,19 @@ export const agentSubscriptions = router({
     }
   }),
 
+  onSessionChanged: workspaceProcedure.input(resumable).subscription(async function* ({
+    ctx,
+    input,
+    signal,
+  }) {
+    for await (const event of ctx.events.subscribe('sessionChanged', {
+      lastEventId: input?.lastEventId,
+      signal,
+    })) {
+      if (event.data.workspaceId === ctx.workspaceId) yield tracked(event.id, event.data)
+    }
+  }),
+
   onOpenSheetRequested: workspaceProcedure.input(resumable).subscription(async function* ({
     ctx,
     input,

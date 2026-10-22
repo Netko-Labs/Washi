@@ -44,10 +44,13 @@ export function createRuntime(options: RuntimeOptions): Runtime {
       },
       approval: (request) => events.emit('approvalRequested', { ...request, workspaceId }),
       openSheet: (id) => events.emit('openSheetRequested', { workspaceId, id }),
+      sessionChanged: (sessionId) => events.emit('sessionChanged', { workspaceId, sessionId }),
     })
     host.setPeople(() => options.control.listMembers(workspaceId))
     host.setSearchKey(() => options.searchKey?.(workspaceId) ?? Promise.resolve(null))
-    return { workspace, host, files: createFileStore(workspace, blobs(workspaceId)) }
+    const files = createFileStore(workspace, blobs(workspaceId))
+    host.setFiles(files)
+    return { workspace, host, files }
   }
 
   return {

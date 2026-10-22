@@ -83,6 +83,18 @@ export function TranscriptView({ transcript }: { transcript: TranscriptEntry[] }
                 key={entry.id}
                 className="my-1 max-w-[85%] self-end rounded-2xl rounded-br-md bg-muted px-3.5 py-2 text-[13px] leading-relaxed"
               >
+                {update.attachments && update.attachments.length > 0 && (
+                  <div className="mb-1 flex flex-wrap gap-1">
+                    {update.attachments.map((ref) => (
+                      <span
+                        key={ref.id}
+                        className="rounded-md bg-background/70 px-1.5 py-0.5 text-[11px] text-muted-foreground"
+                      >
+                        {ref.kind === 'page' ? '▯' : '⇪'} {ref.name}
+                      </span>
+                    ))}
+                  </div>
+                )}
                 {update.text}
               </div>
             )

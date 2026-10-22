@@ -15,6 +15,8 @@ export interface WashiEvents {
   agentUpdate: { workspaceId: string; sessionId: string; entry: TranscriptEntry }
   approvalRequested: ApprovalRequest & { workspaceId: string }
   openSheetRequested: { workspaceId: string; id: string }
+  /** Washi named a conversation, or a person did: the list refetches. */
+  sessionChanged: { workspaceId: string; sessionId: string }
   /** Something in the workspace moved: a page, or table data. Viewers refetch what they show. */
   workspaceChanged: { workspaceId: string; kind: 'page' | 'data'; id: string | null }
   presenceChanged: { workspaceId: string; sheetId: string; people: PagePresence[] }

@@ -1,4 +1,5 @@
 import { mkdirSync } from 'node:fs'
+import type { SDKUserMessage } from '@anthropic-ai/claude-agent-sdk'
 import { query } from '@anthropic-ai/claude-agent-sdk'
 import type { AgentUpdate, Member, TurnBilling } from '@washi/domain'
 import { type ModelCatalogue, priceTurn } from '@washi/models'
@@ -44,6 +45,34 @@ const REJECTED = {
  * the SDK's bundled binary; with `local_cli` it runs the person's install, and
  * that install's own login decides who pays.
  */
+/** Text alone is a string; pictures ride as image blocks in one user message. */
+function promptFor(request: PromptRequest): string | AsyncIterable<SDKUserMessage> {
+  const images = request.images ?? []
+  if (images.length === 0) return request.text
+  const message: SDKUserMessage = {
+    type: 'user',
+    parent_tool_use_id: null,
+    session_id: '',
+    message: {
+      role: 'user',
+      content: [
+        ...images.map((image) => ({
+          type: 'image' as const,
+          source: {
+            type: 'base64' as const,
+            media_type: image.mime as 'image/jpeg' | 'image/png' | 'image/webp',
+            data: image.base64,
+          },
+        })),
+        { type: 'text' as const, text: request.text },
+      ],
+    },
+  }
+  return (async function* () {
+    yield message
+  })()
+}
+
 export function createClaudeSdkPort(deps: ClaudeSdkPortDeps): AgentPort {
   return {
     id: 'anthropic',
@@ -74,7 +103,7 @@ export function createClaudeSdkPort(deps: ClaudeSdkPortDeps): AgentPort {
 
       const run = async (resume: string | null) => {
         const stream = query({
-          prompt: request.text,
+          prompt: promptFor(request),
           options: {
             abortController: abort,
             resume: resume ?? undefined,
@@ -87,6 +116,7 @@ export function createClaudeSdkPort(deps: ClaudeSdkPortDeps): AgentPort {
                 openSheet: deps.openSheet,
                 listPeople: deps.listPeople,
                 searchKey: deps.searchKey,
+                setTitle: request.setTitle,
               }),
             },
             strictMcpConfig: true,

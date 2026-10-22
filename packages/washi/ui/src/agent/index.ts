@@ -1,2 +1,2 @@
 export { AgentFab, AgentPanel } from './agent-panel'
-export { receiptLine, usd } from './lib'
+export { type AgentPanelProps, type PanelPlacement, receiptLine, usd } from './lib'

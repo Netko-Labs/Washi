@@ -69,3 +69,9 @@ export const RESUME_BY = ['anyone', 'owners'] as const
 export const DEFAULT_EFFORT_KEY = 'agent_default_effort'
 export const EFFORTS = ['quick', 'balanced', 'deep'] as const
 export const SDK_EFFORT = { quick: 'low', balanced: 'medium', deep: 'high' } as const
+
+/** An attached picture rides as an image block; a text file rides inline up to this size. */
+export const IMAGE_TYPES: ReadonlySet<string> = new Set(['image/jpeg', 'image/png', 'image/webp'])
+export const MAX_INLINE_FILE_BYTES = 200 * 1024
+/** A conversation's default title: the first words of its first ask. */
+export const TITLE_WORDS = 6

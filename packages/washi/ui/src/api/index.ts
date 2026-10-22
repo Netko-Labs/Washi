@@ -1,2 +1,2 @@
-export { api, bindHost, hostPlace } from './api'
-export type { HostOptions, WashiClient } from './types'
+export { api, bindHost, hostPlace, hostUploadFile } from './api'
+export type { HostOptions, UploadedFile, WashiClient } from './types'

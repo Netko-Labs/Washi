@@ -60,4 +60,20 @@ function createLinks() {
 
 export const api = createTRPCClient<AppRouter>({ links: createLinks() })
 
-bindHost({ client: api, place: 'your server' })
+/** Bytes go to the files route with the active workspace named; the id comes back for the ask. */
+async function uploadFile(file: File) {
+  const body = new FormData()
+  body.set('file', file)
+  const workspace = readActiveWorkspace() ?? ''
+  const response = await fetch(`/api/files?workspace=${encodeURIComponent(workspace)}`, {
+    method: 'POST',
+    body,
+  })
+  if (!response.ok) {
+    const reason = ((await response.json().catch(() => null)) as { error?: string } | null)?.error
+    throw new Error(reason ?? 'That did not upload.')
+  }
+  return (await response.json()) as { id: string; name: string; mime: string; size: number }
+}
+
+bindHost({ client: api, place: 'your server', uploadFile })

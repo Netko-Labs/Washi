@@ -30,6 +30,7 @@ const READ_ONLY = new Set([
   'db_query',
   'db_history',
   'people_list',
+  'set_conversation_title',
 ])
 
 export function isReadTool(name: string): boolean {
@@ -43,6 +44,7 @@ export interface AiToolDeps {
   /** Who is on the team, for person cells — the control plane knows; the workspace file does not. */
   listPeople?: () => Promise<Member[]>
   searchKey?: SearchKeyLookup
+  setTitle?: (title: string) => void
 }
 
 /**
@@ -56,8 +58,18 @@ export function createAiTools({
   openSheet,
   listPeople,
   searchKey,
+  setTitle,
 }: AiToolDeps) {
   return {
+    set_conversation_title: tool({
+      description:
+        'Name this conversation: at most four words, no quotes, no trailing period. Call once, at the start of your first reply.',
+      inputSchema: z.object({ title: z.string().min(1).max(60) }),
+      execute: async ({ title }) => {
+        setTitle?.(title.trim())
+        return { ok: true }
+      },
+    }),
     sheet_list: tool({
       description:
         'List all sheets (id, title, icon, tags, parentId). A sheet with a parentId is a sub-page of that sheet.',

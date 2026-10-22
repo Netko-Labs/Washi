@@ -18,7 +18,7 @@ export function NarrowShell({ workspace, children }: WorkspaceShellProps) {
         {children}
       </main>
       <AskBar />
-      <AgentLayer fab={false} />
+      <AgentLayer fab={false} placement="sheet" />
     </>
   )
 }
