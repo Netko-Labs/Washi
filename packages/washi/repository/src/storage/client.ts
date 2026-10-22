@@ -261,6 +261,15 @@ function createTables(sqlite: Database) {
   `)
   sqlite.exec('CREATE INDEX IF NOT EXISTS idx_comments_sheet ON comments(sheet_id, hlc_created)')
   sqlite.exec(`
+    CREATE TABLE IF NOT EXISTS files (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      mime TEXT NOT NULL,
+      size INTEGER NOT NULL,
+      hlc_created TEXT NOT NULL
+    )
+  `)
+  sqlite.exec(`
     CREATE TABLE IF NOT EXISTS mention_inbox (
       user_id TEXT NOT NULL,
       comment_id TEXT NOT NULL,

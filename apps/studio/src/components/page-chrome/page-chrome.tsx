@@ -4,9 +4,10 @@ import { useState } from 'react'
 import { useCommentsStore } from '@/components/comments'
 import { PagePresence } from '@/components/presence'
 import { RowProperties } from '@/components/row-properties'
+import { readActiveWorkspace } from '@/integrations/trpc'
 import { CoverPicker } from './cover-picker'
 import { IconPicker } from './icon-picker'
-import { type ChromePicker, COVERS, type PageChromeProps } from './lib'
+import { type ChromePicker, coverLook, type PageChromeProps, parseCover } from './lib'
 import { WashiMark } from './washi-mark'
 
 const QUIET_BUTTON =
@@ -18,14 +19,20 @@ export function PageChrome({ pageId }: PageChromeProps) {
   const [picker, setPicker] = useState<ChromePicker | null>(null)
   if (!sheet) return null
 
-  const cover = sheet.cover ? COVERS[sheet.cover] : undefined
+  const parsed = parseCover(sheet.cover)
+  const cover = parsed ? coverLook(parsed, readActiveWorkspace() ?? '') : undefined
   const update = useSheetsStore.getState().updateMeta
   const close = () => setPicker(null)
 
   return (
     <div className="group/chrome relative">
       {cover && (
-        <div className="relative h-[180px] w-full" style={{ background: cover.background }}>
+        <div className="relative h-[180px] w-full bg-muted" style={cover.style}>
+          {cover.caption && (
+            <span className="absolute bottom-3 left-4 rounded-md bg-background/85 px-2 py-1 text-[11.5px] text-muted-foreground backdrop-blur">
+              {cover.caption} · one of Washi's pictures
+            </span>
+          )}
           <button
             type="button"
             onClick={() => setPicker('cover')}

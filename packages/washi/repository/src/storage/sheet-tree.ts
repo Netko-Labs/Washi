@@ -140,3 +140,18 @@ export function emptyTrash(ws: Workspace): number {
     rows.map((row) => row.id),
   )
 }
+
+/** The uploads a trash batch's covers point at — a purge frees them with the pages (D60). */
+export function trashedFileCovers(ws: Workspace, id?: string): string[] {
+  const rows = id
+    ? ws.sqlite
+        .query(
+          `SELECT cover FROM sheets
+           WHERE deleted_at = (SELECT deleted_at FROM sheets WHERE id = ?) AND cover LIKE 'file:%'`,
+        )
+        .all(id)
+    : ws.sqlite
+        .query("SELECT cover FROM sheets WHERE deleted_at IS NOT NULL AND cover LIKE 'file:%'")
+        .all()
+  return (rows as { cover: string }[]).map((row) => row.cover.slice('file:'.length))
+}

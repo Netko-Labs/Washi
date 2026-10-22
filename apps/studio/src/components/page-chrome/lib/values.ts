@@ -1,5 +1,7 @@
-/** Cover presets drawn from Washi's own palette. A page stores the key, never a URL. */
-export const COVERS: Record<string, { label: string; background: string }> = {
+import type { Picture, Preset } from './types'
+
+/** Cover presets drawn from Washi's own palette. A page stores `preset:<key>`. */
+export const COVERS: Record<string, Preset> = {
   persimmon: { label: 'Persimmon', background: 'linear-gradient(120deg, #d4713f, #e9a066)' },
   paper: { label: 'Paper', background: 'linear-gradient(120deg, #f7edd6, #e6d3ad)' },
   sage: { label: 'Sage', background: 'linear-gradient(120deg, #aebb9a, #74866a)' },
@@ -10,6 +12,28 @@ export const COVERS: Record<string, { label: string; background: string }> = {
   dusk: { label: 'Dusk', background: 'linear-gradient(120deg, #31261e, #8a5a3c)' },
   ink: { label: 'Ink', background: 'linear-gradient(120deg, #221a14, #4a3a2e)' },
 }
+
+/** Twelve photographs Washi ships with (`public/covers/`, see ATTRIBUTION.md). A page stores `picture:<slug>`. */
+export const PICTURES: Picture[] = [
+  { slug: 'fjord', label: 'Fjord' },
+  { slug: 'canyon', label: 'Canyon' },
+  { slug: 'highlands', label: 'Highlands' },
+  { slug: 'storm-sea', label: 'Storm sea' },
+  { slug: 'aurora', label: 'Aurora' },
+  { slug: 'fog', label: 'Fog' },
+  { slug: 'snow-camp', label: 'Snow camp' },
+  { slug: 'waterfall', label: 'Waterfall' },
+  { slug: 'valley', label: 'Valley' },
+  { slug: 'river', label: 'River' },
+  { slug: 'alley', label: 'Alley' },
+  { slug: 'tower', label: 'Tower' },
+]
+
+export const COVER_TABS = [
+  { id: 'presets', label: 'Presets' },
+  { id: 'pictures', label: 'Pictures' },
+  { id: 'upload', label: 'Upload' },
+] as const
 
 export const EMOJI = [
   '📝',

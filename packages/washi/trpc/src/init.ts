@@ -1,5 +1,5 @@
 import { initTRPC, TRPCError } from '@trpc/server'
-import type { Workspace } from '@washi/repository'
+import type { FileStore, Workspace } from '@washi/repository'
 import {
   type AgentHost,
   CommentError,
@@ -21,6 +21,7 @@ export type ServerMode = 'hosted' | 'embedded'
 export interface ResolvedWorkspace {
   workspace: Workspace
   host: AgentHost
+  files: FileStore
 }
 
 /** A human. Embedded mode has none — there is only ever one person at the machine. */
@@ -182,7 +183,7 @@ export const workspaceProcedure = t.procedure
     // failed open (disk, sqlite) and surfaces as INTERNAL_SERVER_ERROR.
     const resolved = ctx.runtime.resolve(ctx.workspaceId)
     return next({
-      ctx: { ...ctx, ws: resolved.workspace, host: resolved.host },
+      ctx: { ...ctx, ws: resolved.workspace, host: resolved.host, files: resolved.files },
     })
   })
   .use(async ({ ctx, path, type, getRawInput, next }) => {

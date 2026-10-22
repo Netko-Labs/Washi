@@ -15,6 +15,7 @@ import { Route as WorkspacesRouteImport } from './routes/workspaces'
 import { Route as ApiHealthRouteImport } from './routes/api/health'
 import { Route as WWorkspaceIdRouteImport } from './routes/w/$workspaceId'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ApiFilesSplatRouteImport } from './routes/api/files.$'
 import { Route as ApiTrpcSplatRouteImport } from './routes/api/trpc/$'
 import { Route as WWorkspaceIdIndexRouteImport } from './routes/w/$workspaceId/index'
 import { Route as WWorkspaceIdInboxRouteImport } from './routes/w/$workspaceId/inbox'
@@ -50,6 +51,11 @@ const WWorkspaceIdRoute = WWorkspaceIdRouteImport.update({
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiFilesSplatRoute = ApiFilesSplatRouteImport.update({
+  id: '/api/files/$',
+  path: '/api/files/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiTrpcSplatRoute = ApiTrpcSplatRouteImport.update({
@@ -90,6 +96,7 @@ export interface FileRoutesByFullPath {
   '/api/health': typeof ApiHealthRoute
   '/w/$workspaceId': typeof WWorkspaceIdRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/files/$': typeof ApiFilesSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
   '/w/$workspaceId/inbox': typeof WWorkspaceIdInboxRoute
   '/w/$workspaceId/settings': typeof WWorkspaceIdSettingsRoute
@@ -103,6 +110,7 @@ export interface FileRoutesByTo {
   '/workspaces': typeof WorkspacesRoute
   '/api/health': typeof ApiHealthRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/files/$': typeof ApiFilesSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
   '/w/$workspaceId/inbox': typeof WWorkspaceIdInboxRoute
   '/w/$workspaceId/settings': typeof WWorkspaceIdSettingsRoute
@@ -118,6 +126,7 @@ export interface FileRoutesById {
   '/api/health': typeof ApiHealthRoute
   '/w/$workspaceId': typeof WWorkspaceIdRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/files/$': typeof ApiFilesSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
   '/w/$workspaceId/inbox': typeof WWorkspaceIdInboxRoute
   '/w/$workspaceId/settings': typeof WWorkspaceIdSettingsRoute
@@ -134,6 +143,7 @@ export interface FileRouteTypes {
     | '/api/health'
     | '/w/$workspaceId'
     | '/api/auth/$'
+    | '/api/files/$'
     | '/api/trpc/$'
     | '/w/$workspaceId/inbox'
     | '/w/$workspaceId/settings'
@@ -147,6 +157,7 @@ export interface FileRouteTypes {
     | '/workspaces'
     | '/api/health'
     | '/api/auth/$'
+    | '/api/files/$'
     | '/api/trpc/$'
     | '/w/$workspaceId/inbox'
     | '/w/$workspaceId/settings'
@@ -161,6 +172,7 @@ export interface FileRouteTypes {
     | '/api/health'
     | '/w/$workspaceId'
     | '/api/auth/$'
+    | '/api/files/$'
     | '/api/trpc/$'
     | '/w/$workspaceId/inbox'
     | '/w/$workspaceId/settings'
@@ -176,6 +188,7 @@ export interface RootRouteChildren {
   ApiHealthRoute: typeof ApiHealthRoute
   WWorkspaceIdRoute: typeof WWorkspaceIdRouteWithChildren
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiFilesSplatRoute: typeof ApiFilesSplatRoute
   ApiTrpcSplatRoute: typeof ApiTrpcSplatRoute
 }
 
@@ -221,6 +234,13 @@ declare module '@tanstack/react-router' {
       path: '/api/auth/$'
       fullPath: '/api/auth/$'
       preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/files/$': {
+      id: '/api/files/$'
+      path: '/api/files/$'
+      fullPath: '/api/files/$'
+      preLoaderRoute: typeof ApiFilesSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/trpc/$': {
@@ -295,6 +315,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiHealthRoute: ApiHealthRoute,
   WWorkspaceIdRoute: WWorkspaceIdRouteWithChildren,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiFilesSplatRoute: ApiFilesSplatRoute,
   ApiTrpcSplatRoute: ApiTrpcSplatRoute,
 }
 export const routeTree = rootRouteImport
