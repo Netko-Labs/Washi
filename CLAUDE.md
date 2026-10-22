@@ -180,7 +180,7 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
 - **Routines** run on the server's minute clock (`packages/washi/runtime/src/clock.ts`), over the
   workspaces `ControlPlane.workspaceIds()` knows that already have a file — never a stray or
   deleted one, never a conjured `default`. A run is an ordinary `host.prompt` in a fresh session:
-  daily stop, desk and receipt all apply. One routine in flight per workspace, parked or not —
+  daily stop and desk apply, the receipt is recorded. One routine in flight per workspace, parked or not —
   the stop is checked at start and charged at end, so concurrency would outrun it. At the stop
   nothing is marked; the day catches up after Resume. Marked run before it runs; a scheduled run's
   questions wait 12h. Times are wall-clock minute + IANA zone. `routines` is the only

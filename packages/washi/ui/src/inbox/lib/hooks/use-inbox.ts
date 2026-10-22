@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import { receiptLine } from '../../../agent/lib'
 import { useAgentStore } from '../../../stores'
 import { useToday } from '../../../today'
 import type { DayGroup, InboxFilter, InboxRow } from '../types'
@@ -20,11 +19,7 @@ export function useInbox(extra: InboxRow[] | undefined) {
       who: null,
       verb: turn.prompt || turn.sessionTitle,
       where: null,
-      detail:
-        turn.receipt.stopReason === 'error'
-          ? (turn.receipt.error ?? 'failed')
-          : receiptLine(turn.receipt),
-      mono: true,
+      detail: turn.receipt.stopReason === 'error' ? (turn.receipt.error ?? 'failed') : null,
     }))
     return [...turns, ...(extra ?? [])]
   }, [today, extra])

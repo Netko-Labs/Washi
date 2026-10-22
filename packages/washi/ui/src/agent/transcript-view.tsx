@@ -3,7 +3,7 @@ import type { AgentUpdate, TranscriptEntry } from '@washi/domain'
 import { useDescribeTool } from '../approval'
 import { Markdown } from '../markdown'
 import { Mascot } from '../mascot'
-import { mergeMessageChunks, receiptLine } from './lib'
+import { mergeMessageChunks } from './lib'
 
 function DiffView({ diff }: { diff: { path: string; oldText: string; newText: string } }) {
   return (
@@ -100,6 +100,7 @@ export function TranscriptView({ transcript }: { transcript: TranscriptEntry[] }
                 followups={followupsFor(update.toolCallId)}
               />
             )
+          // A turn ends in Washi's words; the receipt is recorded, never shown here (D62).
           case 'turn_done':
             return update.stopReason === 'error' ? (
               <div
@@ -109,11 +110,7 @@ export function TranscriptView({ transcript }: { transcript: TranscriptEntry[] }
                 <IconAlertTriangle className="size-3.5" />
                 {update.error ?? 'the turn failed'}
               </div>
-            ) : (
-              <div key={entry.id} className="my-1.5 font-mono text-[11px] text-muted-foreground">
-                {receiptLine(update)}
-              </div>
-            )
+            ) : null
           default:
             return null
         }

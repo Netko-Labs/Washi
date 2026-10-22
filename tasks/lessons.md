@@ -31,3 +31,11 @@
 branch, then `git checkout main`, restored the tracked empty file over 18 live rows. Rule: a file that
 holds local state must be untracked on **every** branch before switching; before any checkout or pull
 that touches it, copy it outside the repo. Restored from the transcript; two timestamps are approximate.
+
+## 2026-10-22 — a stacked PR closed itself, again
+
+Opened #65 against `docs/pages-covers`, then squash-merged #64 with `--delete-branch`: GitHub
+closed #65 the moment its base vanished, and a closed PR cannot be retargeted. Same failure as
+#21. Rule: **retarget every stacked PR to main (`gh pr edit N --base main`) before merging the
+PR under it** — or do not delete the base branch until the stack is flat.
+
