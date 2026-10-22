@@ -1,6 +1,8 @@
 import { createRequestContext, washiRuntime } from '@/server/runtime'
 
 const MAX_BYTES = 5 * 1024 * 1024
+/** Multipart framing on top of the file itself. */
+const BODY_SLACK = 16 * 1024
 const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp'])
 
 /** The same gate as a workspace procedure, for a route that carries bytes instead of JSON. */
@@ -14,6 +16,12 @@ export async function workspaceFor(request: Request) {
   if (!allowed) return Response.json({ error: 'unknown workspace' }, { status: 404 })
   const { runtime } = await washiRuntime()
   return runtime.resolve(workspaceId)
+}
+
+/** Refuses an oversized body from its declared length, before any of it is read. */
+export function bodyTooLarge(request: Request): boolean {
+  const declared = Number(request.headers.get('content-length'))
+  return Number.isFinite(declared) && declared > MAX_BYTES + BODY_SLACK
 }
 
 /** A cover is a picture under 5 MB; anything else is refused in words. */
