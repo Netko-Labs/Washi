@@ -24,6 +24,11 @@ export function bodyTooLarge(request: Request): boolean {
   return Number.isFinite(declared) && declared > MAX_BYTES + BODY_SLACK
 }
 
+/** No declared length means no limit could apply before reading; a browser's upload always has one. */
+export function lengthMissing(request: Request): boolean {
+  return !request.headers.get('content-length')
+}
+
 /** A cover is a picture under 5 MB; anything else is refused in words. */
 export function fileLimits(file: File): string | null {
   if (!IMAGE_TYPES.has(file.type)) return 'JPG, PNG or WebP only'

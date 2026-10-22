@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { bodyTooLarge, fileLimits, workspaceFor } from '@/server/files'
+import { bodyTooLarge, fileLimits, lengthMissing, workspaceFor } from '@/server/files'
 
 /**
  * One route, two verbs. POST `/api/files` takes multipart in and answers `{ id, name, mime,
@@ -12,6 +12,8 @@ export const Route = createFileRoute('/api/files/$')({
       POST: async ({ request }) => {
         const resolved = await workspaceFor(request)
         if (resolved instanceof Response) return resolved
+        if (lengthMissing(request))
+          return Response.json({ error: 'length required' }, { status: 411 })
         if (bodyTooLarge(request)) return Response.json({ error: 'up to 5 MB' }, { status: 413 })
         const form = await request.formData().catch(() => null)
         const file = form?.get('file')
