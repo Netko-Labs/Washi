@@ -1,6 +1,5 @@
 import { APPROVAL_MODE_OPTIONS, type OutsideCardProps, PROVIDER_META } from '../lib'
-import { ProviderRow } from '../model-card/provider-row'
-import { Segmented, SettingRow, SettingsCard } from '../shared/card'
+import { ProviderRow, Segmented, SettingRow, SettingsCard } from '../shared/card'
 
 /** Reads pass and page edits land either way. This card is about the outside. */
 export function OutsideCard({

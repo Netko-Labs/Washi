@@ -54,20 +54,13 @@ export function AgentTab() {
         />
       )}
 
-      {settings.error && !dialog && (
-        <p className="text-[13px] text-destructive">{settings.error}</p>
-      )}
+      {settings.error && <p className="text-[13px] text-destructive">{settings.error}</p>}
 
       {dialog && (
         <KeyDialog
           target={dialog}
           connected={connectedFor(dialog)}
-          error={settings.error}
-          onSave={(secret) =>
-            dialog === 'exa'
-              ? settings.saveSearchKey(secret)
-              : settings.save({ key: secret, provider: dialog, model: key?.model ?? null })
-          }
+          onSave={(secret) => settings.connect(dialog, secret)}
           onRemove={dialog === 'exa' ? settings.removeSearchKey : settings.removeKey}
           onClose={() => setDialog(null)}
         />

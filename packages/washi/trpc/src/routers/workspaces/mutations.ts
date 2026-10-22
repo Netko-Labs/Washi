@@ -46,7 +46,7 @@ export const workspaceMutations = router({
       })
     }),
   /** The default model, without typing the key again. Null takes the provider's default. */
-  setAgentModel: workspaceProcedure
+  setAgentModel: ownerProcedure
     .input(z.object({ model: z.string().min(1).max(200).nullable() }))
     .mutation(async ({ ctx, input }) => {
       const secrets = requireSecrets(ctx)

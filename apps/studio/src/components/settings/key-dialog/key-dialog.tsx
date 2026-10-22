@@ -8,9 +8,10 @@ const PRIMARY =
   'h-[38px] rounded-xl bg-primary px-4 font-semibold text-[13.5px] text-primary-foreground disabled:opacity-50'
 
 /** One provider at a time: connect, or see what is connected and replace or remove it. */
-export function KeyDialog({ target, connected, onSave, onRemove, onClose, error }: KeyDialogProps) {
+export function KeyDialog({ target, connected, onSave, onRemove, onClose }: KeyDialogProps) {
   const meta = PROVIDER_META[target]
   const form = useKeyDialog(onSave, onClose)
+  const error = form.error
   const replacing = connected !== null && (form.replacing || error !== null)
   const showForm = !connected || replacing
 
@@ -72,7 +73,7 @@ export function KeyDialog({ target, connected, onSave, onRemove, onClose, error 
               type={form.shown ? 'text' : 'password'}
               value={form.secret}
               autoComplete="off"
-              autoFocus
+              ref={(node) => node?.focus()}
               onChange={(event) => form.setSecret(event.target.value)}
               placeholder={meta.hint}
               className="w-full bg-transparent font-mono text-[13px] outline-none placeholder:text-muted-foreground"

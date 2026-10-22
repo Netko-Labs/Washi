@@ -1,4 +1,4 @@
-import { type ProviderRowProps, sinceLabel } from '../lib'
+import { type ProviderRowProps, sinceLabel } from '../../lib'
 
 /** A provider as a row: the mark, its state in words, and Replace · Remove or Connect. */
 export function ProviderRow({ meta, connected, onConnect, onRemove }: ProviderRowProps) {

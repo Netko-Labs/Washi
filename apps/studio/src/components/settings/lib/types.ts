@@ -123,6 +123,11 @@ export interface ModelCardProps {
   onEffort: (effort: Effort) => Promise<unknown>
 }
 
+export interface ModelPrice {
+  inputPerMTok: number | null
+  outputPerMTok: number | null
+}
+
 export interface ModelMenuProps {
   models: ModelOption[]
   provider: string
@@ -171,9 +176,8 @@ export interface NumberRowProps {
 export interface KeyDialogProps {
   target: KeyTarget
   connected: { last4: string; updatedAt: string; updatedBy?: string | null } | null
-  onSave: (key: string) => Promise<boolean>
+  /** Null when it took; otherwise the server's refusal, which the dialog says in words. */
+  onSave: (key: string) => Promise<string | null>
   onRemove: () => Promise<unknown>
   onClose: () => void
-  /** The reason the last save failed, from the hook that owns the request. */
-  error: string | null
 }

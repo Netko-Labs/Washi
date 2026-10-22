@@ -1,16 +1,19 @@
 import { useState } from 'react'
 
 /** Form state for one provider's key: the secret, whether it shows, whether a save is in flight. */
-export function useKeyDialog(onSave: (key: string) => Promise<boolean>, onClose: () => void) {
+export function useKeyDialog(onSave: (key: string) => Promise<string | null>, onClose: () => void) {
   const [secret, setSecret] = useState('')
   const [view, setView] = useState({ shown: false, replacing: false })
-  const [busy, setBusy] = useState(false)
+  const [save, setSave] = useState<{ busy: boolean; error: string | null }>({
+    busy: false,
+    error: null,
+  })
 
   const submit = async () => {
-    setBusy(true)
-    const saved = await onSave(secret)
-    setBusy(false)
-    if (saved) onClose()
+    setSave({ busy: true, error: null })
+    const error = await onSave(secret)
+    setSave({ busy: false, error })
+    if (!error) onClose()
   }
 
   return {
@@ -20,8 +23,9 @@ export function useKeyDialog(onSave: (key: string) => Promise<boolean>, onClose:
     toggleShown: () => setView((current) => ({ ...current, shown: !current.shown })),
     replacing: view.replacing,
     startReplacing: () => setView((current) => ({ ...current, replacing: true })),
-    busy,
-    canSubmit: !busy && secret.length >= 8,
+    busy: save.busy,
+    error: save.error,
+    canSubmit: !save.busy && secret.length >= 8,
     submit,
   }
 }

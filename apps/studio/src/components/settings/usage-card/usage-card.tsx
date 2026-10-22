@@ -66,6 +66,7 @@ export function UsageCard({
         </div>
       )}
       <NumberRow
+        key={`cap-${spend.capUsd}`}
         label="Daily stop"
         hint="Metered dollars a day before Washi pauses"
         value={spend.capUsd}
@@ -73,6 +74,7 @@ export function UsageCard({
         onSave={onDailyCap}
       />
       <NumberRow
+        key={`turns-${spend.turnCap}`}
         label="Turn cap"
         hint="The backstop for models with no price"
         value={spend.turnCap}

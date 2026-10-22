@@ -13,6 +13,7 @@ export type {
   KeyTarget,
   ModelCardProps,
   ModelMenuProps,
+  ModelPrice,
   NumberRowProps,
   Option,
   OutsideCardProps,

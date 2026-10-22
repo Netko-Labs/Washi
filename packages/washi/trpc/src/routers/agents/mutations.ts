@@ -50,7 +50,7 @@ export const agentMutations = router({
   /** A person's stop, held until a person resumes — the breaker, pulled by hand. */
   pause: ownerProcedure.mutation(({ ctx }) => ctx.host.pause()),
   /** The backstop for models with no price: every turn counts toward it. */
-  setTurnCap: workspaceProcedure
+  setTurnCap: ownerProcedure
     .input(z.object({ turnCap: z.number().int().positive().max(100_000) }))
     .mutation(({ ctx, input }) => ctx.host.setTurnCap(input.turnCap)),
   setResumeBy: ownerProcedure

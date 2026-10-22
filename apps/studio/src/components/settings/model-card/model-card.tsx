@@ -1,7 +1,6 @@
 import { EFFORT_OPTIONS, type ModelCardProps, PROVIDER_META, PROVIDERS } from '../lib'
 import { ModelMenu } from '../model-menu'
-import { Segmented, SettingRow, SettingsCard } from '../shared/card'
-import { ProviderRow } from './provider-row'
+import { ProviderRow, Segmented, SettingRow, SettingsCard } from '../shared/card'
 
 /** One key for the workspace: a row per provider, then what every conversation starts with. */
 export function ModelCard({

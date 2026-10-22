@@ -78,6 +78,21 @@ export function useAgentSettings() {
       await refresh()
     })
 
+  /** For the dialog: the refusal comes back to it; the screen's own error stays as it was. */
+  const connect = async (target: 'anthropic' | 'openrouter' | 'exa', secret: string) => {
+    try {
+      if (target === 'exa') {
+        await api.workspaces.setIntegrationKey.mutate({ integration: 'exa', key: secret })
+      } else {
+        await api.workspaces.setAgentKey.mutate({ key: secret, provider: target, model: null })
+      }
+      await refresh()
+      return null
+    } catch (cause) {
+      return String(cause)
+    }
+  }
+
   const removeKey = () =>
     attempt(async () => {
       await api.workspaces.removeAgentKey.mutate()
@@ -150,6 +165,7 @@ export function useAgentSettings() {
     error,
     loading,
     save,
+    connect,
     removeKey,
     setModel,
     saveSearchKey,
