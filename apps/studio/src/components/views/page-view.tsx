@@ -3,7 +3,7 @@ import { SheetView } from '@washi/ui'
 import { Backlinks } from '@/components/backlinks'
 import { CommentsPanel } from '@/components/comments'
 import { FirstRunGate } from '@/components/first-run'
-import { PageChrome } from '@/components/page-chrome'
+import { PageChrome, pageLook } from '@/components/page-chrome'
 import { PageBody } from '@/components/page-editor'
 import { useRouteTab } from '@/components/shell'
 
@@ -19,6 +19,7 @@ export function PageView() {
       <div className="flex min-h-0 flex-1">
         <SheetView
           chrome={<PageChrome pageId={pageId} />}
+          look={pageLook(workspace.id)}
           footer={<Backlinks pageId={pageId} />}
           body={PageBody}
         />

@@ -1,34 +1,3 @@
-import type { Picture, Preset } from './types'
-
-/** Cover presets drawn from Washi's own palette. A page stores `preset:<key>`. */
-export const COVERS: Record<string, Preset> = {
-  persimmon: { label: 'Persimmon', background: 'linear-gradient(120deg, #d4713f, #e9a066)' },
-  paper: { label: 'Paper', background: 'linear-gradient(120deg, #f7edd6, #e6d3ad)' },
-  sage: { label: 'Sage', background: 'linear-gradient(120deg, #aebb9a, #74866a)' },
-  matcha: { label: 'Matcha', background: 'linear-gradient(120deg, #c9d6a3, #8fa65c)' },
-  sakura: { label: 'Sakura', background: 'linear-gradient(120deg, #f7d3c4, #f0a487)' },
-  indigo: { label: 'Indigo', background: 'linear-gradient(120deg, #3d4f7c, #7a8cbf)' },
-  sky: { label: 'Sky', background: 'linear-gradient(120deg, #bcd8e8, #f2e6c9)' },
-  dusk: { label: 'Dusk', background: 'linear-gradient(120deg, #31261e, #8a5a3c)' },
-  ink: { label: 'Ink', background: 'linear-gradient(120deg, #221a14, #4a3a2e)' },
-}
-
-/** Twelve photographs Washi ships with (`public/covers/`, see ATTRIBUTION.md). A page stores `picture:<slug>`. */
-export const PICTURES: Picture[] = [
-  { slug: 'fjord', label: 'Fjord' },
-  { slug: 'canyon', label: 'Canyon' },
-  { slug: 'highlands', label: 'Highlands' },
-  { slug: 'storm-sea', label: 'Storm sea' },
-  { slug: 'aurora', label: 'Aurora' },
-  { slug: 'fog', label: 'Fog' },
-  { slug: 'snow-camp', label: 'Snow camp' },
-  { slug: 'waterfall', label: 'Waterfall' },
-  { slug: 'valley', label: 'Valley' },
-  { slug: 'river', label: 'River' },
-  { slug: 'alley', label: 'Alley' },
-  { slug: 'tower', label: 'Tower' },
-]
-
 export const COVER_TABS = [
   { id: 'presets', label: 'Presets' },
   { id: 'pictures', label: 'Pictures' },

@@ -1,3 +1,4 @@
+import type { SheetLook } from '@washi/domain'
 import { sheetRevisionTable, sheetTable } from '@washi/domain/db'
 import { and, desc, eq, notInArray } from 'drizzle-orm'
 import { newId, type Workspace } from './client'
@@ -56,6 +57,7 @@ export function restoreRevision(
   ws: Workspace,
   revision: SheetRevision,
   index: SheetIndexInput,
+  look: SheetLook,
 ): boolean {
   const [sheet] = ws.db.select().from(sheetTable).where(eq(sheetTable.id, revision.sheetId)).all()
   if (!sheet || sheet.deletedAt) return false
@@ -66,7 +68,8 @@ export function restoreRevision(
       .update(sheetTable)
       .set({
         title: revision.title,
-        icon: revision.icon,
+        icon: look.icon,
+        cover: look.cover,
         source: revision.source,
         loroSnapshot: Buffer.from(updateSnapshot(sheet.loroSnapshot, revision.source)),
         editedBy: older ? 'washi' : null,

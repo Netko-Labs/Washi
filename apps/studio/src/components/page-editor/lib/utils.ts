@@ -1,4 +1,4 @@
-import type { WsxElement, WsxNode, WsxValue } from '@washi/wsx'
+import { parse, serialize, type WsxElement, type WsxNode, type WsxValue } from '@washi/wsx'
 import type {
   Block,
   DataPick,
@@ -266,4 +266,12 @@ export function titleOf(blocks: Block[], sheet: { rowOf: string | null }): strin
   if (sheet.rowOf || !first || first.kind !== 'h1') return null
   const text = first.text.trim()
   return text ? text.slice(0, 200) : null
+}
+
+/**
+ * The blocks as the page they make, wearing the `<Sheet>` of the version they were typed on — so a
+ * save never writes back a cover, icon or feel someone changed since (D64); the merge keeps theirs.
+ */
+export function sourceOver(savedSource: string, blocks: Block[]): string {
+  return serialize(toSheet(parse(savedSource), blocks))
 }

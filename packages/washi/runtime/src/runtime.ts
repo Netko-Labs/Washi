@@ -5,7 +5,7 @@ import {
   localBlobStore,
   type Workspace,
 } from '@washi/repository'
-import { AgentHost, createStoredKeySource } from '@washi/service'
+import { AgentHost, createStoredKeySource, liftLooksIntoSource } from '@washi/service'
 import { createEventBus, createPresenceBoard, type ResolvedWorkspace } from '@washi/trpc'
 import { watchAgentWrites } from './agent-watch'
 import { DEFAULT_WORKSPACE_ID } from './constants'
@@ -34,6 +34,7 @@ export function createRuntime(options: RuntimeOptions): Runtime {
       options.mode === 'hosted'
         ? createStoredKeySource(async () => (stored ? stored(workspace.id) : null))
         : undefined
+    liftLooksIntoSource(workspace)
     const host = new AgentHost(workspace, keys)
     const workspaceId = workspace.id
     const watch = watchAgentWrites(workspaceId, events, presence)

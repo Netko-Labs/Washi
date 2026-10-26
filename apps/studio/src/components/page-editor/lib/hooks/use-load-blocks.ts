@@ -1,10 +1,10 @@
 import type { SheetDetail } from '@washi/domain'
-import { parse, serialize, type WsxElement } from '@washi/wsx'
+import { parse, type WsxElement } from '@washi/wsx'
 import { useEffect } from 'react'
 import { api } from '@/integrations/trpc'
 import { useEditorStore } from '../editor-store'
 import type { TableRef } from '../types'
-import { toBlocks, toSheet } from '../utils'
+import { sourceOver, toBlocks } from '../utils'
 
 /**
  * Once per page; after that, only an edit that came from someone else — a teammate's save, or
@@ -35,8 +35,8 @@ export function useLoadBlocks(sheet: SheetDetail, root: WsxElement) {
     const editor = useEditorStore.getState()
     if (sheet.source === editor.savedSource || editor.saveState === 'saving') return
     // Typing not yet saved stays: the next save sends its version and the server merges both.
-    const unsaved = serialize(toSheet(root, editor.blocks)) !== editor.savedSource
-    if (unsaved) return
+    const base = editor.savedSource
+    if (base && sourceOver(base, editor.blocks) !== base) return
     editor.absorb(toBlocks(parse(sheet.source)), sheet.version ?? null, sheet.source)
   }, [sheet.source])
 }

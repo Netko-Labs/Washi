@@ -36,7 +36,7 @@ export function pageWriter(sheet: SheetDetail, loaded: WsxElement) {
         // With the version it was drawn from, a canvas edit merges with a teammate's typing.
         const saved = await api.sheets.update.mutate({
           id: sheet.id,
-          write: { title: sheet.title, icon: sheet.icon, source },
+          write: { title: sheet.title, source },
           baseVersion: version,
         })
         version = saved.version

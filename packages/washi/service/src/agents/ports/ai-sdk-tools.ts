@@ -127,7 +127,6 @@ export function createAiTools({
         'Create a sheet from WSX source. It must pass sheet_check. Pass parentId (from sheet_list) to file it under another sheet, as a sub-page.',
       inputSchema: z.object({
         title: z.string().min(1).max(200),
-        icon: z.string().max(16).optional(),
         source: z.string(),
         parentId: z.string().optional(),
       }),
@@ -143,7 +142,6 @@ export function createAiTools({
       inputSchema: z.object({
         id: z.string(),
         title: z.string().min(1).max(200),
-        icon: z.string().max(16).optional(),
         source: z.string(),
         baseVersion: z.string().optional(),
       }),

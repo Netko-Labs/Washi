@@ -172,7 +172,7 @@ function renderElement(node: WsxElement, ctx: Ctx): ReactNode {
   switch (node.name) {
     case 'Sheet':
       return (
-        <SheetFrame theme={p.theme} feel={p.feel} accent={p.accent}>
+        <SheetFrame theme={p.theme} feel={p.feel} accent={p.accent} icon={p.icon} cover={p.cover}>
           {kids}
         </SheetFrame>
       )

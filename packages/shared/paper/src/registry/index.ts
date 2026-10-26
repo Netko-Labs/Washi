@@ -1,4 +1,11 @@
 export {
+  COVER_PICTURES,
+  COVER_PRESETS,
+  coverKeySchema,
+  FILE_KEY,
+  pageIconSchema,
+} from './looks'
+export {
   actionRefSchema,
   type PaperComponentName,
   PRIMITIVE_GROUPS,

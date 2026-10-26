@@ -1,13 +1,11 @@
 import { describe, expect, test } from 'bun:test'
-import { createSheet, deleteSheet, openWorkspace, trashedUploads, updateSheetMeta } from '..'
+import { createSheet, deleteSheet, openWorkspace, trashedUploads } from '..'
 
 function pageWearing(
   ws: ReturnType<typeof openWorkspace>,
   meta: { cover?: string; icon?: string },
 ) {
-  const sheet = createSheet(ws, { title: 'p', source: '...' }, { body: 'p', refs: [] })
-  updateSheetMeta(ws, sheet.id, meta)
-  return sheet.id
+  return createSheet(ws, { title: 'p', source: '...', ...meta }, { body: 'p', refs: [] }).id
 }
 
 describe('trashedUploads', () => {

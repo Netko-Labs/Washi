@@ -124,14 +124,21 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   that stamp is the batch Restore and Purge act on. A restored page whose parent is gone comes
   back at the top level. The service refuses a move into a page's own subtree (`SheetMoveError`
   → 400).
-- Page chrome (icon, `cover`, `full_width`, rename) is metadata — `sheets.updateMeta` never
-  touches the Loro doc, and width alone is not an edit. The studio draws it **above** the sheet
-  through `SheetView`'s `chrome` slot, outside the paper but in its look (`SheetBand`: the sheet's
-  background and measure, so the icon lines up with the title), so Q18 holds: everything on the sheet
-  is still authored by the sheet. A cover is a **key**, never a URL (D60): `preset:sage` (a
-  gradient), `picture:fjord` (one of the twelve photographs in `apps/studio/public/covers/`,
-  attribution beside them) or `file:<id>` (an upload). An icon is a registry name, an emoji
-  or `file:<id>` (an upload; `SheetIcon` draws it through the host's `fileUrl`, else a page glyph).
+- **The look is the page's (D64).** `icon` and `cover` are `<Sheet>` props; the source is the
+  truth and `sheets.icon/cover` a cache every write re-reads off the root (`lookOf`). Never set
+  the columns any other way — `sheets.updateMeta` writes a picked icon or cover into the doc
+  (`updateSheetMetaAndLook`: merged, validated, an edit); only `full_width` and rename are metadata,
+  and width alone is not an edit. A look picked before D64 was lifted into its page once per
+  workspace (`liftLooksIntoSource`, app meta `look_in_source`, quiet: no stamp, no author). Paper's
+  `SheetFrame` draws the cover full bleed and the icon half over it; the host lends what paper
+  can't know through `SheetLookProvider` (picture/file URLs, `drawIcon`, a `band` for its own
+  controls, `edit(part, anchor)`), and `SheetView` takes `chrome` (the band) and `look`. The editor
+  saves over the `<Sheet>` of the version it typed on (`sourceOver`), so typing never reverts a
+  look changed meanwhile. A cover is a **key**, never a URL (D60): `preset:sage` (a gradient),
+  `picture:fjord` (one of the twelve photographs in `apps/studio/public/covers/`, attribution
+  beside them) or `file:<id>` (an upload); presets and pictures live in `@washi/paper/registry`.
+  An icon is a registry name, an emoji or `file:<id>` (`SheetIcon` draws an upload through the
+  host's `fileUrl`, else a page glyph).
 - **Files.** Uploads live in the workspace's files store: a row in the workspace's `files`
   table and the bytes beside the `.db` (`<dataDir>/<workspace>.files/`) or, with
   `WASHI_FILES_S3_*` set, in a bucket under a per-workspace prefix through Bun's own S3 client.

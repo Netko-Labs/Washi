@@ -915,7 +915,8 @@
         <thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead>
         <tbody>
           <tr><td><code>title</code><span class="req">required</span></td><td>string 1–200</td><td>Sidebar, tabs, breadcrumb, search. Also indexed as text.</td></tr>
-          <tr><td><code>icon</code></td><td>one of <code>SHEET_ICONS</code></td><td><code>notebook book bookmark calendar chart checklist clock compass flag flask heart home inbox kanban leaf map money music pen plane rocket sparkles star sun tag target tools user</code>. Never an emoji here.</td></tr>
+          <tr><td><code>icon</code></td><td>a <code>SHEET_ICONS</code> name · one emoji · <code>file:&lt;id&gt;</code></td><td>Names: <code>notebook book bookmark calendar chart checklist clock compass flag flask heart home inbox kanban leaf map money music pen plane rocket sparkles star sun tag target tools user</code>. An emoji is one pictograph (≤16 code units). <code>file:&lt;id&gt;</code> is an upload in the workspace's files store. Drawn 72px under the cover, half over it; the sidebar, tabs and search show it too (D64).</td></tr>
+          <tr><td><code>cover</code></td><td><code>preset:&lt;name&gt;</code> · <code>picture:&lt;slug&gt;</code> · <code>file:&lt;id&gt;</code></td><td>A key, never a URL (D60). Presets: <code>persimmon paper sage matcha sakura indigo sky dusk ink</code>. Pictures: <code>fjord canyon highlands storm-sea aurora fog snow-camp waterfall valley river alley tower</code>. Drawn full bleed, 180px, above the column; a host without the pictures shows the paper's muted tone (D64).</td></tr>
           <tr><td><code>tags</code></td><td>string[] ≤32, each 1–64</td><td></td></tr>
           <tr><td><code>feel</code></td><td><code>note</code> <code>editorial</code> <code>board</code> <code>deck</code></td><td>Reproportions every primitive at once (table below). Default <code>note</code>.</td></tr>
           <tr><td><code>theme</code></td><td><code>washi</code> <code>sumi</code> <code>aizome</code> <code>matcha</code> <code>kobai</code> <code>kraft</code> <code>yukiwa</code> <code>yozora</code></td><td>Eight designed pairs, each 8 tokens × light/dark (<code>bg card ink muted border mutedBg accent accentInk</code>), tested for ink ≥ 7:1 and muted ≥ 4.5:1 on card. Default <code>washi</code>.</td></tr>
@@ -925,7 +926,7 @@
           <tr><td><code>wsx</code></td><td><code>"1"</code></td><td>Format version. Always write it.</td></tr>
         </tbody>
       </table>
-      <div class="side">The Sheet's <code>icon</code> is this enum. The page chrome the studio draws <em>above</em> the sheet (icon, cover, full width, rename) is metadata set by <code>sheets.updateMeta</code> and never touches the source — there an icon may be an emoji, and a cover is a preset key. Two different fields.</div>
+      <div class="side">Icon and cover are the page's own (D64): the source is the truth and <code>sheets.icon</code> / <code>sheets.cover</code> only cache what every write reads off the <code>&lt;Sheet&gt;</code>. Picking one in the studio rewrites these props through the same merge as typing, so it shows in source mode and Washi can set or keep them. Full width and rename stay metadata.</div>
 
       <h3>What feel sets</h3>
       <p>Measures are the design's page frames. Fonts, radii and spacing belong here; a theme only recolours.</p>
@@ -1246,7 +1247,7 @@
       <p>The sheet and its flows. A frame supplies the spacing its children cannot set: <code>Section</code> and the page put <code>--rhythm</code> between blocks; Row, Stack and Grid put <code>--gap</code>.</p>
 
       <h4 id="p-Sheet">Sheet</h4>
-      <p>The page. Props in §2; no enums, no <code>class</code>. Renders <code>&lt;article class="wsx" data-feel data-theme data-accent&gt;</code> with the theme's sixteen tokens inlined, and a <code>.wsx-page</code> at the feel's measure.</p>
+      <p>The page. Props in §2; no enums, no <code>class</code>. Renders <code>&lt;article class="wsx" data-feel data-theme data-accent&gt;</code> with the theme's sixteen tokens inlined: the <code>cover</code> full bleed (<code>.wsx-cover</code>), then a band at the feel's measure holding the <code>icon</code> (<code>.wsx-mark</code>) and whatever the host lends there (<code>SheetLookProvider</code>: picture and file URLs, how to draw a named icon, how to change the look), then a <code>.wsx-page</code> at the feel's measure.</p>
       <p class="pol">children <b>nodes</b> · the root, once</p>
 <pre><span class="t">&lt;Sheet</span> <span class="a">title</span>=<span class="v">"Weekly review"</span> <span class="a">icon</span>=<span class="v">"calendar"</span> <span class="a">feel</span>=<span class="v">"note"</span> <span class="a">theme</span>=<span class="v">"washi"</span> <span class="a">accent</span>=<span class="v">"info"</span> <span class="a">wsx</span>=<span class="v">"1"</span><span class="t">&gt;</span>
   …

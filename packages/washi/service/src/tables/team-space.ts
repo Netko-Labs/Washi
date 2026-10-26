@@ -14,10 +14,8 @@ import {
 } from './team-space-values'
 import type { TeamSpace, TeamSpaceOptions } from './types'
 
-/** The icon goes on the page itself too, so the sidebar and tabs show it. */
 const page = (title: string, icon: string, body: string) => ({
   title,
-  icon,
   source: `<Sheet title=${JSON.stringify(title)} icon="${icon}" wsx="1">\n${body}\n</Sheet>\n`,
 })
 

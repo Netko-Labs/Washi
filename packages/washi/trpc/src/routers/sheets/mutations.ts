@@ -1,11 +1,5 @@
 import { sheetMetaPatchSchema, sheetWriteSchema } from '@washi/domain'
-import {
-  emptyTrash,
-  purgeSheet,
-  sheetVersion,
-  trashedUploads,
-  updateSheetMeta,
-} from '@washi/repository'
+import { emptyTrash, purgeSheet, sheetVersion, trashedUploads } from '@washi/repository'
 import {
   createSheetFromSource,
   duplicateSheet,
@@ -14,6 +8,7 @@ import {
   restoreSheetTree,
   undoWashiWrite,
   updateSheetFromSource,
+  updateSheetMetaAndLook,
 } from '@washi/service'
 import { z } from 'zod'
 import { router, workspaceProcedure } from '../../init'
@@ -40,11 +35,7 @@ export const sheetMutations = router({
     .mutation(({ ctx, input }) => undoWashiWrite(ctx.ws, input.id)),
   updateMeta: workspaceProcedure
     .input(z.object({ id: z.string(), patch: sheetMetaPatchSchema }))
-    .mutation(({ ctx, input }) => {
-      const sheet = updateSheetMeta(ctx.ws, input.id, input.patch)
-      if (!sheet) throw new Error(`sheet not found: ${input.id}`)
-      return sheet
-    }),
+    .mutation(({ ctx, input }) => updateSheetMetaAndLook(ctx.ws, input.id, input.patch)),
   duplicate: workspaceProcedure
     .input(byId)
     .mutation(({ ctx, input }) => duplicateSheet(ctx.ws, input.id)),

@@ -1,6 +1,8 @@
+// conventions: >300 lines — one registry table, grouped by primitive family; split by family when next touched
 import { filterSchema, historyQuerySchema, querySchema, scalarSchema } from '@washi/ink'
 import type { ComponentSpec, WsxRegistry } from '@washi/wsx'
 import { z } from 'zod'
+import { coverKeySchema, pageIconSchema } from './looks'
 import {
   feelSchema,
   gapSchema,
@@ -72,7 +74,8 @@ const frame: Record<string, ComponentSpec> = {
     props: z
       .object({
         title: z.string().min(1).max(200),
-        icon: z.enum(SHEET_ICONS).optional(),
+        icon: z.union([z.enum(SHEET_ICONS), pageIconSchema]).optional(),
+        cover: coverKeySchema.optional(),
         tags: z.array(z.string().min(1).max(64)).max(32).optional(),
         feel: feelSchema.optional(),
         accent: toneSchema.exclude(['neutral']).optional(),

@@ -86,7 +86,6 @@ export function createWashiTools(ws: Workspace, context: ToolContext) {
         'Create a sheet from WSX source. The source must pass sheet_check. Pass parentId (from sheet_list) to file it under another sheet, as a sub-page.',
         {
           title: z.string().min(1).max(200),
-          icon: z.string().max(16).optional(),
           source: z.string(),
           parentId: z.string().optional(),
         },
@@ -102,7 +101,6 @@ export function createWashiTools(ws: Workspace, context: ToolContext) {
         {
           id: z.string(),
           title: z.string().min(1).max(200),
-          icon: z.string().max(16).optional(),
           source: z.string(),
           baseVersion: z.string().optional(),
         },

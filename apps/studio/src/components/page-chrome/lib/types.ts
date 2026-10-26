@@ -1,31 +1,8 @@
 import type { SheetSummary } from '@washi/domain'
-import type { CSSProperties } from 'react'
+import type { LookPart } from '@washi/paper'
 
-export type ChromePicker = 'icon' | 'cover'
-export type CoverKind = 'preset' | 'picture' | 'file'
 export type CoverTab = 'presets' | 'pictures' | 'upload'
 export type IconTab = 'emoji' | 'upload'
-
-export interface ParsedCover {
-  kind: CoverKind
-  key: string
-}
-
-export interface Preset {
-  label: string
-  background: string
-}
-
-export interface Picture {
-  slug: string
-  label: string
-}
-
-export interface CoverLook {
-  style: CSSProperties
-  /** What the band says it is — a picture's name; nothing for a preset or an upload. */
-  caption: string | null
-}
 
 export interface UploadState {
   busy: boolean
@@ -41,6 +18,7 @@ export interface PageChromeProps {
 }
 
 export interface PickerProps {
+  anchor: HTMLElement
   current: string | null
   onPick: (value: string | null) => void
   onClose: () => void
@@ -56,3 +34,11 @@ export interface PickerTabsProps<T extends string> {
   active: T
   onChange: (tab: T) => void
 }
+
+export interface LookPickerState {
+  open: { part: LookPart; anchor: HTMLElement } | null
+  show: (part: LookPart, anchor: HTMLElement) => void
+  close: () => void
+}
+
+export type AnchoredAt = { top: number; left: number } | { top: number; right: number }
