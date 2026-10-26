@@ -1,1 +1,1 @@
-export type { NewWorkspaceFormProps, WorkspaceMenuProps, WorkspaceSwitcherProps } from './types'
+export type { WorkspaceMenuProps, WorkspaceSwitcherProps } from './types'

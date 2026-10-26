@@ -2,9 +2,9 @@ import { IconCheck } from '@tabler/icons-react'
 import { AgentMascot } from '@washi/ui'
 import { useState } from 'react'
 import { KeyForm, useAgentSettings } from '@/components/settings'
-import { DEFAULT_DAILY_STOP_USD, type FirstRunProps, PROMISES } from './lib'
+import { DEFAULT_DAILY_STOP_USD, DONE_STEPS, type FirstRunProps, PROMISES } from './lib'
 
-/** Step two of two. The workspace exists; this is what wakes Washi up inside it. */
+/** The last step of a new workspace (`/new` does the first three): what wakes Washi up inside it. */
 export function FirstRun({ workspace, onDone, onSkip }: FirstRunProps) {
   const settings = useAgentSettings()
   const [capUsd, setCapUsd] = useState(String(DEFAULT_DAILY_STOP_USD))
@@ -24,18 +24,22 @@ export function FirstRun({ workspace, onDone, onSkip }: FirstRunProps) {
       <div className="mx-auto grid max-w-4xl gap-10 px-6 py-10 lg:grid-cols-[1fr_260px]">
         <section>
           <ol className="flex flex-wrap gap-x-5 gap-y-2 text-[13px]">
-            <li className="flex items-center gap-1.5 text-muted-foreground">
-              <IconCheck className="size-3.5" /> Name it · {workspace.name}
-            </li>
+            {DONE_STEPS.map((label) => (
+              <li key={label} className="flex items-center gap-1.5 text-muted-foreground">
+                <IconCheck className="size-3.5" /> {label}
+              </li>
+            ))}
             <li className="flex items-center gap-1.5 font-semibold">
               <span className="grid size-4 place-items-center rounded-full bg-primary font-mono text-[10px] text-primary-foreground">
-                2
+                4
               </span>
-              Give Washi a key
+              Wake Washi
             </li>
           </ol>
 
-          <p className="mt-8 font-mono text-[12px] text-muted-foreground">Step 2 of 2</p>
+          <p className="mt-8 font-mono text-[12px] text-muted-foreground">
+            Step 4 of 4 · {workspace.name}
+          </p>
           <h1 className="mt-1 font-semibold text-[26px] tracking-[-0.02em]">Give Washi a key</h1>
           <p className="mt-2 max-w-xl text-[14px] text-muted-foreground leading-relaxed">
             Washi runs on your server with one model key for the whole workspace. Nobody on the team

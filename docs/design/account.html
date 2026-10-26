@@ -134,6 +134,42 @@
 .sett .danger b { display: block; font-size: 13.5px; color: var(--s-bad); }
 .dbtn { display: inline-flex; align-items: center; height: 44px; padding: 0 16px; border-radius: 12px; background: var(--s-bad); color: #fff; font-weight: 600; font-size: 13.5px; }
 .pin.a { background: var(--s-agent); }
+/* /new — the new-workspace flow */
+.nw { display: flex; flex-direction: column; height: 100%; }
+.nw .top { display: flex; align-items: center; justify-content: space-between; height: 56px; padding: 0 20px; }
+.nw .top .wm { display: flex; align-items: center; gap: 8px; font: 600 13px / 1 var(--s-sans); letter-spacing: 0.18em; text-transform: uppercase; }
+.nw .top .q { font-size: 13px; color: var(--s-mfg); }
+.nw .col { width: 528px; margin: 0 auto; padding-top: 64px; }
+.nw .steps { display: flex; gap: 20px; font-size: 13px; color: var(--s-mfg); }
+.nw .steps span { display: flex; align-items: center; gap: 6px; }
+.nw .steps i { display: grid; place-items: center; width: 16px; height: 16px; border: 1px solid var(--s-border); border-radius: 50%; font: 400 10px / 1 var(--s-mono); font-style: normal; }
+.nw .steps .now { color: var(--s-fg); font-weight: 600; }
+.nw .steps .now i { background: var(--s-primary); border-color: var(--s-primary); color: #fff; }
+.nw h1 { margin: 40px 0 0; font-weight: 600; font-size: 26px; letter-spacing: -0.02em; }
+.nw .sub { margin: 8px 0 0; max-width: 448px; font-size: 14px; line-height: 1.6; color: var(--s-mfg); }
+.nw .lab { margin: 32px 0 6px; font-weight: 600; font-size: 13px; }
+.nw .prev { margin-top: 20px; padding: 12px; border: 1px dashed var(--s-border); border-radius: 12px; }
+.nw .prev small { display: block; margin-bottom: 8px; font: 400 11px / 1 var(--s-mono); color: var(--s-mfg); }
+.nw .prev .r { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500; }
+.nw .prev .r i { width: 30px; height: 30px; border-radius: 8px; background: #d4713f; }
+.nw .prev .r em { display: block; font-style: normal; font-weight: 400; font-size: 12px; color: var(--s-mfg); }
+.nw .go { display: inline-flex; margin-top: 32px; }
+.nw .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 32px; }
+.nw .card { padding: 16px; border: 1px solid var(--s-border); border-radius: 16px; background: var(--s-card); font-size: 13px; color: var(--s-mfg); line-height: 1.5; }
+.nw .card.on { border-color: var(--s-primary); box-shadow: 0 0 0 1px var(--s-primary); }
+.nw .card b { display: block; margin-bottom: 6px; color: var(--s-fg); font-size: 15px; }
+.nw .card ul { margin: 8px 0 0; padding-left: 14px; color: var(--s-fg); font-size: 12.5px; }
+.nw .inv { display: grid; gap: 8px; margin-top: 32px; }
+.nw .inv .rw { display: flex; gap: 8px; }
+.nw .inv .rw .in { flex: 1; }
+.nw .inv .sel { display: flex; align-items: center; height: 44px; padding: 0 10px; border: 1px solid var(--s-border); border-radius: 12px; background: var(--s-card); font-size: 13.5px; }
+.nw .inv .add { font-size: 13px; color: var(--s-mfg); }
+.nw .acts { display: flex; gap: 12px; margin-top: 24px; }
+.nw .ghost { display: flex; align-items: center; height: 44px; padding: 0 20px; border: 1px solid var(--s-border); border-radius: 12px; background: var(--s-card); font-weight: 600; font-size: 14px; }
+.nw .sent { margin-top: 24px; border: 1px solid var(--s-border); border-radius: 12px; background: var(--s-card); }
+.nw .sent div { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; font-size: 13.5px; }
+.nw .sent em { display: block; font: 400 11px / 1.4 var(--s-mono); font-style: normal; color: var(--s-mfg); }
+.nw .sent span { padding: 6px 12px; border: 1px solid var(--s-border); border-radius: 8px; font-size: 12.5px; }
 </style>
 </head>
 <body class="cv">
@@ -283,7 +319,7 @@
             <li class="wsrow"><i style="background:#3d5a73"></i><div><b>Kōbō</b><div class="r">member</div></div></li>
             <li class="wsrow"><i style="background:#94a06b"></i><div><b>Side quests</b><div class="r">admin</div></div></li>
           </ul>
-          <div class="mk"><span class="in ph">Another workspace…</span><span class="pbtn dis">Create</span></div>
+          <div class="mk"><span class="pbtn" style="flex:1">+ New workspace</span></div>
           <p class="signed">Signed in as juan@netko.dev <u>Sign out</u></p>
         </div>
       </div>
@@ -291,25 +327,73 @@
       <span class="pin" style="left:900px;top:565px">2</span>
       <span class="pin" style="left:650px;top:636px">3</span>
     </div>
-    <div class="fnote"><b>1</b> Rows are <code>workspaces.list</code> = the member rows joined to organizations, so the role is Better Auth's: <code>owner</code> for whoever created it, <code>member</code> for the invited. The icon is <code>VaultIcon</code> with a topic hashed from the id (<code>topicFor</code>), so two workspaces never look alike. <b>2</b> Create is disabled until the name has a non-space character. <b>3</b> Sign out here reloads; <code>/</code> then sends you to <code>/sign-in</code>.</div>
+    <div class="fnote"><b>1</b> Rows are <code>workspaces.list</code> = the member rows joined to organizations, so the role is Better Auth's: <code>owner</code> for whoever created it, <code>member</code> for the invited. The icon is <code>VaultIcon</code> with a topic hashed from the id (<code>topicFor</code>), so two workspaces never look alike. <b>2</b> New workspace opens <code>/new</code>; with no workspaces yet it reads <b>Make your first workspace</b>. <b>3</b> Sign out here reloads; <code>/</code> then sends you to <code>/sign-in</code>.</div>
   </article>
 
-  <article class="frame" data-name="Create workspace" data-w="1280" data-h="800">
+  <article class="frame" data-name="New workspace · name it" data-w="1280" data-h="800">
     <div class="app">
-      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / workspaces</span></div>
-      <div class="picker">
-        <div class="pcol">
-          <div class="wm"><i data-mascot="curious" data-size="44"></i><span class="wordmark">washi</span></div>
-          <h1>Make your first workspace</h1>
-          <p class="sub">A workspace holds your pages, your tables and the people you work with.</p>
-          <div class="mk"><span class="in focus">Netko Labs</span><span class="pbtn">Create</span></div>
-          <p class="signed">Signed in as juan@netko.dev <u>Sign out</u></p>
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / new</span></div>
+      <div class="nw">
+        <div class="top"><span class="wm"><i data-mascot="curious" data-size="28"></i>washi</span><span class="q">Cancel</span></div>
+        <div class="col">
+          <div class="steps"><span class="now"><i>1</i>Name it</span><span class=""><i>2</i>Start it</span><span class=""><i>3</i>Invite people</span><span class=""><i>4</i>Wake Washi</span></div>
+          <h1>Name your workspace</h1>
+          <p class="sub">A workspace holds its own pages, tables and people, in one file on this server. Your team's name works; you can change it in Settings.</p>
+          <div class="lab">Workspace name</div>
+          <span class="in focus">Matcha Club</span>
+          <div class="prev"><small>In the switcher</small><div class="r"><i></i><div>Matcha Club<em>Owner · you</em></div></div></div>
+          <span class="pbtn go">Continue</span>
         </div>
       </div>
-      <span class="pin" style="left:900px;top:360px">1</span>
-      <span class="pin" style="left:900px;top:456px">2</span>
+      <span class="pin" style="left:930px;top:395px">1</span>
+      <span class="pin" style="left:930px;top:470px">2</span>
     </div>
-    <div class="fnote"><b>1</b> First run: no list, the mascot switches to <em>suggesting</em>, the placeholder is "Netko Labs". <b>2</b> Create is <code>auth.organization.create({ name, slug })</code> — slug is the kebab name plus a base-36 timestamp, never typed. That makes the organization row and an <code>owner</code> member; the SQLite file is not provisioned here — the runtime's registry opens <code>&lt;dataDir&gt;/&lt;id&gt;.db</code> on first entry, and the clock ignores ids that have no file yet. The team space is offered later, on the empty dashboard ("Set up a team space"), never here.</div>
+    <div class="fnote">From the switcher's <b>New workspace</b> or the picker, a page of its own at <code>/new</code> — no more name field crammed in a 272px menu. <b>1</b> One question a screen; the stepper names all four, the fourth being the workspace's own first run. <b>2</b> The preview is the switcher row it will become. Continue is <code>createWorkspace</code> (<code>auth.organization.create</code>, slug never typed) and makes it the active workspace at once, so the next steps act on something real; after this, Cancel becomes <b>Skip to Matcha Club</b>.</div>
+  </article>
+
+  <article class="frame" data-name="New workspace · start it" data-w="1280" data-h="800">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / new</span></div>
+      <div class="nw">
+        <div class="top"><span class="wm"><i data-mascot="curious" data-size="28"></i>washi</span><span class="q">Skip to Matcha Club</span></div>
+        <div class="col">
+          <div class="steps"><span class=""><i>✓</i>Name it</span><span class="now"><i>2</i>Start it</span><span class=""><i>3</i>Invite people</span><span class=""><i>4</i>Wake Washi</span></div>
+          <h1>How do you want to start?</h1>
+          <p class="sub">Both are ordinary pages and tables. Rename, move or delete anything later.</p>
+          <div class="cards">
+            <div class="card"><b>Empty</b>A blank workspace. Start with a page, or ask Washi to make the first one.<ul><li>No pages</li><li>No tables</li></ul></div>
+            <div class="card on"><b>Team space</b>Where a small team runs its week, ready to fill in.<ul><li>Projects and Issues tables</li><li>Backlog and Roadmap</li><li>Wiki, with How we work</li><li>Ideas canvas</li><li>Weekly review Washi refreshes at 17:00</li></ul></div>
+          </div>
+          <span class="pbtn go">Continue</span>
+        </div>
+      </div>
+      <span class="pin" style="left:930px;top:330px">1</span>
+    </div>
+    <div class="fnote"><b>1</b> Team space is the default: it is <code>tables.seedTeamSpace</code> in the asker's zone (from <code>Intl</code>), the same seed the empty dashboard offers. Empty seeds nothing. A failed seed says why in words and stays on this step.</div>
+  </article>
+
+  <article class="frame" data-name="New workspace · invite people" data-w="1280" data-h="800">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / new</span></div>
+      <div class="nw">
+        <div class="top"><span class="wm"><i data-mascot="curious" data-size="28"></i>washi</span><span class="q">Skip to Matcha Club</span></div>
+        <div class="col">
+          <div class="steps"><span class=""><i>✓</i>Name it</span><span class=""><i>✓</i>Start it</span><span class="now"><i>3</i>Invite people</span><span class=""><i>4</i>Wake Washi</span></div>
+          <h1>Invite your team</h1>
+          <p class="sub">Washi sends no email. Each invite is a link only that address can accept: copy it to them however you talk. Admins can invite people and set Washi up too.</p>
+          <div class="inv">
+            <div class="rw"><span class="in ph">name@team.com</span><span class="sel">Member ⌄</span></div>
+            <div class="rw"><span class="in ph">name@team.com</span><span class="sel">Member ⌄</span></div>
+            <span class="add">+ Add another</span>
+          </div>
+          <div class="acts"><span class="ghost">Create invites</span><span class="pbtn">Open Matcha Club</span></div>
+          <div class="sent"><div><span style="border:0;padding:0">kenji@example.com<em>invited · admin</em></span><span>Copy link</span></div></div>
+        </div>
+      </div>
+      <span class="pin" style="left:930px;top:400px">1</span>
+      <span class="pin" style="left:930px;top:600px">2</span>
+    </div>
+    <div class="fnote"><b>1</b> Three empty rows to start, email + role (Member · Admin); <code>auth.organization.inviteMember</code> per filled row. A row that fails stays with the reason; the rest clear. <b>2</b> Made invitations list with <b>Copy link</b> (<code>inviteLink</code>, the same link Settings · People hands out). Open, or Skip, lands in the workspace — and with no key yet, its first run is <b>Step 4 of 4 · Wake Washi</b>.</div>
   </article>
 
   <article class="frame" data-name="Invite · banner" data-w="1280" data-h="800">
@@ -483,10 +567,10 @@
         <div class="row"><i></i><div><b>Netko Labs</b><div class="r">owner</div></div><span class="ck">✓</span></div>
         <div class="row"><i style="background:#3d5a73"></i><div><b>Kōbō</b><div class="r">member</div></div></div>
         <div class="sep"></div>
-        <div class="nf"><span class="in focus">Pelican</span><span class="pbtn">Create</span></div>
+        <div class="new">＋ New workspace</div>
       </div>
     </div>
-    <div class="fnote">The same <code>create</code> as the picker (organization + owner member), then <code>navigate</code> into it — the menu closes and the loader runs for the new id. An error from Better Auth prints under the field in 12px destructive.</div>
+    <div class="fnote">A row like the rest: it closes the menu and opens <code>/new</code>, where naming, starting and inviting each get a screen. The name field no longer squeezes into the menu, which clipped Create.</div>
   </article>
 
   <article class="frame" data-name="User row" data-w="640" data-h="420">

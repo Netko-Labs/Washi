@@ -5,3 +5,6 @@ export const PROMISES = [
 ] as const
 
 export const DEFAULT_DAILY_STOP_USD = 25
+
+/** What `/new` already did by the time a workspace asks for its key. */
+export const DONE_STEPS = ['Name it', 'Start it', 'Invite people']
