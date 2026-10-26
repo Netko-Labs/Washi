@@ -1,3 +1,24 @@
+# D64 · icon and cover live in WSX (2026-10-25)
+
+Juan: "cover and icon should be a component that is part of wsx" → props on `<Sheet>`; the doc is
+the truth, `sheets.icon/cover` a cache every write re-derives.
+
+- [x] paper: `<Sheet icon cover>` — icon = registry name · emoji · `file:<id>`; cover = key;
+      presets + pictures move into paper
+- [x] write path: create/update derive icon + cover from the root; `updateMeta` icon/cover rewrites
+      the `<Sheet>` props (a person's edit); title/width stay meta
+- [x] lift: once per workspace, pages whose columns hold a look the source lacks get it written in,
+      quietly (no "edited", no undo churn)
+- [x] render: `SheetFrame` draws cover + icon in the paper; host gives URLs, an icon drawer, a band
+      slot and `edit(part, anchor)`
+- [x] studio chrome: band slot only (presence, Add row, row properties, pickers anchored to what
+      was clicked)
+- [x] agent: tools drop the separate `icon`, instructions name `icon` + `cover` props
+- [x] docs: PRD D64 (amends D27/D60), wsx-primitives Sheet, CLAUDE.md
+
+Accept: picking a cover changes the source (`</>` shows it), Washi can set one, the sidebar icon
+follows the source, existing covers survive the lift, desktop + mihon draw presets, gates green.
+
 # Washi, defined → prod (2026-10-14) — one PR per row, code-whiskers until clean, then merge
 
 Juan's calls: `docs/washi.html` Q1–Q7 — Q5 "do as Notion does", the rest as recommended. "Go, I

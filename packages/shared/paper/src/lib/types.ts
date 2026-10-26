@@ -55,12 +55,37 @@ export interface SheetLook {
   theme?: ThemeId
   feel?: Feel
   accent?: Tone
+  icon?: string
+  cover?: string
 }
 
-export interface SheetBandProps extends SheetLook {
+export interface SheetFrameProps extends SheetLook {
   children?: ReactNode
 }
 
-export interface BandColumnProps {
+export type LookPart = 'icon' | 'cover'
+
+/** What a host lends a page's look: where pictures live, how to draw an icon, how to change one. */
+export interface SheetLookHost {
+  /** The host's own band under the icon — who is here, the add buttons, a row's properties. */
+  band?: ReactNode
+  drawIcon?(name: string): ReactNode
+  fileUrl?(id: string): string
+  pictureUrl?(slug: string): string
+  /** A read-only host leaves it out and the look stays still. */
+  edit?(part: LookPart, anchor: HTMLElement): void
+}
+
+export interface SheetLookProviderProps {
+  value: SheetLookHost
   children?: ReactNode
+}
+
+export interface SheetCoverProps {
+  cover: string
+}
+
+export interface SheetMarkProps {
+  icon: string
+  overCover: boolean
 }

@@ -77,9 +77,9 @@ describe('the registry', () => {
     ).toBe('')
   })
 
-  test('what the registry refuses: Box, Span, H1, emoji icons, http figures, nested Repeat, two mascots', () => {
+  test('what the registry refuses: Box, Span, H1, made-up icons, http figures, nested Repeat, two mascots', () => {
     const text = messages(`
-      <Sheet title="t" icon="🗺️">
+      <Sheet title="t" icon="map-pin-ish">
         <Box><Span>x</Span></Box>
         <H1>hi</H1>
         <Figure src="http://x.example/a.png" alt="a" />

@@ -21,6 +21,7 @@ import {
   type WsxMissing,
   WsxParseError,
 } from '@washi/wsx'
+import { lookOf } from './look-of'
 
 export interface WsxCheck {
   ok: boolean
@@ -67,7 +68,7 @@ export function createSheetFromSource(
 ): SheetDetail {
   const root = parseValidated(write.source)
   if (parentId) requireSheet(ws, parentId)
-  return createSheet(ws, write, indexOf(root), parentId, editedBy)
+  return createSheet(ws, { ...write, ...lookOf(root) }, indexOf(root), parentId, editedBy)
 }
 
 export class SheetConflictError extends Error {
@@ -100,7 +101,14 @@ export function updateSheetFromSource(
 ): SheetDetail {
   parseValidated(write.source)
   const source = mergedSource(ws, id, write, baseVersion)
-  const updated = updateSheet(ws, id, { ...write, source }, indexOf(parse(source)), editedBy)
+  const root = parse(source)
+  const updated = updateSheet(
+    ws,
+    id,
+    { ...write, source, ...lookOf(root) },
+    indexOf(root),
+    editedBy,
+  )
   if (!updated) throw new Error(`sheet not found: ${id}`)
   return updated
 }
@@ -115,7 +123,8 @@ export class SheetUndoError extends Error {
 /** Takes back Washi's last write — only while nobody has written the page since. */
 export function undoWashiWrite(ws: Workspace, id: string): SheetDetail {
   const revision = latestRevision(ws, id)
-  if (!revision || !restoreRevision(ws, revision, indexOf(parse(revision.source)))) {
+  const root = revision ? parse(revision.source) : null
+  if (!revision || !root || !restoreRevision(ws, revision, indexOf(root), lookOf(root))) {
     throw new SheetUndoError(id)
   }
   return requireSheet(ws, id)

@@ -34,11 +34,16 @@ export const sheetIconSchema = z.union([
 
 export const sheetWriteSchema = z.object({
   title: z.string().min(1).max(200),
-  icon: sheetIconSchema.nullable().optional(),
   tags: z.array(z.string().min(1).max(64)).max(32).optional(),
   source: z.string().min(1).max(512_000),
 })
 export type SheetWrite = z.infer<typeof sheetWriteSchema>
+/** What the store keeps: the write plus the look its `<Sheet>` wears, read off the source (D64). */
+export interface SheetLook {
+  icon: string | null
+  cover: string | null
+}
+export type StoredSheetWrite = SheetWrite & Partial<SheetLook>
 
 /** What a person changes about a page without touching its content. */
 export const sheetMetaPatchSchema = z.object({

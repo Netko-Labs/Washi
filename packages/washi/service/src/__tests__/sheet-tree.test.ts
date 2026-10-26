@@ -9,6 +9,7 @@ import {
   updateSheetMeta,
   type Workspace,
 } from '@washi/repository'
+import { updateSheetMetaAndLook } from '../sheets/look'
 import { createSheetFromSource } from '../sheets/service'
 import { duplicateSheet, moveSheetTo, restoreSheetTree, SheetMoveError } from '../sheets/tree'
 
@@ -68,9 +69,12 @@ describe('page chrome', () => {
     expect(widened?.fullWidth).toBe(true)
     expect(widened?.hlcUpdated).toBe(sheet.hlcUpdated)
 
-    const renamed = updateSheetMeta(ws, sheet.id, { title: 'Quarterly goblin plan', cover: 'sage' })
-    expect(renamed?.cover).toBe('sage')
-    expect(renamed?.hlcUpdated).not.toBe(sheet.hlcUpdated)
+    const renamed = updateSheetMetaAndLook(ws, sheet.id, {
+      title: 'Quarterly goblin plan',
+      cover: 'preset:sage',
+    })
+    expect(renamed.cover).toBe('preset:sage')
+    expect(renamed.hlcUpdated).not.toBe(sheet.hlcUpdated)
     expect(searchSheets(ws, 'quarterly')[0]?.id).toBe(sheet.id)
   })
 
@@ -78,13 +82,13 @@ describe('page chrome', () => {
     const projects = page('Projects', 'all')
     const alpha = page('Alpha', 'first', projects.id)
     page('Beta', 'second', projects.id)
-    updateSheetMeta(ws, alpha.id, { cover: 'dusk', fullWidth: true })
+    updateSheetMetaAndLook(ws, alpha.id, { cover: 'preset:dusk', fullWidth: true })
 
     const copy = duplicateSheet(ws, alpha.id)
     expect(copy).toMatchObject({
       title: 'Alpha (copy)',
       parentId: projects.id,
-      cover: 'dusk',
+      cover: 'preset:dusk',
       fullWidth: true,
     })
     const order = listSheets(ws)

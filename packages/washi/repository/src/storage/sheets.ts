@@ -5,7 +5,7 @@ import {
   type SheetDetail,
   type SheetMetaPatch,
   type SheetSummary,
-  type SheetWrite,
+  type StoredSheetWrite,
 } from '@washi/domain'
 import { sheetLinkTable, sheetTable } from '@washi/domain/db'
 import { and, desc, eq, isNull, sql } from 'drizzle-orm'
@@ -61,7 +61,7 @@ export function getSheet(ws: Workspace, id: string): SheetDetail | null {
 /** A new page lands last among its siblings, as in Notion. The caller vouches for the parent. */
 export function createSheet(
   ws: Workspace,
-  write: SheetWrite,
+  write: StoredSheetWrite,
   index: SheetIndexInput,
   parentId: string | null = null,
   editedBy: SheetAuthor = null,
@@ -77,6 +77,7 @@ export function createSheet(
       position: positionBetween(lastChildPosition(ws, parentId), null),
       title: write.title,
       icon: write.icon ?? null,
+      cover: write.cover ?? null,
       tags: write.tags ?? [],
       source: write.source,
       loroSnapshot: Buffer.from(createSnapshot(write.source)),
@@ -94,7 +95,7 @@ export function createSheet(
 export function updateSheet(
   ws: Workspace,
   id: string,
-  write: SheetWrite,
+  write: StoredSheetWrite,
   index: SheetIndexInput,
   editedBy: SheetAuthor = null,
 ): SheetDetail | null {
@@ -103,7 +104,8 @@ export function updateSheet(
   const changed =
     write.source !== existing.source ||
     write.title !== existing.title ||
-    (write.icon ?? null) !== existing.icon
+    (write.icon ?? null) !== existing.icon ||
+    (write.cover ?? null) !== existing.cover
 
   ws.sqlite.transaction(() => {
     if (editedBy === 'washi') pushRevision(ws, existing)
@@ -113,6 +115,7 @@ export function updateSheet(
       .set({
         title: write.title,
         icon: write.icon ?? null,
+        cover: write.cover ?? null,
         tags: write.tags ?? existing.tags,
         source: write.source,
         loroSnapshot: Buffer.from(updateSnapshot(existing.loroSnapshot, write.source)),
@@ -144,11 +147,11 @@ export function deleteSheet(ws: Workspace, id: string): boolean {
   return true
 }
 
-/** Title, icon, cover and width — what a person edits around a page; its content is untouched. */
+/** Title and width — what a person edits around a page without touching its content. */
 export function updateSheetMeta(
   ws: Workspace,
   id: string,
-  patch: SheetMetaPatch,
+  patch: Pick<SheetMetaPatch, 'title' | 'fullWidth'>,
 ): SheetDetail | null {
   const [existing] = ws.db
     .select({ deletedAt: sheetTable.deletedAt })
@@ -156,16 +159,14 @@ export function updateSheetMeta(
     .where(eq(sheetTable.id, id))
     .all()
   if (!existing || existing.deletedAt) return null
-  const { title, icon, cover, fullWidth } = patch
-  const isEdit = title !== undefined || icon !== undefined || cover !== undefined
+  const { title, fullWidth } = patch
+  const isEdit = title !== undefined
   if (!isEdit && fullWidth === undefined) return getSheet(ws, id)
 
   ws.db
     .update(sheetTable)
     .set({
       ...(title !== undefined && { title }),
-      ...(icon !== undefined && { icon }),
-      ...(cover !== undefined && { cover }),
       ...(fullWidth !== undefined && { fullWidth }),
       ...(isEdit && { hlcUpdated: ws.now() }),
     })

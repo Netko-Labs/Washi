@@ -49,14 +49,13 @@ export function restoreSheetTree(ws: Workspace, id: string): string[] {
   return ids
 }
 
-/** A copy right below the original, with its look; the pages inside it are not copied. */
+/** A copy right below the original, with its look (in its source) and width; not its sub-pages. */
 export function duplicateSheet(ws: Workspace, id: string): SheetDetail {
   const original = requireSheet(ws, id)
   const copy = createSheetFromSource(
     ws,
     {
       title: `${original.title} (copy)`.slice(0, 200),
-      icon: original.icon,
       tags: original.tags,
       source: original.source,
     },
@@ -67,6 +66,6 @@ export function duplicateSheet(ws: Workspace, id: string): SheetDetail {
     .sort((a, b) => (a.position < b.position ? -1 : a.position > b.position ? 1 : 0))
   const at = siblings.findIndex((sheet) => sheet.id === original.id)
   moveSheet(ws, copy.id, original.parentId, at + 1)
-  updateSheetMeta(ws, copy.id, { cover: original.cover, fullWidth: original.fullWidth })
+  updateSheetMeta(ws, copy.id, { fullWidth: original.fullWidth })
   return requireSheet(ws, copy.id)
 }

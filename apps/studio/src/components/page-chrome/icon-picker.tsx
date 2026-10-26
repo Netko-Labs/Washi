@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { EMOJI, ICON_TABS, type IconTab, type PickerProps, usePickerRoot } from './lib'
+import { EMOJI, ICON_TABS, type IconTab, type PickerProps, useAnchored, usePickerRoot } from './lib'
 import { PickerTabs } from './picker-tabs'
 import { UploadDrop } from './upload-drop'
 
 /** Emoji · Upload. An upload is stored like a cover's and the page wears `file:<id>` (D60). */
-export function IconPicker({ current, onPick, onClose }: PickerProps) {
+export function IconPicker({ anchor, current, onPick, onClose }: PickerProps) {
   const root = usePickerRoot(onClose)
+  const at = useAnchored(anchor)
   const [tab, setTab] = useState<IconTab>(() => (current?.startsWith('file:') ? 'upload' : 'emoji'))
 
   return (
@@ -13,7 +14,8 @@ export function IconPicker({ current, onPick, onClose }: PickerProps) {
       ref={root}
       role="dialog"
       aria-label="Choose an icon"
-      className="absolute top-full left-0 z-40 mt-1 w-[300px] rounded-xl border border-border bg-popover p-2 text-popover-foreground shadow-[0_16px_48px_rgb(0_0_0/0.18)]"
+      style={at}
+      className="fixed z-50 w-[300px] rounded-xl border border-border bg-popover p-2 text-popover-foreground shadow-[0_16px_48px_rgb(0_0_0/0.18)]"
     >
       <div className="flex items-center justify-between px-1 pb-1.5">
         <span className="font-semibold text-[11px] text-muted-foreground uppercase tracking-[0.06em]">

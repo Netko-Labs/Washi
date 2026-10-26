@@ -63,6 +63,7 @@ export {
   listRoutines,
   updateRoutine,
 } from './storage/routines'
+export { rewriteSourceQuietly, sheetsWearingLooks } from './storage/sheet-look'
 export {
   ancestorIds,
   emptyTrash,

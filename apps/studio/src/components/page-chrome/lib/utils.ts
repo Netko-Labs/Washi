@@ -1,42 +1,31 @@
+import type { SheetLookHost } from '@washi/paper'
 import { fileUrl } from '@/integrations/trpc'
-import type { CoverLook, ParsedCover } from './types'
-import { COVERS, PICTURES } from './values'
-
-/** `preset:sage` · `picture:fjord` · `file:<id>`; a bare key from before D60 is a preset. */
-export function parseCover(cover: string | null): ParsedCover | null {
-  if (!cover) return null
-  const at = cover.indexOf(':')
-  if (at < 0) return COVERS[cover] ? { kind: 'preset', key: cover } : null
-  const kind = cover.slice(0, at)
-  const key = cover.slice(at + 1)
-  if (!key) return null
-  if (kind === 'preset') return COVERS[key] ? { kind, key } : null
-  if (kind === 'picture') return PICTURES.some((p) => p.slug === key) ? { kind, key } : null
-  if (kind === 'file') return { kind, key }
-  return null
-}
+import type { AnchoredAt } from './types'
+import { useLookPickerStore } from './use-look-picker-store'
 
 export function pictureUrl(slug: string): string {
   return `/covers/${slug}.jpg`
 }
 
-export function coverLook(cover: ParsedCover, workspaceId: string): CoverLook {
-  if (cover.kind === 'preset') {
-    return { style: { background: COVERS[cover.key]?.background }, caption: null }
-  }
-  const url = cover.kind === 'picture' ? pictureUrl(cover.key) : fileUrl(cover.key, workspaceId)
+/** What the studio lends a page's look: its pictures, its uploads, and a picker on whatever was clicked. */
+export function pageLook(workspaceId: string): Omit<SheetLookHost, 'band' | 'drawIcon'> {
   return {
-    style: {
-      backgroundImage: `url(${url})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-    },
-    caption:
-      cover.kind === 'picture' ? (PICTURES.find((p) => p.slug === cover.key)?.label ?? null) : null,
+    pictureUrl,
+    fileUrl: (id) => fileUrl(id, workspaceId),
+    edit: (part, anchor) => useLookPickerStore.getState().show(part, anchor),
   }
 }
 
-export function sameCover(current: string | null, kind: ParsedCover['kind'], key: string): boolean {
-  const parsed = parseCover(current)
-  return parsed?.kind === kind && parsed.key === key
+const PICKER_WIDTH = 300
+const GUTTER = 8
+
+/** Under the anchor, hanging toward the side of the screen it sits on, and kept on screen. */
+export function anchoredAt(anchor: HTMLElement): AnchoredAt {
+  const rect = anchor.getBoundingClientRect()
+  const width = document.documentElement.clientWidth
+  const top = rect.bottom + 4
+  if (rect.left + rect.width / 2 > width / 2) {
+    return { top, right: Math.max(GUTTER, width - rect.right) }
+  }
+  return { top, left: Math.max(GUTTER, Math.min(rect.left, width - PICKER_WIDTH - GUTTER)) }
 }

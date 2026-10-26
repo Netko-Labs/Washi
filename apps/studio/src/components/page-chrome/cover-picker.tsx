@@ -1,12 +1,11 @@
+import { COVER_PICTURES, COVER_PRESETS } from '@washi/paper/registry'
 import { useState } from 'react'
 import {
   COVER_TABS,
-  COVERS,
   type CoverTab,
-  PICTURES,
   type PickerProps,
   pictureUrl,
-  sameCover,
+  useAnchored,
   usePickerRoot,
 } from './lib'
 import { PickerTabs } from './picker-tabs'
@@ -17,8 +16,9 @@ const TILE =
 const LABEL = 'rounded bg-black/35 px-1 font-medium text-[10.5px] text-white'
 
 /** Presets · Pictures · Upload. Whatever is picked, the page stores a key (D60). */
-export function CoverPicker({ current, onPick, onClose }: PickerProps) {
+export function CoverPicker({ anchor, current, onPick, onClose }: PickerProps) {
   const root = usePickerRoot(onClose)
+  const at = useAnchored(anchor)
   const [tab, setTab] = useState<CoverTab>(() =>
     current?.startsWith('picture:') ? 'pictures' : 'presets',
   )
@@ -30,7 +30,8 @@ export function CoverPicker({ current, onPick, onClose }: PickerProps) {
       ref={root}
       role="dialog"
       aria-label="Choose a cover"
-      className="absolute top-full right-0 z-40 mt-1 w-[300px] rounded-xl border border-border bg-popover p-2 text-popover-foreground shadow-[0_16px_48px_rgb(0_0_0/0.18)]"
+      style={at}
+      className="fixed z-50 w-[300px] rounded-xl border border-border bg-popover p-2 text-popover-foreground shadow-[0_16px_48px_rgb(0_0_0/0.18)]"
     >
       <div className="flex items-center justify-between px-1 pb-1.5">
         <span className="font-semibold text-[11px] text-muted-foreground uppercase tracking-[0.06em]">
@@ -50,12 +51,12 @@ export function CoverPicker({ current, onPick, onClose }: PickerProps) {
 
       {tab === 'presets' && (
         <div className="grid grid-cols-3 gap-1.5">
-          {Object.entries(COVERS).map(([key, cover]) => (
+          {Object.entries(COVER_PRESETS).map(([key, cover]) => (
             <button
               key={key}
               type="button"
               onClick={() => onPick(`preset:${key}`)}
-              className={`${TILE} ${ring(sameCover(current, 'preset', key))}`}
+              className={`${TILE} ${ring(current === `preset:${key}`)}`}
               style={{ background: cover.background }}
             >
               <span className={LABEL}>{cover.label}</span>
@@ -66,12 +67,12 @@ export function CoverPicker({ current, onPick, onClose }: PickerProps) {
 
       {tab === 'pictures' && (
         <div className="grid max-h-[260px] grid-cols-3 gap-1.5 overflow-y-auto">
-          {PICTURES.map((picture) => (
+          {COVER_PICTURES.map((picture) => (
             <button
               key={picture.slug}
               type="button"
               onClick={() => onPick(`picture:${picture.slug}`)}
-              className={`${TILE} h-16 bg-muted ${ring(sameCover(current, 'picture', picture.slug))}`}
+              className={`${TILE} h-16 bg-muted ${ring(current === `picture:${picture.slug}`)}`}
               style={{
                 backgroundImage: `url(${pictureUrl(picture.slug)})`,
                 backgroundSize: 'cover',

@@ -1,20 +1,18 @@
+export { useAnchored } from './hooks/use-anchored'
 export { useImageUpload } from './hooks/use-image-upload'
 export { usePickerRoot } from './hooks/use-picker-root'
 export type {
-  ChromePicker,
-  CoverKind,
-  CoverLook,
+  AnchoredAt,
   CoverTab,
   IconTab,
+  LookPickerState,
   PageChromeProps,
-  ParsedCover,
   PickerProps,
   PickerTabsProps,
-  Picture,
-  Preset,
   UploadDropProps,
   UploadState,
   WashiMarkProps,
 } from './types'
-export { coverLook, parseCover, pictureUrl, sameCover } from './utils'
-export { COVER_TABS, COVERS, EMOJI, ICON_TABS, PICTURES } from './values'
+export { useLookPickerStore } from './use-look-picker-store'
+export { anchoredAt, pageLook, pictureUrl } from './utils'
+export { COVER_TABS, EMOJI, ICON_TABS } from './values'

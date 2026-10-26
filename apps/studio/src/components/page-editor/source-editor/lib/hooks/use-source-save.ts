@@ -22,7 +22,6 @@ export function useSourceSave(sheet: SheetDetail) {
           id: sheet.id,
           write: {
             title: current?.title ?? sheet.title,
-            icon: current?.icon ?? sheet.icon,
             tags: current?.tags ?? sheet.tags,
             source: draft,
           },

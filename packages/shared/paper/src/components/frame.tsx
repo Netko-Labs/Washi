@@ -1,15 +1,9 @@
-import type { CSSProperties, ReactNode } from 'react'
+import type { CSSProperties } from 'react'
 import { styled } from '../lib'
-import type {
-  BandColumnProps,
-  BlockProps,
-  Feel,
-  Gap,
-  PaperSurfaceProps,
-  SheetBandProps,
-  Tone,
-} from '../lib/types'
+import type { BlockProps, Gap, PaperSurfaceProps, SheetFrameProps } from '../lib/types'
+import { useSheetLook } from '../look'
 import { THEMES, type ThemeId } from '../registry/themes'
+import { SheetCover, SheetMark } from './sheet-look'
 
 const ALIGN: Record<string, string> = {
   start: 'flex-start',
@@ -38,18 +32,19 @@ function themeVars(theme: ThemeId): CSSProperties {
   return out as CSSProperties
 }
 
-/** The page: paper, ink, measure, padding and rhythm. Pages never set any of them. */
+/**
+ * The page: paper, ink, measure, padding and rhythm, and the look it wears — cover and icon are
+ * the page's own props (D64). Pages never set the rest. A host's band sits under the icon.
+ */
 export function SheetFrame({
   theme = 'washi',
   feel = 'note',
   accent = 'accent',
+  icon,
+  cover,
   children,
-}: {
-  theme?: ThemeId
-  feel?: Feel
-  accent?: Tone
-  children?: ReactNode
-}) {
+}: SheetFrameProps) {
+  const { band } = useSheetLook()
   return (
     <article
       className="wsx"
@@ -58,37 +53,17 @@ export function SheetFrame({
       data-accent={accent}
       style={themeVars(theme)}
     >
+      {cover && <SheetCover cover={cover} />}
+      {(icon || band) && (
+        <div className="wsx-band-column">
+          <div className="wsx-band">
+            {icon && <SheetMark icon={icon} overCover={Boolean(cover)} />}
+            {band}
+          </div>
+        </div>
+      )}
       <div className="wsx-page">{children}</div>
     </article>
-  )
-}
-
-/** A host's band above the sheet: the page's paper and measure, but outside the page (Q18). */
-export function SheetBand({
-  theme = 'washi',
-  feel = 'note',
-  accent = 'accent',
-  children,
-}: SheetBandProps) {
-  return (
-    <div
-      className="wsx wsx-band"
-      data-feel={feel}
-      data-theme={theme}
-      data-accent={accent}
-      style={themeVars(theme)}
-    >
-      {children}
-    </div>
-  )
-}
-
-/** The band's column lines up with the sheet's: same measure, same inline padding. */
-export function BandColumn({ children }: BandColumnProps) {
-  return (
-    <div className="wsx-band-column">
-      <div className="relative">{children}</div>
-    </div>
   )
 }
 
