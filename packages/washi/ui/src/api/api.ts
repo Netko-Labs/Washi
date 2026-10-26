@@ -22,6 +22,9 @@ export const hostPlace = (): string => host().place
 export const hostUploadFile = (): ((file: File) => Promise<UploadedFile>) | null =>
   host().uploadFile ?? null
 
+/** Null where the host stores no files; an icon or cover that names one falls back then. */
+export const hostFileUrl = (): ((id: string) => string) | null => bound?.fileUrl ?? null
+
 /**
  * The tRPC client every shared component calls, as `api.sheets.list.query()`.
  * A proxy so the binding can happen after the modules that use it are imported.

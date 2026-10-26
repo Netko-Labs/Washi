@@ -129,13 +129,15 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   background and measure, so the icon lines up with the title), so Q18 holds: everything on the sheet
   is still authored by the sheet. A cover is a **key**, never a URL (D60): `preset:sage` (a
   gradient), `picture:fjord` (one of the twelve photographs in `apps/studio/public/covers/`,
-  attribution beside them) or `file:<id>` (an upload). An icon is a registry name or an emoji.
+  attribution beside them) or `file:<id>` (an upload). An icon is a registry name, an emoji
+  or `file:<id>` (an upload; `SheetIcon` draws it through the host's `fileUrl`, else a page glyph).
 - **Files.** Uploads live in the workspace's files store: a row in the workspace's `files`
   table and the bytes beside the `.db` (`<dataDir>/<workspace>.files/`) or, with
   `WASHI_FILES_S3_*` set, in a bucket under a per-workspace prefix through Bun's own S3 client.
   `POST /api/files` (multipart, JPG · PNG · WebP, 5 MB) and `GET /api/files/<id>` are studio
   routes gated like a workspace procedure (`src/server/files.ts`); `files.remove` is tRPC. A
-  purge frees the uploads its pages' covers pointed at. The desktop renders no covers yet.
+  purge frees the uploads its pages' covers and icons pointed at (`trashedUploads`). The desktop
+  renders no covers or uploaded icons yet.
 - Typing into a page (studio `page-editor`) edits the sheet's **top level** as blocks: plain-text
   Title/Text/List/Item/Quote/Callout/Code/Divider become typed blocks; anything else (or text with
   inline marks) stays a locked block, kept byte-for-byte. `/` also drops live blocks in as locked

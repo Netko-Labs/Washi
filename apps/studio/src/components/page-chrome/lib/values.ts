@@ -35,6 +35,11 @@ export const COVER_TABS = [
   { id: 'upload', label: 'Upload' },
 ] as const
 
+export const ICON_TABS = [
+  { id: 'emoji', label: 'Emoji' },
+  { id: 'upload', label: 'Upload' },
+] as const
+
 export const EMOJI = [
   '📝',
   '📚',

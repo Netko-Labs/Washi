@@ -64,11 +64,14 @@ export function PageChrome({ pageId }: PageChromeProps) {
             type="button"
             aria-label="Change the icon"
             onClick={() => setPicker('icon')}
-            className={`grid size-[72px] place-items-center rounded-xl hover:bg-accent ${
+            className={`grid size-[72px] place-items-center rounded-xl hover:bg-(--muted-bg) ${
               cover ? '-mt-9' : 'mt-8'
             }`}
           >
-            <SheetIcon name={sheet.icon} className="size-11 text-[52px]" />
+            <SheetIcon
+              name={sheet.icon}
+              className={sheet.icon.startsWith('file:') ? 'size-16' : 'size-11 text-[52px]'}
+            />
           </button>
         )}
         {(!sheet.icon || !cover) && (

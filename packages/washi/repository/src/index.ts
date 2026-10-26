@@ -71,7 +71,7 @@ export {
   moveSheet,
   purgeSheet,
   restoreSheet,
-  trashedFileCovers,
+  trashedUploads,
 } from './storage/sheet-tree'
 export {
   createSheet,

@@ -15,4 +15,6 @@ export interface HostOptions {
   place: string
   /** Bytes into the workspace's files store. Absent on a host that cannot take uploads yet. */
   uploadFile?: (file: File) => Promise<UploadedFile>
+  /** Where an upload's bytes are read back. Absent where nothing is stored yet. */
+  fileUrl?: (id: string) => string
 }

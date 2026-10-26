@@ -1,3 +1,4 @@
+import { fileUrl } from '@/integrations/trpc'
 import type { CoverLook, ParsedCover } from './types'
 import { COVERS, PICTURES } from './values'
 
@@ -17,10 +18,6 @@ export function parseCover(cover: string | null): ParsedCover | null {
 
 export function pictureUrl(slug: string): string {
   return `/covers/${slug}.jpg`
-}
-
-export function fileUrl(id: string, workspaceId: string): string {
-  return `/api/files/${id}?workspace=${encodeURIComponent(workspaceId)}`
 }
 
 export function coverLook(cover: ParsedCover, workspaceId: string): CoverLook {

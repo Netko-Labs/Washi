@@ -9,6 +9,7 @@ import {
 import { type AppRouter, MAX_TRPC_BATCH_SIZE, WORKSPACE_HEADER } from '@washi/trpc/client'
 import { bindHost } from '@washi/ui'
 import {
+  fileUrl,
   getWebSocketUrl,
   readActiveWorkspace,
   TRPC_HTTP_URL,
@@ -76,4 +77,9 @@ async function uploadFile(file: File) {
   return (await response.json()) as { id: string; name: string; mime: string; size: number }
 }
 
-bindHost({ client: api, place: 'your server', uploadFile })
+bindHost({
+  client: api,
+  place: 'your server',
+  uploadFile,
+  fileUrl: (id) => fileUrl(id, readActiveWorkspace() ?? ''),
+})

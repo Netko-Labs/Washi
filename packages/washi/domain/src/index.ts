@@ -47,6 +47,7 @@ export {
   type SheetSummary,
   type SheetWrite,
   sheetDetailSchema,
+  sheetIconSchema,
   sheetMetaPatchSchema,
   sheetSummarySchema,
   sheetWriteSchema,

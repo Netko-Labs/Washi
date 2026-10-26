@@ -23,3 +23,8 @@ export function writeActiveWorkspace(id: string | null): void {
     // private mode: requests fall back to the server's default workspace
   }
 }
+
+/** An upload's bytes, read back through the files route with its workspace named. */
+export function fileUrl(id: string, workspaceId: string): string {
+  return `/api/files/${id}?workspace=${encodeURIComponent(workspaceId)}`
+}
