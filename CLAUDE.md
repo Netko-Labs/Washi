@@ -52,7 +52,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
 - `apps/studio` — TanStack Start on Nitro (bun preset), from `Netko-Labs/tanstack-solo-server-
   monorepo-template`: SSR, `/api/auth/*`, `/api/trpc/*`, `/trpc-ws`, `/api/health`. A Nitro plugin
   boots the runtime at start (so the routine clock ticks unvisited) and drains sockets on SIGTERM.
-  Pages are routes: `/sign-in?redirect=`, `/workspaces?invite=`, `/w/$workspaceId` (dashboard),
+  Pages are routes: `/sign-in?redirect=`, `/workspaces?invite=`, `/new` (a new workspace: name it ·
+  start it · invite people, then the workspace's first run wakes Washi), `/w/$workspaceId` (dashboard),
   `/p/$pageId`, `/inbox`, `/settings?tab=`, `/trash`. The workspace loader resets the shared stores (child
   effects run before the layout's); routes mark their view active, and a page chosen anywhere
   pushes its URL (`useTabNavigation`). **No tab strip on the web (D58)** — the URL is the whole

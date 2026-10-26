@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
-import { auth } from '@/integrations/auth'
 import { api, setActiveWorkspace } from '@/integrations/trpc'
 import type { WorkspaceSummary } from '@/lib/types'
+import { createWorkspace } from '../utils'
 
 /** A workspace is an organization, so this is Better Auth's list plus a create. */
 export function useWorkspaces(initial?: WorkspaceSummary[]) {
@@ -25,22 +25,13 @@ export function useWorkspaces(initial?: WorkspaceSummary[]) {
 
   const create = async (name: string) => {
     setError(null)
-    const slug = `${name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '')}-${Date.now().toString(36)}`
-    try {
-      const result = await auth.organization.create({ name, slug })
-      if (result.error) {
-        setError(result.error.message ?? 'Could not create that workspace.')
-        return null
-      }
-      await refresh()
-      return result.data?.id ?? null
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : String(cause))
+    const made = await createWorkspace(name)
+    if ('error' in made) {
+      setError(made.error)
       return null
     }
+    await refresh()
+    return made.id
   }
 
   const open = (id: string) => setActiveWorkspace(id)

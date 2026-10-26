@@ -13,8 +13,3 @@ export interface WorkspaceMenuProps {
   onClose: () => void
   placement?: MenuPlacement
 }
-
-export interface NewWorkspaceFormProps {
-  error: string | null
-  onCreate: (name: string) => Promise<void>
-}

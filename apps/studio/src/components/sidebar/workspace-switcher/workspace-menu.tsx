@@ -1,9 +1,8 @@
-import { IconCheck } from '@tabler/icons-react'
-import { getRouteApi, Link, useNavigate } from '@tanstack/react-router'
+import { IconCheck, IconPlus } from '@tabler/icons-react'
+import { getRouteApi, Link } from '@tanstack/react-router'
 import { VaultIcon } from '@washi/ui'
 import { topicFor, useWorkspaces } from '@/components/workspace'
 import type { WorkspaceMenuProps } from './lib'
-import { NewWorkspaceForm } from './new-workspace-form'
 
 const route = getRouteApi('/w/$workspaceId')
 
@@ -12,8 +11,7 @@ const ROW = 'flex w-full items-center gap-2.5 rounded-lg px-2 text-left hover:bg
 /** Opens on the loader's list and refreshes it, so a workspace made in another tab shows up. */
 export function WorkspaceMenu({ currentId, onClose, placement = 'up' }: WorkspaceMenuProps) {
   const { workspaces: known } = route.useLoaderData()
-  const { workspaces, error, create } = useWorkspaces(known)
-  const navigate = useNavigate()
+  const { workspaces } = useWorkspaces(known)
 
   return (
     <div
@@ -46,15 +44,10 @@ export function WorkspaceMenu({ currentId, onClose, placement = 'up' }: Workspac
         ))}
       </div>
       <div className="my-1.5 h-px bg-border" />
-      <NewWorkspaceForm
-        error={error}
-        onCreate={async (name) => {
-          const workspaceId = await create(name)
-          if (!workspaceId) return
-          onClose()
-          await navigate({ to: '/w/$workspaceId', params: { workspaceId } })
-        }}
-      />
+      <Link to="/new" onClick={onClose} className={`${ROW} h-8 text-[13px] text-muted-foreground`}>
+        <IconPlus className="size-[15px]" />
+        New workspace
+      </Link>
     </div>
   )
 }
