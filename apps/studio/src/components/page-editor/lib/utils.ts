@@ -1,6 +1,4 @@
-import type { SheetFrame } from '@washi/paper'
 import type { WsxElement, WsxNode, WsxValue } from '@washi/wsx'
-import type { ComponentProps } from 'react'
 import type {
   Block,
   DataPick,
@@ -238,18 +236,6 @@ export function numberedPositions(blocks: Block[]): number[] {
     run = block.kind === 'number' ? run + 1 : 0
     return run
   })
-}
-
-/** The page's own paper — theme, feel, accent — so typing looks like the page it becomes. */
-export function frameOf(
-  root: WsxElement,
-): Pick<ComponentProps<typeof SheetFrame>, 'theme' | 'feel' | 'accent'> {
-  const pick = (value: WsxValue | undefined) => (typeof value === 'string' ? value : undefined)
-  return {
-    theme: pick(root.props.theme),
-    feel: pick(root.props.feel),
-    accent: pick(root.props.accent),
-  } as Pick<ComponentProps<typeof SheetFrame>, 'theme' | 'feel' | 'accent'>
 }
 
 export function swapNode(node: WsxNode, from: WsxElement, to: WsxElement): WsxNode {

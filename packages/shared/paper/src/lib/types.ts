@@ -1,5 +1,6 @@
 import type { Scalar } from '@washi/ink'
 import type { ReactNode } from 'react'
+import type { ThemeId } from '../registry/themes'
 
 export type Variant = 'plain' | 'outline' | 'filled' | 'raised' | 'tape'
 export type Tone = 'neutral' | 'accent' | 'info' | 'success' | 'warning' | 'danger'
@@ -47,5 +48,19 @@ export interface DataContextValue {
 }
 
 export interface PaperSurfaceProps {
+  children?: ReactNode
+}
+
+export interface SheetLook {
+  theme?: ThemeId
+  feel?: Feel
+  accent?: Tone
+}
+
+export interface SheetBandProps extends SheetLook {
+  children?: ReactNode
+}
+
+export interface BandColumnProps {
   children?: ReactNode
 }

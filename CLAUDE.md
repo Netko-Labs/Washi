@@ -125,7 +125,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   → 400).
 - Page chrome (icon, `cover`, `full_width`, rename) is metadata — `sheets.updateMeta` never
   touches the Loro doc, and width alone is not an edit. The studio draws it **above** the sheet
-  through `SheetView`'s `chrome` slot, outside the paper, so Q18 holds: everything on the sheet
+  through `SheetView`'s `chrome` slot, outside the paper but in its look (`SheetBand`: the sheet's
+  background and measure, so the icon lines up with the title), so Q18 holds: everything on the sheet
   is still authored by the sheet. A cover is a **key**, never a URL (D60): `preset:sage` (a
   gradient), `picture:fjord` (one of the twelve photographs in `apps/studio/public/covers/`,
   attribution beside them) or `file:<id>` (an upload). An icon is a registry name or an emoji.

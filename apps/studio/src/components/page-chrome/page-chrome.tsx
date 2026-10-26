@@ -1,4 +1,5 @@
 import { IconMessageCircle, IconMoodSmile, IconPhoto } from '@tabler/icons-react'
+import { BandColumn } from '@washi/paper'
 import { SheetIcon, useSheetsStore } from '@washi/ui'
 import { useState } from 'react'
 import { useCommentsStore } from '@/components/comments'
@@ -39,7 +40,7 @@ export function PageChrome({ pageId }: PageChromeProps) {
       {cover && (
         <div className="relative h-[180px] w-full bg-muted" style={cover.style}>
           {cover.caption && (
-            <span className="absolute bottom-3 left-4 rounded-md bg-background/85 px-2 py-1 text-[11.5px] text-muted-foreground backdrop-blur">
+            <span className="absolute top-3 right-4 rounded-md bg-background/85 px-2 py-1 text-[11.5px] text-muted-foreground backdrop-blur">
               {cover.caption} · one of Washi's pictures
             </span>
           )}
@@ -53,8 +54,8 @@ export function PageChrome({ pageId }: PageChromeProps) {
           {coverPicker && <div className="absolute top-full right-4">{coverPicker}</div>}
         </div>
       )}
-      <div className={`relative mx-auto px-8 ${sheet.fullWidth ? '' : 'max-w-[760px]'}`}>
-        <div className="absolute top-2 right-8 flex items-center gap-3">
+      <BandColumn>
+        <div className="absolute top-2 right-0 flex items-center gap-3">
           <PagePresence sheetId={sheet.id} />
           <WashiMark sheet={sheet} />
         </div>
@@ -110,7 +111,7 @@ export function PageChrome({ pageId }: PageChromeProps) {
           />
         )}
         {!cover && coverPicker}
-      </div>
+      </BandColumn>
     </div>
   )
 }

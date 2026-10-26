@@ -1,6 +1,14 @@
 import type { CSSProperties, ReactNode } from 'react'
 import { styled } from '../lib'
-import type { BlockProps, Feel, Gap, PaperSurfaceProps, Tone } from '../lib/types'
+import type {
+  BandColumnProps,
+  BlockProps,
+  Feel,
+  Gap,
+  PaperSurfaceProps,
+  SheetBandProps,
+  Tone,
+} from '../lib/types'
 import { THEMES, type ThemeId } from '../registry/themes'
 
 const ALIGN: Record<string, string> = {
@@ -52,6 +60,35 @@ export function SheetFrame({
     >
       <div className="wsx-page">{children}</div>
     </article>
+  )
+}
+
+/** A host's band above the sheet: the page's paper and measure, but outside the page (Q18). */
+export function SheetBand({
+  theme = 'washi',
+  feel = 'note',
+  accent = 'accent',
+  children,
+}: SheetBandProps) {
+  return (
+    <div
+      className="wsx wsx-band"
+      data-feel={feel}
+      data-theme={theme}
+      data-accent={accent}
+      style={themeVars(theme)}
+    >
+      {children}
+    </div>
+  )
+}
+
+/** The band's column lines up with the sheet's: same measure, same inline padding. */
+export function BandColumn({ children }: BandColumnProps) {
+  return (
+    <div className="wsx-band-column">
+      <div className="relative">{children}</div>
+    </div>
   )
 }
 

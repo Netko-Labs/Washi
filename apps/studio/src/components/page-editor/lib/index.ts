@@ -19,7 +19,6 @@ export type {
   TextKind,
 } from './types'
 export {
-  frameOf,
   kindMatches,
   newBlock,
   numberedPositions,
