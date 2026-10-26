@@ -71,6 +71,7 @@ export {
   sharedPage,
   sharedQuery,
   sharedTable,
+  shareSettings,
 } from './sheets/share'
 export { duplicateSheet, moveSheetTo, restoreSheetTree, SheetMoveError } from './sheets/tree'
 export { runHistory } from './tables/history'

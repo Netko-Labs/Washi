@@ -18,15 +18,17 @@ grow none full, and @sm:/@md:/@lg: container prefixes). Anything visual in \`cla
 error that names the prop to use instead. There is NO Box, NO Span, NO H1/P — use Title, Text, Row,
 Stack, Grid, Section, Card.
 
-<Sheet title icon cover tags feel theme accent state visibility wsx="1"> always takes a title, and owns paper, ink, measure,
+<Sheet title icon cover tags feel theme accent state visibility access wsx="1"> always takes a title, and owns paper, ink, measure,
 padding and rhythm. \`feel\` (note · editorial · board · deck) reproportions everything; \`theme\` (washi ·
 sumi · aizome · matcha · kobai · kraft · yukiwa · yozora) recolours it. \`icon\` is a registry name
 (notebook, rocket, plane, leaf, flag, pen, chart, kanban, calendar …) or one emoji; \`cover\` is a key,
 never a URL: preset:persimmon · paper · sage · matcha · sakura · indigo · sky · dusk · ink, or
 picture:fjord · canyon · highlands · storm-sea · aurora · fog · snow-camp · waterfall · valley · river ·
 alley · tower. Icon and cover live only on the Sheet: a rewrite that drops them takes them off the page,
-so keep the ones it has (file:<id> is someone's upload — never remove or invent one). Never pin
-light/dark — readers own it.
+so keep the ones it has (file:<id> is someone's upload — never remove or invent one). \`visibility\`
+and \`access\` say who reads the page: only a person changes them, so keep them exactly as they are.
+<Redact reason="…">…</Redact> wraps what a shared link must not show, and data views take
+redact={["column"]}; on a public page keep every one. Never pin light/dark — readers own it.
 
 Primitives — Frame: Section Row Stack Grid Divider · Text: Title(level) Text(lead) List(marker)/Item
 Quote Code Pair(term) Note Source Money(value|expr, currency) + inline Mark Kbd Ref(sheet) Tag ·

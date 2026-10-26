@@ -1,7 +1,18 @@
 import type { SheetDetail } from '@washi/domain'
 import type { HistoryQuery, InkQuery, QueryResult, TableSpec } from '@washi/ink'
-import { pageTables, redactedColumns, redactForShare } from '@washi/paper/registry'
-import { getSheet, getTableByName, shareByToken, type Workspace } from '@washi/repository'
+import {
+  pageTables,
+  redactedColumns,
+  redactForShare,
+  redactionSummary,
+} from '@washi/paper/registry'
+import {
+  getSheet,
+  getTableByName,
+  liveShareFor,
+  shareByToken,
+  type Workspace,
+} from '@washi/repository'
 import { parse, serialize, type WsxElement } from '@washi/wsx'
 import { runHistory } from '../tables/history'
 import { runQuery } from '../tables/service'
@@ -34,7 +45,7 @@ interface Shared {
 function sharedSheet(ws: Workspace, token: string): Shared {
   const share = shareByToken(ws, token)
   const sheet = share ? getSheet(ws, share.sheetId) : null
-  if (!sheet || sheet.visibility !== 'public' || !readableSet(ws, WORLD).has(sheet.id)) {
+  if (sheet?.visibility !== 'public' || !readableSet(ws, WORLD).has(sheet.id)) {
     throw new ShareGoneError()
   }
   return { sheet, root: parse(sheet.source) }
@@ -116,4 +127,15 @@ export function sharedTable(ws: Workspace, token: string, name: string): TableSp
 export function sharedFileAllowed(ws: Workspace, token: string, fileId: string): boolean {
   const { sheet } = sharedSheet(ws, token)
   return sheet.cover === `file:${fileId}` || sheet.icon === `file:${fileId}`
+}
+
+/** Who reads a page, its live link, and what that link leaves out — the Share popover's view. */
+export function shareSettings(ws: Workspace, id: string) {
+  const sheet = getSheet(ws, id)
+  return {
+    visibility: sheet?.visibility ?? 'shared',
+    access: sheet?.access ?? [],
+    token: liveShareFor(ws, id)?.token ?? null,
+    hidden: sheet ? redactionSummary(parse(sheet.source)) : { blocks: 0, columns: {} },
+  }
 }

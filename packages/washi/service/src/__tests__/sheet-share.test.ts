@@ -81,7 +81,10 @@ describe('a shared link (D65)', () => {
     updateSheetAccess(ws, id, { visibility: 'shared', access: [] }, 'rin')
     expect(() => sharedPage(ws, token)).toThrow(ShareGoneError)
 
-    const parent = createSheetFromSource(ws, { title: 'Vault', source: SOURCE.replace('Pipeline', 'Vault') })
+    const parent = createSheetFromSource(ws, {
+      title: 'Vault',
+      source: SOURCE.replace('Pipeline', 'Vault'),
+    })
     const child = publicPage(parent.id)
     expect(() => sharedPage(ws, child.token)).toThrow(ShareGoneError)
   })

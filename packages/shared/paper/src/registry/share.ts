@@ -101,3 +101,17 @@ export function redactForShare(node: WsxElement): WsxElement {
     ),
   }
 }
+
+/** What a link leaves out, in counts the Share popover can say in words. */
+export function redactionSummary(root: WsxElement): {
+  blocks: number
+  columns: Record<string, string[]>
+} {
+  let blocks = 0
+  walk(root, (node) => {
+    if (node.name === 'Redact') blocks += 1
+  })
+  const columns: Record<string, string[]> = {}
+  for (const [table, set] of redactedColumns(root)) columns[table] = [...set].sort()
+  return { blocks, columns }
+}

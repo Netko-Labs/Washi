@@ -64,6 +64,10 @@ export const SPECIMENS: Record<string, Specimen> = {
     props: { tone: 'info', title: 'Binds refresh on open' },
     children: 'Every bound block refetches when the page opens.',
   },
+  Redact: {
+    props: { reason: 'client names' },
+    children: '<Text>Signed with Acme and Kōbō this quarter.</Text>',
+  },
   Hero: { props: { title: 'Q3 board', subtitle: 'Drag to move. Changes save.' } },
   Figure: {
     props: {

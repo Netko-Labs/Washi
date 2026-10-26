@@ -3,11 +3,10 @@ import {
   getSheet,
   listSheets,
   listTrash,
-  liveShareFor,
   searchSheets,
   sheetVersion,
 } from '@washi/repository'
-import { checkSource, readableSet } from '@washi/service'
+import { checkSource, readableSet, shareSettings } from '@washi/service'
 import { z } from 'zod'
 import { pageProcedure, router, workspaceProcedure } from '../../init'
 
@@ -35,14 +34,7 @@ export const sheetQueries = router({
     return searchSheets(ctx.ws, input.term).filter((hit) => readable.has(hit.id))
   }),
   /** Who reads the page and its link, for the Share popover (D65). */
-  share: pageProcedure.input(byId).query(({ ctx, input }) => {
-    const sheet = getSheet(ctx.ws, input.id)
-    return {
-      visibility: sheet?.visibility ?? 'shared',
-      access: sheet?.access ?? [],
-      token: liveShareFor(ctx.ws, input.id)?.token ?? null,
-    }
-  }),
+  share: pageProcedure.input(byId).query(({ ctx, input }) => shareSettings(ctx.ws, input.id)),
   check: workspaceProcedure
     .input(z.object({ source: z.string() }))
     .query(({ input }) => checkSource(input.source)),

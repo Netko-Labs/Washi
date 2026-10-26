@@ -10,6 +10,7 @@ export {
   pageTables,
   redactedColumns,
   redactForShare,
+  redactionSummary,
   redactionWeight,
 } from './share'
 export {

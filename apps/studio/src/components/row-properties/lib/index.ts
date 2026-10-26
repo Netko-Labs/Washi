@@ -1,3 +1,4 @@
+export { usePeople } from './hooks/use-people'
 export { useRowPage } from './hooks/use-row-page'
 export type {
   CellValue,
