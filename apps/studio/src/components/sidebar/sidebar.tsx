@@ -8,17 +8,18 @@ import { WorkspaceFooter } from './workspace-footer'
 /** Sidebar D (D57) from `md` up: the ask field, the places row, Recents · Favorites · Pages · Routines, the workspace footer. Folds to nothing (D59). */
 export function Sidebar({ workspace, folded, peeking, onFold, onPeekEnd }: SidebarProps) {
   const shown = !folded || peeking
+  // Folded, it stays out of the flow and only slides, so a peek never reflows the page.
   const frame = peeking
-    ? 'fixed inset-y-0 left-0 w-[248px] border-border border-r shadow-[0_16px_48px_rgb(0_0_0/0.18)]'
+    ? 'fixed inset-y-0 left-0 shadow-[0_16px_48px_rgb(0_0_0/0.18)]'
     : folded
-      ? 'w-0'
-      : 'w-[248px] border-border border-r'
+      ? 'fixed inset-y-0 left-0 -translate-x-full'
+      : ''
 
   return (
     <aside
       inert={!shown}
       onPointerLeave={peeking ? onPeekEnd : undefined}
-      className={`group/side z-40 flex shrink-0 flex-col overflow-hidden bg-muted transition-[width] duration-200 ${frame}`}
+      className={`group/side z-40 flex w-[248px] shrink-0 flex-col overflow-hidden border-border border-r bg-muted transition-[translate] duration-200 ${frame}`}
     >
       <div className="flex h-full w-[248px] flex-col">
         <div className="flex shrink-0 items-center gap-1 px-2 pt-2 pb-1.5">
