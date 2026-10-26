@@ -1,2 +1,3 @@
 export { useWorkspaces } from './hooks/use-workspaces'
-export { inviteReturn, topicFor } from './utils'
+export type { CreateResult } from './types'
+export { createWorkspace, inviteReturn, topicFor } from './utils'

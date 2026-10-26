@@ -1,30 +1,17 @@
+import { IconPlus } from '@tabler/icons-react'
+import { Link } from '@tanstack/react-router'
 import { AgentMascot, VaultIcon } from '@washi/ui'
-import { useState } from 'react'
 import { InviteBanner } from '@/components/invite'
 import { signOut, useSession } from '@/integrations/auth'
 import { topicFor, useWorkspaces } from './lib'
 
 /**
- * The rest of onboarding. A workspace is one SQLite file and one organization,
- * so "create a workspace" and "start a team" are the same action — which is
- * why there is no separate team step.
+ * Where an account lands: its workspaces, an invitation to accept, and the way to `/new`. A
+ * workspace is one SQLite file and one organization, so making one is starting a team.
  */
 export function WorkspacePicker({ onOpen }: { onOpen: (id: string) => void }) {
-  const { workspaces, loading, error, create, open } = useWorkspaces()
+  const { workspaces, loading, error, open } = useWorkspaces()
   const { data: session } = useSession()
-  const [name, setName] = useState('')
-  const [busy, setBusy] = useState(false)
-
-  const submit = async () => {
-    if (!name.trim()) return
-    setBusy(true)
-    const id = await create(name.trim()).finally(() => setBusy(false))
-    if (id) {
-      setName('')
-      open(id)
-      onOpen(id)
-    }
-  }
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-lg flex-col justify-center px-6 py-12">
@@ -73,27 +60,13 @@ export function WorkspacePicker({ onOpen }: { onOpen: (id: string) => void }) {
         </ul>
       )}
 
-      <form
-        className="mt-8 flex gap-2"
-        onSubmit={(event) => {
-          event.preventDefault()
-          void submit()
-        }}
+      <Link
+        to="/new"
+        className="mt-8 flex h-11 items-center justify-center gap-2 rounded-xl bg-primary px-5 font-semibold text-[14px] text-primary-foreground"
       >
-        <input
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-          placeholder={workspaces.length ? 'Another workspace…' : 'Netko Labs'}
-          className="h-11 min-w-0 flex-1 rounded-xl border border-border bg-card px-3 text-[14px] outline-none focus-visible:border-primary"
-        />
-        <button
-          type="submit"
-          disabled={busy || !name.trim()}
-          className="h-11 shrink-0 rounded-xl bg-primary px-5 font-semibold text-[14px] text-primary-foreground disabled:opacity-50"
-        >
-          Create
-        </button>
-      </form>
+        <IconPlus className="size-4" />
+        {workspaces.length ? 'New workspace' : 'Make your first workspace'}
+      </Link>
 
       {error && <p className="mt-3 text-[13px] text-destructive">{error}</p>}
 
