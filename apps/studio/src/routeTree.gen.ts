@@ -17,7 +17,9 @@ import { Route as ApiHealthRouteImport } from './routes/api/health'
 import { Route as WWorkspaceIdRouteImport } from './routes/w/$workspaceId'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiFilesSplatRouteImport } from './routes/api/files.$'
+import { Route as ApiShareSplatRouteImport } from './routes/api/share.$'
 import { Route as ApiTrpcSplatRouteImport } from './routes/api/trpc/$'
+import { Route as SWorkspaceIdTokenRouteImport } from './routes/s.$workspaceId.$token'
 import { Route as WWorkspaceIdIndexRouteImport } from './routes/w/$workspaceId/index'
 import { Route as WWorkspaceIdInboxRouteImport } from './routes/w/$workspaceId/inbox'
 import { Route as WWorkspaceIdSettingsRouteImport } from './routes/w/$workspaceId/settings'
@@ -64,9 +66,19 @@ const ApiFilesSplatRoute = ApiFilesSplatRouteImport.update({
   path: '/api/files/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiShareSplatRoute = ApiShareSplatRouteImport.update({
+  id: '/api/share/$',
+  path: '/api/share/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiTrpcSplatRoute = ApiTrpcSplatRouteImport.update({
   id: '/api/trpc/$',
   path: '/api/trpc/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SWorkspaceIdTokenRoute = SWorkspaceIdTokenRouteImport.update({
+  id: '/s/$workspaceId/$token',
+  path: '/s/$workspaceId/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const WWorkspaceIdIndexRoute = WWorkspaceIdIndexRouteImport.update({
@@ -104,7 +116,9 @@ export interface FileRoutesByFullPath {
   '/w/$workspaceId': typeof WWorkspaceIdRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/files/$': typeof ApiFilesSplatRoute
+  '/api/share/$': typeof ApiShareSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/s/$workspaceId/$token': typeof SWorkspaceIdTokenRoute
   '/w/$workspaceId/inbox': typeof WWorkspaceIdInboxRoute
   '/w/$workspaceId/settings': typeof WWorkspaceIdSettingsRoute
   '/w/$workspaceId/trash': typeof WWorkspaceIdTrashRoute
@@ -119,7 +133,9 @@ export interface FileRoutesByTo {
   '/api/health': typeof ApiHealthRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/files/$': typeof ApiFilesSplatRoute
+  '/api/share/$': typeof ApiShareSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/s/$workspaceId/$token': typeof SWorkspaceIdTokenRoute
   '/w/$workspaceId/inbox': typeof WWorkspaceIdInboxRoute
   '/w/$workspaceId/settings': typeof WWorkspaceIdSettingsRoute
   '/w/$workspaceId/trash': typeof WWorkspaceIdTrashRoute
@@ -136,7 +152,9 @@ export interface FileRoutesById {
   '/w/$workspaceId': typeof WWorkspaceIdRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/files/$': typeof ApiFilesSplatRoute
+  '/api/share/$': typeof ApiShareSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/s/$workspaceId/$token': typeof SWorkspaceIdTokenRoute
   '/w/$workspaceId/inbox': typeof WWorkspaceIdInboxRoute
   '/w/$workspaceId/settings': typeof WWorkspaceIdSettingsRoute
   '/w/$workspaceId/trash': typeof WWorkspaceIdTrashRoute
@@ -154,7 +172,9 @@ export interface FileRouteTypes {
     | '/w/$workspaceId'
     | '/api/auth/$'
     | '/api/files/$'
+    | '/api/share/$'
     | '/api/trpc/$'
+    | '/s/$workspaceId/$token'
     | '/w/$workspaceId/inbox'
     | '/w/$workspaceId/settings'
     | '/w/$workspaceId/trash'
@@ -169,7 +189,9 @@ export interface FileRouteTypes {
     | '/api/health'
     | '/api/auth/$'
     | '/api/files/$'
+    | '/api/share/$'
     | '/api/trpc/$'
+    | '/s/$workspaceId/$token'
     | '/w/$workspaceId/inbox'
     | '/w/$workspaceId/settings'
     | '/w/$workspaceId/trash'
@@ -185,7 +207,9 @@ export interface FileRouteTypes {
     | '/w/$workspaceId'
     | '/api/auth/$'
     | '/api/files/$'
+    | '/api/share/$'
     | '/api/trpc/$'
+    | '/s/$workspaceId/$token'
     | '/w/$workspaceId/inbox'
     | '/w/$workspaceId/settings'
     | '/w/$workspaceId/trash'
@@ -202,7 +226,9 @@ export interface RootRouteChildren {
   WWorkspaceIdRoute: typeof WWorkspaceIdRouteWithChildren
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiFilesSplatRoute: typeof ApiFilesSplatRoute
+  ApiShareSplatRoute: typeof ApiShareSplatRoute
   ApiTrpcSplatRoute: typeof ApiTrpcSplatRoute
+  SWorkspaceIdTokenRoute: typeof SWorkspaceIdTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -263,11 +289,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiFilesSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/share/$': {
+      id: '/api/share/$'
+      path: '/api/share/$'
+      fullPath: '/api/share/$'
+      preLoaderRoute: typeof ApiShareSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/trpc/$': {
       id: '/api/trpc/$'
       path: '/api/trpc/$'
       fullPath: '/api/trpc/$'
       preLoaderRoute: typeof ApiTrpcSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/s/$workspaceId/$token': {
+      id: '/s/$workspaceId/$token'
+      path: '/s/$workspaceId/$token'
+      fullPath: '/s/$workspaceId/$token'
+      preLoaderRoute: typeof SWorkspaceIdTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/w/$workspaceId/': {
@@ -337,7 +377,9 @@ const rootRouteChildren: RootRouteChildren = {
   WWorkspaceIdRoute: WWorkspaceIdRouteWithChildren,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiFilesSplatRoute: ApiFilesSplatRoute,
+  ApiShareSplatRoute: ApiShareSplatRoute,
   ApiTrpcSplatRoute: ApiTrpcSplatRoute,
+  SWorkspaceIdTokenRoute: SWorkspaceIdTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

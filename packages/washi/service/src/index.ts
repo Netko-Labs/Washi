@@ -63,6 +63,15 @@ export {
   updateSheetFromSource,
   type WsxCheck,
 } from './sheets/service'
+export {
+  ShareGoneError,
+  ShareRefusedError,
+  sharedFileAllowed,
+  sharedHistory,
+  sharedPage,
+  sharedQuery,
+  sharedTable,
+} from './sheets/share'
 export { duplicateSheet, moveSheetTo, restoreSheetTree, SheetMoveError } from './sheets/tree'
 export { runHistory } from './tables/history'
 export { openRowPage, rowOfSheet, rowTitle } from './tables/rows'

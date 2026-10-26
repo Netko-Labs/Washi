@@ -1,0 +1,119 @@
+import type { SheetDetail } from '@washi/domain'
+import type { HistoryQuery, InkQuery, QueryResult, TableSpec } from '@washi/ink'
+import { pageTables, redactedColumns, redactForShare } from '@washi/paper/registry'
+import { getSheet, getTableByName, shareByToken, type Workspace } from '@washi/repository'
+import { parse, serialize, type WsxElement } from '@washi/wsx'
+import { runHistory } from '../tables/history'
+import { runQuery } from '../tables/service'
+import { readableSet } from './access'
+
+/** A link that is revoked, never was, or points at a page no longer public: all look the same. */
+export class ShareGoneError extends Error {
+  constructor() {
+    super('this link does not open anything')
+    this.name = 'ShareGoneError'
+  }
+}
+
+/** A question a link may not ask: another table, or one that reads a redacted column. */
+export class ShareRefusedError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'ShareRefusedError'
+  }
+}
+
+const WORLD = { id: null, isOwner: false }
+
+interface Shared {
+  sheet: SheetDetail
+  root: WsxElement
+}
+
+/** The page behind a live token, only while it is public and no ancestor is private. */
+function sharedSheet(ws: Workspace, token: string): Shared {
+  const share = shareByToken(ws, token)
+  const sheet = share ? getSheet(ws, share.sheetId) : null
+  if (!sheet || sheet.visibility !== 'public' || !readableSet(ws, WORLD).has(sheet.id)) {
+    throw new ShareGoneError()
+  }
+  return { sheet, root: parse(sheet.source) }
+}
+
+/**
+ * What the link shows: the page with every `<Redact>` emptied server-side, and without the
+ * list of who may read it. The bytes that leave are already safe; the client hides nothing.
+ */
+export function sharedPage(ws: Workspace, token: string) {
+  const { sheet, root } = sharedSheet(ws, token)
+  const { access: _access, visibility: _visibility, ...props } = root.props
+  return {
+    id: sheet.id,
+    title: sheet.title,
+    icon: sheet.icon,
+    cover: sheet.cover,
+    fullWidth: sheet.fullWidth,
+    hlcUpdated: sheet.hlcUpdated,
+    source: serialize(redactForShare({ ...root, props })),
+  }
+}
+
+function hiddenIn(root: WsxElement, table: string): Set<string> {
+  if (!pageTables(root).has(table)) {
+    throw new ShareRefusedError(`this page does not read "${table}"`)
+  }
+  return redactedColumns(root).get(table) ?? new Set()
+}
+
+/** Filtering, sorting or grouping on a hidden column would leak it through counts; refuse. */
+function refuseReading(hidden: Set<string>, columns: (string | undefined)[]) {
+  const named = columns.find((column) => column && hidden.has(column))
+  if (named) throw new ShareRefusedError(`"${named}" is redacted on this page`)
+}
+
+const withoutColumns = (result: QueryResult, hidden: Set<string>): QueryResult =>
+  hidden.size === 0
+    ? result
+    : {
+        ...result,
+        rows: result.rows.map((row) =>
+          Object.fromEntries(Object.entries(row).filter(([column]) => !hidden.has(column))),
+        ),
+      }
+
+export function sharedQuery(ws: Workspace, token: string, query: InkQuery): QueryResult {
+  const { root } = sharedSheet(ws, token)
+  const hidden = hiddenIn(root, query.table)
+  refuseReading(hidden, [
+    ...(query.where ?? []).map((filter) => filter.column),
+    query.orderBy?.column,
+    query.groupBy?.column,
+    ...(query.groupBy?.aggregates ?? []).map((aggregate) => aggregate.column),
+  ])
+  return withoutColumns(runQuery(ws, query), hidden)
+}
+
+export function sharedHistory(ws: Workspace, token: string, query: HistoryQuery): QueryResult {
+  const { root } = sharedSheet(ws, token)
+  refuseReading(
+    hiddenIn(root, query.table),
+    (query.where ?? []).map((filter) => filter.column),
+  )
+  return runHistory(ws, query)
+}
+
+/** A table's columns as the link sees them: redacted ones are not there at all. */
+export function sharedTable(ws: Workspace, token: string, name: string): TableSpec | null {
+  const { root } = sharedSheet(ws, token)
+  const hidden = hiddenIn(root, name)
+  const spec = getTableByName(ws, name)?.spec
+  return spec
+    ? { ...spec, columns: spec.columns.filter((column) => !hidden.has(column.name)) }
+    : null
+}
+
+/** Only an upload the page wears as its cover or icon leaves through its link. */
+export function sharedFileAllowed(ws: Workspace, token: string, fileId: string): boolean {
+  const { sheet } = sharedSheet(ws, token)
+  return sheet.cover === `file:${fileId}` || sheet.icon === `file:${fileId}`
+}
