@@ -247,7 +247,8 @@
 
 /* the panel contract: 320 / 400 / 720 / full — density per bucket */
 @container wsx (max-width: 400px) {
-  .wsx-page {
+  .wsx-page,
+  .wsx-band-column {
     --pad: 20px 16px;
     --rhythm: 14px;
     --t1: 26px;

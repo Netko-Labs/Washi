@@ -5,9 +5,11 @@ export { NowContext, useNow } from './hooks/use-now'
 export { useRunAction } from './hooks/use-run-action'
 export { useSelectOptions } from './hooks/use-select-options'
 export { columnOf, resolveArgs, resolveRow, resolveRowDeep, toRows } from './rows'
+export { frameOf } from './sheet-look'
 export { styled } from './styled'
 export type {
   ActionRef,
+  BandColumnProps,
   BindState,
   BlockProps,
   CellKind,
@@ -15,6 +17,8 @@ export type {
   Feel,
   Gap,
   Row,
+  SheetBandProps,
+  SheetLook,
   Size,
   StyledProps,
   Tone,

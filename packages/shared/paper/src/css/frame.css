@@ -18,6 +18,16 @@
   margin: 0 auto;
   padding: var(--pad);
 }
+.wsx-band {
+  min-height: 0;
+  text-align: start;
+}
+.wsx-band-column {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: var(--pad);
+  padding-block: 0;
+}
 .wsx-page > * + *,
 .wsx-section > * + *,
 .wsx-tab > * + *,

@@ -1,4 +1,4 @@
-import { PaperProvider, WsxView } from '@washi/paper'
+import { frameOf, PaperProvider, SheetBand, WsxView } from '@washi/paper'
 import { type SheetViewProps, usePageSheet } from './lib'
 import { SheetEmpty, SheetFailed, SheetLoading, SheetMissing } from './sheet-states'
 
@@ -18,7 +18,7 @@ export function SheetView({ chrome, footer, body: Body }: SheetViewProps) {
       data-sheet-id={state.sheet.id}
       data-full-width={summary?.fullWidth || undefined}
     >
-      {chrome}
+      {chrome && <SheetBand {...frameOf(state.root)}>{chrome}</SheetBand>}
       <PaperProvider host={host}>
         {Body ? (
           <Body sheet={state.sheet} root={state.root} />

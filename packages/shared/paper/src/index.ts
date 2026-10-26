@@ -23,11 +23,13 @@ export {
 export { Drawer, Schema } from './components/drawer'
 export { Reveal, Show, Tab, Tabs } from './components/flow'
 export {
+  BandColumn,
   Divider,
   Grid,
   PaperSurface,
   Row,
   Section,
+  SheetBand,
   SheetFrame,
   Stack,
 } from './components/frame'
@@ -52,7 +54,8 @@ export {
   Title,
 } from './components/text'
 export { DataProvider, useData } from './data'
-export type { ActionRef, Row as PaperRow } from './lib/types'
+export { frameOf } from './lib/sheet-look'
+export type { ActionRef, Row as PaperRow, SheetLook } from './lib/types'
 export { type PaperHost, PaperProvider, usePaperHost } from './provider'
 export {
   RowProvider,

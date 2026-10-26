@@ -1,7 +1,6 @@
-import { SheetFrame } from '@washi/paper'
+import { frameOf, SheetFrame } from '@washi/paper'
 import { BlockRow } from './block-row'
 import {
-  frameOf,
   numberedPositions,
   type PageEditorProps,
   useAutosave,
