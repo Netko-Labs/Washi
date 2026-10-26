@@ -2,6 +2,7 @@ import type {
   Actor,
   AgentCredentialInput,
   ControlPlane,
+  InstanceStore,
   Integration,
   SecretStore,
   WorkspaceRef,
@@ -24,6 +25,7 @@ import {
 import { createAuth } from './auth'
 import { type ControlDB, createControlDb } from './client'
 import { open, seal } from './crypto'
+import { isInstanceAdmin, setSignupMode, signupMode } from './instance'
 import type { ControlPlaneOptions } from './types'
 
 const AUTH_PREFIX = '/api/auth'
@@ -31,6 +33,7 @@ const AUTH_PREFIX = '/api/auth'
 export interface HostedControlPlane extends ControlPlane {
   db: ControlDB
   secrets: SecretStore
+  instance: InstanceStore
   /** Decrypted, for the agent host only — never for a route. */
   agentKey(workspaceId: string): Promise<AgentCredentialOut | null>
   setAgentKey(
@@ -80,6 +83,11 @@ export function createHostedControlPlane(options: ControlPlaneOptions): HostedCo
         plane.integrationKeyInfo(workspaceId, integration),
       setIntegration: (workspaceId, actorId, integration, key) =>
         plane.setIntegrationKey(workspaceId, actorId, integration, key),
+    },
+    instance: {
+      isAdmin: (actorId) => isInstanceAdmin(db, actorId),
+      signup: () => signupMode(db),
+      setSignup: (mode) => setSignupMode(db, mode),
     },
 
     async authenticate(request) {

@@ -35,6 +35,7 @@ export const Route = createFileRoute('/api/files/$')({
         return new Response(found.bytes.slice(), {
           headers: {
             'content-type': found.file.mime,
+            'x-content-type-options': 'nosniff',
             'content-length': String(found.bytes.byteLength),
             'cache-control': 'private, max-age=31536000, immutable',
           },

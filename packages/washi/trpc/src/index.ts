@@ -4,6 +4,7 @@ import { capabilitiesRouter } from './routers/capabilities'
 import { commentsRouter } from './routers/comments'
 import { devRouter } from './routers/dev'
 import { filesRouter } from './routers/files'
+import { instanceRouter } from './routers/instance'
 import { liveRouter } from './routers/live'
 import { modelsRouter } from './routers/models'
 import { routinesRouter } from './routers/routines'
@@ -25,6 +26,7 @@ export const appRouter = router({
   agents: agentsRouter,
   capabilities: capabilitiesRouter,
   workspaces: workspacesRouter,
+  instance: instanceRouter,
   models: modelsRouter,
   routines: routinesRouter,
   dev: devRouter,
@@ -42,11 +44,14 @@ export {
   type ControlPlane,
   createContext,
   INTEGRATIONS,
+  type InstanceStore,
   type Integration,
   type ResolvedWorkspace,
   type SecretStore,
   type ServerMode,
   type ServerRuntime,
+  SIGNUP_MODES,
+  type SignupMode,
   type WorkspaceRef,
 } from './init'
 export { createMirinBridge, type MirinFrame } from './mirin'

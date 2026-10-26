@@ -6,14 +6,16 @@ type Holder = typeof globalThis & { [RUNTIME]?: Promise<BootedRuntime> }
 
 /**
  * One runtime per process, shared by the Nitro plugin, the routes and the socket — they are
- * separate modules, and dev reloads them. A studio is a team server: hosted unless told otherwise.
+ * separate modules, and dev reloads them. A studio is a team server: always hosted, since
+ * embedded trusts whoever is at the machine and a studio's machine is the network.
  */
 export function washiRuntime(): Promise<BootedRuntime> {
   const holder = globalThis as Holder
-  holder[RUNTIME] ??= bootRuntime({
-    ...process.env,
-    WASHI_MODE: process.env.WASHI_MODE ?? 'hosted',
-  })
+  const mode = process.env.WASHI_MODE ?? 'hosted'
+  if (mode !== 'hosted') {
+    throw new Error(`the studio serves hosted mode only, got WASHI_MODE="${mode}"`)
+  }
+  holder[RUNTIME] ??= bootRuntime({ ...process.env, WASHI_MODE: mode })
   return holder[RUNTIME]
 }
 

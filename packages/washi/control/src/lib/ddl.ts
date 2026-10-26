@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm'
 import type { ControlDB } from './client'
+import { seedInstanceAdmin } from './instance'
 
 /**
  * Hand-written idempotent DDL, matching the workspace side — no drizzle-kit,
@@ -129,4 +130,18 @@ export async function ensureControlSchema(db: ControlDB): Promise<void> {
       updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
       PRIMARY KEY (organization_id, integration)
     )`)
+
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS "instance_setting" (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL,
+      updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+    )`)
+
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS "instance_admin" (
+      user_id TEXT PRIMARY KEY REFERENCES "user"(id) ON DELETE CASCADE,
+      created_at TIMESTAMP NOT NULL DEFAULT NOW()
+    )`)
+  await seedInstanceAdmin(db)
 }

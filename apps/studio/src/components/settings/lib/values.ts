@@ -1,4 +1,4 @@
-import { IconRobot, IconRoute, IconUsers } from '@tabler/icons-react'
+import { IconRobot, IconRoute, IconServer, IconUsers } from '@tabler/icons-react'
 import type {
   ApprovalMode,
   Effort,
@@ -6,6 +6,7 @@ import type {
   ProviderMeta,
   RecommendedModel,
   ResumeBy,
+  SignupMode,
 } from './types'
 
 export const PROVIDERS = [
@@ -62,9 +63,31 @@ export const SETTINGS_TABS = [
     icon: IconRoute,
     desc: 'What Washi does while nobody is watching.',
   },
+  {
+    key: 'server',
+    label: 'Server',
+    icon: IconServer,
+    desc: 'How this server lets people in. Only its app admins see this.',
+  },
 ] as const
 
-export const SETTINGS_TAB_KEYS = ['agent', 'people', 'routines'] as const
+export const SETTINGS_TAB_KEYS = ['agent', 'people', 'routines', 'server'] as const
+
+/** Tabs only an app admin sees. */
+export const ADMIN_TABS: ReadonlySet<string> = new Set(['server'])
+
+export const SIGNUP_OPTIONS: readonly Option<SignupMode>[] = [
+  {
+    id: 'invite',
+    label: 'Invite only',
+    desc: 'Only an email a workspace has invited can create an account.',
+  },
+  {
+    id: 'open',
+    label: 'Anyone',
+    desc: 'Anyone who reaches this server can create an account and workspaces.',
+  },
+]
 
 export const APPROVAL_MODE_OPTIONS: readonly Option<ApprovalMode>[] = [
   {

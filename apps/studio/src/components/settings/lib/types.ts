@@ -7,7 +7,8 @@ export type KeyTarget = ProviderId | 'exa'
 export type Effort = 'quick' | 'balanced' | 'deep'
 export type ResumeBy = 'anyone' | 'owners'
 export type ApprovalMode = 'ask' | 'auto'
-export type SettingsTab = 'agent' | 'people' | 'routines'
+export type SettingsTab = 'agent' | 'people' | 'routines' | 'server'
+export type SignupMode = 'invite' | 'open'
 
 export interface KeyState {
   last4: string

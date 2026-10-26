@@ -168,3 +168,18 @@ export const organizationIntegration = pgTable(
   },
   (table) => [primaryKey({ columns: [table.organizationId, table.integration] })],
 )
+
+/** The server's own settings (`signup`), one row per key. Not a workspace's. */
+export const instanceSetting = pgTable('instance_setting', {
+  key: text('key').primaryKey(),
+  value: text('value').notNull(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+/** Who runs the server: its first account, seeded at boot and after the first sign-up. */
+export const instanceAdmin = pgTable('instance_admin', {
+  userId: text('user_id')
+    .primaryKey()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+})

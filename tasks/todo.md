@@ -903,3 +903,17 @@ source/scratch · matrix. Host in memory.
 
 Acceptance: pick any primitive, turn every knob, the WSX below is what a page would carry and it
 validates; matrix shows variant × tone with no budget error; dark + every theme render.
+
+# Public repo hardening (2026-10-26) — branch `feat/instance-admin` (D66)
+
+- [x] app admin = oldest account (`instance_admin`, seeded at boot + after sign-up)
+- [x] sign-up `invite` (default) · `open`; `user.create.before` refuses the rest, in words
+- [x] Settings → Server, admin only (`instance.me/settings/setSignup`, `adminProcedure`)
+- [x] studio refuses `WASHI_MODE=embedded`; `nosniff` on file responses (files + share)
+- [x] AGPL-3.0-only: `LICENSE` + every `package.json`
+- [ ] later: promote another admin · email verification · rate limit `/api/auth/sign-up`
+
+Acceptance (dev, verified): a stranger's sign-up is 403 with the invite-only line; an invited email
+(any case) signs up; an expired invitation is refused; the admin's toggle persists; a non-admin
+sees no Server tab.
+
