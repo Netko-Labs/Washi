@@ -40,11 +40,14 @@ export {
 } from './entities/comments'
 export type { Member } from './entities/members'
 export {
+  type AccessRow,
   type SearchHit,
+  type SheetAccess,
   type SheetAuthor,
   type SheetDetail,
   type SheetLook,
   type SheetMetaPatch,
+  type SheetShare,
   type SheetSummary,
   type SheetWrite,
   type StoredSheetWrite,
@@ -55,6 +58,7 @@ export {
   sheetWriteSchema,
   type TrashEntry,
   trashEntrySchema,
+  type Viewer,
 } from './entities/sheets'
 export { type RowOf, type UserTable, userTableSchema } from './entities/tables'
 export { compareHlc, createHlcClock, type HlcClock } from './hlc'

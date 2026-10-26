@@ -20,8 +20,9 @@ export const paperHost: PaperHost = {
     await api.capabilities.runAction.mutate({ action })
   },
 
+  // A page this reader cannot open answers NOT_FOUND (D65): the link keeps its own words.
   resolveSheet: async (id) => {
-    const sheet = await api.sheets.get.query({ id })
+    const sheet = await api.sheets.get.query({ id }).catch(() => null)
     return sheet ? { title: sheet.title, icon: sheet.icon } : null
   },
 

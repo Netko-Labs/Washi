@@ -2,10 +2,10 @@ import { commentWriteSchema } from '@washi/domain'
 import { markMentionsRead } from '@washi/repository'
 import { LOCAL_AUTHOR, postComment, removeComment, resolveThread } from '@washi/service'
 import { z } from 'zod'
-import { router, workspaceProcedure } from '../../init'
+import { pageProcedure, router, workspaceProcedure } from '../../init'
 
 export const commentMutations = router({
-  post: workspaceProcedure
+  post: pageProcedure
     .input(commentWriteSchema)
     .mutation(({ ctx, input }) => postComment(ctx.ws, input, ctx.actor ?? LOCAL_AUTHOR)),
   resolve: workspaceProcedure
@@ -16,7 +16,7 @@ export const commentMutations = router({
   remove: workspaceProcedure.input(z.object({ id: z.string() })).mutation(({ ctx, input }) => {
     removeComment(ctx.ws, input.id, ctx.actor?.id ?? LOCAL_AUTHOR.id)
   }),
-  markRead: workspaceProcedure
+  markRead: pageProcedure
     .input(
       z.object({
         commentIds: z.array(z.string()).max(200).optional(),

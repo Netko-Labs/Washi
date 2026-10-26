@@ -53,7 +53,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   monorepo-template`: SSR, `/api/auth/*`, `/api/trpc/*`, `/trpc-ws`, `/api/health`. A Nitro plugin
   boots the runtime at start (so the routine clock ticks unvisited) and drains sockets on SIGTERM.
   Pages are routes: `/sign-in?redirect=`, `/workspaces?invite=`, `/new` (a new workspace: name it ·
-  start it · invite people, then the workspace's first run wakes Washi), `/w/$workspaceId` (dashboard),
+  start it · invite people, then the workspace's first run wakes Washi), `/s/$workspaceId/$token` (a
+  page's read-only link, no session — D65), `/w/$workspaceId` (dashboard),
   `/p/$pageId`, `/inbox`, `/settings?tab=`, `/trash`. The workspace loader resets the shared stores (child
   effects run before the layout's); routes mark their view active, and a page chosen anywhere
   pushes its URL (`useTabNavigation`). **No tab strip on the web (D58)** — the URL is the whole
@@ -139,6 +140,19 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   beside them) or `file:<id>` (an upload); presets and pictures live in `@washi/paper/registry`.
   An icon is a registry name, an emoji or `file:<id>` (`SheetIcon` draws an upload through the
   host's `fileUrl`, else a page glyph).
+- **Who reads a page is the page's (D65).** `<Sheet visibility access>`, cached in
+  `sheets.visibility/access` like the look: `shared` (default) = the workspace, `private` = the
+  member ids in `access` + owners (a page is as closed as its most closed ancestor), `public` =
+  plus a read-only link (`sheet_shares`; one live token per page, opened and closed by
+  `syncShare` on every write). Every read goes through `readableSet(ws, viewer)` — tRPC's
+  `pageProcedure` checks any `id`/`sheetId`/`parentId` and answers NOT_FOUND; `ctx.viewer` is
+  the actor + whether they own the workspace. Washi reads as the asker (`AskOptions.viewer` →
+  `pagesFor`); routines are `NOBODY`. Washi's writes may not change visibility/access nor lower
+  `redactionWeight` on a public page (`guardWashiWrite`). `<Redact reason>` blocks and
+  `redact={[cols]}` on data views are emptied/dropped server-side for a link (`sharedPage`,
+  `sharedQuery`: only the page's own tables, no filter/sort/group on a redacted column).
+  Tables themselves are not page-scoped: members read every table. `forgetUnenforcedVisibility`
+  dropped pre-D65 visibility props once per workspace (app meta `visibility_enforced`).
 - **Files.** Uploads live in the workspace's files store: a row in the workspace's `files`
   table and the bytes beside the `.db` (`<dataDir>/<workspace>.files/`) or, with
   `WASHI_FILES_S3_*` set, in a bucket under a per-workspace prefix through Bun's own S3 client.

@@ -13,6 +13,7 @@ export {
   routineTable,
   sheetLinkTable,
   sheetRevisionTable,
+  sheetShareTable,
   sheetTable,
   userTableTable,
 } from './schema'

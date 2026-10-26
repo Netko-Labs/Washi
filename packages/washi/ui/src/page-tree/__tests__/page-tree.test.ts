@@ -14,6 +14,8 @@ const page = (id: string, parentId: string | null, position: string): SheetSumma
   editedBy: null,
   undoable: false,
   rowOf: null,
+  visibility: 'shared',
+  access: [],
   hlcUpdated: '0',
 })
 

@@ -6,6 +6,14 @@ export {
   pageIconSchema,
 } from './looks'
 export {
+  exprTables,
+  pageTables,
+  redactedColumns,
+  redactForShare,
+  redactionSummary,
+  redactionWeight,
+} from './share'
+export {
   actionRefSchema,
   type PaperComponentName,
   PRIMITIVE_GROUPS,

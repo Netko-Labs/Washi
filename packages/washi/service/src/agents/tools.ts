@@ -1,22 +1,15 @@
 import { createSdkMcpServer, tool } from '@anthropic-ai/claude-agent-sdk'
-import type { Member } from '@washi/domain'
+import type { Member, Viewer } from '@washi/domain'
 import { historyQuerySchema, tableSpecSchema } from '@washi/ink'
-import {
-  getAppMeta,
-  getBacklinks,
-  getSheet,
-  listSheets,
-  listTables,
-  searchSheets,
-  sheetVersion,
-  type Workspace,
-} from '@washi/repository'
+import { getAppMeta, listTables, type Workspace } from '@washi/repository'
 import { fetchPolicySchema, guardedFetch } from '@washi/tsuru'
 import { z } from 'zod'
+import { NOBODY } from '../sheets/access'
 import { checkSource, createSheetFromSource, updateSheetFromSource } from '../sheets/service'
 import { runHistory } from '../tables/history'
 import { defineUserTable, runMutation, runQuery } from '../tables/service'
 import type { SearchKeyLookup } from './lib'
+import { pagesFor } from './lib/pages'
 import { webSearch } from './search'
 
 export const TSURU_HOSTS_KEY = 'tsuru_allowed_hosts'
@@ -40,6 +33,8 @@ export interface ToolContext {
   searchKey?: SearchKeyLookup
   /** Names the conversation — Washi calls it once, at the start of its first reply (D61). */
   setTitle?: (title: string) => void
+  /** Who asked: Washi reads the pages they can (D65). Absent is a routine — workspace pages. */
+  viewer?: Viewer
 }
 
 /**
@@ -47,6 +42,7 @@ export interface ToolContext {
  * MCP server — zero IPC, every input zod-validated, nothing touches fs/shell.
  */
 export function createWashiTools(ws: Workspace, context: ToolContext) {
+  const pages = pagesFor(ws, context.viewer ?? NOBODY)
   return createSdkMcpServer({
     name: 'washi',
     version: '0.1.0',
@@ -64,16 +60,13 @@ export function createWashiTools(ws: Workspace, context: ToolContext) {
         'sheet_list',
         'List all sheets (id, title, icon, tags, parentId). A sheet with a parentId is a sub-page of that sheet.',
         {},
-        async () => text(listSheets(ws)),
+        async () => text(pages.list()),
       ),
       tool(
         'sheet_get',
         'Read one sheet: metadata, full WSX source, and its version (for sheet_replace).',
         { id: z.string() },
-        async ({ id }) => {
-          const sheet = getSheet(ws, id)
-          return text(sheet ? { ...sheet, version: sheetVersion(ws, id) } : null)
-        },
+        async ({ id }) => text(pages.get(id)),
       ),
       tool(
         'sheet_check',
@@ -90,6 +83,7 @@ export function createWashiTools(ws: Workspace, context: ToolContext) {
           parentId: z.string().optional(),
         },
         async ({ parentId, ...input }) => {
+          if (parentId) pages.require(parentId)
           const sheet = createSheetFromSource(ws, input, parentId ?? null, 'washi')
           context.openSheet?.(sheet.id)
           return text(sheet)
@@ -104,17 +98,19 @@ export function createWashiTools(ws: Workspace, context: ToolContext) {
           source: z.string(),
           baseVersion: z.string().optional(),
         },
-        async ({ id, baseVersion, ...write }) =>
-          text(updateSheetFromSource(ws, id, write, 'washi', baseVersion)),
+        async ({ id, baseVersion, ...write }) => {
+          pages.require(id)
+          return text(updateSheetFromSource(ws, id, write, 'washi', baseVersion))
+        },
       ),
       tool(
         'sheet_backlinks',
         'Sheets that reference the given sheet.',
         { id: z.string() },
-        async ({ id }) => text(getBacklinks(ws, id)),
+        async ({ id }) => text(pages.backlinks(id)),
       ),
       tool('search', 'Full-text search across sheets.', { term: z.string() }, async ({ term }) =>
-        text(searchSheets(ws, term)),
+        text(pages.search(term)),
       ),
       tool(
         'people_list',

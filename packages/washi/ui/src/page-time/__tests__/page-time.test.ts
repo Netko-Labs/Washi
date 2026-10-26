@@ -16,6 +16,8 @@ const sheet = (id: string, ms: number) =>
     editedBy: null,
     undoable: false,
     rowOf: null,
+    visibility: 'shared',
+    access: [],
     hlcUpdated: hlcAt(ms),
   }) satisfies SheetSummary
 

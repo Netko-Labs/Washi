@@ -36,7 +36,10 @@ export const agentMutations = router({
         })
       }
       void ctx.host
-        .prompt(input.sessionId, input.text, { attachments: input.attachments })
+        .prompt(input.sessionId, input.text, {
+          attachments: input.attachments,
+          viewer: ctx.viewer,
+        })
         .catch((error) => {
           console.error('[washi] a turn crashed outside its own error handling', error)
         })

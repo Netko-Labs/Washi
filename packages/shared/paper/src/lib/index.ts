@@ -16,6 +16,7 @@ export type {
   Feel,
   Gap,
   LookPart,
+  RedactProps,
   Row,
   SheetCoverProps,
   SheetFrameProps,

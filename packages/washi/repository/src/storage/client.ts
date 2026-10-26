@@ -83,9 +83,22 @@ function createTables(sqlite: Database) {
   ensureColumn(sqlite, 'sheets', 'full_width', 'INTEGER NOT NULL DEFAULT 0')
   ensureColumn(sqlite, 'sheets', 'edited_by', 'TEXT')
   ensureColumn(sqlite, 'sheets', 'row_id', 'TEXT')
+  ensureColumn(sqlite, 'sheets', 'visibility', "TEXT NOT NULL DEFAULT 'shared'")
+  ensureColumn(sqlite, 'sheets', 'access', "TEXT NOT NULL DEFAULT '[]'")
   sqlite.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_sheets_row ON sheets(row_id)')
   sqlite.exec('CREATE INDEX IF NOT EXISTS idx_sheets_parent ON sheets(parent_id, position)')
   backfillPositions(sqlite)
+
+  sqlite.exec(`
+    CREATE TABLE IF NOT EXISTS sheet_shares (
+      token TEXT PRIMARY KEY,
+      sheet_id TEXT NOT NULL,
+      created_by TEXT,
+      created_at TEXT NOT NULL,
+      revoked_at TEXT
+    )
+  `)
+  sqlite.exec('CREATE INDEX IF NOT EXISTS idx_sheet_shares ON sheet_shares(sheet_id)')
 
   sqlite.exec(`
     CREATE TABLE IF NOT EXISTS sheet_revisions (

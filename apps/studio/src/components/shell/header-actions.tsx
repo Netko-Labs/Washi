@@ -3,6 +3,7 @@ import { CommentsButton } from '@/components/comments'
 import { MarkAllRead } from '@/components/mentions'
 import { EditToggle } from '@/components/page-editor'
 import { PageMenu } from '@/components/page-menu'
+import { ShareButton } from '@/components/share'
 import { CopyLinkButton } from './copy-link-button'
 
 export function HeaderActions() {
@@ -14,6 +15,7 @@ export function HeaderActions() {
       {sheet && <CommentsButton sheetId={sheet.id} />}
       {sheet && <EditToggle sheetId={sheet.id} />}
       <MarkAllRead />
+      {sheet && <ShareButton sheet={sheet} />}
       <CopyLinkButton />
       {sheet && <PageMenu sheet={sheet} />}
     </>

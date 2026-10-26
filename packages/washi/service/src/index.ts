@@ -35,7 +35,22 @@ export type { AgentPort, ModelChoice, ProviderId, ToolGate } from './agents/port
 export { defaultModelFor, LAST_RESORT_MODELS, PREFERRED_MODELS } from './agents/ports'
 export { LOCAL_AUTHOR } from './comments/constants'
 export { CommentError, postComment, removeComment, resolveThread } from './comments/service'
-export { liftLooksIntoSource, updateSheetMetaAndLook } from './sheets/look'
+export {
+  canRead,
+  guardWashiWrite,
+  NOBODY,
+  readableIds,
+  readableSet,
+  requireReadable,
+  SheetAccessError,
+  SheetNotFoundError,
+} from './sheets/access'
+export {
+  forgetUnenforcedVisibility,
+  liftLooksIntoSource,
+  updateSheetAccess,
+  updateSheetMetaAndLook,
+} from './sheets/look'
 export {
   checkSource,
   createSheetFromSource,
@@ -48,6 +63,16 @@ export {
   updateSheetFromSource,
   type WsxCheck,
 } from './sheets/service'
+export {
+  ShareGoneError,
+  ShareRefusedError,
+  sharedFileAllowed,
+  sharedHistory,
+  sharedPage,
+  sharedQuery,
+  sharedTable,
+  shareSettings,
+} from './sheets/share'
 export { duplicateSheet, moveSheetTo, restoreSheetTree, SheetMoveError } from './sheets/tree'
 export { runHistory } from './tables/history'
 export { openRowPage, rowOfSheet, rowTitle } from './tables/rows'

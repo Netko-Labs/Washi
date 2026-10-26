@@ -1,21 +1,15 @@
-import type { Member } from '@washi/domain'
+import type { Member, Viewer } from '@washi/domain'
 import { historyQuerySchema, mutationSchema, querySchema, tableSpecSchema } from '@washi/ink'
-import {
-  getBacklinks,
-  getSheet,
-  listSheets,
-  listTables,
-  searchSheets,
-  sheetVersion,
-  type Workspace,
-} from '@washi/repository'
+import { listTables, type Workspace } from '@washi/repository'
 import { guardedFetch } from '@washi/tsuru'
 import { tool } from 'ai'
 import { z } from 'zod'
+import { NOBODY } from '../../sheets/access'
 import { checkSource, createSheetFromSource, updateSheetFromSource } from '../../sheets/service'
 import { runHistory } from '../../tables/history'
 import { defineUserTable, runMutation, runQuery } from '../../tables/service'
 import type { SearchKeyLookup } from '../lib'
+import { pagesFor } from '../lib/pages'
 import { webSearch } from '../search'
 import { currentFetchPolicy } from '../tools'
 
@@ -45,6 +39,8 @@ export interface AiToolDeps {
   listPeople?: () => Promise<Member[]>
   searchKey?: SearchKeyLookup
   setTitle?: (title: string) => void
+  /** Who asked: Washi reads the pages they can (D65). Absent is a routine — workspace pages. */
+  viewer?: Viewer
 }
 
 /**
@@ -59,7 +55,9 @@ export function createAiTools({
   listPeople,
   searchKey,
   setTitle,
+  viewer,
 }: AiToolDeps) {
+  const pages = pagesFor(ws, viewer ?? NOBODY)
   return {
     set_conversation_title: tool({
       description:
@@ -74,16 +72,13 @@ export function createAiTools({
       description:
         'List all sheets (id, title, icon, tags, parentId). A sheet with a parentId is a sub-page of that sheet.',
       inputSchema: z.object({}),
-      execute: async () => listSheets(ws),
+      execute: async () => pages.list(),
     }),
     sheet_get: tool({
       description:
         'Read one sheet: metadata, full WSX source, and its version (for sheet_replace).',
       inputSchema: z.object({ id: z.string() }),
-      execute: async ({ id }) => {
-        const sheet = getSheet(ws, id)
-        return sheet ? { ...sheet, version: sheetVersion(ws, id) } : null
-      },
+      execute: async ({ id }) => pages.get(id),
     }),
     sheet_check: tool({
       description: 'Validate WSX without saving. Run before sheet_create or sheet_replace.',
@@ -93,12 +88,12 @@ export function createAiTools({
     sheet_backlinks: tool({
       description: 'Sheets that reference the given sheet.',
       inputSchema: z.object({ id: z.string() }),
-      execute: async ({ id }) => getBacklinks(ws, id),
+      execute: async ({ id }) => pages.backlinks(id),
     }),
     search: tool({
       description: 'Full-text search across sheets.',
       inputSchema: z.object({ term: z.string() }),
-      execute: async ({ term }) => searchSheets(ws, term),
+      execute: async ({ term }) => pages.search(term),
     }),
     people_list: tool({
       description: 'Who is on the team: { id, name } per member. A person cell holds the id.',
@@ -131,6 +126,7 @@ export function createAiTools({
         parentId: z.string().optional(),
       }),
       execute: async ({ parentId, ...input }) => {
+        if (parentId) pages.require(parentId)
         const sheet = createSheetFromSource(ws, input, parentId ?? null, 'washi')
         openSheet?.(sheet.id)
         return sheet
@@ -145,8 +141,10 @@ export function createAiTools({
         source: z.string(),
         baseVersion: z.string().optional(),
       }),
-      execute: async ({ id, baseVersion, ...write }) =>
-        updateSheetFromSource(ws, id, write, 'washi', baseVersion),
+      execute: async ({ id, baseVersion, ...write }) => {
+        pages.require(id)
+        return updateSheetFromSource(ws, id, write, 'washi', baseVersion)
+      },
     }),
     db_define: tool({
       description:

@@ -117,6 +117,7 @@ export function createClaudeSdkPort(deps: ClaudeSdkPortDeps): AgentPort {
                 listPeople: deps.listPeople,
                 searchKey: deps.searchKey,
                 setTitle: request.setTitle,
+                viewer: request.viewer,
               }),
             },
             strictMcpConfig: true,

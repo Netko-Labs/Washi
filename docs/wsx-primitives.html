@@ -922,7 +922,8 @@
           <tr><td><code>theme</code></td><td><code>washi</code> <code>sumi</code> <code>aizome</code> <code>matcha</code> <code>kobai</code> <code>kraft</code> <code>yukiwa</code> <code>yozora</code></td><td>Eight designed pairs, each 8 tokens × light/dark (<code>bg card ink muted border mutedBg accent accentInk</code>), tested for ink ≥ 7:1 and muted ≥ 4.5:1 on card. Default <code>washi</code>.</td></tr>
           <tr><td><code>accent</code></td><td><code>accent</code> <code>info</code> <code>success</code> <code>warning</code> <code>danger</code></td><td>Which tone the kit takes (Chip, a Card's tape label, and a tone-less Quote, Progress or Step). Not <code>neutral</code>.</td></tr>
           <tr><td><code>state</code></td><td><code>{ local?, stored? }</code></td><td>Declared keys with their initial scalars (§4). Keys 1–64 chars.</td></tr>
-          <tr><td><code>visibility</code></td><td><code>private</code> <code>shared</code> <code>public</code></td><td>Carried, not yet enforced by the renderer. <span class="chip later">later</span></td></tr>
+          <tr><td><code>visibility</code></td><td><code>private</code> <code>shared</code> <code>public</code></td><td>Who reads the page (D65), enforced on every read. <code>shared</code> (the default) is the whole workspace; <code>private</code> is only the people in <code>access</code> and the owner, and pages inside it follow; <code>public</code> is the workspace plus anyone with its read-only link. Only a person sets it: a write by Washi that changes it is refused.</td></tr>
+          <tr><td><code>access</code></td><td>member id[] ≤64</td><td>Who a <code>private</code> page opens for — the same ids a person cell holds. Never leaves through a link.</td></tr>
           <tr><td><code>wsx</code></td><td><code>"1"</code></td><td>Format version. Always write it.</td></tr>
         </tbody>
       </table>
@@ -1455,6 +1456,18 @@ bun run typecheck</div></div></div><figcaption><b>Code</b> — muted background,
 <pre><span class="t">&lt;Callout</span> <span class="a">title</span>=<span class="v">"This week"</span><span class="t">&gt;</span>Three shipped, one slipped.<span class="t">&lt;/Callout&gt;</span>
 <span class="t">&lt;Callout</span> <span class="a">tone</span>=<span class="v">"warning"</span><span class="t">&gt;</span>The demo moved to Thursday.<span class="t">&lt;/Callout&gt;</span></pre>
       <figure class="plate"><div class="inner"><div class="app flat sk"><div class="stack"><div class="pcallout"><span class="ic">i</span><b>This week</b><div class="body">Three shipped, one slipped.</div></div><div class="pcallout warn"><span class="ic">!</span><span></span><div class="body">The demo moved to Thursday.</div></div></div></div></div><figcaption><b>Callout</b> — info with a title, warning without.</figcaption></figure>
+
+      <h4 id="p-Redact">Redact</h4>
+      <p>What a shared link must not show (D65). Members read its contents inside a hatched frame labelled <em>Hidden when shared</em>; the link's copy of the page arrives with the contents already removed on the server and draws a bar with the reason. Nothing to hide client-side: the bytes never leave. On a <code>public</code> page Washi may not remove one.</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>reason</code></td><td>string ≤80</td><td>Said on both sides: "Hidden when shared · budget", "Redacted · budget".</td></tr>
+      </tbody></table>
+      <p class="pol">children <b>nodes</b></p>
+<pre><span class="t">&lt;Redact</span> <span class="a">reason</span>=<span class="v">"client names"</span><span class="t">&gt;</span>
+  <span class="t">&lt;Text&gt;</span>Signed with Acme and Kōbō.<span class="t">&lt;/Text&gt;</span>
+<span class="t">&lt;/Redact&gt;</span>
+<span class="t">&lt;Table</span> <span class="a">bind</span>={<span class="v">{ table: "deals" }</span>} <span class="a">redact</span>={<span class="v">["amount"]</span>} <span class="t">/&gt;</span></pre>
+      <p>Data views — <code>Repeat Table Chart Roadmap Board Database Drawer</code> — take <code>redact={[columns]}</code>. One view's redact hides the column from the whole link: rows lose it, the table's spec loses it, and a link may not filter, sort or group on it (a count would leak it). A link may only ask about tables the page itself reads.</p>
 
       <h4 id="p-Hero">Hero</h4>
       <p>The page opener: serif title at the feel's hero size (58 in editorial and deck), muted subtitle at 60ch. Default <code>size="lg"</code>; <code>size="md"</code> drops the title to t1 for a working page.</p>

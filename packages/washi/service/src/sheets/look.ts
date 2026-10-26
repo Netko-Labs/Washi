@@ -1,10 +1,11 @@
-import type { SheetDetail, SheetLook, SheetMetaPatch } from '@washi/domain'
+import type { SheetAccess, SheetDetail, SheetLook, SheetMetaPatch } from '@washi/domain'
 import {
+  everySheetSource,
   getAppMeta,
   getSheet,
+  openShare,
   rewriteSourceQuietly,
   setAppMeta,
-  sheetsWearingLooks,
   updateSheetMeta,
   type Workspace,
 } from '@washi/repository'
@@ -44,7 +45,7 @@ const keyed = (cover: string) => (cover.includes(':') ? cover : `preset:${cover}
  */
 export function liftLooksIntoSource(ws: Workspace): void {
   if (getAppMeta(ws, LIFTED)) return
-  for (const sheet of sheetsWearingLooks(ws)) {
+  for (const sheet of everySheetSource(ws)) {
     let root: ReturnType<typeof parse>
     try {
       root = parse(sheet.source)
@@ -61,4 +62,59 @@ export function liftLooksIntoSource(ws: Workspace): void {
     rewriteSourceQuietly(ws, sheet.id, source, { ...worn, ...missing })
   }
   setAppMeta(ws, LIFTED, '1')
+}
+
+const ENFORCED = 'visibility_enforced'
+
+/**
+ * Once per workspace: before D65 a `<Sheet visibility>` was carried and never enforced, so one
+ * written then could hide a page or open a link the day it starts to count. Drop those, quietly;
+ * from here on only a person sets who reads a page.
+ */
+export function forgetUnenforcedVisibility(ws: Workspace): void {
+  if (getAppMeta(ws, ENFORCED)) return
+  for (const sheet of everySheetSource(ws)) {
+    let root: ReturnType<typeof parse>
+    try {
+      root = parse(sheet.source)
+    } catch {
+      continue
+    }
+    if (root.props.visibility === undefined && root.props.access === undefined) continue
+    const { visibility: _visibility, access: _access, ...props } = root.props
+    const source = serialize({ ...root, props })
+    if (!checkSource(source).ok) continue
+    rewriteSourceQuietly(ws, sheet.id, source, lookOf(root))
+  }
+  setAppMeta(ws, ENFORCED, '1')
+}
+
+/**
+ * A person sets who reads a page: the `<Sheet>` props move through the ordinary write, and the
+ * page's link opens or closes with `public` (D65). Whoever narrows a page keeps reading it.
+ */
+export function updateSheetAccess(
+  ws: Workspace,
+  id: string,
+  next: SheetAccess,
+  by: string | null,
+): SheetDetail {
+  const sheet = requireSheet(ws, id)
+  const access =
+    next.visibility === 'private' && by && !next.access.includes(by)
+      ? [by, ...next.access]
+      : next.access
+  const root = parse(sheet.source)
+  const { visibility: _visibility, access: _access, ...props } = root.props
+  const source = serialize({
+    ...root,
+    props: {
+      ...props,
+      ...(next.visibility !== 'shared' && { visibility: next.visibility }),
+      ...(next.visibility === 'private' && access.length > 0 && { access }),
+    },
+  })
+  const updated = updateSheetFromSource(ws, id, { title: sheet.title, tags: sheet.tags, source })
+  if (by && next.visibility === 'public') openShare(ws, id, by)
+  return updated
 }

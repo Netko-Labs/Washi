@@ -89,3 +89,7 @@ export interface SheetMarkProps {
   icon: string
   overCover: boolean
 }
+
+export interface RedactProps extends BlockProps {
+  reason?: string
+}

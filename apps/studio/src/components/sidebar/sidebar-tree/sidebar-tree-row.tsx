@@ -1,4 +1,4 @@
-import { IconChevronRight, IconPlus } from '@tabler/icons-react'
+import { IconChevronRight, IconLock, IconPlus, IconWorld } from '@tabler/icons-react'
 import {
   ConfirmDeleteButton,
   SheetIcon,
@@ -75,6 +75,12 @@ export function SidebarTreeRow({
         className="flex h-full min-w-0 flex-1 items-center gap-2 pr-1 pl-1.5 text-left text-[15px] md:text-[13px]"
       >
         <span className="truncate">{sheet.title}</span>
+        {sheet.visibility === 'private' && (
+          <IconLock aria-label="Only some people" className="size-3 shrink-0 opacity-60" />
+        )}
+        {sheet.visibility === 'public' && (
+          <IconWorld aria-label="On a public link" className="size-3 shrink-0 opacity-60" />
+        )}
         {isActive && isRunning && (
           <span
             className="ml-auto size-1.5 shrink-0 rounded-full bg-agent"

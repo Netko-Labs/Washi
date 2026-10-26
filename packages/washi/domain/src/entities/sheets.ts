@@ -13,6 +13,8 @@ export const sheetSummarySchema = z.object({
   /** Washi's last write can be taken back: nobody has written the page since. */
   undoable: z.boolean(),
   rowOf: z.string().nullable(),
+  visibility: z.enum(['private', 'shared', 'public']),
+  access: z.array(z.string()),
   hlcUpdated: z.string(),
 })
 export type SheetSummary = z.infer<typeof sheetSummarySchema>
@@ -43,7 +45,27 @@ export interface SheetLook {
   icon: string | null
   cover: string | null
 }
-export type StoredSheetWrite = SheetWrite & Partial<SheetLook>
+/** Who reads a page (D65): `<Sheet visibility access>`, cached like the look. */
+export interface SheetAccess {
+  visibility: SheetSummary['visibility']
+  access: string[]
+}
+export type StoredSheetWrite = SheetWrite & Partial<SheetLook> & Partial<SheetAccess>
+
+export type AccessRow = Pick<SheetSummary, 'id' | 'parentId' | 'visibility' | 'access'>
+
+/** Who is asking. An owner reads every page; nobody (a routine) reads only workspace pages. */
+export interface Viewer {
+  id: string | null
+  isOwner: boolean
+}
+
+export interface SheetShare {
+  token: string
+  sheetId: string
+  createdBy: string | null
+  createdAt: string
+}
 
 /** What a person changes about a page without touching its content. */
 export const sheetMetaPatchSchema = z.object({

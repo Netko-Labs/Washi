@@ -15,6 +15,11 @@ export const sheetTable = sqliteTable('sheets', {
   editedBy: text('edited_by', { enum: ['washi'] }),
   /** The database row this page is the body of; such a page lives in its table, not the tree. */
   rowId: text('row_id'),
+  /** Cache of `<Sheet visibility access>` (D65) — the source decides, lists filter on these. */
+  visibility: text('visibility', { enum: ['private', 'shared', 'public'] })
+    .notNull()
+    .default('shared'),
+  access: text('access', { mode: 'json' }).$type<string[]>().notNull().default([]),
   /** Derived cache of the Loro doc's text — queries and FTS read this. */
   source: text('source').notNull(),
   loroSnapshot: blob('loro_snapshot', { mode: 'buffer' }).notNull(),
@@ -187,3 +192,12 @@ export const mentionInboxTable = sqliteTable(
   },
   (table) => [primaryKey({ columns: [table.userId, table.commentId] })],
 )
+
+/** A page's read-only link (D65): the token is the link; revoking stamps it, never deletes it. */
+export const sheetShareTable = sqliteTable('sheet_shares', {
+  token: text('token').primaryKey(),
+  sheetId: text('sheet_id').notNull(),
+  createdBy: text('created_by'),
+  createdAt: text('created_at').notNull(),
+  revokedAt: text('revoked_at'),
+})
