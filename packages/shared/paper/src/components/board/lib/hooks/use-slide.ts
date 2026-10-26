@@ -24,6 +24,8 @@ export function useSlide(boardRef: RefObject<HTMLElement | null>) {
     const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const next = new Map<string, SlidePosition>()
     for (const element of board.querySelectorAll<HTMLElement>('[data-slide]')) {
+      // A card hidden mid-drag has no layout; recording it would slide it in from the corner.
+      if (!element.offsetParent) continue
       const key = element.dataset.slide ?? ''
       const now = layoutOf(element)
       next.set(key, now)
