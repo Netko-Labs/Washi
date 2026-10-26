@@ -65,6 +65,7 @@
 }
 
 .wsx-board {
+  position: relative;
   display: flex;
   gap: 14px;
   align-items: flex-start;
@@ -72,6 +73,7 @@
   padding-bottom: 8px;
 }
 .wsx-board-col {
+  position: relative;
   flex: none;
   width: 262px;
   background: var(--muted-bg);
@@ -144,11 +146,13 @@
   cursor: grabbing;
 }
 .wsx-board-card[data-dragging] {
-  opacity: 0.4;
-  box-shadow: var(--shadow-drag);
+  display: none;
 }
-.wsx-board-card[data-before] {
-  box-shadow: 0 -3px 0 0 var(--accent);
+.wsx-board-slot {
+  flex: none;
+  border: 1.5px dashed color-mix(in srgb, var(--accent) 55%, transparent);
+  border-radius: var(--r-input);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
 }
 .wsx-board-card-kicker {
   font-family: var(--font-mono);
