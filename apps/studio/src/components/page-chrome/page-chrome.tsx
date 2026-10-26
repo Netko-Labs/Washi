@@ -23,6 +23,16 @@ export function PageChrome({ pageId }: PageChromeProps) {
   const cover = parsed ? coverLook(parsed, readActiveWorkspace() ?? '') : undefined
   const update = useSheetsStore.getState().updateMeta
   const close = () => setPicker(null)
+  const coverPicker = picker === 'cover' && (
+    <CoverPicker
+      current={sheet.cover}
+      onClose={close}
+      onPick={(next) => {
+        close()
+        void update(sheet.id, { cover: next })
+      }}
+    />
+  )
 
   return (
     <div className="group/chrome relative">
@@ -36,10 +46,11 @@ export function PageChrome({ pageId }: PageChromeProps) {
           <button
             type="button"
             onClick={() => setPicker('cover')}
-            className="absolute right-4 bottom-3 hidden rounded-md bg-background/85 px-2 py-1 text-[12px] backdrop-blur group-hover/chrome:block"
+            className="absolute right-4 bottom-3 hidden rounded-md bg-background/85 px-2 py-1 text-[12px] backdrop-blur group-hover/chrome:block max-md:block"
           >
             Change cover
           </button>
+          {coverPicker && <div className="absolute top-full right-4">{coverPicker}</div>}
         </div>
       )}
       <div className={`relative mx-auto px-8 ${sheet.fullWidth ? '' : 'max-w-[760px]'}`}>
@@ -61,7 +72,7 @@ export function PageChrome({ pageId }: PageChromeProps) {
         )}
         {(!sheet.icon || !cover) && (
           <div
-            className={`flex h-9 items-center gap-1 opacity-0 focus-within:opacity-100 group-hover/chrome:opacity-100 ${
+            className={`flex h-9 items-center gap-1 opacity-0 focus-within:opacity-100 group-hover/chrome:opacity-100 max-md:opacity-100 ${
               sheet.icon || cover ? '' : 'pt-4'
             }`}
           >
@@ -98,16 +109,7 @@ export function PageChrome({ pageId }: PageChromeProps) {
             }}
           />
         )}
-        {picker === 'cover' && (
-          <CoverPicker
-            current={sheet.cover}
-            onClose={close}
-            onPick={(next) => {
-              close()
-              void update(sheet.id, { cover: next })
-            }}
-          />
-        )}
+        {!cover && coverPicker}
       </div>
     </div>
   )
