@@ -3,7 +3,7 @@ import {
   emptyTrash,
   purgeSheet,
   sheetVersion,
-  trashedFileCovers,
+  trashedUploads,
   updateSheetMeta,
 } from '@washi/repository'
 import {
@@ -66,15 +66,15 @@ export const sheetMutations = router({
     .input(byId)
     .mutation(({ ctx, input }) => restoreSheetTree(ctx.ws, input.id)),
   purge: workspaceProcedure.input(byId).mutation(async ({ ctx, input }) => {
-    const covers = trashedFileCovers(ctx.ws, input.id)
+    const uploads = trashedUploads(ctx.ws, input.id)
     const purged = purgeSheet(ctx.ws, input.id)
-    await Promise.all(covers.map((id) => ctx.files.remove(id)))
+    await Promise.all(uploads.map((id) => ctx.files.remove(id)))
     return purged
   }),
   emptyTrash: workspaceProcedure.mutation(async ({ ctx }) => {
-    const covers = trashedFileCovers(ctx.ws)
+    const uploads = trashedUploads(ctx.ws)
     const emptied = emptyTrash(ctx.ws)
-    await Promise.all(covers.map((id) => ctx.files.remove(id)))
+    await Promise.all(uploads.map((id) => ctx.files.remove(id)))
     return emptied
   }),
 })

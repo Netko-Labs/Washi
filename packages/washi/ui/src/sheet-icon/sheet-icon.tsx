@@ -30,6 +30,7 @@ import {
   IconUser,
 } from '@tabler/icons-react'
 import type { ComponentType } from 'react'
+import { hostFileUrl } from '../api'
 import { isEmoji, type SheetIconProps } from './lib'
 
 const ICONS: Record<string, ComponentType<{ className?: string }>> = {
@@ -64,10 +65,14 @@ const ICONS: Record<string, ComponentType<{ className?: string }>> = {
 }
 
 /**
- * A sheet's `icon` is a registry name or an emoji a person picked; unknown names fall back to a
- * page glyph.
+ * A sheet's `icon` is a registry name, an emoji or an upload (`file:<id>`) a person picked;
+ * unknown names, and uploads on a host that stores none, fall back to a page glyph.
  */
 export function SheetIcon({ name, className }: SheetIconProps) {
+  const upload = name?.startsWith('file:') ? hostFileUrl()?.(name.slice('file:'.length)) : null
+  if (upload) {
+    return <img src={upload} alt="" className={`rounded-[22%] object-cover ${className ?? ''}`} />
+  }
   if (name && isEmoji(name)) {
     return (
       <span

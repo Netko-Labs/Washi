@@ -4,6 +4,7 @@ import type { CSSProperties } from 'react'
 export type ChromePicker = 'icon' | 'cover'
 export type CoverKind = 'preset' | 'picture' | 'file'
 export type CoverTab = 'presets' | 'pictures' | 'upload'
+export type IconTab = 'emoji' | 'upload'
 
 export interface ParsedCover {
   kind: CoverKind
@@ -43,4 +44,15 @@ export interface PickerProps {
   current: string | null
   onPick: (value: string | null) => void
   onClose: () => void
+}
+
+export interface UploadDropProps {
+  hint: string
+  onPick: (key: string) => void
+}
+
+export interface PickerTabsProps<T extends string> {
+  tabs: readonly { id: T; label: string }[]
+  active: T
+  onChange: (tab: T) => void
 }

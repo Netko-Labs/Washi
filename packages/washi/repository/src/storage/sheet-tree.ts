@@ -141,31 +141,38 @@ export function emptyTrash(ws: Workspace): number {
   )
 }
 
+// Every upload a page wears, cover or icon, with the batch that page sits in.
+const WORN_FILES = `WITH worn AS (
+  SELECT deleted_at, cover AS key FROM sheets WHERE cover LIKE 'file:%'
+  UNION ALL
+  SELECT deleted_at, icon AS key FROM sheets WHERE icon LIKE 'file:%'
+)`
+
 /**
- * The uploads a trash batch's covers point at and no other page still wears — a purge frees
- * them with the pages (D60). A duplicate shares its original's cover, so a live copy keeps the
- * file, and so does a page in another trash batch.
+ * The uploads a trash batch's covers and icons point at and no other page still wears — a purge
+ * frees them with the pages (D60). A duplicate shares its original's files, so a live copy keeps
+ * them, and so does a page in another trash batch.
  */
-export function trashedFileCovers(ws: Workspace, id?: string): string[] {
+export function trashedUploads(ws: Workspace, id?: string): string[] {
   const rows = id
     ? ws.sqlite
         .query(
-          `SELECT DISTINCT cover FROM sheets
+          `${WORN_FILES}
+           SELECT DISTINCT key FROM worn
            WHERE deleted_at = (SELECT deleted_at FROM sheets WHERE id = ?)
-             AND cover LIKE 'file:%'
-             AND cover NOT IN (
-               SELECT cover FROM sheets
-               WHERE cover LIKE 'file:%'
-                 AND (deleted_at IS NULL OR deleted_at != (SELECT deleted_at FROM sheets WHERE id = ?))
+             AND key NOT IN (
+               SELECT key FROM worn
+               WHERE deleted_at IS NULL OR deleted_at != (SELECT deleted_at FROM sheets WHERE id = ?)
              )`,
         )
         .all(id, id)
     : ws.sqlite
         .query(
-          `SELECT DISTINCT cover FROM sheets
-           WHERE deleted_at IS NOT NULL AND cover LIKE 'file:%'
-             AND cover NOT IN (SELECT cover FROM sheets WHERE deleted_at IS NULL AND cover LIKE 'file:%')`,
+          `${WORN_FILES}
+           SELECT DISTINCT key FROM worn
+           WHERE deleted_at IS NOT NULL
+             AND key NOT IN (SELECT key FROM worn WHERE deleted_at IS NULL)`,
         )
         .all()
-  return (rows as { cover: string }[]).map((row) => row.cover.slice('file:'.length))
+  return (rows as { key: string }[]).map((row) => row.key.slice('file:'.length))
 }

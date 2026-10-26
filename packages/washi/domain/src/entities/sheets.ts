@@ -26,9 +26,15 @@ export const sheetDetailSchema = sheetSummarySchema.extend({
 })
 export type SheetDetail = z.infer<typeof sheetDetailSchema>
 
+/** An emoji, a registry name, or `file:<id>` — an upload, a key never a URL (D60). */
+export const sheetIconSchema = z.union([
+  z.string().max(16),
+  z.string().regex(/^file:[a-z0-9-]{1,48}$/),
+])
+
 export const sheetWriteSchema = z.object({
   title: z.string().min(1).max(200),
-  icon: z.string().max(16).nullable().optional(),
+  icon: sheetIconSchema.nullable().optional(),
   tags: z.array(z.string().min(1).max(64)).max(32).optional(),
   source: z.string().min(1).max(512_000),
 })
@@ -37,7 +43,7 @@ export type SheetWrite = z.infer<typeof sheetWriteSchema>
 /** What a person changes about a page without touching its content. */
 export const sheetMetaPatchSchema = z.object({
   title: z.string().min(1).max(200).optional(),
-  icon: z.string().max(16).nullable().optional(),
+  icon: sheetIconSchema.nullable().optional(),
   // `preset:sage` · `picture:kiso-valley` · `file:<id>` — a key, never a URL (D60).
   cover: z
     .string()

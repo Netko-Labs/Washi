@@ -1,10 +1,12 @@
-import { useRef } from 'react'
-import { useDismiss } from '@/components/shared/dismiss'
-import { EMOJI, type PickerProps } from './lib'
+import { useState } from 'react'
+import { EMOJI, ICON_TABS, type IconTab, type PickerProps, usePickerRoot } from './lib'
+import { PickerTabs } from './picker-tabs'
+import { UploadDrop } from './upload-drop'
 
+/** Emoji · Upload. An upload is stored like a cover's and the page wears `file:<id>` (D60). */
 export function IconPicker({ current, onPick, onClose }: PickerProps) {
-  const root = useRef<HTMLDivElement>(null)
-  useDismiss(root, true, onClose)
+  const root = usePickerRoot(onClose)
+  const [tab, setTab] = useState<IconTab>(() => (current?.startsWith('file:') ? 'upload' : 'emoji'))
 
   return (
     <div
@@ -27,21 +29,29 @@ export function IconPicker({ current, onPick, onClose }: PickerProps) {
           </button>
         )}
       </div>
-      <div className="grid grid-cols-8 gap-0.5">
-        {EMOJI.map((emoji) => (
-          <button
-            key={emoji}
-            type="button"
-            aria-label={`Use ${emoji}`}
-            onClick={() => onPick(emoji)}
-            className={`grid size-8 place-items-center rounded-lg text-[18px] hover:bg-accent ${
-              current === emoji ? 'bg-accent' : ''
-            }`}
-          >
-            {emoji}
-          </button>
-        ))}
-      </div>
+      <PickerTabs tabs={ICON_TABS} active={tab} onChange={setTab} />
+
+      {tab === 'emoji' && (
+        <div className="grid grid-cols-8 gap-0.5">
+          {EMOJI.map((emoji) => (
+            <button
+              key={emoji}
+              type="button"
+              aria-label={`Use ${emoji}`}
+              onClick={() => onPick(emoji)}
+              className={`grid size-8 place-items-center rounded-lg text-[18px] hover:bg-accent ${
+                current === emoji ? 'bg-accent' : ''
+              }`}
+            >
+              {emoji}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {tab === 'upload' && (
+        <UploadDrop hint="Square works best · JPG · PNG · WebP · up to 5 MB" onPick={onPick} />
+      )}
     </div>
   )
 }
