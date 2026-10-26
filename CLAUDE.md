@@ -195,6 +195,13 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   answers, its turns from `agents.today`, and whatever rows the host adds — the studio passes its
   mentions through `useMentionRows`; the desktop passes none. Mark all read is the studio header's.
 - Ids: `Bun.randomUUIDv7()`. Timestamps: HLC strings from domain.
+- **The server is its first account's (D66).** The oldest account is the app admin
+  (`instance_admin`, seeded at boot and after each sign-up once nobody holds it). Sign-up is
+  `invite` by default — only the very first account or an email with a pending, unexpired
+  invitation — or `open`; Better Auth's `user.create.before` hook refuses the rest
+  (`mayCreateAccount`). Settings → Server is the admin's alone (`instance.*`, `adminProcedure`);
+  embedded has no instance store, and the studio refuses to boot in embedded mode. Washi is
+  AGPL-3.0-only (`LICENSE`, every `package.json`).
 - **Who pays for a turn.** A credential is `api_key` or `local_cli`. Embedded finds the
   person's installed `claude` (PATH is empty for a GUI app — known install paths too) and runs
   it via the Agent SDK's `pathToClaudeCodeExecutable` with **no** key in the env, so their own

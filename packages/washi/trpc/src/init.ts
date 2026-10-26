@@ -87,6 +87,16 @@ export interface SecretStore {
   removeIntegration(workspaceId: string, integration: Integration): Promise<void>
 }
 
+export const SIGNUP_MODES = ['invite', 'open'] as const
+export type SignupMode = (typeof SIGNUP_MODES)[number]
+
+/** The server's own settings, held by its app admins (its first account). Absent in embedded mode. */
+export interface InstanceStore {
+  isAdmin(actorId: string): Promise<boolean>
+  signup(): Promise<SignupMode>
+  setSignup(mode: SignupMode): Promise<void>
+}
+
 export interface ControlPlane {
   /** Null when the request carries no valid session. */
   authenticate(request: Request): Promise<Actor | null>
@@ -101,6 +111,7 @@ export interface ControlPlane {
   handle(request: Request): Promise<Response | null>
   /** Absent in embedded mode: there is no BYOK, the machine's own env supplies the key. */
   secrets?: SecretStore
+  instance?: InstanceStore
   close(): Promise<void>
 }
 
@@ -267,4 +278,13 @@ export const ownerProcedure = workspaceProcedure.use(async ({ ctx, next }) => {
     throw new TRPCError({ code: 'FORBIDDEN', message: 'only a workspace owner can change this' })
   }
   return next()
+})
+
+/** The server's own settings: its app admins only, whatever workspace the request names. */
+export const adminProcedure = t.procedure.use(async ({ ctx, next }) => {
+  const store = ctx.runtime.control.instance
+  if (!store || !ctx.actorId || !(await store.isAdmin(ctx.actorId))) {
+    throw new TRPCError({ code: 'FORBIDDEN', message: 'only an app admin can change this' })
+  }
+  return next({ ctx: { ...ctx, instance: store } })
 })

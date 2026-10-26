@@ -7,3 +7,8 @@ export const KEY_BITS = 256
 
 /** A master key shorter than this is not worth the ceremony around it. */
 export const MIN_SECRET_LENGTH = 32
+
+/** A fresh server lets its first account in; after that, only invited emails. */
+export const DEFAULT_SIGNUP = 'invite'
+export const SIGNUP_REFUSED =
+  'This server is invite-only. Ask a workspace owner to invite this email, then sign up with it.'

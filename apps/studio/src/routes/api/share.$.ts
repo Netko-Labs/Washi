@@ -30,7 +30,11 @@ export const Route = createFileRoute('/api/share/$')({
             const found = await resolved.files.get(fileId)
             if (!found) return new Response(null, { status: 404 })
             return new Response(found.bytes.slice(), {
-              headers: { 'content-type': found.file.mime, ...NO_STORE },
+              headers: {
+                'content-type': found.file.mime,
+                'x-content-type-options': 'nosniff',
+                ...NO_STORE,
+              },
             })
           }
           if (part) return Response.json({ error: 'not found' }, { status: 404 })

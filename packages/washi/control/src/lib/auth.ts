@@ -1,8 +1,11 @@
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
+import { APIError } from 'better-auth/api'
 import { organization } from 'better-auth/plugins'
 import * as schema from '../db/schema'
 import type { ControlDB } from './client'
+import { SIGNUP_REFUSED } from './constants'
+import { mayCreateAccount, seedInstanceAdmin } from './instance'
 import type { ControlPlaneOptions } from './types'
 
 export type WashiAuth = ReturnType<typeof createAuth>
@@ -14,6 +17,18 @@ export function createAuth(db: ControlDB, options: ControlPlaneOptions) {
     secret: options.masterKey,
     trustedOrigins: options.trustedOrigins ?? [],
     emailAndPassword: { enabled: true },
+    databaseHooks: {
+      user: {
+        create: {
+          before: async (account) => {
+            if (!(await mayCreateAccount(db, account.email))) {
+              throw new APIError('FORBIDDEN', { message: SIGNUP_REFUSED })
+            }
+          },
+          after: () => seedInstanceAdmin(db),
+        },
+      },
+    },
     plugins: [
       organization({
         // A workspace is an organization, so creating one is the normal path,
