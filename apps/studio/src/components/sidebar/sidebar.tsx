@@ -31,7 +31,7 @@ export function Sidebar({ workspace, folded, peeking, onFold, onPeekEnd }: Sideb
             aria-label="Hide the sidebar (⌘\)"
             title="Hide sidebar ⌘\"
             onClick={onFold}
-            className="grid size-8 shrink-0 place-items-center rounded-lg text-muted-foreground opacity-0 hover:bg-accent focus-visible:opacity-100 group-hover/side:opacity-100"
+            className="grid size-8 shrink-0 place-items-center rounded-lg text-muted-foreground hover:bg-accent"
           >
             <IconLayoutSidebarLeftCollapse className="size-[15px]" />
           </button>
