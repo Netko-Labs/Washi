@@ -1,10 +1,10 @@
 import { countUnreadMentions, listComments, listMentions } from '@washi/repository'
 import { LOCAL_AUTHOR } from '@washi/service'
 import { z } from 'zod'
-import { router, workspaceProcedure } from '../../init'
+import { pageProcedure, router, workspaceProcedure } from '../../init'
 
 export const commentQueries = router({
-  list: workspaceProcedure
+  list: pageProcedure
     .input(z.object({ sheetId: z.string() }))
     .query(({ ctx, input }) => listComments(ctx.ws, input.sheetId)),
   mentions: workspaceProcedure.query(({ ctx }) =>

@@ -32,6 +32,8 @@ const SUMMARY = {
   fullWidth: sheetTable.fullWidth,
   editedBy: sheetTable.editedBy,
   rowOf: sheetTable.rowId,
+  visibility: sheetTable.visibility,
+  access: sheetTable.access,
   // Drizzle renders a lone column unqualified here, and `id` would bind to the revision's.
   undoable:
     sql<boolean>`exists (select 1 from sheet_revisions r where r.sheet_id = sheets.id)`.mapWith(
@@ -78,6 +80,8 @@ export function createSheet(
       title: write.title,
       icon: write.icon ?? null,
       cover: write.cover ?? null,
+      visibility: write.visibility ?? 'shared',
+      access: write.access ?? [],
       tags: write.tags ?? [],
       source: write.source,
       loroSnapshot: Buffer.from(createSnapshot(write.source)),
@@ -116,6 +120,8 @@ export function updateSheet(
         title: write.title,
         icon: write.icon ?? null,
         cover: write.cover ?? null,
+        visibility: write.visibility ?? 'shared',
+        access: write.access ?? [],
         tags: write.tags ?? existing.tags,
         source: write.source,
         loroSnapshot: Buffer.from(updateSnapshot(existing.loroSnapshot, write.source)),

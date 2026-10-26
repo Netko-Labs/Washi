@@ -1,11 +1,15 @@
 import { initTRPC, TRPCError } from '@trpc/server'
+import type { Viewer } from '@washi/domain'
 import type { FileStore, Workspace } from '@washi/repository'
 import {
   type AgentHost,
   CommentError,
   InkError,
+  requireReadable,
+  SheetAccessError,
   SheetConflictError,
   SheetMoveError,
+  SheetNotFoundError,
   SheetUndoError,
   SheetValidationError,
 } from '@washi/service'
@@ -166,6 +170,7 @@ export const workspaceProcedure = t.procedure
         result.error.cause instanceof SheetUndoError ||
         result.error.cause instanceof SheetConflictError ||
         result.error.cause instanceof InkError ||
+        result.error.cause instanceof SheetAccessError ||
         result.error.cause instanceof CommentError)
     ) {
       throw new TRPCError({
@@ -173,6 +178,9 @@ export const workspaceProcedure = t.procedure
         message: result.error.cause.message,
         cause: result.error.cause,
       })
+    }
+    if (!result.ok && result.error.cause instanceof SheetNotFoundError) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: result.error.cause.message })
     }
     return result
   })
@@ -191,8 +199,13 @@ export const workspaceProcedure = t.procedure
     // Membership above is the only unknown-workspace answer; a throw here is a
     // failed open (disk, sqlite) and surfaces as INTERNAL_SERVER_ERROR.
     const resolved = ctx.runtime.resolve(ctx.workspaceId)
+    // Embedded's one person owns everything; hosted owners read every page, private or not.
+    const viewer: Viewer =
+      ctx.mode === 'embedded'
+        ? { id: ctx.actorId ?? 'local', isOwner: true }
+        : { id: ctx.actorId, isOwner: (await roleOf(ctx)) === 'owner' }
     return next({
-      ctx: { ...ctx, ws: resolved.workspace, host: resolved.host, files: resolved.files },
+      ctx: { ...ctx, ws: resolved.workspace, host: resolved.host, files: resolved.files, viewer },
     })
   })
   .use(async ({ ctx, path, type, getRawInput, next }) => {
@@ -208,6 +221,30 @@ export const workspaceProcedure = t.procedure
     return result
   })
 
+const PAGE_KEYS = ['id', 'sheetId', 'parentId'] as const
+
+/**
+ * A procedure about one page: whatever page ids its input names must be readable by the asker
+ * (D65), or it answers NOT_FOUND before the handler runs.
+ */
+export const pageProcedure = workspaceProcedure.use(async ({ ctx, getRawInput, next }) => {
+  const input = (await getRawInput().catch(() => null)) as Record<string, unknown> | null
+  for (const key of PAGE_KEYS) {
+    const id = input?.[key]
+    if (typeof id === 'string') requireReadable(ctx.ws, id, ctx.viewer)
+  }
+  return next()
+})
+
+async function roleOf(ctx: {
+  runtime: { control: ControlPlane }
+  actorId: string | null
+  workspaceId: string
+}): Promise<string | undefined> {
+  const workspaces = await ctx.runtime.control.listWorkspaces(ctx.actorId)
+  return workspaces.find((entry) => entry.id === ctx.workspaceId)?.role
+}
+
 /** Roles that may change what the workspace lets its agent do. Embedded's one person is the owner. */
 const STEWARD_ROLES: ReadonlySet<string> = new Set(['owner', 'admin'])
 
@@ -221,8 +258,7 @@ export async function isSteward(ctx: {
   actorId: string | null
   workspaceId: string
 }): Promise<boolean> {
-  const workspaces = await ctx.runtime.control.listWorkspaces(ctx.actorId)
-  const role = workspaces.find((entry) => entry.id === ctx.workspaceId)?.role
+  const role = await roleOf(ctx)
   return Boolean(role && STEWARD_ROLES.has(role))
 }
 

@@ -21,7 +21,8 @@ import {
   type WsxMissing,
   WsxParseError,
 } from '@washi/wsx'
-import { lookOf } from './look-of'
+import { guardWashiWrite, syncShare } from './access'
+import { accessOf, lookOf } from './look-of'
 
 export interface WsxCheck {
   ok: boolean
@@ -68,7 +69,17 @@ export function createSheetFromSource(
 ): SheetDetail {
   const root = parseValidated(write.source)
   if (parentId) requireSheet(ws, parentId)
-  return createSheet(ws, { ...write, ...lookOf(root) }, indexOf(root), parentId, editedBy)
+  if (editedBy === 'washi') guardWashiWrite(null, root)
+  const access = accessOf(root)
+  const sheet = createSheet(
+    ws,
+    { ...write, ...lookOf(root), ...access },
+    indexOf(root),
+    parentId,
+    editedBy,
+  )
+  syncShare(ws, sheet.id, access, null)
+  return sheet
 }
 
 export class SheetConflictError extends Error {
@@ -102,14 +113,17 @@ export function updateSheetFromSource(
   parseValidated(write.source)
   const source = mergedSource(ws, id, write, baseVersion)
   const root = parse(source)
+  if (editedBy === 'washi') guardWashiWrite(parse(requireSheet(ws, id).source), root)
+  const access = accessOf(root)
   const updated = updateSheet(
     ws,
     id,
-    { ...write, source, ...lookOf(root) },
+    { ...write, source, ...lookOf(root), ...access },
     indexOf(root),
     editedBy,
   )
   if (!updated) throw new Error(`sheet not found: ${id}`)
+  syncShare(ws, id, access, null)
   return updated
 }
 

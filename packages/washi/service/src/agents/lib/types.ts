@@ -4,6 +4,7 @@ import type {
   AttachmentRef,
   CapabilityOrigin,
   TranscriptEntry,
+  Viewer,
 } from '@washi/domain'
 import type { ProviderId } from '../ports/types'
 import type { APPROVAL_MODES, EFFORTS, RESUME_BY, SDK_EFFORT } from './constants'
@@ -104,6 +105,8 @@ export interface Caller {
 
 export interface AskOptions {
   attachments?: AttachmentRef[]
+  /** Who asked (D65). A routine leaves it out and reads only workspace pages. */
+  viewer?: Viewer
 }
 
 export interface SessionOptions {

@@ -57,6 +57,7 @@ export function createAiSdkPort({
         listPeople,
         searchKey,
         setTitle: request.setTitle,
+        viewer: request.viewer,
       })
       const model =
         request.model.model ?? (await defaultModelFor(catalogue, request.model.provider))

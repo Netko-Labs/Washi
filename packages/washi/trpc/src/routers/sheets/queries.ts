@@ -3,28 +3,46 @@ import {
   getSheet,
   listSheets,
   listTrash,
+  liveShareFor,
   searchSheets,
   sheetVersion,
 } from '@washi/repository'
-import { checkSource } from '@washi/service'
+import { checkSource, readableSet } from '@washi/service'
 import { z } from 'zod'
-import { router, workspaceProcedure } from '../../init'
+import { pageProcedure, router, workspaceProcedure } from '../../init'
 
 const byId = z.object({ id: z.string() })
 
 export const sheetQueries = router({
-  list: workspaceProcedure.query(({ ctx }) => listSheets(ctx.ws)),
-  trash: workspaceProcedure.query(({ ctx }) => listTrash(ctx.ws)),
-  get: workspaceProcedure.input(byId).query(({ ctx, input }) => {
+  list: workspaceProcedure.query(({ ctx }) => {
+    const readable = readableSet(ctx.ws, ctx.viewer)
+    return listSheets(ctx.ws).filter((page) => readable.has(page.id))
+  }),
+  trash: workspaceProcedure.query(({ ctx }) => {
+    const readable = readableSet(ctx.ws, ctx.viewer)
+    return listTrash(ctx.ws).filter((entry) => readable.has(entry.id))
+  }),
+  get: pageProcedure.input(byId).query(({ ctx, input }) => {
     const sheet = getSheet(ctx.ws, input.id)
     return sheet ? { ...sheet, version: sheetVersion(ctx.ws, input.id) ?? undefined } : null
   }),
-  backlinks: workspaceProcedure
-    .input(byId)
-    .query(({ ctx, input }) => getBacklinks(ctx.ws, input.id)),
-  search: workspaceProcedure
-    .input(z.object({ term: z.string() }))
-    .query(({ ctx, input }) => searchSheets(ctx.ws, input.term)),
+  backlinks: pageProcedure.input(byId).query(({ ctx, input }) => {
+    const readable = readableSet(ctx.ws, ctx.viewer)
+    return getBacklinks(ctx.ws, input.id).filter((page) => readable.has(page.id))
+  }),
+  search: workspaceProcedure.input(z.object({ term: z.string() })).query(({ ctx, input }) => {
+    const readable = readableSet(ctx.ws, ctx.viewer)
+    return searchSheets(ctx.ws, input.term).filter((hit) => readable.has(hit.id))
+  }),
+  /** Who reads the page and its link, for the Share popover (D65). */
+  share: pageProcedure.input(byId).query(({ ctx, input }) => {
+    const sheet = getSheet(ctx.ws, input.id)
+    return {
+      visibility: sheet?.visibility ?? 'shared',
+      access: sheet?.access ?? [],
+      token: liveShareFor(ctx.ws, input.id)?.token ?? null,
+    }
+  }),
   check: workspaceProcedure
     .input(z.object({ source: z.string() }))
     .query(({ input }) => checkSource(input.source)),

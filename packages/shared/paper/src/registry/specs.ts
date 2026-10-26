@@ -23,6 +23,9 @@ const stateKey = z.string().min(1).max(64)
 const stateBag = z.record(stateKey, scalarSchema)
 const columnName = z.string().min(1).max(64)
 const rowRef = z.string().min(1).max(80)
+const memberId = z.string().min(1).max(80)
+/** Columns hidden from a shared link (D65); one view's redact hides them from the whole page. */
+const redact = z.array(columnName).min(1).max(32).optional()
 
 export const SHEET_ICONS = [
   'notebook',
@@ -82,6 +85,7 @@ const frame: Record<string, ComponentSpec> = {
         theme: themeIdSchema.optional(),
         state: sheetStateSchema.optional(),
         visibility: z.enum(['private', 'shared', 'public']).optional(),
+        access: z.array(memberId).max(64).optional(),
         wsx: z.literal('1').optional(),
       })
       .strict(),
@@ -135,6 +139,9 @@ const text: Record<string, ComponentSpec> = {
 const surface: Record<string, ComponentSpec> = {
   Card: p({ title: z.string().max(120).optional() }, 'nodes'),
   Callout: p({ title: z.string().max(120).optional() }, 'nodes'),
+  Redact: p({ reason: z.string().max(80).optional() }, 'nodes', {
+    hints: { hide: 'wrap what a shared link must not show; members still see it' },
+  }),
   Hero: p(
     {
       title: z.string().min(1).max(200),
@@ -161,11 +168,17 @@ const CHART_SHAPE = {
   label: columnName.optional(),
   value: columnName.optional(),
   empty: z.string().max(160).optional(),
+  redact,
 }
 
 const dataOut: Record<string, ComponentSpec> = {
   Repeat: p(
-    { bind: querySchema, as: z.string().max(32).optional(), empty: z.string().max(160).optional() },
+    {
+      bind: querySchema,
+      as: z.string().max(32).optional(),
+      empty: z.string().max(160).optional(),
+      redact,
+    },
     'nodes',
     { noNest: true },
   ),
@@ -174,6 +187,7 @@ const dataOut: Record<string, ComponentSpec> = {
       bind: querySchema,
       columns: z.array(columnName).max(16).optional(),
       empty: z.string().max(160).optional(),
+      redact,
     },
     'none',
   ),
@@ -227,6 +241,7 @@ const dataOut: Record<string, ComponentSpec> = {
       date: columnName,
       title: columnName.optional(),
       empty: z.string().max(160).optional(),
+      redact,
     },
     'none',
     { hints: { start: 'one date column holds the range: date="when" with start/end values' } },
@@ -273,6 +288,7 @@ const dataIn: Record<string, ComponentSpec> = {
       onAdd: actionRefSchema.optional(),
       onOpen: actionRefSchema.optional(),
       empty: z.string().max(160).optional(),
+      redact,
     },
     'none',
     { hints: { onMove: 'drag writes table.reorder on its own — set rank and groupBy' } },
@@ -297,6 +313,7 @@ const dataIn: Record<string, ComponentSpec> = {
         .max(8)
         .optional(),
       empty: z.string().max(160).optional(),
+      redact,
     },
     'none',
     {
@@ -342,7 +359,12 @@ const flow: Record<string, ComponentSpec> = {
   Tab: p({}, 'nodes', { within: ['Tabs'] }),
   Reveal: p({ label: z.string().min(1).max(120), state: stateKey.optional() }, 'nodes'),
   Drawer: p(
-    { state: stateKey, bind: querySchema.optional(), title: z.string().max(120).optional() },
+    {
+      state: stateKey,
+      bind: querySchema.optional(),
+      title: z.string().max(120).optional(),
+      redact,
+    },
     'nodes',
     { noNest: true },
   ),

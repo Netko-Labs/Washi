@@ -342,6 +342,7 @@ export class AgentHost {
           model: { provider: credential.provider, model: session?.model ?? credential.model },
           effort: SDK_EFFORT[session?.effort ?? this.prefs.effort()],
           images,
+          viewer: ask.viewer,
           setTitle: (title) => {
             updateSession(this.ws, sessionId, { title })
             this.events?.sessionChanged?.(sessionId)

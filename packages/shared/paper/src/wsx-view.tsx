@@ -1,4 +1,4 @@
-import { type ExprAst, parseExpr, type WsxElement, type WsxNode } from '@washi/wsx'
+import type { WsxElement, WsxNode } from '@washi/wsx'
 import { type ComponentType, createElement, type ReactNode, useMemo } from 'react'
 import { Board } from './components/board'
 import { Canvas } from './components/canvas'
@@ -19,6 +19,7 @@ import { Reveal, Show, Tab, Tabs } from './components/flow'
 import { Divider, Grid, Row, Section, SheetFrame, Stack } from './components/frame'
 import { Button, Compose, Field, Slider, Switch, Task } from './components/input'
 import { Chip, Mascot, Missing } from './components/kit'
+import { Redact } from './components/redact'
 import { Roadmap } from './components/roadmap'
 import { Callout, Card, Figure, Hero } from './components/surface'
 import {
@@ -40,6 +41,7 @@ import {
 import { DataProvider } from './data'
 import { NowContext, resolveRow, resolveRowDeep } from './lib'
 import type { Row as DataRow } from './lib/types'
+import { exprTables } from './registry/share'
 import { SheetStateProvider, type SheetStateValue } from './state'
 
 interface Ctx {
@@ -66,45 +68,6 @@ function numberFootnotes(root: WsxElement): Map<WsxElement, number> {
   }
   descend(root)
   return numbers
-}
-
-function aggregateTables(ast: ExprAst, out: Set<string>) {
-  switch (ast.kind) {
-    case 'aggregate':
-      if (ast.source.kind === 'table') out.add(ast.source.name)
-      if (ast.where) aggregateTables(ast.where, out)
-      return
-    case 'binary':
-      aggregateTables(ast.left, out)
-      aggregateTables(ast.right, out)
-      return
-    case 'unary':
-      aggregateTables(ast.operand, out)
-      return
-    case 'call':
-      for (const arg of ast.args) aggregateTables(arg, out)
-      return
-    default:
-      return
-  }
-}
-
-/** Tables expressions aggregate over — prefetched once so `sum(tasks.points)` is synchronous. */
-function exprTables(root: WsxElement): string[] {
-  const out = new Set<string>()
-  const descend = (node: WsxNode) => {
-    if (node.kind !== 'element') return
-    if (typeof node.props.expr === 'string') {
-      try {
-        aggregateTables(parseExpr(node.props.expr), out)
-      } catch {
-        // validation already reported it; the renderer shows null
-      }
-    }
-    for (const child of node.children) descend(child)
-  }
-  descend(root)
-  return [...out].sort()
 }
 
 function renderChildren(nodes: WsxNode[], ctx: Ctx): ReactNode[] {
@@ -137,6 +100,7 @@ const COMPONENTS: Record<string, ComponentType<never>> = {
   Tag,
   Card,
   Callout,
+  Redact,
   Hero,
   Figure,
   Table,

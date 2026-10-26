@@ -1,4 +1,4 @@
-import type { AgentUpdate, TurnBilling } from '@washi/domain'
+import type { AgentUpdate, TurnBilling, Viewer } from '@washi/domain'
 import type { AgentCredential, SdkEffort } from '../lib/types'
 
 /** Every provider Washi can reach. `anthropic` is the native Claude Agent SDK path. */
@@ -21,6 +21,8 @@ export interface PromptRequest {
   images?: { mime: string; base64: string }[]
   /** Washi names the conversation through a tool; the host stores what it says. */
   setTitle?: (title: string) => void
+  /** Who asked; the tools read only the pages they can (D65). */
+  viewer?: Viewer
   /** Prior turns, for ports that do not resume server-side. */
   history: { role: 'user' | 'assistant'; text: string }[]
   /** Opaque to Washi: the Claude SDK's own session id, when a port keeps one. */

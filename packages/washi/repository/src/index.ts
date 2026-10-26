@@ -63,7 +63,8 @@ export {
   listRoutines,
   updateRoutine,
 } from './storage/routines'
-export { rewriteSourceQuietly, sheetsWearingLooks } from './storage/sheet-look'
+export { closeShare, liveShareFor, openShare, shareByToken } from './storage/shares'
+export { accessRows, everySheetSource, rewriteSourceQuietly } from './storage/sheet-look'
 export {
   ancestorIds,
   emptyTrash,

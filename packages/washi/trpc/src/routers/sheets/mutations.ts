@@ -1,28 +1,30 @@
 import { sheetMetaPatchSchema, sheetWriteSchema } from '@washi/domain'
-import { emptyTrash, purgeSheet, sheetVersion, trashedUploads } from '@washi/repository'
+import { emptyTrash, listTrash, purgeSheet, sheetVersion, trashedUploads } from '@washi/repository'
 import {
   createSheetFromSource,
   duplicateSheet,
   moveSheetTo,
+  readableSet,
   removeSheet,
   restoreSheetTree,
   undoWashiWrite,
+  updateSheetAccess,
   updateSheetFromSource,
   updateSheetMetaAndLook,
 } from '@washi/service'
 import { z } from 'zod'
-import { router, workspaceProcedure } from '../../init'
+import { pageProcedure, router, workspaceProcedure } from '../../init'
 
 const byId = z.object({ id: z.string() })
 
 export const sheetMutations = router({
-  create: workspaceProcedure
+  create: pageProcedure
     .input(z.object({ write: sheetWriteSchema, parentId: z.string().nullable().optional() }))
     .mutation(({ ctx, input }) =>
       createSheetFromSource(ctx.ws, input.write, input.parentId ?? null),
     ),
   /** With `baseVersion` (from `get`), a write merges with whatever landed since it was read. */
-  update: workspaceProcedure
+  update: pageProcedure
     .input(
       z.object({ id: z.string(), write: sheetWriteSchema, baseVersion: z.string().optional() }),
     )
@@ -30,19 +32,19 @@ export const sheetMutations = router({
       const sheet = updateSheetFromSource(ctx.ws, input.id, input.write, null, input.baseVersion)
       return { ...sheet, version: sheetVersion(ctx.ws, input.id) ?? undefined }
     }),
-  undoWashi: workspaceProcedure
+  undoWashi: pageProcedure
     .input(byId)
     .mutation(({ ctx, input }) => undoWashiWrite(ctx.ws, input.id)),
-  updateMeta: workspaceProcedure
+  updateMeta: pageProcedure
     .input(z.object({ id: z.string(), patch: sheetMetaPatchSchema }))
     .mutation(({ ctx, input }) => updateSheetMetaAndLook(ctx.ws, input.id, input.patch)),
-  duplicate: workspaceProcedure
+  duplicate: pageProcedure
     .input(byId)
     .mutation(({ ctx, input }) => duplicateSheet(ctx.ws, input.id)),
-  remove: workspaceProcedure.input(byId).mutation(({ ctx, input }) => {
+  remove: pageProcedure.input(byId).mutation(({ ctx, input }) => {
     removeSheet(ctx.ws, input.id)
   }),
-  move: workspaceProcedure
+  move: pageProcedure
     .input(
       z.object({
         id: z.string(),
@@ -53,16 +55,36 @@ export const sheetMutations = router({
     .mutation(({ ctx, input }) => {
       moveSheetTo(ctx.ws, input.id, input.parentId, input.index)
     }),
-  restore: workspaceProcedure
+  restore: pageProcedure
     .input(byId)
     .mutation(({ ctx, input }) => restoreSheetTree(ctx.ws, input.id)),
-  purge: workspaceProcedure.input(byId).mutation(async ({ ctx, input }) => {
+  purge: pageProcedure.input(byId).mutation(async ({ ctx, input }) => {
     const uploads = trashedUploads(ctx.ws, input.id)
     const purged = purgeSheet(ctx.ws, input.id)
     await Promise.all(uploads.map((id) => ctx.files.remove(id)))
     return purged
   }),
+  setAccess: pageProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        visibility: z.enum(['private', 'shared', 'public']),
+        access: z.array(z.string().min(1).max(80)).max(64),
+      }),
+    )
+    .mutation(({ ctx, input }) => updateSheetAccess(ctx.ws, input.id, input, ctx.viewer.id)),
+  /** Empties what this person can see; private pages of others stay in the Trash. */
   emptyTrash: workspaceProcedure.mutation(async ({ ctx }) => {
+    if (!ctx.viewer.isOwner) {
+      const readable = readableSet(ctx.ws, ctx.viewer)
+      let emptied = 0
+      for (const entry of listTrash(ctx.ws).filter((page) => readable.has(page.id))) {
+        const uploads = trashedUploads(ctx.ws, entry.id)
+        emptied += purgeSheet(ctx.ws, entry.id) ? 1 : 0
+        await Promise.all(uploads.map((id) => ctx.files.remove(id)))
+      }
+      return emptied
+    }
     const uploads = trashedUploads(ctx.ws)
     const emptied = emptyTrash(ctx.ws)
     await Promise.all(uploads.map((id) => ctx.files.remove(id)))

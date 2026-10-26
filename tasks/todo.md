@@ -1,3 +1,25 @@
+# D65 · share a page, limit who reads it, redact what leaves (2026-10-26)
+
+Juan, after Notion's Share menu: a read-only link; `visibility` + `access` on `<Sheet>` enforced;
+`<Redact reason>` + `redact={[cols]}` on data views. Stacked on #78 (D64: props are the truth).
+
+- [ ] paper: `<Sheet access>`, `<Redact reason>`, `redact` on data views; `pageTables`,
+      `redactedColumns`, `redactForShare` (zod-only, isomorphic)
+- [ ] cache `visibility` + `access` columns on every write; `readable(summaries, viewer)` with
+      inheritance (a page is as closed as its most closed ancestor); owners read everything
+- [ ] enforce: list · get · search · backlinks · comments · every page mutation; Washi reads as
+      the asker (routines: workspace pages only); Washi never changes visibility/access and never
+      shrinks redactions on a public page
+- [ ] links: `sheet_shares` (token, revocable); `public` ⇔ a live link; studio `/api/share/*`
+      (page, query, file) with masking + refusal of queries touching redacted columns; `/s/$ws/$token`
+- [ ] UI: Share popover (who can read · link on/off · copy · what's hidden), lock/globe in the tree,
+      Redact rendering (members: hatched "hidden when shared"; link: a bar)
+- [ ] docs: PRD D65, wsx-primitives, CLAUDE.md; tests for every refusal
+
+Accept: a private page vanishes for a non-listed member everywhere (list, search, Washi); the link
+shows the page with redactions as bars and redacted columns gone; a query filtering on a redacted
+column is refused; revoking kills the link; gates green.
+
 # D64 · icon and cover live in WSX (2026-10-25)
 
 Juan: "cover and icon should be a component that is part of wsx" → props on `<Sheet>`; the doc is
