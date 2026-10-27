@@ -1,5 +1,4 @@
 import { PeopleSection } from '@/components/people'
-import { RoutinesSection } from '@/components/routines'
 import { AgentTab } from './agent-tab'
 import { GeneralSection } from './general-section'
 import { ADMIN_TABS, SETTINGS_GROUPS, type SettingsScreenProps, useInstanceAdmin } from './lib'
@@ -35,7 +34,6 @@ export function SettingsScreen({ workspaceId, tab, onTab }: SettingsScreenProps)
           {(shown === 'models' || shown === 'outside' || shown === 'usage') && (
             <AgentTab part={shown} />
           )}
-          {shown === 'routines' && <RoutinesSection />}
           {shown === 'server' && <ServerTab />}
         </div>
       </div>

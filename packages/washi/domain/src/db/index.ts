@@ -10,6 +10,7 @@ export {
   mentionInboxTable,
   oplogTable,
   recordTable,
+  routineRunTable,
   routineTable,
   sheetLinkTable,
   sheetRevisionTable,

@@ -5,8 +5,8 @@ export function NameField({ label, field, disabled, hint }: NameFieldProps) {
   const { draft, isChanged, status, commit } = field
   const failed = status !== 'idle' && status !== 'saving' && status !== 'saved'
   return (
-    <div className="border-border border-t px-4 py-3 first:border-t-0">
-      <label className="block text-[13.5px]" htmlFor={label}>
+    <div className="border-border border-t px-5 py-4 first:border-t-0">
+      <label className="block font-medium text-[13.5px]" htmlFor={label}>
         {label}
       </label>
       <div className="mt-2 flex gap-2">

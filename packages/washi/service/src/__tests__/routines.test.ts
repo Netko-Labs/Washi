@@ -14,7 +14,7 @@ const UTC = 'UTC'
 const make = (over: Partial<RoutineCreate> = {}): RoutineCreate => ({
   title: 'r',
   prompt: 'p',
-  minuteOfDay: 7 * 60,
+  cron: '0 7 * * *',
   timeZone: UTC,
   ...over,
 })
@@ -119,7 +119,7 @@ describe('routines can not outrun the daily stop', () => {
     const routine = book.create(make(), null, at('2026-10-07T00:00:00Z'))
     budget.open = false
     expect(book.tick(at('2026-10-08T07:00:00Z'))).toEqual([])
-    expect(getRoutine(ws, routine.id)?.lastRunDay).toBeNull()
+    expect(getRoutine(ws, routine.id)?.lastRunAt).toBeNull()
     budget.open = true
     expect(book.tick(at('2026-10-08T09:00:00Z'))).toEqual([routine.id])
     expect(prompts).toHaveLength(1)
@@ -155,9 +155,9 @@ describe('each run is its own conversation', () => {
       throw new Error('boom')
     }
     const book = new RoutineBook(ws, runner)
-    const routine = book.create(make({ minuteOfDay: 0 }), null, at('2026-10-07T00:00:00Z'))
+    const routine = book.create(make({ cron: '0 0 * * *' }), null, at('2026-10-07T00:00:00Z'))
     book.tick(at('2026-10-08T00:00:00Z'))
-    expect(getRoutine(ws, routine.id)?.lastRunDay).toBe('2026-10-08')
+    expect(getRoutine(ws, routine.id)?.lastRunAt).toBe('2026-10-08T00:00')
     expect(book.tick(at('2026-10-08T00:05:00Z'))).toEqual([])
   })
 })
@@ -169,5 +169,61 @@ describe('a zone is stored the way every client will spell it', () => {
     const utc = parse('utc')
     expect(utc.success && utc.data.timeZone).toBe('UTC')
     expect(parse('Mars/Olympus_Mons').success).toBe(false)
+  })
+})
+
+describe('routines v2 (D68): cron, edits, run history', () => {
+  test('a weekday schedule skips the weekend and catches the Monday', () => {
+    const { runner } = fakeRunner()
+    const book = new RoutineBook(ws, runner)
+    // 2026-10-09 is a Friday.
+    const routine = book.create(make({ cron: '0 9 * * 1-5' }), null, at('2026-10-09T10:00:00Z'))
+    expect(isDue(routine, at('2026-10-10T09:00:00Z'))).toBe(false)
+    expect(isDue(routine, at('2026-10-11T09:00:00Z'))).toBe(false)
+    expect(isDue(routine, at('2026-10-12T09:00:00Z'))).toBe(true)
+  })
+
+  test('every run is recorded with its trigger; Run now leaves the schedule alone', () => {
+    const { runner, running } = fakeRunner()
+    const book = new RoutineBook(ws, runner)
+    const routine = book.create(make(), null, at('2026-10-07T00:00:00Z'))
+    book.run(routine.id, at('2026-10-07T03:00:00Z'))
+    expect(getRoutine(ws, routine.id)?.lastRunAt).toBeNull()
+    running.clear()
+    book.tick(at('2026-10-07T07:00:00Z'))
+    const runs = book.runs(routine.id)
+    expect(runs.map((run) => run.trigger).sort()).toEqual(['manual', 'schedule'])
+    expect(runs.every((run) => run.status === 'done' || run.status === 'running')).toBe(true)
+  })
+
+  test('a new schedule starts from now, like a new routine', () => {
+    const { runner, prompts } = fakeRunner()
+    const book = new RoutineBook(ws, runner)
+    const routine = book.create(make(), null, at('2026-10-08T06:00:00Z'))
+    book.update({ id: routine.id, cron: '0 5 * * *' }, at('2026-10-08T06:00:00Z'))
+    expect(book.tick(at('2026-10-08T06:01:00Z'))).toEqual([])
+    expect(getRoutine(ws, routine.id)?.minuteOfDay).toBe(5 * 60)
+    expect(prompts).toEqual([])
+  })
+
+  test('the old shape still parses: minuteOfDay becomes a daily cron', () => {
+    const parsed = routineCreateSchema.parse({
+      title: 't',
+      prompt: 'p',
+      minuteOfDay: 450,
+      timeZone: 'UTC',
+    })
+    expect(parsed.cron).toBe('30 7 * * *')
+    expect(
+      routineCreateSchema.safeParse({ title: 't', prompt: 'p', timeZone: 'UTC' }).success,
+    ).toBe(false)
+    expect(
+      routineCreateSchema.safeParse({
+        title: 't',
+        prompt: 'p',
+        cron: '61 * * * *',
+        timeZone: 'UTC',
+      }).success,
+    ).toBe(false)
   })
 })

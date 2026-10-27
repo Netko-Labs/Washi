@@ -55,7 +55,7 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   Pages are routes: `/sign-in?redirect=`, `/workspaces?invite=`, `/new` (a new workspace: name it ·
   start it · invite people, then the workspace's first run wakes Washi), `/s/$workspaceId/$token` (a
   page's read-only link, no session — D65), `/w/$workspaceId` (dashboard),
-  `/p/$pageId`, `/inbox`, `/chats` · `/chats/new` · `/chats/$chatId` (D67), `/settings?tab=`, `/trash`. The workspace loader resets the shared stores (child
+  `/p/$pageId`, `/inbox`, `/chats` · `/chats/new` · `/chats/$chatId` (D67), `/routines` · `/routines/$id` (D68), `/settings?tab=`, `/trash`. The workspace loader resets the shared stores (child
   effects run before the layout's); routes mark their view active, and a page chosen anywhere
   pushes its URL (`useTabNavigation`). **No tab strip on the web (D58)** — the URL is the whole
   state; `TabStrip` is the desktop's. The sidebar is **Sidebar D (D57)**: the ask field (the
@@ -224,6 +224,15 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
 - Agent subscriptions are workspaceProcedures and filter on `workspaceId`: one bus serves every
   workspace. HTTP names the workspace in `x-washi-workspace`; a socket in `connectionParams`
   (`contextFromRequest` is the one place both are read). Switching workspace closes the socket.
+- **Routines are pages (D68).** `/routines` (switches, next run, templates) and
+  `/routines/$id` (`?tab=setup|runs`; `/routines/new?template=`). A schedule is five-field cron on
+  the wall clock of its IANA zone (`@washi/domain` `shared/cron`: `parseCron`, `latestOccurrence`,
+  `nextOccurrence`, `describeCron`); due = not run since the latest minute it names **today**
+  (`last_run_at`, a wall key `YYYY-MM-DDTHH:MM`), so a night off never catches up tomorrow.
+  `minuteOfDay` is still accepted on create (→ a daily cron) and still returned, for the desktop.
+  Every run is a row in `routine_runs` (trigger `schedule`·`manual`) and its own chat (the
+  workspace's: `created_by` null); status, cost and duration are read off that chat. Run now leaves
+  the schedule alone. Saving or resuming never fires: the minute already past today counts as run.
 - **Routines** run on the server's minute clock (`packages/washi/runtime/src/clock.ts`), over the
   workspaces `ControlPlane.workspaceIds()` knows that already have a file — never a stray or
   deleted one, never a conjured `default`. A run is an ordinary `host.prompt` in a fresh session:

@@ -45,7 +45,7 @@ export function EnabledModelsCard({ models, provider, enabled, onChange }: Enabl
       desc="What the model chip under the ask offers. A conversation can switch between these."
       tag={{ label: `${current.length} on`, tone: current.length > 0 ? 'ok' : 'off' }}
     >
-      <div className="flex items-center gap-2 border-border border-b px-4">
+      <div className="flex items-center gap-2 border-border border-b px-5">
         <IconSearch className="size-3.5 text-muted-foreground" />
         <input
           value={term}

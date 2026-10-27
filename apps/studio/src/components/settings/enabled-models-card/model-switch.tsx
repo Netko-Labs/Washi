@@ -3,7 +3,7 @@ import type { ModelSwitchProps } from '../lib'
 /** A model as a row with a switch: name and id, its price, and whether the team may pick it. */
 export function ModelSwitch({ model, isOn, isRecommended, onToggle }: ModelSwitchProps) {
   return (
-    <li className="flex items-center gap-3 border-border border-t px-4 py-2.5 first:border-t-0">
+    <li className="flex items-center gap-3 border-border border-t px-5 py-3 first:border-t-0">
       <span className="min-w-0 flex-1">
         <span className="flex items-center gap-2 text-[13px]">
           <span className="truncate">{model.name}</span>
