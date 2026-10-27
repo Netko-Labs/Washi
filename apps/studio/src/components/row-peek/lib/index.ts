@@ -1,3 +1,4 @@
+export { PEEK_DISMISS_SWIPE } from './constants'
 export { usePeek } from './hooks/use-peek'
 export { usePeekEscape } from './hooks/use-peek-escape'
 export { usePeekMode } from './hooks/use-peek-mode'

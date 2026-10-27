@@ -29,7 +29,7 @@ export function RowPeek({ workspaceId }: RowPeekProps) {
         role="dialog"
         aria-modal={mode === 'center'}
         aria-label="Row"
-        className={`fade-in fixed z-50 flex animate-in flex-col overflow-hidden border-border bg-background duration-200 ease-out max-md:inset-0 max-md:h-full max-md:w-full max-md:min-w-0 max-md:rounded-none max-md:border-0 ${PEEK_FRAME[mode]}`}
+        className={`fade-in fixed z-50 flex animate-in flex-col overflow-hidden border-border bg-background duration-200 ease-out max-md:inset-x-0 max-md:top-[env(safe-area-inset-top)] max-md:bottom-0 max-md:left-0 max-md:h-auto max-md:w-full max-md:min-w-0 max-md:rounded-t-2xl max-md:border-0 max-md:[--tw-enter-scale:1] max-md:[--tw-enter-translate-x:0] max-md:slide-in-from-bottom-16 ${PEEK_FRAME[mode]}`}
       >
         <RowPeekBar mode={mode} onMode={setMode} onClose={peek.close} onExpand={peek.expand} />
         <SheetView

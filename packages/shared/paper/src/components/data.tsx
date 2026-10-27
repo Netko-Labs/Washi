@@ -74,6 +74,7 @@ export function Table({
                       return (
                         <td
                           key={key}
+                          data-label={tableLabel(key)}
                           data-num={numeric.has(key) || undefined}
                           data-negative={(isNumber && value < 0) || undefined}
                           data-bool={typeof value === 'boolean' ? String(value) : undefined}

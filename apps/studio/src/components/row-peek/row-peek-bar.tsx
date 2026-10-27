@@ -1,13 +1,31 @@
 import { IconArrowsDiagonal, IconChevronsRight, IconX } from '@tabler/icons-react'
-import { PEEK_MODES, type RowPeekBarProps } from './lib'
+import { useRef } from 'react'
+import { useSwipe } from '@/components/shared/gestures'
+import { PEEK_DISMISS_SWIPE, PEEK_MODES, type RowPeekBarProps } from './lib'
 
 const ICON_BUTTON =
   'grid size-8 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground'
 
 export function RowPeekBar({ mode, onMode, onClose, onExpand }: RowPeekBarProps) {
   const Close = mode === 'side' ? IconChevronsRight : IconX
+  const bar = useRef<HTMLDivElement>(null)
+  // On a phone the peek is a sheet: its bar is the grip that pulls it down and away.
+  useSwipe(bar, {
+    axis: 'y',
+    sign: 1,
+    distance: PEEK_DISMISS_SWIPE,
+    follower: (el) => el.closest<HTMLElement>('[role="dialog"]'),
+    onSwipe: onClose,
+  })
   return (
-    <div className="flex h-12 shrink-0 items-center gap-1 border-border/70 border-b px-2.5">
+    <div
+      ref={bar}
+      className="relative flex h-12 shrink-0 touch-none items-center gap-1 border-border/70 border-b px-2.5 max-md:h-14 max-md:pt-2"
+    >
+      <span
+        aria-hidden
+        className="absolute top-1.5 left-1/2 h-1 w-9 -translate-x-1/2 rounded-full bg-foreground/20 md:hidden"
+      />
       <button
         type="button"
         onClick={onClose}
