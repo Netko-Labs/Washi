@@ -59,9 +59,11 @@ export function computeRollups(
       for (const row of rows) row[column.name] = null
       continue
     }
+    // A relation holds this row's id; anything else holds a value equal to this row's `on`. A list
+    // (relation or multi_select) counts its row toward every row it names.
     const viaColumn = fetched.spec.columns.find((each) => each.name === rollup.via)
     const isList = viaColumn ? ARRAY_COLUMN_TYPES.has(viaColumn.type) : false
-    const on = isList ? 'id' : (rollup.on ?? firstText)
+    const on = viaColumn?.type === 'relation' ? 'id' : (rollup.on ?? firstText)
 
     const buckets = new Map<string, Scalar[]>()
     for (const target of fetched.rows) {

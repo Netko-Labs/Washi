@@ -64,9 +64,12 @@ export function checkRollups(ws: Workspace, spec: TableSpec): void {
     if (via?.type === 'relation' && via.table !== spec.name) {
       fail(`"${rollup.via}" points at "${via.table}", not "${spec.name}"`)
     }
+    // Rollups run before formulas, so `on` must be stored: a computed one is still empty here.
     if (via && via.type !== 'relation' && rollup.on) {
       const on = spec.columns.find((each) => each.name === rollup.on)
-      if (!on || ARRAY_COLUMN_TYPES.has(on.type)) fail(`"${rollup.on}" is not a column to match on`)
+      const isStoredScalar =
+        on && !ARRAY_COLUMN_TYPES.has(on.type) && on.type !== 'formula' && on.type !== 'rollup'
+      if (!isStoredScalar) fail(`"${rollup.on}" is not a stored column to match on`)
     }
     if (rollup.fn !== 'count') {
       const aggregated = rollup.column ? columns.get(rollup.column) : undefined

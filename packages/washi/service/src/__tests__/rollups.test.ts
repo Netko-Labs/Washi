@@ -135,7 +135,48 @@ describe('rollups (D74)', () => {
       'itself a rollup',
     )
     expect(() =>
+      defineUserTable(ws, {
+        name: 'bad_on',
+        columns: [
+          { name: 'name', type: 'text' },
+          { name: 'key', type: 'formula', expr: 'name' },
+          {
+            name: 'r',
+            type: 'rollup',
+            rollup: { table: 'expenses', via: 'category', on: 'key', fn: 'count' },
+          },
+        ],
+      }),
+    ).toThrow('not a stored column to match on')
+    expect(() =>
       runMutation(ws, { kind: 'insert', table: 'categories', data: { name: 'x', spent: 1 } }),
     ).toThrow('computed from the rows it rolls up')
+  })
+
+  test('a multi_select via counts its row toward every choice it holds', () => {
+    defineUserTable(ws, {
+      name: 'posts',
+      columns: [
+        { name: 'title', type: 'text' },
+        { name: 'tags', type: 'multi_select', options: ['Health', 'Pets'] },
+      ],
+    })
+    runMutation(ws, {
+      kind: 'insert',
+      table: 'posts',
+      data: { title: 'a', tags: ['Health', 'Pets'] },
+    })
+    runMutation(ws, { kind: 'insert', table: 'posts', data: { title: 'b', tags: ['Pets'] } })
+    defineUserTable(ws, {
+      name: 'categories',
+      columns: [
+        { name: 'name', type: 'text' },
+        { name: 'budget', type: 'number' },
+        { name: 'posts', type: 'rollup', rollup: { table: 'posts', via: 'tags', fn: 'count' } },
+      ],
+    })
+    const rows = byName(runQuery(ws, { table: 'categories' }).rows)
+    expect(rows.Health).toMatchObject({ posts: 1 })
+    expect(rows.Pets).toMatchObject({ posts: 2 })
   })
 })
