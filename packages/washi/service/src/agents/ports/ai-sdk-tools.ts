@@ -1,4 +1,4 @@
-import type { Member, Viewer } from '@washi/domain'
+import { linkColumnInputSchema, type Member, type Viewer } from '@washi/domain'
 import { historyQuerySchema, mutationSchema, querySchema, tableSpecSchema } from '@washi/ink'
 import { listTables, type Workspace } from '@washi/repository'
 import { guardedFetch } from '@washi/tsuru'
@@ -7,6 +7,7 @@ import { z } from 'zod'
 import { NOBODY } from '../../sheets/access'
 import { checkSource, createSheetFromSource, updateSheetFromSource } from '../../sheets/service'
 import { runHistory } from '../../tables/history'
+import { linkColumn } from '../../tables/link'
 import { defineUserTable, runMutation, runQuery } from '../../tables/service'
 import type { SearchKeyLookup } from '../lib'
 import { pagesFor } from '../lib/pages'
@@ -151,6 +152,12 @@ export function createAiTools({
         "Create or update a table — a database of rows, Notion-style. Column types: text, number, boolean, date (ISO, or start/end), select + options, multi_select + options, status + groups {todo, doing, done}, person (member id), url, relation + table (holds record ids), formula + expr — computed on every read from its own row, never written: month(date), usd * fx_rate, when(paid, false, days(now(), due) < 0); it reads the row’s columns and earlier formulas, no aggregates. Use one instead of a column you would fill by hand from other columns. rollup + rollup {table, via, fn, column?, where?, on?} — one aggregate over another table's rows that point at this row (via a relation holding its id, or a plain value equal to this row's `on`, default its first text column), never written: categories.spent = {table:'expenses', via:'category', fn:'sum', column:'amount', where:[{column:'month', op:'eq', value:{param:'month'}}]}; a query's params fill {param} (unset drops it); formulas may read rollups (left = budget - spent).",
       inputSchema: z.object({ spec: tableSpecSchema }),
       execute: async ({ spec }) => defineUserTable(ws, spec),
+    }),
+    db_link_column: tool({
+      description:
+        'Turn a text, select or multi_select column into a relation to another table: each value names the target row whose text column (on, default its first) reads the same, ignoring case and spaces, so renaming that row renames it everywhere and rollups match by id. create: true makes a target row for each value nothing matches; without it, unmatched values are refused and listed. Pages that filter the old column by name must then filter by id.',
+      inputSchema: z.object({ input: linkColumnInputSchema }),
+      execute: async ({ input }) => linkColumn(ws, input),
     }),
     db_mutate: tool({
       description: 'Insert, update, or delete records.',
