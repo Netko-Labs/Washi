@@ -16,7 +16,7 @@ export function AgentTab({ part }: AgentTabProps) {
     target === 'exa' ? searchKey : key?.provider === target ? key : null
 
   return (
-    <div className="grid gap-4">
+    <div className="grid gap-9">
       {settings.loading && <p className="text-[13px] text-muted-foreground">Loading…</p>}
 
       {part === 'models' && (

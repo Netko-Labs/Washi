@@ -1,5 +1,6 @@
+import { dailyCron, latestOccurrence } from '@washi/domain'
 import { createRoutine, getTableByName, type Workspace } from '@washi/repository'
-import { alreadyPassed, zonedNow } from '../agents/routines'
+import { firstMinuteOfDay, zonedNow } from '../agents/routines'
 import { createSheetFromSource } from '../sheets/service'
 import { InkError } from './errors'
 import { defineUserTable, runMutation } from './service'
@@ -130,11 +131,12 @@ export function seedTeamSpace(ws: Workspace, options: TeamSpaceOptions): TeamSpa
   createRoutine(ws, {
     title: 'Weekly review',
     prompt: REVIEW_PROMPT,
-    minuteOfDay: REVIEW_MINUTE,
+    cron: dailyCron(REVIEW_MINUTE),
+    minuteOfDay: firstMinuteOfDay(dailyCron(REVIEW_MINUTE)),
     timeZone: options.timeZone,
     createdBy: options.actorId,
     // Set up after 17:00, the first review is tomorrow's — never a run the moment the space appears.
-    lastRunDay: alreadyPassed(REVIEW_MINUTE, options.timeZone, new Date()),
+    lastRunAt: latestOccurrence(dailyCron(REVIEW_MINUTE), options.timeZone, new Date()),
   })
   return { backlog: backlog.id }
 }

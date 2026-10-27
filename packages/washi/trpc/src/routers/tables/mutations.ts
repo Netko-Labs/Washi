@@ -1,4 +1,4 @@
-import { routineCreateSchema } from '@washi/domain'
+import { timeZoneSchema } from '@washi/domain'
 import { mutationSchema, tableSpecSchema } from '@washi/ink'
 import {
   defineUserTable,
@@ -23,7 +23,7 @@ export const tableMutations = router({
     .mutation(({ ctx, input }) => ({ sheetId: openRowPage(ctx.ws, input.recordId) })),
   /** Backlog, roadmap, wiki, ideas and a weekly review, on the asker's clock. */
   seedTeamSpace: workspaceProcedure
-    .input(routineCreateSchema.pick({ timeZone: true }))
+    .input(z.object({ timeZone: timeZoneSchema }))
     .mutation(({ ctx, input }) =>
       seedTeamSpace(ctx.ws, { timeZone: input.timeZone, actorId: ctx.actorId }),
     ),

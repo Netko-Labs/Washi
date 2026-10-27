@@ -1,7 +1,15 @@
 import { create } from 'zustand'
 import { useSheetsStore } from '../sheets/sheets-store'
 
-export type AppView = 'note' | 'dashboard' | 'inbox' | 'chats' | 'daily' | 'settings' | 'trash'
+export type AppView =
+  | 'note'
+  | 'dashboard'
+  | 'inbox'
+  | 'chats'
+  | 'routines'
+  | 'daily'
+  | 'settings'
+  | 'trash'
 export type TabKey = `note:${string}` | `view:${Exclude<AppView, 'note'>}`
 
 export interface Identity {

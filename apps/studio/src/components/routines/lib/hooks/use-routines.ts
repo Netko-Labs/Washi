@@ -1,18 +1,17 @@
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '@/integrations/trpc'
-import type { RoutineInput, RoutineWire } from '../types'
+import type { RoutineWire } from '../types'
 
+/** The list page's routines; a switch flips one in place and rereads. */
 export function useRoutines() {
-  const [routines, setRoutines] = useState<RoutineWire[]>([])
+  const [routines, setRoutines] = useState<RoutineWire[] | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const refresh = useCallback(async () => {
     try {
       setRoutines(await api.routines.list.query())
-      return true
     } catch (cause) {
-      setError(String(cause))
-      return false
+      setError(cause instanceof Error ? cause.message : String(cause))
     }
   }, [])
 
@@ -20,24 +19,14 @@ export function useRoutines() {
     void refresh()
   }, [refresh])
 
-  const act = async (action: () => Promise<unknown>) => {
-    setError(null)
-    try {
-      await action()
-      return await refresh()
-    } catch (cause) {
-      setError(cause instanceof Error ? cause.message : String(cause))
-      return false
-    }
+  const toggle = async (id: string, enabled: boolean) => {
+    setRoutines(
+      (current) =>
+        current?.map((routine) => (routine.id === id ? { ...routine, enabled } : routine)) ?? null,
+    )
+    await api.routines.setEnabled.mutate({ id, enabled }).catch(() => undefined)
+    await refresh()
   }
 
-  return {
-    routines,
-    error,
-    create: (input: RoutineInput) => act(() => api.routines.create.mutate(input)),
-    toggle: (id: string, enabled: boolean) =>
-      void act(() => api.routines.setEnabled.mutate({ id, enabled })),
-    runNow: (id: string) => void act(() => api.routines.runNow.mutate({ id })),
-    remove: (id: string) => void act(() => api.routines.remove.mutate({ id })),
-  }
+  return { routines, error, toggle }
 }

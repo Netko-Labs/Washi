@@ -1,4 +1,3 @@
-import { useRouter, useRouterState } from '@tanstack/react-router'
 import { type TabKey, useAgentStore, useViewStore } from '@washi/ui'
 import type { MouseEvent } from 'react'
 import { useMentionsStore } from '@/components/mentions'
@@ -6,19 +5,16 @@ import { pathFor } from '@/components/shell'
 import type { PlaceId } from '../types'
 import { openInPlace } from '../utils'
 
-const TABS: Record<Exclude<PlaceId, 'routines'>, TabKey> = {
+const TABS: Record<PlaceId, TabKey> = {
   home: 'view:dashboard',
   inbox: 'view:inbox',
   chats: 'view:chats',
+  routines: 'view:routines',
 }
 
 /** Which place is open, where each one lives, and the Inbox's count. Nothing is open on a page. */
 export function usePlaces(workspaceId: string, onNavigate: () => void) {
-  const router = useRouter()
   const activeTab = useViewStore((state) => state.activeTab)
-  const settingsTab = useRouterState({
-    select: (state) => (state.location.search as { tab?: string }).tab,
-  })
   const inboxCount =
     useAgentStore((state) => state.approvals.length) + useMentionsStore((state) => state.unread)
 
@@ -29,19 +25,15 @@ export function usePlaces(workspaceId: string, onNavigate: () => void) {
         ? 'inbox'
         : activeTab === 'view:chats'
           ? 'chats'
-          : activeTab === 'view:settings' && settingsTab === 'routines'
+          : activeTab === 'view:routines'
             ? 'routines'
             : null
 
-  const hrefOf = (id: PlaceId) =>
-    id === 'routines'
-      ? `${pathFor(workspaceId, 'view:settings')}?tab=routines`
-      : pathFor(workspaceId, TABS[id])
+  const hrefOf = (id: PlaceId) => pathFor(workspaceId, TABS[id])
 
   const open = (id: PlaceId) => (event: MouseEvent) =>
     openInPlace(event, () => {
-      if (id === 'routines') void router.navigate({ href: hrefOf(id) })
-      else useViewStore.getState().openTab(TABS[id])
+      useViewStore.getState().openTab(TABS[id])
       onNavigate()
     })
 

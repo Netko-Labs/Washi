@@ -11,6 +11,8 @@ export const STATE_LABELS: Record<string, string> = {
 export const VIEW_LABELS: Record<string, string> = {
   dashboard: 'Dashboard',
   inbox: 'Inbox',
+  chats: 'Chats',
+  routines: 'Routines',
   daily: 'Daily note',
   settings: 'Settings',
   trash: 'Trash',

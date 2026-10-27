@@ -50,9 +50,8 @@ export function SidebarPages({ workspaceId, onNavigate }: SidebarSectionProps) {
       </button>
       <div className={LABEL}>Routines</div>
       <Link
-        to="/w/$workspaceId/settings"
+        to="/w/$workspaceId/routines/new"
         params={{ workspaceId }}
-        search={{ tab: 'routines' }}
         onClick={onNavigate}
         className={ROW}
       >

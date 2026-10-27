@@ -7,7 +7,7 @@ export function ProviderRow({ meta, connected, onConnect, onRemove }: ProviderRo
     : `Not connected · ${meta.blurb}`
 
   return (
-    <div className="flex items-center gap-3 border-border border-t px-4 py-3 text-[13.5px] first:border-t-0">
+    <div className="flex items-center gap-3 border-border border-t px-5 py-4 text-[13.5px] first:border-t-0">
       <span
         className={`grid size-[30px] shrink-0 place-items-center rounded-lg font-extrabold text-[12px] ${meta.tint}`}
         aria-hidden
