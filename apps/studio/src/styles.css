@@ -3,14 +3,20 @@
 @import "@washi/ui/css";
 
 /*
- * The desktop shell disables selection and overscroll because it is pretending
- * to be a native window. On the web a page is for reading — selecting text is
- * the point, and rubber-banding is what a browser is supposed to do.
+ * The desktop shell disables selection because it is pretending to be a native
+ * window. On the web a page is for reading — selecting text is the point.
  */
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+}
+
+/* The shell scrolls inner panes, not the body, so the root rule alone would miss them. Only y: x keeps swipe-back. */
+html,
+body,
+* {
+  overscroll-behavior-y: none;
 }
 
 /* A block Washi built, inside the editor: its own paper, minus the page frame around it. */
