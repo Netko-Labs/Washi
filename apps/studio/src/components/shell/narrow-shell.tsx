@@ -1,15 +1,16 @@
 import { Header, useViewStore } from '@washi/ui'
-import { AskBar, BackHome } from '@/components/sidebar'
+import { BackHome } from '@/components/sidebar'
 import { AgentLayer } from './agent-layer'
 import { DrawerEdge } from './drawer-edge'
-import { HeaderActions } from './header-actions'
 import type { WorkspaceShellProps } from './lib'
 import { MobileDrawer } from './mobile-drawer'
+import { NarrowHeaderActions } from './narrow-header-actions'
 import { SidebarButton } from './sidebar-button'
 
 /**
  * Under `md`: the same Home and pages as the desktop, one at a time. ☰ (or a swipe in from the
- * left edge) opens the whole sidebar as a full-screen menu; a page has ‹ back to Home.
+ * left edge) opens the whole sidebar as a full-screen menu; a page has ‹ back to Home. Washi is
+ * the mascot under the thumb, as on the desktop.
  */
 export function NarrowShell({ workspace, children }: WorkspaceShellProps) {
   const activeTab = useViewStore((state) => state.activeTab)
@@ -17,7 +18,7 @@ export function NarrowShell({ workspace, children }: WorkspaceShellProps) {
 
   return (
     <>
-      <main className="flex min-w-0 flex-1 flex-col pb-[60px]">
+      <main className="flex min-w-0 flex-1 flex-col">
         <Header
           leading={
             <>
@@ -25,14 +26,14 @@ export function NarrowShell({ workspace, children }: WorkspaceShellProps) {
               {!isHome && <BackHome workspaceId={workspace.id} />}
             </>
           }
-          actions={<HeaderActions />}
+          actions={<NarrowHeaderActions />}
+          starInActions
         />
         {children}
       </main>
       <DrawerEdge />
       <MobileDrawer workspace={workspace} />
-      <AskBar />
-      <AgentLayer fab={false} placement="sheet" />
+      <AgentLayer placement="sheet" />
     </>
   )
 }

@@ -2,12 +2,12 @@ import { FavoriteStar } from '../favorite-star'
 import { relativeTime } from '../page-time'
 import { ancestorsOf } from '../page-tree'
 import { noteIdOf, useSheetsStore, useViewStore, viewOf } from '../stores'
-import { MAX_CRUMBS, VIEW_LABELS } from './lib'
+import { type HeaderCrumbsProps, MAX_CRUMBS, VIEW_LABELS } from './lib'
 
 const SLASH = <span className="text-muted-foreground opacity-50">/</span>
 
 /** Workspace / … / parent / page — every page above this one is a step back up. */
-export function HeaderCrumbs() {
+export function HeaderCrumbs({ starInActions }: HeaderCrumbsProps) {
   const sheets = useSheetsStore((state) => state.sheets)
   const activeTab = useViewStore((state) => state.activeTab)
   const workspaceName = useViewStore((state) => state.workspaceName)
@@ -51,7 +51,7 @@ export function HeaderCrumbs() {
           </span>
         )}
       </nav>
-      {view === 'note' && active && <FavoriteStar sheetId={active.id} />}
+      {view === 'note' && active && !starInActions && <FavoriteStar sheetId={active.id} />}
     </>
   )
 }

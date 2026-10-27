@@ -6,7 +6,7 @@ import type { AgentLayerProps } from './lib'
 const CHAT_PAGE = /^\/w\/[^/]+\/chats\/[^/]+$/
 
 /** On a chat's own page the chat is the page, so neither the door nor the room is drawn. */
-export function AgentLayer({ fab = true, placement = 'float' }: AgentLayerProps) {
+export function AgentLayer({ placement = 'float' }: AgentLayerProps) {
   const panelOpen = useAgentStore((state) => state.panelOpen)
   const pathname = useRouterState({ select: (state) => state.location.pathname })
   const navigate = useNavigate()
@@ -21,7 +21,8 @@ export function AgentLayer({ fab = true, placement = 'float' }: AgentLayerProps)
 
   return (
     <>
-      {fab && (placement !== 'dock' || !panelOpen) && <AgentFab />}
+      {/* The door stays beside a floating panel; a dock or a phone's sheet covers where it sits. */}
+      {(placement === 'float' || !panelOpen) && <AgentFab />}
       {panelOpen && <AgentPanel placement={placement} onExpand={expand} />}
     </>
   )

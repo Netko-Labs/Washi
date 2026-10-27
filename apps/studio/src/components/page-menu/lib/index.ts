@@ -1,1 +1,7 @@
-export type { PageMenuListProps, PageMenuMode, PageMenuPanelProps, PageMenuProps } from './types'
+export type {
+  PageMenuListProps,
+  PageMenuMode,
+  PageMenuPanelProps,
+  PageMenuProps,
+  PageMenuQuickProps,
+} from './types'

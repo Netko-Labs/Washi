@@ -8,8 +8,6 @@ export interface WorkspaceShellProps {
 }
 
 export interface AgentLayerProps {
-  /** The desktop-width door; under `md` the ask bar is the door and the FAB stays home. */
-  fab?: boolean
   /** Float over the page, dock beside it, or fill a phone (D61). */
   placement?: PanelPlacement
 }

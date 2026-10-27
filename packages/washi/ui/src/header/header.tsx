@@ -4,14 +4,14 @@ import { HeaderCrumbs } from './header-crumbs'
 import { type HeaderProps, STATE_LABELS, useAgentMood } from './lib'
 
 /** 48px header: breadcrumb + agent status pill (Washi.dc.html rev 2 — no bot button, FAB rules). */
-export function Header({ leading, actions }: HeaderProps) {
+export function Header({ leading, actions, starInActions }: HeaderProps) {
   const isNote = useViewStore((state) => viewOf(state.activeTab) === 'note')
   const mascotState = useAgentMood()
 
   return (
     <header className="@container flex h-12 shrink-0 items-center gap-2.5 border-border border-b px-4">
       {leading}
-      <HeaderCrumbs />
+      <HeaderCrumbs starInActions={starInActions} />
       <div className="ml-auto flex flex-none items-center gap-1.5">
         {isNote && (
           <div
