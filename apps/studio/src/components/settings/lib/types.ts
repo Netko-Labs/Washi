@@ -17,7 +17,6 @@ export type SettingsTab =
   | 'models'
   | 'outside'
   | 'usage'
-  | 'routines'
   | 'server'
 export type AgentPart = 'models' | 'outside' | 'usage'
 export type SignupMode = 'invite' | 'open'

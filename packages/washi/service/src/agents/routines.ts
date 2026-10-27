@@ -1,13 +1,24 @@
-import type { Routine, RoutineCreate } from '@washi/domain'
+import {
+  latestOccurrence,
+  parseCron,
+  type Routine,
+  type RoutineCreate,
+  type RoutineRun,
+  type RoutineUpdate,
+} from '@washi/domain'
 import {
   createRoutine,
   createSession,
   deleteRoutine,
   getRoutine,
+  listRoutineRuns,
   listRoutines,
+  recordRoutineRun,
   updateRoutine,
   type Workspace,
 } from '@washi/repository'
+
+const RUNS_SHOWN = 50
 
 /** The wall clock in a zone: which day it is there, and how far into it. */
 export function zonedNow(now: Date, timeZone: string): { day: string; minute: number } {
@@ -30,17 +41,18 @@ export function zonedNow(now: Date, timeZone: string): { day: string; minute: nu
   }
 }
 
-/** Once a day in its own zone, at or after its minute. */
-export function isDue(routine: Routine, now: Date): boolean {
-  if (!routine.enabled) return false
-  const { day, minute } = zonedNow(now, routine.timeZone)
-  return routine.lastRunDay !== day && minute >= routine.minuteOfDay
+/** The first minute of a day the schedule names — what clients from before D68 show. */
+export function firstMinuteOfDay(cron: string): number {
+  const fields = parseCron(cron)
+  if (!fields) return 0
+  return Math.min(...fields.hour) * 60 + Math.min(...fields.minute)
 }
 
-/** Today counts as run when its minute has already passed: nothing fires on save or resume. */
-export function alreadyPassed(minuteOfDay: number, timeZone: string, now: Date): string | null {
-  const { day, minute } = zonedNow(now, timeZone)
-  return minute >= minuteOfDay ? day : null
+/** Not run since the latest minute its schedule names today. */
+export function isDue(routine: Routine, now: Date): boolean {
+  if (!routine.enabled) return false
+  const latest = latestOccurrence(routine.cron, routine.timeZone, now)
+  return latest !== null && (routine.lastRunAt === null || latest > routine.lastRunAt)
 }
 
 export type RunOutcome = 'started' | 'busy' | 'stopped' | 'missing'
@@ -73,20 +85,44 @@ export class RoutineBook {
     return listRoutines(this.ws)
   }
 
+  /** Nothing fires on save: a minute already past today counts as run. */
   create(input: RoutineCreate, actorId: string | null, now = new Date()): Routine {
     return createRoutine(this.ws, {
       ...input,
+      minuteOfDay: firstMinuteOfDay(input.cron),
       createdBy: actorId,
-      lastRunDay: alreadyPassed(input.minuteOfDay, input.timeZone, now),
+      lastRunAt: latestOccurrence(input.cron, input.timeZone, now),
+    })
+  }
+
+  /** A new schedule or zone starts from now, like a new routine. */
+  update({ id, ...patch }: RoutineUpdate, now = new Date()): Routine | null {
+    const routine = getRoutine(this.ws, id)
+    if (!routine) return null
+    const cron = patch.cron ?? routine.cron
+    const timeZone = patch.timeZone ?? routine.timeZone
+    const rescheduled = cron !== routine.cron || timeZone !== routine.timeZone
+    return updateRoutine(this.ws, id, {
+      ...patch,
+      ...(rescheduled && {
+        minuteOfDay: firstMinuteOfDay(cron),
+        lastRunAt: latestOccurrence(cron, timeZone, now),
+      }),
     })
   }
 
   setEnabled(id: string, enabled: boolean, now = new Date()): Routine | null {
     const routine = getRoutine(this.ws, id)
     if (!routine) return null
-    const resumedLate = enabled && !routine.enabled
-    const skip = resumedLate ? alreadyPassed(routine.minuteOfDay, routine.timeZone, now) : null
-    return updateRoutine(this.ws, id, { enabled, ...(skip ? { lastRunDay: skip } : {}) })
+    const resumed = enabled && !routine.enabled
+    return updateRoutine(this.ws, id, {
+      enabled,
+      ...(resumed && { lastRunAt: latestOccurrence(routine.cron, routine.timeZone, now) }),
+    })
+  }
+
+  runs(id: string): RoutineRun[] {
+    return listRoutineRuns(this.ws, id, RUNS_SHOWN)
   }
 
   remove(id: string): void {
@@ -105,9 +141,9 @@ export class RoutineBook {
   }
 
   /**
-   * Marked before it runs, so a crash mid-turn never makes it run twice. Not
-   * marked when it cannot start: a paused workspace catches up after Resume
-   * instead of burning every routine's day on a refusal.
+   * A scheduled run is marked before it runs, so a crash mid-turn never makes it run twice. Not
+   * marked when it cannot start: a paused workspace catches up after Resume instead of burning
+   * every routine's occurrence on a refusal. Run now leaves the schedule alone.
    */
   run(id: string, now = new Date(), { scheduled = false } = {}): RunOutcome {
     const routine = getRoutine(this.ws, id)
@@ -118,9 +154,12 @@ export class RoutineBook {
     if (this.inFlight.size > 0) return 'busy'
     if (!this.runner.canStart()) return 'stopped'
     const sessionId = createSession(this.ws, `Routine · ${routine.title}`).id
-    updateRoutine(this.ws, id, {
-      lastRunDay: zonedNow(now, routine.timeZone).day,
+    const occurrence = scheduled ? latestOccurrence(routine.cron, routine.timeZone, now) : null
+    updateRoutine(this.ws, id, { sessionId, ...(occurrence && { lastRunAt: occurrence }) })
+    recordRoutineRun(this.ws, {
+      routineId: id,
       sessionId,
+      trigger: scheduled ? 'schedule' : 'manual',
     })
     // Only an unattended run waits for the morning; Run now has a person watching.
     if (scheduled) this.runner.waitLonger(sessionId)

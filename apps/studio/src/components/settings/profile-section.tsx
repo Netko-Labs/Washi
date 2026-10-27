@@ -14,7 +14,7 @@ export function ProfileSection() {
 
   return (
     <SettingsCard title="You" desc="Shared with everyone in your workspaces.">
-      <div className="flex items-center gap-3 px-4 pt-4 pb-1">
+      <div className="flex items-center gap-3 px-5 pt-5 pb-1">
         <span
           className="grid size-12 place-items-center rounded-full font-semibold text-[17px]"
           style={{ backgroundColor: identity.color, color: '#fff6e4' }}

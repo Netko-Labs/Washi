@@ -59,13 +59,13 @@ describe('a team space on day one', () => {
   test('set up after 17:00, the review waits for tomorrow instead of running at once', () => {
     setSystemTime(new Date(Date.UTC(2026, 9, 15, 21)))
     seedTeamSpace(ws, { timeZone: 'UTC', actorId: null })
-    expect(listRoutines(ws)[0]?.lastRunDay).toBe('2026-10-15')
+    expect(listRoutines(ws)[0]?.lastRunAt).toBe('2026-10-15T17:00')
   })
 
   test('set up in the morning, today still gets its review', () => {
     setSystemTime(new Date(Date.UTC(2026, 9, 15, 9)))
     seedTeamSpace(ws, { timeZone: 'UTC', actorId: null })
-    expect(listRoutines(ws)[0]?.lastRunDay).toBeNull()
+    expect(listRoutines(ws)[0]?.lastRunAt).toBeNull()
   })
 
   test("dates start on the asker's day, not UTC's", () => {

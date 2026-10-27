@@ -32,18 +32,19 @@ export function writeFold(workspaceId: string, folded: boolean): void {
   }
 }
 
+/** Docked unless this workspace was undocked: the side panel is Washi's default room. */
 export function readDock(workspaceId: string): boolean {
   try {
-    return localStorage.getItem(DOCK_KEY_PREFIX + workspaceId) === '1'
+    return localStorage.getItem(DOCK_KEY_PREFIX + workspaceId) !== '0'
   } catch {
-    return false
+    return true
   }
 }
 
 export function writeDock(workspaceId: string, docked: boolean): void {
   try {
-    if (docked) localStorage.setItem(DOCK_KEY_PREFIX + workspaceId, '1')
-    else localStorage.removeItem(DOCK_KEY_PREFIX + workspaceId)
+    if (docked) localStorage.removeItem(DOCK_KEY_PREFIX + workspaceId)
+    else localStorage.setItem(DOCK_KEY_PREFIX + workspaceId, '0')
   } catch {
     // private mode: the dock lasts the visit
   }

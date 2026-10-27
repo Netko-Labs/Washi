@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { dailyCron, isCron } from '../shared/cron'
 
 /** How hard Washi thinks, in words; the SDK's low · medium · high behind them. */
 export const effortSchema = z.enum(['quick', 'balanced', 'deep'])
@@ -121,15 +122,20 @@ export type ApprovalRequest = z.infer<typeof approvalRequestSchema>
 
 export type ApprovalDecision = 'allow_once' | 'allow_always' | 'reject_once'
 
-/** A prompt Washi runs on its own once a day. Writes still wait for a person. */
+/** A prompt Washi runs on its own, on a schedule in its own zone (D68). Each run is a chat. */
 export const routineSchema = z.object({
   id: z.string(),
   title: z.string(),
   prompt: z.string(),
+  /** Five-field cron on the wall clock of `timeZone`. */
+  cron: z.string(),
+  /** The first minute the schedule names in a day; kept for clients from before D68. */
   minuteOfDay: z.number().int().min(0).max(1439),
   timeZone: z.string(),
   enabled: z.boolean(),
-  lastRunDay: z.string().nullable(),
+  /** The wall key (`YYYY-MM-DDTHH:MM`, in its zone) of the last scheduled run. */
+  lastRunAt: z.string().nullable(),
+  /** The latest run's chat. */
   sessionId: z.string().nullable(),
   createdBy: z.string().nullable(),
   createdAt: z.string(),
@@ -145,15 +151,55 @@ function canonicalZone(zone: string): string | null {
   }
 }
 
-export const routineCreateSchema = z.object({
-  title: z.string().trim().min(1).max(120),
-  prompt: z.string().trim().min(1).max(4000),
-  minuteOfDay: z.number().int().min(0).max(1439),
-  timeZone: z
-    .string()
-    .min(1)
-    .max(64)
-    .refine((zone) => canonicalZone(zone) !== null, 'not an IANA time zone')
-    .transform((zone) => canonicalZone(zone) ?? zone),
+/** An IANA zone, stored the way every client spells it. */
+export const timeZoneSchema = z
+  .string()
+  .min(1)
+  .max(64)
+  .refine((zone) => canonicalZone(zone) !== null, 'not an IANA time zone')
+  .transform((zone) => canonicalZone(zone) ?? zone)
+
+const cronSchema = z.string().trim().max(120).refine(isCron, 'not a five-field cron schedule')
+
+/** `cron`, or `minuteOfDay` for "every day at" — the desktop still sends that. */
+export const routineCreateSchema = z
+  .object({
+    title: z.string().trim().min(1).max(120),
+    prompt: z.string().trim().min(1).max(4000),
+    cron: cronSchema.optional(),
+    minuteOfDay: z.number().int().min(0).max(1439).optional(),
+    timeZone: timeZoneSchema,
+  })
+  .refine((input) => input.cron !== undefined || input.minuteOfDay !== undefined, {
+    message: 'a routine needs a schedule',
+  })
+  .transform(({ minuteOfDay, cron, ...rest }) => ({
+    ...rest,
+    cron: cron ?? dailyCron(minuteOfDay ?? 0),
+  }))
+export type RoutineCreate = z.output<typeof routineCreateSchema>
+
+export const routineUpdateSchema = z.object({
+  id: z.string(),
+  title: z.string().trim().min(1).max(120).optional(),
+  prompt: z.string().trim().min(1).max(4000).optional(),
+  cron: cronSchema.optional(),
+  timeZone: timeZoneSchema.optional(),
 })
-export type RoutineCreate = z.infer<typeof routineCreateSchema>
+export type RoutineUpdate = z.output<typeof routineUpdateSchema>
+
+export const routineRunStatusSchema = z.enum(['running', 'waiting', 'done', 'failed'])
+
+/** One run of a routine: what started it, its chat, and how it went — read off that chat. */
+export const routineRunSchema = z.object({
+  id: z.string(),
+  routineId: z.string(),
+  sessionId: z.string(),
+  trigger: z.enum(['schedule', 'manual']),
+  startedAt: z.string(),
+  status: routineRunStatusSchema,
+  costUsd: z.number(),
+  /** From its start to the chat's last word; null while it runs. */
+  durationMs: z.number().nullable(),
+})
+export type RoutineRun = z.infer<typeof routineRunSchema>

@@ -7,7 +7,7 @@ export function ServerTab() {
   const chosen = SIGNUP_OPTIONS.find((option) => option.id === signup)
 
   return (
-    <div className="grid gap-4">
+    <div className="grid gap-9">
       <SettingsCard
         title="Who can create an account"
         desc="Applies to every workspace on this server."

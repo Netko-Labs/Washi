@@ -20,10 +20,16 @@ export {
   enabledModelSchema,
   type Routine,
   type RoutineCreate,
+  type RoutineRun,
+  type RoutineUpdate,
   routineCreateSchema,
+  routineRunSchema,
+  routineRunStatusSchema,
   routineSchema,
+  routineUpdateSchema,
   type TranscriptEntry,
   type TurnBilling,
+  timeZoneSchema,
   turnBillingSchema,
 } from './entities/agents'
 export {
@@ -76,3 +82,16 @@ export {
 export { type RowOf, type UserTable, userTableSchema } from './entities/tables'
 export { compareHlc, createHlcClock, type HlcClock } from './hlc'
 export { positionBetween } from './position'
+export {
+  type CronFields,
+  dailyCron,
+  describeCron,
+  isCron,
+  latestOccurrence,
+  matchesCron,
+  nextOccurrence,
+  parseCron,
+  type WallMinute,
+  wallKey,
+  wallMinute,
+} from './shared/cron'
