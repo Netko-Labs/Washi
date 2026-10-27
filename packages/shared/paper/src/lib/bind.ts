@@ -1,5 +1,5 @@
 import type { Filter, HistoryQuery, InkQuery } from '@washi/ink'
-import type { BindFilter, BindHistoryQuery, BindQuery } from '../registry'
+import type { BindFilter, BindHistoryQuery, BindQuery, StateRef } from '../registry'
 import type { SheetStateValue } from '../state'
 import type { ActionRef } from './types'
 
@@ -48,7 +48,7 @@ export function resolveHistory(
   return { ...query, where: resolveFilters(query.where, values) }
 }
 
-const isStateRef = (value: unknown): value is { state: string } =>
+const isStateRef = (value: unknown): value is StateRef =>
   value !== null &&
   typeof value === 'object' &&
   typeof (value as { state?: unknown }).state === 'string'

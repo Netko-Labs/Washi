@@ -7,10 +7,10 @@ Washi hit seven platform gaps building a budget. One primitive per PR, each with
 - [x] 2. formula columns (closed expr + `month`·`year`·`when`; computed on read) — D73
 - [x] 3. rollups (by relation or by value, `{ param }` from page state) — D74
 - [x] 3b. convert a choice column to a relation (rename-safe) — `db_link_column`
-- [ ] 4. `<Form table>` — a full typed row from the page
-- [ ] 5. bulk copy verb with per-column `set` and cadence (rollover, every-n-months)
-- [ ] 6. date reminders → Inbox (rides routines phase D)
-- [ ] 7. row Activity from `record_changes`
+- [x] 4. `<Form table>` — a full typed row from the page — D75
+- [x] 5. bulk copy: `table.copy`, `add_months`, cadence by formula — D76
+- [x] 6. date reminders → Inbox, a rule the clock reads, no turn — D77
+- [x] 7. row Activity from `record_changes`, with authors — D78
 
 Accept: one budget page whose month picker drives stats, chart and list; budget vs actual per category
 for the picked month; rollover in one click.
