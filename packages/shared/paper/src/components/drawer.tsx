@@ -1,8 +1,9 @@
-import type { InkQuery, TableSpec } from '@washi/ink'
+import type { TableSpec } from '@washi/ink'
 import { type ReactNode, useEffect, useState } from 'react'
 import { resolveRow, styled, useBind } from '../lib'
 import type { BlockProps, Row } from '../lib/types'
 import { usePaperHost } from '../provider'
+import type { BindQuery } from '../registry'
 import { RowProvider, useSheetState } from '../state'
 import { Bound } from './states'
 
@@ -18,7 +19,7 @@ export function Drawer({
   ...rest
 }: BlockProps & {
   state: string
-  bind?: InkQuery
+  bind?: BindQuery
   title?: string
   children: (row: Row | null) => ReactNode
 }) {

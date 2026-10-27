@@ -1,3 +1,19 @@
+# D72+ · data that computes — Washi's expense-tracker report (2026-10-27)
+
+Washi hit seven platform gaps building a budget. One primitive per PR, each with its PRD decision.
+
+- [x] checkbox: `<Task field>` ticks the named checkbox column (it always wrote `done`) — #93
+- [x] 1. `where` values read page state (`{ state }`) + `<Select state options all>` — D72
+- [ ] 2. formula columns (closed expr + date functions; computed on read)
+- [ ] 3. rollups + convert a choice column to a relation
+- [ ] 4. `<Form table>` — a full typed row from the page
+- [ ] 5. bulk copy verb with per-column `set` and cadence (rollover, every-n-months)
+- [ ] 6. date reminders → Inbox (rides routines phase D)
+- [ ] 7. row Activity from `record_changes`
+
+Accept: one budget page whose month picker drives stats, chart and list; budget vs actual per category
+for the picked month; rollover in one click.
+
 # D67 · D68 · chats live on the tree, routines start themselves (2026-10-26)
 
 Juan: chats anchored to a page or its subtree, back in my latest chat as I move; chats and

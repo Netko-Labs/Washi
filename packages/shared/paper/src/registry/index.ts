@@ -15,6 +15,12 @@ export {
 } from './share'
 export {
   actionRefSchema,
+  type BindFilter,
+  type BindHistoryQuery,
+  type BindQuery,
+  bindFilterSchema,
+  bindHistorySchema,
+  bindQuerySchema,
   type PaperComponentName,
   PRIMITIVE_GROUPS,
   paperRegistry,

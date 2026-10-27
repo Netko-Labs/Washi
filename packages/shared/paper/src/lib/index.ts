@@ -18,6 +18,8 @@ export type {
   LookPart,
   RedactProps,
   Row,
+  SelectOption,
+  SelectProps,
   SheetCoverProps,
   SheetFrameProps,
   SheetLook,

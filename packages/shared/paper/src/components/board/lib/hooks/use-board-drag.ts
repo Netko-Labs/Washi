@@ -1,8 +1,8 @@
-import type { InkQuery } from '@washi/ink'
 import { type DragEvent, useEffect, useRef, useState } from 'react'
 import { useData } from '../../../../data'
 import type { Row } from '../../../../lib/types'
 import { usePaperHost } from '../../../../provider'
+import type { BindQuery } from '../../../../registry'
 import type { BoardDrag, BoardLayout, DragState, Move } from '../types'
 import { boardColumns, cardBelow, naturalBefore, rankPatches } from '../utils'
 import { useSlide } from './use-slide'
@@ -12,7 +12,7 @@ import { useSlide } from './use-slide'
  * a slot the card's height opens there, and every card slides out of its way. A drop is one
  * `table.reorder`: the group column plus a fractional rank.
  */
-export function useBoardDrag(bind: InkQuery, rows: Row[], layout: BoardLayout): BoardDrag {
+export function useBoardDrag(bind: BindQuery, rows: Row[], layout: BoardLayout): BoardDrag {
   const host = usePaperHost()
   const { refresh } = useData()
   const [moves, setMoves] = useState<Record<string, Move>>({})

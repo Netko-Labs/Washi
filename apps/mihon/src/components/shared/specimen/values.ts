@@ -3,8 +3,8 @@ import type { Specimen } from './types'
 const WELCOME = 'welcome'
 const TASKS = `bind={{ table: 'tasks', limit: 3 }}`
 
-/** State every specimen sheet declares, so Show, Tabs, Switch, Slider and Drawer have keys. */
-export const SPECIMEN_STATE = { tab: 'Board', fine: true, points: 5, issue: '' }
+/** State every specimen sheet declares, so Show, Tabs, Switch, Select, Slider and Drawer have keys. */
+export const SPECIMEN_STATE = { tab: 'Board', fine: true, points: 5, issue: '', status: '' }
 
 /** One default for every primitive but Sheet. Knobs override props; wraps satisfy `within`. */
 export const SPECIMENS: Record<string, Specimen> = {
@@ -165,6 +165,10 @@ export const SPECIMENS: Record<string, Specimen> = {
   },
   Task: { children: '$row.title', wrap: `<Repeat ${TASKS}><Here /></Repeat>` },
   Switch: { props: { state: 'fine', label: 'Show the fine print' } },
+  Select: {
+    props: { state: 'status', label: 'Status', options: ['todo', 'doing', 'done'], all: 'Any' },
+    wrap: `<Here /><Repeat bind={{ table: 'tasks', where: [{ column: 'status', op: 'eq', value: { state: 'status' } }] }}><Text>$row.title</Text></Repeat>`,
+  },
   Slider: { props: { state: 'points', min: 0, max: 13, step: 1, label: 'Points' } },
 
   Show: {

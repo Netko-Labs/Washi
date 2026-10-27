@@ -1,9 +1,9 @@
-import type { InkQuery } from '@washi/ink'
 import type { DragEvent, RefObject } from 'react'
 import type { ActionRef, BlockProps, Row } from '../../../lib/types'
+import type { BindQuery } from '../../../registry'
 
 export interface BoardProps extends BlockProps {
-  bind: InkQuery
+  bind: BindQuery
   groupBy: string
   groups?: string[]
   rank?: string

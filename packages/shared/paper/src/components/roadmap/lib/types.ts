@@ -1,8 +1,8 @@
-import type { InkQuery } from '@washi/ink'
 import type { BlockProps } from '../../../lib/types'
+import type { BindQuery } from '../../../registry'
 
 export interface RoadmapProps extends BlockProps {
-  bind: InkQuery
+  bind: BindQuery
   /** The date column: a day, or `start/end`. */
   date: string
   title?: string
