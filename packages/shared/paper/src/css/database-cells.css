@@ -1,0 +1,208 @@
+/* Database cells, read the way Notion shows them: pills, steps, faces, dates in words. */
+
+.wsx-db-th {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.wsx-db-ptype {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.75;
+}
+.wsx-db-table th[data-num] .wsx-db-th {
+  flex-direction: row-reverse;
+}
+
+.wsx-db-input {
+  text-overflow: ellipsis;
+}
+.wsx-db-placeholder {
+  color: color-mix(in srgb, var(--muted) 60%, transparent);
+  font-weight: 400;
+}
+
+/* A reading cell: what the value says, one press from its editor. */
+.wsx-db-reading {
+  display: block;
+  width: 100%;
+  min-height: 30px;
+  padding: 4px 8px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 13.5px;
+  text-align: left;
+  white-space: nowrap;
+  cursor: text;
+}
+.wsx-db-reading[data-num] {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.wsx-db-reading:hover {
+  background: var(--muted-bg);
+}
+.wsx-db-reading:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* Choice cells: the pill is drawn, the platform's select lies invisible over it. */
+.wsx-db-pick {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 8px;
+  border-radius: 6px;
+}
+.wsx-db-pick:hover {
+  background: var(--muted-bg);
+}
+.wsx-db-pick:focus-within {
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+.wsx-db-pick-select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+.wsx-db-pill,
+.wsx-db-chip[data-hue] {
+  --hue: var(--chart-4);
+  background: color-mix(in srgb, var(--hue) 20%, transparent);
+  color: color-mix(in srgb, var(--hue) 55%, var(--ink));
+}
+.wsx-db-pill {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+[data-hue="1"] {
+  --hue: var(--chart-1);
+}
+[data-hue="2"] {
+  --hue: var(--chart-2);
+}
+[data-hue="3"] {
+  --hue: var(--chart-3);
+}
+[data-hue="4"] {
+  --hue: var(--chart-4);
+}
+[data-hue="5"] {
+  --hue: var(--chart-5);
+}
+
+.wsx-db-status {
+  --step: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  padding: 0 9px 0 7px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--step) 16%, transparent);
+  color: color-mix(in srgb, var(--step) 50%, var(--ink));
+  font-size: 12.5px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.wsx-db-status i {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--step);
+}
+.wsx-db-status[data-group="doing"] {
+  --step: var(--tone-info);
+}
+.wsx-db-status[data-group="done"] {
+  --step: var(--tone-success);
+}
+
+.wsx-db-person {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.wsx-db-face {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--k-fill) 22%, var(--muted-bg));
+  color: var(--ink);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.wsx-db-chip[data-relation]::before {
+  content: "↗";
+  margin-right: 4px;
+  color: var(--muted);
+}
+
+/* The title's Open: Notion's pill, shown while the row is hovered. */
+.wsx-db-table .wsx-db-open {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: 6px;
+  background: var(--card);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.12);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.wsx-db-table .wsx-db-open:hover {
+  color: var(--ink);
+}
+
+.wsx-db-foot {
+  display: flex;
+  align-items: center;
+  border-top: 1px solid var(--border);
+}
+.wsx-db-foot .wsx-db-new {
+  flex: 1;
+  border-top: 0;
+}
+.wsx-db-count {
+  padding: 0 14px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+@media (hover: none) {
+  .wsx-db-table .wsx-db-open {
+    opacity: 1;
+  }
+}

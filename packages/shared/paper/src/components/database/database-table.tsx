@@ -2,14 +2,15 @@ import { AddProperty } from './add-property'
 import { DatabaseCell } from './database-cell'
 import {
   isRank,
-  labelOf,
   newRow,
+  tableLabel,
   titleColumn,
   useCommit,
   useRecords,
   useRowActions,
   type ViewProps,
 } from './lib'
+import { PropertyIcon } from './property-icon'
 
 /** Notion's table view: every cell edits in place; the title opens the row as its page. */
 export function DatabaseTable({ db, view, empty }: ViewProps) {
@@ -29,7 +30,12 @@ export function DatabaseTable({ db, view, empty }: ViewProps) {
         <thead>
           <tr>
             {columns.map((column) => (
-              <th key={column.name}>{labelOf(column.name)}</th>
+              <th key={column.name} data-num={column.type === 'number' || undefined}>
+                <span className="wsx-db-th">
+                  <PropertyIcon type={column.type} />
+                  {tableLabel(column.name)}
+                </span>
+              </th>
             ))}
             <th className="wsx-db-plus-cell">
               <AddProperty onAdd={actions.addProperty} />
@@ -53,9 +59,11 @@ export function DatabaseTable({ db, view, empty }: ViewProps) {
                       <button
                         type="button"
                         className="wsx-db-open"
+                        aria-label="Open"
+                        title="Open beside the page"
                         onClick={() => actions.open(id)}
                       >
-                        Open
+                        <span aria-hidden>↗</span> Open
                       </button>
                     )}
                   </td>
@@ -86,13 +94,20 @@ export function DatabaseTable({ db, view, empty }: ViewProps) {
           {error}
         </p>
       )}
-      <button
-        type="button"
-        className="wsx-db-new"
-        onClick={() => void actions.addRow(newRow(db.spec))}
-      >
-        + New
-      </button>
+      <div className="wsx-db-foot">
+        <button
+          type="button"
+          className="wsx-db-new"
+          onClick={() => void actions.addRow(newRow(db.spec))}
+        >
+          + New
+        </button>
+        {records.status === 'ready' && records.rows.length > 0 && (
+          <span className="wsx-db-count">
+            {records.rows.length} {records.rows.length === 1 ? 'row' : 'rows'}
+          </span>
+        )}
+      </div>
     </div>
   )
 }

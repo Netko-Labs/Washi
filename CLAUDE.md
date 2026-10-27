@@ -341,6 +341,12 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   `<Form trigger>` puts a form behind one button in a native `<dialog>` (`FormDialog`: top layer,
   Escape, a bottom sheet under 560px, closes when the row lands). An empty data view is a quiet
   filled line, not a dashed box.
+- **Database views read like Notion's (D84).** A table's head shows each property's type
+  (`PropertyIcon`) and name in sentence case; select/status/person cells draw a pill, a step dot or a
+  face over an invisible native select; dates read "Nov 4, 2026" and numbers group until pressed
+  (`DateCell`/`NumberCell` swap to the editor on a press); the foot counts rows. A Board with no
+  `onAdd` gets + New per column when the host has `newRow`: the row is made in that group, titled
+  Untitled, and opened in the peek.
 - WSX is inert data: registry primitives, literal props, the closed `expr` grammar only. Components
   own appearance (four enums: `variant tone size emphasis`); pages own content. Validation before
   persist and before render. Format reference: `docs/wsx-primitives.html`.

@@ -1,3 +1,4 @@
+import { useData } from '../../../../data'
 import { resolveRowDeep, useRunAction } from '../../../../lib'
 import type { ActionRef, Row } from '../../../../lib/types'
 import { usePaperHost } from '../../../../provider'
@@ -8,6 +9,7 @@ import { substitute } from '../utils'
 export function useCardActions(onOpen: ActionRef | undefined): CardActions {
   const host = usePaperHost()
   const run = useRunAction()
+  const { refresh } = useData()
   return {
     openable: Boolean(onOpen ?? host.openRow),
     open: (row: Row) => {
@@ -16,5 +18,12 @@ export function useCardActions(onOpen: ActionRef | undefined): CardActions {
     },
     shown: (value) => (typeof value === 'number' ? value.toLocaleString(host.locale) : cell(value)),
     add: (action, group) => void run(substitute(action, group)),
+    creatable: Boolean(host.newRow),
+    // The host tells the reader why a row was not added; the board only refetches.
+    create: (table, data) =>
+      void host
+        .newRow?.(table, data)
+        .catch(() => undefined)
+        .finally(refresh),
   }
 }
