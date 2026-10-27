@@ -1,5 +1,11 @@
 import { createSdkMcpServer, tool } from '@anthropic-ai/claude-agent-sdk'
-import { linkColumnInputSchema, type Member, reminderAskSchema, type Viewer } from '@washi/domain'
+import {
+  linkColumnInputSchema,
+  type Member,
+  reminderAskSchema,
+  rowActivityInputSchema,
+  type Viewer,
+} from '@washi/domain'
 import { historyQuerySchema, tableSpecSchema } from '@washi/ink'
 import { getAppMeta, listTables, type Workspace } from '@washi/repository'
 import { fetchPolicySchema, guardedFetch } from '@washi/tsuru'
@@ -7,6 +13,7 @@ import { z } from 'zod'
 import { askReminder } from '../reminders/service'
 import { NOBODY } from '../sheets/access'
 import { checkSource, createSheetFromSource, updateSheetFromSource } from '../sheets/service'
+import { rowActivity } from '../tables/activity'
 import { runHistory } from '../tables/history'
 import { linkColumn } from '../tables/link'
 import { defineUserTable, runMutation, runQuery } from '../tables/service'
@@ -133,7 +140,7 @@ export function createWashiTools(ws: Workspace, context: ToolContext) {
         'db_link_column',
         'Turn a text, select or multi_select column into a relation to another table: each value names the target row whose text column (on, default its first) reads the same, ignoring case and spaces, so renaming that row renames it everywhere and rollups match by id. create: true makes a target row for each value nothing matches; without it, unmatched values are refused and listed. Pages that filter the old column by name must then filter by id.',
         { input: linkColumnInputSchema },
-        async ({ input }) => text(linkColumn(ws, input)),
+        async ({ input }) => text(linkColumn(ws, input, 'washi')),
       ),
       tool(
         'db_query',
@@ -151,12 +158,18 @@ export function createWashiTools(ws: Workspace, context: ToolContext) {
         async ({ query }) => text(runHistory(ws, historyQuerySchema.parse(query))),
       ),
       tool(
+        'db_row_activity',
+        'When and by whom one row changed, newest first: each change\'s atMs, by (a member id from people_list, washi, or null for a change from before authors were kept), kind (created, edited, deleted) and fields [{ column, from, to }]. Answers "when was Water paid?" — find the row\'s id with db_query, then read the change whose fields set paid to true.',
+        rowActivityInputSchema.shape,
+        async ({ recordId, limit }) => text(rowActivity(ws, recordId, limit)),
+      ),
+      tool(
         'db_mutate',
         DB_MUTATE_DESCRIPTION,
         { mutation: z.record(z.string(), z.unknown()) },
         async ({ mutation }) => {
           const { mutationSchema } = await import('@washi/ink')
-          return text(runMutation(ws, mutationSchema.parse(mutation)))
+          return text(runMutation(ws, mutationSchema.parse(mutation), 'washi'))
         },
       ),
       tool(

@@ -23,7 +23,11 @@ const keyOf = (value: string) => value.trim().toLowerCase()
  * so renaming the target renames it everywhere. Unmatched values are created when `create`, and
  * otherwise refused, listed. One transaction: the column changes with every row or not at all.
  */
-export function linkColumn(ws: Workspace, input: LinkColumnInput): LinkColumnResult {
+export function linkColumn(
+  ws: Workspace,
+  input: LinkColumnInput,
+  author: string | null = null,
+): LinkColumnResult {
   const source = getTableByName(ws, input.table)
   if (!source) throw new InkError(`unknown table "${input.table}"`)
   const column = source.spec.columns.find((each) => each.name === input.column)
@@ -75,7 +79,7 @@ export function linkColumn(ws: Workspace, input: LinkColumnInput): LinkColumnRes
 
   return ws.sqlite.transaction(() => {
     for (const value of unmatched)
-      ids.set(keyOf(value), insertRecord(ws, target.id, { [on]: value.trim() }))
+      ids.set(keyOf(value), insertRecord(ws, target.id, { [on]: value.trim() }, author))
     defineUserTable(ws, {
       ...source.spec,
       columns: source.spec.columns.map((each) =>
@@ -88,7 +92,13 @@ export function linkColumn(ws: Workspace, input: LinkColumnInput): LinkColumnRes
       const linked = [
         ...new Set(valuesOf(row[column.name]).map((value) => ids.get(keyOf(value)) ?? '')),
       ]
-      updateRecords(ws, source.id, [String(row.id)], { [column.name]: linked.filter(Boolean) })
+      updateRecords(
+        ws,
+        source.id,
+        [String(row.id)],
+        { [column.name]: linked.filter(Boolean) },
+        author,
+      )
     }
     return { linked: rows.length, created: unmatched }
   })()

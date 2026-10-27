@@ -110,7 +110,12 @@ function copyOf(
  * Every row `where` matches becomes a new row: its stored cells, `set` over them. All or nothing —
  * past the cap nothing is copied, and each copy is checked like an insert before any lands.
  */
-export function copyRecords(ws: Workspace, table: UserTable, mutation: CopyMutation): CopyResult {
+export function copyRecords(
+  ws: Workspace,
+  table: UserTable,
+  mutation: CopyMutation,
+  author: string | null = null,
+): CopyResult {
   const where = resolveWhere(mutation)
   const unknown = unknownQueryColumns(table.spec, where)
   if (unknown.length > 0) throw new InkError(unknown.map((issue) => issue.message).join('; '))
@@ -133,6 +138,8 @@ export function copyRecords(ws: Workspace, table: UserTable, mutation: CopyMutat
   )
   const copies = rows.map((row) => copyOf(table.spec, row, overrides, args))
   for (const data of copies) checkData(ws, table.spec, data)
-  const ids = ws.sqlite.transaction(() => copies.map((data) => insertRecord(ws, table.id, data)))()
+  const ids = ws.sqlite.transaction(() =>
+    copies.map((data) => insertRecord(ws, table.id, data, author)),
+  )()
   return { affected: ids.length, ids }
 }

@@ -29,6 +29,7 @@ export const READ_TOOLS: ReadonlySet<string> = new Set([
   'db_list_tables',
   'db_query',
   'db_history',
+  'db_row_activity',
   'people_list',
 ])
 

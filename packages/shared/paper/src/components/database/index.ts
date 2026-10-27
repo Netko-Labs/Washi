@@ -1,4 +1,4 @@
 export { Database } from './database'
 export { DatabaseCell } from './database-cell'
-export type { CellProps, DatabaseContext, Person } from './lib'
-export { isRank, tableLabel } from './lib'
+export type { CellProps, Choice, DatabaseContext, Person } from './lib'
+export { choicesFor, isRank, tableLabel, useDatabase, useRelationChoices } from './lib'

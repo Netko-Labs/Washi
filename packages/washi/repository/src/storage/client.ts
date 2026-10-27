@@ -5,6 +5,7 @@ import { createHlcClock, positionBetween } from '@washi/domain'
 import * as schema from '@washi/domain/db'
 import { type BunSQLiteDatabase, drizzle } from 'drizzle-orm/bun-sqlite'
 import { backfillChanges } from './changes-backfill'
+import { ensureChangeAuthors } from './changes-ddl'
 import { ensureChatSearch } from './chat-search'
 import { ensureCustomEmojis } from './custom-emojis'
 import { ensureReminders } from './reminders'
@@ -159,6 +160,7 @@ function createTables(sqlite: Database) {
     )
   `)
   sqlite.exec('CREATE INDEX IF NOT EXISTS idx_record_changes ON record_changes(table_id, at_ms)')
+  ensureChangeAuthors(sqlite)
   backfillChanges(sqlite)
 
   sqlite.exec(`

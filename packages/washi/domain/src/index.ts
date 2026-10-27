@@ -103,7 +103,13 @@ export {
 export {
   type LinkColumnInput,
   linkColumnInputSchema,
+  ROW_ACTIVITY_MAX,
+  type RowActivity,
+  type RowActivityInput,
+  type RowChange,
+  type RowFieldChange,
   type RowOf,
+  rowActivityInputSchema,
   type UserTable,
   userTableSchema,
 } from './entities/tables'

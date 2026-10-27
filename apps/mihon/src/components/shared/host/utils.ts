@@ -6,6 +6,7 @@ import {
   type QueryResult,
   type QueryRow,
   type TableSpec,
+  validateRecord,
 } from '@washi/ink'
 import type { PaperHost } from '@washi/paper'
 import type { MemoryTable, Say, SeedTable } from './types'
@@ -135,6 +136,10 @@ export function createBookHost(say: Say, seeds?: SeedTable[]): PaperHost {
       switch (action.verb) {
         case 'table.insert': {
           const table = need(action.table)
+          const issues = validateRecord(table.spec, action.data as QueryRow)
+          if (issues.length > 0) {
+            throw new Error(issues.map((issue) => `${issue.path}: ${issue.message}`).join('; '))
+          }
           table.rows.push({
             id: `${table.spec.name}-${table.next++}`,
             ...(action.data as QueryRow),

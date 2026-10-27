@@ -37,22 +37,30 @@ export function seedTeamSpace(ws: Workspace, options: TeamSpaceOptions): TeamSpa
   defineUserTable(ws, PROJECTS_SPEC)
   defineUserTable(ws, ISSUES_SPEC)
   const project =
-    runMutation(ws, {
-      kind: 'insert',
-      table: 'projects',
-      data: { name: 'Team space', status: 'In progress', when: span(options.timeZone, 0, 28) },
-    }).id ?? ''
-  SEED_ISSUES.forEach((issue, index) => {
-    runMutation(ws, {
-      kind: 'insert',
-      table: 'issues',
-      data: {
-        ...issue,
-        project: [project],
-        rank: index + 1,
-        due: span(options.timeZone, 7 * (index + 1)),
+    runMutation(
+      ws,
+      {
+        kind: 'insert',
+        table: 'projects',
+        data: { name: 'Team space', status: 'In progress', when: span(options.timeZone, 0, 28) },
       },
-    })
+      options.actorId,
+    ).id ?? ''
+  SEED_ISSUES.forEach((issue, index) => {
+    runMutation(
+      ws,
+      {
+        kind: 'insert',
+        table: 'issues',
+        data: {
+          ...issue,
+          project: [project],
+          rank: index + 1,
+          due: span(options.timeZone, 7 * (index + 1)),
+        },
+      },
+      options.actorId,
+    )
   })
 
   const backlog = createSheetFromSource(

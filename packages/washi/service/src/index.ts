@@ -88,6 +88,7 @@ export {
   shareSettings,
 } from './sheets/share'
 export { duplicateSheet, moveSheetTo, restoreSheetTree, SheetMoveError } from './sheets/tree'
+export { rowActivity } from './tables/activity'
 export { runHistory } from './tables/history'
 export { linkColumn } from './tables/link'
 export { openRowPage, rowOfSheet, rowTitle } from './tables/rows'

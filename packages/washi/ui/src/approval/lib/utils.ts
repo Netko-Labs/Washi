@@ -8,6 +8,7 @@ import {
   IconFilePencil,
   IconFilePlus,
   IconFileSearch,
+  IconHistory,
   IconLink,
   IconSearch,
   IconTable,
@@ -181,6 +182,8 @@ export function describeTool(name: string, input: unknown, titleOf: TitleOf): To
         action: 'Looked back through',
         subject: text(record(args.query).table),
       })
+    case 'db_row_activity':
+      return base({ icon: IconHistory, action: 'Looked back through a row’s changes' })
     default:
       return base({ icon: IconTool, action: name.replaceAll('_', ' ') })
   }
