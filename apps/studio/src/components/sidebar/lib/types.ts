@@ -1,13 +1,15 @@
 import type { Icon } from '@tabler/icons-react'
 import type { SheetSummary } from '@washi/domain'
-import type { TabKey } from '@washi/ui'
 import type { WorkspaceSummary } from '@/lib/types'
 
 export type Theme = 'light' | 'dark'
 
+export type PlaceId = 'home' | 'inbox' | 'chats' | 'routines'
+
 export interface PlaceEntry {
-  tab: TabKey
+  id: PlaceId
   label: string
+  title: string
   icon: Icon
 }
 

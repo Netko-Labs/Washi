@@ -1,3 +1,5 @@
+export { PLACES_GAP, PLACES_INSET } from './constants'
+export { usePlaces } from './hooks/use-places'
 export { useRecents } from './hooks/use-recents'
 export { useTheme } from './hooks/use-theme'
 export type {
@@ -5,6 +7,7 @@ export type {
   MenuPlacement,
   MobileHomeProps,
   PlaceEntry,
+  PlaceId,
   RecentEntry,
   RecentSheet,
   SidebarPageRowProps,
@@ -13,4 +16,4 @@ export type {
   Theme,
 } from './types'
 export { openInPlace, pushRecent, readRecents, relativeAge, writeRecents } from './utils'
-export { LABEL, ROW, ROW_ON } from './values'
+export { LABEL, PLACES, ROW, ROW_ON } from './values'

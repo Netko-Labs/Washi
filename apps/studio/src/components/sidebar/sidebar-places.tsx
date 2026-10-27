@@ -1,72 +1,68 @@
-import { IconClock, IconHome, IconInbox, IconMessages } from '@tabler/icons-react'
-import { Link } from '@tanstack/react-router'
-import { useAgentStore, useViewStore } from '@washi/ui'
-import { useMentionsStore } from '@/components/mentions'
-import { pathFor } from '@/components/shell'
-import { openInPlace, type SidebarSectionProps } from './lib'
+import { PLACES, PLACES_GAP, PLACES_INSET, type SidebarSectionProps, usePlaces } from './lib'
 
-const ICON =
-  'relative grid size-9 shrink-0 place-items-center rounded-lg border border-border bg-card text-muted-foreground hover:bg-accent hover:text-foreground md:size-[30px]'
+const EASE = 'duration-[260ms] ease-[cubic-bezier(0.2,0.8,0.2,1)] motion-reduce:transition-none'
 
-/** The places that are not pages, in one row: Home, then Inbox · Chats · Routines as icons. */
+/**
+ * Home · Inbox · Chats · Routines on one track. The open place widens to its name and the pill
+ * slides under it; the pill's slot is pure arithmetic — every other place is one icon wide.
+ */
 export function SidebarPlaces({ workspaceId, onNavigate }: SidebarSectionProps) {
-  const approvals = useAgentStore((state) => state.approvals.length)
-  const mentions = useMentionsStore((state) => state.unread)
-  const activeTab = useViewStore((state) => state.activeTab)
-  const inboxCount = approvals + mentions
-  const place = (tab: 'view:dashboard' | 'view:inbox' | 'view:chats') => () => {
-    useViewStore.getState().openTab(tab)
-    onNavigate()
-  }
+  const { active, inboxCount, hrefOf, open } = usePlaces(workspaceId, onNavigate)
+  const wide = active ?? 'home'
+  const index = PLACES.findIndex((place) => place.id === wide)
+  const step = `(var(--place) + ${PLACES_GAP}px)`
 
   return (
-    <div className="flex items-center gap-1">
-      <a
-        href={pathFor(workspaceId, 'view:dashboard')}
-        onClick={(event) => openInPlace(event, place('view:dashboard'))}
-        className={`flex h-9 min-w-0 flex-1 items-center gap-2 rounded-lg px-2 text-[14px] md:h-[30px] md:text-[13px] ${
-          !activeTab || activeTab === 'view:dashboard'
-            ? 'bg-accent font-medium text-foreground'
-            : 'text-muted-foreground hover:bg-accent'
-        }`}
-      >
-        <IconHome className="size-[17px] md:size-[15px]" />
-        Home
-      </a>
-      <a
-        href={pathFor(workspaceId, 'view:inbox')}
-        onClick={(event) => openInPlace(event, place('view:inbox'))}
-        aria-label="Inbox"
-        title="Inbox"
-        className={`${ICON} ${activeTab === 'view:inbox' ? 'bg-accent text-foreground' : ''}`}
-      >
-        <IconInbox className="size-[17px] md:size-[15px]" />
-        {inboxCount > 0 && (
-          <span className="absolute -top-1.5 -right-1.5 flex h-[15px] min-w-[15px] items-center justify-center rounded-full bg-primary px-1 font-semibold text-[9.5px] text-primary-foreground">
-            {inboxCount}
-          </span>
-        )}
-      </a>
-      <a
-        href={pathFor(workspaceId, 'view:chats')}
-        onClick={(event) => openInPlace(event, place('view:chats'))}
-        aria-label="Chats"
-        title="Chats — your conversations with Washi"
-        className={`${ICON} ${activeTab === 'view:chats' ? 'bg-accent text-foreground' : ''}`}
-      >
-        <IconMessages className="size-[17px] md:size-[15px]" />
-      </a>
-      <Link
-        to="/w/$workspaceId/settings"
-        params={{ workspaceId }}
-        search={{ tab: 'routines' }}
-        onClick={onNavigate}
-        aria-label="Routines"
-        title="Routines"
-        className={ICON}
-      >
-        <IconClock className="size-[17px] md:size-[15px]" />
-      </Link>
-    </div>
+    <nav
+      aria-label="Places"
+      className="relative flex items-center rounded-xl bg-foreground/[0.045] [--place:36px] md:[--place:28px]"
+      style={{ gap: PLACES_GAP, padding: PLACES_INSET }}
+    >
+      <span
+        aria-hidden
+        className={`absolute rounded-[9px] bg-card shadow-[0_1px_2px_rgb(0_0_0/0.08),0_0_0_1px_var(--border)] transition-[left,opacity] ${EASE}`}
+        style={{
+          top: PLACES_INSET,
+          bottom: PLACES_INSET,
+          left: `calc(${PLACES_INSET}px + ${index} * ${step})`,
+          width: `calc(100% - ${2 * PLACES_INSET}px - ${PLACES.length - 1} * ${step})`,
+          opacity: active ? 1 : 0,
+        }}
+      />
+      {PLACES.map(({ id, label, title, icon: Icon }) => {
+        const isWide = id === wide
+        return (
+          <a
+            key={id}
+            href={hrefOf(id)}
+            onClick={open(id)}
+            aria-label={label}
+            aria-current={id === active ? 'page' : undefined}
+            title={title}
+            className={`relative flex h-[var(--place)] min-w-[var(--place)] shrink-0 basis-[var(--place)] items-center rounded-[9px] transition-[flex-grow,color] ${EASE} ${
+              id === active
+                ? 'font-medium text-foreground'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+            style={{ flexGrow: isWide ? 1 : 0 }}
+          >
+            <span className="relative grid size-[var(--place)] shrink-0 place-items-center">
+              <Icon className="size-[17px] md:size-[15px]" />
+              {id === 'inbox' && inboxCount > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-[15px] min-w-[15px] items-center justify-center rounded-full bg-primary px-1 font-semibold text-[9.5px] text-primary-foreground">
+                  {inboxCount}
+                </span>
+              )}
+            </span>
+            <span
+              className={`min-w-0 flex-1 overflow-hidden whitespace-nowrap pr-2 text-[14px] transition-opacity md:text-[13px] ${EASE}`}
+              style={{ opacity: isWide ? 1 : 0 }}
+            >
+              {label}
+            </span>
+          </a>
+        )
+      })}
+    </nav>
   )
 }
