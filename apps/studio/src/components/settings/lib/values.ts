@@ -116,14 +116,14 @@ export const RESUME_BY_OPTIONS: readonly Option<ResumeBy>[] = [
 /** Three per provider, with one line each; the rest of the catalogue sits under them. */
 export const RECOMMENDED: Record<string, RecommendedModel[]> = {
   anthropic: [
-    { id: 'claude-sonnet-4-5', desc: 'Balanced — reads what it needs, writes well' },
-    { id: 'claude-opus-4-1', desc: 'Deepest — plans and checks, slower' },
-    { id: 'claude-haiku-4-5', desc: 'Fastest — short answers, cheapest' },
+    { id: 'claude-sonnet-5-5', desc: 'Balanced — reads what it needs, writes well' },
+    { id: 'claude-opus-5-5', desc: 'Deepest — plans and checks, slower' },
+    { id: 'claude-haiku-5-5', desc: 'Fastest — short answers, cheapest' },
   ],
   openrouter: [
-    { id: 'anthropic/claude-sonnet-4.5', desc: 'Balanced — reads what it needs, writes well' },
-    { id: 'anthropic/claude-opus-4.1', desc: 'Deepest — plans and checks, slower' },
-    { id: 'anthropic/claude-haiku-4.5', desc: 'Fastest — short answers, cheapest' },
+    { id: 'anthropic/claude-sonnet-5.5', desc: 'Balanced — reads what it needs, writes well' },
+    { id: 'anthropic/claude-opus-5.5', desc: 'Deepest — plans and checks, slower' },
+    { id: 'anthropic/claude-haiku-5.5', desc: 'Fastest — short answers, cheapest' },
   ],
 }
 

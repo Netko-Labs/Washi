@@ -1,6 +1,7 @@
 import { IconLogout, IconMoon, IconSettings, IconSun } from '@tabler/icons-react'
 import { Link } from '@tanstack/react-router'
 import { initials, useViewStore } from '@washi/ui'
+import { Floating } from '@/components/shared/floating'
 import { signOut } from '@/integrations/auth'
 import { useTheme } from '../lib'
 import { type UserMenuProps, useMenuState } from './lib'
@@ -29,9 +30,12 @@ export function UserMenu({ workspace, onNavigate, placement = 'up' }: UserMenuPr
         {initials(identity.name)}
       </button>
       {menu.isOpen && (
-        <div
+        <Floating
+          anchor={menu.root}
+          side={placement === 'up' ? 'top' : 'bottom'}
+          align="end"
           role="menu"
-          className={`absolute right-0 z-50 w-[200px] ${placement === 'up' ? 'bottom-full mb-2' : 'top-full mt-2'} rounded-xl border border-border bg-popover p-1.5 text-popover-foreground shadow-[0_16px_48px_rgb(0_0_0/0.18)]`}
+          className="w-[220px] rounded-xl border border-border bg-popover p-1.5 text-popover-foreground shadow-[0_16px_48px_rgb(0_0_0/0.22)]"
         >
           <div className="mb-1 border-border border-b px-2 pt-1 pb-2">
             <div className="truncate font-semibold text-[13px]">{identity.name}</div>
@@ -65,7 +69,7 @@ export function UserMenu({ workspace, onNavigate, placement = 'up' }: UserMenuPr
             <IconLogout className="size-4" />
             Sign out
           </button>
-        </div>
+        </Floating>
       )}
     </div>
   )

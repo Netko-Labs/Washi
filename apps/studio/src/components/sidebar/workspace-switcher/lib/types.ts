@@ -1,3 +1,4 @@
+import type { RefObject } from 'react'
 import type { WorkspaceSummary } from '@/lib/types'
 import type { MenuPlacement } from '../../lib'
 
@@ -9,6 +10,7 @@ export interface WorkspaceSwitcherProps {
 }
 
 export interface WorkspaceMenuProps {
+  anchor: RefObject<HTMLElement | null>
   currentId: string
   onClose: () => void
   placement?: MenuPlacement

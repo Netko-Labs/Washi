@@ -40,6 +40,7 @@ export function WorkspaceSwitcher({
       </button>
       {isOpen && (
         <WorkspaceMenu
+          anchor={root}
           currentId={workspace.id}
           placement={compact ? 'down' : 'up'}
           onClose={() => {

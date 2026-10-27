@@ -1,5 +1,6 @@
 import { IconCheck, IconChevronDown, IconSearch } from '@tabler/icons-react'
 import { useMemo, useState } from 'react'
+import { Floating } from '@/components/shared/floating'
 import {
   MODEL_MENU_LIMIT,
   type ModelMenuProps,
@@ -66,9 +67,12 @@ export function ModelMenu({ models, provider, value, catalogueSource, onPick }: 
         <IconChevronDown className="size-3.5 shrink-0 text-muted-foreground" />
       </button>
       {menu.isOpen && (
-        <div
+        <Floating
+          anchor={menu.root}
+          align="end"
+          offset={6}
           role="listbox"
-          className="absolute top-full right-0 z-50 mt-1.5 w-[340px] overflow-hidden rounded-xl border border-border bg-popover text-popover-foreground shadow-[0_16px_48px_rgb(0_0_0/0.18)]"
+          className="w-[360px] overflow-hidden rounded-xl border border-border bg-popover text-popover-foreground shadow-[0_16px_48px_rgb(0_0_0/0.22)]"
         >
           <label className="flex items-center gap-2 border-border border-b px-3">
             <IconSearch className="size-3.5 text-muted-foreground" />
@@ -127,7 +131,7 @@ export function ModelMenu({ models, provider, value, catalogueSource, onPick }: 
               </button>
             )}
           </div>
-        </div>
+        </Floating>
       )}
     </div>
   )

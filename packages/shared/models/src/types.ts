@@ -45,6 +45,8 @@ export interface ModelSummary {
   inputPerMTok: number | null
   outputPerMTok: number | null
   reasoning: boolean
+  /** YYYY-MM-DD, or null when models.dev does not say. */
+  releasedAt: string | null
 }
 
 export interface TokenUsage {
