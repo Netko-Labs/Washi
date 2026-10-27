@@ -24,7 +24,10 @@ export function useRoutines() {
       (current) =>
         current?.map((routine) => (routine.id === id ? { ...routine, enabled } : routine)) ?? null,
     )
-    await api.routines.setEnabled.mutate({ id, enabled }).catch(() => undefined)
+    setError(null)
+    await api.routines.setEnabled.mutate({ id, enabled }).catch((cause: unknown) => {
+      setError(cause instanceof Error ? cause.message : String(cause))
+    })
     await refresh()
   }
 

@@ -2,6 +2,7 @@ import type { Routine, RoutineRun } from '@washi/domain'
 import { routineRunTable, routineTable } from '@washi/domain/db'
 import { asc, eq } from 'drizzle-orm'
 import { newId, type Workspace } from './client'
+import type { RunRow } from './types'
 
 type RoutineRow = typeof routineTable.$inferSelect
 
@@ -83,18 +84,6 @@ export function recordRoutineRun(
     .insert(routineRunTable)
     .values({ ...run, id: newId(), startedAt: ws.now() })
     .run()
-}
-
-interface RunRow {
-  id: string
-  routineId: string
-  sessionId: string
-  trigger: RoutineRun['trigger']
-  startedAt: string
-  sessionStatus: string | null
-  costUsd: number | null
-  endedAt: string | null
-  waiting: number
 }
 
 const wallMs = (hlc: string) => Number(hlc.slice(0, 14))
