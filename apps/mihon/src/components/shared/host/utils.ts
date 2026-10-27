@@ -170,10 +170,10 @@ export function createBookHost(say: Say, seeds?: SeedTable[]): PaperHost {
     describePeople: async () => PEOPLE,
     replaceNode: async () => say('canvas edit received — a host would save it'),
     openRow: (recordId) => say(`would open ${recordId} as a page`),
-    toggleTask: async (recordId, done) => {
+    toggleTask: async (recordId, done, field = 'done') => {
       for (const table of tables.values()) {
         const row = table.rows.find((each) => each.id === recordId)
-        if (row) row.done = done
+        if (row) row[field] = done
       }
       notify()
     },

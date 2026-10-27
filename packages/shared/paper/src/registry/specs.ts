@@ -332,7 +332,11 @@ const dataIn: Record<string, ComponentSpec> = {
     },
     'none',
   ),
-  Task: p({ row: rowRef.optional(), done: z.boolean().optional() }, 'text'),
+  /** `field` is the checkbox column it ticks (default `done`): a "paid" box is `field="paid"`. */
+  Task: p(
+    { row: rowRef.optional(), done: z.boolean().optional(), field: columnName.optional() },
+    'text',
+  ),
   Switch: p({ state: stateKey, label: z.string().max(120).optional() }, 'none'),
   Slider: p(
     {

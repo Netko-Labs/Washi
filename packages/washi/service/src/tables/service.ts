@@ -16,6 +16,7 @@ import {
   findRecordTableId,
   getTableByName,
   insertRecord,
+  listTables,
   matchRecordIds,
   updateRecords,
   type Workspace,
@@ -148,8 +149,25 @@ export function deleteRecord(ws: Workspace, tableName: string, recordId: string)
 }
 
 /** Task checkbox write-back: flip `done` on one record by id. */
-export function toggleTaskRecord(ws: Workspace, recordId: string, done: boolean): void {
+/**
+ * A `<Task>` ticks one checkbox column on its row. Named, it must be a checkbox column — a typo
+ * would otherwise write a key nothing reads, and the box would look saved and not be. Unnamed, it
+ * is `done`, as it always was, even on a table that never declared one.
+ */
+export function toggleTaskRecord(
+  ws: Workspace,
+  recordId: string,
+  done: boolean,
+  field?: string,
+): void {
   const tableId = findRecordTableId(ws, recordId)
   if (!tableId) throw new InkError(`unknown record "${recordId}"`)
-  updateRecords(ws, tableId, [recordId], { done })
+  if (field !== undefined) {
+    const table = listTables(ws).find((each) => each.id === tableId)
+    const column = table?.spec.columns.find((each) => each.name === field)
+    if (column?.type !== 'boolean') {
+      throw new InkError(`"${field}" is not a checkbox column on ${table?.name ?? 'this table'}`)
+    }
+  }
+  updateRecords(ws, tableId, [recordId], { [field ?? 'done']: done })
 }
