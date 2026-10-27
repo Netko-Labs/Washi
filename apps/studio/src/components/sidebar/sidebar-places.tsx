@@ -8,13 +8,13 @@ import { openInPlace, type SidebarSectionProps } from './lib'
 const ICON =
   'relative grid size-9 shrink-0 place-items-center rounded-lg border border-border bg-card text-muted-foreground hover:bg-accent hover:text-foreground md:size-[30px]'
 
-/** The places that are not pages, in one row: Home, then Inbox · Threads · Routines as icons. */
+/** The places that are not pages, in one row: Home, then Inbox · Chats · Routines as icons. */
 export function SidebarPlaces({ workspaceId, onNavigate }: SidebarSectionProps) {
   const approvals = useAgentStore((state) => state.approvals.length)
   const mentions = useMentionsStore((state) => state.unread)
   const activeTab = useViewStore((state) => state.activeTab)
   const inboxCount = approvals + mentions
-  const place = (tab: 'view:dashboard' | 'view:inbox') => () => {
+  const place = (tab: 'view:dashboard' | 'view:inbox' | 'view:chats') => () => {
     useViewStore.getState().openTab(tab)
     onNavigate()
   }
@@ -47,18 +47,15 @@ export function SidebarPlaces({ workspaceId, onNavigate }: SidebarSectionProps) 
           </span>
         )}
       </a>
-      <button
-        type="button"
-        onClick={() => {
-          useAgentStore.getState().togglePanel()
-          onNavigate()
-        }}
-        aria-label="Threads"
-        title="Threads — the conversations with Washi"
-        className={ICON}
+      <a
+        href={pathFor(workspaceId, 'view:chats')}
+        onClick={(event) => openInPlace(event, place('view:chats'))}
+        aria-label="Chats"
+        title="Chats — your conversations with Washi"
+        className={`${ICON} ${activeTab === 'view:chats' ? 'bg-accent text-foreground' : ''}`}
       >
         <IconMessages className="size-[17px] md:size-[15px]" />
-      </button>
+      </a>
       <Link
         to="/w/$workspaceId/settings"
         params={{ workspaceId }}

@@ -1,4 +1,5 @@
 import {
+  IconArrowsDiagonal,
   IconChevronDown,
   IconLayoutSidebarRightCollapse,
   IconLayoutSidebarRightExpand,
@@ -19,6 +20,7 @@ const FRAME = {
     'fixed inset-x-3 bottom-[84px] z-50 h-[min(620px,calc(100dvh-110px))] rounded-2xl border border-border shadow-[0_24px_64px_rgb(0_0_0/0.22),0_4px_16px_rgb(0_0_0/0.10)] sm:inset-x-auto sm:right-6 sm:bottom-[92px] sm:h-[min(620px,calc(100dvh-130px))] sm:w-[400px]',
   dock: 'relative z-20 h-full w-[420px] shrink-0 border-border border-l',
   sheet: 'fixed inset-0 z-50',
+  page: 'h-full min-h-0 w-full',
 }
 
 const HEADER_BUTTON =
@@ -83,7 +85,7 @@ function EmptyChat({ onStarter }: { onStarter: (text: string) => void }) {
 }
 
 /** The door's room: a popover, a dock beside the page, or the whole screen on a phone (D61). */
-export function AgentPanel({ placement = 'float' }: AgentPanelProps) {
+export function AgentPanel({ placement = 'float', onExpand }: AgentPanelProps) {
   const { sessions, activeSessionId, transcript, approvals, running } = useAgentStore()
   const [convosOpen, setConvosOpen] = useState(false)
   const { scrollRef, activeSheetTitle } = usePanelFrame(transcript.length)
@@ -127,7 +129,18 @@ export function AgentPanel({ placement = 'float' }: AgentPanelProps) {
           >
             <IconPlus className="size-[15px]" />
           </button>
-          {placement !== 'sheet' && (
+          {onExpand && placement !== 'page' && (
+            <button
+              type="button"
+              aria-label="Open the chat as a page"
+              title="Open as a page"
+              onClick={onExpand}
+              className={HEADER_BUTTON}
+            >
+              <IconArrowsDiagonal className="size-[15px]" />
+            </button>
+          )}
+          {(placement === 'float' || placement === 'dock') && (
             <button
               type="button"
               aria-label={
@@ -144,14 +157,16 @@ export function AgentPanel({ placement = 'float' }: AgentPanelProps) {
               )}
             </button>
           )}
-          <button
-            type="button"
-            aria-label="Close agent panel"
-            onClick={() => store().togglePanel()}
-            className={HEADER_BUTTON}
-          >
-            <IconX className="size-[15px]" />
-          </button>
+          {placement !== 'page' && (
+            <button
+              type="button"
+              aria-label="Close agent panel"
+              onClick={() => store().togglePanel()}
+              className={HEADER_BUTTON}
+            >
+              <IconX className="size-[15px]" />
+            </button>
+          )}
         </div>
         {convosOpen && <ConversationsMenu onClose={() => setConvosOpen(false)} />}
       </div>

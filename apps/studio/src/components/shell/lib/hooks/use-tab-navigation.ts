@@ -2,7 +2,7 @@ import { useRouter } from '@tanstack/react-router'
 import { useViewStore } from '@washi/ui'
 import { useEffect } from 'react'
 import { readActiveWorkspace } from '@/integrations/trpc'
-import { pathFor } from '../utils'
+import { isWithin, pathFor } from '../utils'
 
 /**
  * The other direction: a page chosen anywhere (sidebar, palette, the agent opening one) moves
@@ -18,7 +18,9 @@ export function useTabNavigation(workspaceId: string) {
         if (readActiveWorkspace() !== workspaceId) return
         if (state.activeTab === previous.activeTab) return
         const target = pathFor(workspaceId, state.activeTab)
-        if (target !== router.state.location.pathname) router.history.push(target)
+        if (!isWithin(router.state.location.pathname, target, workspaceId)) {
+          router.history.push(target)
+        }
       }),
     [workspaceId, router],
   )

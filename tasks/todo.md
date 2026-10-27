@@ -1,3 +1,23 @@
+# D67 · D68 · chats live on the tree, routines start themselves (2026-10-26)
+
+Juan: chats anchored to a page or its subtree, back in my latest chat as I move; chats and
+routines as full pages, out of Settings; routines triggered by schedules, events and webhooks.
+
+- [x] phase 0: PRD D67 · D68, routes; proposed frames in `docs/design/agent.html`
+- [x] A: `created_by` + anchor columns, `chatProcedure`, filtered subscriptions/approvals/today;
+      FTS5 chat search; `/chats`, `/chats/new`, `/chats/$chatId`; panel `page` placement + ⤢;
+      sidebar Threads → Chats
+- [ ] B: anchor chip in the composer; the panel opens your latest chat covering the page; 📌;
+      refuse an anchor the asker cannot read
+- [ ] C: `/routines` + `/routines/$id` (Setup · Runs), a chat per run (`routine_runs`), cron,
+      Test; Settings → Routines goes
+- [ ] D: event triggers, 60 s coalescing, Washi's own writes fire nothing
+- [ ] E: webhooks (hosted): URL + sealed secret, HMAC, payload inspector, always asks at the desk
+- [ ] later: fork from a message, share read-only, "make it a routine", templates
+
+Accept: a member's chat is invisible to everyone else (list, transcript, stream, search, Inbox);
+search finds a word split across streamed chunks; ⤢ opens the chat as a page and back returns.
+
 # D65 · share a page, limit who reads it, redact what leaves (2026-10-26)
 
 Juan, after Notion's Share menu: a read-only link; `visibility` + `access` on `<Sheet>` enforced;

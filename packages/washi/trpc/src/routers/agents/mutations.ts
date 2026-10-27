@@ -1,6 +1,6 @@
 import { TRPCError } from '@trpc/server'
-import { attachmentRefSchema, effortSchema } from '@washi/domain'
-import { createSession } from '@washi/repository'
+import { attachmentRefSchema, chatAnchorSchema, effortSchema } from '@washi/domain'
+import { createSession, isSessionVisible } from '@washi/repository'
 import {
   APPROVAL_MODES,
   EFFORTS,
@@ -10,15 +10,19 @@ import {
 } from '@washi/service'
 import { z } from 'zod'
 import { isSteward, ownerProcedure, router, workspaceProcedure } from '../../init'
+import { chatProcedure } from '../../shared/chats'
 
 const decisionSchema = z.enum(['allow_once', 'allow_always', 'reject_once'])
 
 export const agentMutations = router({
+  /** A chat is its starter's (D67); one started from a page may be anchored to it. */
   createSession: workspaceProcedure
-    .input(z.object({ title: z.string() }))
-    .mutation(({ ctx, input }) => createSession(ctx.ws, input.title)),
+    .input(z.object({ title: z.string(), anchor: chatAnchorSchema.nullish() }))
+    .mutation(({ ctx, input }) =>
+      createSession(ctx.ws, input.title, { createdBy: ctx.viewer.id, anchor: input.anchor }),
+    ),
   // Fire-and-forget: updates stream back over the agentUpdate subscription.
-  prompt: workspaceProcedure
+  prompt: chatProcedure
     .input(
       z.object({
         sessionId: z.string(),
@@ -44,11 +48,11 @@ export const agentMutations = router({
           console.error('[washi] a turn crashed outside its own error handling', error)
         })
     }),
-  renameSession: workspaceProcedure
+  renameSession: chatProcedure
     .input(z.object({ sessionId: z.string(), title: z.string().trim().min(1).max(120) }))
     .mutation(({ ctx, input }) => ctx.host.renameSession(input.sessionId, input.title)),
   /** Refused while it runs — Stop first. */
-  deleteSession: workspaceProcedure
+  deleteSession: chatProcedure
     .input(z.object({ sessionId: z.string() }))
     .mutation(({ ctx, input }) => {
       try {
@@ -59,7 +63,7 @@ export const agentMutations = router({
       return { deleted: true }
     }),
   /** A conversation's own model and effort; null takes the workspace default (D61). */
-  setSessionOptions: workspaceProcedure
+  setSessionOptions: chatProcedure
     .input(
       z.object({
         sessionId: z.string(),
@@ -71,7 +75,7 @@ export const agentMutations = router({
       ctx.host.setSessionOptions(input.sessionId, { model: input.model, effort: input.effort }),
     ),
   /** Stop the running turn. Its open approvals are answered "no" on the way out. */
-  cancel: workspaceProcedure
+  cancel: chatProcedure
     .input(z.object({ sessionId: z.string() }))
     .mutation(({ ctx, input }) => ({ cancelled: ctx.host.cancel(input.sessionId) })),
   /** Clearing the breaker is a person's decision — nothing clears it on a timer. */
@@ -133,6 +137,10 @@ export const agentMutations = router({
   resolveApproval: workspaceProcedure
     .input(z.object({ id: z.string(), decision: decisionSchema }))
     .mutation(({ ctx, input }) => {
+      const request = ctx.host.pendingApprovals().find((pending) => pending.id === input.id)
+      if (request && !isSessionVisible(ctx.ws, request.sessionId, ctx.viewer.id)) {
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'no such question' })
+      }
       ctx.host.resolveApprovalRequest(input.id, input.decision, ctx.actorId)
     }),
 })

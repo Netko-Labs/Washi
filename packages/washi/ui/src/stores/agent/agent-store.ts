@@ -16,6 +16,9 @@ interface AgentState {
   transcript: TranscriptEntry[]
   approvals: ApprovalRequest[]
   running: boolean
+  /** A blank chat on screen: nothing is created until its first send (D67). */
+  draft: boolean
+  startDraft: () => void
   panelOpen: boolean
   togglePanel: () => void
   /** Docked beside the page instead of floating over it (D61). The host remembers it. */
@@ -73,6 +76,8 @@ export const useAgentStore = create<AgentState>((set, get) => ({
   transcript: [],
   approvals: [],
   running: false,
+  draft: false,
+  startDraft: () => set({ draft: true, activeSessionId: null, transcript: [], running: false }),
   panelOpen: false,
   togglePanel: () => set((state) => ({ panelOpen: !state.panelOpen })),
   docked: false,
@@ -143,7 +148,7 @@ export const useAgentStore = create<AgentState>((set, get) => ({
       ],
     }))
     // Re-checked after the await: a conversation chosen meanwhile is the person's choice.
-    if (!get().activeSessionId && !creating && sessions[0]) {
+    if (!get().activeSessionId && !get().draft && !creating && sessions[0]) {
       await get().selectSession(sessions[0].id)
     }
   },
@@ -169,7 +174,7 @@ export const useAgentStore = create<AgentState>((set, get) => ({
 
   /** Claims the session before awaiting, so a slower, older selection can never win. */
   selectSession: async (id) => {
-    set({ activeSessionId: id, transcript: [] })
+    set({ activeSessionId: id, transcript: [], draft: false })
     const transcript = await api.agents.transcript.query({ sessionId: id })
     if (get().activeSessionId === id) set({ transcript })
   },
@@ -247,6 +252,7 @@ export const useAgentStore = create<AgentState>((set, get) => ({
       transcript: [],
       approvals: [],
       running: false,
+      draft: false,
     })
   },
 }))

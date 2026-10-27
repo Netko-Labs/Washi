@@ -231,8 +231,12 @@ export class AgentHost {
   }
 
   /** What happened, what needs you, what it cost — one read for the Today screen. */
-  today(): TodayReport {
-    return { turns: recentTurns(this.ws), pending: this.approvals.list(), spend: this.spend() }
+  today(viewerId?: string | null): TodayReport {
+    return {
+      turns: recentTurns(this.ws, viewerId),
+      pending: this.approvals.list(),
+      spend: this.spend(),
+    }
   }
 
   resolveApprovalRequest(

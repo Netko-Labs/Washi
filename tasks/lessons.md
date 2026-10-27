@@ -1,5 +1,10 @@
 # Lessons
 
+- **Never `git stash` while `bun run dev:studio` runs.** The router plugin rewrites
+  `routeTree.gen.ts` the moment the route files vanish, and the pop then refuses to overwrite it.
+  Compare against a baseline with `git worktree add` instead; if it happens, `git checkout` the
+  generated file and pop again.
+
 - **One Bun everywhere.** `packageManager`, CI and images must agree: Bun 1.4 writes lockfile v2,
   which 1.3 can't read. The repo is on `bun@1.4.0`; bump all three together.
 - **`mirin check` failing on a branch proves nothing until the base passes too.** "Never published

@@ -199,6 +199,95 @@
 .mp .r .dsc{display:block;font-size:12px;color:var(--s-mfg)}
 .mp .r .pr{font:400 11px/1.3 var(--s-mono)}
 .ran{font-size:12px;color:var(--s-mfg)}
+.app .side.sb.sbD .hrow .ib.on{background:var(--s-accent);border-color:var(--s-input);color:var(--s-fg)}
+.app .agent.page{position:relative;right:auto;bottom:auto;width:auto;max-height:none;border:0;border-radius:0;box-shadow:none;background:var(--s-bg);z-index:auto;min-width:0}
+.app .agent .ah .anc{font-weight:500}
+.app .agent .ah .x span.on{background:var(--s-accent);color:var(--s-fg)}
+.anc{display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 7px;border-radius:6px;background:var(--s-muted);font:500 11px/1 var(--s-sans);color:var(--s-mfg);white-space:nowrap}
+.anc.lnk{background:#3d5a7312;color:var(--s-agent);border:1px solid #3d5a7333}
+.wait{display:inline-flex;align-items:center;gap:5px;height:20px;padding:0 8px;border-radius:99px;background:#fbe9e4;color:#7f2a1c;font:600 11px/1 var(--s-sans);white-space:nowrap}
+.rtag{display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 7px;border-radius:6px;border:1px dashed var(--s-agent);color:var(--s-agent);font:500 11px/1 var(--s-sans);white-space:nowrap}
+.chats{max-width:780px;margin:0 auto;padding:30px 40px 40px;width:100%}
+.chats h1{font:600 24px/1.2 var(--s-sans);letter-spacing:-.02em;margin:0 0 14px;display:flex;align-items:center;gap:10px}
+.chats h1 .btn{margin-left:auto}
+.chats .srch{display:flex;align-items:center;gap:8px;height:40px;border:1px solid var(--s-border);border-radius:12px;background:var(--s-card);padding:0 12px;font-size:13.5px;color:#a39b8d}
+.chats .srch .kbd{margin-left:auto}
+.chats .fl{display:flex;gap:6px;margin:12px 0 0}
+.chats .day{display:block;margin:20px 0 2px;font:600 11px/1 var(--s-sans);text-transform:uppercase;letter-spacing:.06em;color:var(--s-mfg)}
+.chr{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:10px;border-bottom:1px solid var(--s-border)}
+.chr.hov{background:var(--s-card);border-radius:10px}
+.chr .t{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;min-width:0}
+.chr .ex{font-size:12.5px;color:var(--s-mfg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chr .ex mark{background:#f5d28a88;color:inherit;border-radius:3px;padding:0 1px}
+.chr .age{font:400 11px/1.6 var(--s-mono);color:var(--s-mfg);text-align:right;grid-row:1}
+.split{display:grid;grid-template-columns:1fr 1fr;flex:1;min-height:0}
+.split > .agent.page{border-right:1px solid var(--s-border)}
+.touched{display:flex;align-items:center;gap:6px;padding:8px 14px;border-bottom:1px solid var(--s-border);background:var(--s-card);font-size:12px;flex-wrap:wrap}
+.touched .lbl2{margin-right:4px}
+.tp{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 4px 0 9px;border-radius:99px;border:1px solid var(--s-border);background:var(--s-bg);font-size:12px}
+.tp.on{border-color:var(--s-agent);background:#3d5a7312}
+.tp .u{height:20px;padding:0 7px;border-radius:99px;display:inline-flex;align-items:center;font-size:11px;color:var(--s-mfg);background:var(--s-muted)}
+.newchat{flex:1;display:grid;place-items:center}
+.newchat .in{width:640px;display:grid;justify-items:center;gap:14px}
+.newchat h2{font:400 26px/1.2 var(--s-serif);margin:0}
+.newchat .cbox{width:100%;box-sizing:border-box;background:var(--s-card)}
+.newchat .sugs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%}
+.sug{border:1px solid var(--s-border);border-radius:12px;background:var(--s-card);padding:10px 12px;display:grid;gap:6px;font-size:12.5px;line-height:1.4}
+.sug .anc{justify-self:start}
+.seg.xs span{padding:3px 9px;font-size:11.5px}
+.rlist{max-width:860px;margin:0 auto;padding:30px 40px 40px;width:100%}
+.rlist h1{font:600 24px/1.2 var(--s-sans);letter-spacing:-.02em;margin:0;display:flex;align-items:center;gap:10px}
+.rlist h1 .btn{margin-left:auto}
+.rlist .lead{color:var(--s-mfg);margin:4px 0 18px;font-size:13.5px}
+.rrow{display:flex;align-items:center;gap:14px;padding:12px 12px;border:1px solid var(--s-border);border-radius:12px;background:var(--s-card);margin-bottom:8px}
+.rrow .tgl{width:34px;height:34px;border-radius:9px;background:var(--s-muted);display:grid;place-items:center;font-size:15px;color:var(--s-agent);flex:none}
+.rrow .mid{flex:1;min-width:0;display:grid;gap:3px}
+.rrow .n{font-size:14px;font-weight:600}.rrow.off .n,.rrow.off .s{color:var(--s-mfg)}
+.rrow .s{font-size:12.5px;color:var(--s-mfg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rrow .s b{color:var(--s-fg);font-weight:600}
+.rrow .when{font:400 11px/1 var(--s-mono);color:var(--s-mfg);white-space:nowrap;flex:none;display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 8px;border-radius:99px;background:var(--s-muted)}
+.rrow .when.need{background:#fbe9e4;color:#7f2a1c}
+.tpls{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.tpl{border:1px dashed var(--s-input);border-radius:12px;padding:10px 12px;display:grid;gap:6px;font-size:12px;color:var(--s-mfg);line-height:1.4;align-content:start}
+.tpl b{font-size:13px;color:var(--s-fg)}.tpl .tgl{font-size:14px;color:var(--s-agent)}
+.rset{padding:22px 40px 40px;width:100%;max-width:1000px;margin:0 auto}
+.rset .rh{display:flex;align-items:center;gap:10px}
+.rset .rh h1{font:600 22px/1.2 var(--s-sans);letter-spacing:-.02em;margin:0}
+.rset .stabs{display:flex;gap:4px;border-bottom:1px solid var(--s-border);margin:14px 0 20px}
+.rset .stabs span{height:34px;display:inline-flex;align-items:center;gap:7px;padding:0 12px;font-size:13px;font-weight:500;color:var(--s-mfg);border-bottom:2px solid transparent;margin-bottom:-1px}
+.rset .stabs span.on{color:var(--s-fg);border-color:var(--s-primary)}
+.rset .cols{display:grid;grid-template-columns:1fr 360px;gap:20px;align-items:start}
+.sent{border:1px solid var(--s-border);border-radius:16px;background:var(--s-card);padding:16px;display:grid;gap:12px}
+.sent .ln{display:grid;grid-template-columns:64px 1fr;gap:10px;align-items:start}
+.sent .w{font:400 20px/34px var(--s-serif);color:var(--s-mfg)}
+.sent .slot{display:flex;flex-wrap:wrap;gap:6px;align-items:center;min-height:34px}
+.tchip2{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 11px;border-radius:10px;border:1px solid var(--s-border);background:var(--s-bg);font-size:13px;white-space:nowrap}
+.tchip2.on{border-color:var(--s-primary);background:var(--s-accent)}
+.tchip2 .c{font-size:9px;color:var(--s-mfg)}.tchip2 .x{color:var(--s-mfg);font-size:11px}
+.tchip2.add{border-style:dashed;color:var(--s-mfg)}
+.sent .ta{border:1px solid var(--s-border);border-radius:12px;background:var(--s-bg);padding:10px 12px;font-size:13.5px;line-height:1.55;min-height:96px}
+.guard{display:flex;gap:10px;align-items:flex-start;border:1px solid #3d5a7333;background:#3d5a7310;border-radius:12px;padding:10px 12px;font-size:12.5px;color:var(--s-agent);line-height:1.45}
+.guard b{color:var(--s-fg)}
+.side2{display:grid;gap:14px}
+.side2 .card2{margin-top:0}
+.side2 .kv{display:grid;gap:4px;padding:10px 16px;border-top:1px solid var(--s-border);font-size:12.5px}
+.side2 .kv:first-of-type{border-top:0}
+.side2 .kv .k{font-size:11px;color:var(--s-mfg);text-transform:uppercase;letter-spacing:.04em}
+.side2 .kv .v{display:flex;align-items:center;gap:8px;font:400 12px/1.3 var(--s-mono);min-width:0}
+.side2 .kv .v span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.side2 .kv .v .btn{height:24px;font:600 11px/1 var(--s-sans)}
+.side2 .pl{display:flex;align-items:center;gap:8px;padding:8px 16px;border-top:1px solid var(--s-border);font-size:12px}
+.side2 .pl .m{font:400 11px/1 var(--s-mono);color:var(--s-mfg);margin-left:auto;white-space:nowrap}
+.side2 .pl .ok{color:var(--s-ok)}.side2 .pl .no{color:var(--s-bad)}
+.caps{display:flex;gap:10px;align-items:center;padding:12px 16px;font-size:12.5px;color:var(--s-mfg);flex-wrap:wrap}
+.caps .in{width:72px;height:32px;border:1px solid var(--s-border);border-radius:9px;background:var(--s-bg);display:flex;align-items:center;padding:0 10px;font:400 13px/1 var(--s-mono);color:var(--s-fg)}
+.rset .ft{display:flex;align-items:center;gap:8px;justify-content:flex-end}
+.pill.need{border-color:#c25f2c55;background:#c25f2c12;color:var(--s-primary)}
+.pill.need .dot{--d:var(--s-primary);background:var(--s-primary)}
+.pill.fail{border-color:#b5543c55;background:#b5543c12;color:var(--s-bad)}
+.pill.fail .dot{--d:var(--s-bad);background:var(--s-bad)}
+.grid .gc.mono{font:400 12px/1 var(--s-mono);color:var(--s-mfg)}
+.grid .gc.go{justify-content:flex-end;color:var(--s-mfg)}
 </style>
 </head>
 <body class="cv">
@@ -929,6 +1018,358 @@
     <div class="fnote">A run is an ordinary turn in a fresh conversation titled <code>Routine · {title}</code>, so day N never pays to re-read days 1 to N-1. 1 what a run shows: the prompt, the tools in words, Washi's words, and <em>when</em> it ran. No duration, no dollars, no model name — receipts and prices leave every turn (D62); they are still recorded, and live in Settings → Usage and a Usage page later. Today retells a run by what it did. Run now is the same path with a person watching — its questions keep the 5-minute patience.</div>
   </article>
   <div class="sticky" style="left:2730px;top:60px"><b>decided</b><ol><li>Routines are the only caller-free path into a turn. Keep it that way.</li><li>The clock walks <code>ControlPlane.workspaceIds()</code> that have a file — never a stray .db, never a conjured <code>default</code>.</li><li>Marked before it runs: a crash mid-turn never runs it twice. Not marked when stopped: the day catches up after Resume.</li></ol></div>
+</section>
+
+<!-- ───────────────────────── 6b · ROUTINES V2 (D68) ───────────────────────── -->
+<section class="cv-group" data-name="Routines v2" data-note="D68 · /routines · When ‹trigger›, Washi ‹does this› on ‹pages› · every run is a chat · outside data is never instructions">
+  <article class="frame" data-name="Routines · list · proposed" data-w="1280" data-h="800">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / netko-labs / routines</span></div>
+      <div class="shell">
+        <aside class="side sb sbD">
+          <div class="sa"><i data-mascot="happy" data-size="20"></i>Ask Washi or search<span class="k">⌘K</span></div>
+          <div class="hrow"><div class="it"><span class="g">⌂</span>Home</div><span class="ib" title="Inbox">◫</span><span class="ib" title="Chats">≡</span><span class="ib on" title="Routines">◷</span></div>
+          <div class="lbl2">Pages</div>
+          <div class="it"><span class="tw">▸</span><span class="g">▤</span>Backlog</div>
+          <div class="it"><span class="tw">▸</span><span class="g">▥</span>Roadmap</div>
+          <div class="it"><span class="tw">▸</span><span class="g">☰</span>Wiki</div>
+          <div class="it"><span class="tw">▸</span><span class="g">☷</span>Weekly review</div>
+          <div class="it"><span class="tw">▸</span><span class="g">▯</span>Team</div>
+          <div class="it faint" style="margin-top:6px"><span class="g">⌫</span>Trash</div>
+          <div class="wsb"><span class="wsav">N</span>Netko Labs<span class="car">⌄</span><span class="sp"></span><span class="ib">?</span><span class="av" style="--c:#a97f52">JV</span></div>
+        </aside>
+        <div class="content">
+          <div class="hdr"><span class="crumb">Netko Labs / <b>Routines</b></span><span class="sp"></span></div>
+          <div class="rlist">
+            <h1>Routines<span class="btn pri lg">+ New routine</span></h1>
+            <p class="lead">Chats that start themselves — on a clock, when something changes, or when another tool calls.</p>
+            <div class="rrow"><span class="tgl" title="Schedule">◷</span><span class="mid"><span class="n">Standup digest</span><span class="s">When <b>every weekday at 09:00</b> · Washi <b>writes the standup digest</b> on <b>Team › Standup</b></span></span><span class="when">next · tomorrow 09:00</span><span class="toggle"></span></div>
+            <div class="rrow"><span class="tgl" title="Schedule">◷</span><span class="mid"><span class="n">Weekly review</span><span class="s">When <b>Fridays at 17:00</b> · Washi <b>rewrites the “This week” callout</b> on <b>Weekly review</b></span></span><span class="when">next · Fri 17:00</span><span class="toggle"></span></div>
+            <div class="rrow"><span class="tgl" title="Event">⚡</span><span class="mid"><span class="n">Triage new issues</span><span class="s">When <b>a row is created in issues</b> · Washi <b>sets project and priority</b> on <b>Backlog</b> + issues</span></span><span class="when">ran 12 min ago · done</span><span class="toggle"></span></div>
+            <div class="rrow"><span class="tgl" title="Webhook">⇆</span><span class="mid"><span class="n">GitHub push → changelog</span><span class="s">When <b>GitHub sends a push to main</b> · Washi <b>adds what merged</b> on <b>Wiki › Changelog</b></span></span><span class="when need">ran 2h ago · needs you</span><span class="toggle"></span></div>
+            <div class="rrow off"><span class="tgl" title="Manual">✋</span><span class="mid"><span class="n">Stale-issue sweep</span><span class="s">When <b>someone presses Run</b> · Washi <b>flags issues untouched for 14 days</b> on <b>Backlog</b> + issues</span></span><span class="when">ran Oct 21</span><span class="toggle off"></span></div>
+            <div class="lbl2" style="margin:22px 0 10px">Start from a template</div>
+            <div class="tpls">
+              <div class="tpl"><span class="tgl">◷</span><b>Weekly review</b>Fridays 17:00 · rewrites “This week” from issues</div>
+              <div class="tpl"><span class="tgl">⚡</span><b>Triage new issues</b>A new row in issues · sets project, priority, owner</div>
+              <div class="tpl"><span class="tgl">⇆</span><b>GitHub push → changelog</b>A push to main · one line per merged PR</div>
+              <div class="tpl"><span class="tgl">◷</span><b>Stale-issue sweep</b>Mondays 08:00 · flags issues idle 14 days</div>
+              <div class="tpl"><span class="tgl">◷</span><b>Standup digest</b>Weekdays 09:00 · what moved since yesterday</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <span class="pin" style="left:1210px;top:96px">1</span>
+      <span class="pin" style="left:370px;top:196px">2</span>
+      <span class="pin" style="left:1040px;top:196px">3</span>
+      <span class="pin" style="left:370px;top:560px">4</span>
+    </div>
+    <div class="fnote">Routines leave Settings for <code>/routines</code>, and the places row's ◷ opens it. 1 New routine opens the setup on a blank sentence. 2 a row reads as one sentence — <b>When ‹trigger›, Washi ‹does this› on ‹pages›</b> — with the trigger's glyph: ◷ schedule · ⚡ event · ⇆ webhook · ✋ manual. 3 a schedule shows its next run; the rest their last, with its status (<q>needs you</q> = a run waiting at the desk); the switch pauses it without deleting. 4 five templates fill the sentence; nothing runs until Save. The seeded team space's 17:00 Weekly review becomes the first row.</div>
+  </article>
+
+  <article class="frame" data-name="Routine · setup · proposed" data-w="1280" data-h="900">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / netko-labs / routines / github-push-changelog</span></div>
+      <div class="shell">
+        <aside class="side sb sbD">
+          <div class="sa"><i data-mascot="happy" data-size="20"></i>Ask Washi or search<span class="k">⌘K</span></div>
+          <div class="hrow"><div class="it"><span class="g">⌂</span>Home</div><span class="ib" title="Inbox">◫</span><span class="ib" title="Chats">≡</span><span class="ib on" title="Routines">◷</span></div>
+          <div class="lbl2">Pages</div>
+          <div class="it"><span class="tw">▸</span><span class="g">▤</span>Backlog</div>
+          <div class="it"><span class="tw">▾</span><span class="g">☰</span>Wiki</div>
+          <div class="it ind"><span class="g">▯</span>Changelog</div>
+          <div class="it ind"><span class="g">▯</span>How we work</div>
+          <div class="it"><span class="tw">▸</span><span class="g">☷</span>Weekly review</div>
+          <div class="wsb"><span class="wsav">N</span>Netko Labs<span class="car">⌄</span><span class="sp"></span><span class="ib">?</span><span class="av" style="--c:#a97f52">JV</span></div>
+        </aside>
+        <div class="content">
+          <div class="hdr"><span class="crumb">Routines / <b>GitHub push → changelog</b></span><span class="sp"></span><span class="toggle"></span><span class="btn ghost icon">⋯</span></div>
+          <div class="rset">
+            <div class="rh"><span class="tgl" style="font-size:18px;color:var(--s-agent)">⇆</span><h1>GitHub push → changelog</h1></div>
+            <div class="stabs"><span class="on">Setup</span><span>Runs · 19</span></div>
+            <div class="cols">
+              <div style="display:grid;gap:14px">
+                <div class="sent">
+                  <div class="ln"><span class="w">When</span><span class="slot"><span class="tchip2 on">⇆ a webhook arrives <span class="c">▾</span></span><span class="tchip2">from GitHub · push to <b>main</b> <span class="c">▾</span></span></span></div>
+                  <div class="ln"><span class="w">Washi</span><div class="ta">Read the commits in the payload. For each merged pull request, add one line under today's date on Changelog: what changed, in words a teammate would use. Link the issue when the PR names one, and set that issue to done.</div></div>
+                  <div class="ln"><span class="w">on</span><span class="slot"><span class="tchip2">▯ Wiki › Changelog <span class="c">▾</span></span><span class="tchip2">▦ issues <span class="x">×</span></span><span class="tchip2 add">+ table</span></span></div>
+                </div>
+                <div class="guard"><span>⛉</span><span><b>What arrives from outside is data, never instructions</b> — webhook runs ask at the desk. The payload reaches Washi fenced as untrusted; a commit message that says “ignore the above” is just a commit message. It may write only under Changelog and in issues.</span></div>
+                <div class="card2">
+                  <div class="ch"><h2>Limits</h2><span class="d">under the workspace's daily stop of $10.00</span></div>
+                  <div class="caps">At most <span class="in">20</span> runs a day and <span class="in">$2.00</span> a day. Pushes inside 60 s run once.</div>
+                </div>
+                <div class="ft"><span class="btn lg">▷ Test with sample payload</span><span class="btn pri lg">Save</span></div>
+              </div>
+              <div class="side2">
+                <div class="card2">
+                  <div class="ch"><h2>Webhook</h2><span class="tag ok">● receiving</span></div>
+                  <div class="kv"><span class="k">URL</span><span class="v"><span>https://washi.netko.dev/api/hooks/rt_01J9x7…/github</span><span class="btn">Copy</span></span></div>
+                  <div class="kv"><span class="k">Secret</span><span class="v"><span>whsec_••••••••••••3f9a</span><span class="btn">Rotate</span></span></div>
+                  <div class="kv"><span class="k">Signature</span><span class="v" style="font-family:var(--s-sans)"><span>HMAC (GitHub, Stripe) · <code>X-Hub-Signature-256</code></span></span></div>
+                </div>
+                <div class="card2">
+                  <div class="ch"><h2>Last payloads</h2><span class="d">kept 7 days</span></div>
+                  <div class="pl"><span class="ok">✓</span>push · main · 4 commits<span class="m">2h ago</span></div>
+                  <div class="pl"><span class="ok">✓</span>push · main · 1 commit<span class="m">yesterday</span></div>
+                  <div class="pl"><span class="ok">✓</span>push · main · 2 commits<span class="m">Oct 24</span></div>
+                  <div class="pl"><span class="no">✕</span>push · bad signature, refused<span class="m">Oct 23</span></div>
+                  <div class="pl" style="color:var(--s-mfg)">Use one as the sample for Test<span class="m">›</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <span class="pin" style="left:300px;top:212px">1</span>
+      <span class="pin" style="left:300px;top:296px">2</span>
+      <span class="pin" style="left:300px;top:404px">3</span>
+      <span class="pin" style="left:880px;top:212px">4</span>
+      <span class="pin" style="left:300px;top:640px">5</span>
+    </div>
+    <div class="fnote"><code>/routines/$id</code> · Setup. The sentence is the editor. 1 <b>When</b> — the trigger chip: schedule (presets or cron + IANA zone, the next run shown), event (a row created or updated in a table, matching conditions, a status reaching done, a page created under a page, Washi mentioned in a comment), webhook (hosted only), manual. 2 <b>Washi</b> — the instructions, in words. 3 <b>on</b> — the anchor (a page, or a page and below) and the tables it may write; nothing else is writable. 4 the trigger's card: for a webhook, the URL, the sealed secret (shown once, then masked; Rotate), HMAC accepted, and the last payloads — any one becomes Test's sample. 5 caps per routine under the daily stop; events and pushes coalesce for 60 s. Test runs the real path with a person watching. (Mobbin: ClickUp's <q>When Every… then Launch AI Agent</q>.)</div>
+  </article>
+
+  <article class="frame" data-name="Routine · runs · proposed" data-w="1280" data-h="800">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / netko-labs / routines / github-push-changelog?tab=runs</span></div>
+      <div class="shell">
+        <aside class="side sb sbD">
+          <div class="sa need"><i data-mascot="happy peek" data-size="20"></i>Ask Washi or search<span class="k">⌘K</span></div>
+          <div class="hrow"><div class="it"><span class="g">⌂</span>Home</div><span class="ib" title="Inbox">◫</span><span class="ib" title="Chats">≡</span><span class="ib on" title="Routines">◷</span></div>
+          <div class="lbl2">Pages</div>
+          <div class="it"><span class="tw">▸</span><span class="g">▤</span>Backlog</div>
+          <div class="it"><span class="tw">▾</span><span class="g">☰</span>Wiki</div>
+          <div class="it ind"><span class="g">▯</span>Changelog</div>
+          <div class="it"><span class="tw">▸</span><span class="g">☷</span>Weekly review</div>
+          <div class="wsb"><span class="wsav">N</span>Netko Labs<span class="car">⌄</span><span class="sp"></span><span class="ib">?</span><span class="av" style="--c:#a97f52">JV</span></div>
+        </aside>
+        <div class="content">
+          <div class="hdr"><span class="crumb">Routines / <b>GitHub push → changelog</b></span><span class="sp"></span><span class="btn">▷ Run now</span><span class="toggle"></span></div>
+          <div class="rset">
+            <div class="rh"><span class="tgl" style="font-size:18px;color:var(--s-agent)">⇆</span><h1>GitHub push → changelog</h1></div>
+            <div class="stabs"><span>Setup</span><span class="on">Runs · 19</span></div>
+            <div class="tiles">
+              <div class="tile"><div class="k">Last 24h</div><div class="v">3 runs</div><div class="sub">$0.21 · 1 waiting on you</div></div>
+              <div class="tile"><div class="k">Last 7d</div><div class="v">19 runs</div><div class="sub">$1.34 · median 38 s</div></div>
+              <div class="tile"><div class="k">Failed</div><div class="v">1</div><div class="sub">bad signature, refused · Oct 23</div></div>
+            </div>
+            <div class="grid" style="--cols:2.2fr 1.1fr 1fr .8fr .7fr 36px;margin-top:18px">
+              <div class="gr gh"><div class="gc">Trigger</div><div class="gc">Started</div><div class="gc">Status</div><div class="gc">Duration</div><div class="gc">Cost</div><div class="gc"></div></div>
+              <div class="gr"><div class="gc">⇆ push · main · 2 commits</div><div class="gc mono">today 14:02</div><div class="gc"><span class="pill prog"><span class="dot"></span>Running</span></div><div class="gc mono">0:21</div><div class="gc mono">—</div><div class="gc go">›</div></div>
+              <div class="gr"><div class="gc">⇆ push · main · 4 commits</div><div class="gc mono">today 12:10</div><div class="gc"><span class="pill need"><span class="dot"></span>Needs you</span></div><div class="gc mono">0:44</div><div class="gc mono">$0.09</div><div class="gc go">›</div></div>
+              <div class="gr"><div class="gc">✋ Run now · JV</div><div class="gc mono">today 09:31</div><div class="gc"><span class="pill done"><span class="dot"></span>Done</span></div><div class="gc mono">0:36</div><div class="gc mono">$0.07</div><div class="gc go">›</div></div>
+              <div class="gr"><div class="gc">⇆ push · main · 1 commit</div><div class="gc mono">yesterday 18:47</div><div class="gc"><span class="pill done"><span class="dot"></span>Done</span></div><div class="gc mono">0:29</div><div class="gc mono">$0.05</div><div class="gc go">›</div></div>
+              <div class="gr"><div class="gc">▷ Test · sample payload</div><div class="gc mono">yesterday 11:05</div><div class="gc"><span class="pill done"><span class="dot"></span>Done</span></div><div class="gc mono">0:41</div><div class="gc mono">$0.08</div><div class="gc go">›</div></div>
+              <div class="gr"><div class="gc">⇆ push · main · 2 commits</div><div class="gc mono">Oct 24 16:20</div><div class="gc"><span class="pill done"><span class="dot"></span>Done</span></div><div class="gc mono">0:33</div><div class="gc mono">$0.06</div><div class="gc go">›</div></div>
+              <div class="gr"><div class="gc">⇆ push · bad signature</div><div class="gc mono">Oct 23 10:12</div><div class="gc"><span class="pill fail"><span class="dot"></span>Failed</span></div><div class="gc mono">0:00</div><div class="gc mono">$0.00</div><div class="gc go">›</div></div>
+              <div class="add">Show 12 more</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <span class="pin" style="left:300px;top:226px">1</span>
+      <span class="pin" style="left:300px;top:360px">2</span>
+      <span class="pin" style="left:1206px;top:400px">3</span>
+    </div>
+    <div class="fnote"><code>/routines/$id</code> · Runs. 1 three tiles: the last 24 hours, the last 7 days, what failed. 2 one row per <code>routine_runs</code> entry — trigger (with its payload's gist), started, status (<b>Done</b> · <b>Running</b> · <b>Needs you</b> · <b>Failed</b>), duration, cost. Cost shows here because this is the routine's ledger, not a conversation (D62 still holds in the chat). A refused signature is a failed run that never reached Washi: $0.00. 3 every row opens its chat (<code>/chats/$chatId</code>) — a run is a chat that started itself. (Mobbin: Cursor's automation runs.)</div>
+  </article>
+
+  <div class="sticky" style="left:4140px;top:60px"><b>proposed · D68</b><ol><li>Webhooks and events only ever start routines: <code>routines</code> stays the one caller-free path into a turn.</li><li>Outside data is fenced as untrusted; a webhook run asks at the desk even in <code>auto</code>.</li><li>Washi's own writes fire no event — no loops.</li></ol></div>
+</section>
+
+<!-- ───────────────────────── 7a · CHATS (D67) ───────────────────────── -->
+<section class="cv-group" data-name="Chats" data-note="D67 · /chats · a chat is its starter's · anchored to a page or its subtree · the panel opens your latest chat that covers the page">
+  <article class="frame" data-name="Chats · history · proposed" data-w="1280" data-h="800">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / netko-labs / chats</span></div>
+      <div class="shell">
+        <aside class="side sb sbD">
+          <div class="sa"><i data-mascot="happy" data-size="20"></i>Ask Washi or search<span class="k">⌘K</span></div>
+          <div class="hrow"><div class="it"><span class="g">⌂</span>Home</div><span class="ib" title="Inbox">◫</span><span class="ib on" title="Chats">≡</span><span class="ib" title="Routines">◷</span></div>
+          <div class="lbl2">Recents</div>
+          <div class="rec"><span class="g">▯</span>Q3 plan<span class="t">1h</span></div>
+          <div class="rec"><span class="g">▯</span>Backlog<span class="t">4h</span></div>
+          <div class="rec"><span class="g">▯</span>Weekly review<span class="t">1d</span></div>
+          <div class="lbl2">Pages</div>
+          <div class="it"><span class="tw">▸</span><span class="g">▤</span>Backlog</div>
+          <div class="it"><span class="tw">▾</span><span class="g">▥</span>Roadmap</div>
+          <div class="it ind"><span class="g">▯</span>Q3 plan</div>
+          <div class="it"><span class="tw">▸</span><span class="g">☰</span>Wiki</div>
+          <div class="it"><span class="tw">▸</span><span class="g">☷</span>Weekly review</div>
+          <div class="it faint" style="margin-top:6px"><span class="g">⌫</span>Trash</div>
+          <div class="wsb"><span class="wsav">N</span>Netko Labs<span class="car">⌄</span><span class="sp"></span><span class="ib">?</span><span class="av" style="--c:#a97f52">JV</span></div>
+        </aside>
+        <div class="content">
+          <div class="hdr"><span class="crumb">Netko Labs / <b>Chats</b></span><span class="sp"></span><span class="btn pri">+ New chat</span></div>
+          <div class="chats">
+            <h1>Chats</h1>
+            <div class="srch">⌕ Search every message — try “CSV import”<span class="kbd">/</span></div>
+            <div class="fl"><span class="fchip on">All</span><span class="fchip">▥ Here and below</span><span class="fchip">◷ Routine runs</span><span class="fchip">Waiting on you · 1</span></div>
+            <span class="day">Today</span>
+            <div class="chr hov"><span class="t">Q3 plan dates vs the Backlog<span class="anc">▥ Roadmap › Q3 plan</span><span class="wait">● Waiting on you</span></span><span class="age">12 min</span><span class="ex">Washi: Two milestones land before their issues are done — CSV import and cover presets. Move them to October, or keep the dates?</span></div>
+            <div class="chr"><span class="t">Standup digest<span class="rtag">◷ Routine run</span><span class="anc">☰ Wiki › Standup</span></span><span class="age">09:00</span><span class="ex">Washi: Wrote today's digest — 4 issues moved, 2 new in triage, nothing blocked.</span></div>
+            <div class="chr"><span class="t">Triage the six issues with no owner<span class="anc">▤ Backlog and below</span></span><span class="age">08:41</span><span class="ex">Washi: Assigned four by who touched the code last; two need a decision, I left them in Todo.</span></div>
+            <span class="day">Yesterday</span>
+            <div class="chr"><span class="t">Where does the invite token go</span><span class="age">16:20</span><span class="ex">Washi: It travels in the link as <code>?invite=</code>; the workspace screen accepts it after sign-in.</span></div>
+            <div class="chr"><span class="t">Rewrite this week<span class="anc">☷ Weekly review</span></span><span class="age">15:02</span><span class="ex">Washi: Rewrote the “This week” callout from 9 status changes since Monday.</span></div>
+            <span class="day">Oct 23</span>
+            <div class="chr"><span class="t">Shipped this week, as a page</span><span class="age">17:45</span><span class="ex">Washi: Seven issues moved to done since Monday; two slipped. They're on Shipped this week.</span></div>
+            <div class="chr"><span class="t">Roadmap risks for the review<span class="anc">▥ Roadmap and below</span></span><span class="age">11:10</span><span class="ex">Washi: The riskiest item is <mark>CSV import</mark> — blocked on column typing since Oct 14.</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="fab"><i data-mascot="happy bob" data-size="40" class="m"></i></div>
+      <span class="pin" style="left:420px;top:116px">1</span>
+      <span class="pin" style="left:420px;top:168px">2</span>
+      <span class="pin" style="left:1020px;top:258px">3</span>
+      <span class="pin" style="left:610px;top:316px">4</span>
+    </div>
+    <div class="fnote">Threads is renamed <b>Chats</b>, and the places row says so. 1 one search over every message, FTS5 in the workspace file — a hit highlights in the excerpt. 2 filters: <b>All</b> · <b>Here and below</b> (the page you came from, and its subtree) · <b>Routine runs</b> · <b>Waiting on you</b> (a question or an approval open in that chat). 3 a row: title, the anchor as a path chip (none when the chat is unanchored), the last reply, the age; grouped by day. Only <b>your</b> chats — a chat is its starter's (<code>created_by</code>); one from before D67 stays the workspace's and lists for everyone. A chat anchored to a page you cannot read is not listed (D65). 4 a routine run is a chat too (D68), dashed and marked with its trigger. (Mobbin: ChatGPT's search list, Klarna's previous chats by day.)</div>
+  </article>
+
+  <article class="frame" data-name="Chat · page · proposed" data-w="1280" data-h="800">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / netko-labs / chats / 01J9q3-plan-dates</span></div>
+      <div class="shell">
+        <aside class="side sb sbD">
+          <div class="sa need"><i data-mascot="happy peek" data-size="20"></i>Ask Washi or search<span class="k">⌘K</span></div>
+          <div class="hrow"><div class="it"><span class="g">⌂</span>Home</div><span class="ib" title="Inbox">◫</span><span class="ib on" title="Chats">≡</span><span class="ib" title="Routines">◷</span></div>
+          <div class="lbl2">Pages</div>
+          <div class="it"><span class="tw">▸</span><span class="g">▤</span>Backlog</div>
+          <div class="it"><span class="tw">▾</span><span class="g">▥</span>Roadmap</div>
+          <div class="it ind on"><span class="g">▯</span>Q3 plan</div>
+          <div class="it"><span class="tw">▸</span><span class="g">☷</span>Weekly review</div>
+          <div class="wsb"><span class="wsav">N</span>Netko Labs<span class="car">⌄</span><span class="sp"></span><span class="ib">?</span><span class="av" style="--c:#a97f52">JV</span></div>
+        </aside>
+        <div class="content">
+          <div class="hdr"><span class="crumb">Chats / <b>Q3 plan dates vs the Backlog</b></span><span class="anc">▥ Roadmap and below</span><span class="sp"></span><span class="btn ghost">⋯</span></div>
+          <div class="split">
+            <div class="agent page">
+              <div class="body" style="padding:18px 22px;flex:1">
+                <div class="me">Check the Q3 plan dates against the Backlog. Anything that can't make it?</div>
+                <div class="tool">◉ Read Q3 plan</div>
+                <div class="tool">▤ Read issues</div>
+                <div class="tool">✎ Update the page Q3 plan</div>
+                <div class="tool">✎ Update the page Roadmap</div>
+                <div class="wtxt">Two milestones land before their issues are done: <b>CSV import</b> (blocked on column typing) and <b>Cover presets</b> (no owner). I marked both at risk on Q3 plan and added a line to Roadmap's summary.</div>
+                <div class="me">Add the owners next to each milestone too.</div>
+                <div class="tool">☺ Looked at who is on the team</div>
+                <div class="tool">✎ Update rows in issues</div>
+                <div class="wtxt">Done — every milestone on Q3 plan now names its owner, from the issues table. Cover presets still has none: move it to October, or keep the date?</div>
+              </div>
+              <div class="compose"><div class="cbox"><div class="ph">Reply, or tell Washi what to change…</div><div class="row"><span class="plus">+</span><span class="chip">▥ This page + below <span class="c">▾</span></span><span class="chip">◆ Sonnet 4.5 <span class="c">▾</span></span><span class="chip q">Balanced <span class="c">▾</span></span><span title="Pin this chat">📌</span><span class="send dim">↑</span></div></div></div>
+            </div>
+            <div class="content" style="min-height:0">
+              <div class="touched"><span class="lbl2">Pages touched</span><span class="tp on">▯ Q3 plan<span class="u">↶ Undo</span></span><span class="tp">▥ Roadmap<span class="u">↶ Undo</span></span><span class="tp">▦ issues · 3 rows<span class="u">↶ Undo</span></span></div>
+              <div class="sheet" style="padding:18px 28px">
+                <div class="wmark"><span class="sp2">✦</span>Washi wrote this 4 min ago<span class="u">↶ Undo</span></div>
+                <h1>Q3 plan</h1>
+                <p>What ships before the end of September, from the Roadmap.</p>
+                <h3>Milestones</h3>
+                <p><span class="pill done"><span class="dot"></span>Done</span> Auth refresh on reconnect · Sep 5 · R</p>
+                <p><span class="pill prog"><span class="dot"></span>Doing</span> Presence heartbeat · Sep 19 · JV</p>
+                <p><span class="pill metric"><span class="dot"></span>At risk</span> CSV import · Sep 26 · R — blocked on column typing</p>
+                <p><span class="pill metric"><span class="dot"></span>At risk</span> Cover presets · Sep 30 · no owner</p>
+                <h3>Not this quarter</h3>
+                <p>Offline sync · local-only mode</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <span class="pin" style="left:604px;top:60px">1</span>
+      <span class="pin" style="left:924px;top:110px">2</span>
+      <span class="pin" style="left:470px;top:740px">3</span>
+    </div>
+    <div class="fnote"><code>/chats/$chatId</code> — the chat as a page, with everything the panel has. 1 the anchor travels with the chat: <q>Roadmap and below</q>. 2 any page Washi touched in this chat opens beside the transcript (Dropbox Dash's split); the <b>Pages touched</b> strip lists them, and each pill's Undo pops that page's <code>sheet_revisions</code> — refused once a person has changed it since. A row write counts by table. 3 the composer adds the anchor chip (<q>This page + below ▾</q>: this page · this page and below · nothing) and 📌, which holds this chat across pages instead of following the anchor.</div>
+  </article>
+
+  <article class="frame" data-name="Chats · new · proposed" data-w="1280" data-h="800">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / netko-labs / chats / new</span></div>
+      <div class="shell">
+        <aside class="side sb sbD">
+          <div class="sa"><i data-mascot="happy" data-size="20"></i>Ask Washi or search<span class="k">⌘K</span></div>
+          <div class="hrow"><div class="it"><span class="g">⌂</span>Home</div><span class="ib" title="Inbox">◫</span><span class="ib on" title="Chats">≡</span><span class="ib" title="Routines">◷</span></div>
+          <div class="lbl2">Recents</div>
+          <div class="rec"><span class="g">▯</span>Weekly review<span class="t">20m</span></div>
+          <div class="rec"><span class="g">▯</span>Backlog<span class="t">2h</span></div>
+          <div class="rec"><span class="g">▯</span>Q3 plan<span class="t">1d</span></div>
+          <div class="lbl2">Pages</div>
+          <div class="it"><span class="tw">▸</span><span class="g">▤</span>Backlog</div>
+          <div class="it"><span class="tw">▸</span><span class="g">▥</span>Roadmap</div>
+          <div class="it"><span class="tw">▸</span><span class="g">☰</span>Wiki</div>
+          <div class="it"><span class="tw">▸</span><span class="g">☷</span>Weekly review</div>
+          <div class="wsb"><span class="wsav">N</span>Netko Labs<span class="car">⌄</span><span class="sp"></span><span class="ib">?</span><span class="av" style="--c:#a97f52">JV</span></div>
+        </aside>
+        <div class="content">
+          <div class="hdr"><span class="crumb">Chats / <b>New chat</b></span><span class="sp"></span></div>
+          <div class="newchat"><div class="in">
+            <i data-mascot="happy bob" data-size="64"></i>
+            <h2>What are we working on?</h2>
+            <div class="cbox"><div class="ph">Ask, or tell Washi what to write…</div><div class="row"><span class="plus">+</span><span class="chip q">No page <span class="c">▾</span></span><span class="chip">◆ Sonnet 4.5 <span class="c">▾</span></span><span class="chip q">Balanced <span class="c">▾</span></span><span class="send dim">↑</span></div></div>
+            <div class="sugs">
+              <div class="sug"><span class="anc">☷ Weekly review</span>Draft this week's callout from what moved in issues</div>
+              <div class="sug"><span class="anc">▤ Backlog</span>Triage the issues with no owner or project</div>
+              <div class="sug"><span class="anc">▥ Roadmap › Q3 plan</span>Check the milestone dates against the Backlog</div>
+            </div>
+          </div></div>
+        </div>
+      </div>
+      <span class="pin" style="left:612px;top:432px">1</span>
+      <span class="pin" style="left:612px;top:526px">2</span>
+    </div>
+    <div class="fnote"><code>/chats/new</code> — centred, nothing else on the screen. 1 the composer starts unanchored (<q>No page ▾</q>); the chat is saved on the first send, never before. 2 three suggestions from your last three pages (Recents), each already anchored to its page — picking one fills the composer and sets the chip; nothing sends by itself.</div>
+  </article>
+
+  <article class="frame" data-name="Agent panel · anchored · proposed" data-w="1280" data-h="800">
+    <div class="app">
+      <div class="bar"><i></i><i></i><i></i><span>washi.netko.dev / w / netko-labs / p / q3-plan</span></div>
+      <div class="shell withdock">
+        <aside class="side sb sbD">
+          <div class="sa"><i data-mascot="happy" data-size="20"></i>Ask Washi or search<span class="k">⌘K</span></div>
+          <div class="hrow"><div class="it"><span class="g">⌂</span>Home</div><span class="ib" title="Inbox">◫</span><span class="ib" title="Chats">≡</span><span class="ib" title="Routines">◷</span></div>
+          <div class="lbl2">Pages</div>
+          <div class="it"><span class="tw">▸</span><span class="g">▤</span>Backlog</div>
+          <div class="it"><span class="tw">▾</span><span class="g">▥</span>Roadmap</div>
+          <div class="it ind on"><span class="g">▯</span>Q3 plan</div>
+          <div class="it ind"><span class="g">▯</span>Q4 bets</div>
+          <div class="it"><span class="tw">▸</span><span class="g">☷</span>Weekly review</div>
+          <div class="wsb"><span class="wsav">N</span>Netko Labs<span class="car">⌄</span><span class="sp"></span><span class="ib">?</span><span class="av" style="--c:#a97f52">JV</span></div>
+        </aside>
+        <div class="content">
+          <div class="hdr"><span class="crumb">Netko Labs / Roadmap / <b>Q3 plan</b></span><span class="sp"></span><span class="apill"><i data-mascot="happy" data-size="17"></i>Washi watching</span><span class="btn">Edit</span></div>
+          <div class="sheet"><h1>Q3 plan</h1><p>What ships before the end of September, from the Roadmap.</p><h3>Milestones</h3><p>Auth refresh on reconnect · Sep 5 · done</p><p>Presence heartbeat · Sep 19</p><p>CSV import · Sep 26 · at risk</p><p>Cover presets · Sep 30 · at risk</p></div>
+        </div>
+      </div>
+      <div class="agent dock">
+        <div class="ah"><i data-mascot="happy" data-size="26"></i><span class="ttl">Q3 plan dates vs the Backlog<small><span class="anc" style="height:17px;margin-top:2px">▥ Roadmap and below</span></small></span><span style="color:var(--s-mfg);font-size:11px">▴</span><span class="x"><span title="Open as page">⤢</span><span title="Pin this chat">📌</span><span title="New chat">+</span><span title="Float">⇤</span><span>×</span></span></div>
+        <div class="menu cvs" style="width:330px">
+          <div style="display:flex;align-items:center;padding:6px 6px 4px"><span class="seg xs"><span class="on">Here</span><span>Recent</span></span><span class="sp"></span><span class="ran">covers Q3 plan</span></div>
+          <div class="mi on">Q3 plan dates vs the Backlog<span class="anc" style="margin-left:auto">▥ Roadmap and below</span></div>
+          <div class="mi">Roadmap risks for the review<span class="anc" style="margin-left:auto">▥ Roadmap and below</span></div>
+          <div class="mi">Q3 plan · first draft<span class="anc" style="margin-left:auto">▯ This page</span></div>
+          <div class="sep"></div>
+          <div class="mi" style="color:var(--s-mfg)">+ New chat here</div>
+          <div class="mi" style="color:var(--s-mfg)">All chats<span class="k">›</span></div>
+        </div>
+        <div class="body" style="padding:16px;flex:1;filter:brightness(.92)">
+          <div class="me">Check the Q3 plan dates against the Backlog. Anything that can't make it?</div>
+          <div class="tool">◉ Read Q3 plan</div>
+          <div class="tool">▤ Read issues</div>
+          <div class="wtxt">Two milestones land before their issues are done: CSV import and Cover presets.</div>
+        </div>
+        <div class="compose"><div class="cbox"><div class="ph">Reply, or tell Washi what to change…</div><div class="row"><span class="plus">+</span><span class="chip">▥ This page + below <span class="c">▾</span></span><span class="chip">◆ Sonnet 4.5 <span class="c">▾</span></span><span class="send dim">↑</span></div></div></div>
+      </div>
+      <span class="pin" style="left:846px;top:60px">1</span>
+      <span class="pin" style="left:1110px;top:60px">2</span>
+      <span class="pin" style="left:846px;top:112px">3</span>
+    </div>
+    <div class="fnote">On a page the panel opens <b>your latest chat whose anchor covers it</b> — walking up the tree: Q3 plan has none of its own, so the one anchored to <q>Roadmap and below</q> opens. No match → a blank chat, saved on the first send. 1 the header is the chat's title over its anchor chip. 2 <q>⤢</q> opens it as a page (<code>/chats/$chatId</code>); <q>📌</q> pins it, so moving to Backlog keeps this chat instead of switching. 3 the conversation menu has a small switch: <b>Here</b> (chats covering this page, nearest first) · <b>Recent</b> (all of yours, newest first). The anchor is a reference, never the page's text.</div>
+  </article>
+
+  <div class="sticky" style="left:4140px;top:60px"><b>proposed · D67</b><ol><li>A chat is its starter's; one before D67 stays the workspace's.</li><li>Anchor = <code>anchor_sheet_id</code> + <code>page</code> · <code>subtree</code>. A chat started from a page anchors to its subtree.</li><li>An unreadable anchor hides the chat (D65).</li></ol></div>
 </section>
 
 <!-- ───────────────────────── 7 · CONVERSATIONS ───────────────────────── -->

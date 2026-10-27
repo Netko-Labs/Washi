@@ -1,4 +1,5 @@
 import { tracked } from '@trpc/server'
+import { isSessionVisible } from '@washi/repository'
 import { z } from 'zod'
 import { router, workspaceProcedure } from '../../init'
 
@@ -7,7 +8,8 @@ import { router, workspaceProcedure } from '../../init'
  * closing mid-turn resumes the transcript instead of losing its middle.
  *
  * Every one is a workspaceProcedure and filters on its workspace: the bus is
- * shared by the whole server, and a transcript is the workspace's content.
+ * shared by the whole server. Chat events also filter on the chat: someone
+ * else's never streams to you (D67).
  */
 const resumable = z.object({ lastEventId: z.string().nullish() }).optional()
 
@@ -21,7 +23,10 @@ export const agentSubscriptions = router({
       lastEventId: input?.lastEventId,
       signal,
     })) {
-      if (event.data.workspaceId === ctx.workspaceId) yield tracked(event.id, event.data)
+      if (event.data.workspaceId !== ctx.workspaceId) continue
+      if (isSessionVisible(ctx.ws, event.data.sessionId, ctx.viewer.id)) {
+        yield tracked(event.id, event.data)
+      }
     }
   }),
 
@@ -34,7 +39,10 @@ export const agentSubscriptions = router({
       lastEventId: input?.lastEventId,
       signal,
     })) {
-      if (event.data.workspaceId === ctx.workspaceId) yield tracked(event.id, event.data)
+      if (event.data.workspaceId !== ctx.workspaceId) continue
+      if (isSessionVisible(ctx.ws, event.data.sessionId, ctx.viewer.id)) {
+        yield tracked(event.id, event.data)
+      }
     }
   }),
 
@@ -47,7 +55,10 @@ export const agentSubscriptions = router({
       lastEventId: input?.lastEventId,
       signal,
     })) {
-      if (event.data.workspaceId === ctx.workspaceId) yield tracked(event.id, event.data)
+      if (event.data.workspaceId !== ctx.workspaceId) continue
+      if (isSessionVisible(ctx.ws, event.data.sessionId, ctx.viewer.id)) {
+        yield tracked(event.id, event.data)
+      }
     }
   }),
 

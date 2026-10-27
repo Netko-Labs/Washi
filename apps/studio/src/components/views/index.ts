@@ -1,3 +1,4 @@
+export { ChatsView, ChatView } from './chats-view'
 export { DashboardView } from './dashboard-view'
 export { InboxView } from './inbox-view'
 export { PageView } from './page-view'

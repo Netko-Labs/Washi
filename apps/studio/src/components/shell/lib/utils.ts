@@ -9,6 +9,12 @@ export function pathFor(workspaceId: string, tab: TabKey | null): string {
   return `${base}/${tab.slice(5)}`
 }
 
+/** A chat's page is under its view's address (`/chats/<id>` under `/chats`); Home is under nothing. */
+export function isWithin(pathname: string, target: string, workspaceId: string): boolean {
+  if (pathname === target) return true
+  return target !== `/w/${workspaceId}` && pathname.startsWith(`${target}/`)
+}
+
 export function readFold(workspaceId: string): boolean {
   try {
     return localStorage.getItem(FOLD_KEY_PREFIX + workspaceId) === '1'

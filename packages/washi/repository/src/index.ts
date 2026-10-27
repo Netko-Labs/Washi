@@ -18,11 +18,13 @@ export {
   getSdkSessionId,
   getSession,
   getTranscript,
+  isSessionVisible,
   listSessions,
   resolveApproval,
   updateSession,
 } from './storage/agents'
 export { listChanges, type RecordChange } from './storage/changes'
+export { searchChats } from './storage/chat-search'
 export {
   type DrizzleDB,
   newId,
