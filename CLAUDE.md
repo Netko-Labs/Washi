@@ -199,8 +199,12 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   `db_link_column` (`linkColumn`) turns a text/select/multi_select column into a relation in one
   transaction, matching values to the target's text column; `create` makes the missing targets. Every row can open as a page (`sheets.row_id`, unique; out of the tree). Every write to a
   row also appends what it became to `record_changes` — the history a `Chart history` replays day
-  by day. Never update `records` without going through `insertRecord`/`updateRecords`/
-  `deleteRecords`, or history silently forgets.
+  by day — and who wrote it (`author`, D78): a member id the service passes as data (tRPC's
+  `ctx.viewer.id`, the person who pressed a page action), `washi` for its tools and agent actions,
+  null for versions from before. `rowActivity` diffs consecutive versions (formulas and rollups are
+  never stored, so never diffed): the row page's Activity and Washi's `db_row_activity`. Never
+  update `records` without going through `insertRecord`/`updateRecords`/`deleteRecords`, or
+  history silently forgets.
 - **Team space.** `tables.seedTeamSpace` makes `projects` + `issues`, the Backlog, Roadmap, Wiki
   (+ How we work), Ideas canvas and Weekly review pages, and a 17:00 routine (the asker's zone) that
   rewrites only the review's "This week" callout. It refuses a workspace that already has either

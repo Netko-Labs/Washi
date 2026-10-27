@@ -1232,7 +1232,7 @@
       <table>
         <thead><tr><th>Tools</th><th>At the desk</th></tr></thead>
         <tbody>
-          <tr><td><code>READ_TOOLS</code>: <code>sheet_list sheet_get sheet_check sheet_backlinks search db_list_tables db_query db_history people_list</code></td><td>pass</td></tr>
+          <tr><td><code>READ_TOOLS</code>: <code>sheet_list sheet_get sheet_check sheet_backlinks search db_list_tables db_query db_history db_row_activity people_list</code></td><td>pass</td></tr>
           <tr><td><code>CHANGE_TOOLS</code>: <code>sheet_create sheet_replace db_define db_mutate</code></td><td>land without asking, marked <code>edited_by = 'washi'</code>; each page write pushes the prior state onto <code>sheet_revisions</code></td></tr>
           <tr><td><code>fetch_url</code>, <code>action_run</code></td><td>always stop at the <code>ApprovalDesk</code>; unanswered for 5 minutes is a denial (12 hours for a routine). "Always" on a fetch adds the host to the allowlist, not a blank cheque.</td></tr>
         </tbody>

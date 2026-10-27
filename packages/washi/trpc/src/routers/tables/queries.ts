@@ -1,6 +1,7 @@
+import { rowActivityInputSchema } from '@washi/domain'
 import { historyQuerySchema, querySchema } from '@washi/ink'
 import { listTables } from '@washi/repository'
-import { rowOfSheet, runHistory, runQuery } from '@washi/service'
+import { rowActivity, rowOfSheet, runHistory, runQuery } from '@washi/service'
 import { z } from 'zod'
 import { router, workspaceProcedure } from '../../init'
 
@@ -17,4 +18,8 @@ export const tableQueries = router({
   rowOf: workspaceProcedure
     .input(z.object({ sheetId: z.string() }))
     .query(({ ctx, input }) => rowOfSheet(ctx.ws, input.sheetId)),
+  /** Who changed a row, when, and from what to what — newest first (D78). */
+  rowActivity: workspaceProcedure
+    .input(rowActivityInputSchema)
+    .query(({ ctx, input }) => rowActivity(ctx.ws, input.recordId, input.limit)),
 })

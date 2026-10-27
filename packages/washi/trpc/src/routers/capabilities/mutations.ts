@@ -9,6 +9,6 @@ export const capabilityMutations = router({
   runAction: workspaceProcedure
     .input(z.object({ action: z.record(z.string(), z.unknown()) }))
     .mutation(async ({ ctx, input }) => {
-      await ctx.host.executeAction(input.action, { origin: 'sheet', actorId: ctx.actorId })
+      await ctx.host.executeAction(input.action, { origin: 'sheet', actorId: ctx.viewer.id })
     }),
 })

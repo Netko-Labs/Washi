@@ -54,12 +54,17 @@ export function defineTable(ws: Workspace, spec: TableSpec): UserTable {
   return { id, name: spec.name, spec, hlcUpdated: now }
 }
 
-export function insertRecord(ws: Workspace, tableId: string, data: RecordData): string {
+export function insertRecord(
+  ws: Workspace,
+  tableId: string,
+  data: RecordData,
+  author: string | null = null,
+): string {
   const now = ws.now()
   const id = newId()
   ws.db.insert(recordTable).values({ id, tableId, data, hlcCreated: now, hlcUpdated: now }).run()
   appendOp(ws, 'record', id, { kind: 'insert', tableId, data })
-  appendChange(ws, tableId, id, data)
+  appendChange(ws, tableId, id, data, author)
   return id
 }
 
@@ -77,6 +82,7 @@ export function updateRecords(
   tableId: string,
   ids: string[],
   patch: RecordData,
+  author: string | null = null,
 ): number {
   if (ids.length === 0) return 0
   const rows = ws.db
@@ -93,12 +99,17 @@ export function updateRecords(
       .where(eq(recordTable.id, row.id))
       .run()
     appendOp(ws, 'record', row.id, { kind: 'update', tableId, patch })
-    appendChange(ws, tableId, row.id, merged)
+    appendChange(ws, tableId, row.id, merged, author)
   }
   return rows.length
 }
 
-export function deleteRecords(ws: Workspace, tableId: string, ids: string[]): number {
+export function deleteRecords(
+  ws: Workspace,
+  tableId: string,
+  ids: string[],
+  author: string | null = null,
+): number {
   if (ids.length === 0) return 0
   const placeholders = ids.map(() => '?').join(', ')
   const result = ws.sqlite
@@ -106,7 +117,7 @@ export function deleteRecords(ws: Workspace, tableId: string, ids: string[]): nu
     .run(ws.now(), tableId, ...ids)
   for (const id of ids) {
     appendOp(ws, 'record', id, { kind: 'delete', tableId })
-    appendChange(ws, tableId, id, null)
+    appendChange(ws, tableId, id, null, author)
   }
   return result.changes
 }

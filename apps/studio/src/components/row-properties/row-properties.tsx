@@ -1,6 +1,7 @@
 import { DatabaseCell, isRank, PaperProvider, PaperSurface, tableLabel } from '@washi/paper'
 import { paperHost } from '@washi/ui'
 import { PROPERTY_ICONS, type RowPropertiesProps, useRowPage } from './lib'
+import { RowActivity } from './row-activity'
 import { RowTitle } from './row-title'
 
 /** A row's page opens on the row: its name, then every property, each editable as Notion does. */
@@ -51,6 +52,7 @@ export function RowProperties({ sheetId }: RowPropertiesProps) {
             })}
         </dl>
       </PaperProvider>
+      <RowActivity rowOf={rowOf} people={people} />
     </div>
   )
 }

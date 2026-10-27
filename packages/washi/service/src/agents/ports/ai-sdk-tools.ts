@@ -1,4 +1,9 @@
-import { linkColumnInputSchema, type Member, type Viewer } from '@washi/domain'
+import {
+  linkColumnInputSchema,
+  type Member,
+  rowActivityInputSchema,
+  type Viewer,
+} from '@washi/domain'
 import { historyQuerySchema, mutationSchema, querySchema, tableSpecSchema } from '@washi/ink'
 import { listTables, type Workspace } from '@washi/repository'
 import { guardedFetch } from '@washi/tsuru'
@@ -6,6 +11,7 @@ import { tool } from 'ai'
 import { z } from 'zod'
 import { NOBODY } from '../../sheets/access'
 import { checkSource, createSheetFromSource, updateSheetFromSource } from '../../sheets/service'
+import { rowActivity } from '../../tables/activity'
 import { runHistory } from '../../tables/history'
 import { linkColumn } from '../../tables/link'
 import { defineUserTable, runMutation, runQuery } from '../../tables/service'
@@ -24,6 +30,7 @@ const READ_ONLY = new Set([
   'db_list_tables',
   'db_query',
   'db_history',
+  'db_row_activity',
   'people_list',
   'set_conversation_title',
 ])
@@ -117,6 +124,12 @@ export function createAiTools({
       inputSchema: z.object({ query: historyQuerySchema }),
       execute: async ({ query }) => runHistory(ws, query),
     }),
+    db_row_activity: tool({
+      description:
+        'When and by whom one row changed, newest first: each change\'s atMs, by (a member id from people_list, washi, or null for a change from before authors were kept), kind (created, edited, deleted) and fields [{ column, from, to }]. Answers "when was Water paid?" — find the row\'s id with db_query, then read the change whose fields set paid to true.',
+      inputSchema: rowActivityInputSchema,
+      execute: async ({ recordId, limit }) => rowActivity(ws, recordId, limit),
+    }),
 
     sheet_create: tool({
       description:
@@ -157,12 +170,12 @@ export function createAiTools({
       description:
         'Turn a text, select or multi_select column into a relation to another table: each value names the target row whose text column (on, default its first) reads the same, ignoring case and spaces, so renaming that row renames it everywhere and rollups match by id. create: true makes a target row for each value nothing matches; without it, unmatched values are refused and listed. Pages that filter the old column by name must then filter by id.',
       inputSchema: z.object({ input: linkColumnInputSchema }),
-      execute: async ({ input }) => linkColumn(ws, input),
+      execute: async ({ input }) => linkColumn(ws, input, 'washi'),
     }),
     db_mutate: tool({
       description: 'Insert, update, or delete records.',
       inputSchema: z.object({ mutation: mutationSchema }),
-      execute: async ({ mutation }) => runMutation(ws, mutation),
+      execute: async ({ mutation }) => runMutation(ws, mutation, 'washi'),
     }),
     fetch_url: tool({
       description: 'Fetch an https URL through the workspace fetch policy (tsuru).',

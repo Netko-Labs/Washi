@@ -16,7 +16,7 @@ export const tableMutations = router({
     .mutation(({ ctx, input }) => defineUserTable(ctx.ws, input.spec)),
   mutate: workspaceProcedure
     .input(z.object({ mutation: mutationSchema }))
-    .mutation(({ ctx, input }) => runMutation(ctx.ws, input.mutation)),
+    .mutation(({ ctx, input }) => runMutation(ctx.ws, input.mutation, ctx.viewer.id)),
   /** Notion's "open as page": the row's page, made on first open. */
   openRow: workspaceProcedure
     .input(z.object({ recordId: z.string() }))
@@ -36,6 +36,6 @@ export const tableMutations = router({
       }),
     )
     .mutation(({ ctx, input }) => {
-      toggleTaskRecord(ctx.ws, input.recordId, input.done, input.field)
+      toggleTaskRecord(ctx.ws, input.recordId, input.done, input.field, ctx.viewer.id)
     }),
 })

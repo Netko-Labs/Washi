@@ -38,7 +38,7 @@ export class CapabilityDesk {
     }
 
     this.ledger({ origin, actorId }, verb, input, origin === 'sheet' ? 'auto' : 'allowed')
-    await runAction(checked.action, this.handlers())
+    await runAction(checked.action, this.handlers(origin === 'agent' ? 'washi' : actorId))
   }
 
   /** A page-side fetch path — same policy, no approval loop. */
@@ -84,7 +84,8 @@ export class CapabilityDesk {
     })
   }
 
-  private handlers(): HankoHandlers {
+  /** `author` signs the rows a verb writes: the person who pressed, or Washi (D78). */
+  private handlers(author: string | null): HankoHandlers {
     return {
       'sheet.open': (action) => {
         this.events()?.openSheet(action.sheet)
@@ -97,16 +98,16 @@ export class CapabilityDesk {
         this.events()?.openSheet(sheet.id)
       },
       'table.insert': (action) => {
-        runMutation(this.ws, { kind: 'insert', table: action.table, data: action.data })
+        runMutation(this.ws, { kind: 'insert', table: action.table, data: action.data }, author)
       },
       'table.update': (action) => {
-        updateRecord(this.ws, action.table, action.row, action.set)
+        updateRecord(this.ws, action.table, action.row, action.set, author)
       },
       'table.reorder': (action) => {
-        updateRecord(this.ws, action.table, action.row, action.set)
+        updateRecord(this.ws, action.table, action.row, action.set, author)
       },
       'table.delete': (action) => {
-        deleteRecord(this.ws, action.table, action.row)
+        deleteRecord(this.ws, action.table, action.row, author)
       },
       'table.column': (action) => {
         addColumn(this.ws, action.table, action.column)
