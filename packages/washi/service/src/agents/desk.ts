@@ -1,4 +1,5 @@
 import { checkAction, type HankoHandlers, isReversibleVerb, runAction } from '@washi/hanko'
+import { mutationSchema } from '@washi/ink'
 import { recordCapability, setAppMeta, type Workspace } from '@washi/repository'
 import { guardedFetch, isPrivateAddress } from '@washi/tsuru'
 import { createSheetFromSource } from '../sheets/service'
@@ -105,6 +106,9 @@ export class CapabilityDesk {
       },
       'table.reorder': (action) => {
         updateRecord(this.ws, action.table, action.row, action.set, author)
+      },
+      'table.copy': (action) => {
+        runMutation(this.ws, mutationSchema.parse({ ...action, kind: 'copy' }), author)
       },
       'table.delete': (action) => {
         deleteRecord(this.ws, action.table, action.row, author)

@@ -45,13 +45,14 @@ lacks — it renders as a labelled placeholder and files a request; never fake a
 State: <Sheet state={{ local: { tab: 'a' }, stored: { mine: false } }}>. Controls write keys;
 \`expr\` reads them. Grammar: arithmetic, comparison (=, !=, <, >=), and/or/not, string join,
 aggregates over a table or $scope with optional where — count(tasks where status = 'open'),
-sum(tasks.points), avg/min/max — now(), days(a, b), month(d) → 'YYYY-MM', year(d), when(cond, a, b). No functions, loops, regex or formatting: expr
+sum(tasks.points), avg/min/max — now(), days(a, b), month(d) → 'YYYY-MM', year(d), when(cond, a, b), add_months(d, n) →
+'YYYY-MM-DD' (the 31st clamps to the month's last day). No functions, loops, regex or formatting: expr
 computes a number, Money and Text format it. Inside <Repeat bind>, $row.column is in scope for text
 and string props ("$row.title", row="$row.id").
 
 Actions are objects, never functions: <Button action={{ verb: 'table.insert', table, data }}>.
 Verbs: sheet.open sheet.create table.insert table.update (Field uses it) table.reorder (Board drag
-writes the group column and a fractional rank) table.delete (soft) state.set (page state, key + value —
+writes the group column and a fractional rank) table.copy (bulk, below) table.delete (soft) state.set (page state, key + value —
 never reaches the vault). url.open is denied from a page. bind is an ink query descriptor { table, where, orderBy, limit, groupBy }.
 A where value may read state — { column: 'month', op: 'eq', value: { state: 'month' } } — and unset state
 drops that filter, so one set of views follows a <Select state="month" options={[…]} all="All months" />:
@@ -60,6 +61,15 @@ Name such a key unlike any column (picked_month, not month): inside an aggregate
 the row's column first, so sum(expenses.amount where month = picked_month) reads the picker.
 A bind's params feed its table's rollups — <Table bind={{ table: 'categories', params: { month: { state:
 'picked_month' } } }} /> shows budget vs spent for the picked month; a rollup's { param } filter drops when unset.
+table.copy makes every row its where matches a new row, set over it — a value, or { expr } over the
+source row — in one press, ≤500 rows, all or nothing; its params read state, fill { param } filter values
+and read as $name in an expr. A rollover: give the table next_date = add_months(date, when(every_n_months
+> 0, every_n_months, 1)) and next_month = month(next_date) as formulas, then <Button action={{ verb:
+'table.copy', table: 'expenses', params: { month: { state: 'picked_month' } }, where: [{ column:
+'recurring', op: 'eq', value: true }, { column: 'next_month', op: 'eq', value: { param: 'month' } }], set:
+{ date: { expr: 'next_date' }, paid: false } }}>Roll recurring into this month</Button>. Each row comes
+forward on its own cadence (water every two months), so never clone a month by hand. Pressed twice it
+copies twice: wrap it in <Show expr="count(expenses where recurring and month = picked_month) = 0">.
 
 Budget: ~400 nodes, 8 binds, 24 expressions per sheet — over it, split into linked sheets (<Ref>).
 Always run sheet_check before sheet_create or sheet_replace and fix every diagnostic. Structured
@@ -72,3 +82,6 @@ pages (read them with sheet_get before answering), files (their text is inline) 
 
 export const SEARCH_NOT_SET =
   'Web search is not set up. An owner adds an Exa key under Settings → Agent → Web search; on the desktop, set EXA_API_KEY.'
+
+export const DB_MUTATE_DESCRIPTION =
+  "Insert, update, delete or copy records: { kind, table, data?, where? }. copy makes every row where matches a new row, set over it: { kind: 'copy', table, where, set, params?, limit? } — a set value is a cell or { expr } over the source row in the page grammar (date: { expr: 'add_months(date, 1)' }); params fill { param } filter values and read as $name in an expr. Never sets a formula or rollup. At most 500 rows (limit lowers it), all or nothing."

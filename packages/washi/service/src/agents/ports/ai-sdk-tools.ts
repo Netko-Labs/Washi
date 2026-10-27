@@ -15,7 +15,7 @@ import { rowActivity } from '../../tables/activity'
 import { runHistory } from '../../tables/history'
 import { linkColumn } from '../../tables/link'
 import { defineUserTable, runMutation, runQuery } from '../../tables/service'
-import type { SearchKeyLookup } from '../lib'
+import { DB_MUTATE_DESCRIPTION, type SearchKeyLookup } from '../lib'
 import { pagesFor } from '../lib/pages'
 import { webSearch } from '../search'
 import { currentFetchPolicy } from '../tools'
@@ -173,7 +173,7 @@ export function createAiTools({
       execute: async ({ input }) => linkColumn(ws, input, 'washi'),
     }),
     db_mutate: tool({
-      description: 'Insert, update, or delete records.',
+      description: DB_MUTATE_DESCRIPTION,
       inputSchema: z.object({ mutation: mutationSchema }),
       execute: async ({ mutation }) => runMutation(ws, mutation, 'washi'),
     }),

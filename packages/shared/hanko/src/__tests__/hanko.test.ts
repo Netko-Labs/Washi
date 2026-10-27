@@ -8,6 +8,16 @@ describe('hanko', () => {
       true,
     )
     expect(checkAction({ verb: 'url.open', url: 'https://example.com' }).ok).toBe(true)
+    const copy = {
+      verb: 'table.copy',
+      table: 'expenses',
+      params: { month: '2026-11' },
+      where: [{ column: 'next_month', op: 'eq', value: { param: 'month' } }],
+      set: { date: { expr: 'next_date' }, paid: false },
+    }
+    expect(checkAction(copy).ok).toBe(true)
+    expect(checkAction({ ...copy, where: [] }).ok).toBe(false)
+    expect(checkAction({ ...copy, limit: 501 }).ok).toBe(false)
   })
 
   test('unknown verbs and bad payloads are refused with messages', () => {
@@ -32,6 +42,7 @@ describe('hanko', () => {
         'table.insert': () => {},
         'table.update': () => {},
         'table.reorder': () => {},
+        'table.copy': () => {},
         'table.delete': () => {},
         'table.column': () => {},
         'url.open': () => {},
@@ -47,6 +58,7 @@ describe('hanko', () => {
           'table.insert': () => {},
           'table.update': () => {},
           'table.reorder': () => {},
+          'table.copy': () => {},
           'table.delete': () => {},
           'table.column': () => {},
           'url.open': () => {},
@@ -68,6 +80,7 @@ describe('table.column', () => {
         'table.insert': noop,
         'table.update': noop,
         'table.reorder': noop,
+        'table.copy': noop,
         'table.delete': noop,
         'table.column': (action) => {
           added.push(action.column.name)

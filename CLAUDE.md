@@ -205,6 +205,10 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   never stored, so never diffed): the row page's Activity and Washi's `db_row_activity`. Never
   update `records` without going through `insertRecord`/`updateRecords`/`deleteRecords`, or
   history silently forgets.
+  A **copy** (D76: ink kind `copy`, page verb `table.copy`, `tables/copy.ts`) makes every row a
+  `where` matches a new row, `set` over it — a cell or `{ expr }` over the source row
+  (`add_months(date, 1)`); `params` fill `{ param }` filters and read as `$name`, and an unset one
+  refuses. One transaction through `insertRecord`, ≤500 rows or nothing, computed columns never set.
 - **Team space.** `tables.seedTeamSpace` makes `projects` + `issues`, the Backlog, Roadmap, Wiki
   (+ How we work), Ideas canvas and Weekly review pages, and a 17:00 routine (the asker's zone) that
   rewrites only the review's "This week" callout. It refuses a workspace that already has either

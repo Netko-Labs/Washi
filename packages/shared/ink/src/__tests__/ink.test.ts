@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'bun:test'
+import { z } from 'zod'
 import { mutationSchema, querySchema, tableSpecSchema, validateRecord } from '../index'
 
 const tasks = tableSpecSchema.parse({
@@ -108,5 +109,34 @@ describe('Notion properties', () => {
     expect(paths({ link: 'javascript:alert(1)' })).toEqual(['link'])
     expect(paths({ when: '2026-10-14/2026-10-01' })).toEqual(['when'])
     expect(paths({ when: 'soon' })).toEqual(['when'])
+  })
+})
+
+describe('the copy mutation (D76)', () => {
+  const copy = {
+    kind: 'copy',
+    table: 'expenses',
+    params: { month: '2026-11' },
+    where: [{ column: 'next_month', op: 'eq', value: { param: 'month' } }],
+    set: { date: { expr: 'next_date' }, paid: false },
+  }
+
+  test('parses with params, { param } filters and { expr } cells; set defaults to nothing', () => {
+    expect(mutationSchema.safeParse(copy).success).toBe(true)
+    const { set: _, ...bare } = copy
+    expect(mutationSchema.parse(bare)).toMatchObject({ kind: 'copy', set: {} })
+  })
+
+  test('needs a where, and copies at most 500 rows', () => {
+    expect(mutationSchema.safeParse({ ...copy, where: [] }).success).toBe(false)
+    expect(mutationSchema.safeParse({ ...copy, limit: 500 }).success).toBe(true)
+    expect(mutationSchema.safeParse({ ...copy, limit: 501 }).success).toBe(false)
+    expect(mutationSchema.safeParse({ ...copy, params: { 'Bad Name': 1 } }).success).toBe(false)
+  })
+
+  test('the tool schema Washi is handed still converts to JSON Schema', () => {
+    const json = JSON.stringify(z.toJSONSchema(z.object({ mutation: mutationSchema })))
+    expect(json).toContain('"copy"')
+    expect(json).toContain('"expr"')
   })
 })

@@ -1,6 +1,7 @@
 import type { Filter, HistoryQuery, InkQuery } from '@washi/ink'
 import type { BindFilter, BindHistoryQuery, BindQuery } from '../registry'
 import type { SheetStateValue } from '../state'
+import type { ActionRef } from './types'
 
 /** A filter's `{ state }` read from the page; unset, empty or null state drops the filter ("All"). */
 export function resolveFilters(
@@ -45,4 +46,24 @@ export function resolveHistory(
   values: Record<string, SheetStateValue>,
 ): HistoryQuery {
   return { ...query, where: resolveFilters(query.where, values) }
+}
+
+const isStateRef = (value: unknown): value is { state: string } =>
+  value !== null &&
+  typeof value === 'object' &&
+  typeof (value as { state?: unknown }).state === 'string'
+
+/** An action's `params` read page state like a query's (D76): `table.copy` into the picked month. */
+export function resolveActionParams(
+  action: ActionRef,
+  values: Record<string, SheetStateValue>,
+): ActionRef {
+  const { params } = action
+  if (params === null || typeof params !== 'object' || Array.isArray(params)) return action
+  const resolved: Record<string, unknown> = {}
+  for (const [name, value] of Object.entries(params)) {
+    const read = isStateRef(value) ? values[value.state] : value
+    if (read !== undefined && read !== null && read !== '') resolved[name] = read
+  }
+  return { ...action, params: resolved }
 }
