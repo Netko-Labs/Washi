@@ -14,5 +14,5 @@ export type {
   PanelFrame,
   PanelPlacement,
 } from './types'
-export { mergeMessageChunks, receiptLine, usd } from './utils'
+export { mergeMessageChunks, offeredModels, receiptLine, usd } from './utils'
 export { EFFORTS, LOCAL_MODELS, MAX_ATTACHMENTS, RECOMMENDED_MODELS, UPLOAD_ACCEPT } from './values'

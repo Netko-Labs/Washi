@@ -1,3 +1,4 @@
+import type { EnabledModel } from '@washi/domain'
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '@/integrations/trpc'
 import type { ModelOption } from '@/lib/types'
@@ -159,6 +160,13 @@ export function useAgentSettings() {
       setSettings((await api.agents.setDefaultEffort.mutate({ effort })) as AgentSettingsState)
     })
 
+  const setEnabledModels = (enabled: EnabledModel[] | null) =>
+    attempt(async () => {
+      setSettings(
+        (await api.agents.setEnabledModels.mutate({ models: enabled })) as AgentSettingsState,
+      )
+    })
+
   return {
     key,
     searchKey,
@@ -182,6 +190,7 @@ export function useAgentSettings() {
     setTurnCap,
     setResumeBy,
     setDefaultEffort,
+    setEnabledModels,
     refresh,
   }
 }

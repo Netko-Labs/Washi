@@ -1,4 +1,14 @@
-import { IconRobot, IconRoute, IconServer, IconUsers } from '@tabler/icons-react'
+import {
+  IconAdjustments,
+  IconBuildingCommunity,
+  IconGauge,
+  IconRoute,
+  IconServer,
+  IconSparkles,
+  IconUserCircle,
+  IconUsers,
+  IconWorld,
+} from '@tabler/icons-react'
 import type {
   ApprovalMode,
   Effort,
@@ -6,6 +16,8 @@ import type {
   ProviderMeta,
   RecommendedModel,
   ResumeBy,
+  SettingsGroup,
+  SettingsTab,
   SignupMode,
 } from './types'
 
@@ -44,34 +56,95 @@ export const PROVIDER_META: Record<'anthropic' | 'openrouter' | 'exa', ProviderM
   },
 }
 
-export const SETTINGS_TABS = [
+/** Account is yours, Workspace is the team's, Washi is the agent's; Server is the app admin's. */
+export const SETTINGS_GROUPS: SettingsGroup[] = [
   {
-    key: 'agent',
-    label: 'Agent',
-    icon: IconRobot,
-    desc: 'What Washi thinks with, what leaves the server, and the stop.',
+    label: 'Account',
+    sections: [
+      { key: 'profile', label: 'Profile', icon: IconUserCircle, desc: 'How the team sees you.' },
+      {
+        key: 'preferences',
+        label: 'Preferences',
+        icon: IconAdjustments,
+        desc: 'How Washi looks for you, on this device.',
+      },
+    ],
   },
   {
-    key: 'people',
-    label: 'People',
-    icon: IconUsers,
-    desc: 'Who is in this workspace, and who is invited.',
+    label: 'Workspace',
+    sections: [
+      {
+        key: 'general',
+        label: 'General',
+        icon: IconBuildingCommunity,
+        desc: 'The workspace’s name and where to find it.',
+      },
+      {
+        key: 'people',
+        label: 'People',
+        icon: IconUsers,
+        desc: 'Who is in this workspace, and who is invited.',
+      },
+    ],
   },
   {
-    key: 'routines',
-    label: 'Routines',
-    icon: IconRoute,
-    desc: 'What Washi does while nobody is watching.',
+    label: 'Washi',
+    sections: [
+      {
+        key: 'models',
+        label: 'Models',
+        icon: IconSparkles,
+        desc: 'The key Washi runs on, the models the team can pick, and how hard it thinks.',
+      },
+      {
+        key: 'outside',
+        label: 'What leaves',
+        icon: IconWorld,
+        desc: 'Fetches, searches and actions that reach outside the server.',
+      },
+      {
+        key: 'usage',
+        label: 'Usage',
+        icon: IconGauge,
+        desc: 'What today cost, and the stop that keeps it honest.',
+      },
+      {
+        key: 'routines',
+        label: 'Routines',
+        icon: IconRoute,
+        desc: 'What Washi does while nobody is watching.',
+      },
+    ],
   },
   {
-    key: 'server',
     label: 'Server',
-    icon: IconServer,
-    desc: 'How this server lets people in. Only its app admins see this.',
+    sections: [
+      {
+        key: 'server',
+        label: 'Sign-up',
+        icon: IconServer,
+        desc: 'How this server lets people in. Only its app admins see this.',
+      },
+    ],
   },
-] as const
+]
 
-export const SETTINGS_TAB_KEYS = ['agent', 'people', 'routines', 'server'] as const
+export const SETTINGS_TAB_KEYS = [
+  'profile',
+  'preferences',
+  'general',
+  'people',
+  'models',
+  'outside',
+  'usage',
+  'routines',
+  'server',
+] as const satisfies readonly SettingsTab[]
+
+export const THEME_OPTIONS = [
+  { id: 'light', label: 'Light', desc: 'Paper' },
+  { id: 'dark', label: 'Dark', desc: 'Ink' },
+] as const
 
 /** Tabs only an app admin sees. */
 export const ADMIN_TABS: ReadonlySet<string> = new Set(['server'])

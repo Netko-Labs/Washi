@@ -2,8 +2,6 @@ import type { Icon } from '@tabler/icons-react'
 import type { SheetSummary } from '@washi/domain'
 import type { WorkspaceSummary } from '@/lib/types'
 
-export type Theme = 'light' | 'dark'
-
 export type PlaceId = 'home' | 'inbox' | 'chats' | 'routines'
 
 export interface PlaceEntry {

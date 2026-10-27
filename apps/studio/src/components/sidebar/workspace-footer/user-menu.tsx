@@ -1,9 +1,15 @@
-import { IconLogout, IconMoon, IconSettings, IconSun } from '@tabler/icons-react'
+import {
+  IconBuildingCommunity,
+  IconLogout,
+  IconMoon,
+  IconSun,
+  IconUserCircle,
+} from '@tabler/icons-react'
 import { Link } from '@tanstack/react-router'
 import { initials, useViewStore } from '@washi/ui'
 import { Floating } from '@/components/shared/floating'
+import { useTheme } from '@/components/shared/theme'
 import { signOut } from '@/integrations/auth'
-import { useTheme } from '../lib'
 import { type UserMenuProps, useMenuState } from './lib'
 
 const ROW =
@@ -48,7 +54,7 @@ export function UserMenu({ workspace, onNavigate, placement = 'up' }: UserMenuPr
           <Link
             to="/w/$workspaceId/settings"
             params={{ workspaceId: workspace.id }}
-            search={{ tab: 'agent' }}
+            search={{ tab: 'profile' }}
             role="menuitem"
             onClick={() => {
               menu.close()
@@ -56,10 +62,25 @@ export function UserMenu({ workspace, onNavigate, placement = 'up' }: UserMenuPr
             }}
             className={ROW}
           >
-            <IconSettings className="size-4" />
-            Settings
+            <IconUserCircle className="size-4" />
+            Account settings
             <kbd className="ml-auto font-sans text-[10.5px] text-muted-foreground">⌘,</kbd>
           </Link>
+          <Link
+            to="/w/$workspaceId/settings"
+            params={{ workspaceId: workspace.id }}
+            search={{ tab: 'general' }}
+            role="menuitem"
+            onClick={() => {
+              menu.close()
+              onNavigate()
+            }}
+            className={ROW}
+          >
+            <IconBuildingCommunity className="size-4" />
+            Workspace settings
+          </Link>
+          <div className="my-1 h-px bg-border" />
           <button
             type="button"
             role="menuitem"

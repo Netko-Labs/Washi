@@ -4,6 +4,7 @@ import type {
   ApprovalDecision,
   ApprovalRequest,
   AttachmentRef,
+  EnabledModel,
   Member,
 } from '@washi/domain'
 import { createModelCatalogue, type ModelCatalogue } from '@washi/models'
@@ -172,6 +173,7 @@ export class AgentHost {
       turnCap: this.budget.turnCap(),
       resumeBy: this.prefs.resumeBy(),
       effort: this.prefs.effort(),
+      enabledModels: this.prefs.enabledModels(),
       zone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     }
   }
@@ -183,6 +185,11 @@ export class AgentHost {
 
   setDefaultEffort(effort: Effort): AgentSettingsReport {
     this.prefs.setEffort(effort)
+    return this.settings()
+  }
+
+  setEnabledModels(models: EnabledModel[] | null): AgentSettingsReport {
+    this.prefs.setEnabledModels(models)
     return this.settings()
   }
 

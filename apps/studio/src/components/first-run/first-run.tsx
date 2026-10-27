@@ -20,7 +20,7 @@ export function FirstRun({ workspace, onDone, onSkip }: FirstRunProps) {
   }
 
   return (
-    <div className="min-h-0 flex-1 overflow-y-auto">
+    <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-none">
       <div className="mx-auto grid max-w-4xl gap-10 px-6 py-10 lg:grid-cols-[1fr_260px]">
         <section>
           <ol className="flex flex-wrap gap-x-5 gap-y-2 text-[13px]">

@@ -30,6 +30,14 @@ export const agentSessionSchema = z.object({
   updatedAt: z.string(),
 })
 
+/** A model the workspace offers in the composer; the name is the catalogue's, kept for the label. */
+export const enabledModelSchema = z.object({
+  provider: z.string().min(1).max(40),
+  id: z.string().min(1).max(200),
+  name: z.string().min(1).max(120),
+})
+export type EnabledModel = z.infer<typeof enabledModelSchema>
+
 /** A chat found by what was said in it: the words around the match, marked with ⟦ ⟧. */
 export const chatSearchHitSchema = z.object({
   sessionId: z.string(),

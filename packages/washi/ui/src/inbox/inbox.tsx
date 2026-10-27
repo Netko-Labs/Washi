@@ -19,7 +19,7 @@ export function Inbox({ rows }: InboxProps) {
   const showNeeds = filter === 'all' || filter === 'needs'
 
   return (
-    <div className="flex-1 overflow-y-auto">
+    <div className="flex-1 overflow-y-auto overscroll-y-none">
       <section className="mx-auto max-w-[720px] px-6 pt-9 pb-[60px]">
         <div className="flex items-baseline gap-2.5 px-3">
           <h1 className="font-semibold text-[22px] tracking-[-0.02em]">Inbox</h1>

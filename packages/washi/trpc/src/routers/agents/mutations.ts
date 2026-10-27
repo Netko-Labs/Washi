@@ -1,5 +1,10 @@
 import { TRPCError } from '@trpc/server'
-import { attachmentRefSchema, chatAnchorSchema, effortSchema } from '@washi/domain'
+import {
+  attachmentRefSchema,
+  chatAnchorSchema,
+  effortSchema,
+  enabledModelSchema,
+} from '@washi/domain'
 import { createSession, isSessionVisible } from '@washi/repository'
 import {
   APPROVAL_MODES,
@@ -99,6 +104,10 @@ export const agentMutations = router({
     .input(z.object({ resumeBy: z.enum(RESUME_BY) }))
     .mutation(({ ctx, input }) => ctx.host.setResumeBy(input.resumeBy)),
   /** What a new conversation and every routine start with. */
+  /** What the composer offers; null goes back to the recommended three. */
+  setEnabledModels: ownerProcedure
+    .input(z.object({ models: z.array(enabledModelSchema).max(40).nullable() }))
+    .mutation(({ ctx, input }) => ctx.host.setEnabledModels(input.models)),
   setDefaultEffort: workspaceProcedure
     .input(z.object({ effort: z.enum(EFFORTS) }))
     .mutation(({ ctx, input }) => ctx.host.setDefaultEffort(input.effort)),

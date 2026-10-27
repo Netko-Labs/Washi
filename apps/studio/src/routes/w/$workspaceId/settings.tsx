@@ -7,8 +7,9 @@ const isTab = (value: unknown): value is SettingsTab =>
 
 export const Route = createFileRoute('/w/$workspaceId/settings')({
   ssr: false,
+  // `agent` was one tab before the sections split; an old link lands on its first part.
   validateSearch: (search: Record<string, unknown>): { tab: SettingsTab } => ({
-    tab: isTab(search.tab) ? search.tab : 'agent',
+    tab: isTab(search.tab) ? search.tab : 'models',
   }),
   component: SettingsView,
 })

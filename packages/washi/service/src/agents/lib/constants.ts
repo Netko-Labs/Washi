@@ -67,6 +67,8 @@ export const RESUME_BY = ['anyone', 'owners'] as const
 
 /** What a new conversation and every routine start with. The SDK's effort, in words. */
 export const DEFAULT_EFFORT_KEY = 'agent_default_effort'
+/** JSON `EnabledModel[]`; absent means the recommended three. */
+export const ENABLED_MODELS_KEY = 'agent_enabled_models'
 export const EFFORTS = ['quick', 'balanced', 'deep'] as const
 export const SDK_EFFORT = { quick: 'low', balanced: 'medium', deep: 'high' } as const
 
