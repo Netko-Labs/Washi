@@ -37,7 +37,7 @@ export function workspaceStats(ws: Workspace): WorkspaceStats {
 
 /** Transcripts, sessions and approval history. Sheets and tables survive. */
 export function clearAgentHistory(ws: Workspace): void {
-  for (const table of ['agent_turns', 'agent_sessions', 'approvals']) {
+  for (const table of ['agent_turns', 'agent_sessions', 'agent_sessions_fts', 'approvals']) {
     ws.sqlite.exec(`DELETE FROM ${table}`)
   }
 }
@@ -59,6 +59,7 @@ export function eraseWorkspace(ws: Workspace): void {
     'user_tables',
     'agent_turns',
     'agent_sessions',
+    'agent_sessions_fts',
     'approvals',
     'capability_calls',
     'oplog',

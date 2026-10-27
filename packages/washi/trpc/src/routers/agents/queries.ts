@@ -1,9 +1,17 @@
-import { getTranscript, listSessions } from '@washi/repository'
+import { getTranscript, isSessionVisible, listSessions, searchChats } from '@washi/repository'
 import { z } from 'zod'
 import { router, workspaceProcedure } from '../../init'
+import { chatProcedure } from '../../shared/chats'
+
+const SEARCH_LIMIT = 30
 
 export const agentQueries = router({
-  listSessions: workspaceProcedure.query(({ ctx }) => listSessions(ctx.ws)),
+  /** Your chats and the workspace's, newest first (D67). */
+  listSessions: workspaceProcedure.query(({ ctx }) => listSessions(ctx.ws, ctx.viewer.id)),
+  /** Every word, as a prefix, in a chat's title or anything said in it. */
+  searchChats: workspaceProcedure
+    .input(z.object({ text: z.string().trim().min(1).max(200) }))
+    .query(({ ctx, input }) => searchChats(ctx.ws, ctx.viewer.id, input.text, SEARCH_LIMIT)),
   /** What today cost and whether the breaker is holding the next turn. */
   spend: workspaceProcedure.query(({ ctx }) => ctx.host.spend()),
   /** The stop's settings and the workspace's standing choices: who resumes, the default effort. */
@@ -16,10 +24,22 @@ export const agentQueries = router({
   inference: workspaceProcedure.query(({ ctx }) => ctx.host.inference()),
   /** Whether page and table changes skip the desk. Outbound actions always ask. */
   /** What Washi is waiting on right now — so a panel opened late can still answer. */
-  pendingApprovals: workspaceProcedure.query(({ ctx }) => ctx.host.pendingApprovals()),
+  pendingApprovals: workspaceProcedure.query(({ ctx }) =>
+    ctx.host
+      .pendingApprovals()
+      .filter((request) => isSessionVisible(ctx.ws, request.sessionId, ctx.viewer.id)),
+  ),
   /** The last day's turns with their receipts, what is waiting on a person, and the spend. */
-  today: workspaceProcedure.query(({ ctx }) => ctx.host.today()),
-  transcript: workspaceProcedure
+  today: workspaceProcedure.query(({ ctx }) => {
+    const report = ctx.host.today(ctx.viewer.id)
+    return {
+      ...report,
+      pending: report.pending.filter((request) =>
+        isSessionVisible(ctx.ws, request.sessionId, ctx.viewer.id),
+      ),
+    }
+  }),
+  transcript: chatProcedure
     .input(z.object({ sessionId: z.string() }))
     .query(({ ctx, input }) => getTranscript(ctx.ws, input.sessionId)),
 })

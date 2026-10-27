@@ -14,6 +14,7 @@ export function hlcMs(hlc: string): number {
  */
 export function recentTurns(
   ws: Workspace,
+  viewerId?: string | null,
   now = Date.now(),
   windowMs = TODAY_WINDOW_MS,
   limit = TODAY_TURN_LIMIT,
@@ -22,7 +23,7 @@ export function recentTurns(
   // Keyed by HLC: it orders correctly where two turns share a millisecond.
   const turns: { hlc: string; summary: TurnSummary }[] = []
 
-  for (const session of listSessions(ws)) {
+  for (const session of listSessions(ws, viewerId)) {
     if (hlcMs(session.updatedAt) < since) continue
     let prompt = ''
     let tools: string[] = []

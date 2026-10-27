@@ -1,6 +1,13 @@
-import type { AgentSession, AgentUpdate, ApprovalRequest, TranscriptEntry } from '@washi/domain'
+import type {
+  AgentSession,
+  AgentUpdate,
+  ApprovalRequest,
+  ChatAnchor,
+  TranscriptEntry,
+} from '@washi/domain'
 import { agentSessionTable, agentTurnTable, approvalTable } from '@washi/domain/db'
-import { asc, desc, eq } from 'drizzle-orm'
+import { asc, desc, eq, isNull, or } from 'drizzle-orm'
+import { forgetChatSearch, indexChatSearch } from './chat-search'
 import { newId, type Workspace } from './client'
 
 function toSession(row: typeof agentSessionTable.$inferSelect): AgentSession {
@@ -12,24 +19,60 @@ function toSession(row: typeof agentSessionTable.$inferSelect): AgentSession {
     costUsd: row.costUsd,
     model: row.model,
     effort: row.effort as AgentSession['effort'],
+    createdBy: row.createdBy,
+    anchor:
+      row.anchorSheetId && row.anchorScope
+        ? { sheetId: row.anchorSheetId, scope: row.anchorScope as ChatAnchor['scope'] }
+        : null,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
   }
 }
 
-export function listSessions(ws: Workspace): AgentSession[] {
-  return ws.db
-    .select()
-    .from(agentSessionTable)
-    .orderBy(desc(agentSessionTable.updatedAt))
-    .all()
-    .map(toSession)
+/** Every chat, or only those `viewerId` may read: theirs and the workspace's (D67). */
+export function listSessions(ws: Workspace, viewerId?: string | null): AgentSession[] {
+  const query = ws.db.select().from(agentSessionTable)
+  const workspaces = isNull(agentSessionTable.createdBy)
+  const scoped =
+    viewerId === undefined
+      ? query
+      : query.where(
+          viewerId === null
+            ? workspaces
+            : or(workspaces, eq(agentSessionTable.createdBy, viewerId)),
+        )
+  return scoped.orderBy(desc(agentSessionTable.updatedAt)).all().map(toSession)
 }
 
-export function createSession(ws: Workspace, title: string): AgentSession {
+/** A chat nobody can find is no secret, so a missing one reads as visible. */
+export function isSessionVisible(ws: Workspace, id: string, viewerId: string | null): boolean {
+  const [row] = ws.db
+    .select({ createdBy: agentSessionTable.createdBy })
+    .from(agentSessionTable)
+    .where(eq(agentSessionTable.id, id))
+    .all()
+  return !row || row.createdBy === null || row.createdBy === viewerId
+}
+
+export function createSession(
+  ws: Workspace,
+  title: string,
+  options: { createdBy?: string | null; anchor?: ChatAnchor | null } = {},
+): AgentSession {
   const now = ws.now()
   const id = newId()
-  ws.db.insert(agentSessionTable).values({ id, title, createdAt: now, updatedAt: now }).run()
+  ws.db
+    .insert(agentSessionTable)
+    .values({
+      id,
+      title,
+      createdBy: options.createdBy ?? null,
+      anchorSheetId: options.anchor?.sheetId ?? null,
+      anchorScope: options.anchor?.scope ?? null,
+      createdAt: now,
+      updatedAt: now,
+    })
+    .run()
   return toSession(
     ws.db.select().from(agentSessionTable).where(eq(agentSessionTable.id, id)).all()[0]!,
   )
@@ -52,10 +95,12 @@ export function updateSession(
     .set({ ...patch, updatedAt: ws.now() })
     .where(eq(agentSessionTable.id, id))
     .run()
+  if (patch.title !== undefined) indexChatSearch(ws, id)
 }
 
 /** The conversation, its turns and its answered questions. A running one is refused upstream. */
 export function deleteSession(ws: Workspace, id: string): void {
+  forgetChatSearch(ws, id)
   ws.db.delete(agentTurnTable).where(eq(agentTurnTable.sessionId, id)).run()
   ws.db.delete(approvalTable).where(eq(approvalTable.sessionId, id)).run()
   ws.db.delete(agentSessionTable).where(eq(agentSessionTable.id, id)).run()
@@ -95,6 +140,7 @@ export function appendTurn(ws: Workspace, sessionId: string, update: AgentUpdate
       createdAt: entry.createdAt,
     })
     .run()
+  if (update.kind === 'user_message' || update.kind === 'turn_done') indexChatSearch(ws, sessionId)
   return entry
 }
 

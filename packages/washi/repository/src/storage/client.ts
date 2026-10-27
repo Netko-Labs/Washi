@@ -5,6 +5,7 @@ import { createHlcClock, positionBetween } from '@washi/domain'
 import * as schema from '@washi/domain/db'
 import { type BunSQLiteDatabase, drizzle } from 'drizzle-orm/bun-sqlite'
 import { backfillChanges } from './changes-backfill'
+import { ensureChatSearch } from './chat-search'
 
 export type DrizzleDB = BunSQLiteDatabase<typeof schema>
 
@@ -196,6 +197,9 @@ function createTables(sqlite: Database) {
   ensureColumn(sqlite, 'approvals', 'resolved_by', 'TEXT')
   ensureColumn(sqlite, 'agent_sessions', 'model', 'TEXT')
   ensureColumn(sqlite, 'agent_sessions', 'effort', 'TEXT')
+  ensureColumn(sqlite, 'agent_sessions', 'created_by', 'TEXT')
+  ensureColumn(sqlite, 'agent_sessions', 'anchor_sheet_id', 'TEXT')
+  ensureColumn(sqlite, 'agent_sessions', 'anchor_scope', 'TEXT')
 
   sqlite.exec(`
     CREATE TABLE IF NOT EXISTS capability_calls (
@@ -297,6 +301,8 @@ function createTables(sqlite: Database) {
   sqlite.exec(`
     CREATE VIRTUAL TABLE IF NOT EXISTS sheets_fts USING fts5(id UNINDEXED, title, body)
   `)
+
+  ensureChatSearch(sqlite)
 
   // window_state used to live here. A server has no windows — it moved to the
   // desktop client's own store.

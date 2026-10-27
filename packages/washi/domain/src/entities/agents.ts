@@ -4,6 +4,16 @@ import { z } from 'zod'
 export const effortSchema = z.enum(['quick', 'balanced', 'deep'])
 export type Effort = z.infer<typeof effortSchema>
 
+/** How far a chat's anchor reaches: its page alone, or the page and everything under it (D67). */
+export const chatAnchorScopeSchema = z.enum(['page', 'subtree'])
+export type ChatAnchorScope = z.infer<typeof chatAnchorScopeSchema>
+
+export const chatAnchorSchema = z.object({
+  sheetId: z.string().min(1),
+  scope: chatAnchorScopeSchema,
+})
+export type ChatAnchor = z.infer<typeof chatAnchorSchema>
+
 export const agentSessionSchema = z.object({
   id: z.string(),
   provider: z.string(),
@@ -13,9 +23,21 @@ export const agentSessionSchema = z.object({
   /** A conversation's own choices; null takes the workspace default (D61). */
   model: z.string().nullable(),
   effort: effortSchema.nullable(),
+  /** Whose chat it is; null is the workspace's — a routine's runs, and every chat before D67. */
+  createdBy: z.string().nullable(),
+  anchor: chatAnchorSchema.nullable(),
   createdAt: z.string(),
   updatedAt: z.string(),
 })
+
+/** A chat found by what was said in it: the words around the match, marked with ⟦ ⟧. */
+export const chatSearchHitSchema = z.object({
+  sessionId: z.string(),
+  title: z.string(),
+  snippet: z.string(),
+  updatedAt: z.string(),
+})
+export type ChatSearchHit = z.infer<typeof chatSearchHitSchema>
 
 /** What rides with an ask: a page by id (Washi reads it), or a file from the files store. */
 export const attachmentRefSchema = z.object({

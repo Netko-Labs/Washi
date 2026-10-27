@@ -24,6 +24,9 @@ import { Route as WWorkspaceIdIndexRouteImport } from './routes/w/$workspaceId/i
 import { Route as WWorkspaceIdInboxRouteImport } from './routes/w/$workspaceId/inbox'
 import { Route as WWorkspaceIdSettingsRouteImport } from './routes/w/$workspaceId/settings'
 import { Route as WWorkspaceIdTrashRouteImport } from './routes/w/$workspaceId/trash'
+import { Route as WWorkspaceIdChatsIndexRouteImport } from './routes/w/$workspaceId/chats/index'
+import { Route as WWorkspaceIdChatsChatIdRouteImport } from './routes/w/$workspaceId/chats/$chatId'
+import { Route as WWorkspaceIdChatsNewRouteImport } from './routes/w/$workspaceId/chats/new'
 import { Route as WWorkspaceIdPPageIdRouteImport } from './routes/w/$workspaceId/p/$pageId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -101,6 +104,21 @@ const WWorkspaceIdTrashRoute = WWorkspaceIdTrashRouteImport.update({
   path: '/trash',
   getParentRoute: () => WWorkspaceIdRoute,
 } as any)
+const WWorkspaceIdChatsIndexRoute = WWorkspaceIdChatsIndexRouteImport.update({
+  id: '/chats/',
+  path: '/chats/',
+  getParentRoute: () => WWorkspaceIdRoute,
+} as any)
+const WWorkspaceIdChatsChatIdRoute = WWorkspaceIdChatsChatIdRouteImport.update({
+  id: '/chats/$chatId',
+  path: '/chats/$chatId',
+  getParentRoute: () => WWorkspaceIdRoute,
+} as any)
+const WWorkspaceIdChatsNewRoute = WWorkspaceIdChatsNewRouteImport.update({
+  id: '/chats/new',
+  path: '/chats/new',
+  getParentRoute: () => WWorkspaceIdRoute,
+} as any)
 const WWorkspaceIdPPageIdRoute = WWorkspaceIdPPageIdRouteImport.update({
   id: '/p/$pageId',
   path: '/p/$pageId',
@@ -123,7 +141,10 @@ export interface FileRoutesByFullPath {
   '/w/$workspaceId/settings': typeof WWorkspaceIdSettingsRoute
   '/w/$workspaceId/trash': typeof WWorkspaceIdTrashRoute
   '/w/$workspaceId/': typeof WWorkspaceIdIndexRoute
+  '/w/$workspaceId/chats/$chatId': typeof WWorkspaceIdChatsChatIdRoute
+  '/w/$workspaceId/chats/new': typeof WWorkspaceIdChatsNewRoute
   '/w/$workspaceId/p/$pageId': typeof WWorkspaceIdPPageIdRoute
+  '/w/$workspaceId/chats/': typeof WWorkspaceIdChatsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -140,7 +161,10 @@ export interface FileRoutesByTo {
   '/w/$workspaceId/settings': typeof WWorkspaceIdSettingsRoute
   '/w/$workspaceId/trash': typeof WWorkspaceIdTrashRoute
   '/w/$workspaceId': typeof WWorkspaceIdIndexRoute
+  '/w/$workspaceId/chats/$chatId': typeof WWorkspaceIdChatsChatIdRoute
+  '/w/$workspaceId/chats/new': typeof WWorkspaceIdChatsNewRoute
   '/w/$workspaceId/p/$pageId': typeof WWorkspaceIdPPageIdRoute
+  '/w/$workspaceId/chats': typeof WWorkspaceIdChatsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -159,7 +183,10 @@ export interface FileRoutesById {
   '/w/$workspaceId/settings': typeof WWorkspaceIdSettingsRoute
   '/w/$workspaceId/trash': typeof WWorkspaceIdTrashRoute
   '/w/$workspaceId/': typeof WWorkspaceIdIndexRoute
+  '/w/$workspaceId/chats/$chatId': typeof WWorkspaceIdChatsChatIdRoute
+  '/w/$workspaceId/chats/new': typeof WWorkspaceIdChatsNewRoute
   '/w/$workspaceId/p/$pageId': typeof WWorkspaceIdPPageIdRoute
+  '/w/$workspaceId/chats/': typeof WWorkspaceIdChatsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -179,7 +206,10 @@ export interface FileRouteTypes {
     | '/w/$workspaceId/settings'
     | '/w/$workspaceId/trash'
     | '/w/$workspaceId/'
+    | '/w/$workspaceId/chats/$chatId'
+    | '/w/$workspaceId/chats/new'
     | '/w/$workspaceId/p/$pageId'
+    | '/w/$workspaceId/chats/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -196,7 +226,10 @@ export interface FileRouteTypes {
     | '/w/$workspaceId/settings'
     | '/w/$workspaceId/trash'
     | '/w/$workspaceId'
+    | '/w/$workspaceId/chats/$chatId'
+    | '/w/$workspaceId/chats/new'
     | '/w/$workspaceId/p/$pageId'
+    | '/w/$workspaceId/chats'
   id:
     | '__root__'
     | '/'
@@ -214,7 +247,10 @@ export interface FileRouteTypes {
     | '/w/$workspaceId/settings'
     | '/w/$workspaceId/trash'
     | '/w/$workspaceId/'
+    | '/w/$workspaceId/chats/$chatId'
+    | '/w/$workspaceId/chats/new'
     | '/w/$workspaceId/p/$pageId'
+    | '/w/$workspaceId/chats/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -338,6 +374,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WWorkspaceIdTrashRouteImport
       parentRoute: typeof WWorkspaceIdRoute
     }
+    '/w/$workspaceId/chats/': {
+      id: '/w/$workspaceId/chats/'
+      path: '/chats'
+      fullPath: '/w/$workspaceId/chats/'
+      preLoaderRoute: typeof WWorkspaceIdChatsIndexRouteImport
+      parentRoute: typeof WWorkspaceIdRoute
+    }
+    '/w/$workspaceId/chats/$chatId': {
+      id: '/w/$workspaceId/chats/$chatId'
+      path: '/chats/$chatId'
+      fullPath: '/w/$workspaceId/chats/$chatId'
+      preLoaderRoute: typeof WWorkspaceIdChatsChatIdRouteImport
+      parentRoute: typeof WWorkspaceIdRoute
+    }
+    '/w/$workspaceId/chats/new': {
+      id: '/w/$workspaceId/chats/new'
+      path: '/chats/new'
+      fullPath: '/w/$workspaceId/chats/new'
+      preLoaderRoute: typeof WWorkspaceIdChatsNewRouteImport
+      parentRoute: typeof WWorkspaceIdRoute
+    }
     '/w/$workspaceId/p/$pageId': {
       id: '/w/$workspaceId/p/$pageId'
       path: '/p/$pageId'
@@ -353,7 +410,10 @@ interface WWorkspaceIdRouteChildren {
   WWorkspaceIdSettingsRoute: typeof WWorkspaceIdSettingsRoute
   WWorkspaceIdTrashRoute: typeof WWorkspaceIdTrashRoute
   WWorkspaceIdIndexRoute: typeof WWorkspaceIdIndexRoute
+  WWorkspaceIdChatsChatIdRoute: typeof WWorkspaceIdChatsChatIdRoute
+  WWorkspaceIdChatsNewRoute: typeof WWorkspaceIdChatsNewRoute
   WWorkspaceIdPPageIdRoute: typeof WWorkspaceIdPPageIdRoute
+  WWorkspaceIdChatsIndexRoute: typeof WWorkspaceIdChatsIndexRoute
 }
 
 const WWorkspaceIdRouteChildren: WWorkspaceIdRouteChildren = {
@@ -361,7 +421,10 @@ const WWorkspaceIdRouteChildren: WWorkspaceIdRouteChildren = {
   WWorkspaceIdSettingsRoute: WWorkspaceIdSettingsRoute,
   WWorkspaceIdTrashRoute: WWorkspaceIdTrashRoute,
   WWorkspaceIdIndexRoute: WWorkspaceIdIndexRoute,
+  WWorkspaceIdChatsChatIdRoute: WWorkspaceIdChatsChatIdRoute,
+  WWorkspaceIdChatsNewRoute: WWorkspaceIdChatsNewRoute,
   WWorkspaceIdPPageIdRoute: WWorkspaceIdPPageIdRoute,
+  WWorkspaceIdChatsIndexRoute: WWorkspaceIdChatsIndexRoute,
 }
 
 const WWorkspaceIdRouteWithChildren = WWorkspaceIdRoute._addFileChildren(

@@ -1,11 +1,16 @@
 import type { AgentSession, AttachmentRef, Effort } from '@washi/domain'
 import type { RefObject } from 'react'
 
-export type PanelPlacement = 'float' | 'dock' | 'sheet'
+export type PanelPlacement = 'float' | 'dock' | 'sheet' | 'page'
 
 export interface AgentPanelProps {
-  /** Float is the popover; dock is a flex sibling the host places beside the page; sheet fills a phone. */
+  /**
+   * Float is the popover; dock is a flex sibling the host places beside the page; sheet fills a
+   * phone; page is a chat's own route (D67), where the host owns the frame around it.
+   */
   placement?: PanelPlacement
+  /** Opens the chat as a page; the host knows where that is. No callback, no ⤢. */
+  onExpand?: () => void
 }
 
 export interface ConversationsMenuProps {

@@ -41,7 +41,7 @@ describe('today retells each turn: the ask, what it touched, the receipt', () =>
     const session = createSession(ws, 'Old')
     appendTurn(ws, session.id, { kind: 'user_message', text: 'hi' })
     appendTurn(ws, session.id, { kind: 'turn_done', stopReason: 'end_turn' })
-    expect(recentTurns(ws, Date.now() + 2 * 24 * 60 * 60_000)).toEqual([])
+    expect(recentTurns(ws, undefined, Date.now() + 2 * 24 * 60 * 60_000)).toEqual([])
   })
 
   test('an HLC reads back as its wall clock', () => {

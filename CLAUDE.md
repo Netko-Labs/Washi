@@ -55,12 +55,12 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   Pages are routes: `/sign-in?redirect=`, `/workspaces?invite=`, `/new` (a new workspace: name it ·
   start it · invite people, then the workspace's first run wakes Washi), `/s/$workspaceId/$token` (a
   page's read-only link, no session — D65), `/w/$workspaceId` (dashboard),
-  `/p/$pageId`, `/inbox`, `/settings?tab=`, `/trash`. The workspace loader resets the shared stores (child
+  `/p/$pageId`, `/inbox`, `/chats` · `/chats/new` · `/chats/$chatId` (D67), `/settings?tab=`, `/trash`. The workspace loader resets the shared stores (child
   effects run before the layout's); routes mark their view active, and a page chosen anywhere
   pushes its URL (`useTabNavigation`). **No tab strip on the web (D58)** — the URL is the whole
   state; `TabStrip` is the desktop's. The sidebar is **Sidebar D (D57)**: the ask field (the
   mascot is Washi's state and opens the panel, the text opens the palette), Home with Inbox ·
-  Threads · Routines as icons, Recents (last three pages opened, per workspace in localStorage),
+  Chats · Routines as icons, Recents (last three pages opened, per workspace in localStorage),
   Favorites, the page tree (native drag and drop; `placementFor` in `@washi/ui` decides where a
   drop lands and refuses a page into its own subtree), Routines, Trash, and the workspace footer:
   the name switches workspaces in place (the shell is keyed by workspace id and the route has
@@ -202,6 +202,14 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   (`mayCreateAccount`). Settings → Server is the admin's alone (`instance.*`, `adminProcedure`);
   embedded has no instance store, and the studio refuses to boot in embedded mode. Washi is
   AGPL-3.0-only (`LICENSE`, every `package.json`).
+- **A chat is its starter's (D67).** `agent_sessions.created_by`; null is the workspace's (a
+  routine's runs, every chat before D67). `chatProcedure` answers NOT_FOUND for any `sessionId`
+  that is someone else's, and the agent subscriptions, `pendingApprovals` and `today` drop their
+  events — an owner does not read a member's chat. A chat may be anchored (`anchor_sheet_id` +
+  `page`·`subtree`). Search is FTS5 over title + everything said (`agent_sessions_fts`, rebuilt per
+  chat on each ask and each finished turn; `searchChats`, matches marked ⟦ ⟧). A chat opens as a
+  page at `/chats/$chatId` (the panel's `page` placement; the host's `onExpand` gives the panel ⤢);
+  `/chats/new` is the store's `draft` — nothing is created until the first send.
 - **Who pays for a turn.** A credential is `api_key` or `local_cli`. Embedded finds the
   person's installed `claude` (PATH is empty for a GUI app — known install paths too) and runs
   it via the Agent SDK's `pathToClaudeCodeExecutable` with **no** key in the env, so their own
