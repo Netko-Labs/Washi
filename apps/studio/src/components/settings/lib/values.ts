@@ -3,6 +3,7 @@ import {
   IconBucket,
   IconBuildingCommunity,
   IconGauge,
+  IconMoodSmile,
   IconServer,
   IconSparkles,
   IconUserCircle,
@@ -91,6 +92,12 @@ export const SETTINGS_GROUPS: SettingsGroup[] = [
         icon: IconBucket,
         desc: 'Where the covers, icons and pictures people upload are kept.',
       },
+      {
+        key: 'emojis',
+        label: 'Emojis',
+        icon: IconMoodSmile,
+        desc: 'The team’s own pictures, for page icons, by :name:.',
+      },
     ],
   },
   {
@@ -135,6 +142,7 @@ export const SETTINGS_TAB_KEYS = [
   'general',
   'people',
   'storage',
+  'emojis',
   'models',
   'outside',
   'usage',

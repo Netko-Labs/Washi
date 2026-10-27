@@ -14,6 +14,7 @@ export type SettingsTab =
   | 'general'
   | 'people'
   | 'storage'
+  | 'emojis'
   | 'models'
   | 'outside'
   | 'usage'

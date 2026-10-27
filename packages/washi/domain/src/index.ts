@@ -52,6 +52,13 @@ export {
   mentionItemSchema,
   mentionRefSchema,
 } from './entities/comments'
+export {
+  type CustomEmoji,
+  type CustomEmojiWrite,
+  customEmojiNameSchema,
+  customEmojiSchema,
+  customEmojiWriteSchema,
+} from './entities/emojis'
 export type { Member } from './entities/members'
 export {
   type AccessRow,
