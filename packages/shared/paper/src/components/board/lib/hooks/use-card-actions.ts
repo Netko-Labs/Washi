@@ -19,6 +19,11 @@ export function useCardActions(onOpen: ActionRef | undefined): CardActions {
     shown: (value) => (typeof value === 'number' ? value.toLocaleString(host.locale) : cell(value)),
     add: (action, group) => void run(substitute(action, group)),
     creatable: Boolean(host.newRow),
-    create: (table, data) => void host.newRow?.(table, data).finally(refresh),
+    // The host tells the reader why a row was not added; the board only refetches.
+    create: (table, data) =>
+      void host
+        .newRow?.(table, data)
+        .catch(() => undefined)
+        .finally(refresh),
   }
 }

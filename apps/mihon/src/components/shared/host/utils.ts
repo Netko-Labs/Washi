@@ -176,8 +176,12 @@ export function createBookHost(say: Say, seeds?: SeedTable[]): PaperHost {
     replaceNode: async () => say('canvas edit received — a host would save it'),
     openRow: (recordId) => say(`would open ${recordId} as a page`),
     newRow: async (table, data) => {
-      await host.runAction({ verb: 'table.insert', table, data })
-      say(`would open the new ${table} row beside the page`)
+      try {
+        await host.runAction({ verb: 'table.insert', table, data })
+        say(`would open the new ${table} row beside the page`)
+      } catch (cause) {
+        say(`that row was not added — ${String(cause)}`)
+      }
     },
     toggleTask: async (recordId, done, field = 'done') => {
       for (const table of tables.values()) {

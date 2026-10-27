@@ -50,8 +50,14 @@ export const paperHost: PaperHost = {
       }),
 
   newRow: async (table, data) => {
-    const { id } = await api.tables.mutate.mutate({ mutation: { kind: 'insert', table, data } })
-    if (id) paperHost.openRow?.(id)
+    try {
+      const { id } = await api.tables.mutate.mutate({ mutation: { kind: 'insert', table, data } })
+      if (id) paperHost.openRow?.(id)
+    } catch (cause) {
+      const { useNoticeStore } = await import('../stores')
+      const reason = cause instanceof Error ? cause.message : String(cause)
+      useNoticeStore.getState().say(`That row was not added — ${reason}`)
+    }
   },
 
   toggleTask: async (recordId, done, field) => {

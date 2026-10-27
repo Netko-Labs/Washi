@@ -25,7 +25,10 @@ export interface PaperHost {
   onDataChange?(listener: () => void): () => void
   /** Opens a record as its own page, Notion-style. A host without row pages leaves it out. */
   openRow?(recordId: string): void
-  /** Adds a row and opens it where the reader is, to be filled in; without it a new row is inline. */
+  /**
+   * Adds a row and opens it where the reader is, to be filled in; without it a new row is inline.
+   * It resolves either way: a host says itself why a row was not added.
+   */
   newRow?(table: string, data: Record<string, string>): Promise<void>
   /** Ticks `field` (default `done`) on the row; refused unless it is a checkbox column. */
   toggleTask(recordId: string, done: boolean, field?: string): Promise<void>
