@@ -21,6 +21,7 @@ import { Button, Compose, Field, Slider, Switch, Task } from './components/input
 import { Chip, Mascot, Missing } from './components/kit'
 import { Redact } from './components/redact'
 import { Roadmap } from './components/roadmap'
+import { Select } from './components/select'
 import { Callout, Card, Figure, Hero } from './components/surface'
 import {
   Code,
@@ -118,6 +119,7 @@ const COMPONENTS: Record<string, ComponentType<never>> = {
   Button,
   Task,
   Switch,
+  Select,
   Slider,
   Show,
   Tabs,

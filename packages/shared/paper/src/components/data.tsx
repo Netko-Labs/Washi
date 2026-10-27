@@ -1,8 +1,8 @@
-import type { InkQuery } from '@washi/ink'
 import type { ReactNode } from 'react'
 import { styled, useBind, useExprValue } from '../lib'
 import type { BlockProps, Row } from '../lib/types'
 import { usePaperHost } from '../provider'
+import type { BindQuery } from '../registry'
 import { RowProvider } from '../state'
 import { Chart } from './chart'
 import { Bound, cell } from './states'
@@ -15,7 +15,7 @@ export function Repeat({
   empty,
   children,
   ...rest
-}: BlockProps & { bind: InkQuery; empty?: string; children: (row: Row) => ReactNode }) {
+}: BlockProps & { bind: BindQuery; empty?: string; children: (row: Row) => ReactNode }) {
   const state = useBind(bind)
   return (
     <div {...styled(rest, 'wsx-repeat wsx-stack')}>
@@ -37,7 +37,7 @@ export function Table({
   columns,
   empty,
   ...rest
-}: BlockProps & { bind: InkQuery; columns?: string[]; empty?: string }) {
+}: BlockProps & { bind: BindQuery; columns?: string[]; empty?: string }) {
   const state = useBind(bind)
   const { openRow } = usePaperHost()
   return (

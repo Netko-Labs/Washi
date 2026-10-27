@@ -1,17 +1,20 @@
-import type { HistoryQuery } from '@washi/ink'
 import { useEffect, useState } from 'react'
 import { useData } from '../../data'
 import { usePaperHost } from '../../provider'
+import type { BindHistoryQuery } from '../../registry'
+import { useSheetState } from '../../state'
+import { resolveHistory } from '../bind'
 import type { BindState } from '../types'
 
 const DAY = { month: 'short', day: 'numeric', timeZone: 'UTC' } as const
 
 /** A history query's days, labelled "Oct 1"; refetched whenever a verb lands, like a bind. */
-export function useHistory(query: HistoryQuery): BindState {
+export function useHistory(query: BindHistoryQuery): BindState {
   const host = usePaperHost()
   const { version } = useData()
+  const { values } = useSheetState()
   const [state, setState] = useState<BindState>({ rows: [], status: 'loading', error: null })
-  const key = JSON.stringify(query)
+  const key = JSON.stringify(resolveHistory(query, values))
 
   useEffect(() => {
     if (!host.runHistory) {

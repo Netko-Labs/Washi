@@ -21,6 +21,22 @@ export const actionRefSchema = z
 const exprSchema = z.string().min(1).max(512)
 const stateKey = z.string().min(1).max(64)
 const stateBag = z.record(stateKey, scalarSchema)
+
+/**
+ * A data view's filter may read page state — `{ state: 'month' }` — so one set of views follows a
+ * picker (D72). The page resolves it before the query leaves; unset state drops the filter.
+ */
+export const stateRefSchema = z.object({ state: stateKey }).strict()
+export const bindFilterSchema = filterSchema.extend({
+  value: z.union([filterSchema.shape.value, stateRefSchema]),
+})
+const bindWhere = z.array(bindFilterSchema).max(16).optional()
+export const bindQuerySchema = querySchema.extend({ where: bindWhere })
+export const bindHistorySchema = historyQuerySchema.extend({ where: bindWhere })
+export type StateRef = z.infer<typeof stateRefSchema>
+export type BindFilter = z.infer<typeof bindFilterSchema>
+export type BindQuery = z.infer<typeof bindQuerySchema>
+export type BindHistoryQuery = z.infer<typeof bindHistorySchema>
 const columnName = z.string().min(1).max(64)
 const rowRef = z.string().min(1).max(80)
 const memberId = z.string().min(1).max(80)
@@ -162,8 +178,8 @@ const surface: Record<string, ComponentSpec> = {
 }
 
 const CHART_SHAPE = {
-  bind: querySchema.optional(),
-  history: historyQuerySchema.optional(),
+  bind: bindQuerySchema.optional(),
+  history: bindHistorySchema.optional(),
   kind: z.enum(['bar', 'line', 'area', 'donut']),
   label: columnName.optional(),
   value: columnName.optional(),
@@ -174,7 +190,7 @@ const CHART_SHAPE = {
 const dataOut: Record<string, ComponentSpec> = {
   Repeat: p(
     {
-      bind: querySchema,
+      bind: bindQuerySchema,
       as: z.string().max(32).optional(),
       empty: z.string().max(160).optional(),
       redact,
@@ -184,7 +200,7 @@ const dataOut: Record<string, ComponentSpec> = {
   ),
   Table: p(
     {
-      bind: querySchema,
+      bind: bindQuerySchema,
       columns: z.array(columnName).max(16).optional(),
       empty: z.string().max(160).optional(),
       redact,
@@ -237,7 +253,7 @@ const dataOut: Record<string, ComponentSpec> = {
   ),
   Roadmap: p(
     {
-      bind: querySchema,
+      bind: bindQuerySchema,
       date: columnName,
       title: columnName.optional(),
       empty: z.string().max(160).optional(),
@@ -276,7 +292,7 @@ const dataIn: Record<string, ComponentSpec> = {
   ),
   Board: p(
     {
-      bind: querySchema,
+      bind: bindQuerySchema,
       groupBy: columnName,
       groups: z.array(z.string().min(1).max(40)).min(1).max(12).optional(),
       rank: columnName.optional(),
@@ -304,7 +320,7 @@ const dataIn: Record<string, ComponentSpec> = {
               kind: z.enum(['table', 'board', 'timeline']),
               groupBy: columnName.optional(),
               date: columnName.optional(),
-              where: z.array(filterSchema).max(16).optional(),
+              where: bindWhere,
               columns: z.array(columnName).max(16).optional(),
             })
             .strict(),
@@ -334,6 +350,26 @@ const dataIn: Record<string, ComponentSpec> = {
   ),
   Task: p({ row: rowRef.optional(), done: z.boolean().optional() }, 'text'),
   Switch: p({ state: stateKey, label: z.string().max(120).optional() }, 'none'),
+  /** Picks one value into state — a month for every view filtered on it. `all` is "no filter". */
+  Select: p(
+    {
+      state: stateKey,
+      label: z.string().max(120).optional(),
+      options: z
+        .array(
+          z.union([
+            z.string().min(1).max(80),
+            z
+              .object({ value: z.string().min(1).max(80), label: z.string().min(1).max(80) })
+              .strict(),
+          ]),
+        )
+        .min(1)
+        .max(60),
+      all: z.string().min(1).max(60).optional(),
+    },
+    'none',
+  ),
   Slider: p(
     {
       state: stateKey,
@@ -361,7 +397,7 @@ const flow: Record<string, ComponentSpec> = {
   Drawer: p(
     {
       state: stateKey,
-      bind: querySchema.optional(),
+      bind: bindQuerySchema.optional(),
       title: z.string().max(120).optional(),
       redact,
     },

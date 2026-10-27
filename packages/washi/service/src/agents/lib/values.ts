@@ -36,7 +36,8 @@ Surface: Card(title) Callout(title) Hero(title subtitle align) Figure(https src,
 Repeat(bind) Table(bind columns) Stat(value|expr label hint trend) Chart(bind kind) Timeline/Step
 Progress(value|expr) Badge Avatar Schema(table) · Data in: Field(field kind table row) Board(bind
 groupBy groups rank kicker badge meta avatar onAdd onOpen) Button(action) Compose(action label —
-$value and $now supplied) Task(row) Switch(state) Slider(state) · Flow: Show(expr) Tabs(labels
+$value and $now supplied) Task(row field — the checkbox column it ticks, done when absent)
+Switch(state) Select(state options all — one choice into state) Slider(state) · Flow: Show(expr) Tabs(labels
 state)/Tab Reveal(label) Drawer(state bind title — opens when the key is truthy; with bind the key is
 a row id and children get $row) · Kit: Chip Mascot(mood) · Missing(kind reason) for anything the registry
 lacks — it renders as a labelled placeholder and files a request; never fake a capability.
@@ -52,6 +53,11 @@ Actions are objects, never functions: <Button action={{ verb: 'table.insert', ta
 Verbs: sheet.open sheet.create table.insert table.update (Field uses it) table.reorder (Board drag
 writes the group column and a fractional rank) table.delete (soft) state.set (page state, key + value —
 never reaches the vault). url.open is denied from a page. bind is an ink query descriptor { table, where, orderBy, limit, groupBy }.
+A where value may read state — { column: 'month', op: 'eq', value: { state: 'month' } } — and unset state
+drops that filter, so one set of views follows a <Select state="month" options={[…]} all="All months" />:
+never copy a page's stats, charts and lists per month or per anything a picker could choose.
+Name such a key unlike any column (picked_month, not month): inside an aggregate's where a bare name is
+the row's column first, so sum(expenses.amount where month = picked_month) reads the picker.
 
 Budget: ~400 nodes, 8 binds, 24 expressions per sheet — over it, split into linked sheets (<Ref>).
 Always run sheet_check before sheet_create or sheet_replace and fix every diagnostic. Structured

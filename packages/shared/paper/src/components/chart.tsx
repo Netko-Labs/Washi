@@ -1,7 +1,7 @@
-import type { HistoryQuery, InkQuery } from '@washi/ink'
 import { columnOf, styled, useBind, useHistory } from '../lib'
 import type { BindState, BlockProps, Row } from '../lib/types'
 import { usePaperHost } from '../provider'
+import type { BindHistoryQuery, BindQuery } from '../registry'
 import { Bound } from './states'
 
 const RAMP = [
@@ -187,7 +187,7 @@ export function Chart({
   bind,
   history,
   ...look
-}: ChartLook & { bind?: InkQuery; history?: HistoryQuery }) {
+}: ChartLook & { bind?: BindQuery; history?: BindHistoryQuery }) {
   return history ? (
     <HistoryChart history={history} {...look} />
   ) : (
@@ -195,12 +195,12 @@ export function Chart({
   )
 }
 
-function BoundChart({ bind, label, ...look }: ChartLook & { bind?: InkQuery }) {
+function BoundChart({ bind, label, ...look }: ChartLook & { bind?: BindQuery }) {
   return <ChartBody state={useBind(bind)} label={label ?? bind?.groupBy?.column} {...look} />
 }
 
 /** Over time: one point per day, labelled the way a person reads a date. */
-function HistoryChart({ history, ...look }: ChartLook & { history: HistoryQuery }) {
+function HistoryChart({ history, ...look }: ChartLook & { history: BindHistoryQuery }) {
   return <ChartBody state={useHistory(history)} label="day" value="count" {...look} />
 }
 

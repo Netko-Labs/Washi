@@ -93,3 +93,14 @@ export interface SheetMarkProps {
 export interface RedactProps extends BlockProps {
   reason?: string
 }
+
+/** A `<Select>` choice: the value written to state, shown as itself or a label. */
+export type SelectOption = string | { value: string; label: string }
+
+export interface SelectProps extends BlockProps {
+  state: string
+  label?: string
+  options: SelectOption[]
+  /** An empty choice that clears the state, so every view filtered on it shows everything. */
+  all?: string
+}

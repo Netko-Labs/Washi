@@ -1139,7 +1139,7 @@
         <thead><tr><th>Field</th><th>Shape</th><th>Notes</th></tr></thead>
         <tbody>
           <tr><td><code>table</code><span class="req">required</span></td><td>string</td><td>A table name: snake_case identifier when defined.</td></tr>
-          <tr><td><code>where</code></td><td>≤16 × <code>{ column, op, value }</code></td><td>ANDed. <code>op</code>: <code>eq ne gt gte lt lte contains in</code>. <code>value</code> a scalar or a list (≤100) for <code>in</code>. <code>id</code> is always filterable. A comparison against <code>null</code> is never true (SQL); <code>contains</code> is a case-insensitive substring. On a list column (<code>multi_select</code>, <code>relation</code>) <code>eq contains in</code> mean <em>holds any of</em> and <code>ne</code> <em>holds none of</em>.</td></tr>
+          <tr><td><code>where</code></td><td>≤16 × <code>{ column, op, value }</code></td><td>ANDed. <code>op</code>: <code>eq ne gt gte lt lte contains in</code>. <code>value</code> a scalar, a list (≤100) for <code>in</code>, or <code>{ state: 'key' }</code> — the page reads that state key before the query leaves, and an unset, empty or null key drops the filter (D72), so one set of views follows a <a href="#p-Select">Select</a>. <code>id</code> is always filterable. A comparison against <code>null</code> is never true (SQL); <code>contains</code> is a case-insensitive substring. On a list column (<code>multi_select</code>, <code>relation</code>) <code>eq contains in</code> mean <em>holds any of</em> and <code>ne</code> <em>holds none of</em>.</td></tr>
           <tr><td><code>orderBy</code></td><td><code>{ column, direction }</code></td><td><code>asc</code> (default) or <code>desc</code>.</td></tr>
           <tr><td><code>limit</code></td><td>integer 1–1000</td><td></td></tr>
           <tr><td><code>groupBy</code></td><td><code>{ column, aggregates: [{ fn, column? }] }</code></td><td>1–8 aggregates, <code>fn</code> <code>count sum avg min max</code>. Returns one row per group — feeds a <code>Chart</code> directly (label = the group column, value = the first numeric column).</td></tr>
@@ -1743,6 +1743,18 @@ bun run typecheck</div></div></div><figcaption><b>Code</b> — muted background,
 <pre><span class="t">&lt;Switch</span> <span class="a">state</span>=<span class="v">"mine"</span> <span class="a">label</span>=<span class="v">"Only mine"</span> <span class="t">/&gt;</span></pre>
       <figure class="plate"><div class="inner"><div class="app flat sk"><div class="switch"><i></i>Only mine</div></div></div><figcaption><b>Switch</b> on.</figcaption></figure>
 
+      <h4 id="p-Select">Select</h4>
+      <p>Writes one choice to a state key. Every data view whose <code>where</code> reads that key follows it: one stats row, one chart, one list for whichever month is picked, instead of a copy per month (D72).</p>
+      <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
+        <tr><td><code>state</code><span class="req">required</span></td><td>key 1–64</td><td>Name it unlike any column: inside an aggregate's <code>where</code> a bare name is the column first.</td></tr>
+        <tr><td><code>options</code><span class="req">required</span></td><td>1–60 × string, or <code>{ value, label }</code></td><td>The value is what state holds and filters compare against.</td></tr>
+        <tr><td><code>all</code></td><td>string ≤60</td><td>An empty choice that clears the key — every filter on it drops.</td></tr>
+        <tr><td><code>label</code></td><td>string ≤120</td><td></td></tr>
+      </tbody></table>
+      <p class="pol">children <b>none</b></p>
+<pre><span class="t">&lt;Select</span> <span class="a">state</span>=<span class="v">"picked_month"</span> <span class="a">options</span>={['2026-10', '2026-11']} <span class="a">all</span>=<span class="v">"All months"</span> <span class="t">/&gt;</span>
+<span class="t">&lt;Table</span> <span class="a">bind</span>={{ table: 'expenses', where: [{ column: 'month', op: 'eq', value: { state: 'picked_month' } }] }} <span class="t">/&gt;</span></pre>
+
       <h4 id="p-Slider">Slider</h4>
       <p>Writes a number to a state key; shows the label (or the key) and the value above a range input.</p>
       <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
@@ -1968,6 +1980,7 @@ Sheet: over the complexity budget — 412 nodes (budget 400). Split into linked 
           <tr><td>Stat</td><td>data out</td><td class="no">—</td><td class="yes">expr</td><td class="no">—</td><td><a href="#p-Stat">§</a></td></tr>
           <tr><td>Step</td><td>data out</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Step">§</a></td></tr>
           <tr><td>Switch</td><td>data in</td><td class="no">—</td><td class="yes">state</td><td class="no">—</td><td><a href="#p-Switch">§</a></td></tr>
+          <tr><td>Select</td><td>data in</td><td class="no">—</td><td class="yes">state</td><td class="no">—</td><td><a href="#p-Select">§</a></td></tr>
           <tr><td>Tab</td><td>flow</td><td class="no">—</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Tab">§</a></td></tr>
           <tr><td>Table</td><td>data out</td><td class="yes">bind</td><td class="no">—</td><td class="no">—</td><td><a href="#p-Table">§</a></td></tr>
           <tr><td>Tabs</td><td>flow</td><td class="no">—</td><td class="yes">state?</td><td class="no">—</td><td><a href="#p-Tabs">§</a></td></tr>
