@@ -37,15 +37,22 @@ export const paperHost: PaperHost = {
     void api.tables.openRow
       .mutate({ recordId })
       .then(async ({ sheetId }) => {
-        const { useSheetsStore, useViewStore } = await import('../stores')
+        const { useRowOpenerStore, useSheetsStore, useViewStore } = await import('../stores')
         await useSheetsStore.getState().refresh()
-        useViewStore.getState().openTab(`note:${sheetId}`)
+        const { opener } = useRowOpenerStore.getState()
+        if (opener) opener(sheetId)
+        else useViewStore.getState().openTab(`note:${sheetId}`)
       })
       .catch(async (cause: unknown) => {
         const { useNoticeStore } = await import('../stores')
         const reason = cause instanceof Error ? cause.message : String(cause)
         useNoticeStore.getState().say(`That row did not open — ${reason}`)
       }),
+
+  newRow: async (table, data) => {
+    const { id } = await api.tables.mutate.mutate({ mutation: { kind: 'insert', table, data } })
+    if (id) paperHost.openRow?.(id)
+  },
 
   toggleTask: async (recordId, done, field) => {
     await api.tables.toggleTask.mutate({ recordId, done, field })

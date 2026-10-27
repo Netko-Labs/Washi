@@ -26,6 +26,8 @@ export interface SheetBodyProps {
 }
 
 export interface SheetViewProps {
+  /** A page other than the open tab — a row peeked over the page that holds it. */
+  sheetId?: string
   /** The host's band under the page's icon — presence, add buttons, row properties on the web. */
   chrome?: ReactNode
   /** Where the page's pictures live and how its look changes; the desktop lends none yet. */

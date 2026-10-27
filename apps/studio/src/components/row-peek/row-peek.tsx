@@ -1,0 +1,56 @@
+import { IconArrowUpRight } from '@tabler/icons-react'
+import { SheetView } from '@washi/ui'
+import { pageLook } from '@/components/page-chrome'
+import { RowProperties } from '@/components/row-properties'
+import { PEEK_FRAME, type RowPeekProps, usePeek, usePeekEscape, usePeekMode } from './lib'
+import { RowPeekBar } from './row-peek-bar'
+
+/**
+ * A row opened where the reader is, Notion's peek: its name and properties to edit, its page
+ * below. The look stays still here — a cover or icon is changed on the row's own page.
+ */
+export function RowPeek({ workspaceId }: RowPeekProps) {
+  const peek = usePeek(workspaceId)
+  const [mode, setMode] = usePeekMode()
+  usePeekEscape(peek.sheetId !== null, peek.close)
+  if (!peek.sheetId) return null
+
+  const { edit: _edit, ...look } = pageLook(workspaceId)
+  return (
+    <>
+      {mode === 'center' && (
+        <div
+          aria-hidden
+          onClick={peek.close}
+          className="fade-in fixed inset-0 z-40 animate-in bg-black/40 backdrop-blur-[2px] duration-200"
+        />
+      )}
+      <aside
+        role="dialog"
+        aria-modal={mode === 'center'}
+        aria-label="Row"
+        className={`fade-in fixed z-50 flex animate-in flex-col overflow-hidden border-border bg-background duration-200 ease-out max-md:inset-0 max-md:h-full max-md:w-full max-md:min-w-0 max-md:rounded-none max-md:border-0 ${PEEK_FRAME[mode]}`}
+      >
+        <RowPeekBar mode={mode} onMode={setMode} onClose={peek.close} onExpand={peek.expand} />
+        <SheetView
+          key={peek.sheetId}
+          sheetId={peek.sheetId}
+          chrome={<RowProperties sheetId={peek.sheetId} />}
+          look={look}
+          footer={
+            <div className="mx-auto w-full max-w-[760px] px-8 pb-12">
+              <button
+                type="button"
+                onClick={peek.expand}
+                className="flex items-center gap-1.5 rounded-md px-2 py-1 text-[13px] text-muted-foreground hover:bg-accent hover:text-foreground"
+              >
+                Write on its page
+                <IconArrowUpRight className="size-4" />
+              </button>
+            </div>
+          }
+        />
+      </aside>
+    </>
+  )
+}
