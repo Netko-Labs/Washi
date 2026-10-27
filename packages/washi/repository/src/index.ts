@@ -42,6 +42,14 @@ export {
   markMentionsRead,
   setThreadResolved,
 } from './storage/comments'
+export {
+  createCustomEmoji,
+  customEmojiNamed,
+  deleteCustomEmoji,
+  getCustomEmoji,
+  isUploadWorn,
+  listCustomEmojis,
+} from './storage/custom-emojis'
 export { executeQuery, matchRecordIds } from './storage/ink-executor'
 export { listCapabilityCalls, recordCapability } from './storage/ledger'
 export {

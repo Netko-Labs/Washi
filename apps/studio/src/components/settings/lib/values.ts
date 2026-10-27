@@ -2,6 +2,7 @@ import {
   IconAdjustments,
   IconBuildingCommunity,
   IconGauge,
+  IconMoodSmile,
   IconServer,
   IconSparkles,
   IconUserCircle,
@@ -84,6 +85,12 @@ export const SETTINGS_GROUPS: SettingsGroup[] = [
         icon: IconUsers,
         desc: 'Who is in this workspace, and who is invited.',
       },
+      {
+        key: 'emojis',
+        label: 'Emojis',
+        icon: IconMoodSmile,
+        desc: 'The team’s own pictures, for page icons, by :name:.',
+      },
     ],
   },
   {
@@ -127,6 +134,7 @@ export const SETTINGS_TAB_KEYS = [
   'preferences',
   'general',
   'people',
+  'emojis',
   'models',
   'outside',
   'usage',

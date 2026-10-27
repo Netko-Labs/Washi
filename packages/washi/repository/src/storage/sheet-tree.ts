@@ -141,17 +141,19 @@ export function emptyTrash(ws: Workspace): number {
   )
 }
 
-// Every upload a page wears, cover or icon, with the batch that page sits in.
+// Every upload a page wears, cover or icon, with the batch that page sits in; `kept` is what the
+// workspace's emojis hold, which no purge frees.
 const WORN_FILES = `WITH worn AS (
   SELECT deleted_at, cover AS key FROM sheets WHERE cover LIKE 'file:%'
   UNION ALL
   SELECT deleted_at, icon AS key FROM sheets WHERE icon LIKE 'file:%'
-)`
+),
+kept AS (SELECT 'file:' || file_id AS key FROM custom_emojis)`
 
 /**
  * The uploads a trash batch's covers and icons point at and no other page still wears — a purge
  * frees them with the pages (D60). A duplicate shares its original's files, so a live copy keeps
- * them, and so does a page in another trash batch.
+ * them, and so does a page in another trash batch, and so does a workspace emoji.
  */
 export function trashedUploads(ws: Workspace, id?: string): string[] {
   const rows = id
@@ -163,7 +165,8 @@ export function trashedUploads(ws: Workspace, id?: string): string[] {
              AND key NOT IN (
                SELECT key FROM worn
                WHERE deleted_at IS NULL OR deleted_at != (SELECT deleted_at FROM sheets WHERE id = ?)
-             )`,
+             )
+             AND key NOT IN (SELECT key FROM kept)`,
         )
         .all(id, id)
     : ws.sqlite
@@ -171,7 +174,8 @@ export function trashedUploads(ws: Workspace, id?: string): string[] {
           `${WORN_FILES}
            SELECT DISTINCT key FROM worn
            WHERE deleted_at IS NOT NULL
-             AND key NOT IN (SELECT key FROM worn WHERE deleted_at IS NULL)`,
+             AND key NOT IN (SELECT key FROM worn WHERE deleted_at IS NULL)
+             AND key NOT IN (SELECT key FROM kept)`,
         )
         .all()
   return (rows as { key: string }[]).map((row) => row.key.slice('file:'.length))
