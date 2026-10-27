@@ -1,5 +1,6 @@
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
+import { tickReminders } from '@washi/service'
 import type { ServerRuntime } from '@washi/trpc'
 import { ROUTINE_TICK_MS } from './constants'
 
@@ -17,7 +18,7 @@ export async function liveWorkspaceIds(
 }
 
 /**
- * The only caller of routines. A tick never throws: one broken workspace must not
+ * The only caller of routines and reminders. A tick never throws: one broken workspace must not
  * stop every other workspace's morning.
  */
 export function startRoutineClock(runtime: ServerRuntime, dataDir: string): () => void {
@@ -28,9 +29,11 @@ export function startRoutineClock(runtime: ServerRuntime, dataDir: string): () =
     try {
       for (const id of await liveWorkspaceIds(runtime, dataDir)) {
         try {
-          runtime.resolve(id).host.routines.tick()
+          const resolved = runtime.resolve(id)
+          resolved.host.routines.tick()
+          tickReminders(resolved.workspace)
         } catch (error) {
-          console.error(`[washi] routines in workspace ${id} failed to tick`, error)
+          console.error(`[washi] workspace ${id} failed to tick`, error)
         }
       }
     } catch (error) {
