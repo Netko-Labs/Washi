@@ -53,6 +53,9 @@ export function linkColumn(ws: Workspace, input: LinkColumnInput): LinkColumnRes
     table: source.name,
     limit: ALL_ROWS,
   }).rows
+  if (rows.length >= ALL_ROWS || ids.size >= ALL_ROWS) {
+    throw new InkError(`too many rows to link in one step (${ALL_ROWS} or more); nothing changed`)
+  }
   const valuesOf = (cell: Cell | undefined) =>
     (Array.isArray(cell) ? cell : [cell]).filter(
       (value): value is string => typeof value === 'string' && value.trim() !== '',
