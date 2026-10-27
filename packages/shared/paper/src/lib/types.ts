@@ -104,3 +104,15 @@ export interface SelectProps extends BlockProps {
   /** An empty choice that clears the state, so every view filtered on it shows everything. */
   all?: string
 }
+
+/** One bar, slice or point of a chart: its label and its number. */
+export interface ChartPoint {
+  label: string
+  value: number
+}
+
+export interface ChartBarsProps {
+  points: ChartPoint[]
+  colors: readonly string[]
+  locale?: string
+}

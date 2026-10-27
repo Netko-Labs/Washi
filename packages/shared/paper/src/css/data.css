@@ -98,6 +98,84 @@
   width: 100%;
   height: clamp(150px, 30cqw, 240px);
 }
+/* Bars: label · track · figure on one line each, so long names and big numbers both fit. */
+.wsx-bars {
+  display: grid;
+  grid-template-columns: minmax(72px, max-content) 1fr auto;
+  align-items: center;
+  gap: 8px 12px;
+  font-size: 13px;
+}
+.wsx-bar {
+  display: contents;
+}
+.wsx-bar-label {
+  max-width: 200px;
+  overflow: hidden;
+  color: var(--muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wsx-bar-track {
+  height: 14px;
+  border-radius: 999px;
+  background: var(--muted-bg);
+  overflow: hidden;
+}
+.wsx-bar-track i,
+.wsx-column-track i {
+  display: block;
+  border-radius: inherit;
+  transition:
+    width 260ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    height 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.wsx-bar-track i {
+  height: 100%;
+}
+.wsx-bar-figure,
+.wsx-column-figure {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+/* Columns, for short labels — months, days. */
+.wsx-columns {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  height: clamp(160px, 30cqw, 240px);
+  font-size: 12px;
+}
+.wsx-column {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.wsx-column-track {
+  display: flex;
+  flex: 1;
+  align-items: flex-end;
+  width: min(100%, 44px);
+}
+.wsx-column-track i {
+  width: 100%;
+  border-radius: 6px 6px 3px 3px;
+}
+.wsx-column-label {
+  color: var(--muted);
+}
+@media (prefers-reduced-motion: reduce) {
+  .wsx-bar-track i,
+  .wsx-column-track i {
+    transition: none;
+  }
+}
+
 .wsx-chart-legend {
   display: flex;
   flex-wrap: wrap;
