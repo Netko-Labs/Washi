@@ -32,4 +32,9 @@ describe('a Task ticks the column it names', () => {
     expect(() => toggleTaskRecord(ws, billId, true, 'amount')).toThrow('not a checkbox column')
     expect(() => toggleTaskRecord(ws, billId, true, 'payd')).toThrow('not a checkbox column')
   })
+
+  test('a bare Task names nothing and is never refused, even where no done column exists', () => {
+    expect(() => toggleTaskRecord(ws, billId, true)).not.toThrow()
+    expect(paidOf()).toBe(false)
+  })
 })
