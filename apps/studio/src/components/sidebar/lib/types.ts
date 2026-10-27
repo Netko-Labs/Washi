@@ -33,6 +33,12 @@ export interface SidebarProps {
   drawer?: boolean
 }
 
+export interface SidebarToggleProps {
+  open: boolean
+  onClick: () => void
+  onPointerEnter?: () => void
+}
+
 export interface BackHomeProps {
   workspaceId: string
 }

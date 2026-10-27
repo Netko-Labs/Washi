@@ -67,7 +67,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   drop lands and refuses a page into its own subtree), Routines, Trash, and the workspace footer:
   the name switches workspaces in place (the shell is keyed by workspace id and the route has
   `gcTime: 0`, so every switch reruns the loader and the route effects), the avatar holds theme ·
-  settings · sign out. The sidebar **folds** (D59): `⌘\`, a » in the header while folded, the
+  settings · sign out. The sidebar **folds** (D59): `⌘\` or its toggle (`SidebarToggle`, top-left at the same pixel open or folded, as
+  claude.ai has it; hovering it folded peeks, a click pins), the
   left edge peeks it as an overlay, remembered per workspace (`washi:fold:<id>`). Under `md`
   `NarrowShell` shows the same Home (the dashboard) and pages as the desktop, one at a time; a page
   has ‹ back, and ☰ or a swipe in from the left edge opens the whole sidebar as a full-screen menu

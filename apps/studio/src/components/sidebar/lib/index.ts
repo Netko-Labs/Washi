@@ -11,6 +11,7 @@ export type {
   SidebarPageRowProps,
   SidebarProps,
   SidebarSectionProps,
+  SidebarToggleProps,
 } from './types'
 export { openInPlace, pushRecent, readRecents, relativeAge, writeRecents } from './utils'
 export { LABEL, PLACES, ROW, ROW_ON } from './values'
