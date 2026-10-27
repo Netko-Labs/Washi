@@ -68,10 +68,12 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   the name switches workspaces in place (the shell is keyed by workspace id and the route has
   `gcTime: 0`, so every switch reruns the loader and the route effects), the avatar holds theme ·
   settings · sign out. The sidebar **folds** (D59): `⌘\`, a » in the header while folded, the
-  left edge peeks it as an overlay, remembered per workspace (`washi:fold:<id>`). Under `md` there
-  is no drawer: `NarrowShell` makes the sidebar the Home screen (places as top tabs, Recents as
-  cards, 48px rows) and the ask field a bottom bar whose ✎ is New page on Home and Edit on a page;
-  a page opens with ‹ back. `useIsNarrow` picks the shell; the workspace routes never SSR.
+  left edge peeks it as an overlay, remembered per workspace (`washi:fold:<id>`). Under `md`
+  `NarrowShell` makes the sidebar the Home screen (places as top tabs, Recents as cards, 48px rows)
+  and the ask field a bottom bar whose ✎ is New page on Home and Edit on a page; a page opens with
+  ‹ back, and ☰ or a swipe in from the left edge slides the whole sidebar over it (`MobileDrawer`,
+  D80; swiped back left to close). Gestures are `useSwipe` (`components/shared/gestures`): touch
+  events, axis-locked, far-or-fast commits; a phone's peek is a sheet its bar pulls down. `useIsNarrow` picks the shell; the workspace routes never SSR.
 - `apps/desktop` — mirin shell: window, menu, icon, Develop menu. `src/bun/` (main) boots the
   embedded runtime and serves `appRouter` via `createMirinBridge`; the renderer's `api` is a tRPC
   client over `mirinLink`. No port, no token.
@@ -326,6 +328,11 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   Never hand agents fs/shell/raw SQL. `web_search` is tsuru's `exaSearch`: hosted runs on the
   workspace's Exa key (`organization_integration`, sealed like BYOK, `Settings → Agent → Web
   search`); embedded reads `EXA_API_KEY`. No key → the tool answers with where one goes.
+- **Primitives fit any width (D80).** Paper reads the sheet's own width (`@container wsx`), never
+  the window — a phone, the agent panel and a peek reflow alike (`css/narrow.css`): ≤520 a Table
+  stacks into cards (first column the title, `data-label` the rest), ≤480 ledger rows wrap, bars put
+  the label over the track, a Form goes one column; ≤400 stats sit two to a row. Coarse pointers get
+  44px targets and 16px inputs.
 - WSX is inert data: registry primitives, literal props, the closed `expr` grammar only. Components
   own appearance (four enums: `variant tone size emphasis`); pages own content. Validation before
   persist and before render. Format reference: `docs/wsx-primitives.html`.

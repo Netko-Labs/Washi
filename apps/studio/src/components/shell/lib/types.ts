@@ -21,9 +21,16 @@ export interface ShellState {
   setFolded: (folded: boolean) => void
   toggleFold: () => void
   setPeeking: (peeking: boolean) => void
+  /** Under `md`: the whole sidebar slid over the page from the ☰ button or the left edge. */
+  drawer: boolean
+  setDrawer: (drawer: boolean) => void
 }
 
 export interface FoldState {
   folded: boolean
   peeking: boolean
+}
+
+export interface MobileDrawerProps {
+  workspace: WorkspaceSummary
 }

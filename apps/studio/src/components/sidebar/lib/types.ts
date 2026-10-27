@@ -29,6 +29,8 @@ export interface SidebarProps {
   peeking: boolean
   onFold: () => void
   onPeekEnd: () => void
+  /** Slid over a phone's page: full height, a touch wider, no fold to remember. */
+  drawer?: boolean
 }
 
 export interface MobileHomeProps {

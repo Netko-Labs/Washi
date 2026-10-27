@@ -1,0 +1,161 @@
+/*
+ * Small pages. Every rule here reads the sheet's own width (`@container wsx`), never the window,
+ * so a phone, the agent panel and a peek all reflow the same way.
+ */
+
+/* ≤ 520: a table becomes a stack of cards — its first column the card's title, the rest label · value. */
+@container wsx (max-width: 520px) {
+  .wsx-table-wrap {
+    overflow: visible;
+    border: 0;
+    background: none;
+    box-shadow: none;
+  }
+  .wsx-table,
+  .wsx-table tbody,
+  .wsx-table tr,
+  .wsx-table td {
+    display: block;
+    width: 100%;
+  }
+  .wsx-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .wsx-table tbody tr {
+    margin-bottom: 10px;
+    padding: 4px 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--r-card);
+    background: var(--card);
+    box-shadow: var(--shadow-card);
+  }
+  .wsx-table tbody tr:hover td {
+    background: none;
+  }
+  .wsx-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    padding: 8px 0;
+    text-align: right;
+  }
+  .wsx-table td::before {
+    content: attr(data-label);
+    flex: none;
+    color: var(--muted);
+    font-size: 12.5px;
+    font-weight: 500;
+    text-align: left;
+  }
+  .wsx-table td:first-child {
+    padding-top: 12px;
+    font-size: 15px;
+    text-align: left;
+  }
+  .wsx-table td:first-child::before {
+    content: none;
+  }
+  .wsx-table tr:last-child td {
+    border-bottom: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
+  }
+  .wsx-table tr td:last-child {
+    border-bottom: 0;
+  }
+}
+
+/* ≤ 480: a ledger line puts its name on top and the rest under it, the last control at the end. */
+@container wsx (max-width: 480px) {
+  .wsx-repeat:has(> .wsx-row):not(:has(> .wsx-row > .wsx-card)) > .wsx-row {
+    row-gap: 8px;
+    padding-block: 12px;
+  }
+  .wsx-repeat:has(> .wsx-row):not(:has(> .wsx-row > .wsx-card)) > .wsx-row > :first-child {
+    flex-basis: 100%;
+  }
+  .wsx-repeat:has(> .wsx-row):not(:has(> .wsx-row > .wsx-card)) > .wsx-row > :last-child {
+    margin-left: auto;
+  }
+
+  /* Bars: each its own block — label and figure on a line, the track under them. */
+  .wsx-bars {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .wsx-bar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "label figure" "track track";
+    gap: 6px 12px;
+  }
+  .wsx-bar > * {
+    padding-block: 0;
+  }
+  .wsx-bar-label {
+    grid-area: label;
+  }
+  .wsx-bar-figure {
+    grid-area: figure;
+  }
+  .wsx-bar-track {
+    grid-area: track;
+  }
+  .wsx-columns {
+    gap: 6px;
+  }
+
+  .wsx-form {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    padding: 16px;
+  }
+  .wsx-form-actions {
+    margin: 2px -16px -16px;
+    padding: 12px 16px;
+  }
+  .wsx-form-actions .wsx-button {
+    flex: 1;
+  }
+
+  .wsx-select-row {
+    display: flex;
+    width: 100%;
+  }
+  .wsx-select {
+    flex: 1;
+  }
+}
+
+/* ≤ 400: stats sit two to a row instead of one huge number per screen. */
+@container wsx (max-width: 400px) {
+  .wsx-grid:has(> .wsx-stat) {
+    row-gap: 18px;
+  }
+  .wsx-grid > .wsx-stat {
+    grid-column: span 6;
+  }
+  .wsx-stat-value {
+    font-size: calc(26px * var(--sz));
+  }
+}
+
+/* Fingers: 44px targets, inputs that never zoom the page. */
+@media (pointer: coarse) {
+  .wsx-task[data-toggle] {
+    height: calc(34px * var(--sz));
+    padding-inline: 9px 13px;
+  }
+  .wsx-field-input,
+  .wsx-button {
+    min-height: 44px;
+  }
+  .wsx-field-input {
+    font-size: 16px;
+  }
+}
