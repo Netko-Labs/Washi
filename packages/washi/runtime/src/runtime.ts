@@ -3,6 +3,7 @@ import {
   createFileStore,
   createWorkspaceRegistry,
   localBlobStore,
+  routedBlobStore,
   type Workspace,
 } from '@washi/repository'
 import {
@@ -13,6 +14,7 @@ import {
 } from '@washi/service'
 import { createEventBus, createPresenceBoard, type ResolvedWorkspace } from '@washi/trpc'
 import { watchAgentWrites } from './agent-watch'
+import { workspaceBuckets } from './buckets'
 import { DEFAULT_WORKSPACE_ID } from './constants'
 import type { Runtime, RuntimeOptions } from './types'
 
@@ -28,6 +30,9 @@ export function createRuntime(options: RuntimeOptions): Runtime {
   const registry = createWorkspaceRegistry((id) => join(options.dataDir, `${id}.db`))
   const blobs =
     options.blobs ?? ((id: string) => localBlobStore(join(options.dataDir, `${id}.files`)))
+  const ownBucket = options.workspaceStorage ? workspaceBuckets(options.workspaceStorage) : null
+  const blobsOf = (id: string) =>
+    ownBucket ? routedBlobStore(() => ownBucket(id), blobs(id)) : blobs(id)
   const hosts = new Map<string, ResolvedWorkspace>()
 
   const attachHost = (workspace: Workspace): ResolvedWorkspace => {
@@ -55,7 +60,7 @@ export function createRuntime(options: RuntimeOptions): Runtime {
     })
     host.setPeople(() => options.control.listMembers(workspaceId))
     host.setSearchKey(() => options.searchKey?.(workspaceId) ?? Promise.resolve(null))
-    const files = createFileStore(workspace, blobs(workspaceId))
+    const files = createFileStore(workspace, blobsOf(workspaceId))
     host.setFiles(files)
     return { workspace, host, files }
   }

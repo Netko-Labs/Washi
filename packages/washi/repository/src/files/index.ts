@@ -1,4 +1,6 @@
 export { localBlobStore } from './local'
+export { ProbeMismatchError, probeBlobStore } from './probe'
+export { routedBlobStore } from './routed'
 export { s3BlobStores } from './s3'
 export { createFileStore } from './store'
 export type { BlobStore, BlobStoreFactory, FileStore, S3BlobOptions, StoredFile } from './types'

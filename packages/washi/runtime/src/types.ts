@@ -1,6 +1,6 @@
-import type { BlobStoreFactory } from '@washi/repository'
+import type { BlobStore, BlobStoreFactory } from '@washi/repository'
 import type { StoredKey } from '@washi/service'
-import type { ControlPlane, ServerMode, ServerRuntime } from '@washi/trpc'
+import type { ControlPlane, ServerMode, ServerRuntime, StorageConfig } from '@washi/trpc'
 
 export interface RuntimeOptions {
   mode: ServerMode
@@ -16,6 +16,8 @@ export interface RuntimeOptions {
   searchKey?: (workspaceId: string) => Promise<string | null>
   /** Where a workspace's files go. Absent: a folder beside its .db (D60). */
   blobs?: BlobStoreFactory
+  /** Hosted only: a workspace's own bucket, which takes its new uploads in front of `blobs`. */
+  workspaceStorage?: (workspaceId: string) => Promise<StorageConfig | null>
 }
 
 export interface HostedSecrets {
@@ -31,4 +33,10 @@ export interface BootedRuntime {
   dataDir: string
   trustedOrigins: string[]
   stop(): Promise<void>
+}
+
+/** A workspace's bucket client and the config it was built from, serialised to compare. */
+export interface BuiltBucket {
+  config: string
+  store: BlobStore
 }

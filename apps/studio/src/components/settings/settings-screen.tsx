@@ -7,6 +7,7 @@ import { PreferencesSection } from './preferences-section'
 import { ProfileSection } from './profile-section'
 import { ServerTab } from './server-tab'
 import { SettingsTabs } from './settings-tabs'
+import { StorageSection } from './storage-section'
 
 /** Every section in one column: whose it is as pills (yours, the team's, Washi's, the server's), then its tabs. */
 export function SettingsScreen({ workspaceId, tab, onTab }: SettingsScreenProps) {
@@ -32,6 +33,7 @@ export function SettingsScreen({ workspaceId, tab, onTab }: SettingsScreenProps)
           {shown === 'preferences' && <PreferencesSection />}
           {shown === 'general' && <GeneralSection workspaceId={workspaceId} />}
           {shown === 'people' && <PeopleSection workspaceId={workspaceId} />}
+          {shown === 'storage' && <StorageSection />}
           {shown === 'emojis' && <EmojisSection />}
           {(shown === 'models' || shown === 'outside' || shown === 'usage') && (
             <AgentTab part={shown} />

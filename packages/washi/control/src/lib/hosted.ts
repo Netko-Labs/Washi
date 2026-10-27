@@ -26,7 +26,8 @@ import { createAuth } from './auth'
 import { type ControlDB, createControlDb } from './client'
 import { open, seal } from './crypto'
 import { isInstanceAdmin, setSignupMode, signupMode } from './instance'
-import type { ControlPlaneOptions } from './types'
+import { createStorageStore } from './storage'
+import type { ControlPlaneOptions, HostedStorageStore } from './types'
 
 const AUTH_PREFIX = '/api/auth'
 
@@ -34,6 +35,7 @@ export interface HostedControlPlane extends ControlPlane {
   db: ControlDB
   secrets: SecretStore
   instance: InstanceStore
+  storage: HostedStorageStore
   /** Decrypted, for the agent host only — never for a route. */
   agentKey(workspaceId: string): Promise<AgentCredentialOut | null>
   setAgentKey(
@@ -89,6 +91,7 @@ export function createHostedControlPlane(options: ControlPlaneOptions): HostedCo
       signup: () => signupMode(db),
       setSignup: (mode) => setSignupMode(db, mode),
     },
+    storage: createStorageStore(db, options.masterKey),
 
     async authenticate(request) {
       const result = await auth.api.getSession({ headers: request.headers })

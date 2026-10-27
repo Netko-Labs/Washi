@@ -166,6 +166,15 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   routes gated like a workspace procedure (`src/server/files.ts`); `files.remove` is tRPC. A
   purge frees the uploads its pages' covers and icons pointed at (`trashedUploads`). The desktop
   renders no covers or uploaded icons yet.
+- **A workspace may bring its own bucket (D70).** Settings → Workspace → Storage: endpoint,
+  region, bucket, folder and a key pair, in the control plane's `organization_storage` (the
+  pair sealed like BYOK, only the key id's last four shown; `storage.*`, writes `ownerProcedure`).
+  `storage.set` re-runs `storage.test` (`testStorage`: put, read back, delete a probe under
+  `<folder>/<workspace>/`) and refuses unless it passes. New uploads go to that bucket; a read
+  tries it, then the server's store (`routedBlobStore`), so nothing moves or is deleted on a
+  switch. A change lands on the next upload, no restart (`workspaceBuckets` rebuilds when the
+  config reads differently; the control plane caches the opened config until `set`/`remove`).
+  After Remove, files that landed in the bucket no longer open. Embedded has no storage store.
 - Typing into a page (studio `page-editor`) edits the sheet's **top level** as blocks: plain-text
   Title/Text/List/Item/Quote/Callout/Code/Divider become typed blocks; anything else (or text with
   inline marks) stays a locked block, kept byte-for-byte. `/` also drops live blocks in as locked
@@ -271,8 +280,9 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
 - **Settings is grouped by whose it is (D69):** one column, the groups as sliding pills and each
   group's sections as tabs under them — Account (Profile — `auth.updateUser`; Preferences —
   the theme, one `useTheme` store in `components/shared/theme`), Workspace (General — rename through
-  `auth.organization.update`, owners and admins; People; Emojis — D71), Washi (Models · What
-  leaves · Usage · Routines), Server (the app admin's). `?tab=` names the section; an unknown one (the old `agent`)
+  `auth.organization.update`, owners and admins; People; Storage — D70; Emojis — D71), Washi
+  (Models · What leaves · Usage · Routines), Server (the app admin's). `?tab=` names the section;
+  an unknown one (the old `agent`)
   lands on Models. **The team's models** are app meta `agent_enabled_models` (`EnabledModel[]`, id +
   the catalogue's name, per provider; none for the key's provider = the recommended three), set by owners (`agents.setEnabledModels`)
   and read by the composer's model chip through `agents.settings`. Menus and pickers in the studio

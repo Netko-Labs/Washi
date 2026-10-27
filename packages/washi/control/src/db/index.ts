@@ -4,6 +4,7 @@ export {
   member,
   organization,
   organizationSecret,
+  organizationStorage,
   session,
   user,
   verification,

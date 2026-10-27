@@ -14,7 +14,7 @@ export interface S3BlobOptions {
   accessKeyId: string
   secretAccessKey: string
   /** A prefix inside the bucket, so one bucket can hold more than Washi. */
-  prefix?: string
+  prefix?: string | null
 }
 
 export interface StoredFile {

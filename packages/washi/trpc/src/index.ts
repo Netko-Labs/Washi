@@ -10,6 +10,7 @@ import { liveRouter } from './routers/live'
 import { modelsRouter } from './routers/models'
 import { routinesRouter } from './routers/routines'
 import { sheetsRouter } from './routers/sheets'
+import { storageRouter } from './routers/storage'
 import { systemRouter } from './routers/system'
 import { tablesRouter } from './routers/tables'
 import { workspacesRouter } from './routers/workspaces'
@@ -23,6 +24,7 @@ export const appRouter = router({
   sheets: sheetsRouter,
   comments: commentsRouter,
   files: filesRouter,
+  storage: storageRouter,
   emojis: emojisRouter,
   tables: tablesRouter,
   agents: agentsRouter,
@@ -76,4 +78,5 @@ export {
   type PagePresence,
   type PresenceBoard,
 } from './shared/presence'
+export type { StorageConfig, StorageInfo, StorageStore } from './shared/storage'
 export { closeAllPeers, createTRPCWebSocketHooks, type PeerLike } from './ws'

@@ -132,6 +132,20 @@ export async function ensureControlSchema(db: ControlDB): Promise<void> {
     )`)
 
   await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS "organization_storage" (
+      organization_id TEXT PRIMARY KEY REFERENCES "organization"(id) ON DELETE CASCADE,
+      endpoint TEXT NOT NULL,
+      region TEXT NOT NULL,
+      bucket TEXT NOT NULL,
+      prefix TEXT,
+      ciphertext TEXT NOT NULL,
+      iv TEXT NOT NULL,
+      key_last4 TEXT NOT NULL,
+      updated_by TEXT REFERENCES "user"(id) ON DELETE SET NULL,
+      updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+    )`)
+
+  await db.execute(sql`
     CREATE TABLE IF NOT EXISTS "instance_setting" (
       key TEXT PRIMARY KEY,
       value TEXT NOT NULL,

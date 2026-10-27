@@ -16,6 +16,7 @@ import {
 } from '@washi/service'
 import type { EventBus } from './shared/events'
 import type { PresenceBoard } from './shared/presence'
+import type { StorageStore } from './shared/storage'
 
 /**
  * Deployment mode. Asserted once at boot, never per request (C2) — two auth
@@ -113,6 +114,7 @@ export interface ControlPlane {
   /** Absent in embedded mode: there is no BYOK, the machine's own env supplies the key. */
   secrets?: SecretStore
   instance?: InstanceStore
+  storage?: StorageStore
   close(): Promise<void>
 }
 

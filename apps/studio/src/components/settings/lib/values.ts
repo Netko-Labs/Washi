@@ -1,5 +1,6 @@
 import {
   IconAdjustments,
+  IconBucket,
   IconBuildingCommunity,
   IconGauge,
   IconMoodSmile,
@@ -86,6 +87,12 @@ export const SETTINGS_GROUPS: SettingsGroup[] = [
         desc: 'Who is in this workspace, and who is invited.',
       },
       {
+        key: 'storage',
+        label: 'Storage',
+        icon: IconBucket,
+        desc: 'Where the covers, icons and pictures people upload are kept.',
+      },
+      {
         key: 'emojis',
         label: 'Emojis',
         icon: IconMoodSmile,
@@ -134,6 +141,7 @@ export const SETTINGS_TAB_KEYS = [
   'preferences',
   'general',
   'people',
+  'storage',
   'emojis',
   'models',
   'outside',
