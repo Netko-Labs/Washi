@@ -1,4 +1,5 @@
 import { Background, Controls, ReactFlow, ReactFlowProvider } from '@xyflow/react'
+import { reachOf } from '../../lib'
 import { usePaperHost } from '../../provider'
 import { IdeaNode } from './idea-node'
 import {
@@ -32,7 +33,7 @@ function CanvasFlow({ node }: CanvasProps) {
 
   return (
     <CanvasContext.Provider value={actions}>
-      <div className="wsx-canvas">
+      <div className="wsx-canvas" data-width={reachOf(node.props.width)}>
         <ReactFlow
           nodes={flow.nodes}
           edges={flow.edges}

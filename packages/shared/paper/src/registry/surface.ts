@@ -7,6 +7,8 @@ export const SIZES = ['sm', 'md', 'lg'] as const
 export const EMPHASES = ['quiet', 'normal', 'strong'] as const
 export const GAPS = ['tight', 'normal', 'loose'] as const
 export const FEELS = ['note', 'editorial', 'board', 'deck'] as const
+/** How far a wide block reaches past the text column: not at all, a little, to the sheet's edges. */
+export const WIDTHS = ['page', 'wide', 'full'] as const
 export const THEME_IDS = [
   'washi',
   'sumi',
@@ -24,6 +26,7 @@ export const sizeSchema = z.enum(SIZES)
 export const emphasisSchema = z.enum(EMPHASES)
 export const gapSchema = z.enum(GAPS)
 export const feelSchema = z.enum(FEELS)
+export const widthSchema = z.enum(WIDTHS)
 export const themeIdSchema = z.enum(THEME_IDS)
 
 const FLOW = ['row', 'col', 'wrap', 'nowrap', 'grid-2', 'grid-3', 'grid-4']
@@ -131,7 +134,8 @@ export const STYLE_PROP_HINTS: Record<string, string> = {
   font: 'type is selected by role — Title level, Text size',
   fontSize: 'use size',
   weight: 'use emphasis',
-  width: 'measure belongs to the Sheet — use span inside Grid',
+  width:
+    'only wide blocks take width (page · wide · full): Board Agenda Table Database Roadmap Chart Canvas Grid — elsewhere use span inside Grid',
   height: 'not addressable',
   margin: 'rhythm belongs to the parent — use Section, Stack or gap',
   padding: 'padding belongs to the component — use size',
