@@ -26,7 +26,12 @@ export {
   resolveApproval,
   updateSession,
 } from './storage/agents'
-export { listChanges, listRecordChanges, type RecordChange } from './storage/changes'
+export {
+  listChanges,
+  listRecordChanges,
+  type RecordChange,
+  recordCreatedMs,
+} from './storage/changes'
 export { searchChats } from './storage/chat-search'
 export {
   type DrizzleDB,

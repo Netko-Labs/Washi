@@ -1,9 +1,17 @@
 import type { RowActivity, RowChange, RowFieldChange } from '@washi/domain'
 import type { RecordData, TableSpec } from '@washi/ink'
-import { findRecordTableId, listRecordChanges, listTables, type Workspace } from '@washi/repository'
+import {
+  findRecordTableId,
+  listRecordChanges,
+  listTables,
+  recordCreatedMs,
+  type Workspace,
+} from '@washi/repository'
 import { InkError } from './errors'
 
 const DEFAULT_LIMIT = 20
+/** A first version this long after the row was made is a backfilled snapshot, not its creation. */
+const SNAPSHOT_AFTER_MS = 1000
 
 /** Formulas and rollups are worked out on read, never stored — so they never change. */
 function computedNames(spec: TableSpec): Set<string> {
@@ -32,8 +40,17 @@ export function rowActivity(ws: Workspace, recordId: string, limit = DEFAULT_LIM
   const skipped = computedNames(table.spec)
 
   const changes: RowChange[] = []
+  const createdMs = recordCreatedMs(ws, recordId)
   let previous: RecordData | null = null
-  for (const { data, atMs, author } of listRecordChanges(ws, recordId)) {
+  for (const [index, { data, atMs, author }] of listRecordChanges(ws, recordId).entries()) {
+    // Rows older than the change log were backfilled from their last edit: that version is only
+    // a baseline to diff against, never "added this row" at a time it wasn't.
+    const isSnapshot =
+      index === 0 && data !== null && createdMs !== null && atMs - createdMs > SNAPSHOT_AFTER_MS
+    if (isSnapshot) {
+      previous = data
+      continue
+    }
     const kind = data === null ? 'deleted' : previous === null ? 'created' : 'edited'
     const fields = data === null ? [] : diff(previous ?? {}, data, skipped)
     if (kind === 'created' || kind === 'deleted' || fields.length > 0) {

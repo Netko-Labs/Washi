@@ -93,6 +93,23 @@ describe('a row says who changed it, when, and from what (D78)', () => {
     expect(rowActivity(ws, water).changes[0]?.by).toBeNull()
   })
 
+  test('a backfilled snapshot is a baseline, never a fabricated "added this row"', () => {
+    // What backfillChanges leaves for a row the oplog never saw: one version, at its last edit.
+    ws.sqlite.query('DELETE FROM record_changes').run()
+    at(9)
+    ws.sqlite
+      .query(
+        'INSERT INTO record_changes (table_id, record_id, data, at_ms) SELECT table_id, id, data, ? FROM records',
+      )
+      .run(Date.now())
+    expect(rowActivity(ws, water).changes).toEqual([])
+    at(10)
+    toggleTaskRecord(ws, water, true, 'paid', 'juan')
+    const [paid] = rowActivity(ws, water).changes
+    expect(paid?.kind).toBe('edited')
+    expect(paid?.fields).toEqual([{ column: 'paid', from: null, to: true }])
+  })
+
   test('newest first, cut at the limit, and says when there is more', () => {
     for (const amount of [31, 32, 33, 34]) {
       runMutation(

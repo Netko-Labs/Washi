@@ -59,3 +59,11 @@ export function listRecordChanges(ws: Workspace, recordId: string): RecordChange
       .all(recordId) as ChangeRow[]
   ).map(toChange)
 }
+
+/** When the row was made, in ms — what tells a real first version from a snapshot taken later. */
+export function recordCreatedMs(ws: Workspace, recordId: string): number | null {
+  const row = ws.sqlite.query('SELECT hlc_created FROM records WHERE id = ?').get(recordId) as {
+    hlc_created: string
+  } | null
+  return row ? Number(row.hlc_created.slice(0, 14)) : null
+}
