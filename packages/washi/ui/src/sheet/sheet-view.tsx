@@ -3,8 +3,8 @@ import { SheetIcon } from '../sheet-icon'
 import { type SheetViewProps, usePageSheet } from './lib'
 import { SheetEmpty, SheetFailed, SheetLoading, SheetMissing } from './sheet-states'
 
-export function SheetView({ chrome, look, footer, body: Body }: SheetViewProps) {
-  const { summary, state, host } = usePageSheet()
+export function SheetView({ sheetId, chrome, look, footer, body: Body }: SheetViewProps) {
+  const { summary, state, host } = usePageSheet(sheetId)
 
   if (state.status === 'idle') return <SheetEmpty />
   if (state.status === 'loading') return <SheetLoading />

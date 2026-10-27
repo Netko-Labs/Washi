@@ -6,9 +6,10 @@ import type { PageSheet } from '../types'
 import { pageWriter } from '../utils'
 import { useSheet } from './use-sheet'
 
-/** The open page, and a host that can write parts of it back — what a hand-drawn canvas needs. */
-export function usePageSheet(): PageSheet {
-  const pageId = useViewStore((state) => noteIdOf(state.activeTab))
+/** The open page (or `sheetId`), and a host that can write parts of it back — what a canvas needs. */
+export function usePageSheet(sheetId?: string): PageSheet {
+  const activeId = useViewStore((state) => noteIdOf(state.activeTab))
+  const pageId = sheetId ?? activeId
   const summary = useSheetsStore((state) => state.sheets.find((sheet) => sheet.id === pageId))
   const state = useSheet(pageId, summary?.hlcUpdated)
 

@@ -55,7 +55,9 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   Pages are routes: `/sign-in?redirect=`, `/workspaces?invite=`, `/new` (a new workspace: name it ·
   start it · invite people, then the workspace's first run wakes Washi), `/s/$workspaceId/$token` (a
   page's read-only link, no session — D65), `/w/$workspaceId` (dashboard),
-  `/p/$pageId`, `/inbox`, `/chats` · `/chats/new` · `/chats/$chatId` (D67), `/routines` · `/routines/$id` (D68), `/settings?tab=`, `/trash`. The workspace loader resets the shared stores (child
+  `/p/$pageId`, `/inbox`, `/chats` · `/chats/new` · `/chats/$chatId` (D67), `/routines` · `/routines/$id` (D68), `/settings?tab=`, `/trash`. Any of them may carry `?peek=<page>`: a row
+  opened over it (D79, `RowPeek` — side or center, `washi:peek`; Back closes it). The shell
+  registers the peek with `useRowOpenerStore`; without one (the desktop) `openRow` opens a tab. The workspace loader resets the shared stores (child
   effects run before the layout's); routes mark their view active, and a page chosen anywhere
   pushes its URL (`useTabNavigation`). **No tab strip on the web (D58)** — the URL is the whole
   state; `TabStrip` is the desktop's. The sidebar is **Sidebar D (D57)**: the ask field (the

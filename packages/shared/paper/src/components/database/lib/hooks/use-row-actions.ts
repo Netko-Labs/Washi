@@ -19,7 +19,14 @@ export function useRowActions(table: string) {
   return {
     canOpen: Boolean(host.openRow),
     open: (id: string) => host.openRow?.(id),
-    addRow: (data: Record<string, string>) => run({ verb: 'table.insert', table, data }),
+    addRow: async (data: Record<string, string>) => {
+      if (!host.newRow) return run({ verb: 'table.insert', table, data })
+      try {
+        await host.newRow(table, data)
+      } finally {
+        refresh()
+      }
+    },
     addProperty: (name: string, type: ColumnSpec['type'], options: string[]) =>
       run({
         verb: 'table.column',
