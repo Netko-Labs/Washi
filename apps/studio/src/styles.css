@@ -37,6 +37,10 @@ body {
  * takes pinch-zoom from everyone. Unlayered, so it beats Tailwind's text-[…] utilities.
  */
 @media (max-width: 767px) {
+  /* Room under a page's last block for Washi's button, which sits over the corner on a phone. */
+  [data-sheet-id] {
+    padding-bottom: calc(88px + env(safe-area-inset-bottom));
+  }
   input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
   textarea,
   select,

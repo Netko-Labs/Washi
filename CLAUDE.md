@@ -69,10 +69,11 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   `gcTime: 0`, so every switch reruns the loader and the route effects), the avatar holds theme ·
   settings · sign out. The sidebar **folds** (D59): `⌘\`, a » in the header while folded, the
   left edge peeks it as an overlay, remembered per workspace (`washi:fold:<id>`). Under `md`
-  `NarrowShell` shows the same Home (the dashboard) and pages as the desktop, one at a time, with
-  the ask field a bottom bar whose ✎ is New page on Home and Edit on a page; a page has ‹ back, and
-  ☰ or a swipe in from the left edge opens the whole sidebar as a full-screen menu (`MobileDrawer`,
-  D80/D81; ✕, a swipe back left or a pick closes it). Gestures are `useSwipe` (`components/shared/gestures`): touch
+  `NarrowShell` shows the same Home (the dashboard) and pages as the desktop, one at a time; a page
+  has ‹ back, and ☰ or a swipe in from the left edge opens the whole sidebar as a full-screen menu
+  (`MobileDrawer`, D80–D82; drawn once and slid, never mounted on open; ✕, a swipe back left or a
+  pick closes it). The header keeps Edit and ⋯ (`NarrowHeaderActions`; comments, share, copy link and
+  the star fold into ⋯ as `PageMenuQuick`); Washi is the mascot FAB under the thumb, no bottom bar. Gestures are `useSwipe` (`components/shared/gestures`): touch
   events, axis-locked, far-or-fast commits; a phone's peek is a sheet its bar pulls down. `useIsNarrow` picks the shell; the workspace routes never SSR.
 - `apps/desktop` — mirin shell: window, menu, icon, Develop menu. `src/bun/` (main) boots the
   embedded runtime and serves `appRouter` via `createMirinBridge`; the renderer's `api` is a tRPC

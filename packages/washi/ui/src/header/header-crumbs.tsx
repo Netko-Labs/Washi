@@ -51,7 +51,12 @@ export function HeaderCrumbs() {
           </span>
         )}
       </nav>
-      {view === 'note' && active && <FavoriteStar sheetId={active.id} />}
+      {/* A phone's header has no room: the star is in the page's ⋯ there. */}
+      {view === 'note' && active && (
+        <span className="hidden @md:contents">
+          <FavoriteStar sheetId={active.id} />
+        </span>
+      )}
     </>
   )
 }

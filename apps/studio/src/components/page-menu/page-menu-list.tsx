@@ -9,15 +9,17 @@ import {
 import { useSheetsStore } from '@washi/ui'
 import { useEditorStore } from '@/components/page-editor'
 import type { PageMenuListProps } from './lib'
+import { PageMenuQuick } from './page-menu-quick'
 
 const ITEM =
   'flex h-8 w-full items-center gap-2.5 rounded-lg px-2 text-left text-[13px] hover:bg-accent'
 
-export function PageMenuList({ sheet, onMode, onDone }: PageMenuListProps) {
+export function PageMenuList({ sheet, onMode, onDone, compact }: PageMenuListProps) {
   const store = useSheetsStore.getState
 
   return (
     <div className="p-1">
+      {compact && <PageMenuQuick sheet={sheet} onMode={onMode} onDone={onDone} />}
       <button type="button" onClick={() => onMode('rename')} className={ITEM}>
         <IconCursorText className="size-4 text-muted-foreground" />
         Rename
