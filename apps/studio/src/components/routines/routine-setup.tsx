@@ -14,7 +14,9 @@ export function RoutineSetup({
   onSave,
   onRemove,
 }: RoutineSetupProps) {
-  const canSave = draft.prompt.trim().length > 0 && isChanged && !isSaving
+  // An emptied time box is "", which would save as midnight nobody chose.
+  const hasTime = draft.schedule.kind === 'custom' || /^\d{2}:\d{2}$/.test(draft.schedule.time)
+  const canSave = draft.prompt.trim().length > 0 && hasTime && isChanged && !isSaving
 
   return (
     <div className="grid gap-3">
