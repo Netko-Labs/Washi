@@ -1,7 +1,33 @@
-import { ARRAY_COLUMN_TYPES, type Filter, type TableSpec } from '@washi/ink'
-import { getTableByName, type Workspace } from '@washi/repository'
+import {
+  ARRAY_COLUMN_TYPES,
+  type Filter,
+  type RecordData,
+  type TableSpec,
+  validateRecord,
+} from '@washi/ink'
+import { findRecordTableId, getTableByName, type Workspace } from '@washi/repository'
 import { parseExpr, validateExpr } from '@washi/wsx'
 import { InkError } from './errors'
+
+/** Every id a relation cell names must be a live record of the table it points at. */
+function checkRelations(ws: Workspace, spec: TableSpec, data: RecordData): void {
+  for (const column of spec.columns) {
+    const ids = data[column.name]
+    if (column.type !== 'relation' || !Array.isArray(ids) || !column.table) continue
+    const target = getTableByName(ws, column.table)
+    if (!target) throw new InkError(`unknown table "${column.table}"`)
+    const stray = ids.find((id) => findRecordTableId(ws, id) !== target.id)
+    if (stray) throw new InkError(`${column.name}: no record "${stray}" in "${column.table}"`)
+  }
+}
+
+export function checkData(ws: Workspace, spec: TableSpec, data: RecordData): void {
+  const issues = validateRecord(spec, data)
+  if (issues.length > 0) {
+    throw new InkError(issues.map((issue) => `${issue.path}: ${issue.message}`).join('; '))
+  }
+  checkRelations(ws, spec, data)
+}
 
 const LIST_OPS: ReadonlySet<Filter['op']> = new Set(['eq', 'ne', 'contains', 'in'])
 

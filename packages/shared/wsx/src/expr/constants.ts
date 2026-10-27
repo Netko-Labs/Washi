@@ -5,7 +5,7 @@ export const EXPR_MAX_SOURCE_LENGTH = 512
 export const MS_PER_DAY = 86_400_000
 
 export const AGGREGATE_NAMES = ['count', 'sum', 'avg', 'min', 'max'] as const
-export const FUNCTION_NAMES = ['now', 'days', 'month', 'year', 'when'] as const
+export const FUNCTION_NAMES = ['now', 'days', 'month', 'year', 'when', 'add_months'] as const
 
 /** How many arguments each function takes. */
 export const FUNCTION_ARITY: Record<(typeof FUNCTION_NAMES)[number], number> = {
@@ -14,6 +14,7 @@ export const FUNCTION_ARITY: Record<(typeof FUNCTION_NAMES)[number], number> = {
   month: 1,
   year: 1,
   when: 3,
+  add_months: 2,
 }
 export const KEYWORDS = ['and', 'or', 'not', 'where', 'true', 'false', 'null'] as const
 export const ROW_ARG = '$row'

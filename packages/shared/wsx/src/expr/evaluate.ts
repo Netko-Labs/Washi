@@ -195,6 +195,20 @@ function isoOf(value: Scalar): string | null {
   return ms === null ? null : new Date(ms).toISOString()
 }
 
+/** `n` whole months on, as `YYYY-MM-DD`; the 31st lands on the month's last day. */
+function addMonths(date: Scalar, months: Scalar): Scalar {
+  const iso = isoOf(date)
+  if (iso === null || months === null) return null
+  if (typeof months !== 'number' || !Number.isInteger(months)) {
+    throw new ExprEvalError(`add_months expects a whole number of months, got ${String(months)}`)
+  }
+  const from = new Date(iso)
+  const target = new Date(Date.UTC(from.getUTCFullYear(), from.getUTCMonth() + months, 1))
+  const lastDay = new Date(Date.UTC(target.getUTCFullYear(), target.getUTCMonth() + 1, 0))
+  target.setUTCDate(Math.min(from.getUTCDate(), lastDay.getUTCDate()))
+  return target.toISOString().slice(0, 10)
+}
+
 function call(node: Extract<ExprAst, { kind: 'call' }>, ctx: EvalContext, depth: number): Scalar {
   if (node.name === 'now') return ctx.scope.now
   const first = () => visit(node.args[0] as ExprAst, ctx, depth)
@@ -206,6 +220,9 @@ function call(node: Extract<ExprAst, { kind: 'call' }>, ctx: EvalContext, depth:
   if (node.name === 'year') {
     const iso = isoOf(first())
     return iso === null ? null : Number(iso.slice(0, 4))
+  }
+  if (node.name === 'add_months') {
+    return addMonths(first(), visit(node.args[1] as ExprAst, ctx, depth))
   }
   const from = toMs(visit(node.args[0] as ExprAst, ctx, depth))
   const to = toMs(visit(node.args[1] as ExprAst, ctx, depth))
