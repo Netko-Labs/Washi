@@ -21,9 +21,10 @@ const storage: StorageStore = {
     return saved
   },
   async set(_workspaceId, actorId, config) {
+    const { secretAccessKey: _secret, accessKeyId, ...rest } = config
     saved = {
-      ...config,
-      accessKeyLast4: config.accessKeyId.slice(-4),
+      ...rest,
+      accessKeyLast4: accessKeyId.slice(-4),
       updatedAt: new Date(),
       updatedBy: actorId,
     }

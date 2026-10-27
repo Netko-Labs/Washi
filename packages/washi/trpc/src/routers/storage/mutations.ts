@@ -2,9 +2,9 @@ import { TRPCError } from '@trpc/server'
 import { storageConfigSchema } from '@washi/domain'
 import { testStorage } from '@washi/service'
 import { ownerProcedure, router } from '../../init'
-import type { StorageStore } from '../../shared/storage'
+import type { PrivateAddressContext, StorageContext, StorageInfo } from '../../shared/storage'
 
-function requireStorage(ctx: { runtime: { control: { storage?: StorageStore } } }) {
+function requireStorage(ctx: StorageContext) {
   const { storage } = ctx.runtime.control
   if (!storage) {
     throw new TRPCError({
@@ -16,10 +16,7 @@ function requireStorage(ctx: { runtime: { control: { storage?: StorageStore } } 
 }
 
 /** Only the app admin may point a workspace at the server's own network (a MinIO beside it). */
-async function mayUsePrivate(ctx: {
-  actorId: string | null
-  runtime: { control: { instance?: { isAdmin(actorId: string): Promise<boolean> } } }
-}): Promise<boolean> {
+async function mayUsePrivate(ctx: PrivateAddressContext): Promise<boolean> {
   const { instance } = ctx.runtime.control
   return Boolean(ctx.actorId && instance && (await instance.isAdmin(ctx.actorId)))
 }
@@ -41,7 +38,17 @@ export const storageMutations = router({
       allowPrivate: await mayUsePrivate(ctx),
     })
     if (!result.ok) throw new TRPCError({ code: 'BAD_REQUEST', message: result.reason })
-    return storage.set(ctx.workspaceId, ctx.actorId, input)
+    const saved = await storage.set(ctx.workspaceId, ctx.actorId, input)
+    // Named field by field: whatever a store returns, the secret never rides back.
+    return {
+      endpoint: saved.endpoint,
+      region: saved.region,
+      bucket: saved.bucket,
+      prefix: saved.prefix,
+      accessKeyLast4: saved.accessKeyLast4,
+      updatedAt: saved.updatedAt,
+      updatedBy: saved.updatedBy,
+    } satisfies StorageInfo
   }),
   /** Back to the server's store. Files already in the bucket stay there, untouched. */
   remove: ownerProcedure.mutation(async ({ ctx }) => {

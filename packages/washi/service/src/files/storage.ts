@@ -1,7 +1,8 @@
+import { lookup } from 'node:dns/promises'
 import type { StorageConfig } from '@washi/domain'
 import { ProbeMismatchError, probeBlobStore, s3BlobStores } from '@washi/repository'
 import { isPrivateAddress } from '@washi/tsuru'
-import type { StorageTest } from './types'
+import type { StorageTest, StorageTestOptions } from './types'
 import { STORAGE_REFUSALS } from './values'
 
 const PROBE_TIMEOUT_MS = 15_000
@@ -14,9 +15,13 @@ const PROBE_TIMEOUT_MS = 15_000
 export async function testStorage(
   config: StorageConfig,
   workspaceId: string,
-  { allowPrivate = false, timeoutMs = PROBE_TIMEOUT_MS } = {},
+  {
+    allowPrivate = false,
+    timeoutMs = PROBE_TIMEOUT_MS,
+    resolve = resolveAll,
+  }: StorageTestOptions = {},
 ): Promise<StorageTest> {
-  if (!allowPrivate && isPrivateAddress(new URL(config.endpoint).hostname)) {
+  if (!allowPrivate && (await reachesInside(new URL(config.endpoint).hostname, resolve))) {
     return {
       ok: false,
       reason: 'That address is inside the server’s own network. Only the app admin can use one.',
@@ -43,6 +48,25 @@ export async function testStorage(
   } finally {
     clearTimeout(timer)
   }
+}
+
+/**
+ * The name as written and every address it resolves to. A name that does not resolve is left to
+ * the probe, which then fails in words. Resolution can change after this — the residual is DNS
+ * rebinding, the same open question tsuru has.
+ */
+async function reachesInside(
+  hostname: string,
+  resolve: (hostname: string) => Promise<string[]>,
+): Promise<boolean> {
+  const bare = hostname.replace(/^\[|\]$/g, '')
+  if (isPrivateAddress(bare)) return true
+  const addresses = await resolve(bare).catch(() => [])
+  return addresses.some((address) => isPrivateAddress(address))
+}
+
+async function resolveAll(hostname: string): Promise<string[]> {
+  return (await lookup(hostname, { all: true })).map(({ address }) => address)
 }
 
 function refusalOf(cause: unknown): string {

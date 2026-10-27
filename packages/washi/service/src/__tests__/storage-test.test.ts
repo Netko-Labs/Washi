@@ -84,3 +84,14 @@ describe('a private address is the server’s own network', () => {
     expect(result.ok ? '' : result.reason).toContain('app admin')
   })
 })
+
+describe('a name that resolves inside is inside too', () => {
+  test('a public-looking host pointing at a private address is refused', async () => {
+    const result = await testStorage(
+      { ...config('open'), endpoint: 'https://bucket.example.test' },
+      'w1',
+      { resolve: async () => ['10.0.0.5'] },
+    )
+    expect(result.ok ? '' : result.reason).toContain('app admin')
+  })
+})
