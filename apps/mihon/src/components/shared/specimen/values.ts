@@ -163,6 +163,15 @@ export const SPECIMENS: Record<string, Specimen> = {
       placeholder: 'Add a task',
     },
   },
+  Form: {
+    props: {
+      table: 'tasks',
+      fields: ['title', 'priority', 'due', 'points', 'blocked'],
+      defaults: { status: 'todo', done: false },
+      submit: 'Add task',
+    },
+    wrap: `<Here /><Repeat bind={{ table: 'tasks', where: [{ column: 'status', op: 'eq', value: 'todo' }] }}><Text>$row.title · $row.priority</Text></Repeat>`,
+  },
   Task: { children: '$row.title', wrap: `<Repeat ${TASKS}><Here /></Repeat>` },
   Switch: { props: { state: 'fine', label: 'Show the fine print' } },
   Select: {

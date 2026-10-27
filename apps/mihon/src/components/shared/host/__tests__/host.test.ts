@@ -64,3 +64,10 @@ test('a deleted row id is never reused', async () => {
   expect(ids).toContain('tasks-8')
   expect(ids).not.toContain('tasks-7')
 })
+
+test('an insert the server would refuse is refused here, in ink’s words', async () => {
+  const host = createBookHost(() => {})
+  await expect(
+    host.runAction({ verb: 'table.insert', table: 'tasks', data: { points: 'many' } }),
+  ).rejects.toThrow('points: expected a number')
+})

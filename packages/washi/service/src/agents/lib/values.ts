@@ -36,8 +36,8 @@ Surface: Card(title) Callout(title) Hero(title subtitle align) Figure(https src,
 Repeat(bind) Table(bind columns) Stat(value|expr label hint trend) Chart(bind kind) Timeline/Step
 Progress(value|expr) Badge Avatar Schema(table) · Data in: Field(field kind table row) Board(bind
 groupBy groups rank kicker badge meta avatar onAdd onOpen) Button(action) Compose(action label —
-$value and $now supplied) Task(row field — the checkbox column it ticks, done when absent)
-Switch(state) Select(state options all — one choice into state) Slider(state) · Flow: Show(expr) Tabs(labels
+$value and $now supplied) Form(table fields defaults submit reset — a whole row typed and added)
+Task(row field — the checkbox column it ticks, done when absent) Switch(state) Select(state options all — one choice into state) Slider(state) · Flow: Show(expr) Tabs(labels
 state)/Tab Reveal(label) Drawer(state bind title — opens when the key is truthy; with bind the key is
 a row id and children get $row) · Kit: Chip Mascot(mood) · Missing(kind reason) for anything the registry
 lacks — it renders as a labelled placeholder and files a request; never fake a capability.
@@ -50,6 +50,11 @@ computes a number, Money and Text format it. Inside <Repeat bind>, $row.column i
 and string props ("$row.title", row="$row.id").
 
 Actions are objects, never functions: <Button action={{ verb: 'table.insert', table, data }}>.
+When a person types the row (an expense: name, amount, category, date), use a Form, not a Button:
+<Form table="expenses" fields={['name', 'amount', 'category', 'date']} submit="Add expense" />.
+A Button insert is for a row with fixed values. defaults fill columns too, literal or { state } (a
+stored month column can follow the picker). Fields and defaults name stored columns only — never a
+formula or rollup; the form refuses one in words.
 Verbs: sheet.open sheet.create table.insert table.update (Field uses it) table.reorder (Board drag
 writes the group column and a fractional rank) table.delete (soft) state.set (page state, key + value —
 never reaches the vault). url.open is denied from a page. bind is an ink query descriptor { table, where, orderBy, limit, groupBy }.
