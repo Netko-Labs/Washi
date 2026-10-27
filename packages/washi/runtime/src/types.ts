@@ -1,4 +1,4 @@
-import type { BlobStoreFactory } from '@washi/repository'
+import type { BlobStore, BlobStoreFactory } from '@washi/repository'
 import type { StoredKey } from '@washi/service'
 import type { ControlPlane, ServerMode, ServerRuntime, StorageConfig } from '@washi/trpc'
 
@@ -33,4 +33,10 @@ export interface BootedRuntime {
   dataDir: string
   trustedOrigins: string[]
   stop(): Promise<void>
+}
+
+/** A workspace's bucket client and the config it was built from, serialised to compare. */
+export interface BuiltBucket {
+  config: string
+  store: BlobStore
 }

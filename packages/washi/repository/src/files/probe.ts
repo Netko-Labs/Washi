@@ -6,8 +6,13 @@ const PROBE = new TextEncoder().encode('washi checks it can write here')
 export async function probeBlobStore(store: BlobStore): Promise<void> {
   const key = `.washi-probe-${Bun.randomUUIDv7()}`
   await store.write(key, PROBE, 'text/plain')
-  const back = await store.read(key)
-  await store.delete(key)
+  let back: Uint8Array | null
+  try {
+    back = await store.read(key)
+  } finally {
+    // A failed read must not leave the test file behind; a failed delete is the refusal to report.
+    await store.delete(key)
+  }
   if (!back || Buffer.compare(back, PROBE) !== 0) throw new ProbeMismatchError()
 }
 

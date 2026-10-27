@@ -1,5 +1,6 @@
 import { type BlobStore, s3BlobStores } from '@washi/repository'
 import type { StorageConfig } from '@washi/trpc'
+import type { BuiltBucket } from './types'
 
 /**
  * Each workspace's own bucket, rebuilt the first time its config reads differently — so a
@@ -8,7 +9,7 @@ import type { StorageConfig } from '@washi/trpc'
 export function workspaceBuckets(
   lookup: (workspaceId: string) => Promise<StorageConfig | null>,
 ): (workspaceId: string) => Promise<BlobStore | null> {
-  const built = new Map<string, { config: string; store: BlobStore }>()
+  const built = new Map<string, BuiltBucket>()
   return async (workspaceId) => {
     const config = await lookup(workspaceId)
     if (!config) {
