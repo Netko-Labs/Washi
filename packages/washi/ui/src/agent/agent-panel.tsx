@@ -192,7 +192,10 @@ export function AgentPanel({ placement = 'float', onExpand }: AgentPanelProps) {
   )
 }
 
-/** The 52px mascot FAB; ⌘J and this button toggle the popover. */
+/**
+ * The mascot door: the whole tile on a squircle, so Washi's face and state read at a glance.
+ * ⌘J and this button open the panel. `corner-shape` falls back to plain rounding where unknown.
+ */
 export function AgentFab() {
   const togglePanel = useAgentStore((state) => state.togglePanel)
   const transcript = useAgentStore((state) => state.transcript)
@@ -217,9 +220,9 @@ export function AgentFab() {
       aria-label="Ask Washi (⌘J)"
       title="Ask Washi (⌘J)"
       onClick={togglePanel}
-      className="fixed right-6 bottom-6 z-[48] size-[52px] overflow-hidden rounded-full border-2 border-card bg-[#DF8552] shadow-[0_8px_28px_rgb(0_0_0/0.18)] transition-[transform,box-shadow] duration-150 hover:-translate-y-px hover:shadow-[0_12px_34px_rgb(0_0_0/0.24)]"
+      className="fixed right-6 bottom-6 z-[48] size-[60px] overflow-hidden rounded-[22px] bg-card ring-2 ring-card shadow-[0_8px_28px_rgb(0_0_0/0.18)] transition-[transform,box-shadow] duration-150 [corner-shape:squircle] hover:-translate-y-px hover:shadow-[0_12px_34px_rgb(0_0_0/0.24)] supports-[corner-shape:squircle]:rounded-[32%]"
     >
-      <AgentMascot state={mascotStateFor(transcript, running, approvals)} size={48} crop />
+      <AgentMascot state={mascotStateFor(transcript, running, approvals)} size={60} />
     </button>
   )
 }
