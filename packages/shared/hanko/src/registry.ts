@@ -4,13 +4,8 @@ import { z } from 'zod'
  * The closed verb registry (spec §5). Every side effect a sheet or agent can
  * trigger is one of these, zod-validated, stamped through the approvals flow.
  */
-const cell = z.union([
-  z.string(),
-  z.number(),
-  z.boolean(),
-  z.null(),
-  z.array(z.string().min(1).max(200)).max(100),
-])
+const scalar = z.union([z.string(), z.number(), z.boolean(), z.null()])
+const cell = z.union([scalar, z.array(z.string().min(1).max(200)).max(100)])
 
 const options = z.array(z.string().min(1).max(64)).max(64)
 
@@ -32,6 +27,13 @@ const column = z.object({
   options: options.optional(),
   groups: z.object({ todo: options, doing: options, done: options }).optional(),
   table: z.string().min(1).max(64).optional(),
+})
+
+/** ink re-checks the whole copy; a filter value may name one of its params. */
+const copyFilter = z.object({
+  column: z.string().min(1),
+  op: z.enum(['eq', 'ne', 'gt', 'gte', 'lt', 'lte', 'contains', 'in']),
+  value: z.union([scalar, z.array(scalar).max(100), z.object({ param: z.string().min(1) })]),
 })
 
 export const VERBS = {
@@ -61,6 +63,14 @@ export const VERBS = {
       .record(z.string(), cell)
       .refine((patch) => Object.keys(patch).length > 0, 'set must patch at least one column'),
   }),
+  'table.copy': z.object({
+    verb: z.literal('table.copy'),
+    table: z.string().min(1),
+    params: z.record(z.string(), scalar).optional(),
+    where: z.array(copyFilter).min(1).max(16),
+    set: z.record(z.string(), z.union([cell, z.object({ expr: z.string().min(1) })])).default({}),
+    limit: z.number().int().positive().max(500).optional(),
+  }),
   'table.delete': z.object({
     verb: z.literal('table.delete'),
     table: z.string().min(1),
@@ -87,6 +97,7 @@ const REVERSIBLE_VERBS = new Set<Verb>([
   'table.insert',
   'table.update',
   'table.reorder',
+  'table.copy',
   'table.delete',
   'table.column',
 ])
@@ -141,6 +152,8 @@ export async function runAction(input: unknown, handlers: HankoHandlers): Promis
       return handlers['table.update'](result.action)
     case 'table.reorder':
       return handlers['table.reorder'](result.action)
+    case 'table.copy':
+      return handlers['table.copy'](result.action)
     case 'table.delete':
       return handlers['table.delete'](result.action)
     case 'table.column':

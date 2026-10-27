@@ -49,4 +49,4 @@ export type {
   TurnSummary,
 } from './types'
 export { titleFrom } from './utils'
-export { SEARCH_NOT_SET, SYSTEM_INSTRUCTIONS } from './values'
+export { DB_MUTATE_DESCRIPTION, SEARCH_NOT_SET, SYSTEM_INSTRUCTIONS } from './values'

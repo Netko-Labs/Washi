@@ -1,4 +1,4 @@
-import type { Member, Viewer } from '@washi/domain'
+import { linkColumnInputSchema, type Member, type Viewer } from '@washi/domain'
 import { historyQuerySchema, mutationSchema, querySchema, tableSpecSchema } from '@washi/ink'
 import { listTables, type Workspace } from '@washi/repository'
 import { guardedFetch } from '@washi/tsuru'
@@ -7,8 +7,9 @@ import { z } from 'zod'
 import { NOBODY } from '../../sheets/access'
 import { checkSource, createSheetFromSource, updateSheetFromSource } from '../../sheets/service'
 import { runHistory } from '../../tables/history'
+import { linkColumn } from '../../tables/link'
 import { defineUserTable, runMutation, runQuery } from '../../tables/service'
-import type { SearchKeyLookup } from '../lib'
+import { DB_MUTATE_DESCRIPTION, type SearchKeyLookup } from '../lib'
 import { pagesFor } from '../lib/pages'
 import { webSearch } from '../search'
 import { currentFetchPolicy } from '../tools'
@@ -152,8 +153,14 @@ export function createAiTools({
       inputSchema: z.object({ spec: tableSpecSchema }),
       execute: async ({ spec }) => defineUserTable(ws, spec),
     }),
+    db_link_column: tool({
+      description:
+        'Turn a text, select or multi_select column into a relation to another table: each value names the target row whose text column (on, default its first) reads the same, ignoring case and spaces, so renaming that row renames it everywhere and rollups match by id. create: true makes a target row for each value nothing matches; without it, unmatched values are refused and listed. Pages that filter the old column by name must then filter by id.',
+      inputSchema: z.object({ input: linkColumnInputSchema }),
+      execute: async ({ input }) => linkColumn(ws, input),
+    }),
     db_mutate: tool({
-      description: 'Insert, update, or delete records.',
+      description: DB_MUTATE_DESCRIPTION,
       inputSchema: z.object({ mutation: mutationSchema }),
       execute: async ({ mutation }) => runMutation(ws, mutation),
     }),

@@ -13,10 +13,17 @@ import {
   toneSchema,
 } from './surface'
 
-/** Hanko action descriptor as sheets carry it; the verb registry validates server-side. */
+const actionLeaf = z.union([scalarSchema, z.array(scalarSchema)])
+const actionEntry = z.union([actionLeaf, z.record(z.string(), actionLeaf)])
+const actionRecord = z.record(z.string(), actionEntry)
+
+/**
+ * Hanko action descriptor as sheets carry it; the verb registry validates server-side. Two levels
+ * deep, for `table.copy`'s filters (`value: { param }`) and `set` (`{ expr }`).
+ */
 export const actionRefSchema = z
   .object({ verb: z.string().min(1) })
-  .catchall(z.union([scalarSchema, z.array(scalarSchema), z.record(z.string(), scalarSchema)]))
+  .catchall(z.union([actionEntry, z.array(z.union([scalarSchema, actionRecord])), actionRecord]))
 
 const exprSchema = z.string().min(1).max(512)
 const stateKey = z.string().min(1).max(64)

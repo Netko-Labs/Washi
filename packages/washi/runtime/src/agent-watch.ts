@@ -2,7 +2,7 @@ import type { TranscriptEntry } from '@washi/domain'
 import { AGENT_PRESENCE_TTL_MS, type EventBus, type PresenceBoard } from '@washi/trpc'
 
 const PAGE_WRITES = new Set(['sheet_create', 'sheet_replace'])
-const DATA_WRITES = new Set(['db_define', 'db_mutate', 'action_run'])
+const DATA_WRITES = new Set(['db_define', 'db_link_column', 'db_mutate', 'action_run'])
 
 /**
  * Washi is a collaborator in the room: it shows up on the page it is writing, and when a write

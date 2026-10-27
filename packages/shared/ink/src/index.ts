@@ -1,3 +1,4 @@
+export { COPY_ROW_CAP } from './constants'
 export { matchesFilters } from './match'
 export {
   type Aggregate,
@@ -7,9 +8,11 @@ export {
   type Cell,
   type ColumnSpec,
   type ColumnType,
+  type CopyValue,
   cellSchema,
   columnSpecSchema,
   columnTypeSchema,
+  copyValueSchema,
   type Filter,
   type FilterOp,
   filterOpSchema,

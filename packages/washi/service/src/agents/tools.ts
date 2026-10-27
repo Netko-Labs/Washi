@@ -1,5 +1,5 @@
 import { createSdkMcpServer, tool } from '@anthropic-ai/claude-agent-sdk'
-import type { Member, Viewer } from '@washi/domain'
+import { linkColumnInputSchema, type Member, type Viewer } from '@washi/domain'
 import { historyQuerySchema, tableSpecSchema } from '@washi/ink'
 import { getAppMeta, listTables, type Workspace } from '@washi/repository'
 import { fetchPolicySchema, guardedFetch } from '@washi/tsuru'
@@ -7,8 +7,9 @@ import { z } from 'zod'
 import { NOBODY } from '../sheets/access'
 import { checkSource, createSheetFromSource, updateSheetFromSource } from '../sheets/service'
 import { runHistory } from '../tables/history'
+import { linkColumn } from '../tables/link'
 import { defineUserTable, runMutation, runQuery } from '../tables/service'
-import type { SearchKeyLookup } from './lib'
+import { DB_MUTATE_DESCRIPTION, type SearchKeyLookup } from './lib'
 import { pagesFor } from './lib/pages'
 import { webSearch } from './search'
 
@@ -128,6 +129,12 @@ export function createWashiTools(ws: Workspace, context: ToolContext) {
         async ({ spec }) => text(defineUserTable(ws, spec)),
       ),
       tool(
+        'db_link_column',
+        'Turn a text, select or multi_select column into a relation to another table: each value names the target row whose text column (on, default its first) reads the same, ignoring case and spaces, so renaming that row renames it everywhere and rollups match by id. create: true makes a target row for each value nothing matches; without it, unmatched values are refused and listed. Pages that filter the old column by name must then filter by id.',
+        { input: linkColumnInputSchema },
+        async ({ input }) => text(linkColumn(ws, input)),
+      ),
+      tool(
         'db_query',
         'Query a table: filters, orderBy, limit, groupBy aggregations (count/sum/avg/min/max).',
         { query: z.record(z.string(), z.unknown()) },
@@ -144,7 +151,7 @@ export function createWashiTools(ws: Workspace, context: ToolContext) {
       ),
       tool(
         'db_mutate',
-        'Insert, update, or delete records: { kind, table, data?, where? }.',
+        DB_MUTATE_DESCRIPTION,
         { mutation: z.record(z.string(), z.unknown()) },
         async ({ mutation }) => {
           const { mutationSchema } = await import('@washi/ink')

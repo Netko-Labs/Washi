@@ -75,6 +75,15 @@ function describeTable(name: string, input: Record<string, unknown>): ToolDescri
   if (mutation.kind === 'delete') {
     return base({ icon: IconDatabaseEdit, action: 'Remove rows from', subject: table })
   }
+  if (mutation.kind === 'copy') {
+    const changed = Object.keys(record(mutation.set))
+    return base({
+      icon: IconDatabaseEdit,
+      action: 'Copy rows forward in',
+      subject: table,
+      details: changed.length ? [`Each copy changes ${changed.join(', ')}`] : [],
+    })
+  }
   const fields = Object.keys(record(mutation.data))
   return base({
     icon: IconDatabaseEdit,
@@ -109,6 +118,14 @@ export function describeTool(name: string, input: unknown, titleOf: TitleOf): To
     case 'db_define':
     case 'db_mutate':
       return describeTable(name, args)
+    case 'db_link_column': {
+      const input = record(args.input)
+      return base({
+        icon: IconLink,
+        action: `Link ${text(input.table) ?? 'a table'}’s ${text(input.column) ?? 'column'} to`,
+        subject: text(input.target),
+      })
+    }
     case 'fetch_url':
       return base({
         icon: IconWorld,

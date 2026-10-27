@@ -195,10 +195,16 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   in memory over ≤5000 rows; a link hides any formula that reads a redacted column), `rollup` (D74:
   `{ table, via, fn, column?, where?, on? }` — an aggregate over another table's rows pointing here,
   by relation id or by `on` value; `{ param }` in its `where` reads the query's `params`, which a page
-  may fill from state; computed before formulas by `ink-rollups.ts`; never over another rollup). Every row can open as a page (`sheets.row_id`, unique; out of the tree). Every write to a
+  may fill from state; computed before formulas by `ink-rollups.ts`; never over another rollup). Washi's
+  `db_link_column` (`linkColumn`) turns a text/select/multi_select column into a relation in one
+  transaction, matching values to the target's text column; `create` makes the missing targets. Every row can open as a page (`sheets.row_id`, unique; out of the tree). Every write to a
   row also appends what it became to `record_changes` — the history a `Chart history` replays day
   by day. Never update `records` without going through `insertRecord`/`updateRecords`/
   `deleteRecords`, or history silently forgets.
+  A **copy** (D76: ink kind `copy`, page verb `table.copy`, `tables/copy.ts`) makes every row a
+  `where` matches a new row, `set` over it — a cell or `{ expr }` over the source row
+  (`add_months(date, 1)`); `params` fill `{ param }` filters and read as `$name`, and an unset one
+  refuses. One transaction through `insertRecord`, ≤500 rows or nothing, computed columns never set.
 - **Team space.** `tables.seedTeamSpace` makes `projects` + `issues`, the Backlog, Roadmap, Wiki
   (+ How we work), Ideas canvas and Weekly review pages, and a 17:00 routine (the asker's zone) that
   rewrites only the review's "This week" callout. It refuses a workspace that already has either
