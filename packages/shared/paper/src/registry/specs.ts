@@ -1,5 +1,5 @@
 // conventions: >300 lines — one registry table, grouped by primitive family; split by family when next touched
-import { filterSchema, historyQuerySchema, querySchema, scalarSchema } from '@washi/ink'
+import { cellSchema, filterSchema, historyQuerySchema, querySchema, scalarSchema } from '@washi/ink'
 import type { ComponentSpec, WsxRegistry } from '@washi/wsx'
 import { z } from 'zod'
 import { coverKeySchema, pageIconSchema } from './looks'
@@ -354,6 +354,25 @@ const dataIn: Record<string, ComponentSpec> = {
       label: z.string().max(40).optional(),
       placeholder: z.string().max(120).optional(),
       multiline: z.boolean().optional(),
+    },
+    'none',
+  ),
+  /**
+   * One whole row typed and inserted with `table.insert` (D75). The registry can't see columns:
+   * a field that is computed or unknown is refused when the form renders, and by the write.
+   */
+  Form: p(
+    {
+      table: z.string().min(1).max(64),
+      fields: z
+        .array(columnName)
+        .min(1)
+        .max(32)
+        .refine((names) => new Set(names).size === names.length, 'a field is named twice')
+        .optional(),
+      defaults: z.record(columnName, z.union([cellSchema, stateRefSchema])).optional(),
+      submit: z.string().min(1).max(40).optional(),
+      reset: z.boolean().optional(),
     },
     'none',
   ),

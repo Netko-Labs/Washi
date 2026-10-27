@@ -25,6 +25,7 @@ export {
   PRIMITIVE_GROUPS,
   paperRegistry,
   SHEET_ICONS,
+  type StateRef,
   sheetStateSchema,
 } from './specs'
 export {

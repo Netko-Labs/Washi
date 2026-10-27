@@ -16,6 +16,7 @@ import {
 import { Database } from './components/database'
 import { Drawer, Schema } from './components/drawer'
 import { Reveal, Show, Tab, Tabs } from './components/flow'
+import { Form } from './components/form'
 import { Divider, Grid, Row, Section, SheetFrame, Stack } from './components/frame'
 import { Button, Compose, Field, Slider, Switch, Task } from './components/input'
 import { Chip, Mascot, Missing } from './components/kit'
@@ -129,6 +130,7 @@ const COMPONENTS: Record<string, ComponentType<never>> = {
   Mascot,
   Missing,
   Compose,
+  Form,
   Schema,
 }
 
