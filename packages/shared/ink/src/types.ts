@@ -12,6 +12,7 @@ export const columnTypeSchema = z.enum([
   'person',
   'url',
   'relation',
+  'formula',
 ])
 export type ColumnType = z.infer<typeof columnTypeSchema>
 
@@ -40,6 +41,12 @@ export const columnSpecSchema = z
     groups: statusGroupsSchema.optional(),
     /** The table a `relation` points at. */
     table: identifier('table').optional(),
+    /**
+     * A `formula`'s expression over its own row's columns, in the page expr grammar
+     * (`month(date)`, `amount * fx_rate`, `when(paid, 0, days(now(), due))`). Computed on every
+     * read, never stored.
+     */
+    expr: z.string().min(1).max(500).optional(),
   })
   .superRefine((column, ctx) => {
     // Stored specs are re-parsed on every read: a rule added here must not orphan an old table.
@@ -48,6 +55,12 @@ export const columnSpecSchema = z
       ctx.addIssue({ code: 'custom', path: [key], message: `a ${column.type} column needs ${key}` })
     if (column.type === 'status') needs('groups')
     if (column.type === 'relation') needs('table')
+    if (column.type === 'formula' && column.expr === undefined) {
+      ctx.addIssue({ code: 'custom', path: ['expr'], message: 'a formula column needs expr' })
+    }
+    if (column.type !== 'formula' && column.expr !== undefined) {
+      ctx.addIssue({ code: 'custom', path: ['expr'], message: 'only a formula column has expr' })
+    }
   })
 export type ColumnSpec = z.infer<typeof columnSpecSchema>
 

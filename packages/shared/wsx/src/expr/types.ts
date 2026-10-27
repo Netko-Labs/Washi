@@ -8,7 +8,7 @@ export type LogicalOperator = 'and' | 'or'
 export type BinaryOperator = ArithmeticOperator | ComparisonOperator | LogicalOperator
 export type UnaryOperator = '-' | 'not'
 export type AggregateName = 'count' | 'sum' | 'avg' | 'min' | 'max'
-export type FunctionName = 'now' | 'days'
+export type FunctionName = 'now' | 'days' | 'month' | 'year' | 'when'
 
 export interface LiteralNode {
   kind: 'literal'

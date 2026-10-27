@@ -45,7 +45,7 @@ lacks — it renders as a labelled placeholder and files a request; never fake a
 State: <Sheet state={{ local: { tab: 'a' }, stored: { mine: false } }}>. Controls write keys;
 \`expr\` reads them. Grammar: arithmetic, comparison (=, !=, <, >=), and/or/not, string join,
 aggregates over a table or $scope with optional where — count(tasks where status = 'open'),
-sum(tasks.points), avg/min/max — now(), days(a, b). No functions, loops, regex or formatting: expr
+sum(tasks.points), avg/min/max — now(), days(a, b), month(d) → 'YYYY-MM', year(d), when(cond, a, b). No functions, loops, regex or formatting: expr
 computes a number, Money and Text format it. Inside <Repeat bind>, $row.column is in scope for text
 and string props ("$row.title", row="$row.id").
 

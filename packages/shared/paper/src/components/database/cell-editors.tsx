@@ -135,3 +135,22 @@ function groupOf(column: CellProps['column'], value: string): string | undefined
   if (column.groups.doing.includes(value)) return 'doing'
   return 'todo'
 }
+
+/** A formula's value, read-only: it is computed from the row's other cells, never typed. */
+export function FormulaCell({ column, value }: ScalarCellProps) {
+  const shown =
+    value === null || value === undefined
+      ? '—'
+      : typeof value === 'boolean'
+        ? value
+          ? '✓'
+          : '—'
+        : typeof value === 'number'
+          ? value.toLocaleString()
+          : String(value)
+  return (
+    <span className="wsx-db-formula" title={column.expr} data-formula>
+      {shown}
+    </span>
+  )
+}

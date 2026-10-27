@@ -123,8 +123,18 @@ describe('evaluate', () => {
     expect(run("days(now(), '2026-09-08T12:00:00Z')")).toBe(0)
     expect(run('days(0, 86400000 * 3)')).toBe(3)
     expect(run('days(null, now())')).toBeNull()
-    expect(() => run("days('yesterday', now())")).toThrow('days() expects ISO date strings')
+    expect(() => run("days('yesterday', now())")).toThrow('expected an ISO date string')
     expect(run("days(now(), '2026-09-30') > 20")).toBe(true)
+  })
+
+  test('month(), year() and when() — what a formula column needs', () => {
+    expect(run("month('2026-11-01')")).toBe('2026-11')
+    expect(run("month('2026-11-30T23:00:00Z')")).toBe('2026-11')
+    expect(run("year('2026-11-01')")).toBe(2026)
+    expect(run('month(null)')).toBeNull()
+    expect(run("when(1 > 0, 'yes', 'no')")).toBe('yes')
+    expect(run('when(false, 1 / 0, 2)')).toBe(2)
+    expect(() => run('month(1, 2)')).toThrow('takes 1 arguments')
   })
 
   test('step budget', () => {

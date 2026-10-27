@@ -81,6 +81,10 @@ export function validateRecord(spec: TableSpec, data: RecordData): InkIssue[] {
       issues.push({ path: key, message: `unknown column "${key}" on table "${spec.name}"` })
       continue
     }
+    if (column.type === 'formula') {
+      issues.push({ path: key, message: `"${key}" is computed from its formula; write its inputs` })
+      continue
+    }
     const problem = checkValue(column, value)
     if (problem) issues.push({ path: key, message: problem })
   }

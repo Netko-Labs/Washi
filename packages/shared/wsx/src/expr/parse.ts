@@ -1,4 +1,10 @@
-import { AGGREGATE_NAMES, EXPR_LIMITS, FUNCTION_NAMES, SCOPE_ARG } from './constants'
+import {
+  AGGREGATE_NAMES,
+  EXPR_LIMITS,
+  FUNCTION_ARITY,
+  FUNCTION_NAMES,
+  SCOPE_ARG,
+} from './constants'
 import { ExprBudgetError, ExprSyntaxError } from './errors'
 import { tokenize } from './tokenize'
 import type {
@@ -199,7 +205,7 @@ class Parser {
     }
     this.expect(')')
     this.rejectPostfix()
-    const arity = name === 'now' ? 0 : 2
+    const arity = FUNCTION_ARITY[name]
     if (args.length !== arity)
       this.fail(`\`${name}()\` takes ${arity} arguments, got ${args.length}`)
     return { kind: 'call', name, args }

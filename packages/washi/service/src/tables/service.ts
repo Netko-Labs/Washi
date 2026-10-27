@@ -23,7 +23,7 @@ import {
 } from '@washi/repository'
 import { InkError } from './errors'
 import { renameRowPages, trashRowPages } from './rows'
-import { checkListUse } from './rules'
+import { checkFormulas, checkListUse } from './rules'
 
 export { InkError }
 
@@ -35,6 +35,7 @@ function requireTable(ws: Workspace, name: string): UserTable {
 
 export function defineUserTable(ws: Workspace, input: unknown): UserTable {
   const spec: TableSpec = tableSpecSchema.parse(input)
+  checkFormulas(spec)
   for (const column of spec.columns) {
     if (column.table && column.table !== spec.name && !getTableByName(ws, column.table)) {
       throw new InkError(`${column.name}: relation to unknown table "${column.table}"`)

@@ -186,3 +186,11 @@
   color: var(--tone-danger-text);
   font-size: 12.5px;
 }
+
+.wsx-db-formula {
+  display: block;
+  padding: 0 8px;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  cursor: default;
+}

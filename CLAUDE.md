@@ -189,7 +189,10 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   `expr`, `bind` and `action` are a page's whole behaviour, and nothing in it executes.
 - **Tables are Notion databases.** Properties: `status` (todo · doing · done groups), `select`,
   `multi_select`, `person` (member id), `date` (`start/end` for a range), `url`, `relation` (record
-  ids). Every row can open as a page (`sheets.row_id`, unique; out of the tree). Every write to a
+  ids), `formula` (D73: an `expr` over its own row in the page grammar — `month(date)`, `usd * fx_rate`,
+  `when(paid, false, days(now(), due) < 0)` — computed on every read by `ink-formulas.ts`, never
+  stored or written; checked at definition; a query that filters, orders or groups on one finishes
+  in memory over ≤5000 rows; a link hides any formula that reads a redacted column). Every row can open as a page (`sheets.row_id`, unique; out of the tree). Every write to a
   row also appends what it became to `record_changes` — the history a `Chart history` replays day
   by day. Never update `records` without going through `insertRecord`/`updateRecords`/
   `deleteRecords`, or history silently forgets.

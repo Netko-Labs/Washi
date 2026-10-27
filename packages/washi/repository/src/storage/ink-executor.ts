@@ -8,6 +8,14 @@ import {
 } from '@washi/ink'
 
 import type { Workspace } from './client'
+import {
+  computeFormulas,
+  finishInMemory,
+  formulaNames,
+  MEMORY_ROW_CAP,
+  needsMemory,
+  storedSpec,
+} from './ink-formulas'
 
 const FILTER_SQL: Record<Filter['op'], string> = {
   eq: '= ?',
@@ -116,18 +124,15 @@ function groupQuery(
   return { rows, total: rows.length }
 }
 
-/** Run an ink query over a table's JSON records. Descriptor → parametrized SQL. */
-export function executeQuery(
+/** Stored rows matching stored-column filters, lists and booleans restored. */
+function selectRows(
   ws: Workspace,
   tableId: string,
   spec: TableSpec,
-  query: InkQuery,
-): QueryResult {
-  const limit = query.limit ?? 200
-  if (query.groupBy) {
-    return groupQuery(ws, tableId, spec, { ...query, groupBy: query.groupBy }, limit)
-  }
-
+  filters: Filter[],
+  orderBy: InkQuery['orderBy'],
+  limit: number,
+): QueryResult['rows'] {
   const selectParams: Scalar[] = []
   const projection = spec.columns
     .map((column) => {
@@ -136,10 +141,10 @@ export function executeQuery(
     })
     .join(', ')
 
-  const where = buildWhere(query.where ?? [], spec)
+  const where = buildWhere(filters, spec)
   // Ordering targets the projected alias, so the json path is bound once.
-  const orderSql = query.orderBy
-    ? ` ORDER BY "${assertIdentifier(query.orderBy.column)}" ${query.orderBy.direction === 'desc' ? 'DESC' : 'ASC'}`
+  const orderSql = orderBy
+    ? ` ORDER BY "${assertIdentifier(orderBy.column)}" ${orderBy.direction === 'desc' ? 'DESC' : 'ASC'}`
     : ' ORDER BY hlc_created ASC'
   const sql = `
     SELECT id, ${projection}
@@ -157,16 +162,52 @@ export function executeQuery(
       if (lists.has(column.name) && typeof value === 'string') row[column.name] = JSON.parse(value)
     }
   }
+  return rows
+}
+
+/**
+ * Run an ink query over a table's JSON records. Descriptor → parametrized SQL, then each row's
+ * formulas. A query that filters, orders or groups on a formula reads up to `MEMORY_ROW_CAP`
+ * stored rows and finishes in memory.
+ */
+export function executeQuery(
+  ws: Workspace,
+  tableId: string,
+  spec: TableSpec,
+  query: InkQuery,
+): QueryResult {
+  const limit = query.limit ?? 200
+  const stored = storedSpec(spec)
+  if (needsMemory(spec, query)) {
+    const formulas = formulaNames(spec)
+    const where = query.where ?? []
+    const sqlFilters = where.filter((filter) => !formulas.has(filter.column))
+    const rows = selectRows(ws, tableId, stored, sqlFilters, undefined, MEMORY_ROW_CAP)
+    computeFormulas(spec, rows)
+    const formulaFilters = where.filter((filter) => formulas.has(filter.column))
+    return finishInMemory(spec, rows, query, formulaFilters, limit)
+  }
+  if (query.groupBy) {
+    return groupQuery(ws, tableId, stored, { ...query, groupBy: query.groupBy }, limit)
+  }
+  const rows = selectRows(ws, tableId, stored, query.where ?? [], query.orderBy, limit)
+  computeFormulas(spec, rows)
   return { rows, total: rows.length }
 }
 
-/** Ids matched by a filter set, for update/delete mutations. */
+/** Ids matched by a filter set, for update/delete mutations; a formula filter is computed. */
 export function matchRecordIds(
   ws: Workspace,
   tableId: string,
   spec: TableSpec,
   filters: Filter[],
 ): string[] {
+  if (needsMemory(spec, { where: filters })) {
+    const query: InkQuery = { table: spec.name, where: filters }
+    return executeQuery(ws, tableId, spec, { ...query, limit: MEMORY_ROW_CAP }).rows.map((row) =>
+      String(row.id),
+    )
+  }
   const where = buildWhere(filters, spec)
   return ws.sqlite
     .query(`SELECT id FROM records WHERE table_id = ? AND deleted_at IS NULL${where.sql}`)

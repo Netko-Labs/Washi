@@ -184,13 +184,29 @@ function toMs(value: Scalar): number | null {
   if (typeof value === 'number') return value
   const parsed = typeof value === 'string' ? Date.parse(value) : Number.NaN
   if (Number.isNaN(parsed)) {
-    throw new ExprEvalError(`days() expects ISO date strings or ms numbers, got ${typeName(value)}`)
+    throw new ExprEvalError(`expected an ISO date string or ms number, got ${typeName(value)}`)
   }
   return parsed
 }
 
+/** `YYYY-MM-DD…` of a date cell or a ms number, in UTC — what a date column stores. */
+function isoOf(value: Scalar): string | null {
+  const ms = toMs(value)
+  return ms === null ? null : new Date(ms).toISOString()
+}
+
 function call(node: Extract<ExprAst, { kind: 'call' }>, ctx: EvalContext, depth: number): Scalar {
   if (node.name === 'now') return ctx.scope.now
+  const first = () => visit(node.args[0] as ExprAst, ctx, depth)
+  // Only the branch taken is evaluated, so `when(qty = 0, 0, total / qty)` never divides by zero.
+  if (node.name === 'when') {
+    return visit(node.args[truthy('when', first()) ? 1 : 2] as ExprAst, ctx, depth)
+  }
+  if (node.name === 'month') return isoOf(first())?.slice(0, 7) ?? null
+  if (node.name === 'year') {
+    const iso = isoOf(first())
+    return iso === null ? null : Number(iso.slice(0, 4))
+  }
   const from = toMs(visit(node.args[0] as ExprAst, ctx, depth))
   const to = toMs(visit(node.args[1] as ExprAst, ctx, depth))
   if (from === null || to === null) return null
