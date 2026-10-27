@@ -1,5 +1,6 @@
 import type {
   Reminder,
+  ReminderAsk,
   ReminderCreate,
   ReminderInbox,
   ReminderUpdate,
@@ -58,6 +59,12 @@ export function createReminderRule(
 ): Reminder {
   checkRule(ws, input)
   return createReminder(ws, { ...input, createdBy: actorId })
+}
+
+/** Washi's way in: the asker's zone when it was told one, the server's otherwise. */
+export function askReminder(ws: Workspace, input: ReminderAsk, actorId: string | null): Reminder {
+  const timeZone = input.timeZone ?? Intl.DateTimeFormat().resolvedOptions().timeZone
+  return createReminderRule(ws, { ...input, timeZone }, actorId)
 }
 
 export function updateReminderRule(ws: Workspace, { id, ...patch }: ReminderUpdate): Reminder {

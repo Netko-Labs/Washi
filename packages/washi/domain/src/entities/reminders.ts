@@ -35,6 +35,12 @@ export const reminderCreateSchema = z.object({
 })
 export type ReminderCreate = z.output<typeof reminderCreateSchema>
 
+/** What Washi sends: the zone is the server's when it does not know the asker's. */
+export const reminderAskSchema = reminderCreateSchema.extend({
+  timeZone: timeZoneSchema.optional(),
+})
+export type ReminderAsk = z.output<typeof reminderAskSchema>
+
 export const reminderUpdateSchema = z.object({
   id: z.string(),
   title: z.string().trim().min(1).max(120).optional(),

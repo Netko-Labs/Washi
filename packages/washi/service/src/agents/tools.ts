@@ -1,9 +1,10 @@
 import { createSdkMcpServer, tool } from '@anthropic-ai/claude-agent-sdk'
-import { linkColumnInputSchema, type Member, type Viewer } from '@washi/domain'
+import { linkColumnInputSchema, type Member, reminderAskSchema, type Viewer } from '@washi/domain'
 import { historyQuerySchema, tableSpecSchema } from '@washi/ink'
 import { getAppMeta, listTables, type Workspace } from '@washi/repository'
 import { fetchPolicySchema, guardedFetch } from '@washi/tsuru'
 import { z } from 'zod'
+import { askReminder } from '../reminders/service'
 import { NOBODY } from '../sheets/access'
 import { checkSource, createSheetFromSource, updateSheetFromSource } from '../sheets/service'
 import { runHistory } from '../tables/history'
@@ -157,6 +158,13 @@ export function createWashiTools(ws: Workspace, context: ToolContext) {
           const { mutationSchema } = await import('@washi/ink')
           return text(runMutation(ws, mutationSchema.parse(mutation)))
         },
+      ),
+      tool(
+        'reminder_create',
+        'Remind people before a date in a table comes due — bills to pay, deadlines, renewals, trips. Not a routine: no turn runs and nothing is spent. The server checks every minute and puts one Inbox row per table row per due date, from daysBefore (0–60) days ahead, for rows matching where (same grammar as db_query, e.g. paid = false). dateColumn must be a date column; personColumn (a person column) sends each row only to the member it names, otherwise everyone sees it. Use it whenever the ask is "remind me/us when … is due".',
+        reminderAskSchema.shape,
+        async (input) =>
+          text(askReminder(ws, reminderAskSchema.parse(input), context.viewer?.id ?? null)),
       ),
       tool(
         'fetch_url',

@@ -16,7 +16,14 @@ describe('both ports agree on what a read is', () => {
   })
 
   test('every write stops at the desk', () => {
-    for (const name of ['sheet_create', 'sheet_replace', 'db_define', 'db_mutate', 'action_run']) {
+    for (const name of [
+      'sheet_create',
+      'sheet_replace',
+      'db_define',
+      'db_mutate',
+      'reminder_create',
+      'action_run',
+    ]) {
       expect(isReadTool(name)).toBe(false)
     }
   })

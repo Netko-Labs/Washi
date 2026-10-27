@@ -62,10 +62,12 @@ export {
 export type { Member } from './entities/members'
 export {
   type Reminder,
+  type ReminderAsk,
   type ReminderCreate,
   type ReminderHit,
   type ReminderInbox,
   type ReminderUpdate,
+  reminderAskSchema,
   reminderCreateSchema,
   reminderHitSchema,
   reminderInboxSchema,
