@@ -225,6 +225,15 @@ export function dataNode(pick: DataPick): WsxElement {
   return element('Database', { table }, [])
 }
 
+/**
+ * The `<Sheet>` a locked block is drawn in: the page's theme and feel, never its look — the cover
+ * and icon belong to the page once, not to every block (D64).
+ */
+export function blockFrame(rootProps: Record<string, WsxValue>): Record<string, WsxValue> {
+  const { cover: _cover, icon: _icon, ...frame } = rootProps
+  return frame
+}
+
 export function lockedBlock(node: WsxElement): Block {
   return locked(node)
 }

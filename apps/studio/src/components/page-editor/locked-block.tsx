@@ -1,7 +1,7 @@
 import { PaperProvider, usePaperHost, WsxView } from '@washi/paper'
 import type { WsxElement } from '@washi/wsx'
 import { useMemo } from 'react'
-import { type LockedBlockProps, useEditorStore } from './lib'
+import { blockFrame, type LockedBlockProps, useEditorStore } from './lib'
 
 /** Live blocks — databases, charts, canvases — move and delete whole; what is inside edits in place. */
 export function LockedBlock({ block, rootProps }: LockedBlockProps) {
@@ -23,7 +23,12 @@ export function LockedBlock({ block, rootProps }: LockedBlockProps) {
     >
       <PaperProvider host={host}>
         <WsxView
-          root={{ kind: 'element', name: 'Sheet', props: rootProps, children: [block.node] }}
+          root={{
+            kind: 'element',
+            name: 'Sheet',
+            props: blockFrame(rootProps),
+            children: [block.node],
+          }}
         />
       </PaperProvider>
     </div>

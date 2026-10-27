@@ -3,6 +3,7 @@ import { paperRegistry } from '@washi/paper/registry'
 import { hasErrors, parse, serialize, validate } from '@washi/wsx'
 import {
   applyShortcut,
+  blockFrame,
   dataNode,
   lockedBlock,
   newBlock,
@@ -118,5 +119,15 @@ describe('the heading names the page', () => {
     expect(
       titleOf(blocks('<Sheet title="t"><Title>Row</Title></Sheet>'), { rowOf: 'record' }),
     ).toBeNull()
+  })
+})
+
+describe('locked block frame', () => {
+  test('keeps the page theme but never its cover or icon', () => {
+    const root = parse(
+      `<Sheet title="T" theme="washi" feel="board" cover="picture:fog" icon="💵"><Divider /></Sheet>`,
+    )
+    if (root.kind !== 'element') throw new Error('not an element')
+    expect(blockFrame(root.props)).toEqual({ title: 'T', theme: 'washi', feel: 'board' })
   })
 })
