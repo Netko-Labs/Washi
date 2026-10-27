@@ -69,10 +69,10 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   `gcTime: 0`, so every switch reruns the loader and the route effects), the avatar holds theme ·
   settings · sign out. The sidebar **folds** (D59): `⌘\`, a » in the header while folded, the
   left edge peeks it as an overlay, remembered per workspace (`washi:fold:<id>`). Under `md`
-  `NarrowShell` makes the sidebar the Home screen (places as top tabs, Recents as cards, 48px rows)
-  and the ask field a bottom bar whose ✎ is New page on Home and Edit on a page; a page opens with
-  ‹ back, and ☰ or a swipe in from the left edge slides the whole sidebar over it (`MobileDrawer`,
-  D80; swiped back left to close). Gestures are `useSwipe` (`components/shared/gestures`): touch
+  `NarrowShell` shows the same Home (the dashboard) and pages as the desktop, one at a time, with
+  the ask field a bottom bar whose ✎ is New page on Home and Edit on a page; a page has ‹ back, and
+  ☰ or a swipe in from the left edge opens the whole sidebar as a full-screen menu (`MobileDrawer`,
+  D80/D81; ✕, a swipe back left or a pick closes it). Gestures are `useSwipe` (`components/shared/gestures`): touch
   events, axis-locked, far-or-fast commits; a phone's peek is a sheet its bar pulls down. `useIsNarrow` picks the shell; the workspace routes never SSR.
 - `apps/desktop` — mirin shell: window, menu, icon, Develop menu. `src/bun/` (main) boots the
   embedded runtime and serves `appRouter` via `createMirinBridge`; the renderer's `api` is a tRPC
@@ -331,8 +331,9 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
 - **Primitives fit any width (D80).** Paper reads the sheet's own width (`@container wsx`), never
   the window — a phone, the agent panel and a peek reflow alike (`css/narrow.css`): ≤520 a Table
   stacks into cards (first column the title, `data-label` the rest), ≤480 ledger rows wrap, bars put
-  the label over the track, a Form goes one column; ≤400 stats sit two to a row. Coarse pointers get
-  44px targets and 16px inputs.
+  the label over the track, a Form goes one column, stats sit two to a row. A Stat in a Grid sizes
+  its figure to its own column (`15cqi`), and `.wsx` clips sideways overflow, so a phone never
+  scrolls a page horizontally. Coarse pointers get 44px targets and 16px inputs.
 - WSX is inert data: registry primitives, literal props, the closed `expr` grammar only. Components
   own appearance (four enums: `variant tone size emphasis`); pages own content. Validation before
   persist and before render. Format reference: `docs/wsx-primitives.html`.

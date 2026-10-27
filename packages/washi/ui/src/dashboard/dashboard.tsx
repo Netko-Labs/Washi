@@ -31,7 +31,7 @@ export function Dashboard() {
 
   return (
     <div className="flex-1 overflow-y-auto overscroll-y-none">
-      <section className="mx-auto max-w-[940px] px-10 pt-11 pb-[60px]">
+      <section className="mx-auto max-w-[940px] px-4 pt-6 pb-[60px] md:px-10 md:pt-11">
         <h1 className="mb-1 font-semibold text-[28px] tracking-[-0.02em]">
           {greeting()}, {firstName}
         </h1>
@@ -46,7 +46,7 @@ export function Dashboard() {
 
         {pages.length === 0 && <StartHere />}
 
-        <div className="mb-[30px] grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3.5">
+        <div className="mb-[30px] grid grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-3 md:gap-3.5">
           <div className="rounded-[14px] border border-border bg-card px-[18px] py-4">
             <div className="mb-1.5 text-muted-foreground text-xs">Pages</div>
             <div className="font-semibold text-[26px] tracking-[-0.02em]">{pages.length}</div>

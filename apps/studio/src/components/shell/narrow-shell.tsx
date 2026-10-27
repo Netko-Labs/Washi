@@ -1,5 +1,5 @@
 import { Header, useViewStore } from '@washi/ui'
-import { AskBar, BackHome, MobileHome } from '@/components/sidebar'
+import { AskBar, BackHome } from '@/components/sidebar'
 import { AgentLayer } from './agent-layer'
 import { DrawerEdge } from './drawer-edge'
 import { HeaderActions } from './header-actions'
@@ -8,8 +8,8 @@ import { MobileDrawer } from './mobile-drawer'
 import { SidebarButton } from './sidebar-button'
 
 /**
- * Under `md`: Home is the sidebar; a page opens over it with ‹ back, and ☰ (or a swipe from the
- * left edge) slides the whole sidebar over the page. The ask bar is the door.
+ * Under `md`: the same Home and pages as the desktop, one at a time. ☰ (or a swipe in from the
+ * left edge) opens the whole sidebar as a full-screen menu; a page has ‹ back to Home.
  */
 export function NarrowShell({ workspace, children }: WorkspaceShellProps) {
   const activeTab = useViewStore((state) => state.activeTab)
@@ -17,21 +17,19 @@ export function NarrowShell({ workspace, children }: WorkspaceShellProps) {
 
   return (
     <>
-      {isHome && <MobileHome workspace={workspace} />}
-      {/* The dashboard route stays mounted so its route effect keeps the tab honest. */}
-      <main className={`min-w-0 flex-1 flex-col pb-[60px] ${isHome ? 'hidden' : 'flex'}`}>
+      <main className="flex min-w-0 flex-1 flex-col pb-[60px]">
         <Header
           leading={
             <>
               <SidebarButton />
-              <BackHome workspaceId={workspace.id} />
+              {!isHome && <BackHome workspaceId={workspace.id} />}
             </>
           }
           actions={<HeaderActions />}
         />
         {children}
       </main>
-      {!isHome && <DrawerEdge />}
+      <DrawerEdge />
       <MobileDrawer workspace={workspace} />
       <AskBar />
       <AgentLayer fab={false} placement="sheet" />

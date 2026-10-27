@@ -93,6 +93,13 @@
   align-items: baseline;
   gap: 8px;
 }
+/* In a grid the figure sizes to its own column, so a big number never runs into the next stat. */
+.wsx-grid > .wsx-stat {
+  container-type: inline-size;
+}
+.wsx-grid > .wsx-stat .wsx-stat-value {
+  font-size: min(calc(34px * var(--sz)), 15cqi);
+}
 .wsx-stat[data-tone]:not([data-tone="neutral"]) .wsx-stat-value {
   color: var(--t-text);
 }

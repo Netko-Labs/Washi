@@ -1,4 +1,4 @@
-import { IconLayoutSidebarLeftCollapse } from '@tabler/icons-react'
+import { IconLayoutSidebarLeftCollapse, IconX } from '@tabler/icons-react'
 import { AskField } from './ask-field'
 import type { SidebarProps } from './lib'
 import { SidebarPages } from './sidebar-pages'
@@ -10,7 +10,7 @@ export function Sidebar({ workspace, folded, peeking, onFold, onPeekEnd, drawer 
   const shown = !folded || peeking || drawer
   // Folded, it stays out of the flow and only slides, so a peek never reflows the page.
   const frame = drawer
-    ? 'h-full w-[min(86vw,320px)] shadow-[0_16px_48px_rgb(0_0_0/0.28)]'
+    ? 'h-full w-full border-r-0 bg-background'
     : peeking
       ? 'fixed inset-y-0 left-0 w-[248px] shadow-[0_16px_48px_rgb(0_0_0/0.18)]'
       : folded
@@ -24,7 +24,7 @@ export function Sidebar({ workspace, folded, peeking, onFold, onPeekEnd, drawer 
       className={`group/side z-40 flex shrink-0 flex-col overflow-hidden border-border border-r bg-muted transition-[translate] duration-200 ${frame}`}
     >
       <div
-        className={`flex h-full flex-col ${drawer ? 'w-full pt-[env(safe-area-inset-top)]' : 'w-[248px]'}`}
+        className={`flex h-full flex-col ${drawer ? 'w-full pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]' : 'w-[248px]'}`}
       >
         <div className="flex shrink-0 items-center gap-1 px-2 pt-2 pb-1.5">
           <div className="min-w-0 flex-1">
@@ -35,9 +35,13 @@ export function Sidebar({ workspace, folded, peeking, onFold, onPeekEnd, drawer 
             aria-label={drawer ? 'Close the sidebar' : 'Hide the sidebar (⌘\\)'}
             title={drawer ? 'Close sidebar' : 'Hide sidebar ⌘\\'}
             onClick={onFold}
-            className="grid size-8 shrink-0 place-items-center rounded-lg text-muted-foreground hover:bg-accent"
+            className={`grid shrink-0 place-items-center rounded-lg text-muted-foreground hover:bg-accent ${drawer ? 'size-10' : 'size-8'}`}
           >
-            <IconLayoutSidebarLeftCollapse className="size-[15px]" />
+            {drawer ? (
+              <IconX className="size-5" />
+            ) : (
+              <IconLayoutSidebarLeftCollapse className="size-[15px]" />
+            )}
           </button>
         </div>
         <div className="shrink-0 px-2 pb-1">
