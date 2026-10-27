@@ -73,12 +73,14 @@ export function runQuery(ws: Workspace, query: InkQuery): QueryResult {
   return executeQuery(ws, table.id, table.spec, query)
 }
 
+/** `author` is who the change log names (D78): a member id, `washi`, or null when unknown. */
 export function runMutation(
   ws: Workspace,
   mutation: InkMutation,
+  author: string | null = null,
 ): { affected: number; id?: string; ids?: string[] } {
   const table = requireTable(ws, mutation.table)
-  if (mutation.kind === 'copy') return copyRecords(ws, table, mutation)
+  if (mutation.kind === 'copy') return copyRecords(ws, table, mutation, author)
 
   if (mutation.kind !== 'insert') {
     const issues = unknownQueryColumns(table.spec, mutation.where)
@@ -92,16 +94,16 @@ export function runMutation(
 
   switch (mutation.kind) {
     case 'insert':
-      return { affected: 1, id: insertRecord(ws, table.id, mutation.data) }
+      return { affected: 1, id: insertRecord(ws, table.id, mutation.data, author) }
     case 'update': {
       const ids = matchRecordIds(ws, table.id, table.spec, mutation.where)
-      const affected = updateRecords(ws, table.id, ids, mutation.data)
+      const affected = updateRecords(ws, table.id, ids, mutation.data, author)
       renameRowPages(ws, table.spec, mutation.data, ids)
       return { affected }
     }
     case 'delete': {
       const ids = matchRecordIds(ws, table.id, table.spec, mutation.where)
-      const affected = deleteRecords(ws, table.id, ids)
+      const affected = deleteRecords(ws, table.id, ids, author)
       trashRowPages(ws, ids)
       return { affected }
     }
@@ -114,19 +116,25 @@ export function updateRecord(
   tableName: string,
   recordId: string,
   patch: RecordData,
+  author: string | null = null,
 ): void {
   const table = requireTable(ws, tableName)
   checkData(ws, table.spec, patch)
-  if (updateRecords(ws, table.id, [recordId], patch) === 0) {
+  if (updateRecords(ws, table.id, [recordId], patch, author) === 0) {
     throw new InkError(`unknown record "${recordId}" on table "${tableName}"`)
   }
   renameRowPages(ws, table.spec, patch, [recordId])
 }
 
 /** Soft-delete one record by id — the `table.delete` verb. The row keeps its history. */
-export function deleteRecord(ws: Workspace, tableName: string, recordId: string): void {
+export function deleteRecord(
+  ws: Workspace,
+  tableName: string,
+  recordId: string,
+  author: string | null = null,
+): void {
   const table = requireTable(ws, tableName)
-  if (deleteRecords(ws, table.id, [recordId]) === 0) {
+  if (deleteRecords(ws, table.id, [recordId], author) === 0) {
     throw new InkError(`unknown record "${recordId}" on table "${tableName}"`)
   }
   trashRowPages(ws, [recordId])
@@ -143,6 +151,7 @@ export function toggleTaskRecord(
   recordId: string,
   done: boolean,
   field?: string,
+  author: string | null = null,
 ): void {
   const tableId = findRecordTableId(ws, recordId)
   if (!tableId) throw new InkError(`unknown record "${recordId}"`)
@@ -153,5 +162,5 @@ export function toggleTaskRecord(
       throw new InkError(`"${field}" is not a checkbox column on ${table?.name ?? 'this table'}`)
     }
   }
-  updateRecords(ws, tableId, [recordId], { [field ?? 'done']: done })
+  updateRecords(ws, tableId, [recordId], { [field ?? 'done']: done }, author)
 }
