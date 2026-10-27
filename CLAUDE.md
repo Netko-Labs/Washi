@@ -140,6 +140,12 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   beside them) or `file:<id>` (an upload); presets and pictures live in `@washi/paper/registry`.
   An icon is a registry name, an emoji or `file:<id>` (`SheetIcon` draws an upload through the
   host's `fileUrl`, else a page glyph).
+- **A workspace keeps its own emoji (D71).** `custom_emojis` (workspace file; `ensureCustomEmojis`):
+  a bare lowercase shortcode unique per workspace over an upload; `emojis.list/add/remove`, its
+  adder or a steward removes. Picking one sets the icon to `file:<fileId>`. `trashedUploads` never
+  frees an emoji's file; removing the emoji frees it only if nothing wears it (`isUploadWorn`).
+  The picker's Unicode set is generated (`apps/studio/scripts/emoji-values.ts` from
+  `emoji-test.txt`, ≤ Emoji 15.1) into `components/shared/emoji/values/` — never hand-edit it.
 - **Who reads a page is the page's (D65).** `<Sheet visibility access>`, cached in
   `sheets.visibility/access` like the look: `shared` (default) = the workspace, `private` = the
   member ids in `access` + owners (a page is as closed as its most closed ancestor), `public` =
@@ -255,8 +261,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
 - **Settings is grouped by whose it is (D69):** one column, the groups as sliding pills and each
   group's sections as tabs under them — Account (Profile — `auth.updateUser`; Preferences —
   the theme, one `useTheme` store in `components/shared/theme`), Workspace (General — rename through
-  `auth.organization.update`, owners and admins; People), Washi (Models · What leaves · Usage ·
-  Routines), Server (the app admin's). `?tab=` names the section; an unknown one (the old `agent`)
+  `auth.organization.update`, owners and admins; People; Emojis — D71), Washi (Models · What
+  leaves · Usage · Routines), Server (the app admin's). `?tab=` names the section; an unknown one (the old `agent`)
   lands on Models. **The team's models** are app meta `agent_enabled_models` (`EnabledModel[]`, id +
   the catalogue's name, per provider; none for the key's provider = the recommended three), set by owners (`agents.setEnabledModels`)
   and read by the composer's model chip through `agents.settings`. Menus and pickers in the studio

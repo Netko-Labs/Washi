@@ -15,4 +15,4 @@ export type {
 } from './types'
 export { useLookPickerStore } from './use-look-picker-store'
 export { anchoredAt, pageLook, pictureUrl } from './utils'
-export { COVER_TABS, EMOJI, ICON_TABS } from './values'
+export { COVER_TABS, ICON_TABS } from './values'
