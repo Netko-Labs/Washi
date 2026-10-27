@@ -3,14 +3,14 @@ import type { EffortChoice, ModelChoice } from './types'
 /** Three per provider, one line each — the same three Settings recommends. */
 export const RECOMMENDED_MODELS: Record<string, ModelChoice[]> = {
   anthropic: [
-    { id: 'claude-sonnet-4-5', label: 'Sonnet 4.5', desc: 'Balanced' },
-    { id: 'claude-opus-4-1', label: 'Opus 4.1', desc: 'Deepest · slower' },
-    { id: 'claude-haiku-4-5', label: 'Haiku 4.5', desc: 'Fastest · cheapest' },
+    { id: 'claude-sonnet-5-5', label: 'Sonnet 5.5', desc: 'Balanced' },
+    { id: 'claude-opus-5-5', label: 'Opus 5.5', desc: 'Deepest · slower' },
+    { id: 'claude-haiku-5-5', label: 'Haiku 5.5', desc: 'Fastest · cheapest' },
   ],
   openrouter: [
-    { id: 'anthropic/claude-sonnet-4.5', label: 'Sonnet 4.5', desc: 'Balanced' },
-    { id: 'anthropic/claude-opus-4.1', label: 'Opus 4.1', desc: 'Deepest · slower' },
-    { id: 'anthropic/claude-haiku-4.5', label: 'Haiku 4.5', desc: 'Fastest · cheapest' },
+    { id: 'anthropic/claude-sonnet-5.5', label: 'Sonnet 5.5', desc: 'Balanced' },
+    { id: 'anthropic/claude-opus-5.5', label: 'Opus 5.5', desc: 'Deepest · slower' },
+    { id: 'anthropic/claude-haiku-5.5', label: 'Haiku 5.5', desc: 'Fastest · cheapest' },
   ],
 }
 

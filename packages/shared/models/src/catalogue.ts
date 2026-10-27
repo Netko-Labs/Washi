@@ -111,15 +111,21 @@ export function createModelCatalogue(options: CatalogueOptions = {}): ModelCatal
             provider: providerId,
             providerName: entry.name ?? providerId,
             id: model.id,
-            name: model.name ?? model.id,
+            // models.dev tags an alias "(latest)" even once a newer family ships.
+            name: (model.name ?? model.id).replace(/\s*\(latest\)$/, ''),
             contextTokens: model.limit?.context ?? null,
             inputPerMTok: model.cost?.input ?? null,
             outputPerMTok: model.cost?.output ?? null,
             reasoning: model.reasoning === true,
+            releasedAt: model.release_date ?? null,
           })
         }
       }
-      return summaries.sort((a, b) => a.name.localeCompare(b.name))
+      // Newest first: the model a person wants is almost never the oldest one.
+      return summaries.sort(
+        (a, b) =>
+          (b.releasedAt ?? '').localeCompare(a.releasedAt ?? '') || a.name.localeCompare(b.name),
+      )
     },
 
     source: () => from,
