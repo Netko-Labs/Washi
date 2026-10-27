@@ -3,7 +3,7 @@ import { useViewStore } from '@washi/ui'
 import { pathFor } from '@/components/shell'
 import { type BackHomeProps, openInPlace } from '../lib'
 
-/** ‹ goes to Home — the sidebar — never a drawer over the page. */
+/** ‹ goes to Home, the dashboard. */
 export function BackHome({ workspaceId }: BackHomeProps) {
   return (
     <a
