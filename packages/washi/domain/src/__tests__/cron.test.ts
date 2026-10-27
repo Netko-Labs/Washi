@@ -19,6 +19,7 @@ describe('cron', () => {
     expect(describeCron('0 10 * * 0,6')).toBe('Weekends at 10:00')
     expect(describeCron('0 17 * * 5')).toBe('Every Friday at 17:00')
     expect(describeCron('15 * * * *')).toBe('Every hour at :15')
+    expect(describeCron('0 * * * 1')).toBe('0 * * * 1')
     expect(describeCron('0 9 1 * *')).toBe('0 9 1 * *')
   })
 

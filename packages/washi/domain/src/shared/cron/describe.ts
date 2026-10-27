@@ -12,7 +12,7 @@ export function describeCron(expression: string): string {
   const hours = [...fields.hour]
   if (dom !== '*' || month !== '*') return expression
 
-  if (hourText === '*' && minutes.length === 1) {
+  if (hourText === '*' && dow === '*' && minutes.length === 1) {
     return `Every hour at :${pad(minutes[0] ?? 0)}`
   }
   if (minuteText?.includes('/') || hourText?.includes('/')) return expression
