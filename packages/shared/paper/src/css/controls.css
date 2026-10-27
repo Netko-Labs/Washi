@@ -18,7 +18,8 @@
   transition:
     background var(--ease),
     border-color var(--ease),
-    box-shadow var(--ease);
+    box-shadow var(--ease),
+    transform var(--ease);
 }
 .wsx-button[data-tone="neutral"] {
   background: var(--ink);
@@ -45,11 +46,22 @@
   color: var(--t-text);
 }
 .wsx-button:hover:not(:disabled) {
-  filter: brightness(0.96);
+  background-image: linear-gradient(
+    color-mix(in srgb, currentColor 9%, transparent),
+    color-mix(in srgb, currentColor 9%, transparent)
+  );
+}
+.wsx-button:active:not(:disabled) {
+  transform: translateY(0.5px);
 }
 .wsx-button:disabled {
-  opacity: 0.5;
-  cursor: default;
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.wsx-button:disabled:not([data-variant="outline"], [data-variant="plain"]) {
+  background: var(--muted-bg);
+  color: var(--muted);
+  opacity: 1;
 }
 .wsx-button:focus-visible,
 .wsx-switch:focus-visible,
@@ -59,61 +71,6 @@
   outline-offset: 2px;
 }
 
-.wsx-field {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  min-width: 0;
-}
-.wsx-field-label {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-.wsx-field-input {
-  height: 34px;
-  padding: 0 11px;
-  border-radius: var(--r-input);
-  border: 1.5px solid var(--border);
-  background: var(--card);
-  color: var(--ink);
-  font: inherit;
-  font-size: 14px;
-  transition: border-color var(--ease);
-}
-select.wsx-field-input {
-  appearance: none;
-  padding-right: 28px;
-  background-image:
-    linear-gradient(45deg, transparent 50%, var(--muted) 50%),
-    linear-gradient(135deg, var(--muted) 50%, transparent 50%);
-  background-position:
-    calc(100% - 16px) 15px,
-    calc(100% - 11px) 15px;
-  background-size: 5px 5px;
-  background-repeat: no-repeat;
-  cursor: pointer;
-}
-.wsx-field-input:focus {
-  outline: none;
-  border-color: var(--accent);
-}
-.wsx-field-help,
-.wsx-field-error {
-  font-size: 12px;
-  color: var(--muted);
-}
-.wsx-field-error {
-  color: var(--tone-danger-text);
-}
-.wsx-field[data-kind="boolean"] {
-  flex-direction: row;
-  align-items: center;
-  gap: 9px;
-}
-
 .wsx-task {
   display: flex;
   align-items: flex-start;
@@ -121,42 +78,111 @@ select.wsx-field-input {
   cursor: pointer;
   line-height: 1.5;
 }
-.wsx-task input {
+.wsx-task input,
+.wsx-form-check {
   appearance: none;
   flex: none;
-  width: 16px;
-  height: 16px;
-  margin-top: 4px;
-  border: 1.5px solid var(--border);
-  border-radius: var(--r-cell);
+  width: 17px;
+  height: 17px;
+  margin: 3px 0 0;
+  border: 1.5px solid color-mix(in srgb, var(--ink) 28%, var(--border));
+  border-radius: 5px;
   background: var(--card);
   display: grid;
   place-items: center;
   cursor: pointer;
   transition:
     background var(--ease),
-    border-color var(--ease);
+    border-color var(--ease),
+    box-shadow var(--ease);
 }
-.wsx-task input:checked {
+.wsx-task input:hover:not(:disabled),
+.wsx-form-check:hover {
+  border-color: var(--accent);
+}
+.wsx-task input:focus-visible,
+.wsx-form-check:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 28%, transparent);
+}
+.wsx-task input:checked,
+.wsx-form-check:checked {
   background: var(--accent);
   border-color: var(--accent);
 }
-.wsx-task input:checked::after {
+.wsx-task input:checked::after,
+.wsx-form-check:checked::after {
   content: "";
   width: 8px;
-  height: 5px;
+  height: 4.5px;
   border: 2px solid var(--accent-ink);
   border-top: 0;
   border-right: 0;
   transform: translateY(-1px) rotate(-45deg);
+  animation: wsx-tick 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes wsx-tick {
+  from {
+    transform: translateY(-1px) rotate(-45deg) scale(0.4);
+    opacity: 0;
+  }
 }
 .wsx-task[data-done] > span {
   color: var(--muted);
   text-decoration: line-through;
+  text-decoration-color: color-mix(in srgb, var(--muted) 60%, transparent);
 }
 .wsx-task input:disabled {
   opacity: 0.6;
   cursor: default;
+}
+
+/* A task over a named field is a state, not a to-do: a chip that fills when it holds. */
+.wsx-task[data-toggle] {
+  flex: none;
+  align-items: center;
+  gap: 7px;
+  height: calc(28px * var(--sz));
+  padding: 0 11px 0 7px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: calc(12.5px * var(--sz));
+  font-weight: 600;
+  line-height: 1;
+  color: var(--muted);
+  user-select: none;
+  transition:
+    background var(--ease),
+    border-color var(--ease),
+    color var(--ease);
+}
+.wsx-task[data-toggle]:hover {
+  color: var(--ink);
+  border-color: color-mix(in srgb, var(--ink) 25%, var(--border));
+}
+.wsx-task[data-toggle] input {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  border-radius: 999px;
+}
+.wsx-task[data-toggle][data-done] {
+  border-color: color-mix(in srgb, var(--tone-success) 45%, var(--border));
+  background: color-mix(in srgb, var(--tone-success) 15%, transparent);
+  color: var(--tone-success-text);
+}
+.wsx-task[data-toggle][data-done] > span {
+  color: inherit;
+  text-decoration: none;
+}
+.wsx-task[data-toggle] input:checked {
+  background: var(--tone-success);
+  border-color: var(--tone-success);
+}
+.wsx-task[data-toggle] input:checked::after {
+  width: 7px;
+  height: 4px;
+  border-color: var(--tone-success-on);
 }
 
 .wsx-switch-row {
@@ -224,46 +250,4 @@ select.wsx-field-input {
     height: 44px;
     touch-action: manipulation;
   }
-}
-
-.wsx-select-row {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  font-size: 14px;
-}
-.wsx-select-label {
-  color: var(--muted);
-}
-.wsx-select {
-  width: auto;
-  min-width: 140px;
-}
-
-.wsx-form {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 12px 14px;
-  align-items: start;
-}
-.wsx-form-actions,
-.wsx-form-error {
-  grid-column: 1 / -1;
-}
-.wsx-form-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.wsx-form-status {
-  font-size: 12px;
-  color: var(--tone-success-text);
-}
-.wsx-form-list {
-  min-height: 34px;
-  padding: 0;
-}
-.wsx-form-check {
-  margin: 0;
-  accent-color: var(--accent);
 }

@@ -185,7 +185,7 @@ function ChartBody({
         const points = toPoints(rows, label, value, locale)
         return (
           <div {...styled(rest, 'wsx-chart')} data-kind={kind}>
-            {kind === 'bar' && <ChartBars points={points} colors={RAMP} locale={locale} />}
+            {kind === 'bar' && <ChartBars points={points} locale={locale} />}
             {(kind === 'line' || kind === 'area') && (
               <Lines points={points} area={kind === 'area'} locale={locale} />
             )}

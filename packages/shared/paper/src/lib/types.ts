@@ -113,6 +113,5 @@ export interface ChartPoint {
 
 export interface ChartBarsProps {
   points: ChartPoint[]
-  colors: readonly string[]
   locale?: string
 }

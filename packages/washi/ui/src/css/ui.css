@@ -20,6 +20,19 @@
   --measure: 100%;
 }
 
+/* Native controls and scrollbars follow the mode; without it a dark page wears light chrome. */
+:root {
+  color-scheme: light;
+  scrollbar-color: color-mix(in srgb, var(--foreground) 20%, transparent) transparent;
+}
+.dark {
+  color-scheme: dark;
+  scrollbar-color: color-mix(in srgb, var(--foreground) 20%, transparent) transparent;
+}
+* {
+  scrollbar-width: thin;
+}
+
 :root {
   /* Washi.dc.html (0.4) — the paper palette, design-exact hex */
   --background: #f1ede5;

@@ -22,11 +22,11 @@ function isColumnar(points: ChartPoint[]): boolean {
 /**
  * Bars in HTML, not a stretched picture: text stays its own size at any width, a long label gets
  * its own line, and every figure fits. Values read compact ("4.1M"); the exact one is on hover.
+ * One series, one hue — the sheet's accent — so length alone carries the comparison.
  */
-export function ChartBars({ points, colors, locale }: ChartBarsProps) {
+export function ChartBars({ points, locale }: ChartBarsProps) {
   const max = Math.max(1, ...points.map((point) => point.value))
   const share = (value: number) => `${Math.max(0, (value / max) * 100)}%`
-  const color = (index: number) => colors[index % colors.length]
 
   if (isColumnar(points)) {
     return (
@@ -35,7 +35,7 @@ export function ChartBars({ points, colors, locale }: ChartBarsProps) {
           <div key={point.label + index} className="wsx-column" title={exact(point.value, locale)}>
             <span className="wsx-column-figure">{compact(point.value, locale)}</span>
             <span className="wsx-column-track">
-              <i style={{ height: share(point.value), background: color(index) }} />
+              <i style={{ height: share(point.value) }} />
             </span>
             <span className="wsx-column-label">{point.label}</span>
           </div>
@@ -54,7 +54,7 @@ export function ChartBars({ points, colors, locale }: ChartBarsProps) {
         >
           <span className="wsx-bar-label">{point.label}</span>
           <span className="wsx-bar-track">
-            <i style={{ width: share(point.value), background: color(index) }} />
+            <i style={{ width: share(point.value) }} />
           </span>
           <span className="wsx-bar-figure">{compact(point.value, locale)}</span>
         </div>

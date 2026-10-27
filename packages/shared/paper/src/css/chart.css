@@ -1,0 +1,130 @@
+/* Charts: one series reads in one hue — the sheet's accent, or the chart's own tone. */
+
+.wsx-chart {
+  --bar: var(--k-fill);
+  width: 100%;
+  overflow: hidden;
+}
+.wsx-chart[data-tone] {
+  --bar: var(--t-fill);
+}
+.wsx-chart svg {
+  display: block;
+  width: 100%;
+  height: clamp(150px, 30cqw, 240px);
+}
+
+/* Bars: label · track · figure on one line each, so long names and big numbers both fit. */
+.wsx-bars {
+  display: grid;
+  grid-template-columns: minmax(88px, min(32%, 240px)) 1fr minmax(4ch, auto);
+  align-items: center;
+  gap: 4px 14px;
+  font-size: calc(13.5px * var(--sz));
+}
+.wsx-bar {
+  display: contents;
+}
+.wsx-bar > * {
+  padding-block: 6px;
+}
+.wsx-bar-label {
+  overflow: hidden;
+  color: var(--ink);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wsx-bar-track {
+  position: relative;
+  height: 8px;
+  padding: 0;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--muted-bg) 80%, transparent);
+  overflow: hidden;
+}
+.wsx-bar-track i,
+.wsx-column-track i {
+  display: block;
+  background: var(--bar);
+  border-radius: inherit;
+  transition:
+    width 320ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    height 320ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity var(--ease);
+}
+.wsx-bar-track i {
+  height: 100%;
+}
+.wsx-bar-figure,
+.wsx-column-figure {
+  font-size: calc(12.5px * var(--sz));
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  text-align: right;
+}
+.wsx-bars:hover .wsx-bar-track i,
+.wsx-columns:hover .wsx-column-track i {
+  opacity: 0.45;
+}
+.wsx-bars .wsx-bar:hover .wsx-bar-track i,
+.wsx-columns .wsx-column:hover .wsx-column-track i {
+  opacity: 1;
+}
+.wsx-bar:hover .wsx-bar-figure,
+.wsx-column:hover .wsx-column-figure {
+  color: var(--ink);
+}
+
+/* Columns, for short labels — months, days. Each stands in a ghost of the tallest. */
+.wsx-columns {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  height: clamp(160px, 30cqw, 240px);
+  font-size: calc(12px * var(--sz));
+}
+.wsx-column {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.wsx-column-track {
+  display: flex;
+  flex: 1;
+  align-items: flex-end;
+  width: min(100%, 40px);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--muted-bg) 55%, transparent);
+}
+.wsx-column-track i {
+  width: 100%;
+}
+.wsx-column-label {
+  color: var(--muted);
+}
+@media (prefers-reduced-motion: reduce) {
+  .wsx-bar-track i,
+  .wsx-column-track i {
+    transition: none;
+  }
+}
+
+.wsx-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.wsx-chart-legend i {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  margin-right: 6px;
+}
