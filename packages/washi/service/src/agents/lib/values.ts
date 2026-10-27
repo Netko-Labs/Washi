@@ -58,6 +58,8 @@ drops that filter, so one set of views follows a <Select state="month" options={
 never copy a page's stats, charts and lists per month or per anything a picker could choose.
 Name such a key unlike any column (picked_month, not month): inside an aggregate's where a bare name is
 the row's column first, so sum(expenses.amount where month = picked_month) reads the picker.
+A bind's params feed its table's rollups — <Table bind={{ table: 'categories', params: { month: { state:
+'picked_month' } } }} /> shows budget vs spent for the picked month; a rollup's { param } filter drops when unset.
 
 Budget: ~400 nodes, 8 binds, 24 expressions per sheet — over it, split into linked sheets (<Ref>).
 Always run sheet_check before sheet_create or sheet_replace and fix every diagnostic. Structured

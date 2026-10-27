@@ -13,6 +13,7 @@ export const columnTypeSchema = z.enum([
   'url',
   'relation',
   'formula',
+  'rollup',
 ])
 export type ColumnType = z.infer<typeof columnTypeSchema>
 
@@ -47,6 +48,8 @@ export const columnSpecSchema = z
      * read, never stored.
      */
     expr: z.string().min(1).max(500).optional(),
+    /** A `rollup`: one aggregate over another table's rows that point at this one (D74). */
+    rollup: z.lazy(() => rollupSpecSchema).optional(),
   })
   .superRefine((column, ctx) => {
     // Stored specs are re-parsed on every read: a rule added here must not orphan an old table.
@@ -60,6 +63,12 @@ export const columnSpecSchema = z
     }
     if (column.type !== 'formula' && column.expr !== undefined) {
       ctx.addIssue({ code: 'custom', path: ['expr'], message: 'only a formula column has expr' })
+    }
+    if (column.type === 'rollup' && column.rollup === undefined) {
+      ctx.addIssue({ code: 'custom', path: ['rollup'], message: 'a rollup column needs rollup' })
+    }
+    if (column.type !== 'rollup' && column.rollup !== undefined) {
+      ctx.addIssue({ code: 'custom', path: ['rollup'], message: 'only a rollup column has rollup' })
     }
   })
 export type ColumnSpec = z.infer<typeof columnSpecSchema>
@@ -96,8 +105,34 @@ export const aggregateSchema = z.object({
 })
 export type Aggregate = z.infer<typeof aggregateSchema>
 
+/** A rollup filter may name a query parameter — `{ param: 'month' }` — the page fills (D74). */
+export const paramRefSchema = z.object({ param: identifier('param') }).strict()
+export type ParamRef = z.infer<typeof paramRefSchema>
+
+export const rollupFilterSchema = filterSchema.extend({
+  value: z.union([filterSchema.shape.value, paramRefSchema]),
+})
+export type RollupFilter = z.infer<typeof rollupFilterSchema>
+
+/**
+ * Over `table`'s rows whose `via` points at this row — a relation holding this row's id, or a
+ * plain value equal to this row's `on` column (its first text column when unnamed) — one
+ * aggregate, after `where`.
+ */
+export const rollupSpecSchema = z.object({
+  table: identifier('table'),
+  via: identifier('column'),
+  on: identifier('column').optional(),
+  fn: aggregateFnSchema,
+  column: identifier('column').optional(),
+  where: z.array(rollupFilterSchema).max(8).optional(),
+})
+export type RollupSpec = z.infer<typeof rollupSpecSchema>
+
 export const querySchema = z.object({
   table: z.string().min(1),
+  /** Values a rollup's `{ param }` filters read; unset drops that filter. */
+  params: z.record(identifier('param'), scalarSchema).optional(),
   where: z.array(filterSchema).max(16).optional(),
   orderBy: z
     .object({ column: z.string().min(1), direction: z.enum(['asc', 'desc']).default('asc') })

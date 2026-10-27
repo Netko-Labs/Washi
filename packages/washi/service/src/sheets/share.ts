@@ -78,19 +78,29 @@ function namesIn(node: unknown, into: Set<string>): Set<string> {
 }
 
 /**
- * The page's redacted columns of `table`, and every formula that reads one — directly or through
+ * The page's redacted columns of `table`; every rollup over a table the page doesn't read, or over
+ * a column it redacts there; and every formula that reads any of those — directly or through
  * another formula — or `cop = usd * fx_rate` would hand a hidden `usd` straight to the link.
  */
 function hiddenIn(ws: Workspace, root: WsxElement, table: string): Set<string> {
-  if (!pageTables(root).has(table)) {
+  const readable = pageTables(root)
+  if (!readable.has(table)) {
     throw new ShareRefusedError(`this page does not read "${table}"`)
   }
-  const hidden = new Set(redactedColumns(root).get(table) ?? [])
+  const redacted = redactedColumns(root)
+  const hidden = new Set(redacted.get(table) ?? [])
+  const columns = getTableByName(ws, table)?.spec.columns ?? []
+  for (const column of columns) {
+    const rollup = column.rollup
+    if (column.type !== 'rollup' || !rollup) continue
+    const there = redacted.get(rollup.table) ?? new Set<string>()
+    const touched = [rollup.via, rollup.column, ...(rollup.where ?? []).map((each) => each.column)]
+    if (!readable.has(rollup.table) || touched.some((name) => name && there.has(name))) {
+      hidden.add(column.name)
+    }
+  }
   if (hidden.size === 0) return hidden
-  const formulas = (getTableByName(ws, table)?.spec.columns ?? []).filter(
-    (column) => column.type === 'formula' && column.expr,
-  )
-  for (const column of formulas) {
+  for (const column of columns.filter((each) => each.type === 'formula' && each.expr)) {
     let reads: Set<string>
     try {
       reads = namesIn(parseExpr(column.expr ?? ''), new Set())

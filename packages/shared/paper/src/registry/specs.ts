@@ -31,7 +31,9 @@ export const bindFilterSchema = filterSchema.extend({
   value: z.union([filterSchema.shape.value, stateRefSchema]),
 })
 const bindWhere = z.array(bindFilterSchema).max(16).optional()
-export const bindQuerySchema = querySchema.extend({ where: bindWhere })
+/** A query's `params` feed its table's rollups; each may read state too (D74). */
+const bindParams = z.record(stateKey, z.union([scalarSchema, stateRefSchema])).optional()
+export const bindQuerySchema = querySchema.extend({ where: bindWhere, params: bindParams })
 export const bindHistorySchema = historyQuerySchema.extend({ where: bindWhere })
 export type StateRef = z.infer<typeof stateRefSchema>
 export type BindFilter = z.infer<typeof bindFilterSchema>

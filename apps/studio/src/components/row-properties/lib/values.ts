@@ -8,6 +8,7 @@ import {
   IconMathFunction,
   IconProgress,
   IconSquareCheck,
+  IconSum,
   IconTags,
   IconUser,
 } from '@tabler/icons-react'
@@ -25,4 +26,5 @@ export const PROPERTY_ICONS: Record<Column['type'], typeof IconHash> = {
   url: IconLink,
   relation: IconArrowUpRight,
   formula: IconMathFunction,
+  rollup: IconSum,
 }

@@ -81,8 +81,9 @@ export function validateRecord(spec: TableSpec, data: RecordData): InkIssue[] {
       issues.push({ path: key, message: `unknown column "${key}" on table "${spec.name}"` })
       continue
     }
-    if (column.type === 'formula') {
-      issues.push({ path: key, message: `"${key}" is computed from its formula; write its inputs` })
+    if (column.type === 'formula' || column.type === 'rollup') {
+      const from = column.type === 'formula' ? 'its formula' : 'the rows it rolls up'
+      issues.push({ path: key, message: `"${key}" is computed from ${from}; write its inputs` })
       continue
     }
     const problem = checkValue(column, value)

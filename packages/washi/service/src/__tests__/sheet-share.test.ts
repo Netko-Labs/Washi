@@ -63,6 +63,27 @@ describe('a shared link (D65)', () => {
     ])
   })
 
+  test('a rollup over a table the page does not show stays off the link, and so do its formulas (D74)', () => {
+    defineUserTable(ws, {
+      name: 'deals',
+      columns: [
+        { name: 'client', type: 'text' },
+        { name: 'amount', type: 'number' },
+        {
+          name: 'paid_out',
+          type: 'rollup',
+          rollup: { table: 'salaries', via: 'who', on: 'client', fn: 'count' },
+        },
+        { name: 'busy', type: 'formula', expr: 'paid_out > 0' },
+      ],
+    })
+    const { token } = publicPage()
+    const row = sharedQuery(ws, token, { table: 'deals' }).rows[0]
+    expect(row).toMatchObject({ client: 'Acme' })
+    expect(row).not.toHaveProperty('paid_out')
+    expect(row).not.toHaveProperty('busy')
+  })
+
   test('a formula that reads a redacted column is redacted too, however indirectly (D73)', () => {
     const { token } = publicPage()
     const rows = sharedQuery(ws, token, { table: 'deals' }).rows
