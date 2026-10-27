@@ -251,8 +251,9 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   for what leaves, each call ledgered as `auto`; policy refusals still refuse. Owner or admin
   only (`ownerProcedure`), as is setting an integration key.
 - **The agent panel (D61).** `AgentPanel` takes a `placement`: `float` (the popover), `dock` (a
-  flex sibling the studio's wide shell puts beside the page; remembered per workspace in
-  `washi:dock:<id>`, the FAB steps aside while it is open) or `sheet` (the whole screen under
+  flex sibling the studio's wide shell puts beside the page; the default — only an undock is
+  remembered, `washi:dock:<id>` = `0`; the FAB, the whole mascot tile on a squircle, steps aside
+  while it is open) or `sheet` (the whole screen under
   `md`). The composer sets a conversation up: `+` attaches a page by id (Washi is told to read it
   with `sheet_get`), a text file (inlined, 200 KB) or a picture (an image block on the Claude
   port; the AI SDK path says it cannot see it yet) through the host's `uploadFile`; the model

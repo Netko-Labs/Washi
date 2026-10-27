@@ -80,7 +80,7 @@ export const useAgentStore = create<AgentState>((set, get) => ({
   startDraft: () => set({ draft: true, activeSessionId: null, transcript: [], running: false }),
   panelOpen: false,
   togglePanel: () => set((state) => ({ panelOpen: !state.panelOpen })),
-  docked: false,
+  docked: true,
   setDocked: (docked) => set({ docked }),
   toggleDocked: () => set((state) => ({ docked: !state.docked })),
 
