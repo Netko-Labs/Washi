@@ -3,45 +3,78 @@
 .wsx-table-wrap {
   overflow-x: auto;
   border: 1px solid var(--border);
-  border-radius: var(--r-input);
+  border-radius: var(--r-card);
   background: var(--card);
+  box-shadow: var(--shadow-card);
 }
 .wsx-table {
   width: 100%;
-  border-collapse: collapse;
-  font-size: calc(13.5px * var(--sz));
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: calc(14px * var(--sz));
 }
 .wsx-table th {
   text-align: left;
-  font-size: 10.5px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-size: calc(12px * var(--sz));
+  font-weight: 600;
   color: var(--muted);
-  padding: 9px 12px;
+  padding: 12px 16px 10px;
   border-bottom: 1px solid var(--border);
-  background: var(--muted-bg);
   white-space: nowrap;
 }
 .wsx-table td {
-  padding: 8px 12px;
-  border-bottom: 1px solid var(--border);
-  vertical-align: top;
+  padding: 11px 16px;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
+  vertical-align: middle;
+  color: var(--ink);
+  transition: background var(--ease);
+}
+.wsx-table td:first-child {
+  font-weight: 600;
+}
+.wsx-table tr:last-child td {
+  border-bottom: 0;
+}
+.wsx-table tbody tr:hover td {
+  background: color-mix(in srgb, var(--muted-bg) 55%, transparent);
 }
 .wsx-table tr[data-openable] {
   cursor: pointer;
 }
-
-.wsx-table tr[data-openable]:hover td {
-  background: var(--muted-bg);
-}
-
-.wsx-table tr:last-child td {
-  border-bottom: 0;
-}
-.wsx-table td[data-num] {
+.wsx-table [data-num] {
   text-align: right;
   font-variant-numeric: tabular-nums;
+}
+.wsx-table td[data-negative] {
+  color: var(--tone-danger-text);
+}
+.wsx-table td[data-bool="true"] {
+  color: var(--tone-success-text);
+}
+.wsx-table td[data-bool="false"] {
+  color: var(--muted);
+}
+
+/* A repeated row is a ledger line: one card, hairlines between, unless the rows hold cards. */
+.wsx-repeat:has(> .wsx-row):not(:has(> .wsx-row > .wsx-card)) {
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  background: var(--card);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+.wsx-repeat:has(> .wsx-row):not(:has(> .wsx-row > .wsx-card)) > .wsx-row {
+  align-items: center;
+  padding: 10px 16px;
+  min-height: 52px;
+  transition: background var(--ease);
+}
+.wsx-repeat:has(> .wsx-row):not(:has(> .wsx-row > .wsx-card)) > .wsx-row + .wsx-row {
+  border-top: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
+}
+.wsx-repeat:has(> .wsx-row):not(:has(> .wsx-row > .wsx-card)) > .wsx-row:hover {
+  background: color-mix(in srgb, var(--muted-bg) 45%, transparent);
 }
 
 .wsx-stat {
@@ -87,109 +120,6 @@
 }
 .wsx-stat-trend[data-trend="flat"] {
   color: var(--muted);
-}
-
-.wsx-chart {
-  width: 100%;
-  overflow: hidden;
-}
-.wsx-chart svg {
-  display: block;
-  width: 100%;
-  height: clamp(150px, 30cqw, 240px);
-}
-/* Bars: label · track · figure on one line each, so long names and big numbers both fit. */
-.wsx-bars {
-  display: grid;
-  grid-template-columns: minmax(72px, max-content) 1fr auto;
-  align-items: center;
-  gap: 8px 12px;
-  font-size: 13px;
-}
-.wsx-bar {
-  display: contents;
-}
-.wsx-bar-label {
-  max-width: 200px;
-  overflow: hidden;
-  color: var(--muted);
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.wsx-bar-track {
-  height: 14px;
-  border-radius: 999px;
-  background: var(--muted-bg);
-  overflow: hidden;
-}
-.wsx-bar-track i,
-.wsx-column-track i {
-  display: block;
-  border-radius: inherit;
-  transition:
-    width 260ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    height 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-.wsx-bar-track i {
-  height: 100%;
-}
-.wsx-bar-figure,
-.wsx-column-figure {
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  color: var(--ink);
-}
-
-/* Columns, for short labels — months, days. */
-.wsx-columns {
-  display: flex;
-  align-items: stretch;
-  gap: 10px;
-  height: clamp(160px, 30cqw, 240px);
-  font-size: 12px;
-}
-.wsx-column {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  min-width: 0;
-}
-.wsx-column-track {
-  display: flex;
-  flex: 1;
-  align-items: flex-end;
-  width: min(100%, 44px);
-}
-.wsx-column-track i {
-  width: 100%;
-  border-radius: 6px 6px 3px 3px;
-}
-.wsx-column-label {
-  color: var(--muted);
-}
-@media (prefers-reduced-motion: reduce) {
-  .wsx-bar-track i,
-  .wsx-column-track i {
-    transition: none;
-  }
-}
-
-.wsx-chart-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 14px;
-  margin-top: 8px;
-  font-size: 12px;
-  color: var(--muted);
-}
-.wsx-chart-legend i {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  margin-right: 6px;
 }
 
 .wsx-timeline {

@@ -68,6 +68,7 @@ export function Field({
       <input
         id={id}
         type="checkbox"
+        className="wsx-form-check"
         checked={value === 'true'}
         onChange={(event) => {
           setValue(String(event.target.checked))
@@ -188,7 +189,11 @@ export function Task({
   const rowId = row ?? (scoped?.id as string | undefined)
   const [checked, setChecked] = useState(done ?? scoped?.[field ?? 'done'] === true)
   return (
-    <label {...styled(rest, 'wsx-task')} data-done={checked || undefined}>
+    <label
+      {...styled(rest, 'wsx-task')}
+      data-done={checked || undefined}
+      data-toggle={field ? '' : undefined}
+    >
       <input
         type="checkbox"
         checked={checked}

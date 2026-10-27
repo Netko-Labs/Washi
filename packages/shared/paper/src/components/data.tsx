@@ -5,6 +5,7 @@ import { usePaperHost } from '../provider'
 import type { BindQuery } from '../registry'
 import { RowProvider } from '../state'
 import { Chart } from './chart'
+import { tableLabel } from './database'
 import { Bound, cell } from './states'
 
 export { Chart }
@@ -39,18 +40,24 @@ export function Table({
   ...rest
 }: BlockProps & { bind: BindQuery; columns?: string[]; empty?: string }) {
   const state = useBind(bind)
-  const { openRow } = usePaperHost()
+  const { openRow, locale } = usePaperHost()
   return (
     <Bound state={state} empty={empty}>
       {(rows) => {
         const keys = columns ?? Object.keys(rows[0] ?? {}).filter((key) => key !== 'id')
+        const numeric = new Set(
+          keys.filter((key) => rows.some((row) => typeof row[key] === 'number')),
+        )
+        const number = new Intl.NumberFormat(locale, { maximumFractionDigits: 2 })
         return (
           <div {...styled(rest, 'wsx-table-wrap')}>
             <table className="wsx-table">
               <thead>
                 <tr>
                   {keys.map((key) => (
-                    <th key={key}>{key.replace(/_/g, ' ')}</th>
+                    <th key={key} data-num={numeric.has(key) || undefined}>
+                      {tableLabel(key)}
+                    </th>
                   ))}
                 </tr>
               </thead>
@@ -61,11 +68,20 @@ export function Table({
                     data-openable={openRow && typeof row.id === 'string' ? '' : undefined}
                     onClick={() => typeof row.id === 'string' && openRow?.(row.id)}
                   >
-                    {keys.map((key) => (
-                      <td key={key} data-num={typeof row[key] === 'number' || undefined}>
-                        {cell(row[key])}
-                      </td>
-                    ))}
+                    {keys.map((key) => {
+                      const value = row[key]
+                      const isNumber = typeof value === 'number'
+                      return (
+                        <td
+                          key={key}
+                          data-num={numeric.has(key) || undefined}
+                          data-negative={(isNumber && value < 0) || undefined}
+                          data-bool={typeof value === 'boolean' ? String(value) : undefined}
+                        >
+                          {isNumber ? number.format(value) : cell(value)}
+                        </td>
+                      )
+                    })}
                   </tr>
                 ))}
               </tbody>
