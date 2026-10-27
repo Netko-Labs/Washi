@@ -32,6 +32,7 @@ export const agentSessionSchema = z.object({
 
 /** A model the workspace offers in the composer; the name is the catalogue's, kept for the label. */
 export const enabledModelSchema = z.object({
+  provider: z.string().min(1).max(40),
   id: z.string().min(1).max(200),
   name: z.string().min(1).max(120),
 })

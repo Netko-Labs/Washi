@@ -7,8 +7,9 @@ import { ModelSwitch } from './model-switch'
 const SHOWN = 30
 
 /**
- * What the composer's model chip offers the team. Nothing picked means the recommended three;
- * the first switch turns that implicit list into an explicit one.
+ * What the composer's model chip offers the team, per provider. Nothing picked for this provider
+ * means the recommended three; the first switch turns that implicit list into an explicit one.
+ * Another provider's picks are kept as they are.
  */
 export function EnabledModelsCard({ models, provider, enabled, onChange }: EnabledModelsCardProps) {
   const [term, setTerm] = useState('')
@@ -18,7 +19,12 @@ export function EnabledModelsCard({ models, provider, enabled, onChange }: Enabl
   const recommended = (RECOMMENDED[provider] ?? []).flatMap((pick) =>
     own.filter((model) => model.id === pick.id),
   )
-  const current = enabled ?? recommended.map((model) => ({ id: model.id, name: model.name }))
+  const others = (enabled ?? []).filter((model) => model.provider !== provider)
+  const picked = (enabled ?? []).filter((model) => model.provider === provider)
+  const current =
+    picked.length > 0
+      ? picked
+      : recommended.map((model) => ({ provider, id: model.id, name: model.name }))
   const isOn = (id: string) => current.some((model) => model.id === id)
   const needle = term.trim().toLowerCase()
   const shown = own
@@ -26,9 +32,12 @@ export function EnabledModelsCard({ models, provider, enabled, onChange }: Enabl
     .slice(0, SHOWN)
 
   const toggle = (id: string, name: string) =>
-    void onChange(
-      isOn(id) ? current.filter((model) => model.id !== id) : [...current, { id, name }],
-    )
+    void onChange([
+      ...others,
+      ...(isOn(id)
+        ? current.filter((model) => model.id !== id)
+        : [...current, { provider, id, name }]),
+    ])
 
   return (
     <SettingsCard
@@ -45,10 +54,10 @@ export function EnabledModelsCard({ models, provider, enabled, onChange }: Enabl
           aria-label="Search models"
           className="h-10 flex-1 bg-transparent text-[13px] outline-none placeholder:text-muted-foreground"
         />
-        {enabled && (
+        {picked.length > 0 && (
           <button
             type="button"
-            onClick={() => void onChange(null)}
+            onClick={() => void onChange(others.length > 0 ? others : null)}
             className="shrink-0 text-[12px] text-muted-foreground hover:text-foreground"
           >
             Back to recommended

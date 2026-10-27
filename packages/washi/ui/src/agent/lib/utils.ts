@@ -45,11 +45,17 @@ export function mergeMessageChunks(entries: TranscriptEntry[]): TranscriptEntry[
   return merged
 }
 
-/** The workspace's picks, described where they are one of the recommended; else the three. */
+/**
+ * The workspace's picks for the provider its key is on, described where they are one of the
+ * recommended. None for this provider — never chosen, all switched off, or chosen under another
+ * key — offers the recommended three: the chip is never empty.
+ */
 export function offeredModels(inference: InferenceView | null): ModelChoice[] {
-  const recommended = RECOMMENDED_MODELS[inference?.provider ?? 'anthropic'] ?? []
-  if (!inference?.enabledModels) return recommended
-  return inference.enabledModels.map((model) => ({
+  const provider = inference?.provider ?? 'anthropic'
+  const recommended = RECOMMENDED_MODELS[provider] ?? []
+  const picked = inference?.enabledModels?.filter((model) => model.provider === provider) ?? []
+  if (picked.length === 0) return recommended
+  return picked.map((model) => ({
     id: model.id,
     label: model.name.replace(/^Claude /, ''),
     desc: recommended.find((pick) => pick.id === model.id)?.desc ?? '',

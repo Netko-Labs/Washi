@@ -257,7 +257,7 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   `auth.organization.update`, owners and admins; People), Washi (Models · What leaves · Usage ·
   Routines), Server (the app admin's). `?tab=` names the section; an unknown one (the old `agent`)
   lands on Models. **The team's models** are app meta `agent_enabled_models` (`EnabledModel[]`, id +
-  the catalogue's name; null = the recommended three), set by owners (`agents.setEnabledModels`)
+  the catalogue's name, per provider; none for the key's provider = the recommended three), set by owners (`agents.setEnabledModels`)
   and read by the composer's model chip through `agents.settings`. Menus and pickers in the studio
   are `Floating` (`components/shared/floating`): portalled to the body, so no `overflow-hidden`
   card or sidebar clips them; `useDismiss` treats a press inside `[data-floating]` as inside.
