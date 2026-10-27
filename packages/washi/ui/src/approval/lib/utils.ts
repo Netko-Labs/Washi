@@ -109,6 +109,14 @@ export function describeTool(name: string, input: unknown, titleOf: TitleOf): To
     case 'db_define':
     case 'db_mutate':
       return describeTable(name, args)
+    case 'db_link_column': {
+      const input = record(args.input)
+      return base({
+        icon: IconLink,
+        action: `Link ${text(input.table) ?? 'a table'}’s ${text(input.column) ?? 'column'} to`,
+        subject: text(input.target),
+      })
+    }
     case 'fetch_url':
       return base({
         icon: IconWorld,

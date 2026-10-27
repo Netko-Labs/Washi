@@ -86,7 +86,13 @@ export {
   type StorageInfo,
   storageConfigSchema,
 } from './entities/storage'
-export { type RowOf, type UserTable, userTableSchema } from './entities/tables'
+export {
+  type LinkColumnInput,
+  linkColumnInputSchema,
+  type RowOf,
+  type UserTable,
+  userTableSchema,
+} from './entities/tables'
 export { compareHlc, createHlcClock, type HlcClock } from './hlc'
 export { positionBetween } from './position'
 export {

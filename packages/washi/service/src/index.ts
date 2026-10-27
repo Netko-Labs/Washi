@@ -78,6 +78,7 @@ export {
 } from './sheets/share'
 export { duplicateSheet, moveSheetTo, restoreSheetTree, SheetMoveError } from './sheets/tree'
 export { runHistory } from './tables/history'
+export { linkColumn } from './tables/link'
 export { openRowPage, rowOfSheet, rowTitle } from './tables/rows'
 export {
   addColumn,

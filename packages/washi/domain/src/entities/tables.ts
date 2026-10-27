@@ -16,3 +16,18 @@ export interface RowOf {
   /** Titles of the records its relation cells point at, by record id. */
   related: Record<string, string>
 }
+
+const snake = z
+  .string()
+  .regex(/^[a-z][a-z0-9_]*$/)
+  .max(64)
+
+/** Turn a choice column into a relation to `target`, matching values to its `on` text column. */
+export const linkColumnInputSchema = z.object({
+  table: snake,
+  column: snake,
+  target: snake,
+  on: snake.optional(),
+  create: z.boolean().optional(),
+})
+export type LinkColumnInput = z.infer<typeof linkColumnInputSchema>

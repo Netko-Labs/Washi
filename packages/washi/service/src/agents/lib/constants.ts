@@ -40,6 +40,7 @@ export const CHANGE_TOOLS: ReadonlySet<string> = new Set([
   'sheet_create',
   'sheet_replace',
   'db_define',
+  'db_link_column',
   'db_mutate',
 ])
 

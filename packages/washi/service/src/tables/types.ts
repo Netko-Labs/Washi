@@ -8,3 +8,8 @@ export interface TeamSpaceOptions {
   timeZone: string
   actorId: string | null
 }
+
+export interface LinkColumnResult {
+  linked: number
+  created: string[]
+}
