@@ -1,3 +1,4 @@
+import { IconBell } from '@tabler/icons-react'
 import { AgentMascot } from '../mascot'
 import { initials } from '../stores'
 import { type InboxRowProps, whenLabel } from './lib'
@@ -12,7 +13,14 @@ export function InboxRow({ row, now }: InboxRowProps) {
       {row.unread && (
         <span className="absolute top-[18px] left-0 size-1.5 rounded-full bg-primary" />
       )}
-      {row.who ? (
+      {row.kind === 'reminder' ? (
+        <span
+          className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full bg-accent text-muted-foreground"
+          aria-hidden
+        >
+          <IconBell className="size-4" />
+        </span>
+      ) : row.who ? (
         <span
           className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full bg-primary font-semibold text-[10.5px] text-primary-foreground"
           aria-hidden

@@ -39,6 +39,17 @@ export { addCustomEmoji, CustomEmojiError, removeCustomEmoji } from './emojis/se
 export { testStorage } from './files/storage'
 export type { StorageTest } from './files/types'
 export {
+  createReminderRule,
+  listReminderRules,
+  markRemindersRead,
+  ReminderError,
+  reminderInbox,
+  removeReminderRule,
+  tickReminders,
+  unreadReminders,
+  updateReminderRule,
+} from './reminders/service'
+export {
   canRead,
   guardWashiWrite,
   NOBODY,

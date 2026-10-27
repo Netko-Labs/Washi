@@ -1,3 +1,4 @@
+import type { Filter } from '@washi/ink'
 import { blob, integer, primaryKey, real, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
 export const sheetTable = sqliteTable('sheets', {
@@ -167,6 +168,43 @@ export const routineRunTable = sqliteTable('routine_runs', {
   trigger: text('trigger').notNull(),
   startedAt: text('started_at').notNull(),
 })
+
+/** A date rule the clock evaluates (D77): rows of `table` whose `date_column` comes due. No turn runs. */
+export const reminderTable = sqliteTable('reminders', {
+  id: text('id').primaryKey(),
+  title: text('title').notNull(),
+  table: text('table_name').notNull(),
+  dateColumn: text('date_column').notNull(),
+  daysBefore: integer('days_before').notNull(),
+  where: text('where_json', { mode: 'json' }).$type<Filter[]>().notNull(),
+  personColumn: text('person_column'),
+  timeZone: text('time_zone').notNull(),
+  enabled: integer('enabled', { mode: 'boolean' }).notNull().default(true),
+  createdBy: text('created_by'),
+  createdAt: text('created_at').notNull(),
+})
+
+/** One row per row per due date; `recipient` null is everyone the workspace has. */
+export const reminderHitTable = sqliteTable('reminder_hits', {
+  id: text('id').primaryKey(),
+  reminderId: text('reminder_id').notNull(),
+  recordId: text('record_id').notNull(),
+  dueDay: text('due_day').notNull(),
+  rowTitle: text('row_title').notNull(),
+  recipient: text('recipient'),
+  hlcCreated: text('hlc_created').notNull(),
+})
+
+/** Who has seen a hit; an unread hit is one with no row here for that person. */
+export const reminderReadTable = sqliteTable(
+  'reminder_reads',
+  {
+    hitId: text('hit_id').notNull(),
+    userId: text('user_id').notNull(),
+    readAt: text('read_at').notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.hitId, table.userId] })],
+)
 
 export const appMetaTable = sqliteTable('app_meta', {
   key: text('key').primaryKey(),

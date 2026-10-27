@@ -49,6 +49,16 @@ describe('tool calls read like a person asked', () => {
     expect(define.details).toEqual(['Columns: name, area'])
   })
 
+  test('a reminder says when it speaks', () => {
+    const reminder = describeTool(
+      'reminder_create',
+      { title: 'Bills due', table: 'bills', dateColumn: 'due', daysBefore: 2 },
+      titles,
+    )
+    expect(`${reminder.action} ${reminder.subject}`).toBe('Set a reminder Bills due')
+    expect(reminder.details).toEqual(['2 days before due · bills'])
+  })
+
   test('what leaves the workspace says so', () => {
     const fetch = describeTool('fetch_url', { url: 'https://kyoto.travel/en' }, titles)
     expect(`${fetch.action} ${fetch.subject}`).toBe('Visit kyoto.travel')

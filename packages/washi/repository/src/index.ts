@@ -70,6 +70,17 @@ export {
 export { getAppMeta, setAppMeta } from './storage/meta'
 export { createWorkspaceRegistry, type WorkspaceRegistry } from './storage/registry'
 export {
+  countUnreadReminderHits,
+  createReminder,
+  deleteReminder,
+  getReminder,
+  listReminderHits,
+  listReminders,
+  markReminderHitsRead,
+  recordReminderHit,
+  updateReminder,
+} from './storage/reminders'
+export {
   latestRevision,
   restoreRevision,
   type SheetRevision,

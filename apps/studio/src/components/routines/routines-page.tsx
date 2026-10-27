@@ -2,6 +2,7 @@ import { IconPlus } from '@tabler/icons-react'
 import { Link } from '@tanstack/react-router'
 import { Mascot } from '@washi/ui'
 import { ROUTINE_TEMPLATES, type RoutinesPageProps, useRoutines } from './lib'
+import { RemindersSection } from './reminders-section'
 import { RoutineListRow } from './routine-list-row'
 
 /** Everything Washi does on its own, each with its switch; templates to start one in a click. */
@@ -70,6 +71,8 @@ export function RoutinesPage({ workspaceId }: RoutinesPageProps) {
             </Link>
           ))}
         </div>
+
+        <RemindersSection />
       </div>
     </div>
   )

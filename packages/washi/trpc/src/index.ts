@@ -8,6 +8,7 @@ import { filesRouter } from './routers/files'
 import { instanceRouter } from './routers/instance'
 import { liveRouter } from './routers/live'
 import { modelsRouter } from './routers/models'
+import { remindersRouter } from './routers/reminders'
 import { routinesRouter } from './routers/routines'
 import { sheetsRouter } from './routers/sheets'
 import { storageRouter } from './routers/storage'
@@ -33,6 +34,7 @@ export const appRouter = router({
   instance: instanceRouter,
   models: modelsRouter,
   routines: routinesRouter,
+  reminders: remindersRouter,
   dev: devRouter,
   live: liveRouter,
 })

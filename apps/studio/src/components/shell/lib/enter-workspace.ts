@@ -1,6 +1,7 @@
 import { useAgentStore, useFavoritesStore, useSheetsStore, useViewStore } from '@washi/ui'
 import { useCommentsStore } from '@/components/comments'
 import { useMentionsStore } from '@/components/mentions'
+import { useRemindersStore } from '@/components/reminders'
 import { setActiveWorkspace } from '@/integrations/trpc'
 import type { WorkspaceSummary } from '@/lib/types'
 
@@ -12,6 +13,7 @@ export function enterWorkspace(workspace: WorkspaceSummary): void {
   useFavoritesStore.getState().bind(workspace.id)
   useCommentsStore.getState().reset()
   useMentionsStore.getState().reset()
+  useRemindersStore.getState().reset()
   const view = useViewStore.getState()
   view.closeAll()
   view.setWorkspaceName(workspace.name)

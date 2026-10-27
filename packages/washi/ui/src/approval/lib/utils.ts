@@ -1,4 +1,5 @@
 import {
+  IconBell,
   IconBolt,
   IconChartLine,
   IconDatabase,
@@ -125,6 +126,18 @@ export function describeTool(name: string, input: unknown, titleOf: TitleOf): To
         icon: IconLink,
         action: `Link ${text(input.table) ?? 'a table'}’s ${text(input.column) ?? 'column'} to`,
         subject: text(input.target),
+      })
+    }
+    case 'reminder_create': {
+      const days = typeof args.daysBefore === 'number' ? args.daysBefore : 0
+      const when = days === 0 ? 'On the day' : days === 1 ? 'A day before' : `${days} days before`
+      return base({
+        icon: IconBell,
+        action: 'Set a reminder',
+        subject: text(args.title),
+        details: [
+          `${when} ${text(args.dateColumn) ?? 'the date'} · ${text(args.table) ?? 'a table'}`,
+        ],
       })
     }
     case 'fetch_url':

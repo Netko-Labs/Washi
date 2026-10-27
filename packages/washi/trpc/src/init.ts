@@ -6,6 +6,7 @@ import {
   CommentError,
   CustomEmojiError,
   InkError,
+  ReminderError,
   requireReadable,
   SheetAccessError,
   SheetConflictError,
@@ -186,7 +187,8 @@ export const workspaceProcedure = t.procedure
         result.error.cause instanceof InkError ||
         result.error.cause instanceof SheetAccessError ||
         result.error.cause instanceof CommentError ||
-        result.error.cause instanceof CustomEmojiError)
+        result.error.cause instanceof CustomEmojiError ||
+        result.error.cause instanceof ReminderError)
     ) {
       throw new TRPCError({
         code: 'BAD_REQUEST',

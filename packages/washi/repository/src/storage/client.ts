@@ -8,6 +8,7 @@ import { backfillChanges } from './changes-backfill'
 import { ensureChangeAuthors } from './changes-ddl'
 import { ensureChatSearch } from './chat-search'
 import { ensureCustomEmojis } from './custom-emojis'
+import { ensureReminders } from './reminders'
 import { ensureRoutineRuns } from './routine-runs-ddl'
 
 export type DrizzleDB = BunSQLiteDatabase<typeof schema>
@@ -309,6 +310,7 @@ function createTables(sqlite: Database) {
 
   ensureChatSearch(sqlite)
   ensureCustomEmojis(sqlite)
+  ensureReminders(sqlite)
 
   // window_state used to live here. A server has no windows — it moved to the
   // desktop client's own store.

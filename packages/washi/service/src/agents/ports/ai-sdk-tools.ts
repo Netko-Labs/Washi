@@ -1,6 +1,7 @@
 import {
   linkColumnInputSchema,
   type Member,
+  reminderAskSchema,
   rowActivityInputSchema,
   type Viewer,
 } from '@washi/domain'
@@ -9,6 +10,7 @@ import { listTables, type Workspace } from '@washi/repository'
 import { guardedFetch } from '@washi/tsuru'
 import { tool } from 'ai'
 import { z } from 'zod'
+import { askReminder } from '../../reminders/service'
 import { NOBODY } from '../../sheets/access'
 import { checkSource, createSheetFromSource, updateSheetFromSource } from '../../sheets/service'
 import { rowActivity } from '../../tables/activity'
@@ -176,6 +178,12 @@ export function createAiTools({
       description: DB_MUTATE_DESCRIPTION,
       inputSchema: z.object({ mutation: mutationSchema }),
       execute: async ({ mutation }) => runMutation(ws, mutation, 'washi'),
+    }),
+    reminder_create: tool({
+      description:
+        'Remind people before a date in a table comes due — bills to pay, deadlines, renewals, trips. Not a routine: no turn runs and nothing is spent. The server checks every minute and puts one Inbox row per table row per due date, from daysBefore (0–60) days ahead, for rows matching where (same grammar as db_query, e.g. paid = false). dateColumn must be a date column; personColumn (a person column) sends each row only to the member it names, otherwise everyone sees it. Use it whenever the ask is "remind me/us when … is due".',
+      inputSchema: reminderAskSchema,
+      execute: async (input) => askReminder(ws, input, viewer?.id ?? null),
     }),
     fetch_url: tool({
       description: 'Fetch an https URL through the workspace fetch policy (tsuru).',

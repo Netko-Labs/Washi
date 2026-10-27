@@ -43,6 +43,7 @@ export const CHANGE_TOOLS: ReadonlySet<string> = new Set([
   'db_define',
   'db_link_column',
   'db_mutate',
+  'reminder_create',
 ])
 
 /** An unanswered approval is a denial, not a hang. */

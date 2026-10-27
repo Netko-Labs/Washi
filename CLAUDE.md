@@ -264,6 +264,14 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   Every run is a row in `routine_runs` (trigger `schedule`·`manual`) and its own chat (the
   workspace's: `created_by` null); status, cost and duration are read off that chat. Run now leaves
   the schedule alone. Saving or resuming never fires: the minute already past today counts as run.
+- **Reminders are rules, not turns (D77).** `reminders` (workspace file; `ensureReminders`): a table,
+  its `date` column, `days_before` 0–60, an ink `where`, an optional `person` column, the zone it
+  counts days in. The routine clock calls `tickReminders` beside `routines.tick` — no agent, no
+  cost — and `reminder_hits` takes one row per rule · row · due day (`INSERT OR IGNORE`), so a row
+  reminds once per date; a range counts by its start. A person column sends a row only to the member
+  it names; `reminder_reads` is per person. `reminders.inbox/unread/markRead` feed the studio's Inbox
+  (`useReminderRows`, its count polled every 30s like mentions); rules sit under Routines; Washi's
+  `reminder_create`. A rule whose table or column is gone is skipped, never thrown.
 - **Routines** run on the server's minute clock (`packages/washi/runtime/src/clock.ts`), over the
   workspaces `ControlPlane.workspaceIds()` knows that already have a file — never a stray or
   deleted one, never a conjured `default`. A run is an ordinary `host.prompt` in a fresh session:
