@@ -29,7 +29,7 @@ export function useInbox(extra: InboxRow[] | undefined) {
     now,
   )
   const unread = rows.filter((row) => row.unread).length
-  const mentions = (extra ?? []).length
+  const mentions = (extra ?? []).filter((row) => row.kind === 'mention').length
 
   return { approvals, groups, filter, setFilter, now, unread, mentions, hasMentions: !!extra }
 }

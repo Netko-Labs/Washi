@@ -1,6 +1,7 @@
 import { useAgentStore, useLiveStore, useSheetsStore, useViewStore } from '@washi/ui'
 import { useEffect } from 'react'
 import { useMentionsPoll } from '@/components/mentions'
+import { useRemindersPoll } from '@/components/reminders'
 import { useSession } from '@/integrations/auth'
 
 /**
@@ -10,6 +11,7 @@ import { useSession } from '@/integrations/auth'
 export function useWorkspaceBoot(workspaceId: string) {
   const { data: session } = useSession()
   useMentionsPoll(workspaceId)
+  useRemindersPoll(workspaceId)
   const name = session?.user.name
   const email = session?.user.email
 
