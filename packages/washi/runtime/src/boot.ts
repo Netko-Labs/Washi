@@ -62,6 +62,7 @@ export async function bootRuntime(env: Env): Promise<BootedRuntime> {
       storedAgentKey: (workspaceId) => hosted.agentKey(workspaceId),
       searchKey: (workspaceId) => hosted.integrationKey(workspaceId, 'exa'),
       blobs,
+      workspaceStorage: (workspaceId) => hosted.storage.config(workspaceId),
     }
   } else {
     const control = createEmbeddedControlPlane({ workspaceId: DEFAULT_WORKSPACE_ID })

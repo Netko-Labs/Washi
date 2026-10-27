@@ -169,6 +169,25 @@ export const organizationIntegration = pgTable(
   (table) => [primaryKey({ columns: [table.organizationId, table.integration] })],
 )
 
+/**
+ * A workspace's own bucket for new uploads. Where it is stays legible; the access key pair is
+ * sealed like the agent key, and only the key id's last four come back out.
+ */
+export const organizationStorage = pgTable('organization_storage', {
+  organizationId: text('organization_id')
+    .primaryKey()
+    .references(() => organization.id, { onDelete: 'cascade' }),
+  endpoint: text('endpoint').notNull(),
+  region: text('region').notNull(),
+  bucket: text('bucket').notNull(),
+  prefix: text('prefix'),
+  ciphertext: text('ciphertext').notNull(),
+  iv: text('iv').notNull(),
+  keyLast4: text('key_last4').notNull(),
+  updatedBy: text('updated_by').references(() => user.id, { onDelete: 'set null' }),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
 /** The server's own settings (`signup`), one row per key. Not a workspace's. */
 export const instanceSetting = pgTable('instance_setting', {
   key: text('key').primaryKey(),

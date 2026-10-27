@@ -68,6 +68,11 @@ export {
   trashEntrySchema,
   type Viewer,
 } from './entities/sheets'
+export {
+  type StorageConfig,
+  type StorageInfo,
+  storageConfigSchema,
+} from './entities/storage'
 export { type RowOf, type UserTable, userTableSchema } from './entities/tables'
 export { compareHlc, createHlcClock, type HlcClock } from './hlc'
 export { positionBetween } from './position'

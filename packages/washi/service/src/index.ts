@@ -35,6 +35,8 @@ export type { AgentPort, ModelChoice, ProviderId, ToolGate } from './agents/port
 export { defaultModelFor, LAST_RESORT_MODELS, PREFERRED_MODELS } from './agents/ports'
 export { LOCAL_AUTHOR } from './comments/constants'
 export { CommentError, postComment, removeComment, resolveThread } from './comments/service'
+export { testStorage } from './files/storage'
+export type { StorageTest } from './files/types'
 export {
   canRead,
   guardWashiWrite,
