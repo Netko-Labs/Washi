@@ -27,6 +27,7 @@ export function NarrowShell({ workspace, children }: WorkspaceShellProps) {
             </>
           }
           actions={<NarrowHeaderActions />}
+          starInActions
         />
         {children}
       </main>
