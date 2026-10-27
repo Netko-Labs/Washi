@@ -1,4 +1,4 @@
-import type { ReminderDraft, ReminderInput, ReminderWire, TableWire } from './types'
+import type { OnlyOption, ReminderDraft, ReminderInput, ReminderWire, TableWire } from './types'
 
 const columnsOf = (table: TableWire | undefined, type: string) =>
   (table?.spec.columns ?? []).filter((column) => column.type === type).map((c) => c.name)
@@ -10,7 +10,7 @@ export const datedTables = (tables: TableWire[]) =>
   tables.filter((table) => dateColumns(table).length > 0)
 
 /** "Only where paid is off" and "on", per checkbox column. */
-export function onlyOptions(table: TableWire | undefined): { value: string; label: string }[] {
+export function onlyOptions(table: TableWire | undefined): OnlyOption[] {
   return columnsOf(table, 'boolean').flatMap((name) => [
     { value: `${name}:false`, label: `Only where ${name} is off` },
     { value: `${name}:true`, label: `Only where ${name} is on` },

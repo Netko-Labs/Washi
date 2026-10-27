@@ -13,6 +13,11 @@ export interface ReminderDraft {
   only: string
 }
 
+export interface OnlyOption {
+  value: string
+  label: string
+}
+
 export interface ReminderRuleRowProps {
   reminder: ReminderWire
   onToggle: (enabled: boolean) => void

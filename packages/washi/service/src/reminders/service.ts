@@ -24,12 +24,10 @@ import { rowTitle } from '../tables/rows'
 import { runQuery } from '../tables/service'
 import { DUE_ROWS_PER_TICK } from './constants'
 import { ReminderError } from './errors'
-import type { DueRow } from './types'
+import type { DueRow, Rule } from './types'
 import { addDays, dayIn, dueDayOf } from './utils'
 
 export { ReminderError }
-
-type Rule = Pick<Reminder, 'table' | 'dateColumn' | 'personColumn' | 'where'>
 
 function columnOf(table: UserTable, name: string, type: ColumnType): boolean {
   return table.spec.columns.some((column) => column.name === name && column.type === type)
