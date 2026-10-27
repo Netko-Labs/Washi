@@ -133,15 +133,15 @@ describe('where uploads go is the owner’s call', () => {
   test('an owner cannot save a bucket that failed its test, and nothing is kept', async () => {
     await expect(callerFor('owner').storage.set(unreachable)).rejects.toMatchObject({
       code: 'BAD_REQUEST',
-      message: 'Nothing answered at this address.',
+      message: 'That address is inside the server’s own network. Only the app admin can use one.',
     })
     expect(saved).toBeNull()
   })
 
-  test('an owner hears the refusal from a test in words', async () => {
+  test('an owner hears the refusal in words — a loopback bucket is the app admin’s alone', async () => {
     expect(await callerFor('owner').storage.test(unreachable)).toEqual({
       ok: false,
-      reason: 'Nothing answered at this address.',
+      reason: 'That address is inside the server’s own network. Only the app admin can use one.',
     })
   })
 })
