@@ -123,7 +123,7 @@ export function createWashiTools(ws: Workspace, context: ToolContext) {
       ),
       tool(
         'db_define',
-        'Create or update a table — a database of rows, Notion-style. snake_case names. Column types: text, number, boolean, date (ISO, or start/end), select + options, multi_select + options, status + groups {todo, doing, done}, person (member id), url, relation + table (holds record ids).',
+        'Create or update a table — a database of rows, Notion-style. snake_case names. Column types: text, number, boolean, date (ISO, or start/end), select + options, multi_select + options, status + groups {todo, doing, done}, person (member id), url, relation + table (holds record ids), formula + expr — computed on every read from its own row, never written: month(date), usd * fx_rate, when(paid, false, days(now(), due) < 0); it reads the row’s columns and earlier formulas, no aggregates. Use one instead of a column you would fill by hand from other columns.',
         { spec: tableSpecSchema },
         async ({ spec }) => text(defineUserTable(ws, spec)),
       ),

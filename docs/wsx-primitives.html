@@ -1060,7 +1060,7 @@
             <li>a state key by bare name</li>
             <li><code>$row.column</code> inside <code>Repeat</code> or a bound <code>Drawer</code></li>
             <li>aggregates <code>count sum avg min max</code> over a table, with an optional <code>where</code></li>
-            <li><code>now()</code> and <code>days(a, b)</code></li>
+            <li><code>now()</code>, <code>days(a, b)</code>, <code>month(d)</code>, <code>year(d)</code> and <code>when(cond, a, b)</code></li>
           </ul>
         </div>
         <div>
@@ -1097,6 +1097,7 @@
         <li><code>=</code> and <code>!=</code> are strict. Ordering compares two numbers or two strings; mixed types compare <code>false</code>.</li>
         <li><code>and</code> / <code>or</code> short-circuit and want booleans: <code>null</code> reads as <code>false</code>; a number or string there is an error.</li>
         <li><code>now()</code> is milliseconds, <strong>frozen per render pass</strong> — two reads in one page agree. <code>days(a, b)</code> is <code>trunc((b − a) / 86 400 000)</code>; each side an ISO date string or a number of ms; <code>null</code> in → <code>null</code> out.</li>
+        <li><code>month(d)</code> is <code>'YYYY-MM'</code> and <code>year(d)</code> a number, both in UTC from an ISO date or ms; <code>null</code> in → <code>null</code> out. <code>when(cond, a, b)</code> evaluates only the branch taken, so <code>when(qty = 0, 0, total / qty)</code> never divides by zero (<code>if</code> stays reserved: there is no control flow). The same grammar defines a table's <b>formula</b> columns (D73), where a bare name is the row's own column.</li>
         <li>Tables an expression aggregates over are prefetched once per sheet (<code>limit: 1000</code>) and again after every verb or remote change, so evaluation is synchronous.</li>
         <li>At render a bad expression — syntax, unknown name, type error, budget — <strong>renders as <code>null</code></strong>; <code>useExprValue</code> never throws. Stat shows <code>—</code>, Show hides, Progress shows 0 %.</li>
       </ul>

@@ -19,6 +19,9 @@ beforeEach(() => {
     columns: [
       { name: 'client', type: 'text' },
       { name: 'amount', type: 'number' },
+      { name: 'in_thousands', type: 'formula', expr: 'amount / 1000' },
+      { name: 'big', type: 'formula', expr: 'in_thousands > 10' },
+      { name: 'label', type: 'formula', expr: "client + ' deal'" },
     ],
   })
   runMutation(ws, { kind: 'insert', table: 'deals', data: { client: 'Acme', amount: 40000 } })
@@ -56,7 +59,22 @@ describe('a shared link (D65)', () => {
     expect(rows[0]).not.toHaveProperty('amount')
     expect(sharedTable(ws, token, 'deals')?.columns.map((column) => column.name)).toEqual([
       'client',
+      'label',
     ])
+  })
+
+  test('a formula that reads a redacted column is redacted too, however indirectly (D73)', () => {
+    const { token } = publicPage()
+    const rows = sharedQuery(ws, token, { table: 'deals' }).rows
+    expect(rows[0]).toMatchObject({ client: 'Acme', label: 'Acme deal' })
+    expect(rows[0]).not.toHaveProperty('in_thousands')
+    expect(rows[0]).not.toHaveProperty('big')
+    expect(() =>
+      sharedQuery(ws, token, {
+        table: 'deals',
+        where: [{ column: 'big', op: 'eq', value: true }],
+      }),
+    ).toThrow(ShareRefusedError)
   })
 
   test('refuses another table, and any question about a redacted column', () => {

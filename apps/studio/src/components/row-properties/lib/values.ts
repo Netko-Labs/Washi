@@ -5,6 +5,7 @@ import {
   IconHash,
   IconLetterT,
   IconLink,
+  IconMathFunction,
   IconProgress,
   IconSquareCheck,
   IconTags,
@@ -23,4 +24,5 @@ export const PROPERTY_ICONS: Record<Column['type'], typeof IconHash> = {
   person: IconUser,
   url: IconLink,
   relation: IconArrowUpRight,
+  formula: IconMathFunction,
 }

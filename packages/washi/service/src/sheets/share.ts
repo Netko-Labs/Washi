@@ -13,7 +13,7 @@ import {
   shareByToken,
   type Workspace,
 } from '@washi/repository'
-import { parse, serialize, type WsxElement } from '@washi/wsx'
+import { parse, parseExpr, serialize, type WsxElement } from '@washi/wsx'
 import { runHistory } from '../tables/history'
 import { runQuery } from '../tables/service'
 import { readableSet } from './access'
@@ -69,11 +69,37 @@ export function sharedPage(ws: Workspace, token: string) {
   }
 }
 
-function hiddenIn(root: WsxElement, table: string): Set<string> {
+function namesIn(node: unknown, into: Set<string>): Set<string> {
+  if (!node || typeof node !== 'object') return into
+  const { kind, name } = node as { kind?: unknown; name?: unknown }
+  if (kind === 'identifier' && typeof name === 'string') into.add(name)
+  for (const child of Object.values(node)) namesIn(child, into)
+  return into
+}
+
+/**
+ * The page's redacted columns of `table`, and every formula that reads one — directly or through
+ * another formula — or `cop = usd * fx_rate` would hand a hidden `usd` straight to the link.
+ */
+function hiddenIn(ws: Workspace, root: WsxElement, table: string): Set<string> {
   if (!pageTables(root).has(table)) {
     throw new ShareRefusedError(`this page does not read "${table}"`)
   }
-  return redactedColumns(root).get(table) ?? new Set()
+  const hidden = new Set(redactedColumns(root).get(table) ?? [])
+  if (hidden.size === 0) return hidden
+  const formulas = (getTableByName(ws, table)?.spec.columns ?? []).filter(
+    (column) => column.type === 'formula' && column.expr,
+  )
+  for (const column of formulas) {
+    let reads: Set<string>
+    try {
+      reads = namesIn(parseExpr(column.expr ?? ''), new Set())
+    } catch {
+      reads = new Set()
+    }
+    if ([...reads].some((name) => hidden.has(name))) hidden.add(column.name)
+  }
+  return hidden
 }
 
 /** Filtering, sorting or grouping on a hidden column would leak it through counts; refuse. */
@@ -94,7 +120,7 @@ const withoutColumns = (result: QueryResult, hidden: Set<string>): QueryResult =
 
 export function sharedQuery(ws: Workspace, token: string, query: InkQuery): QueryResult {
   const { root } = sharedSheet(ws, token)
-  const hidden = hiddenIn(root, query.table)
+  const hidden = hiddenIn(ws, root, query.table)
   refuseReading(hidden, [
     ...(query.where ?? []).map((filter) => filter.column),
     query.orderBy?.column,
@@ -107,7 +133,7 @@ export function sharedQuery(ws: Workspace, token: string, query: InkQuery): Quer
 export function sharedHistory(ws: Workspace, token: string, query: HistoryQuery): QueryResult {
   const { root } = sharedSheet(ws, token)
   refuseReading(
-    hiddenIn(root, query.table),
+    hiddenIn(ws, root, query.table),
     (query.where ?? []).map((filter) => filter.column),
   )
   return runHistory(ws, query)
@@ -116,7 +142,7 @@ export function sharedHistory(ws: Workspace, token: string, query: HistoryQuery)
 /** A table's columns as the link sees them: redacted ones are not there at all. */
 export function sharedTable(ws: Workspace, token: string, name: string): TableSpec | null {
   const { root } = sharedSheet(ws, token)
-  const hidden = hiddenIn(root, name)
+  const hidden = hiddenIn(ws, root, name)
   const spec = getTableByName(ws, name)?.spec
   return spec
     ? { ...spec, columns: spec.columns.filter((column) => !hidden.has(column.name)) }

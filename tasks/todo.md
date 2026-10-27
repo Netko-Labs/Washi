@@ -4,7 +4,7 @@ Washi hit seven platform gaps building a budget. One primitive per PR, each with
 
 - [x] checkbox: `<Task field>` ticks the named checkbox column (it always wrote `done`) — #93
 - [x] 1. `where` values read page state (`{ state }`) + `<Select state options all>` — D72
-- [ ] 2. formula columns (closed expr + date functions; computed on read)
+- [x] 2. formula columns (closed expr + `month`·`year`·`when`; computed on read) — D73
 - [ ] 3. rollups + convert a choice column to a relation
 - [ ] 4. `<Form table>` — a full typed row from the page
 - [ ] 5. bulk copy verb with per-column `set` and cadence (rollover, every-n-months)
