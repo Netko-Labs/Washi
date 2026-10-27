@@ -6,6 +6,7 @@ import * as schema from '@washi/domain/db'
 import { type BunSQLiteDatabase, drizzle } from 'drizzle-orm/bun-sqlite'
 import { backfillChanges } from './changes-backfill'
 import { ensureChatSearch } from './chat-search'
+import { ensureCustomEmojis } from './custom-emojis'
 
 export type DrizzleDB = BunSQLiteDatabase<typeof schema>
 
@@ -303,6 +304,7 @@ function createTables(sqlite: Database) {
   `)
 
   ensureChatSearch(sqlite)
+  ensureCustomEmojis(sqlite)
 
   // window_state used to live here. A server has no windows — it moved to the
   // desktop client's own store.

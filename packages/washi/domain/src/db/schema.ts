@@ -184,6 +184,15 @@ export const fileTable = sqliteTable('files', {
   hlcCreated: text('hlc_created').notNull(),
 })
 
+/** A workspace's own emoji: a `:shortcode:` over an upload. A purge never frees its file. */
+export const customEmojiTable = sqliteTable('custom_emojis', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull().unique(),
+  fileId: text('file_id').notNull(),
+  createdBy: text('created_by').notNull(),
+  hlcCreated: text('hlc_created').notNull(),
+})
+
 /** One row per person mentioned: their Inbox, read or not. */
 export const mentionInboxTable = sqliteTable(
   'mention_inbox',

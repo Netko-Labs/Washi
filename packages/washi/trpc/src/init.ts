@@ -4,6 +4,7 @@ import type { FileStore, Workspace } from '@washi/repository'
 import {
   type AgentHost,
   CommentError,
+  CustomEmojiError,
   InkError,
   requireReadable,
   SheetAccessError,
@@ -182,7 +183,8 @@ export const workspaceProcedure = t.procedure
         result.error.cause instanceof SheetConflictError ||
         result.error.cause instanceof InkError ||
         result.error.cause instanceof SheetAccessError ||
-        result.error.cause instanceof CommentError)
+        result.error.cause instanceof CommentError ||
+        result.error.cause instanceof CustomEmojiError)
     ) {
       throw new TRPCError({
         code: 'BAD_REQUEST',

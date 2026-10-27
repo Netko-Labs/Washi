@@ -35,6 +35,7 @@ export type { AgentPort, ModelChoice, ProviderId, ToolGate } from './agents/port
 export { defaultModelFor, LAST_RESORT_MODELS, PREFERRED_MODELS } from './agents/ports'
 export { LOCAL_AUTHOR } from './comments/constants'
 export { CommentError, postComment, removeComment, resolveThread } from './comments/service'
+export { addCustomEmoji, CustomEmojiError, removeCustomEmoji } from './emojis/service'
 export {
   canRead,
   guardWashiWrite,
