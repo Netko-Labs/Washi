@@ -335,6 +335,12 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   the label over the track, a Form goes one column, stats sit two to a row. A Stat in a Grid sizes
   its figure to its own column (`15cqi`), and `.wsx` clips sideways overflow, so a phone never
   scrolls a page horizontally. Coarse pointers get 44px targets and 16px inputs.
+- **Pages are apps, not forms laid flat (D83).** `<Agenda bind date title time end badge add>` is a
+  week (‹ › Today, the week the reader's, never saved; a list under 720px); a row opens in the peek;
+  each day's + opens a modal Form seeded with that day (`seed`, written even when not shown).
+  `<Form trigger>` puts a form behind one button in a native `<dialog>` (`FormDialog`: top layer,
+  Escape, a bottom sheet under 560px, closes when the row lands). An empty data view is a quiet
+  filled line, not a dashed box.
 - WSX is inert data: registry primitives, literal props, the closed `expr` grammar only. Components
   own appearance (four enums: `variant tone size emphasis`); pages own content. Validation before
   persist and before render. Format reference: `docs/wsx-primitives.html`.

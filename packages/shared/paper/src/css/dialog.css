@@ -1,0 +1,115 @@
+/* A modal over the page — the browser's own <dialog>, so it sits in the top layer. */
+
+.wsx-dialog {
+  /* A reset that zeroes every margin would pin the modal to the corner: auto is what centres it. */
+  margin: auto;
+  width: min(560px, calc(100vw - 32px));
+  max-height: min(86vh, 760px);
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--card);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  box-shadow: var(--shadow-modal);
+  overflow: auto;
+}
+.wsx-dialog::backdrop {
+  background: rgb(0 0 0 / 0.45);
+  backdrop-filter: blur(3px);
+}
+.wsx-dialog[open] {
+  animation: wsx-dialog-in 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.wsx-dialog[open]::backdrop {
+  animation: wsx-fade-in 220ms ease;
+}
+@keyframes wsx-dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+}
+@keyframes wsx-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+.wsx-dialog-sheet {
+  padding: 18px 22px 22px;
+}
+.wsx-dialog-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.wsx-dialog-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 21px;
+  font-weight: 400;
+  line-height: 1.2;
+}
+.wsx-dialog-close {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: var(--muted);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+.wsx-dialog-close:hover {
+  background: var(--muted-bg);
+  color: var(--ink);
+}
+.wsx-dialog .wsx-form {
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+.wsx-dialog .wsx-form-actions {
+  margin: 4px -22px -22px;
+  padding: 14px 22px;
+  border-radius: 0 0 18px 18px;
+}
+
+/* A phone gets a sheet from the bottom, the way its own apps add things. */
+@media (max-width: 560px) {
+  .wsx-dialog {
+    width: 100%;
+    max-width: 100%;
+    max-height: 92dvh;
+    margin: auto 0 0;
+    border-bottom: 0;
+    border-radius: 20px 20px 0 0;
+  }
+  .wsx-dialog[open] {
+    animation-name: wsx-sheet-in;
+  }
+  .wsx-dialog .wsx-form-actions {
+    padding-bottom: calc(14px + env(safe-area-inset-bottom));
+    border-radius: 0;
+  }
+}
+@keyframes wsx-sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+.wsx-form-trigger {
+  align-self: flex-start;
+}
+.wsx-form-trigger-plus {
+  margin-top: -1px;
+  font-size: 17px;
+  line-height: 1;
+}

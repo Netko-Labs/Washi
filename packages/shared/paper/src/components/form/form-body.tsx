@@ -4,9 +4,27 @@ import { tableLabel } from '../database'
 import { FormField } from './form-field'
 import { type FormBodyProps, formPlan, useFormDraft } from './lib'
 
-export function FormBody({ db, fields, defaults, submit, reset = true, ...rest }: FormBodyProps) {
-  const plan = formPlan(db.spec, fields, defaults)
-  const draft = useFormDraft({ table: db.table, written: plan.written, defaults, reset })
+export function FormBody({
+  db,
+  fields,
+  defaults,
+  submit,
+  reset = true,
+  seed,
+  onAdded,
+  onCancel,
+  ...rest
+}: FormBodyProps) {
+  // A seeded column is written even when it is not shown: the day a calendar's + stood on.
+  const plan = formPlan(db.spec, fields, { ...defaults, ...seed })
+  const draft = useFormDraft({
+    table: db.table,
+    written: plan.written,
+    defaults,
+    seed,
+    reset,
+    onAdded,
+  })
   const id = useId()
 
   if (plan.refused.length > 0) {
@@ -49,6 +67,11 @@ export function FormBody({ db, fields, defaults, submit, reset = true, ...rest }
         >
           {submit ?? 'Add'}
         </button>
+        {onCancel && (
+          <button type="button" className="wsx-button" data-variant="plain" onClick={onCancel}>
+            Cancel
+          </button>
+        )}
         <span className="wsx-form-status" role="status" aria-live="polite">
           {status.kind === 'added' && 'Added'}
         </span>
