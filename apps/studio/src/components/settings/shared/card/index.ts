@@ -1,3 +1,4 @@
+export { NameField } from './name-field'
 export { NumberRow } from './number-row'
 export { ProviderRow } from './provider-row'
 export { Segmented } from './segmented'

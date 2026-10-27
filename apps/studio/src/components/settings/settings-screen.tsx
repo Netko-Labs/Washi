@@ -1,43 +1,43 @@
 import { PeopleSection } from '@/components/people'
 import { RoutinesSection } from '@/components/routines'
 import { AgentTab } from './agent-tab'
-import { ADMIN_TABS, SETTINGS_TABS, type SettingsScreenProps, useInstanceAdmin } from './lib'
+import { GeneralSection } from './general-section'
+import { ADMIN_TABS, SETTINGS_GROUPS, type SettingsScreenProps, useInstanceAdmin } from './lib'
+import { PreferencesSection } from './preferences-section'
+import { ProfileSection } from './profile-section'
 import { ServerTab } from './server-tab'
+import { SettingsNav } from './settings-nav'
 
+/** Every section in one place, grouped by whose it is: yours, the team's, Washi's, the server's. */
 export function SettingsScreen({ workspaceId, tab, onTab }: SettingsScreenProps) {
   const isAdmin = useInstanceAdmin()
-  const tabs = SETTINGS_TABS.filter((entry) => isAdmin || !ADMIN_TABS.has(entry.key))
-  const current = tabs.find((entry) => entry.key === tab) ?? SETTINGS_TABS[0]
+  const groups = SETTINGS_GROUPS.map((group) => ({
+    ...group,
+    sections: group.sections.filter((section) => isAdmin || !ADMIN_TABS.has(section.key)),
+  })).filter((group) => group.sections.length > 0)
+  const sections = groups.flatMap((group) => group.sections)
+  const current = sections.find((section) => section.key === tab) ?? sections[0]
+  if (!current) return null
   const shown = current.key
 
   return (
     <section className="min-h-0 flex-1 overflow-y-auto">
-      <div className="mx-auto max-w-[680px] px-5 pt-9 pb-16 md:px-10 md:pt-11">
-        <h1 className="mb-1 font-semibold text-2xl tracking-[-0.02em]">Settings</h1>
-        <p className="mb-[22px] text-muted-foreground">{current.desc}</p>
+      <div className="mx-auto flex max-w-[980px] flex-col gap-6 px-5 pt-9 pb-16 md:flex-row md:gap-12 md:px-10 md:pt-11">
+        <SettingsNav groups={groups} current={shown} onTab={onTab} />
+        <div className="min-w-0 max-w-[680px] flex-1">
+          <h1 className="font-semibold text-2xl tracking-[-0.02em]">{current.label}</h1>
+          <p className="mt-1 mb-6 text-muted-foreground">{current.desc}</p>
 
-        <div className="mb-[26px] flex gap-1 overflow-x-auto border-border border-b">
-          {tabs.map(({ key, label, icon: Icon }) => (
-            <button
-              type="button"
-              key={key}
-              onClick={() => onTab(key)}
-              className={`-mb-px flex h-9 shrink-0 items-center gap-[7px] border-b-2 px-3 font-medium text-[13px] ${
-                shown === key
-                  ? 'border-primary text-foreground'
-                  : 'border-transparent text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              <Icon className="size-3.5" />
-              {label}
-            </button>
-          ))}
+          {shown === 'profile' && <ProfileSection />}
+          {shown === 'preferences' && <PreferencesSection />}
+          {shown === 'general' && <GeneralSection workspaceId={workspaceId} />}
+          {shown === 'people' && <PeopleSection workspaceId={workspaceId} />}
+          {(shown === 'models' || shown === 'outside' || shown === 'usage') && (
+            <AgentTab part={shown} />
+          )}
+          {shown === 'routines' && <RoutinesSection />}
+          {shown === 'server' && <ServerTab />}
         </div>
-
-        {shown === 'agent' && <AgentTab />}
-        {shown === 'people' && <PeopleSection workspaceId={workspaceId} />}
-        {shown === 'routines' && <RoutinesSection />}
-        {shown === 'server' && <ServerTab />}
       </div>
     </section>
   )

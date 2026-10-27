@@ -2,7 +2,7 @@ import { IconCheck, IconChevronDown } from '@tabler/icons-react'
 import { useState } from 'react'
 import { api } from '../api'
 import { useAgentStore } from '../stores'
-import { EFFORTS, LOCAL_MODELS, type OptionChipsProps, RECOMMENDED_MODELS } from './lib'
+import { EFFORTS, LOCAL_MODELS, type OptionChipsProps, offeredModels } from './lib'
 
 const CHIP =
   'flex h-6 max-w-[150px] items-center gap-1 rounded-full border border-border bg-card px-2 font-medium text-[11px] hover:bg-accent'
@@ -15,9 +15,7 @@ const ROW =
 export function OptionChips({ session, inference }: OptionChipsProps) {
   const [open, setOpen] = useState<'model' | 'effort' | null>(null)
   const local = inference?.active === 'local_cli'
-  const models = local
-    ? LOCAL_MODELS
-    : (RECOMMENDED_MODELS[inference?.provider ?? 'anthropic'] ?? [])
+  const models = local ? LOCAL_MODELS : offeredModels(inference)
   const currentModel = local ? inference?.localModel : session?.model
   const modelLabel = local
     ? (LOCAL_MODELS.find((m) => m.id === (currentModel ?? 'default'))?.label ?? 'Default')
@@ -73,7 +71,9 @@ export function OptionChips({ session, inference }: OptionChipsProps) {
               >
                 <span className="min-w-0 flex-1">
                   <span className="block">{model.label}</span>
-                  <span className="block text-[11px] text-muted-foreground">{model.desc}</span>
+                  {model.desc && (
+                    <span className="block text-[11px] text-muted-foreground">{model.desc}</span>
+                  )}
                 </span>
                 {(local ? (currentModel ?? 'default') : currentModel) === model.id && (
                   <IconCheck className="size-3.5" />

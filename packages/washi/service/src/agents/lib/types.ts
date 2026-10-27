@@ -3,6 +3,7 @@ import type {
   ApprovalRequest,
   AttachmentRef,
   CapabilityOrigin,
+  EnabledModel,
   TranscriptEntry,
   Viewer,
 } from '@washi/domain'
@@ -156,5 +157,6 @@ export interface AgentSettingsReport {
   turnCap: number
   resumeBy: ResumeBy
   effort: Effort
+  enabledModels: EnabledModel[] | null
   zone: string
 }

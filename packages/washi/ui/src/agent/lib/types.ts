@@ -1,4 +1,4 @@
-import type { AgentSession, AttachmentRef, Effort } from '@washi/domain'
+import type { AgentSession, AttachmentRef, Effort, EnabledModel } from '@washi/domain'
 import type { RefObject } from 'react'
 
 export type PanelPlacement = 'float' | 'dock' | 'sheet' | 'page'
@@ -32,6 +32,8 @@ export interface InferenceView {
   provider: string | null
   localModel: string | null
   plan: string | null
+  /** The workspace's picks for the composer; null offers the recommended three. */
+  enabledModels: EnabledModel[] | null
 }
 
 export interface ModelChoice {

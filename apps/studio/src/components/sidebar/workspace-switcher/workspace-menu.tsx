@@ -50,7 +50,7 @@ export function WorkspaceMenu({
             <Link
               to="/w/$workspaceId/settings"
               params={{ workspaceId: current.id }}
-              search={{ tab: 'agent' }}
+              search={{ tab: 'general' }}
               onClick={onClose}
               className={SHORTCUT}
             >

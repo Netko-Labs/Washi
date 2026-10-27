@@ -1,5 +1,7 @@
 import type { AgentUpdate, TranscriptEntry } from '@washi/domain'
 import { hostPlace } from '../../api'
+import type { InferenceView, ModelChoice } from './types'
+import { RECOMMENDED_MODELS } from './values'
 
 type TurnDone = Extract<AgentUpdate, { kind: 'turn_done' }>
 
@@ -41,4 +43,15 @@ export function mergeMessageChunks(entries: TranscriptEntry[]): TranscriptEntry[
     merged.push(entry)
   }
   return merged
+}
+
+/** The workspace's picks, described where they are one of the recommended; else the three. */
+export function offeredModels(inference: InferenceView | null): ModelChoice[] {
+  const recommended = RECOMMENDED_MODELS[inference?.provider ?? 'anthropic'] ?? []
+  if (!inference?.enabledModels) return recommended
+  return inference.enabledModels.map((model) => ({
+    id: model.id,
+    label: model.name.replace(/^Claude /, ''),
+    desc: recommended.find((pick) => pick.id === model.id)?.desc ?? '',
+  }))
 }

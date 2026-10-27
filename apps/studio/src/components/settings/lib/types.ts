@@ -1,4 +1,5 @@
 import type { Icon } from '@tabler/icons-react'
+import type { EnabledModel } from '@washi/domain'
 import type { ReactNode } from 'react'
 import type { ModelOption } from '@/lib/types'
 
@@ -7,7 +8,17 @@ export type KeyTarget = ProviderId | 'exa'
 export type Effort = 'quick' | 'balanced' | 'deep'
 export type ResumeBy = 'anyone' | 'owners'
 export type ApprovalMode = 'ask' | 'auto'
-export type SettingsTab = 'agent' | 'people' | 'routines' | 'server'
+export type SettingsTab =
+  | 'profile'
+  | 'preferences'
+  | 'general'
+  | 'people'
+  | 'models'
+  | 'outside'
+  | 'usage'
+  | 'routines'
+  | 'server'
+export type AgentPart = 'models' | 'outside' | 'usage'
 export type SignupMode = 'invite' | 'open'
 
 export interface KeyState {
@@ -38,6 +49,7 @@ export interface AgentSettingsState {
   turnCap: number
   resumeBy: ResumeBy
   effort: Effort
+  enabledModels: EnabledModel[] | null
   zone: string
 }
 
@@ -181,4 +193,60 @@ export interface KeyDialogProps {
   onSave: (key: string) => Promise<string | null>
   onRemove: () => Promise<unknown>
   onClose: () => void
+}
+
+export interface SettingsSection {
+  key: SettingsTab
+  label: string
+  icon: Icon
+  desc: string
+}
+
+export interface SettingsGroup {
+  label: string
+  sections: SettingsSection[]
+}
+
+export interface SettingsNavProps {
+  groups: SettingsGroup[]
+  current: SettingsTab
+  onTab: (tab: SettingsTab) => void
+}
+
+export interface AgentTabProps {
+  part: AgentPart
+}
+
+export interface EnabledModelsCardProps {
+  models: ModelOption[]
+  provider: ProviderId | null
+  enabled: EnabledModel[] | null
+  onChange: (models: EnabledModel[] | null) => Promise<boolean>
+}
+
+export interface GeneralSectionProps {
+  workspaceId: string
+}
+
+export interface ModelSwitchProps {
+  model: ModelOption
+  isOn: boolean
+  isRecommended: boolean
+  onToggle: () => void
+}
+
+export interface NameDraft {
+  draft: string
+  setDraft: (value: string) => void
+  isChanged: boolean
+  /** idle · saving · saved, or the refusal in words. */
+  status: string
+  commit: () => Promise<void>
+}
+
+export interface NameFieldProps {
+  label: string
+  field: NameDraft
+  hint?: string
+  disabled?: boolean
 }

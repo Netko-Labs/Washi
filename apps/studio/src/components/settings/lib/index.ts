@@ -2,12 +2,18 @@ export { useAgentSettings } from './hooks/use-agent-settings'
 export { useInstanceAdmin } from './hooks/use-instance-admin'
 export { useKeyForm } from './hooks/use-key-form'
 export { useMenu } from './hooks/use-menu'
+export { useNameDraft } from './hooks/use-name-draft'
 export { useServerSettings } from './hooks/use-server-settings'
+export { useWorkspaceRename } from './hooks/use-workspace-rename'
 export type {
+  AgentPart,
   AgentSettingsState,
+  AgentTabProps,
   ApprovalMode,
   Effort,
+  EnabledModelsCardProps,
   GaugeProps,
+  GeneralSectionProps,
   KeyDialogProps,
   KeyFormProps,
   KeyInput,
@@ -16,6 +22,9 @@ export type {
   ModelCardProps,
   ModelMenuProps,
   ModelPrice,
+  ModelSwitchProps,
+  NameDraft,
+  NameFieldProps,
   NumberRowProps,
   Option,
   OutsideCardProps,
@@ -28,7 +37,10 @@ export type {
   SegmentedProps,
   SettingRowProps,
   SettingsCardProps,
+  SettingsGroup,
+  SettingsNavProps,
   SettingsScreenProps,
+  SettingsSection,
   SettingsTab,
   SignupMode,
   SpendState,
@@ -44,7 +56,8 @@ export {
   PROVIDERS,
   RECOMMENDED,
   RESUME_BY_OPTIONS,
+  SETTINGS_GROUPS,
   SETTINGS_TAB_KEYS,
-  SETTINGS_TABS,
   SIGNUP_OPTIONS,
+  THEME_OPTIONS,
 } from './values'

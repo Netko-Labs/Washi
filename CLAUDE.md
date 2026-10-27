@@ -252,7 +252,16 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   its first ask, then by Washi through `set_conversation_title` (a tool both ports expose,
   asked for in the instructions); `agents.renameSession` and `deleteSession` (refused while a
   turn runs) are the person's. `onSessionChanged` tells the list to refetch.
-- **Settings → Agent (studio) is three cards (D63):** Model (a row per provider; `workspaces.
+- **Settings is grouped by whose it is (D69):** Account (Profile — `auth.updateUser`; Preferences —
+  the theme, one `useTheme` store in `components/shared/theme`), Workspace (General — rename through
+  `auth.organization.update`, owners and admins; People), Washi (Models · What leaves · Usage ·
+  Routines), Server (the app admin's). `?tab=` names the section; an unknown one (the old `agent`)
+  lands on Models. **The team's models** are app meta `agent_enabled_models` (`EnabledModel[]`, id +
+  the catalogue's name; null = the recommended three), set by owners (`agents.setEnabledModels`)
+  and read by the composer's model chip through `agents.settings`. Menus and pickers in the studio
+  are `Floating` (`components/shared/floating`): portalled to the body, so no `overflow-hidden`
+  card or sidebar clips them; `useDismiss` treats a press inside `[data-floating]` as inside.
+- **Settings → Washi is the old three cards (D63):** Model (a row per provider; `workspaces.
   setAgentModel` changes the default model without a new key, `removeAgentKey` puts Washi to
   sleep; the default effort — Quick · Balanced · Deep — is `agents.setDefaultEffort`, mapped to
   the SDK's `low · medium · high` on every turn), What leaves the server, Usage and the daily
