@@ -7,7 +7,6 @@ import {
   type TableSpec,
   tableSpecSchema,
   unknownQueryColumns,
-  validateRecord,
 } from '@washi/ink'
 import {
   defineTable,
@@ -21,9 +20,10 @@ import {
   updateRecords,
   type Workspace,
 } from '@washi/repository'
+import { copyRecords } from './copy'
 import { InkError } from './errors'
 import { renameRowPages, trashRowPages } from './rows'
-import { checkFormulas, checkListUse, checkRollups } from './rules'
+import { checkData, checkFormulas, checkListUse, checkRollups } from './rules'
 
 export { InkError }
 
@@ -55,25 +55,6 @@ export function addColumn(ws: Workspace, tableName: string, column: unknown): Us
   return defineUserTable(ws, { ...table.spec, columns: [...table.spec.columns, column] })
 }
 
-/** Every id a relation cell names must be a live record of the table it points at. */
-function checkRelations(ws: Workspace, spec: TableSpec, data: RecordData): void {
-  for (const column of spec.columns) {
-    const ids = data[column.name]
-    if (column.type !== 'relation' || !Array.isArray(ids) || !column.table) continue
-    const target = requireTable(ws, column.table)
-    const stray = ids.find((id) => findRecordTableId(ws, id) !== target.id)
-    if (stray) throw new InkError(`${column.name}: no record "${stray}" in "${column.table}"`)
-  }
-}
-
-function checkData(ws: Workspace, spec: TableSpec, data: RecordData): void {
-  const issues = validateRecord(spec, data)
-  if (issues.length > 0) {
-    throw new InkError(issues.map((issue) => `${issue.path}: ${issue.message}`).join('; '))
-  }
-  checkRelations(ws, spec, data)
-}
-
 export function runQuery(ws: Workspace, query: InkQuery): QueryResult {
   const table = requireTable(ws, query.table)
   // Every slot that names a column, aggregates included — a descriptor column
@@ -95,8 +76,9 @@ export function runQuery(ws: Workspace, query: InkQuery): QueryResult {
 export function runMutation(
   ws: Workspace,
   mutation: InkMutation,
-): { affected: number; id?: string } {
+): { affected: number; id?: string; ids?: string[] } {
   const table = requireTable(ws, mutation.table)
+  if (mutation.kind === 'copy') return copyRecords(ws, table, mutation)
 
   if (mutation.kind !== 'insert') {
     const issues = unknownQueryColumns(table.spec, mutation.where)

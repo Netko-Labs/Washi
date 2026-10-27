@@ -137,6 +137,19 @@ describe('evaluate', () => {
     expect(() => run('month(1, 2)')).toThrow('takes 1 arguments')
   })
 
+  test('add_months() — a date rolled forward, the 31st clamped to the month it lands in', () => {
+    expect(run("add_months('2026-10-15', 1)")).toBe('2026-11-15')
+    expect(run("add_months('2026-01-31', 1)")).toBe('2026-02-28')
+    expect(run("add_months('2028-01-31', 1)")).toBe('2028-02-29')
+    expect(run("add_months('2026-11-30', 2)")).toBe('2027-01-30')
+    expect(run("add_months('2026-03-31', -1)")).toBe('2026-02-28')
+    expect(run("month(add_months('2026-09-05T10:00:00Z', 2))")).toBe('2026-11')
+    expect(run('add_months(null, 1)')).toBeNull()
+    expect(run("add_months('2026-10-15', null)")).toBeNull()
+    expect(() => run("add_months('2026-10-15', 1.5)")).toThrow('whole number of months')
+    expect(() => run("add_months('2026-10-15')")).toThrow('takes 2 arguments')
+  })
+
   test('step budget', () => {
     expect(() => run('count(tasks)')).not.toThrow()
     expect(() => evaluateExpr(parseExpr('count(tasks)'), SCOPE, { budget: 3 })).toThrow(

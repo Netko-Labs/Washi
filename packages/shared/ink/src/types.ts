@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { COPY_ROW_CAP } from './constants'
 
 /** Notion's property kinds. Array-valued: `multi_select`, `relation` (record ids). */
 export const columnTypeSchema = z.enum([
@@ -158,6 +159,10 @@ export type HistoryQuery = z.infer<typeof historyQuerySchema>
 export const recordDataSchema = z.record(z.string(), cellSchema)
 export type RecordData = z.infer<typeof recordDataSchema>
 
+/** A copied row's cell: a value, or an expr over its source row — `add_months(date, 1)`. */
+export const copyValueSchema = z.union([cellSchema, z.object({ expr: z.string().min(1).max(500) })])
+export type CopyValue = z.infer<typeof copyValueSchema>
+
 export const mutationSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('insert'), table: z.string().min(1), data: recordDataSchema }),
   z.object({
@@ -170,6 +175,18 @@ export const mutationSchema = z.discriminatedUnion('kind', [
     kind: z.literal('delete'),
     table: z.string().min(1),
     where: z.array(filterSchema).min(1).max(16),
+  }),
+  /**
+   * Every row `where` matches, copied as a new row with `set` over it. `params` fill the `{ param }`
+   * filter values and read as `$name` in a `set` expr (D76).
+   */
+  z.object({
+    kind: z.literal('copy'),
+    table: z.string().min(1),
+    params: z.record(identifier('param'), scalarSchema).optional(),
+    where: z.array(rollupFilterSchema).min(1).max(16),
+    set: z.record(z.string(), copyValueSchema).default({}),
+    limit: z.number().int().positive().max(COPY_ROW_CAP).optional(),
   }),
 ])
 export type InkMutation = z.infer<typeof mutationSchema>

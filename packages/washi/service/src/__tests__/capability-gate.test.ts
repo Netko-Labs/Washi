@@ -52,6 +52,47 @@ describe('sheet actions pass the same desk as agent actions', () => {
     expect(call?.decision).toBe('auto')
   })
 
+  test('a page Button copies rows through the same gate (D76)', async () => {
+    const { host } = makeHost()
+    defineUserTable(ws, {
+      name: 'expenses',
+      columns: [
+        { name: 'name', type: 'text' },
+        { name: 'date', type: 'date' },
+        { name: 'recurring', type: 'boolean' },
+        { name: 'month', type: 'formula', expr: 'month(date)' },
+      ],
+    })
+    await host.executeAction(
+      {
+        verb: 'table.insert',
+        table: 'expenses',
+        data: { name: 'Rent', date: '2026-10-01', recurring: true },
+      },
+      { origin: 'sheet' },
+    )
+
+    await host.executeAction(
+      {
+        verb: 'table.copy',
+        table: 'expenses',
+        params: { from: '2026-10' },
+        where: [
+          { column: 'recurring', op: 'eq', value: true },
+          { column: 'month', op: 'eq', value: { param: 'from' } },
+        ],
+        set: { date: { expr: 'add_months(date, 1)' } },
+      },
+      { origin: 'sheet', actorId: 'u1' },
+    )
+
+    const dates = runQuery(ws, { table: 'expenses' }).rows.map((row) => row.date)
+    expect(dates).toEqual(['2026-10-01', '2026-11-01'])
+    const copy = listCapabilityCalls(ws).find((call) => call.subject === 'table.copy')
+    expect(copy?.decision).toBe('auto')
+    expect(copy?.actorId).toBe('u1')
+  })
+
   test('a sheet cannot run a verb that leaves the machine', async () => {
     const { host } = makeHost()
 

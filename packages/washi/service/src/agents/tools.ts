@@ -9,7 +9,7 @@ import { checkSource, createSheetFromSource, updateSheetFromSource } from '../sh
 import { runHistory } from '../tables/history'
 import { linkColumn } from '../tables/link'
 import { defineUserTable, runMutation, runQuery } from '../tables/service'
-import type { SearchKeyLookup } from './lib'
+import { DB_MUTATE_DESCRIPTION, type SearchKeyLookup } from './lib'
 import { pagesFor } from './lib/pages'
 import { webSearch } from './search'
 
@@ -151,7 +151,7 @@ export function createWashiTools(ws: Workspace, context: ToolContext) {
       ),
       tool(
         'db_mutate',
-        'Insert, update, or delete records: { kind, table, data?, where? }.',
+        DB_MUTATE_DESCRIPTION,
         { mutation: z.record(z.string(), z.unknown()) },
         async ({ mutation }) => {
           const { mutationSchema } = await import('@washi/ink')
