@@ -47,8 +47,8 @@ export const paperHost: PaperHost = {
         useNoticeStore.getState().say(`That row did not open — ${reason}`)
       }),
 
-  toggleTask: async (recordId, done) => {
-    await api.tables.toggleTask.mutate({ recordId, done })
+  toggleTask: async (recordId, done, field) => {
+    await api.tables.toggleTask.mutate({ recordId, done, field })
   },
 
   describeTable: async (name) => {

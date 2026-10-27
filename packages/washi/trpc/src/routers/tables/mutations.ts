@@ -28,8 +28,14 @@ export const tableMutations = router({
       seedTeamSpace(ctx.ws, { timeZone: input.timeZone, actorId: ctx.actorId }),
     ),
   toggleTask: workspaceProcedure
-    .input(z.object({ recordId: z.string(), done: z.boolean() }))
+    .input(
+      z.object({
+        recordId: z.string(),
+        done: z.boolean(),
+        field: z.string().min(1).max(64).optional(),
+      }),
+    )
     .mutation(({ ctx, input }) => {
-      toggleTaskRecord(ctx.ws, input.recordId, input.done)
+      toggleTaskRecord(ctx.ws, input.recordId, input.done, input.field)
     }),
 })

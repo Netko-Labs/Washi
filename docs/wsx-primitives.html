@@ -1221,7 +1221,7 @@
           <tr><td><code>Button</code></td><td><code>action</code></td><td><code>$row.*</code> when inside Repeat or a bound Drawer (resolved through strings, arrays and objects)</td></tr>
           <tr><td><code>Compose</code></td><td><code>action</code></td><td><code>$value</code> (the trimmed text) and <code>$now</code> (ISO timestamp), then the box clears</td></tr>
           <tr><td><code>Board</code></td><td><code>onAdd</code> per column with <code>$group</code>; <code>onOpen</code> per card with <code>$row.*</code></td><td>and a drop writes <code>table.reorder</code> on its own</td></tr>
-          <tr><td><code>Task</code></td><td>—</td><td>a checkbox that calls the host's <code>toggleTask(rowId, done)</code>, no action object</td></tr>
+          <tr><td><code>Task</code></td><td>—</td><td>a checkbox that calls the host's <code>toggleTask(rowId, done, field)</code>, no action object</td></tr>
           <tr><td><code>Field</code> <code>Roadmap</code> <code>Database</code></td><td>—</td><td>write <code>table.update</code> / <code>table.column</code> themselves</td></tr>
         </tbody>
       </table>
@@ -1649,7 +1649,7 @@ bun run typecheck</div></div></div><figcaption><b>Code</b> — muted background,
       <figure class="plate"><div class="inner"><div class="app flat sk"><table class="ptable"><thead><tr><th>field</th><th>type</th><th>options</th></tr></thead><tbody><tr><td>name</td><td>text</td><td></td></tr><tr><td>status</td><td>status</td><td>Not started · In progress · Done</td></tr><tr><td>points</td><td>number</td><td></td></tr></tbody></table></div></div><figcaption><b>Schema</b> of <code>issues</code>.</figcaption></figure>
 
       <div class="group-head" id="g-dataIn"><h3>Data in</h3><span class="count">8 · writes</span></div>
-      <p>What a person touches. Field, Board, Roadmap and Database write verbs themselves; Button and Compose carry one; Switch and Slider write state; Task flips a row's <code>done</code>.</p>
+      <p>What a person touches. Field, Board, Roadmap and Database write verbs themselves; Button and Compose carry one; Switch and Slider write state; Task flips a row's checkbox column (<code>done</code> unless it names another).</p>
 
       <h4 id="p-Field">Field</h4>
       <p>One primitive over the column types. Label, help and error are structural. Writes <code>table.update</code> on blur (select and boolean on change) — when it knows a row: <code>row</code>, or <code>$row.id</code> inside Repeat; otherwise the error reads <em>this field is not bound to a row</em>. A <code>select</code> offers the column's options from the table spec (a status column's three groups too); a page never enumerates them.</p>
@@ -1724,10 +1724,11 @@ bun run typecheck</div></div></div><figcaption><b>Code</b> — muted background,
       <figure class="plate"><div class="inner"><div class="app flat sk"><div class="flex" style="gap:8px;flex-wrap:nowrap"><div class="pfield" style="flex:1"><div class="in"><span class="muted">Leave a note</span></div></div><span class="pbtn sm" style="opacity:.5">Post</span></div></div></div><figcaption><b>Compose</b> — empty, so Post waits.</figcaption></figure>
 
       <h4 id="p-Task">Task</h4>
-      <p>A checkbox bound to a row's <code>done</code> column through the host's <code>toggleTask</code>. Disabled without a row id.</p>
+      <p>A checkbox bound to one of a row's checkbox columns through the host's <code>toggleTask</code>: <code>field</code> names it (a bill's <code>paid</code>), <code>done</code> when it doesn't. A named column that isn't a checkbox is refused, never written. Disabled without a row id.</p>
       <table><thead><tr><th>Prop</th><th>Type</th><th>Notes</th></tr></thead><tbody>
         <tr><td><code>row</code></td><td>string 1–80</td><td>Record id; defaults to <code>$row.id</code> inside Repeat.</td></tr>
-        <tr><td><code>done</code></td><td>boolean</td><td>Initial state; defaults to the row's <code>done</code>.</td></tr>
+        <tr><td><code>done</code></td><td>boolean</td><td>Initial state; defaults to the row's value of <code>field</code>.</td></tr>
+        <tr><td><code>field</code></td><td>column 1–64</td><td>The checkbox column it ticks; <code>done</code> when absent. Must be a <code>boolean</code> column.</td></tr>
       </tbody></table>
       <p class="pol">children <b>text</b></p>
 <pre><span class="t">&lt;Task</span> <span class="a">row</span>=<span class="v">"0199c2…"</span><span class="t">&gt;</span>Write the review<span class="t">&lt;/Task&gt;</span></pre>

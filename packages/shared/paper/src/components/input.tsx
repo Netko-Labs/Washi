@@ -179,13 +179,14 @@ export function Compose({
 export function Task({
   row,
   done,
+  field,
   children,
   ...rest
-}: BlockProps & { row?: string; done?: boolean }) {
+}: BlockProps & { row?: string; done?: boolean; field?: string }) {
   const host = usePaperHost()
   const scoped = useRow()
   const rowId = row ?? (scoped?.id as string | undefined)
-  const [checked, setChecked] = useState(done ?? scoped?.done === true)
+  const [checked, setChecked] = useState(done ?? scoped?.[field ?? 'done'] === true)
   return (
     <label {...styled(rest, 'wsx-task')} data-done={checked || undefined}>
       <input
@@ -194,7 +195,7 @@ export function Task({
         disabled={!rowId}
         onChange={async (event) => {
           setChecked(event.target.checked)
-          if (rowId) await host.toggleTask(rowId, event.target.checked)
+          if (rowId) await host.toggleTask(rowId, event.target.checked, field)
         }}
       />
       <span>{children}</span>
