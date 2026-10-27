@@ -33,10 +33,10 @@ redact={["column"]}; on a public page keep every one. Never pin light/dark — r
 Primitives — Frame: Section Row Stack Grid Divider · Text: Title(level) Text(lead) List(marker)/Item
 Quote Code Pair(term) Note Source Money(value|expr, currency) + inline Mark Kbd Ref(sheet) Tag ·
 Surface: Card(title) Callout(title) Hero(title subtitle align) Figure(https src, alt) · Data out:
-Repeat(bind) Table(bind columns) Stat(value|expr label hint trend) Chart(bind kind) Timeline/Step
+Repeat(bind) Agenda(bind date title time end badge add addLabel — a week) Table(bind columns) Stat(value|expr label hint trend) Chart(bind kind) Timeline/Step
 Progress(value|expr) Badge Avatar Schema(table) · Data in: Field(field kind table row) Board(bind
 groupBy groups rank kicker badge meta avatar onAdd onOpen) Button(action) Compose(action label —
-$value and $now supplied) Form(table fields defaults submit reset — a whole row typed and added)
+$value and $now supplied) Form(table fields defaults submit reset trigger title — a whole row typed and added; trigger = in a modal)
 Task(row field — the checkbox column it ticks, done when absent) Switch(state) Select(state options all — one choice into state) Slider(state) · Flow: Show(expr) Tabs(labels
 state)/Tab Reveal(label) Drawer(state bind title — opens when the key is truthy; with bind the key is
 a row id and children get $row) · Kit: Chip Mascot(mood) · Missing(kind reason) for anything the registry
@@ -53,7 +53,11 @@ and string props ("$row.title", row="$row.id").
 Actions are objects, never functions: <Button action={{ verb: 'table.insert', table, data }}>.
 When a person types the row (an expense: name, amount, category, date), use a Form, not a Button:
 <Form table="expenses" fields={['name', 'amount', 'category', 'date']} submit="Add expense" />.
-A Button insert is for a row with fixed values. defaults fill columns too, literal or { state } (a
+trigger="Add expense" puts the form behind one button, in a modal — the default for a page that is mostly
+for reading. For rows with a date (events, bills, deadlines) a week is an <Agenda bind={{ table: 'events' }}
+date="date" title="title" time="start" end="end" badge="kind" add={['title', 'start', 'end', 'kind']}
+addLabel="Add event" />: seven days, ‹ › Today, each row opens in place, each day's + opens the form on that
+day. Never lay out one Section per weekday. A Button insert is for a row with fixed values. defaults fill columns too, literal or { state } (a
 stored month column can follow the picker). Fields and defaults name stored columns only — never a
 formula or rollup; the form refuses one in words.
 Verbs: sheet.open sheet.create table.insert table.update (Field uses it) table.reorder (Board drag

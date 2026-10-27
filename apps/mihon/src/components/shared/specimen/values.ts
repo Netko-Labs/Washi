@@ -83,6 +83,16 @@ export const SPECIMENS: Record<string, Specimen> = {
     children:
       '<Row align="center"><Text class="grow">$row.title</Text><Badge>$row.status</Badge><Avatar label="$row.assignee" size="sm" /></Row>',
   },
+  Agenda: {
+    props: {
+      bind: { table: 'tasks' },
+      date: 'due',
+      title: 'title',
+      badge: 'priority',
+      add: ['title', 'priority', 'points'],
+      addLabel: 'Add task',
+    },
+  },
   Table: {
     props: { bind: { table: 'tasks', limit: 4 }, columns: ['title', 'status', 'assignee'] },
   },

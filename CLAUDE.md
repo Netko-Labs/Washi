@@ -335,6 +335,12 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   the label over the track, a Form goes one column, stats sit two to a row. A Stat in a Grid sizes
   its figure to its own column (`15cqi`), and `.wsx` clips sideways overflow, so a phone never
   scrolls a page horizontally. Coarse pointers get 44px targets and 16px inputs.
+- **Pages are apps, not forms laid flat (D83).** `<Agenda bind date title time end badge add>` is a
+  week (‹ › Today, the week the reader's, never saved; a list under 720px); a row opens in the peek;
+  each day's + opens a modal Form seeded with that day (`seed`, written even when not shown).
+  `<Form trigger>` puts a form behind one button in a native `<dialog>` (`FormDialog`: top layer,
+  Escape, a bottom sheet under 560px, closes when the row lands). An empty data view is a quiet
+  filled line, not a dashed box.
 - **Database views read like Notion's (D84).** A table's head shows each property's type
   (`PropertyIcon`) and name in sentence case; select/status/person cells draw a pill, a step dot or a
   face over an invisible native select; dates read "Nov 4, 2026" and numbers group until pressed

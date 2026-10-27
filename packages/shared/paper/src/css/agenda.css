@@ -1,0 +1,259 @@
+/* Agenda: a week as a calendar shows it — seven columns, today marked, events as tinted cards. */
+
+.wsx-agenda {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.wsx-agenda-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.wsx-agenda-range {
+  font-family: var(--font-serif);
+  font-size: calc(18px * var(--sz));
+  color: var(--ink);
+}
+.wsx-agenda-nav {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--muted-bg) 75%, transparent);
+}
+.wsx-agenda-nav button {
+  min-width: 30px;
+  height: 28px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background var(--ease),
+    color var(--ease);
+}
+.wsx-agenda-nav button:hover:not(:disabled) {
+  background: var(--card);
+  color: var(--ink);
+}
+.wsx-agenda-nav button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.wsx-agenda-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  background: var(--card);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  transition: opacity var(--ease);
+}
+.wsx-agenda-days[aria-busy] {
+  opacity: 0.6;
+}
+.wsx-agenda-day {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 176px;
+}
+.wsx-agenda-day + .wsx-agenda-day {
+  border-left: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+}
+.wsx-agenda-day[data-today] {
+  background: color-mix(in srgb, var(--k-fill) 5%, transparent);
+}
+.wsx-agenda-day-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 8px 8px 10px;
+}
+.wsx-agenda-weekday {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.wsx-agenda-date {
+  font-family: var(--font-serif);
+  font-size: 17px;
+  line-height: 1;
+  color: var(--ink);
+}
+.wsx-agenda-day[data-today] .wsx-agenda-weekday {
+  color: var(--k-text);
+}
+.wsx-agenda-day[data-today] .wsx-agenda-date {
+  display: inline-grid;
+  place-items: center;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--k-fill);
+  color: var(--k-on);
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  font-weight: 700;
+}
+.wsx-agenda-add {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  margin-left: auto;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity var(--ease),
+    background var(--ease),
+    color var(--ease);
+}
+.wsx-agenda-day:hover .wsx-agenda-add,
+.wsx-agenda-add:focus-visible {
+  opacity: 1;
+}
+.wsx-agenda-add:hover {
+  background: var(--muted-bg);
+  color: var(--ink);
+}
+.wsx-agenda-add:focus-visible,
+.wsx-agenda-nav button:focus-visible,
+.wsx-agenda-event:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+@media (hover: none) {
+  .wsx-agenda-add {
+    opacity: 1;
+  }
+}
+
+.wsx-agenda-events {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 8px 10px;
+}
+.wsx-agenda-free {
+  padding: 2px 2px;
+  font-size: 12px;
+  color: color-mix(in srgb, var(--muted) 65%, transparent);
+}
+.wsx-agenda-event {
+  --bar: var(--k-fill);
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  width: 100%;
+  min-width: 0;
+  padding: 6px 8px 7px 11px;
+  border: 0;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--bar) 14%, transparent);
+  box-shadow: inset 3px 0 0 var(--bar);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+}
+button.wsx-agenda-event {
+  cursor: pointer;
+  transition: background var(--ease);
+}
+button.wsx-agenda-event:hover {
+  background: color-mix(in srgb, var(--bar) 24%, transparent);
+}
+.wsx-agenda-event[data-hue="1"] {
+  --bar: var(--chart-1);
+}
+.wsx-agenda-event[data-hue="2"] {
+  --bar: var(--chart-2);
+}
+.wsx-agenda-event[data-hue="3"] {
+  --bar: var(--chart-3);
+}
+.wsx-agenda-event[data-hue="4"] {
+  --bar: var(--chart-4);
+}
+.wsx-agenda-event[data-hue="5"] {
+  --bar: var(--chart-5);
+}
+.wsx-agenda-time {
+  font-size: 11.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+.wsx-agenda-title {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+.wsx-agenda-badge {
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* Under 720 the week is a list: the day on the left, its events beside it, + at the end. */
+@container wsx (max-width: 719px) {
+  .wsx-agenda-days {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .wsx-agenda-day {
+    display: grid;
+    grid-template-columns: 54px minmax(0, 1fr);
+    align-items: start;
+    min-height: 0;
+  }
+  .wsx-agenda-day + .wsx-agenda-day {
+    border-top: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+    border-left: 0;
+  }
+  .wsx-agenda-day-head {
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px 0;
+  }
+  .wsx-agenda-add {
+    position: absolute;
+    top: 9px;
+    right: 8px;
+    opacity: 1;
+  }
+  .wsx-agenda-events {
+    padding: 10px 42px 10px 0;
+  }
+  .wsx-agenda-free {
+    padding-top: 4px;
+  }
+  .wsx-agenda-range {
+    font-size: 16px;
+  }
+}

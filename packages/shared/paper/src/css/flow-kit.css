@@ -231,6 +231,14 @@
   font-size: 13.5px;
   color: var(--muted);
 }
+/* Nothing yet reads as a quiet line, not a hole in the page. */
+.wsx-empty[data-state="empty"] {
+  padding: 12px 14px;
+  border: 0;
+  background: color-mix(in srgb, var(--muted-bg) 50%, transparent);
+  text-align: left;
+  font-size: 13px;
+}
 .wsx-empty[data-state="error"] {
   border-style: solid;
   border-color: var(--tone-danger);

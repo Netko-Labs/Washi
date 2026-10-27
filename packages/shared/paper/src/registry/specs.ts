@@ -207,6 +207,26 @@ const dataOut: Record<string, ComponentSpec> = {
     'nodes',
     { noNest: true },
   ),
+  /**
+   * A week of rows on their `date`, ‹ › to move, today marked; a row opens where the reader is.
+   * `add` names the fields of each day's + — a modal Form with that day already in `date`.
+   */
+  Agenda: p(
+    {
+      bind: bindQuerySchema,
+      date: columnName,
+      title: columnName.optional(),
+      time: columnName.optional(),
+      end: columnName.optional(),
+      badge: columnName.optional(),
+      add: z.array(columnName).min(1).max(16).optional(),
+      addLabel: z.string().min(1).max(40).optional(),
+      empty: z.string().max(60).optional(),
+      weekStart: z.enum(['monday', 'sunday']).optional(),
+      redact,
+    },
+    'none',
+  ),
   Table: p(
     {
       bind: bindQuerySchema,
@@ -373,6 +393,9 @@ const dataIn: Record<string, ComponentSpec> = {
       defaults: z.record(columnName, z.union([cellSchema, stateRefSchema])).optional(),
       submit: z.string().min(1).max(40).optional(),
       reset: z.boolean().optional(),
+      /** A button with these words opens the form in a modal instead of laying it on the page. */
+      trigger: z.string().min(1).max(40).optional(),
+      title: z.string().min(1).max(80).optional(),
     },
     'none',
   ),
