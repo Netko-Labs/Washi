@@ -75,7 +75,7 @@ export function Board({
                   {resting.length === 0 && drag.target?.group !== name && (
                     <div className="wsx-board-drop">Drop here</div>
                   )}
-                  {onAdd && (
+                  {onAdd ? (
                     <button
                       type="button"
                       className="wsx-board-add"
@@ -83,6 +83,18 @@ export function Board({
                     >
                       + Add card
                     </button>
+                  ) : (
+                    actions.creatable && (
+                      <button
+                        type="button"
+                        className="wsx-board-add"
+                        onClick={() =>
+                          actions.create(bind.table, { [groupBy]: name, [titleKey]: 'Untitled' })
+                        }
+                      >
+                        + New
+                      </button>
+                    )
                   )}
                 </section>
               )

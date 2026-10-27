@@ -335,6 +335,12 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   the label over the track, a Form goes one column, stats sit two to a row. A Stat in a Grid sizes
   its figure to its own column (`15cqi`), and `.wsx` clips sideways overflow, so a phone never
   scrolls a page horizontally. Coarse pointers get 44px targets and 16px inputs.
+- **Database views read like Notion's (D84).** A table's head shows each property's type
+  (`PropertyIcon`) and name in sentence case; select/status/person cells draw a pill, a step dot or a
+  face over an invisible native select; dates read "Nov 4, 2026" and numbers group until pressed
+  (`DateCell`/`NumberCell` swap to the editor on a press); the foot counts rows. A Board with no
+  `onAdd` gets + New per column when the host has `newRow`: the row is made in that group, titled
+  Untitled, and opened in the peek.
 - WSX is inert data: registry primitives, literal props, the closed `expr` grammar only. Components
   own appearance (four enums: `variant tone size emphasis`); pages own content. Validation before
   persist and before render. Format reference: `docs/wsx-primitives.html`.

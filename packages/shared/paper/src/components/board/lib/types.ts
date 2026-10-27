@@ -51,6 +51,9 @@ export interface CardActions {
   open: (row: Row) => void
   shown: (value: Row[string] | undefined) => string
   add: (action: ActionRef, group: string) => void
+  /** Notion's + New in a column: the row is made already in it and opened where the reader is. */
+  creatable: boolean
+  create: (table: string, data: Record<string, string>) => void
 }
 
 export interface BoardCardProps {

@@ -53,6 +53,23 @@ export interface ChoiceCellProps extends ScalarCellProps {
   choices: Choice[]
 }
 
+export type StatusGroup = 'todo' | 'doing' | 'done'
+
+export interface ChoiceLookProps {
+  column: ColumnSpec
+  value: string
+  label: string
+  index: number
+}
+
+export interface PropertyIconProps {
+  type: ColumnSpec['type']
+}
+
+export interface DateInputsProps extends ScalarCellProps {
+  onDone: () => void
+}
+
 export interface AddPropertyProps {
   onAdd: (name: string, type: ColumnSpec['type'], options: string[]) => Promise<void>
 }

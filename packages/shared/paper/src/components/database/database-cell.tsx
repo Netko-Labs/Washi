@@ -1,5 +1,8 @@
-import { CheckCell, ChoiceCell, DateCell, FormulaCell, ListCell, TextCell } from './cell-editors'
+import { CheckCell, FormulaCell, ListCell, TextCell } from './cell-editors'
+import { ChoiceCell } from './choice-cell'
+import { DateCell } from './date-cell'
 import { type CellProps, choicesFor, useRelationChoices } from './lib'
+import { NumberCell } from './number-cell'
 
 /** One cell, edited the way its property type reads. */
 export function DatabaseCell(props: CellProps) {
@@ -19,6 +22,8 @@ export function DatabaseCell(props: CellProps) {
       return <ListCell {...props} choices={choicesFor(column, db.people)} />
     case 'relation':
       return <ListCell {...props} choices={related} />
+    case 'number':
+      return <NumberCell {...props} />
     case 'formula':
     case 'rollup':
       return <FormulaCell {...props} />

@@ -125,7 +125,7 @@ export function createBookHost(say: Say, seeds?: SeedTable[]): PaperHost {
     Object.assign(row, set as Record<string, Cell>)
   }
 
-  return {
+  const host: PaperHost = {
     runQuery: async (query) => runQuery(need(query.table), query),
     runHistory: async (query) => runHistory(need(query.table), query),
     onDataChange: (listener) => {
@@ -175,6 +175,10 @@ export function createBookHost(say: Say, seeds?: SeedTable[]): PaperHost {
     describePeople: async () => PEOPLE,
     replaceNode: async () => say('canvas edit received — a host would save it'),
     openRow: (recordId) => say(`would open ${recordId} as a page`),
+    newRow: async (table, data) => {
+      await host.runAction({ verb: 'table.insert', table, data })
+      say(`would open the new ${table} row beside the page`)
+    },
     toggleTask: async (recordId, done, field = 'done') => {
       for (const table of tables.values()) {
         const row = table.rows.find((each) => each.id === recordId)
@@ -185,4 +189,5 @@ export function createBookHost(say: Say, seeds?: SeedTable[]): PaperHost {
     describeTable: async (name) => tables.get(name)?.spec ?? null,
     locale: typeof navigator === 'undefined' ? 'en-US' : navigator.language,
   }
+  return host
 }
