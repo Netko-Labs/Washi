@@ -42,10 +42,8 @@ export function linkColumn(ws: Workspace, input: LinkColumnInput): LinkColumnRes
   }
 
   const ids = new Map<string, string>()
-  for (const row of executeQuery(ws, target.id, target.spec, {
-    table: target.name,
-    limit: ALL_ROWS,
-  }).rows) {
+  const targets = executeQuery(ws, target.id, target.spec, { table: target.name, limit: ALL_ROWS })
+  for (const row of targets.rows) {
     const name = row[on]
     if (typeof name === 'string' && !ids.has(keyOf(name))) ids.set(keyOf(name), String(row.id))
   }
@@ -53,7 +51,7 @@ export function linkColumn(ws: Workspace, input: LinkColumnInput): LinkColumnRes
     table: source.name,
     limit: ALL_ROWS,
   }).rows
-  if (rows.length >= ALL_ROWS || ids.size >= ALL_ROWS) {
+  if (rows.length >= ALL_ROWS || targets.rows.length >= ALL_ROWS) {
     throw new InkError(`too many rows to link in one step (${ALL_ROWS} or more); nothing changed`)
   }
   const valuesOf = (cell: Cell | undefined) =>
