@@ -136,7 +136,7 @@ function groupOf(column: CellProps['column'], value: string): string | undefined
   return 'todo'
 }
 
-/** A formula's value, read-only: it is computed from the row's other cells, never typed. */
+/** A formula's or rollup's value, read-only: it is computed on read, never typed. */
 export function FormulaCell({ column, value }: ScalarCellProps) {
   const shown =
     value === null || value === undefined
@@ -149,7 +149,11 @@ export function FormulaCell({ column, value }: ScalarCellProps) {
           ? value.toLocaleString()
           : String(value)
   return (
-    <span className="wsx-db-formula" title={column.expr} data-formula>
+    <span
+      className="wsx-db-formula"
+      title={column.expr ?? (column.rollup && `${column.rollup.fn} of ${column.rollup.table}`)}
+      data-formula
+    >
       {shown}
     </span>
   )

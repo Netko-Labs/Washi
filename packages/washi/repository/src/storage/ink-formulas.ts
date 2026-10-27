@@ -26,16 +26,19 @@ function astOf(expr: string): ExprAst | null {
   return parsed.get(expr) ?? null
 }
 
+const isComputed = (type: string) => type === 'formula' || type === 'rollup'
+
+/** Formula and rollup columns: worked out on read, absent from the stored JSON. */
 export function formulaNames(spec: TableSpec): Set<string> {
-  return new Set(spec.columns.filter((column) => column.type === 'formula').map((c) => c.name))
+  return new Set(spec.columns.filter((column) => isComputed(column.type)).map((c) => c.name))
 }
 
-/** The table as SQL sees it: formula columns are not in the stored JSON. */
+/** The table as SQL sees it: computed columns are not in the stored JSON. */
 export function storedSpec(spec: TableSpec): TableSpec {
-  return { ...spec, columns: spec.columns.filter((column) => column.type !== 'formula') }
+  return { ...spec, columns: spec.columns.filter((column) => !isComputed(column.type)) }
 }
 
-/** Whether filtering, ordering or grouping needs a formula's value, so SQL alone cannot answer. */
+/** Whether filtering, ordering or grouping needs a computed value, so SQL alone cannot answer. */
 export function needsMemory(
   spec: TableSpec,
   query: Pick<InkQuery, 'where' | 'orderBy' | 'groupBy'>,

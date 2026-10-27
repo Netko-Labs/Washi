@@ -1,4 +1,5 @@
 import { ARRAY_COLUMN_TYPES, type Filter, type TableSpec } from '@washi/ink'
+import { getTableByName, type Workspace } from '@washi/repository'
 import { parseExpr, validateExpr } from '@washi/wsx'
 import { InkError } from './errors'
 
@@ -40,5 +41,42 @@ export function checkFormulas(spec: TableSpec): void {
       if (errors.length > 0) throw new InkError(`${column.name}: ${errors.join('; ')}`)
     }
     if (column.type === 'formula') readable.push(column.name)
+  }
+}
+
+/**
+ * A rollup must name a table, a `via` column on it that points here — a relation to this table,
+ * or a plain value matched to this row's `on` — and something to aggregate that is stored or a
+ * formula there: never another rollup, so no rollup ever waits on itself.
+ */
+export function checkRollups(ws: Workspace, spec: TableSpec): void {
+  for (const column of spec.columns) {
+    const rollup = column.rollup
+    if (column.type !== 'rollup' || !rollup) continue
+    const fail = (message: string) => {
+      throw new InkError(`${column.name}: ${message}`)
+    }
+    const target = rollup.table === spec.name ? spec : getTableByName(ws, rollup.table)?.spec
+    if (!target) fail(`no table "${rollup.table}" to roll up`)
+    const columns = new Map((target?.columns ?? []).map((each) => [each.name, each]))
+    const via = columns.get(rollup.via)
+    if (!via) fail(`"${rollup.table}" has no column "${rollup.via}"`)
+    if (via?.type === 'relation' && via.table !== spec.name) {
+      fail(`"${rollup.via}" points at "${via.table}", not "${spec.name}"`)
+    }
+    if (via && via.type !== 'relation' && rollup.on) {
+      const on = spec.columns.find((each) => each.name === rollup.on)
+      if (!on || ARRAY_COLUMN_TYPES.has(on.type)) fail(`"${rollup.on}" is not a column to match on`)
+    }
+    if (rollup.fn !== 'count') {
+      const aggregated = rollup.column ? columns.get(rollup.column) : undefined
+      if (!aggregated) fail(`${rollup.fn} needs a column of "${rollup.table}"`)
+      if (aggregated?.type === 'rollup') fail(`"${aggregated.name}" is itself a rollup`)
+    }
+    for (const filter of rollup.where ?? []) {
+      if (filter.column !== 'id' && !columns.has(filter.column)) {
+        fail(`"${rollup.table}" has no column "${filter.column}" to filter on`)
+      }
+    }
   }
 }

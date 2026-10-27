@@ -20,6 +20,7 @@ export function DatabaseCell(props: CellProps) {
     case 'relation':
       return <ListCell {...props} choices={related} />
     case 'formula':
+    case 'rollup':
       return <FormulaCell {...props} />
     default:
       return <TextCell {...props} />

@@ -2,6 +2,7 @@ import {
   ARRAY_COLUMN_TYPES,
   type Filter,
   type InkQuery,
+  matchesFilters,
   type QueryResult,
   type Scalar,
   type TableSpec,
@@ -16,6 +17,9 @@ import {
   needsMemory,
   storedSpec,
 } from './ink-formulas'
+import { computeRollups } from './ink-rollups'
+import { getTableByName } from './tables'
+import type { RollupFetch } from './types'
 
 const FILTER_SQL: Record<Filter['op'], string> = {
   eq: '= ?',
@@ -165,10 +169,37 @@ function selectRows(
   return rows
 }
 
+/** A rollup's target: its stored rows after filters, formulas computed — never its own rollups. */
+function rollupFetch(ws: Workspace): RollupFetch {
+  return (table, filters) => {
+    const target = getTableByName(ws, table)
+    if (!target) return null
+    const computed = formulaNames(target.spec)
+    const sqlFilters = filters.filter((filter) => !computed.has(filter.column))
+    const rows = selectRows(
+      ws,
+      target.id,
+      storedSpec(target.spec),
+      sqlFilters,
+      undefined,
+      MEMORY_ROW_CAP,
+    )
+    computeFormulas(target.spec, rows)
+    const rest = filters.filter((filter) => computed.has(filter.column))
+    return { spec: target.spec, rows: rows.filter((row) => matchesFilters(row, rest, target.spec)) }
+  }
+}
+
+/** Rollups first, then formulas: a formula may read a rollup (`budget - spent`). */
+function compute(ws: Workspace, spec: TableSpec, rows: QueryResult['rows'], query: InkQuery) {
+  computeRollups(spec, rows, query.params, rollupFetch(ws))
+  computeFormulas(spec, rows)
+}
+
 /**
  * Run an ink query over a table's JSON records. Descriptor → parametrized SQL, then each row's
- * formulas. A query that filters, orders or groups on a formula reads up to `MEMORY_ROW_CAP`
- * stored rows and finishes in memory.
+ * rollups and formulas. A query that filters, orders or groups on a computed column reads up to
+ * `MEMORY_ROW_CAP` stored rows and finishes in memory.
  */
 export function executeQuery(
   ws: Workspace,
@@ -179,19 +210,19 @@ export function executeQuery(
   const limit = query.limit ?? 200
   const stored = storedSpec(spec)
   if (needsMemory(spec, query)) {
-    const formulas = formulaNames(spec)
+    const computed = formulaNames(spec)
     const where = query.where ?? []
-    const sqlFilters = where.filter((filter) => !formulas.has(filter.column))
+    const sqlFilters = where.filter((filter) => !computed.has(filter.column))
     const rows = selectRows(ws, tableId, stored, sqlFilters, undefined, MEMORY_ROW_CAP)
-    computeFormulas(spec, rows)
-    const formulaFilters = where.filter((filter) => formulas.has(filter.column))
-    return finishInMemory(spec, rows, query, formulaFilters, limit)
+    compute(ws, spec, rows, query)
+    const computedFilters = where.filter((filter) => computed.has(filter.column))
+    return finishInMemory(spec, rows, query, computedFilters, limit)
   }
   if (query.groupBy) {
     return groupQuery(ws, tableId, stored, { ...query, groupBy: query.groupBy }, limit)
   }
   const rows = selectRows(ws, tableId, stored, query.where ?? [], query.orderBy, limit)
-  computeFormulas(spec, rows)
+  compute(ws, spec, rows, query)
   return { rows, total: rows.length }
 }
 

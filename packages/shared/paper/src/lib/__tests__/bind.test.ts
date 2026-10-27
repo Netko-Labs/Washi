@@ -25,7 +25,20 @@ describe('a filter that reads page state (D72)', () => {
     for (const values of cleared) {
       expect(resolveFilters(where, values)).toEqual([{ column: 'paid', op: 'eq', value: false }])
     }
-    expect(resolveQuery({ table: 'expenses' }, {})).toEqual({ table: 'expenses', where: undefined })
+    expect(resolveQuery({ table: 'expenses' }, {})).toEqual({
+      table: 'expenses',
+      where: undefined,
+      params: undefined,
+    })
+  })
+
+  test('params read state for rollups; unset ones are left out', () => {
+    const query = { table: 'categories', params: { month: { state: 'picked_month' }, cap: 3 } }
+    expect(resolveQuery(query, { picked_month: '2026-11' }).params).toEqual({
+      month: '2026-11',
+      cap: 3,
+    })
+    expect(resolveQuery(query, {}).params).toEqual({ cap: 3 })
   })
 
   test('a page with a Select driving its views validates; a malformed reference does not', () => {
