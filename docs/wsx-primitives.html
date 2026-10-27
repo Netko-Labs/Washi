@@ -1060,7 +1060,7 @@
             <li>a state key by bare name</li>
             <li><code>$row.column</code> inside <code>Repeat</code> or a bound <code>Drawer</code></li>
             <li>aggregates <code>count sum avg min max</code> over a table, with an optional <code>where</code></li>
-            <li><code>now()</code>, <code>days(a, b)</code>, <code>month(d)</code>, <code>year(d)</code> and <code>when(cond, a, b)</code></li>
+            <li><code>now()</code>, <code>days(a, b)</code>, <code>month(d)</code>, <code>year(d)</code>, <code>when(cond, a, b)</code> and <code>add_months(d, n)</code></li>
           </ul>
         </div>
         <div>
@@ -1098,6 +1098,7 @@
         <li><code>and</code> / <code>or</code> short-circuit and want booleans: <code>null</code> reads as <code>false</code>; a number or string there is an error.</li>
         <li><code>now()</code> is milliseconds, <strong>frozen per render pass</strong> — two reads in one page agree. <code>days(a, b)</code> is <code>trunc((b − a) / 86 400 000)</code>; each side an ISO date string or a number of ms; <code>null</code> in → <code>null</code> out.</li>
         <li><code>month(d)</code> is <code>'YYYY-MM'</code> and <code>year(d)</code> a number, both in UTC from an ISO date or ms; <code>null</code> in → <code>null</code> out. <code>when(cond, a, b)</code> evaluates only the branch taken, so <code>when(qty = 0, 0, total / qty)</code> never divides by zero (<code>if</code> stays reserved: there is no control flow). The same grammar defines a table's <b>formula</b> columns (D73), where a bare name is the row's own column.</li>
+        <li><code>add_months(d, n)</code> is <code>'YYYY-MM-DD'</code>, <code>n</code> whole months on (negative goes back) in UTC; a day the month lacks clamps to its last, so <code>add_months('2026-01-31', 1)</code> is <code>'2026-02-28'</code>. <code>null</code> in → <code>null</code> out; a fraction of a month is an error.</li>
         <li>Tables an expression aggregates over are prefetched once per sheet (<code>limit: 1000</code>) and again after every verb or remote change, so evaluation is synchronous.</li>
         <li>At render a bad expression — syntax, unknown name, type error, budget — <strong>renders as <code>null</code></strong>; <code>useExprValue</code> never throws. Stat shows <code>—</code>, Show hides, Progress shows 0 %.</li>
       </ul>
@@ -1208,6 +1209,7 @@
           <tr><td><code>table.insert</code></td><td><code>{ table, data }</code></td><td>server, <code>runMutation</code></td><td>runs</td><td>asks</td></tr>
           <tr><td><code>table.update</code></td><td><code>{ table, row, set }</code> — <code>set</code> patches ≥1 column</td><td>server, <code>updateRecord</code> (history appended)</td><td>runs — Field, Roadmap, Database write it</td><td>asks</td></tr>
           <tr><td><code>table.reorder</code></td><td><code>{ table, row, set }</code> — same shape</td><td>server, <code>updateRecord</code></td><td>runs — Board writes the group column and a fractional rank</td><td>asks</td></tr>
+          <tr><td><code>table.copy</code></td><td><code>{ table, where, set?, params?, limit? }</code> — <code>where</code> ≥1 filter, a value may be <code>{ param }</code>; a <code>set</code> value is a cell or <code>{ expr }</code></td><td>server, <code>runMutation</code> kind <code>copy</code>: every match becomes a new row (history appended), ≤500, all or nothing</td><td>runs — <code>params</code> may read state</td><td><code>db_mutate</code>, asks</td></tr>
           <tr><td><code>table.delete</code></td><td><code>{ table, row }</code></td><td>server, <code>deleteRecord</code></td><td>runs</td><td>asks</td></tr>
           <tr><td><code>table.column</code></td><td><code>{ table, column: { name, type, options?, groups?, table? } }</code></td><td>server, <code>addColumn</code>; the whole spec re-validates</td><td>runs — Database's header writes it</td><td>asks</td></tr>
           <tr><td><code>url.open</code></td><td><code>{ url }</code> public https</td><td>the host machine's opener</td><td><strong>denied</strong>: <em>"url.open" leaves this machine — a sheet cannot run it without a stamp</em></td><td>asks</td></tr>
@@ -1215,6 +1217,20 @@
       </table>
       <p><code>REVERSIBLE_VERBS</code> — every verb except <code>url.open</code> — stay inside the workspace and can be undone, so a person clicking one in a sheet is consent (<code>decision: auto</code>). Anything that leaves the machine needs a stamp every time.</p>
       <div class="side"><code>state.set</code> is not in <code>VERBS</code>; <code>useRunAction</code> intercepts it before the host sees it. wsx.md listed it beside the server verbs — same behaviour, now said plainly.</div>
+
+      <h3>A month rolled forward — <code>table.copy</code> (D76)</h3>
+      <p>Every row its <code>where</code> matches is copied as a new row: its stored cells, then <code>set</code> over them. A <code>set</code> value is a literal cell or <code>{ expr }</code> — the page grammar over the <em>source</em> row, bare names its columns (formulas included). <code>params</code> fill each <code>{ param }</code> filter value and read as <code>$name</code> in an expr; on a page each may be <code>{ state }</code>, resolved before the action leaves. Unlike a view's, an unset param <strong>refuses</strong> — dropping the filter would copy far more. Formula and rollup columns are never set; an unknown column, a bad expr or a copy that fails its table's checks refuses the whole press. More than 500 matches (or <code>limit</code>) copies nothing and says so.</p>
+<pre><span class="c">// expenses: recurring, every_n_months, date, paid — and two formulas
+//   next_date  = add_months(date, when(every_n_months &gt; 0, every_n_months, 1))
+//   next_month = month(next_date)</span>
+<span class="t">&lt;Show</span> <span class="a">expr</span>=<span class="v">"count(expenses where recurring and month = picked_month) = 0"</span><span class="t">&gt;</span>
+  <span class="t">&lt;Button</span> <span class="a">action</span>={<span class="v">{ verb: 'table.copy', table: 'expenses',
+    params: { month: { state: 'picked_month' } },
+    where: [{ column: 'recurring', op: 'eq', value: true },
+            { column: 'next_month', op: 'eq', value: { param: 'month' } }],
+    set: { date: { expr: 'next_date' }, paid: false } }</span>}<span class="t">&gt;</span>Roll recurring into this month<span class="t">&lt;/Button&gt;</span>
+<span class="t">&lt;/Show&gt;</span></pre>
+      <p>Each row comes forward on its own cadence: rent from October lands in November, and water billed in September (every two months) lands there too, while October's groceries stay put. The 31st lands on the 30th. The <code>Show</code> offers the press once per month — the verb itself copies again if pressed again.</p>
 
       <h3>The primitives that carry one</h3>
       <table>

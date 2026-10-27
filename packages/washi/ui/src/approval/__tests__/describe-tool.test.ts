@@ -27,6 +27,20 @@ describe('tool calls read like a person asked', () => {
     expect(said('db_mutate', { mutation: { kind: 'delete', table: 'places', where: [] } })).toBe(
       'Remove rows from places',
     )
+    const copy = describeTool(
+      'db_mutate',
+      {
+        mutation: {
+          kind: 'copy',
+          table: 'expenses',
+          where: [{ column: 'recurring', op: 'eq', value: true }],
+          set: { date: { expr: 'next_date' }, paid: false },
+        },
+      },
+      titles,
+    )
+    expect(copy.action).toBe('Copy rows forward in')
+    expect(copy.details).toEqual(['Each copy changes date, paid'])
     const define = describeTool(
       'db_define',
       { spec: { name: 'places', columns: [{ name: 'name' }, { name: 'area' }] } },

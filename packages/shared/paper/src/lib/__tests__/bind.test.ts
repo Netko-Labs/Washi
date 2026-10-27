@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import { hasErrors, parse, validate } from '@washi/wsx'
 import { paperRegistry } from '../../registry'
-import { resolveFilters, resolveQuery } from '../bind'
+import { resolveActionParams, resolveFilters, resolveQuery } from '../bind'
 
 describe('a filter that reads page state (D72)', () => {
   const where = [
@@ -51,5 +51,36 @@ describe('a filter that reads page state (D72)', () => {
       )
     expect(hasErrors(page(`{ state: 'picked_month' }`))).toBe(false)
     expect(hasErrors(page(`{ state: 'picked_month', fallback: 1 }`))).toBe(true)
+  })
+})
+
+describe('a copy Button that reads page state (D76)', () => {
+  const rollover = {
+    verb: 'table.copy',
+    table: 'expenses',
+    params: { month: { state: 'picked_month' }, note: 'rolled' },
+    where: [
+      { column: 'recurring', op: 'eq', value: true },
+      { column: 'next_month', op: 'eq', value: { param: 'month' } },
+    ],
+    set: { date: { expr: 'next_date' }, paid: false },
+  }
+
+  test('params take the picked value before the action leaves; unset ones are left out', () => {
+    expect(resolveActionParams(rollover, { picked_month: '2026-11' })).toEqual({
+      ...rollover,
+      params: { month: '2026-11', note: 'rolled' },
+    })
+    expect(resolveActionParams(rollover, {}).params).toEqual({ note: 'rolled' })
+    const insert = { verb: 'table.insert', table: 'expenses', data: { name: 'x' } }
+    expect(resolveActionParams(insert, {})).toBe(insert)
+  })
+
+  test('the page carrying it validates', () => {
+    const action = JSON.stringify(rollover).replace(/"(\w+)":/g, '$1:')
+    const page = parse(
+      `<Sheet title="Budget" state={{ local: { picked_month: '2026-11' } }}><Button action={${action}}>Roll recurring into this month</Button></Sheet>`,
+    )
+    expect(hasErrors(validate(page, paperRegistry))).toBe(false)
   })
 })
