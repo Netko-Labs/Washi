@@ -1,5 +1,6 @@
 import type { WsxElement, WsxNode } from '@washi/wsx'
 import { type ComponentType, createElement, type ReactNode, useMemo } from 'react'
+import { Agenda } from './components/agenda'
 import { Board } from './components/board'
 import { Canvas } from './components/canvas'
 import {
@@ -114,6 +115,7 @@ const COMPONENTS: Record<string, ComponentType<never>> = {
   Badge,
   Avatar,
   Field,
+  Agenda,
   Board,
   Database,
   Roadmap,

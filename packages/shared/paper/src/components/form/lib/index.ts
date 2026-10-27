@@ -7,11 +7,14 @@ export type {
   FormBodyProps,
   FormChoiceProps,
   FormDefault,
+  FormDialogProps,
   FormDraft,
   FormFieldProps,
+  FormInlineProps,
   FormInputProps,
   FormPlan,
   FormProps,
   FormStatus,
+  FormUnavailableProps,
 } from './types'
 export { cellOf, formPlan, hasEntries, resolveDefaults, rowOf } from './utils'

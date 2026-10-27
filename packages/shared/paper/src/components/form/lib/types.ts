@@ -15,10 +15,32 @@ export interface FormProps extends BlockProps {
   defaults?: Record<string, FormDefault>
   submit?: string
   reset?: boolean
+  /** A button with this label opens the form in a modal instead of laying it on the page. */
+  trigger?: string
+  /** The modal's heading; the trigger's words when left out. */
+  title?: string
 }
 
-export interface FormBodyProps extends Omit<FormProps, 'table'> {
+export type FormInlineProps = Omit<FormProps, 'trigger' | 'title'>
+
+export interface FormBodyProps extends Omit<FormInlineProps, 'table'> {
   db: DatabaseContext
+  /** Values the opener already knows — the day a calendar's + was pressed on. */
+  seed?: Record<string, Cell>
+  onAdded?: () => void
+  onCancel?: () => void
+}
+
+export interface FormDialogProps extends FormInlineProps {
+  open: boolean
+  onClose: () => void
+  title: string
+  seed?: Record<string, Cell>
+}
+
+export interface FormUnavailableProps {
+  db: 'unreadable' | 'missing' | null
+  table: string
 }
 
 /** What the form shows, what it writes (shown + defaulted), and every name it refuses, in words. */
@@ -41,7 +63,9 @@ export interface FormDraftOptions {
   table: string
   written: ColumnSpec[]
   defaults?: Record<string, FormDefault>
+  seed?: Record<string, Cell>
   reset: boolean
+  onAdded?: () => void
 }
 
 export interface FormDraft {
