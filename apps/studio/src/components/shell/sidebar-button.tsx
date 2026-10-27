@@ -1,4 +1,4 @@
-import { IconLayoutSidebarLeftExpand } from '@tabler/icons-react'
+import { IconMenu2 } from '@tabler/icons-react'
 import { useShellStore } from './lib'
 
 export function SidebarButton() {
@@ -6,11 +6,11 @@ export function SidebarButton() {
     <button
       type="button"
       onClick={() => useShellStore.getState().setDrawer(true)}
-      aria-label="Open the sidebar"
-      title="Sidebar"
+      aria-label="Open the menu"
+      title="Menu"
       className="-ml-2 grid size-10 shrink-0 place-items-center rounded-lg text-muted-foreground hover:bg-accent active:bg-accent"
     >
-      <IconLayoutSidebarLeftExpand className="size-[20px]" />
+      <IconMenu2 className="size-[20px]" />
     </button>
   )
 }

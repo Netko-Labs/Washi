@@ -4,7 +4,6 @@ export { useRecents } from './hooks/use-recents'
 export type {
   BackHomeProps,
   MenuPlacement,
-  MobileHomeProps,
   PlaceEntry,
   PlaceId,
   RecentEntry,
