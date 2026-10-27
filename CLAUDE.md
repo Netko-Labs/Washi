@@ -331,8 +331,9 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
 - **Primitives fit any width (D80).** Paper reads the sheet's own width (`@container wsx`), never
   the window — a phone, the agent panel and a peek reflow alike (`css/narrow.css`): ≤520 a Table
   stacks into cards (first column the title, `data-label` the rest), ≤480 ledger rows wrap, bars put
-  the label over the track, a Form goes one column; ≤400 stats sit two to a row. Coarse pointers get
-  44px targets and 16px inputs.
+  the label over the track, a Form goes one column, stats sit two to a row. A Stat in a Grid sizes
+  its figure to its own column (`15cqi`), and `.wsx` clips sideways overflow, so a phone never
+  scrolls a page horizontally. Coarse pointers get 44px targets and 16px inputs.
 - WSX is inert data: registry primitives, literal props, the closed `expr` grammar only. Components
   own appearance (four enums: `variant tone size emphasis`); pages own content. Validation before
   persist and before render. Format reference: `docs/wsx-primitives.html`.

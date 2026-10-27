@@ -132,16 +132,13 @@
   }
 }
 
-/* ≤ 400: stats sit two to a row instead of one huge number per screen. */
-@container wsx (max-width: 400px) {
+/* ≤ 480: stats sit two to a row; each figure still sizes to its column. */
+@container wsx (max-width: 480px) {
   .wsx-grid:has(> .wsx-stat) {
     row-gap: 18px;
   }
   .wsx-grid > .wsx-stat {
     grid-column: span 6;
-  }
-  .wsx-stat-value {
-    font-size: calc(26px * var(--sz));
   }
 }
 
