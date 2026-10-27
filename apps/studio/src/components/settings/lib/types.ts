@@ -207,7 +207,7 @@ export interface SettingsGroup {
   sections: SettingsSection[]
 }
 
-export interface SettingsNavProps {
+export interface SettingsTabsProps {
   groups: SettingsGroup[]
   current: SettingsTab
   onTab: (tab: SettingsTab) => void

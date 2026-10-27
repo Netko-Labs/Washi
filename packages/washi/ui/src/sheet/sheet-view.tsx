@@ -15,7 +15,7 @@ export function SheetView({ chrome, look, footer, body: Body }: SheetViewProps) 
   // sheet was authored by the sheet — its cover and icon too (D64); a host's band sits under them.
   return (
     <div
-      className="group/sheet flex-1 overflow-y-auto"
+      className="group/sheet flex-1 overflow-y-auto overscroll-y-none"
       data-sheet-id={state.sheet.id}
       data-full-width={summary?.fullWidth || undefined}
     >

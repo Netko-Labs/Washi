@@ -171,7 +171,7 @@ export function AgentPanel({ placement = 'float', onExpand }: AgentPanelProps) {
         {convosOpen && <ConversationsMenu onClose={() => setConvosOpen(false)} />}
       </div>
 
-      <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto">
+      <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto overscroll-y-none">
         {transcript.length === 0 && !running ? (
           <EmptyChat onStarter={(text) => void store().sendPrompt(text)} />
         ) : (

@@ -13,7 +13,7 @@ export function TrashPage() {
   )
 
   return (
-    <div className="min-h-0 flex-1 overflow-y-auto">
+    <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-none">
       <div className="mx-auto w-full max-w-[760px] px-6 py-10">
         <div className="flex items-end justify-between gap-4">
           <div>

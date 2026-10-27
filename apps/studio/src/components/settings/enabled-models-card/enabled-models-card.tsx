@@ -64,7 +64,7 @@ export function EnabledModelsCard({ models, provider, enabled, onChange }: Enabl
           </button>
         )}
       </div>
-      <ul className="max-h-[420px] overflow-y-auto">
+      <ul>
         {shown.map((model) => (
           <ModelSwitch
             key={model.id}

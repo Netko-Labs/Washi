@@ -252,7 +252,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   its first ask, then by Washi through `set_conversation_title` (a tool both ports expose,
   asked for in the instructions); `agents.renameSession` and `deleteSession` (refused while a
   turn runs) are the person's. `onSessionChanged` tells the list to refetch.
-- **Settings is grouped by whose it is (D69):** Account (Profile — `auth.updateUser`; Preferences —
+- **Settings is grouped by whose it is (D69):** one column, the groups as sliding pills and each
+  group's sections as tabs under them — Account (Profile — `auth.updateUser`; Preferences —
   the theme, one `useTheme` store in `components/shared/theme`), Workspace (General — rename through
   `auth.organization.update`, owners and admins; People), Washi (Models · What leaves · Usage ·
   Routines), Server (the app admin's). `?tab=` names the section; an unknown one (the old `agent`)

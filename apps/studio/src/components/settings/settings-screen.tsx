@@ -6,9 +6,9 @@ import { ADMIN_TABS, SETTINGS_GROUPS, type SettingsScreenProps, useInstanceAdmin
 import { PreferencesSection } from './preferences-section'
 import { ProfileSection } from './profile-section'
 import { ServerTab } from './server-tab'
-import { SettingsNav } from './settings-nav'
+import { SettingsTabs } from './settings-tabs'
 
-/** Every section in one place, grouped by whose it is: yours, the team's, Washi's, the server's. */
+/** Every section in one column: whose it is as pills (yours, the team's, Washi's, the server's), then its tabs. */
 export function SettingsScreen({ workspaceId, tab, onTab }: SettingsScreenProps) {
   const isAdmin = useInstanceAdmin()
   const groups = SETTINGS_GROUPS.map((group) => ({
@@ -21,12 +21,12 @@ export function SettingsScreen({ workspaceId, tab, onTab }: SettingsScreenProps)
   const shown = current.key
 
   return (
-    <section className="min-h-0 flex-1 overflow-y-auto">
-      <div className="mx-auto flex max-w-[980px] flex-col gap-6 px-5 pt-9 pb-16 md:flex-row md:gap-12 md:px-10 md:pt-11">
-        <SettingsNav groups={groups} current={shown} onTab={onTab} />
-        <div className="min-w-0 max-w-[680px] flex-1">
-          <h1 className="font-semibold text-2xl tracking-[-0.02em]">{current.label}</h1>
-          <p className="mt-1 mb-6 text-muted-foreground">{current.desc}</p>
+    <section className="min-h-0 flex-1 overflow-y-auto overscroll-y-none">
+      <div className="mx-auto max-w-[720px] px-5 pt-9 pb-16 md:px-10 md:pt-11">
+        <h1 className="mb-5 font-semibold text-[26px] tracking-[-0.02em]">Settings</h1>
+        <SettingsTabs groups={groups} current={shown} onTab={onTab} />
+        <div>
+          <p className="mb-5 text-[13.5px] text-muted-foreground">{current.desc}</p>
 
           {shown === 'profile' && <ProfileSection />}
           {shown === 'preferences' && <PreferencesSection />}

@@ -12,10 +12,12 @@ body {
   font-family: var(--font-sans);
 }
 
-/* The shell scrolls inner panes, not the body, so the root rule alone would miss them. Only y: x keeps swipe-back. */
+/*
+ * No rubber band. The shell scrolls page panes, not the body, so each pane also carries
+ * `overscroll-y-none`; nested lists and menus keep chaining their scroll to the page.
+ */
 html,
-body,
-* {
+body {
   overscroll-behavior-y: none;
 }
 

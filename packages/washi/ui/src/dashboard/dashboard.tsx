@@ -30,7 +30,7 @@ export function Dashboard() {
   }
 
   return (
-    <div className="flex-1 overflow-y-auto">
+    <div className="flex-1 overflow-y-auto overscroll-y-none">
       <section className="mx-auto max-w-[940px] px-10 pt-11 pb-[60px]">
         <h1 className="mb-1 font-semibold text-[28px] tracking-[-0.02em]">
           {greeting()}, {firstName}
