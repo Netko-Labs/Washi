@@ -1,7 +1,8 @@
 import { columnOf, styled, useBind, useHistory } from '../lib'
-import type { BindState, BlockProps, Row } from '../lib/types'
+import type { BindState, BlockProps, ChartPoint, Row } from '../lib/types'
 import { usePaperHost } from '../provider'
 import type { BindHistoryQuery, BindQuery } from '../registry'
+import { ChartBars } from './chart-bars'
 import { Bound } from './states'
 
 const RAMP = [
@@ -18,10 +19,7 @@ const DAY = /^\d{4}-\d{2}-\d{2}$/
 const TICK = { fontSize: 9, fill: 'var(--muted)', fontFamily: 'var(--font-sans)' }
 const FIGURE = { fontSize: 9, fontWeight: 600, fill: 'var(--ink)', fontFamily: 'var(--font-sans)' }
 
-interface Point {
-  label: string
-  value: number
-}
+type Point = ChartPoint
 
 function pickColumns(rows: Row[], label?: string, value?: string): [string, string] {
   return [label ?? columnOf(rows, 'string') ?? 'id', value ?? columnOf(rows, 'number') ?? 'count']
@@ -47,38 +45,6 @@ function toPoints(rows: Row[], label?: string, value?: string, locale?: string):
     label: row[labelKey] === null ? 'None' : readable(String(row[labelKey] ?? ''), locale),
     value: typeof row[valueKey] === 'number' ? (row[valueKey] as number) : 0,
   }))
-}
-
-function Bars({ points, locale }: { points: Point[]; locale?: string }) {
-  const max = Math.max(1, ...points.map((point) => point.value))
-  const slot = (W - PAD * 2) / points.length
-  const bar = Math.min(slot * 0.62, 44)
-  return (
-    <svg viewBox={`0 0 ${W} ${H}`} role="img">
-      {points.map((point, index) => {
-        const height = ((H - 28) * point.value) / max
-        const x = PAD + slot * index + (slot - bar) / 2
-        return (
-          <g key={point.label + index}>
-            <rect
-              x={x}
-              y={H - 20 - height}
-              width={bar}
-              height={height}
-              rx="4"
-              fill={RAMP[index % RAMP.length]}
-            />
-            <text x={x + bar / 2} y={H - 24 - height} textAnchor="middle" {...FIGURE}>
-              {figure(point.value, locale)}
-            </text>
-            <text x={x + bar / 2} y={H - 6} textAnchor="middle" {...TICK}>
-              {point.label.length > 14 ? `${point.label.slice(0, 13)}…` : point.label}
-            </text>
-          </g>
-        )
-      })}
-    </svg>
-  )
 }
 
 /** First, middle and last label under the line; the latest and the peak value over it. */
@@ -219,7 +185,7 @@ function ChartBody({
         const points = toPoints(rows, label, value, locale)
         return (
           <div {...styled(rest, 'wsx-chart')} data-kind={kind}>
-            {kind === 'bar' && <Bars points={points} locale={locale} />}
+            {kind === 'bar' && <ChartBars points={points} colors={RAMP} locale={locale} />}
             {(kind === 'line' || kind === 'area') && (
               <Lines points={points} area={kind === 'area'} locale={locale} />
             )}
