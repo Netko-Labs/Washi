@@ -9,8 +9,8 @@ routines as full pages, out of Settings; routines triggered by schedules, events
       sidebar Threads → Chats
 - [ ] B: anchor chip in the composer; the panel opens your latest chat covering the page; 📌;
       refuse an anchor the asker cannot read
-- [ ] C: `/routines` + `/routines/$id` (Setup · Runs), a chat per run (`routine_runs`), cron,
-      Test; Settings → Routines goes
+- [x] C: `/routines` + `/routines/$id` (Setup · Runs), a chat per run (`routine_runs`), cron
+      with presets, templates; Settings → Routines goes (Test with a payload waits for D/E)
 - [ ] D: event triggers, 60 s coalescing, Washi's own writes fire nothing
 - [ ] E: webhooks (hosted): URL + sealed secret, HMAC, payload inspector, always asks at the desk
 - [ ] later: fork from a message, share read-only, "make it a routine", templates

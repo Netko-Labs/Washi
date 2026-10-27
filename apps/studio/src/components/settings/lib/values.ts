@@ -3,7 +3,6 @@ import {
   IconBuildingCommunity,
   IconGauge,
   IconMoodSmile,
-  IconRoute,
   IconServer,
   IconSparkles,
   IconUserCircle,
@@ -115,12 +114,6 @@ export const SETTINGS_GROUPS: SettingsGroup[] = [
         icon: IconGauge,
         desc: 'What today cost, and the stop that keeps it honest.',
       },
-      {
-        key: 'routines',
-        label: 'Routines',
-        icon: IconRoute,
-        desc: 'What Washi does while nobody is watching.',
-      },
     ],
   },
   {
@@ -145,7 +138,6 @@ export const SETTINGS_TAB_KEYS = [
   'models',
   'outside',
   'usage',
-  'routines',
   'server',
 ] as const satisfies readonly SettingsTab[]
 

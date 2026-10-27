@@ -1,5 +1,4 @@
 import { PeopleSection } from '@/components/people'
-import { RoutinesSection } from '@/components/routines'
 import { AgentTab } from './agent-tab'
 import { EmojisSection } from './emojis-section'
 import { GeneralSection } from './general-section'
@@ -37,7 +36,6 @@ export function SettingsScreen({ workspaceId, tab, onTab }: SettingsScreenProps)
           {(shown === 'models' || shown === 'outside' || shown === 'usage') && (
             <AgentTab part={shown} />
           )}
-          {shown === 'routines' && <RoutinesSection />}
           {shown === 'server' && <ServerTab />}
         </div>
       </div>

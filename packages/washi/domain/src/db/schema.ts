@@ -149,12 +149,23 @@ export const routineTable = sqliteTable('routines', {
   /** IANA zone the person meant, so 07:00 stays 07:00 across daylight saving. */
   timeZone: text('time_zone').notNull(),
   enabled: integer('enabled', { mode: 'boolean' }).notNull().default(true),
-  /** YYYY-MM-DD in `timeZone` of the last run, so a day runs at most once. */
+  /** Before D68: YYYY-MM-DD of the last run. Read once to backfill `last_run_at`. */
   lastRunDay: text('last_run_day'),
-  /** The conversation every run of this routine appends to. */
+  /** The latest run's chat. */
   sessionId: text('session_id'),
   createdBy: text('created_by'),
   createdAt: text('created_at').notNull(),
+  cron: text('cron'),
+  lastRunAt: text('last_run_at'),
+})
+
+/** One row per run; how it went is read off its chat (`agent_sessions`). */
+export const routineRunTable = sqliteTable('routine_runs', {
+  id: text('id').primaryKey(),
+  routineId: text('routine_id').notNull(),
+  sessionId: text('session_id').notNull(),
+  trigger: text('trigger').notNull(),
+  startedAt: text('started_at').notNull(),
 })
 
 export const appMetaTable = sqliteTable('app_meta', {

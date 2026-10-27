@@ -70,7 +70,9 @@ export {
   createRoutine,
   deleteRoutine,
   getRoutine,
+  listRoutineRuns,
   listRoutines,
+  recordRoutineRun,
   updateRoutine,
 } from './storage/routines'
 export { closeShare, liveShareFor, openShare, shareByToken } from './storage/shares'
