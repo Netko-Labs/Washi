@@ -1,6 +1,5 @@
-import { IconLayoutSidebarLeftExpand } from '@tabler/icons-react'
 import { Header } from '@washi/ui'
-import { Sidebar } from '@/components/sidebar'
+import { Sidebar, SidebarToggle } from '@/components/sidebar'
 import { AgentLayer } from './agent-layer'
 import { HeaderActions } from './header-actions'
 import { useDock, useFold, useShellStore, type WorkspaceShellProps } from './lib'
@@ -31,16 +30,13 @@ export function WideShell({ workspace, children }: WorkspaceShellProps) {
         <Header
           leading={
             folded && (
-              <button
-                type="button"
-                onClick={() => shell().toggleFold()}
-                onPointerEnter={() => shell().setPeeking(true)}
-                aria-label="Show the sidebar (⌘\)"
-                title="Show sidebar ⌘\"
-                className="-ml-2 grid size-9 shrink-0 place-items-center rounded-lg text-muted-foreground hover:bg-accent"
-              >
-                <IconLayoutSidebarLeftExpand className="size-[18px]" />
-              </button>
+              <div className="-ml-2">
+                <SidebarToggle
+                  open={false}
+                  onClick={() => shell().toggleFold()}
+                  onPointerEnter={() => shell().setPeeking(true)}
+                />
+              </div>
             )
           }
           actions={<HeaderActions />}
