@@ -11,6 +11,7 @@ import {
   styledSchema,
   themeIdSchema,
   toneSchema,
+  widthSchema,
 } from './surface'
 
 const actionLeaf = z.union([scalarSchema, z.array(scalarSchema)])
@@ -51,6 +52,7 @@ const rowRef = z.string().min(1).max(80)
 const memberId = z.string().min(1).max(80)
 /** Columns hidden from a shared link (D65); one view's redact hides them from the whole page. */
 const redact = z.array(columnName).min(1).max(32).optional()
+const width = widthSchema.optional()
 
 export const SHEET_ICONS = [
   'notebook',
@@ -133,7 +135,7 @@ const frame: Record<string, ComponentSpec> = {
     { gap: gapSchema.optional(), align: z.enum(['start', 'center', 'end', 'stretch']).optional() },
     'nodes',
   ),
-  Grid: p({ gap: gapSchema.optional() }, 'nodes'),
+  Grid: p({ gap: gapSchema.optional(), width }, 'nodes'),
   Divider: p({}, 'none'),
 }
 
@@ -187,6 +189,7 @@ const surface: Record<string, ComponentSpec> = {
 }
 
 const CHART_SHAPE = {
+  width,
   bind: bindQuerySchema.optional(),
   history: bindHistorySchema.optional(),
   kind: z.enum(['bar', 'line', 'area', 'donut']),
@@ -214,6 +217,7 @@ const dataOut: Record<string, ComponentSpec> = {
   Agenda: p(
     {
       bind: bindQuerySchema,
+      width,
       date: columnName,
       title: columnName.optional(),
       time: columnName.optional(),
@@ -230,6 +234,7 @@ const dataOut: Record<string, ComponentSpec> = {
   Table: p(
     {
       bind: bindQuerySchema,
+      width,
       columns: z.array(columnName).max(16).optional(),
       empty: z.string().max(160).optional(),
       redact,
@@ -256,7 +261,7 @@ const dataOut: Record<string, ComponentSpec> = {
     children: 'none',
   },
   Timeline: p({}, 'nodes'),
-  Canvas: p({}, 'nodes', {
+  Canvas: p({ width }, 'nodes', {
     hints: {
       nodes: 'children are <Node id x y tone? page?>label</Node> and <Edge from to label? />',
     },
@@ -283,6 +288,7 @@ const dataOut: Record<string, ComponentSpec> = {
   Roadmap: p(
     {
       bind: bindQuerySchema,
+      width,
       date: columnName,
       title: columnName.optional(),
       empty: z.string().max(160).optional(),
@@ -322,6 +328,7 @@ const dataIn: Record<string, ComponentSpec> = {
   Board: p(
     {
       bind: bindQuerySchema,
+      width,
       groupBy: columnName,
       groups: z.array(z.string().min(1).max(40)).min(1).max(12).optional(),
       rank: columnName.optional(),
@@ -341,6 +348,7 @@ const dataIn: Record<string, ComponentSpec> = {
   Database: p(
     {
       table: z.string().min(1).max(64),
+      width,
       views: z
         .array(
           z

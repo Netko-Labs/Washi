@@ -42,6 +42,22 @@ describe('the styling surface', () => {
     )
   })
 
+  test('only wide blocks take width; the rest are told which do', () => {
+    expect(
+      messages(
+        `<Sheet title="t"><Board bind={{ table: 'tasks' }} groupBy="status" width="full" /><Agenda bind={{ table: 'tasks' }} date="due" width="wide" /><Grid width="page"><Text>x</Text></Grid></Sheet>`,
+      ),
+    ).toBe('')
+    expect(messages(`<Sheet title="t"><Text width="full">x</Text></Sheet>`)).toContain(
+      'only wide blocks take width',
+    )
+    expect(
+      messages(
+        `<Sheet title="t"><Board bind={{ table: 'tasks' }} groupBy="status" width="huge" /></Sheet>`,
+      ),
+    ).toContain('page · wide · full')
+  })
+
   test('the Sheet has no class and never pins the mode', () => {
     const text = messages(`<Sheet title="t" class="p-4" mood="dark"><Text>x</Text></Sheet>`)
     expect(text).toContain('prop class is not addressable on <Sheet> — the Sheet owns measure')

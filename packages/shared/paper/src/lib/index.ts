@@ -6,7 +6,7 @@ export { useRunAction } from './hooks/use-run-action'
 export { useSelectOptions } from './hooks/use-select-options'
 export { columnOf, resolveArgs, resolveRow, resolveRowDeep, toRows } from './rows'
 export { frameOf } from './sheet-look'
-export { styled } from './styled'
+export { reachOf, styled } from './styled'
 export type {
   ActionRef,
   BindState,
@@ -30,4 +30,5 @@ export type {
   StyledProps,
   Tone,
   Variant,
+  Width,
 } from './types'

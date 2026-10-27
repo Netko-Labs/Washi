@@ -1,0 +1,40 @@
+/*
+ * A wide block (`width="wide" | "full"`) reaches past the text column toward the sheet's edges,
+ * centred on the column, never closer to an edge than the page's own gutter.
+ */
+
+/* Registered so `100cqi` resolves on the page (against the `wsx` container) and inherits as px. */
+@property --sheet-w {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+.wsx-page {
+  --sheet-w: 100cqi;
+  --wide-reach: 120px;
+}
+
+:is(.wsx-page, .wsx-section, .wsx-tab) > [data-width] {
+  width: var(--reach);
+  max-width: none;
+  margin-inline: calc((100% - var(--reach)) / 2);
+}
+[data-width="wide"] {
+  --reach: max(100%, min(100% + 2 * var(--wide-reach), var(--sheet-w) - 2 * var(--pad-x)));
+}
+[data-width="full"] {
+  --reach: max(100%, var(--sheet-w) - 2 * var(--pad-x));
+}
+/* Inside a card, a grid cell or a drawer the column is the box itself: stay in it. */
+:is(.wsx-card, .wsx-grid, .wsx-stack, .wsx-row, .wsx-callout, .wsx-reveal, .wsx-drawer)
+  :is(.wsx-section, .wsx-tab)
+  > [data-width] {
+  width: auto;
+  margin-inline: 0;
+}
+
+/* A board given room spends it on its columns before it shows empty floor. */
+:is(.wsx-board, .wsx-db):is([data-width="wide"], [data-width="full"]) .wsx-board-col {
+  flex: 1 0 262px;
+  max-width: 360px;
+}

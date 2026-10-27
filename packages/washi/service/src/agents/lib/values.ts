@@ -57,7 +57,9 @@ trigger="Add expense" puts the form behind one button, in a modal — the defaul
 for reading. For rows with a date (events, bills, deadlines) a week is an <Agenda bind={{ table: 'events' }}
 date="date" title="title" time="start" end="end" badge="kind" add={['title', 'start', 'end', 'kind']}
 addLabel="Add event" />: seven days, ‹ › Today, each row opens in place, each day's + opens the form on that
-day. Never lay out one Section per weekday. A Button insert is for a row with fixed values. defaults fill columns too, literal or { state } (a
+day. Never lay out one Section per weekday. A wide block (Board Agenda Table Database Roadmap Chart
+Canvas Grid) takes width="wide" (a little past the text column) or "full" (the sheet's whole width):
+give a board or a week full when it is what the page is for; text always stays in the column. A Button insert is for a row with fixed values. defaults fill columns too, literal or { state } (a
 stored month column can follow the picker). Fields and defaults name stored columns only — never a
 formula or rollup; the form refuses one in words.
 Verbs: sheet.open sheet.create table.insert table.update (Field uses it) table.reorder (Board drag

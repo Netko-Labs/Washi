@@ -347,6 +347,11 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   (`DateCell`/`NumberCell` swap to the editor on a press); the foot counts rows. A Board with no
   `onAdd` gets + New per column when the host has `newRow`: the row is made in that group, titled
   Untitled, and opened in the peek.
+- **A wide block reaches past the column (D85).** `width="wide" | "full"` on Board · Agenda · Table ·
+  Database · Roadmap · Chart · Canvas · Grid (`css/reach.css`): the sheet's width is `--sheet-w`
+  (`100cqi`, an `@property` so it inherits as px), the reach is centred on the column and stops at
+  the gutter (`--pad-x`); inside a Card, Grid, Stack, Row, Callout, Reveal or Drawer it stays put. In
+  the page editor each live block is its own sheet, so a wide block sits in the column while editing.
 - WSX is inert data: registry primitives, literal props, the closed `expr` grammar only. Components
   own appearance (four enums: `variant tone size emphasis`); pages own content. Validation before
   persist and before render. Format reference: `docs/wsx-primitives.html`.

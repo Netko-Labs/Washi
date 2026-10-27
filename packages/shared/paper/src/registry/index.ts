@@ -39,5 +39,6 @@ export {
   THEME_IDS,
   TONES,
   VARIANTS,
+  WIDTHS,
 } from './surface'
 export { THEMES, type ThemeId, type ThemeTokens } from './themes'

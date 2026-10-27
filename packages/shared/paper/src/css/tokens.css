@@ -202,6 +202,7 @@
 .wsx[data-feel="note"] {
   --measure: 760px;
   --pad: 40px 32px;
+  --pad-x: 32px;
   --rhythm: 18px;
   --body: 15px;
   --t1: 32px;
@@ -213,6 +214,7 @@
 .wsx[data-feel="editorial"] {
   --measure: 700px;
   --pad: 56px 40px;
+  --pad-x: 40px;
   --rhythm: 22px;
   --body: 16px;
   --t1: 40px;
@@ -224,6 +226,7 @@
 .wsx[data-feel="board"] {
   --measure: 1180px;
   --pad: 26px;
+  --pad-x: 26px;
   --rhythm: 16px;
   --body: 14px;
   --t1: 28px;
@@ -235,6 +238,7 @@
 .wsx[data-feel="deck"] {
   --measure: 960px;
   --pad: 56px 48px;
+  --pad-x: 48px;
   --rhythm: 32px;
   --body: 17px;
   --t1: 46px;
@@ -250,6 +254,7 @@
   .wsx-page,
   .wsx-band-column {
     --pad: 20px 16px;
+    --pad-x: 16px;
     --rhythm: 14px;
     --t1: 26px;
     --hero: 32px;
