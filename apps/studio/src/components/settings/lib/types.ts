@@ -13,6 +13,7 @@ export type SettingsTab =
   | 'preferences'
   | 'general'
   | 'people'
+  | 'storage'
   | 'models'
   | 'outside'
   | 'usage'

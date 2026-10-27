@@ -1,5 +1,6 @@
 import {
   IconAdjustments,
+  IconBucket,
   IconBuildingCommunity,
   IconGauge,
   IconRoute,
@@ -85,6 +86,12 @@ export const SETTINGS_GROUPS: SettingsGroup[] = [
         icon: IconUsers,
         desc: 'Who is in this workspace, and who is invited.',
       },
+      {
+        key: 'storage',
+        label: 'Storage',
+        icon: IconBucket,
+        desc: 'Where the covers, icons and pictures people upload are kept.',
+      },
     ],
   },
   {
@@ -134,6 +141,7 @@ export const SETTINGS_TAB_KEYS = [
   'preferences',
   'general',
   'people',
+  'storage',
   'models',
   'outside',
   'usage',
