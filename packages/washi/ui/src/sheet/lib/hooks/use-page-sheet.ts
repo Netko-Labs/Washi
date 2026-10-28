@@ -16,7 +16,11 @@ export function usePageSheet(sheetId?: string): PageSheet {
   const host = useMemo<PaperHost>(
     () =>
       state.status === 'ready'
-        ? { ...paperHost, replaceNode: pageWriter(state.sheet, state.root) }
+        ? {
+            ...paperHost,
+            pageId: state.sheet.id,
+            replaceNode: pageWriter(state.sheet, state.root),
+          }
         : paperHost,
     [state],
   )

@@ -390,6 +390,12 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   `css/layout-kit.css` (`.wsx-cols`/`.wsx-col` — `.wsx-columns` is the column chart's). A Column and
   a Tile are each a `wsx` container, so what sits in one reflows to its own width. Both take `width`.
   The editor keeps them as locked blocks for now.
+- **A hub page lists its pages (D90).** `<Subpages of? layout="list|cards|gallery">` draws a page's
+  children live (`PaperHost.listPages` + `onPagesChange` over the sheets store, so a reader never sees
+  one they cannot open; `pageId` is the page being drawn; `newPage` gives + New page), `<PageLink
+  sheet>` one page as a block. A host with no page tree (a shared link) leaves `listPages` out and
+  Subpages draws nothing. `/` in the editor: New page inside (made under the page, linked in place),
+  Subpages, Subpage gallery, Link to page · <title>.
 - WSX is inert data: registry primitives, literal props, the closed `expr` grammar only. Components
   own appearance (four enums: `variant tone size emphasis`); pages own content. Validation before
   persist and before render. Format reference: `/learn` and the registry specs.

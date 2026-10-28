@@ -1,0 +1,106 @@
+/* Links to pages: a line (Notion's link to page), a card, or a gallery card wearing the cover. */
+.wsx-subpages[data-layout="list"] {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.wsx-subpages:is([data-layout="cards"], [data-layout="gallery"]) {
+  display: grid;
+  gap: var(--gap);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 180px), 1fr));
+}
+.wsx-page-entry {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.wsx-page-entry-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.wsx-page-entry-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wsx-page-entry[data-layout="list"] {
+  padding: 5px 8px;
+  margin-inline: -8px;
+  border-radius: var(--r-cell);
+}
+.wsx-page-entry[data-layout="list"] .wsx-page-entry-title {
+  text-decoration: underline;
+  text-decoration-color: color-mix(in oklab, var(--ink) 25%, transparent);
+  text-underline-offset: 3px;
+}
+.wsx-page-entry[data-layout="list"]:hover {
+  background: var(--muted-bg);
+}
+.wsx-page-entry:is([data-layout="cards"], [data-layout="gallery"]) {
+  overflow: hidden;
+  border: var(--card-border) solid var(--border);
+  border-radius: var(--r-card);
+  background: var(--card);
+  box-shadow: var(--shadow-card);
+  transition:
+    border-color var(--ease),
+    box-shadow var(--ease);
+}
+.wsx-page-entry:is([data-layout="cards"], [data-layout="gallery"]):hover {
+  border-color: color-mix(in oklab, var(--accent) 45%, var(--border));
+}
+.wsx-page-entry[data-layout="cards"] .wsx-page-entry-name,
+.wsx-page-entry[data-layout="gallery"] .wsx-page-entry-name {
+  padding: 12px 14px;
+  font-weight: 600;
+}
+.wsx-page-entry-cover {
+  display: block;
+  aspect-ratio: 16 / 7;
+  background-position: center;
+  background-size: cover;
+}
+.wsx-page-entry-cover[data-empty] {
+  background: var(--muted-bg);
+}
+.wsx-page-glyph {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 1.25em;
+  height: 1.25em;
+  color: var(--muted);
+  line-height: 1;
+}
+.wsx-page-glyph > * {
+  max-width: 100%;
+  max-height: 100%;
+}
+.wsx-page-glyph svg {
+  width: 1.05em;
+  height: 1.05em;
+}
+.wsx-page-new {
+  color: var(--muted);
+}
+.wsx-page-new:is([data-layout="cards"], [data-layout="gallery"]) {
+  display: grid;
+  place-items: center;
+  min-height: 52px;
+  border-style: dashed;
+  background: transparent;
+  box-shadow: none;
+}
+.wsx-page-entry[data-missing] {
+  color: var(--muted);
+  cursor: default;
+}

@@ -21,6 +21,9 @@ export const SUMMARIES: Record<string, string> = {
   Stack: 'Lays blocks top to bottom with an even gap.',
   Grid: 'A twelve-column field; children take span. One column under 400px.',
   Divider: 'A quiet rule between parts of a page.',
+  PageLink: 'A link to one page as a block: its icon and title, opened on a press.',
+  Subpages:
+    'Every page under this one (or of), live, in the sidebar’s order: a list, cards, or a gallery of covers.',
   Columns:
     'Notion’s columns: Columns side by side, each its ratio’s share; they stack under 560px.',
   Column: 'One column inside Columns; ratio 1–6 is its share of the width.',
@@ -82,6 +85,19 @@ export const SUMMARIES: Record<string, string> = {
 
 /** Primitives that only work together; each source validates and renders over the book's `tasks`. */
 export const RECIPES: Recipe[] = [
+  {
+    id: 'hub',
+    title: 'A hub for its pages',
+    why: 'A main page for a part of life: its figures on top, every page under it as cards with their covers, one pinned link.',
+    uses: ['Subpages', 'PageLink', 'Stat', 'Columns'],
+    source: `<Sheet title="Finances" icon="💸">
+  <Columns>
+    <Column><Stat label="Open tasks" expr="count(tasks where status != 'done')" /></Column>
+    <Column ratio={2}><Text emphasis="quiet">Start from the budget; everything else is one press away.</Text><PageLink sheet="budget" /></Column>
+  </Columns>
+  <Section title="Pages"><Subpages layout="gallery" /></Section>
+</Sheet>`,
+  },
   {
     id: 'home',
     title: 'A home in tiles',

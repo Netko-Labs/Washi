@@ -1,5 +1,7 @@
 import type { WsxElement, WsxValue } from '@washi/wsx'
-import type { SheetLook } from './types'
+import type { CSSProperties } from 'react'
+import { COVER_PRESETS } from '../registry/looks'
+import type { SheetLook, SheetLookHost } from './types'
 
 /** The page's own paper and look — theme, feel, accent, icon, cover — read off its `<Sheet>`. */
 export function frameOf(root: WsxElement): SheetLook {
@@ -11,4 +13,12 @@ export function frameOf(root: WsxElement): SheetLook {
     icon: pick(root.props.icon),
     cover: pick(root.props.cover),
   } as SheetLook
+}
+
+/** A cover key as a background: a preset's gradient, or the picture the host lends. */
+export function coverStyle(cover: string, look: SheetLookHost): CSSProperties {
+  const [kind, key] = [cover.slice(0, cover.indexOf(':')), cover.slice(cover.indexOf(':') + 1)]
+  if (kind === 'preset') return { background: COVER_PRESETS[key]?.background }
+  const url = kind === 'picture' ? look.pictureUrl?.(key) : look.fileUrl?.(key)
+  return url ? { backgroundImage: `url(${url})` } : {}
 }

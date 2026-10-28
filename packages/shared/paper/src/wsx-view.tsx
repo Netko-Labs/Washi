@@ -22,6 +22,7 @@ import { Divider, Grid, Row, Section, SheetFrame, Stack } from './components/fra
 import { Button, Compose, Field, Slider, Switch, Task } from './components/input'
 import { Chip, Mascot, Missing } from './components/kit'
 import { Bento, Column, Columns, Tile } from './components/layout'
+import { PageLink, Subpages } from './components/pages'
 import { Redact } from './components/redact'
 import { Roadmap } from './components/roadmap'
 import { Select } from './components/select'
@@ -94,6 +95,8 @@ const COMPONENTS: Record<string, ComponentType<never>> = {
   Column,
   Bento,
   Tile,
+  PageLink,
+  Subpages,
   Title,
   Text,
   List,

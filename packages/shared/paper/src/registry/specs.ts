@@ -4,6 +4,7 @@ import type { ComponentSpec, WsxRegistry } from '@washi/wsx'
 import { z } from 'zod'
 import { LAYOUT_SPECS } from './layout-specs'
 import { coverKeySchema, pageIconSchema } from './looks'
+import { PAGE_SPECS } from './page-specs'
 import { p } from './spec-kit'
 import {
   feelSchema,
@@ -484,7 +485,16 @@ const kit: Record<string, ComponentSpec> = {
 }
 
 export const paperRegistry: WsxRegistry = {
-  components: { ...frame, ...text, ...surface, ...dataOut, ...dataIn, ...flow, ...kit },
+  components: {
+    ...frame,
+    ...text,
+    ...surface,
+    ...PAGE_SPECS,
+    ...dataOut,
+    ...dataIn,
+    ...flow,
+    ...kit,
+  },
   hints: STYLE_PROP_HINTS,
   budget: { nodes: 400, binds: 8, exprs: 24 },
 }
@@ -493,6 +503,7 @@ export const PRIMITIVE_GROUPS = {
   frame: Object.keys(frame),
   text: Object.keys(text),
   surface: Object.keys(surface),
+  pages: Object.keys(PAGE_SPECS),
   dataOut: Object.keys(dataOut),
   dataIn: Object.keys(dataIn),
   flow: Object.keys(flow),

@@ -79,3 +79,11 @@ export const KIND_PLACEHOLDERS: Partial<Record<TextKind, string>> = {
   callout: 'Something to notice',
   code: 'Code',
 }
+
+/** A page made from `/`: a heading waiting for its name, like a page made in the sidebar. */
+export const NEW_SUBPAGE_SOURCE = `<Sheet title="Untitled" icon="notebook" wsx="1">
+  <Title></Title>
+</Sheet>`
+
+/** How many pages `/` offers to link to at once. */
+export const LINK_MATCHES = 5

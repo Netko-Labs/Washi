@@ -2,6 +2,14 @@ import type { SeedTable } from './types'
 
 export const WELCOME_SHEET = { title: 'Welcome to Washi', icon: 'sparkles' }
 
+/** The pages a hub in the book lists: Subpages and PageLink read these. */
+export const BOOK_PAGES = [
+  { id: 'budget', title: 'Monthly budget', icon: '💰', cover: 'preset:sage' },
+  { id: 'income', title: 'Income', icon: '📈', cover: 'picture:valley' },
+  { id: 'expenses', title: 'Expenses', icon: '🧾', cover: 'preset:persimmon' },
+  { id: 'travel', title: 'Travel', icon: '✈️', cover: 'picture:fjord' },
+]
+
 export const PEOPLE = [
   { id: 'p1', name: 'Peje' },
   { id: 'p2', name: 'Mira Kaneko' },
