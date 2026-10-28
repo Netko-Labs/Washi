@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { api } from '../../api'
 import { useSheetsStore } from '../sheets/sheets-store'
+import { useThemesStore } from '../themes/themes-store'
 import type { LiveState } from './types'
 
 let subscription: { unsubscribe: () => void } | null = null
@@ -21,7 +22,10 @@ export const useLiveStore = create<LiveState>(() => ({
           return
         }
         if (pageTimer) clearTimeout(pageTimer)
-        pageTimer = setTimeout(() => void useSheetsStore.getState().refresh(), PAGE_REFRESH_MS)
+        pageTimer = setTimeout(() => {
+          void useSheetsStore.getState().refresh()
+          void useThemesStore.getState().refresh()
+        }, PAGE_REFRESH_MS)
       },
     })
   },

@@ -1,3 +1,4 @@
+// conventions: >300 lines — the workspace DDL is one ordered script; split when next touched
 import { Database } from 'bun:sqlite'
 import { mkdirSync } from 'node:fs'
 import { dirname } from 'node:path'
@@ -10,6 +11,7 @@ import { ensureChatSearch } from './chat-search'
 import { ensureCustomEmojis } from './custom-emojis'
 import { ensureReminders } from './reminders'
 import { ensureRoutineRuns } from './routine-runs-ddl'
+import { ensureWorkspaceThemes } from './workspace-themes'
 
 export type DrizzleDB = BunSQLiteDatabase<typeof schema>
 
@@ -310,6 +312,7 @@ function createTables(sqlite: Database) {
 
   ensureChatSearch(sqlite)
   ensureCustomEmojis(sqlite)
+  ensureWorkspaceThemes(sqlite)
   ensureReminders(sqlite)
 
   // window_state used to live here. A server has no windows — it moved to the

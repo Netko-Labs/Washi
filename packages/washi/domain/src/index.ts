@@ -114,6 +114,14 @@ export {
   type UserTable,
   userTableSchema,
 } from './entities/tables'
+export {
+  type ThemeTokensWrite,
+  themeTokensSchema,
+  type WorkspaceTheme,
+  type WorkspaceThemeWrite,
+  workspaceThemeSchema,
+  workspaceThemeWriteSchema,
+} from './entities/themes'
 export { compareHlc, createHlcClock, type HlcClock } from './hlc'
 export { positionBetween } from './position'
 export {

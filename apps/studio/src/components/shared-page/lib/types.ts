@@ -1,3 +1,4 @@
+import type { ThemePair } from '@washi/paper/registry'
 import type { WsxElement } from '@washi/wsx'
 
 export interface SharedPayload {
@@ -8,6 +9,8 @@ export interface SharedPayload {
   fullWidth: boolean
   hlcUpdated: string
   source: string
+  /** The workspace theme the page wears, if any; built-in themes need nothing. */
+  theme: ThemePair | null
 }
 
 export type SharedState =

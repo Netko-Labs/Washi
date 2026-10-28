@@ -21,4 +21,5 @@ export {
   sheetShareTable,
   sheetTable,
   userTableTable,
+  workspaceThemeTable,
 } from './schema'

@@ -1,4 +1,10 @@
-import { useAgentStore, useLiveStore, useSheetsStore, useViewStore } from '@washi/ui'
+import {
+  useAgentStore,
+  useLiveStore,
+  useSheetsStore,
+  useThemesStore,
+  useViewStore,
+} from '@washi/ui'
 import { useEffect } from 'react'
 import { useMentionsPoll } from '@/components/mentions'
 import { useRemindersPoll } from '@/components/reminders'
@@ -21,6 +27,7 @@ export function useWorkspaceBoot(workspaceId: string) {
 
   useEffect(() => {
     void useSheetsStore.getState().refresh()
+    void useThemesStore.getState().refresh()
     void useAgentStore.getState().init()
     useLiveStore.getState().connect()
     // Only the subscriptions need closing; resetting state is the loader's job, and doing it

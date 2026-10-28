@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react'
 import { styled } from '../lib'
 import type { BlockProps, Gap, PaperSurfaceProps, SheetFrameProps } from '../lib/types'
 import { useSheetLook } from '../look'
-import { THEMES, type ThemeId } from '../registry/themes'
+import { THEMES, type ThemeId, type ThemePair } from '../registry/themes'
 import { SheetCover, SheetMark } from './sheet-look'
 
 const ALIGN: Record<string, string> = {
@@ -13,8 +13,7 @@ const ALIGN: Record<string, string> = {
   stretch: 'stretch',
 }
 
-function themeVars(theme: ThemeId): CSSProperties {
-  const pair = THEMES[theme]
+function themeVars(pair: ThemePair): CSSProperties {
   const out: Record<string, string> = {}
   for (const [mode, tokens] of [
     ['l', pair.light],
@@ -44,14 +43,16 @@ export function SheetFrame({
   cover,
   children,
 }: SheetFrameProps) {
-  const { band } = useSheetLook()
+  const { band, theme: lend } = useSheetLook()
+  const own = Object.hasOwn(THEMES, theme) ? THEMES[theme as ThemeId] : lend?.(theme)
+  const pair = own ?? THEMES.washi
   return (
     <article
       className="wsx"
       data-feel={feel}
       data-theme={theme}
       data-accent={accent}
-      style={themeVars(theme)}
+      style={themeVars(pair)}
     >
       {cover && <SheetCover cover={cover} />}
       {(icon || band) && (
@@ -70,7 +71,7 @@ export function SheetFrame({
 /** Paper's tokens without the page (no `.wsx`), for paper controls in a host's own chrome. */
 export function PaperSurface({ children }: PaperSurfaceProps) {
   return (
-    <div className="wsx-tokens" style={themeVars('washi')}>
+    <div className="wsx-tokens" style={themeVars(THEMES.washi)}>
       {children}
     </div>
   )

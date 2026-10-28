@@ -3,8 +3,8 @@ import { useSession } from '@/integrations/auth'
 
 const workspaceRoute = getRouteApi('/w/$workspaceId')
 
-/** Its adder removes an emoji, and so does an owner or admin — the server checks the same. */
-export function useMayRemove() {
+/** What someone added, they or an owner or admin may change — the server checks the same. */
+export function useMayChange() {
   const { workspace } = workspaceRoute.useLoaderData()
   const { data: session } = useSession()
   const isSteward = workspace.role === 'owner' || workspace.role === 'admin'

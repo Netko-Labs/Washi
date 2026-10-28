@@ -36,9 +36,24 @@ export {
   GAPS,
   SIZES,
   STYLE_PROP_HINTS,
+  sheetThemeSchema,
   THEME_IDS,
   TONES,
   VARIANTS,
   WIDTHS,
+  WORKSPACE_THEME_KEY,
 } from './surface'
-export { THEMES, type ThemeId, type ThemePair, type ThemeTokens } from './themes'
+export { contrastRatio, isThemeRefused, THEME_RULES, themeChecks } from './theme-check'
+export { toHex } from './theme-color'
+export { fillDraft, readTheme, THEME_TOKENS, ThemeImportError, themeFile } from './theme-import'
+export {
+  THEMES,
+  type ThemeCheck,
+  type ThemeDraft,
+  type ThemeId,
+  type ThemeMode,
+  type ThemePair,
+  type ThemeRule,
+  type ThemeTokens,
+  type ThemeVerdict,
+} from './themes'

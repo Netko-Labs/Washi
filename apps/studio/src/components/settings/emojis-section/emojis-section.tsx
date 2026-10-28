@@ -1,14 +1,14 @@
 import { useCustomEmojis } from '@/components/shared/emoji'
 import { SettingsCard } from '../shared/card'
+import { useMayChange, useMemberNames } from '../shared/stewardship'
 import { EmojiAddCard } from './emoji-add-card'
 import { EmojiCard } from './emoji-card'
-import { useMayRemove, useMemberNames } from './lib'
 
 /** What the icon picker's "This workspace" row holds; everyone in the workspace sees them. */
 export function EmojisSection() {
   const { emojis, error, add, remove } = useCustomEmojis()
   const names = useMemberNames()
-  const mayRemove = useMayRemove()
+  const mayRemove = useMayChange()
 
   return (
     <div className="grid gap-4">

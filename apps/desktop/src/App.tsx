@@ -12,6 +12,7 @@ import {
   useAgentStore,
   useLiveStore,
   useSheetsStore,
+  useThemesStore,
   useViewStore,
   viewOf,
 } from '@washi/ui'
@@ -33,6 +34,7 @@ export function App() {
 
   useEffect(() => {
     void refresh()
+    void useThemesStore.getState().refresh()
     subscribeDevCommands()
     // From boot, not from the panel: the inbox badge and Inbox need live approvals
     // whether or not the panel was ever opened.
