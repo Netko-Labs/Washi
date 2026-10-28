@@ -5,6 +5,7 @@ export { useRelationChoices } from './hooks/use-relation-choices'
 export { useRowActions } from './hooks/use-row-actions'
 export type {
   AddPropertyProps,
+  CardValueProps,
   Cell,
   CellProps,
   Choice,
@@ -17,6 +18,7 @@ export type {
   DatabaseProps,
   DatabaseView,
   DateInputsProps,
+  GalleryCardProps,
   Person,
   PropertyIconProps,
   QueryRow,

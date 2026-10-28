@@ -5,8 +5,10 @@ export type { Cell, ColumnSpec, QueryRow, TableSpec }
 
 export interface DatabaseView {
   name: string
-  kind: 'table' | 'board' | 'timeline'
+  kind: 'table' | 'board' | 'timeline' | 'gallery'
   groupBy?: string
+  /** A gallery's picture: a url column (https) or one holding a cover key. */
+  cover?: string
   date?: string
   where?: Filter[]
   columns?: string[]
@@ -83,4 +85,19 @@ export interface RecordsState {
   rows: QueryRow[]
   status: 'loading' | 'ready' | 'error'
   error: string | null
+}
+
+export interface GalleryCardProps {
+  db: DatabaseContext
+  row: QueryRow
+  title: ColumnSpec | undefined
+  cover: ColumnSpec | undefined
+  shown: ColumnSpec[]
+  onOpen?: () => void
+}
+
+export interface CardValueProps {
+  db: DatabaseContext
+  column: ColumnSpec
+  value: Cell | undefined
 }

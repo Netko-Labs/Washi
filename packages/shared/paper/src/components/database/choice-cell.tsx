@@ -2,7 +2,7 @@ import { toneOf } from '../../lib'
 import { type ChoiceCellProps, type ChoiceLookProps, hueAt, initialsOf, statusGroupOf } from './lib'
 
 /** A status reads by its step, a person by their face, a select by its own hue. */
-function ChoiceLook({ column, value, label, index }: ChoiceLookProps) {
+export function ChoiceLook({ column, value, label, index }: ChoiceLookProps) {
   if (column.type === 'status') {
     return (
       <span className="wsx-db-status" data-group={statusGroupOf(column, value)}>

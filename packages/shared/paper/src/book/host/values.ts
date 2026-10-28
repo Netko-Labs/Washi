@@ -113,4 +113,21 @@ export const SEED_TABLES: SeedTable[] = [
       },
     ],
   },
+  {
+    spec: {
+      name: 'classes',
+      columns: [
+        { name: 'name', type: 'text' },
+        { name: 'cover', type: 'text' },
+        { name: 'term', type: 'select', options: ['fall', 'spring'] },
+        { name: 'grade', type: 'number' },
+      ],
+    },
+    rows: [
+      { name: 'Organic chemistry', cover: 'preset:persimmon', term: 'fall', grade: 91 },
+      { name: 'Linear algebra', cover: 'preset:sage', term: 'fall', grade: 87 },
+      { name: 'Art history', cover: 'preset:sakura', term: 'fall', grade: 95 },
+      { name: 'Statistics', cover: 'preset:indigo', term: 'spring', grade: 78 },
+    ],
+  },
 ]
