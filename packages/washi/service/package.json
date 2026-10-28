@@ -5,6 +5,7 @@
   "dependencies": {
     "@ai-sdk/anthropic": "^4",
     "@anthropic-ai/claude-agent-sdk": "^0.3.228",
+    "@jitl/quickjs-singlefile-mjs-release-sync": "0.32.0",
     "@openrouter/ai-sdk-provider": "^3",
     "@washi/domain": "workspace:*",
     "@washi/hanko": "workspace:*",
@@ -16,6 +17,7 @@
     "@washi/wsx": "workspace:*",
     "ai": "^7",
     "mirinjs": "0.1.0-alpha.19",
+    "quickjs-emscripten-core": "0.32.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {

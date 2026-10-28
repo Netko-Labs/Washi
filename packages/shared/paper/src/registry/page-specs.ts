@@ -42,6 +42,19 @@ export const PAGE_SPECS: Record<string, ComponentSpec> = {
   Script: p({ title: z.string().max(80).optional() }, 'text', {
     hints: { code: 'the TSX is the Script’s children: a backtick string with a function view()' },
   }),
+  Automation: p(
+    {
+      table: z.string().min(1).max(64).describe('table'),
+      on: z.enum(['insert', 'update']),
+      title: z.string().max(80).optional(),
+    },
+    'text',
+    {
+      hints: {
+        code: 'the TSX is the Automation’s children: a backtick string with a function run(event)',
+      },
+    },
+  ),
   Include: p({ sheet: pageId }, 'none', {
     hints: { children: 'Include draws the other page itself; it takes no children' },
   }),

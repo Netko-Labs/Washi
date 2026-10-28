@@ -29,7 +29,7 @@ export function useScriptCode(block: LockedBlock) {
       const ask = ++asked
       setCheck({ status: 'checking' })
       api.scripts.compile
-        .query({ source })
+        .query({ source, entry: block.node.name === 'Automation' ? 'run' : 'view' })
         .then((compiled) => {
           if (ask !== asked) return
           if (!compiled.ok) return setCheck({ status: 'refused', error: compiled.error })

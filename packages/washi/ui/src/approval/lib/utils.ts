@@ -148,6 +148,13 @@ export function describeTool(name: string, input: unknown, titleOf: TitleOf): To
         details: text(args.url) ? [String(args.url)] : [],
         outbound: true,
       })
+    case 'automation':
+      return base({
+        icon: IconBolt,
+        action: 'Ran an automation on',
+        subject: text(args.table),
+        details: text(args.title) ? [String(args.title)] : [],
+      })
     case 'link_preview':
       return base({
         icon: IconWorld,

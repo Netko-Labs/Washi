@@ -21,6 +21,15 @@ export interface SheetIndexInput {
   refs: string[]
   /** `file:<id>` keys the page uses, so a purge knows which uploads it frees. */
   files?: string[]
+  /** The `<Automation>` blocks the page holds, in order: what a row write may run. */
+  automations?: AutomationEntry[]
+}
+
+export interface AutomationEntry {
+  table: string
+  event: 'insert' | 'update'
+  title: string | null
+  source: string
 }
 
 const SUMMARY = {
@@ -243,6 +252,14 @@ export function indexSheet(ws: Workspace, id: string, title: string, index: Shee
   ws.sqlite.query('DELETE FROM sheet_files WHERE src = ?').run(id)
   for (const key of index.files ?? []) {
     ws.sqlite.query('INSERT OR IGNORE INTO sheet_files (src, key) VALUES (?, ?)').run(id, key)
+  }
+  ws.sqlite.query('DELETE FROM sheet_automations WHERE src = ?').run(id)
+  for (const [position, entry] of (index.automations ?? []).entries()) {
+    ws.sqlite
+      .query(
+        'INSERT INTO sheet_automations (src, position, table_name, event, title, source) VALUES (?, ?, ?, ?, ?, ?)',
+      )
+      .run(id, position, entry.table, entry.event, entry.title, entry.source)
   }
 }
 

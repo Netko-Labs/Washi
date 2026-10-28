@@ -180,3 +180,26 @@
   color: var(--muted);
   font-size: 0.86em;
 }
+
+/* An automation is a note about the page, not content: a quiet line with its trigger. */
+.wsx-automation {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  background: var(--muted-bg);
+}
+.wsx-automation strong {
+  display: block;
+  font-weight: 600;
+}
+.wsx-automation-when {
+  color: var(--muted);
+  font-size: 0.86em;
+}
+.wsx-automation-when code {
+  font-family: var(--font-mono);
+  font-size: 0.95em;
+}

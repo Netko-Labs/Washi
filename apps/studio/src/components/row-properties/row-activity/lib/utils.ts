@@ -83,6 +83,7 @@ function changePhrase(change: RowChange, context: PhraseContext, now: number): s
 
 function whoOf(by: string | null, context: PhraseContext): string {
   if (by === 'washi') return 'Washi'
+  if (by === 'automation') return 'An automation'
   return context.people.find((person) => person.id === by)?.name ?? 'Someone'
 }
 

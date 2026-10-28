@@ -115,3 +115,10 @@ export const STARTER_WIDGET = `<div id="clock" style="font: 600 40px system-ui; 
   tick()
   setInterval(tick, 1000)
 </script>`
+/** What `/automation` drops in over a table: a new row starts with a status. */
+export const STARTER_AUTOMATION = (table: string) => `function run(event) {
+  // event: { table, kind, row, before } — rows({ table }) reads, act({ verb, … }) changes rows.
+  if (!event.row.status) {
+    act({ verb: 'table.update', table: '${table}', row: event.row.id, set: { status: 'todo' } })
+  }
+}`

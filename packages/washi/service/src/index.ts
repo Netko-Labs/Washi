@@ -56,8 +56,9 @@ export {
   unreadReminders,
   updateReminderRule,
 } from './reminders/service'
+export { runAutomation, watchAutomations } from './scripts/automations'
 export { compileScript, SCRIPT_MAX_CHARS } from './scripts/compile'
-export type { CompiledScript } from './scripts/types'
+export type { AutomationEvent, CompiledScript, ScriptEntry } from './scripts/types'
 export {
   canRead,
   guardWashiWrite,
