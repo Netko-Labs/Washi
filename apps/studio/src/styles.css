@@ -21,6 +21,17 @@ body {
   overscroll-behavior-y: none;
 }
 
+/*
+ * A 64px gutter each side of a page wider than a phone, reading or editing alike, so the editor's
+ * + and ⋮⋮ (56px left of a block) are never clipped by `.wsx` — Notion keeps 96.
+ */
+@container wsx (min-width: 640px) {
+  [data-sheet-id] > .wsx > :is(.wsx-page, .wsx-band-column) {
+    --pad-x: 64px;
+    padding-inline: 64px;
+  }
+}
+
 /* A block Washi built, inside the editor: its own paper, minus the page frame around it. */
 .page-editor-locked .wsx {
   min-height: 0;

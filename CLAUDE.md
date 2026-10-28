@@ -188,6 +188,10 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   (`<Database>`), or a 30-day progress chart over a status's done group. Saves go through `sheets.update` — the
   same validation as the agent's. `serialize` writes text with `<{}>&`, runs of spaces or
   newlines as a string literal, so typed text always round-trips.
+  A locked block draws its own `<Sheet>` frame under a `SheetLookProvider` with no `band` or `edit`, so
+  the page's controls (cover, comments, Undo) are drawn once, not per block. The studio gives a page
+  64px gutters from a 640px sheet up (`styles.css`), the room each block's + and ⋮⋮ need; the handle's
+  hover area is the whole gutter beside the block.
 - **Source mode** (the `</>` toggle while editing, or *Edit source* in the page menu) edits the
   sheet's raw WSX in CodeMirror. It runs the server's own check client-side (parse + validate
   against `paperRegistry`), autosaves only a valid draft through `sheets.update` with
