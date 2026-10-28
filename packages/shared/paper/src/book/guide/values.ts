@@ -29,6 +29,8 @@ export const SUMMARIES: Record<string, string> = {
   Audio: 'A sound with the browser’s player, its title above.',
   File: 'A document as a line: its kind, name and size; it opens or downloads.',
   Bookmark: 'A link as a card — title, a line about it, its picture — read once when it was made.',
+  Widget:
+    'A page’s own HTML and JS in a frame with no origin and no network, reaching the page only through washi.rows / state / act — off until an owner allows widgets.',
   Script:
     'A block written in TypeScript: function view() returns primitives; useState, useRows, useInterval and act are its only reach. Runs sandboxed in a workspace.',
   Include: 'Another page drawn here and kept current — its blocks, not its cover; never nested.',

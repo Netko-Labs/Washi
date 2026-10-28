@@ -27,3 +27,15 @@ export function setEmbedHosts(ws: Workspace, raw: string[]): string[] {
   setAppMeta(ws, EMBED_HOSTS, JSON.stringify(hosts.sort()))
   return embedHosts(ws)
 }
+
+const WIDGETS = 'widgets_enabled'
+
+/** Whether pages may run their own HTML in a widget — off until an owner says so. */
+export function widgetsEnabled(ws: Workspace): boolean {
+  return getAppMeta(ws, WIDGETS) === '1'
+}
+
+export function setWidgetsEnabled(ws: Workspace, enabled: boolean): boolean {
+  setAppMeta(ws, WIDGETS, enabled ? '1' : '0')
+  return widgetsEnabled(ws)
+}

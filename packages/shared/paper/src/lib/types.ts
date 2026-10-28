@@ -98,6 +98,22 @@ export interface ScriptSandbox {
   dispose(): void
 }
 
+export interface WidgetProps extends BlockProps {
+  title?: string
+  height?: number
+  /** The HTML, the Widget's own text. */
+  source: string
+}
+
+/** What a widget's frame may say to the page: nothing else is heard. */
+export type WidgetMessage =
+  | { type: 'height'; value: number }
+  | { type: 'rows'; id: number; query: unknown }
+  | { type: 'set'; key: string; value: unknown }
+  | { type: 'act'; action: unknown }
+
+export type WidgetGate = 'asking' | 'off' | 'on'
+
 export interface GalleryProps extends BlockProps {
   columns?: 2 | 3 | 4
   gap?: Gap

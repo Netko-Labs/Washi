@@ -7,7 +7,7 @@ import { useEmbedHosts } from './lib'
 
 /** What a page may put in a frame: the built-ins always, these sites once an owner lists them. */
 export function EmbedsSection() {
-  const { hosts, error, save } = useEmbedHosts()
+  const { hosts, widgets, error, save, allowWidgets } = useEmbedHosts()
   const isSteward = useIsSteward()
   const [draft, setDraft] = useState('')
   const add = async () => {
@@ -88,6 +88,28 @@ export function EmbedsSection() {
         {error && (
           <p className="border-border border-t px-4 py-3 text-[13px] text-destructive">{error}</p>
         )}
+      </SettingsCard>
+      <SettingsCard
+        title="Widgets"
+        desc="A widget is a page’s own HTML and JavaScript, run in a frame with no network and no reach but the page’s. Off, a widget shows as a note."
+        tag={widgets ? { tone: 'ok', label: 'On' } : { tone: 'off', label: 'Off' }}
+      >
+        <div className="flex items-center justify-between gap-3 px-4 py-3">
+          <p className="text-[13px] text-muted-foreground">
+            {widgets
+              ? 'Pages in this workspace run their widgets.'
+              : 'No page in this workspace runs a widget.'}
+          </p>
+          {isSteward && (
+            <button
+              type="button"
+              onClick={() => void allowWidgets(!widgets)}
+              className="h-9 shrink-0 rounded-xl border border-border px-4 font-semibold text-[13px] hover:bg-accent"
+            >
+              {widgets ? 'Turn off' : 'Allow widgets'}
+            </button>
+          )}
+        </div>
       </SettingsCard>
     </div>
   )

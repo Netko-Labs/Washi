@@ -15,8 +15,8 @@ Specs were dropped for a rewrite (#118); this list is the plan until they return
 - [x] Gallery (pictures in a grid, a lightbox) — D95
 - [x] scripting: `<Script>` TSX inline in a page, any member writes, sandboxed in QuickJS — D96
 - [x] a Script's code edited in place (Code · Preview, kept once it compiles)
-- [ ] scripting, next: server hooks on the same engine (on row insert, custom formula functions);
-      iframe widgets behind an owner switch
+- [x] widgets: a page's own HTML in a sealed frame, behind an owner switch — D98
+- [ ] scripting, next: server hooks (#134), custom formula functions
 
 # D72+ · data that computes — Washi's expense-tracker report (2026-10-27)
 

@@ -142,6 +142,7 @@ export type DataPick =
   | { kind: 'upload'; as: UploadKind; file?: File }
   | { kind: 'gallery'; files?: File[] }
   | { kind: 'script' }
+  | { kind: 'widget' }
 
 /** What `links.preview` read off a site, before it becomes a Bookmark's props. */
 export interface BookmarkPreview {
