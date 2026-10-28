@@ -1,0 +1,113 @@
+/* Agenda view="month": a grid of whole weeks, hairlines between days, events one line each. */
+
+@container wsx (min-width: 720px) {
+  .wsx-agenda[data-view="month"] .wsx-agenda-days {
+    gap: 1px;
+    background: color-mix(in srgb, var(--border) 60%, transparent);
+  }
+  .wsx-agenda[data-view="month"] .wsx-agenda-head {
+    padding: 8px 10px 7px;
+    background: var(--card);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .wsx-agenda[data-view="month"] .wsx-agenda-day {
+    min-height: 116px;
+    background: var(--card);
+  }
+  .wsx-agenda[data-view="month"] .wsx-agenda-day + .wsx-agenda-day {
+    border-left: 0;
+  }
+  .wsx-agenda[data-view="month"] .wsx-agenda-day[data-today] {
+    background: color-mix(in srgb, var(--k-fill) 5%, var(--card));
+  }
+  .wsx-agenda[data-view="month"] .wsx-agenda-day[data-outside] {
+    background: color-mix(in srgb, var(--muted-bg) 55%, var(--card));
+  }
+  .wsx-agenda[data-view="month"] .wsx-agenda-day[data-outside] .wsx-agenda-date {
+    color: var(--muted);
+  }
+  .wsx-agenda[data-view="month"] .wsx-agenda-day-head {
+    padding: 7px 6px 5px 9px;
+  }
+  .wsx-agenda[data-view="month"] .wsx-agenda-weekday,
+  .wsx-agenda[data-view="month"] .wsx-agenda-free,
+  .wsx-agenda[data-view="month"] .wsx-agenda-badge {
+    display: none;
+  }
+  .wsx-agenda[data-view="month"] .wsx-agenda-date {
+    font-size: 15px;
+  }
+  .wsx-agenda[data-view="month"] .wsx-agenda-day[data-today] .wsx-agenda-date {
+    min-width: 24px;
+    height: 24px;
+    font-size: 12.5px;
+  }
+  .wsx-agenda[data-view="month"] .wsx-agenda-add {
+    width: 22px;
+    height: 22px;
+    font-size: 16px;
+  }
+  .wsx-agenda[data-view="month"] .wsx-agenda-events {
+    gap: 3px;
+    padding: 0 5px 7px;
+  }
+  .wsx-agenda[data-view="month"] .wsx-agenda-event {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 5px;
+    padding: 2px 6px 3px 8px;
+    border-radius: 6px;
+    box-shadow: inset 2px 0 0 var(--bar);
+  }
+  .wsx-agenda[data-view="month"] .wsx-agenda-time {
+    flex: none;
+    font-size: 11px;
+  }
+  .wsx-agenda[data-view="month"] .wsx-agenda-title {
+    display: block;
+    overflow: hidden;
+    font-size: 12px;
+    font-weight: 550;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .wsx-agenda[data-view="month"] .wsx-agenda-more[open] {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+}
+
+.wsx-agenda-more summary {
+  width: fit-content;
+  padding: 1px 6px;
+  border-radius: 6px;
+  list-style: none;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+}
+.wsx-agenda-more summary::-webkit-details-marker {
+  display: none;
+}
+.wsx-agenda-more summary:hover {
+  background: var(--muted-bg);
+  color: var(--ink);
+}
+.wsx-agenda-more[open] summary {
+  display: none;
+}
+
+/* Under 720 a month is the week's list, holding only the days with something on, and today. */
+@container wsx (max-width: 719px) {
+  .wsx-agenda[data-view="month"] .wsx-agenda-head,
+  .wsx-agenda[data-view="month"] .wsx-agenda-day[data-outside],
+  .wsx-agenda[data-view="month"] .wsx-agenda-day[data-empty]:not([data-today]) {
+    display: none;
+  }
+}

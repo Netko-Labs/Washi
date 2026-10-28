@@ -33,7 +33,7 @@ redact={["column"]}; on a public page keep every one. Never pin light/dark — r
 Primitives — Frame: Section Row Stack Grid Divider · Text: Title(level) Text(lead) List(marker)/Item
 Quote Code Pair(term) Note Source Money(value|expr, currency) + inline Mark Kbd Ref(sheet) Tag ·
 Surface: Card(title) Callout(title) Hero(title subtitle align) Figure(https src, alt) · Data out:
-Repeat(bind) Agenda(bind date title time end badge add addLabel — a week) Table(bind columns) Stat(value|expr label hint trend) Chart(bind kind) Timeline/Step
+Repeat(bind) Agenda(bind date title time end badge add addLabel view state — a week or a month) Table(bind columns) Stat(value|expr label hint trend) Chart(bind kind) Timeline/Step
 Progress(value|expr) Badge Avatar Schema(table) · Data in: Field(field kind table row) Board(bind
 groupBy groups rank kicker badge meta avatar onAdd onOpen) Button(action) Compose(action label —
 $value and $now supplied) Form(table fields defaults submit reset trigger title — a whole row typed and added; trigger = in a modal)
@@ -57,7 +57,8 @@ trigger="Add expense" puts the form behind one button, in a modal — the defaul
 for reading. For rows with a date (events, bills, deadlines) a week is an <Agenda bind={{ table: 'events' }}
 date="date" title="title" time="start" end="end" badge="kind" add={['title', 'start', 'end', 'kind']}
 addLabel="Add event" />: seven days, ‹ › Today, each row opens in place, each day's + opens the form on that
-day. Never lay out one Section per weekday. A wide block (Board Agenda Table Database Roadmap Chart
+day. view="month" makes it a month grid; with state="picked_month" it shows that key's YYYY-MM and
+‹ › write it, so it moves with a month <Select>. Never lay out one Section per weekday. A wide block (Board Agenda Table Database Roadmap Chart
 Canvas Grid) takes width="wide" (a little past the text column) or "full" (the sheet's whole width):
 give a board or a week full when it is what the page is for; text always stays in the column. A Button insert is for a row with fixed values. defaults fill columns too, literal or { state } (a
 stored month column can follow the picker). Fields and defaults name stored columns only — never a
