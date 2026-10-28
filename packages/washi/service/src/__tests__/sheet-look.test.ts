@@ -37,6 +37,14 @@ describe('the look lives in the page (D64)', () => {
     expect(removed.icon).toBe('book')
   })
 
+  test('a picked theme is a prop of the page; an id the registry lacks is refused', () => {
+    const sheet = createSheetFromSource(ws, { title: 'Matcha', source: source() })
+    const themed = updateSheetMetaAndLook(ws, sheet.id, { theme: 'rose-pine' })
+    expect(themed.source).toContain('theme="rose-pine"')
+    expect(() => updateSheetMetaAndLook(ws, sheet.id, { theme: 'neon' })).toThrow()
+    expect(updateSheetMetaAndLook(ws, sheet.id, { theme: null }).source).not.toContain('theme=')
+  })
+
   test('width alone still never touches the page', () => {
     const sheet = createSheetFromSource(ws, { title: 'Matcha', source: source() })
     const wide = updateSheetMetaAndLook(ws, sheet.id, { fullWidth: true })

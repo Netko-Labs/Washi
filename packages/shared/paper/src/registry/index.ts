@@ -41,4 +41,4 @@ export {
   VARIANTS,
   WIDTHS,
 } from './surface'
-export { THEMES, type ThemeId, type ThemeTokens } from './themes'
+export { THEMES, type ThemeId, type ThemePair, type ThemeTokens } from './themes'

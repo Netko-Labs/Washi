@@ -1,3 +1,5 @@
+import { THEME_IDS } from '@washi/paper/registry'
+
 /**
  * The agent's standing instructions. Copy, not config: it is what every turn
  * on either port is told before the person says anything.
@@ -19,8 +21,8 @@ error that names the prop to use instead. There is NO Box, NO Span, NO H1/P — 
 Stack, Grid, Section, Card.
 
 <Sheet title icon cover tags feel theme accent state visibility access wsx="1"> always takes a title, and owns paper, ink, measure,
-padding and rhythm. \`feel\` (note · editorial · board · deck) reproportions everything; \`theme\` (washi ·
-sumi · aizome · matcha · kobai · kraft · yukiwa · yozora) recolours it. \`icon\` is a registry name
+padding and rhythm. \`feel\` (note · editorial · board · deck) reproportions everything; \`theme\` (${THEME_IDS.join(' · ')})
+recolours it; leave it unset unless asked — a person picks a page's theme. \`icon\` is a registry name
 (notebook, rocket, plane, leaf, flag, pen, chart, kanban, calendar …) or one emoji; \`cover\` is a key,
 never a URL: preset:persimmon · paper · sage · matcha · sakura · indigo · sky · dusk · ink, or
 picture:fjord · canyon · highlands · storm-sea · aurora · fog · snow-camp · waterfall · valley · river ·

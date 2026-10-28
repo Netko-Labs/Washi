@@ -81,6 +81,7 @@ export {
   type SheetAuthor,
   type SheetDetail,
   type SheetLook,
+  type SheetLookPatch,
   type SheetMetaPatch,
   type SheetShare,
   type SheetSummary,

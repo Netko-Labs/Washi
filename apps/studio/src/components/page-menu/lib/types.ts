@@ -1,6 +1,6 @@
 import type { SheetSummary } from '@washi/domain'
 
-export type PageMenuMode = 'menu' | 'rename' | 'move' | 'share'
+export type PageMenuMode = 'menu' | 'rename' | 'move' | 'share' | 'theme'
 
 export interface PageMenuProps {
   sheet: SheetSummary

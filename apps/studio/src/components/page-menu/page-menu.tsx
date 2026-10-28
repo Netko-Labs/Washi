@@ -6,6 +6,7 @@ import type { PageMenuMode, PageMenuProps } from './lib'
 import { MoveToPanel } from './move-to-panel'
 import { PageMenuList } from './page-menu-list'
 import { RenameForm } from './rename-form'
+import { ThemePanel } from './theme-panel'
 
 /** The ⋯ beside Copy link: what a person does to a page as a whole. */
 export function PageMenu({ sheet, compact }: PageMenuProps) {
@@ -42,6 +43,7 @@ export function PageMenu({ sheet, compact }: PageMenuProps) {
           {mode === 'share' && <SharePanel sheet={sheet} onClose={close} />}
           {mode === 'rename' && <RenameForm sheet={sheet} onDone={close} />}
           {mode === 'move' && <MoveToPanel sheet={sheet} onDone={close} />}
+          {mode === 'theme' && <ThemePanel sheet={sheet} onDone={close} />}
         </div>
       )}
     </div>
