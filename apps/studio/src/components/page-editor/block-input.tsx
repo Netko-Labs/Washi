@@ -8,7 +8,7 @@ import {
   HEADING_LEVELS,
   KIND_LOOKS,
   KIND_PLACEHOLDERS,
-  pickFile,
+  pickFiles,
   type SlashOption,
   slashMatches,
   useAutoSize,
@@ -30,8 +30,12 @@ export function BlockInput({ block, numberAt }: BlockInputProps) {
       // An upload's picker opens inside this press; the block lands once the file is stored.
       const ready =
         chosen.kind === 'upload'
-          ? pickFile(acceptFor(chosen.as)).then((file) => (file ? { ...chosen, file } : null))
-          : Promise.resolve(chosen)
+          ? pickFiles(acceptFor(chosen.as)).then(([file]) => (file ? { ...chosen, file } : null))
+          : chosen.kind === 'gallery'
+            ? pickFiles(acceptFor('image'), true).then((files) =>
+                files.length > 0 ? { ...chosen, files } : null,
+              )
+            : Promise.resolve(chosen)
       // The `/` text stays put, so a refused name (taken since the menu loaded) can be retyped.
       ready
         .then((landing) => landing && store().insertData(block.id, landing))

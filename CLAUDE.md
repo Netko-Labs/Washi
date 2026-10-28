@@ -202,7 +202,10 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   press that chose them and land the block once stored. Every `file:` key a page holds is indexed in
   `sheet_files` on each write (`extractFiles`), so a purge frees a block's upload like a cover's
   (`trashedUploads`), `isUploadWorn` keeps one still used, and a shared link serves only uploads its
-  own (redacted) page uses. The desktop renders no covers or uploaded icons yet.
+  own (redacted) page uses. `<Gallery columns gap>` holds Figures as squares; a press opens a native
+  `<dialog>` lightbox read off the grid as drawn (‹ › and the arrow keys walk, Escape closes);
+  `/gallery` uploads several pictures at once (one refused refuses all, in its words). The desktop
+  renders no covers or uploaded icons yet.
 - **A workspace may bring its own bucket (D70).** Settings → Workspace → Storage: endpoint,
   region, bucket, folder and a key pair, in the control plane's `organization_storage` (the
   pair sealed like BYOK, only the key id's last four shown; `storage.*`, writes `ownerProcedure`).

@@ -12,7 +12,7 @@ Specs were dropped for a rewrite (#118); this list is the plan until they return
 - [x] Include · Backlinks · Outline — D93
 - [x] Bookmark (a link as a card) — D94
 - [x] File · Video · Audio + wider uploads — D95
-- [ ] Gallery (pictures in a grid, a lightbox)
+- [x] Gallery (pictures in a grid, a lightbox) — D95
 - [ ] scripting: script blocks in QuickJS (worker), then server hooks on the same engine; iframe
       widgets later behind an owner switch — waiting on: authors, inline vs named, language
 

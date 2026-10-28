@@ -2,6 +2,7 @@ import type { ComponentSpec } from '@washi/wsx'
 import { z } from 'zod'
 import { FILE_KEY } from './looks'
 import { p } from './spec-kit'
+import { gapSchema, widthSchema } from './surface'
 
 /** An https address, or an upload the workspace holds as `file:<id>`. */
 export const mediaSrcSchema = z
@@ -25,6 +26,15 @@ export const MEDIA_SPECS: Record<string, ComponentSpec> = {
     {
       hints: { url: 'the address is src: https or file:<id>' },
     },
+  ),
+  Gallery: p(
+    {
+      columns: z.union([z.literal(2), z.literal(3), z.literal(4)]).optional(),
+      gap: gapSchema.optional(),
+      width: widthSchema.optional(),
+    },
+    'nodes',
+    { hints: { images: 'a Gallery holds Figures; each opens large on a press' } },
   ),
   Audio: p({ src: mediaSrcSchema, title: z.string().max(120).optional() }, 'none'),
   File: p(

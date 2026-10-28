@@ -28,6 +28,11 @@ export const SPECIMENS: Record<string, Specimen> = {
   Divider: {},
   PageLink: { props: { sheet: 'budget' } },
   Include: { props: { sheet: 'budget' } },
+  Gallery: {
+    props: { columns: 3 },
+    children:
+      '<Figure src="https://interactive-examples.mdn.mozilla.net/media/cc0-images/grapefruit-slice-332-332.jpg" alt="Grapefruit" caption="Breakfast" /><Figure src="https://interactive-examples.mdn.mozilla.net/media/examples/plumeria.jpg" alt="Plumeria" caption="The garden" /><Figure src="https://interactive-examples.mdn.mozilla.net/media/cc0-images/surfer-240-200.jpg" alt="Surfer" caption="The coast" />',
+  },
   Video: {
     props: {
       src: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',

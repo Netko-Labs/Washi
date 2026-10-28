@@ -34,6 +34,7 @@ export {
   SheetFrame,
   Stack,
 } from './components/frame'
+export { Gallery } from './components/gallery'
 export { Button, Compose, Field, Slider, Switch, Task } from './components/input'
 export { Chip, Mascot, Missing } from './components/kit'
 export { Bento, Column, Columns, Tile } from './components/layout'
