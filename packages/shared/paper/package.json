@@ -7,7 +7,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./registry": "./src/registry/index.ts",
-    "./css": "./src/css/paper.css"
+    "./css": "./src/css/paper.css",
+    "./book": "./src/book/index.ts"
   },
   "scripts": {
     "check-types": "tsgo -p tsconfig.json --noEmit"

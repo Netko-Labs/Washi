@@ -1,7 +1,7 @@
 import { WsxView } from '@washi/paper'
+import { pageSource } from '@washi/paper/book'
 import { useMemo } from 'react'
 import { useBookStore } from '@/components/shared/book'
-import { pageSource } from '@/components/shared/specimen'
 import { Source } from '@/components/source'
 import { compile } from './lib'
 

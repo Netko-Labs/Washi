@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
-import { paperRegistry } from '@washi/paper/registry'
 import { parse, validate } from '@washi/wsx'
+import { paperRegistry } from '../../../registry'
 import { knobsFor } from '../../knobs'
 import { matrixAxes, matrixSource, specimenSource } from '../utils'
 import { SPECIMENS } from '../values'

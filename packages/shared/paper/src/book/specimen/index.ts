@@ -1,4 +1,4 @@
-export type { MatrixAxes, PageInput, Specimen, SpecimenInput } from './types'
+export type { MatrixAxes, PageInput, Specimen, SpecimenInput, SpecimenView } from './types'
 export {
   matrixAxes,
   matrixSource,

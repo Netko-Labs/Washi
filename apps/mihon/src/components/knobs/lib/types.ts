@@ -1,5 +1,5 @@
+import type { KnobDef } from '@washi/paper/book'
 import type { WsxValue } from '@washi/wsx'
-import type { KnobDef } from '@/components/shared/knobs'
 
 export interface KnobFieldProps {
   def: KnobDef
