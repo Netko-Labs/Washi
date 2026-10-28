@@ -46,6 +46,37 @@ function newDatabaseName(query: string, taken: string[]): string {
 }
 
 /** Text kinds first, then what can live on the page: a new database, a view, a progress chart. */
+/** `/embed https://…`, or an https address typed after `/`: that site in a frame. */
+function embedOptions(query: string): Extract<SlashOption, { type: 'data' }>[] {
+  const typed = query.trim().replace(/^embed\s*/i, '')
+  let url: URL
+  try {
+    url = new URL(typed)
+  } catch {
+    return /^embed/i.test(query.trim())
+      ? [
+          {
+            type: 'data',
+            key: 'embed',
+            label: 'Embed',
+            hint: 'paste an https address',
+            pick: { kind: 'embed', src: '' },
+          },
+        ]
+      : []
+  }
+  if (url.protocol !== 'https:') return []
+  return [
+    {
+      type: 'data',
+      key: `embed:${url.href}`,
+      label: `Embed · ${url.hostname}`,
+      hint: 'frame',
+      pick: { kind: 'embed', src: url.href },
+    },
+  ]
+}
+
 function pageOptions(needle: string, pages: PageRef[]): Extract<SlashOption, { type: 'data' }>[] {
   const subpages = [
     { key: 'subpage', label: 'New page inside', hint: 'page', pick: { kind: 'subpage' as const } },
@@ -126,11 +157,12 @@ export function slashMatches(
       option.label.toLowerCase().includes(needle) ||
       (option.key === 'database' && /^(new\s+)?database/.test(needle)),
   )
-  return [...kinds, ...pageOptions(needle, pages), ...matching]
+  return [...kinds, ...embedOptions(query), ...pageOptions(needle, pages), ...matching]
 }
 
 /** The live block a pick becomes, as WSX the page keeps whole. */
 export function dataNode(pick: DataPick): WsxElement {
+  if (pick.kind === 'embed') return element('Embed', { src: pick.src }, [])
   if (pick.kind === 'link') return element('PageLink', { sheet: pick.sheet }, [])
   if (pick.kind === 'subpages') {
     return element('Subpages', pick.layout === 'list' ? {} : { layout: pick.layout }, [])

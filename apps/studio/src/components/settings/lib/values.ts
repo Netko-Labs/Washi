@@ -2,6 +2,7 @@ import {
   IconAdjustments,
   IconBucket,
   IconBuildingCommunity,
+  IconFrame,
   IconGauge,
   IconMoodSmile,
   IconPalette,
@@ -105,6 +106,12 @@ export const SETTINGS_GROUPS: SettingsGroup[] = [
         icon: IconPalette,
         desc: 'Page themes the team made or brought in — eight colours a mode, checked for contrast.',
       },
+      {
+        key: 'embeds',
+        label: 'Embeds',
+        icon: IconFrame,
+        desc: 'Which sites a page may show in a frame. https only; the rest show as a link.',
+      },
     ],
   },
   {
@@ -151,6 +158,7 @@ export const SETTINGS_TAB_KEYS = [
   'storage',
   'emojis',
   'themes',
+  'embeds',
   'models',
   'outside',
   'usage',

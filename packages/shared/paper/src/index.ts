@@ -21,6 +21,7 @@ export {
   tableLabel,
 } from './components/database'
 export { Drawer, Schema } from './components/drawer'
+export { Embed } from './components/embed'
 export { Reveal, Show, Tab, Tabs } from './components/flow'
 export { Form } from './components/form'
 export {

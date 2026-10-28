@@ -4,6 +4,21 @@ import { childrenOf } from '../page-tree'
 import { useLiveStore } from '../stores/live/live-store'
 import { useSheetsStore } from '../stores/sheets/sheets-store'
 
+let listed: { at: number; hosts: Promise<string[]> } | null = null
+
+/** The workspace's embed list, asked once a minute at most; every embed on a page shares it. */
+function listedEmbedHosts(): Promise<string[]> {
+  if (!listed || Date.now() - listed.at > 60_000) {
+    listed = { at: Date.now(), hosts: api.embeds.hosts.query().catch(() => []) }
+  }
+  return listed.hosts
+}
+
+/** A new workspace, or a changed list: the next embed asks again. */
+export function forgetEmbedHosts(): void {
+  listed = null
+}
+
 /** Wires the closed capability surface of rendered sheets to the main process. */
 export const paperHost: PaperHost = {
   runQuery: (query) => api.tables.query.query({ query }),
@@ -48,6 +63,8 @@ export const paperHost: PaperHost = {
     useSheetsStore.subscribe((state, previous) => {
       if (state.sheets !== previous.sheets) listener()
     }),
+
+  embedAllowed: async (host) => (await listedEmbedHosts()).includes(host),
 
   newPage: (parentId) => useSheetsStore.getState().createSheet(parentId),
 

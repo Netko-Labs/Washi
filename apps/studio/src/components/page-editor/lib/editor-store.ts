@@ -184,6 +184,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
     setTables: (tables) => set({ tables }),
     insertData: async (id, pick) => {
       if (!locate(get().blocks, id)) return
+      if (pick.kind === 'embed' && !pick.src) throw new Error('paste an https address after /embed')
       if (pick.kind === 'database') {
         await api.tables.define.mutate({ spec: NEW_DATABASE(pick.name) })
       }

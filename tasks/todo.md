@@ -8,7 +8,7 @@ Specs were dropped for a rewrite (#118); this list is the plan until they return
       inside a column edit like the top level
 - [x] hub pages: `Subpages` (list · cards · gallery, live) + `PageLink`; `/` New page inside — D90
 - [x] Database `gallery` view: cards with a cover column, like Notion's — D91
-- [ ] Embed: https only, provider allowlist + the workspace's hosts, sandboxed iframe; http refused
+- [x] Embed: https only, provider allowlist + the workspace's hosts, sandboxed iframe; http refused — D92
 - [ ] Bookmark (a link as a card) · Include (another page's blocks, live)
 - [ ] Backlinks · Outline
 - [ ] File · Video · Audio · Gallery (uploads)

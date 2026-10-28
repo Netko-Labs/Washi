@@ -403,6 +403,16 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   sheet>` one page as a block. A host with no page tree (a shared link) leaves `listPages` out and
   Subpages draws nothing. `/` in the editor: New page inside (made under the page, linked in place),
   Subpages, Subpage gallery, Link to page · <title>.
+- **An embed is https and listed (D92).** `<Embed src title ratio height>`: the registry refuses http;
+  a built-in provider (`EMBED_PROVIDERS` — YouTube via youtube-nocookie, Vimeo, Spotify, Loom, Figma,
+  CodePen, CodeSandbox, Miro, Google Maps, Indify) turns its page URL into its player and always plays;
+  any other host plays only if the workspace lists it — app meta `embed_hosts`, `embeds.hosts` /
+  `embeds.setHosts` (owners and admins), Settings → Workspace → Embeds — which `PaperHost.embedAllowed`
+  asks (the studio caches it a minute; `forgetEmbedHosts` on a switch or a save). Anything else is a
+  quiet card with an Open ↗ link; a shared link has no list, so only built-ins play there. Frames are
+  sandboxed (scripts, same-origin, popups, presentation, forms). This list is not tsuru's fetch
+  allowlist: one is what a reader's browser loads, the other what may leave the server. `/embed <url>`
+  or an https address after `/` drops one in the editor.
 - WSX is inert data: registry primitives, literal props, the closed `expr` grammar only. Components
   own appearance (four enums: `variant tone size emphasis`); pages own content. Validation before
   persist and before render. Format reference: `/learn` and the registry specs.

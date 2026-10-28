@@ -1,5 +1,6 @@
 import { PeopleSection } from '@/components/people'
 import { AgentTab } from './agent-tab'
+import { EmbedsSection } from './embeds-section'
 import { EmojisSection } from './emojis-section'
 import { GeneralSection } from './general-section'
 import { ADMIN_TABS, SETTINGS_GROUPS, type SettingsScreenProps, useInstanceAdmin } from './lib'
@@ -37,6 +38,7 @@ export function SettingsScreen({ workspaceId, tab, onTab }: SettingsScreenProps)
           {shown === 'storage' && <StorageSection />}
           {shown === 'emojis' && <EmojisSection />}
           {shown === 'themes' && <ThemesSection />}
+          {shown === 'embeds' && <EmbedsSection />}
           {(shown === 'models' || shown === 'outside' || shown === 'usage') && (
             <AgentTab part={shown} />
           )}

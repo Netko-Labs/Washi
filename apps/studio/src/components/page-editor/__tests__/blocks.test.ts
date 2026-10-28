@@ -100,6 +100,20 @@ describe('the / menu drops live data on the page', () => {
     expect(sheet(dataNode({ kind: 'subpages', layout: 'gallery' }))).toEqual([])
   })
 
+  test('an https address after / embeds it; http is never offered', () => {
+    const embed = (query: string) =>
+      slashMatches(query, []).find(
+        (option) => option.type === 'data' && option.key.startsWith('embed'),
+      )
+    expect(embed('embed https://open.spotify.com/track/x')).toMatchObject({
+      label: 'Embed · open.spotify.com',
+      pick: { kind: 'embed', src: 'https://open.spotify.com/track/x' },
+    })
+    expect(embed('https://tally.so/r/abc')).toMatchObject({ label: 'Embed · tally.so' })
+    expect(embed('http://tally.so/r/abc')).toBeUndefined()
+    expect(embed('embed')).toMatchObject({ hint: 'paste an https address' })
+  })
+
   test('what lands is valid WSX: a Database, or a Chart over the done statuses', () => {
     const root = parse('<Sheet title="Review" wsx="1"><Title>Review</Title></Sheet>')
     const blocks = [

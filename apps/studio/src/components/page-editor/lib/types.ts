@@ -136,6 +136,7 @@ export type DataPick =
   | { kind: 'subpage' }
   | { kind: 'subpages'; layout: 'list' | 'gallery' }
   | { kind: 'link'; sheet: string }
+  | { kind: 'embed'; src: string }
 
 /** A page the `/` menu can link to. */
 export interface PageRef {

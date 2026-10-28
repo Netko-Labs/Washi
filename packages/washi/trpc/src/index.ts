@@ -3,6 +3,7 @@ import { agentsRouter } from './routers/agents'
 import { capabilitiesRouter } from './routers/capabilities'
 import { commentsRouter } from './routers/comments'
 import { devRouter } from './routers/dev'
+import { embedsRouter } from './routers/embeds'
 import { emojisRouter } from './routers/emojis'
 import { filesRouter } from './routers/files'
 import { instanceRouter } from './routers/instance'
@@ -27,6 +28,7 @@ export const appRouter = router({
   comments: commentsRouter,
   files: filesRouter,
   storage: storageRouter,
+  embeds: embedsRouter,
   emojis: emojisRouter,
   themes: themesRouter,
   tables: tablesRouter,
