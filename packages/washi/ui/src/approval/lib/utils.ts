@@ -148,6 +148,14 @@ export function describeTool(name: string, input: unknown, titleOf: TitleOf): To
         details: text(args.url) ? [String(args.url)] : [],
         outbound: true,
       })
+    case 'link_preview':
+      return base({
+        icon: IconWorld,
+        action: 'Read a bookmark from',
+        subject: hostOf(text(args.href)),
+        details: text(args.href) ? [String(args.href)] : [],
+        outbound: true,
+      })
     case 'web_search':
       return base({
         icon: IconWorldSearch,

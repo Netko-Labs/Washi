@@ -67,6 +67,9 @@ describe('tool calls read like a person asked', () => {
     expect(search.outbound).toBe(true)
     expect(fetch.outbound).toBe(true)
     expect(describeTool('sheet_create', {}, titles).outbound).toBe(false)
+    const preview = describeTool('link_preview', { href: 'https://github.com/oven-sh/bun' }, titles)
+    expect(`${preview.action} ${preview.subject}`).toBe('Read a bookmark from github.com')
+    expect(preview.outbound).toBe(true)
   })
 
   test('a page draft carries its source for the preview', () => {
