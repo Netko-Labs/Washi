@@ -6,10 +6,17 @@ let engine: Promise<QuickJSWASMModule> | null = null
 
 /** QuickJS, loaded the first time a page has a script — never for one that has none. */
 function loadEngine(): Promise<QuickJSWASMModule> {
-  engine ??= Promise.all([
-    import('quickjs-emscripten-core'),
-    import('@jitl/quickjs-singlefile-mjs-release-sync'),
-  ]).then(([core, variant]) => core.newQuickJSWASMModuleFromVariant(variant.default))
+  if (!engine) {
+    const loading = Promise.all([
+      import('quickjs-emscripten-core'),
+      import('@jitl/quickjs-singlefile-mjs-release-sync'),
+    ]).then(([core, variant]) => core.newQuickJSWASMModuleFromVariant(variant.default))
+    engine = loading
+    // A load that failed (a dropped chunk) is not remembered: the next script tries again.
+    loading.catch(() => {
+      if (engine === loading) engine = null
+    })
+  }
   return engine
 }
 

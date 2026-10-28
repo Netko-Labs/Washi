@@ -1,4 +1,5 @@
 import type { Diagnostic, WsxElement, WsxNode } from '@washi/wsx'
+import type { CompiledScript, FoundScript } from './types'
 
 /** A script is one page block's worth of TSX, not a program. */
 export const SCRIPT_MAX_CHARS = 20_000
@@ -7,8 +8,6 @@ const transpiler = new Bun.Transpiler({
   loader: 'tsx',
   tsconfig: { compilerOptions: { jsx: 'react', jsxFactory: 'h', jsxFragmentFactory: 'Fragment' } },
 })
-
-export type CompiledScript = { ok: true; js: string } | { ok: false; error: string }
 
 /**
  * TSX in, plain JS out, the JSX as `h(Card, …)` calls the sandbox answers. A script imports and
@@ -35,7 +34,7 @@ export function compileScript(source: string): CompiledScript {
   }
 }
 
-function scripts(node: WsxNode, path: string, out: { path: string; source: string }[]) {
+function scripts(node: WsxNode, path: string, out: FoundScript[]) {
   if (node.kind !== 'element') return
   const here = path ? `${path} > ${node.name}` : node.name
   if (node.name === 'Script') {
@@ -49,7 +48,7 @@ function scripts(node: WsxNode, path: string, out: { path: string; source: strin
 
 /** Every script on the page compiled now, so one that cannot run is refused before it is saved. */
 export function scriptDiagnostics(root: WsxElement): Diagnostic[] {
-  const found: { path: string; source: string }[] = []
+  const found: FoundScript[] = []
   scripts(root, '', found)
   return found.flatMap(({ path, source }) => {
     const compiled = compileScript(source)
