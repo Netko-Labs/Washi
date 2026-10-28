@@ -140,6 +140,7 @@ export type DataPick =
   | { kind: 'bookmark'; href: string }
   /** `file` arrives once the person picked one; the menu offers the kind. */
   | { kind: 'upload'; as: UploadKind; file?: File }
+  | { kind: 'gallery'; files?: File[] }
 
 /** What `links.preview` read off a site, before it becomes a Bookmark's props. */
 export interface BookmarkPreview {
@@ -147,6 +148,13 @@ export interface BookmarkPreview {
   description: string | null
   image: string | null
   site: string | null
+}
+
+/** An upload once stored: what a block needs to point at it. */
+export interface StoredUpload {
+  id: string
+  name: string
+  size: number
 }
 
 /** A page the `/` menu can link to. */

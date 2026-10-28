@@ -7,6 +7,7 @@ import {
   blockFrame,
   bookmarkNode,
   dataNode,
+  galleryNode,
   slashMatches,
   titleOf,
   uploadNode,
@@ -164,6 +165,18 @@ describe('the / menu drops live data on the page', () => {
       name: 'plan.pdf',
       bytes: 2048,
     })
+    expect(labels('gallery')).toEqual(['Gallery'])
+    const gallery = galleryNode([
+      { id: 'a', name: 'one.jpg', size: 10 },
+      { id: 'b', name: 'two.jpg', size: 20 },
+    ])
+    const sheet = {
+      kind: 'element' as const,
+      name: 'Sheet',
+      props: { title: 't' },
+      children: [gallery],
+    }
+    expect(validate(sheet, paperRegistry)).toEqual([])
   })
 
   test('what lands is valid WSX: a Database, or a Chart over the done statuses', () => {

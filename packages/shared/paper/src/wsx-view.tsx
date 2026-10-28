@@ -21,6 +21,7 @@ import { Embed } from './components/embed'
 import { Reveal, Show, Tab, Tabs } from './components/flow'
 import { Form } from './components/form'
 import { Divider, Grid, Row, Section, SheetFrame, Stack } from './components/frame'
+import { Gallery } from './components/gallery'
 import { Button, Compose, Field, Slider, Switch, Task } from './components/input'
 import { Chip, Mascot, Missing } from './components/kit'
 import { Bento, Column, Columns, Tile } from './components/layout'
@@ -107,6 +108,7 @@ const COMPONENTS: Record<string, ComponentType<never>> = {
   Video,
   Audio,
   File,
+  Gallery,
   Title,
   Text,
   List,

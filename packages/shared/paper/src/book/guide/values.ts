@@ -23,6 +23,8 @@ export const SUMMARIES: Record<string, string> = {
   Divider: 'A quiet rule between parts of a page.',
   Embed:
     'Another site in a sandboxed frame — https only; YouTube, Spotify, Figma and the other built-ins play, any other host only if the workspace lists it.',
+  Gallery:
+    'Pictures in a grid of squares, 2–4 across; a press opens one large, the arrows walk the rest.',
   Video: 'A video that plays in place — an upload (file:<id>) or an https address.',
   Audio: 'A sound with the browser’s player, its title above.',
   File: 'A document as a line: its kind, name and size; it opens or downloads.',

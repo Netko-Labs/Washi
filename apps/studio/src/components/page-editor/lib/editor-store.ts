@@ -6,7 +6,7 @@ import { api } from '@/integrations/trpc'
 import { flatten, locate, mapBlocks, moveBlock, resizeColumns, tidy, writeList } from './columns'
 import { lockedBlock, newBlock, reconcile, turnInto } from './convert'
 import type { Block, BlockPlace, EditorState, FocusRequest, TextBlock } from './types'
-import { applyShortcut, bookmarkNode, dataNode, swapNode, uploadNode } from './utils'
+import { applyShortcut, bookmarkNode, dataNode, galleryNode, swapNode, uploadNode } from './utils'
 import { LIST_MARKERS, NEW_DATABASE, NEW_SUBPAGE_SOURCE } from './values'
 
 function isTyped(block: Block | undefined): block is TextBlock {
@@ -27,6 +27,32 @@ async function uploaded(as: UploadKind, file: File | undefined) {
   if (!send) throw new Error('this app stores no files')
   const stored = await send(file)
   return uploadNode(as, { id: stored.id, name: file.name, size: file.size })
+}
+
+/** Every picture stored before any lands; one refused refuses the gallery, in its words. */
+async function uploadedGallery(files: File[]) {
+  if (files.length === 0) throw new Error('no pictures were picked')
+  for (const file of files) {
+    const refused = uploadRefusal(file.type, file.size, 'image')
+    if (refused) throw new Error(`${file.name}: ${refused}`)
+  }
+  const send = hostUploadFile()
+  if (!send) throw new Error('this app stores no files')
+  // All or none: if one fails, the ones that did land are taken back so nothing is left unused.
+  const sent = await Promise.allSettled(files.map((file) => send(file)))
+  const landed = sent.flatMap((each, at) =>
+    each.status === 'fulfilled'
+      ? [{ id: each.value.id, name: files[at]?.name ?? '', size: files[at]?.size ?? 0 }]
+      : [],
+  )
+  const failed = sent.find((each) => each.status === 'rejected')
+  if (failed) {
+    await Promise.all(
+      landed.map((each) => api.files.remove.mutate({ id: each.id }).catch(() => {})),
+    )
+    throw failed.reason instanceof Error ? failed.reason : new Error('a picture did not upload')
+  }
+  return galleryNode(landed)
 }
 
 /** The page being typed into: every row reads its own block and calls these to change the page. */
@@ -203,11 +229,10 @@ export const useEditorStore = create<EditorState>((set, get) => {
       if (pick.kind === 'database') {
         await api.tables.define.mutate({ spec: NEW_DATABASE(pick.name) })
       }
-      let node =
-        pick.kind === 'subpage' || pick.kind === 'bookmark' || pick.kind === 'upload'
-          ? null
-          : dataNode(pick)
+      const isLater = ['subpage', 'bookmark', 'upload', 'gallery'].includes(pick.kind)
+      let node = isLater ? null : dataNode(pick)
       if (pick.kind === 'upload') node = await uploaded(pick.as, pick.file)
+      if (pick.kind === 'gallery') node = await uploadedGallery(pick.files ?? [])
       if (pick.kind === 'bookmark') {
         // Read once now and kept as the page's own words; a site that will not answer is just its link.
         const seen = await api.links.preview.mutate({ href: pick.href }).catch(() => null)

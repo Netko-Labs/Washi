@@ -28,7 +28,7 @@ export {
   blockFrame,
   kindMatches,
   numberedPositions,
-  pickFile,
+  pickFiles,
   slashMatches,
   titleOf,
 } from './utils'

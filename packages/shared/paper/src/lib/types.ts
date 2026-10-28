@@ -55,6 +55,18 @@ export interface PageEntryProps {
   onOpen: () => void
 }
 
+export interface GalleryProps extends BlockProps {
+  columns?: 2 | 3 | 4
+  gap?: Gap
+}
+
+/** The picture a lightbox shows: what the grid drew, read back off it. */
+export interface LightboxPicture {
+  src: string
+  alt: string
+  caption: string
+}
+
 export interface VideoProps extends BlockProps {
   src: string
   title?: string

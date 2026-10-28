@@ -8,6 +8,7 @@ import type {
   KindOption,
   PageRef,
   SlashOption,
+  StoredUpload,
   TableRef,
   TextBlock,
 } from './types'
@@ -95,23 +96,30 @@ function linkOptions(query: string): Extract<SlashOption, { type: 'data' }>[] {
 
 /** Image, Video, Audio, File: each opens the picker and lands as its block once uploaded. */
 function uploadOptions(needle: string): Extract<SlashOption, { type: 'data' }>[] {
-  return UPLOAD_OPTIONS.filter(
+  const gallery: Extract<SlashOption, { type: 'data' }> = {
+    type: 'data',
+    key: 'upload:gallery',
+    label: 'Gallery',
+    hint: 'pictures',
+    pick: { kind: 'gallery' },
+  }
+  const uploads = UPLOAD_OPTIONS.filter(
     (option) =>
       !needle || option.label.toLowerCase().includes(needle) || option.words.includes(needle),
   ).map((option) => ({
-    type: 'data',
+    type: 'data' as const,
     key: `upload:${option.as}`,
     label: option.label,
     hint: 'upload',
-    pick: { kind: 'upload', as: option.as },
+    pick: { kind: 'upload' as const, as: option.as },
   }))
+  return !needle || 'gallery photos pictures album'.includes(needle)
+    ? [...uploads, gallery]
+    : uploads
 }
 
 /** The block an upload becomes: a picture, a player, or a document line. */
-export function uploadNode(
-  as: UploadKind,
-  file: { id: string; name: string; size: number },
-): WsxElement {
+export function uploadNode(as: UploadKind, file: StoredUpload): WsxElement {
   const src = `file:${file.id}`
   if (as === 'image') return element('Figure', { src, alt: file.name }, [])
   if (as === 'video') return element('Video', { src, title: file.name }, [])
@@ -120,15 +128,25 @@ export function uploadNode(
 }
 
 /** A hidden picker, opened inside the press that chose it — browsers refuse one opened later. */
-export function pickFile(accept: string): Promise<File | null> {
+export function pickFiles(accept: string, isMany = false): Promise<File[]> {
   return new Promise((resolve) => {
     const input = document.createElement('input')
     input.type = 'file'
     input.accept = accept
-    input.addEventListener('change', () => resolve(input.files?.[0] ?? null), { once: true })
-    input.addEventListener('cancel', () => resolve(null), { once: true })
+    input.multiple = isMany
+    input.addEventListener('change', () => resolve([...(input.files ?? [])]), { once: true })
+    input.addEventListener('cancel', () => resolve([]), { once: true })
     input.click()
   })
+}
+
+/** Pictures already stored, as a Gallery of Figures. */
+export function galleryNode(files: StoredUpload[]): WsxElement {
+  return element(
+    'Gallery',
+    {},
+    files.map((file) => element('Figure', { src: `file:${file.id}`, alt: file.name }, [])),
+  )
 }
 
 function pageOptions(needle: string, pages: PageRef[]): Extract<SlashOption, { type: 'data' }>[] {
@@ -232,7 +250,9 @@ export function bookmarkNode(href: string, seen: BookmarkPreview | null): WsxEle
 }
 
 export function dataNode(pick: DataPick): WsxElement {
-  if (pick.kind === 'upload') throw new Error('an upload lands once its file is stored')
+  if (pick.kind === 'upload' || pick.kind === 'gallery') {
+    throw new Error('an upload lands once its file is stored')
+  }
   if (pick.kind === 'bookmark') return bookmarkNode(pick.href, null)
   if (pick.kind === 'embed') return element('Embed', { src: pick.src }, [])
   if (pick.kind === 'link') return element('PageLink', { sheet: pick.sheet }, [])
