@@ -384,6 +384,12 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   (`100cqi`, an `@property` so it inherits as px), the reach is centred on the column and stops at
   the gutter (`--pad-x`); inside a Card, Grid, Stack, Row, Callout, Reveal or Drawer it stays put. In
   the page editor each live block is its own sheet, so a wide block sits in the column while editing.
+- **A page lays itself out (D89).** `<Columns><Column ratio>` is Notion's side by side (flex shares,
+  stacked under 560px); `<Bento columns><Tile shape title>` packs tiles densely (square · wide · tall
+  · big · banner; 2 across under 720px, 1 under 400). Specs in `registry/layout-specs.ts`, CSS in
+  `css/layout-kit.css` (`.wsx-cols`/`.wsx-col` — `.wsx-columns` is the column chart's). A Column and
+  a Tile are each a `wsx` container, so what sits in one reflows to its own width. Both take `width`.
+  The editor keeps them as locked blocks for now.
 - WSX is inert data: registry primitives, literal props, the closed `expr` grammar only. Components
   own appearance (four enums: `variant tone size emphasis`); pages own content. Validation before
   persist and before render. Format reference: `/learn` and the registry specs.

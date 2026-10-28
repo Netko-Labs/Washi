@@ -24,6 +24,26 @@ export interface BlockProps extends StyledProps {
   children?: ReactNode
 }
 
+export type TileShape = 'square' | 'wide' | 'tall' | 'big' | 'banner'
+
+export interface ColumnsProps extends BlockProps {
+  gap?: Gap
+}
+
+export interface ColumnProps extends BlockProps {
+  ratio?: number
+}
+
+export interface BentoProps extends BlockProps {
+  gap?: Gap
+  columns?: 3 | 4 | 6
+}
+
+export interface TileProps extends BlockProps {
+  shape?: TileShape
+  title?: string
+}
+
 export type Row = Record<string, Scalar>
 
 export type CellKind = 'string' | 'number'

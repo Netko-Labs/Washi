@@ -2,7 +2,9 @@
 import { cellSchema, filterSchema, historyQuerySchema, querySchema, scalarSchema } from '@washi/ink'
 import type { ComponentSpec, WsxRegistry } from '@washi/wsx'
 import { z } from 'zod'
+import { LAYOUT_SPECS } from './layout-specs'
 import { coverKeySchema, pageIconSchema } from './looks'
+import { p } from './spec-kit'
 import {
   feelSchema,
   gapSchema,
@@ -89,16 +91,6 @@ export const sheetStateSchema = z
   .object({ local: stateBag.optional(), stored: stateBag.optional() })
   .strict()
 
-const p = (
-  shape: z.ZodRawShape,
-  children: ComponentSpec['children'],
-  rest?: Omit<ComponentSpec, 'props' | 'children'>,
-): ComponentSpec => ({
-  props: styledSchema.extend(shape).strict(),
-  children,
-  ...rest,
-})
-
 const frame: Record<string, ComponentSpec> = {
   Sheet: {
     props: z
@@ -137,6 +129,7 @@ const frame: Record<string, ComponentSpec> = {
   ),
   Grid: p({ gap: gapSchema.optional(), width }, 'nodes'),
   Divider: p({}, 'none'),
+  ...LAYOUT_SPECS,
 }
 
 const text: Record<string, ComponentSpec> = {
