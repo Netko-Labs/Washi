@@ -173,6 +173,20 @@ export interface SlashMenuProps {
   onPick: (option: SlashOption) => void
 }
 
+export interface ScriptBlockProps {
+  block: LockedBlock
+  rootProps: Record<string, WsxValue>
+}
+
+export interface ScriptCodeProps {
+  block: LockedBlock
+}
+
+export type ScriptCheck =
+  | { status: 'checking' }
+  | { status: 'ok' }
+  | { status: 'refused'; error: string }
+
 export interface LockedBlockProps {
   block: LockedBlock
   rootProps: Record<string, WsxValue>

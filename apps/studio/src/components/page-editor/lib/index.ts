@@ -7,6 +7,7 @@ export { useAutosave } from './hooks/use-autosave'
 export { useBlockDrop } from './hooks/use-block-drop'
 export { useFocusRequest } from './hooks/use-focus-request'
 export { useLoadBlocks } from './hooks/use-load-blocks'
+export { useScriptCode } from './hooks/use-script-code'
 export type {
   Block,
   BlockInputProps,
@@ -19,6 +20,8 @@ export type {
   LockedBlockProps,
   PageBodyProps,
   PageEditorProps,
+  ScriptBlockProps,
+  ScriptCodeProps,
   SlashMenuProps,
   SlashOption,
   TextBlock,

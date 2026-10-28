@@ -9,3 +9,6 @@ export const MAX_RATIO = 6
 
 /** The outer fifth of a block's width is a drop beside it; the rest drops above or below. */
 export const SIDE_DROP = 0.2
+
+/** How long typing in a script waits before it is compiled and, if it compiles, kept. */
+export const SCRIPT_CHECK_MS = 400
