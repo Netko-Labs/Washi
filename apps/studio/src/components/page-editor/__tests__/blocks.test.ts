@@ -167,8 +167,8 @@ describe('the / menu drops live data on the page', () => {
     })
     expect(labels('gallery')).toEqual(['Gallery'])
     const gallery = galleryNode([
-      { id: 'a', name: 'one.jpg' },
-      { id: 'b', name: 'two.jpg' },
+      { id: 'a', name: 'one.jpg', size: 10 },
+      { id: 'b', name: 'two.jpg', size: 20 },
     ])
     const sheet = {
       kind: 'element' as const,

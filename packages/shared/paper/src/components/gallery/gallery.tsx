@@ -1,4 +1,4 @@
-import { type KeyboardEvent, useEffect, useRef } from 'react'
+import { type KeyboardEvent, useRef } from 'react'
 import { styled } from '../../lib'
 import type { GalleryProps } from '../../lib/types'
 import { useLightbox } from './lib'
@@ -6,15 +6,7 @@ import { useLightbox } from './lib'
 /** Pictures in a grid of squares; a press opens one large, ‹ › or the arrow keys walk the rest. */
 export function Gallery({ columns = 3, gap, children, ...rest }: GalleryProps) {
   const grid = useRef<HTMLDivElement>(null)
-  const dialog = useRef<HTMLDialogElement>(null)
   const box = useLightbox(grid)
-
-  useEffect(() => {
-    const element = dialog.current
-    if (!element) return
-    if (box.picture && !element.open) element.showModal()
-    if (!box.picture && element.open) element.close()
-  }, [box.picture])
 
   const keys = (event: KeyboardEvent<HTMLDialogElement>) => {
     if (event.key === 'ArrowRight') box.step(1)
@@ -28,7 +20,7 @@ export function Gallery({ columns = 3, gap, children, ...rest }: GalleryProps) {
       <div ref={grid} className="wsx-gallery-grid" onClick={box.open}>
         {children}
       </div>
-      <dialog ref={dialog} className="wsx-lightbox" onClose={box.close} onKeyDown={keys}>
+      <dialog ref={box.dialog} className="wsx-lightbox" onClose={box.close} onKeyDown={keys}>
         {box.picture && (
           <figure>
             <img className="wsx-lightbox-image" src={box.picture.src} alt={box.picture.alt} />

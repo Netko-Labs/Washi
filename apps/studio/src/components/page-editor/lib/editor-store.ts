@@ -38,8 +38,21 @@ async function uploadedGallery(files: File[]) {
   }
   const send = hostUploadFile()
   if (!send) throw new Error('this app stores no files')
-  const stored = await Promise.all(files.map((file) => send(file)))
-  return galleryNode(stored.map((each, at) => ({ id: each.id, name: files[at]?.name ?? '' })))
+  // All or none: if one fails, the ones that did land are taken back so nothing is left unused.
+  const sent = await Promise.allSettled(files.map((file) => send(file)))
+  const landed = sent.flatMap((each, at) =>
+    each.status === 'fulfilled'
+      ? [{ id: each.value.id, name: files[at]?.name ?? '', size: files[at]?.size ?? 0 }]
+      : [],
+  )
+  const failed = sent.find((each) => each.status === 'rejected')
+  if (failed) {
+    await Promise.all(
+      landed.map((each) => api.files.remove.mutate({ id: each.id }).catch(() => {})),
+    )
+    throw failed.reason instanceof Error ? failed.reason : new Error('a picture did not upload')
+  }
+  return galleryNode(landed)
 }
 
 /** The page being typed into: every row reads its own block and calls these to change the page. */

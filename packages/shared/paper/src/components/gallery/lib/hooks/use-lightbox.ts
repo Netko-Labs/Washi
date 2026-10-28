@@ -1,4 +1,4 @@
-import { type MouseEvent, type RefObject, useState } from 'react'
+import { type MouseEvent, type RefObject, useEffect, useRef, useState } from 'react'
 import type { LightboxPicture } from '../../../../lib/types'
 
 function picturesIn(grid: HTMLElement | null): LightboxPicture[] {
@@ -9,13 +9,23 @@ function picturesIn(grid: HTMLElement | null): LightboxPicture[] {
   }))
 }
 
-/** Which picture is large, read off the grid as drawn; a press on one opens it. */
+/** Which picture is large, read off the grid as drawn; a press on one opens it in the dialog. */
 export function useLightbox(grid: RefObject<HTMLElement | null>) {
   const [at, setAt] = useState<number | null>(null)
+  const dialog = useRef<HTMLDialogElement>(null)
   const pictures = at === null ? [] : picturesIn(grid.current)
   const count = pictures.length
+  const isOpen = at !== null && count > 0
+
+  useEffect(() => {
+    const element = dialog.current
+    if (!element) return
+    if (isOpen && !element.open) element.showModal()
+    if (!isOpen && element.open) element.close()
+  }, [isOpen])
 
   return {
+    dialog,
     picture: at === null ? null : (pictures[at] ?? null),
     at,
     count,

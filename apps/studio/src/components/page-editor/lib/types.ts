@@ -150,6 +150,13 @@ export interface BookmarkPreview {
   site: string | null
 }
 
+/** An upload once stored: what a block needs to point at it. */
+export interface StoredUpload {
+  id: string
+  name: string
+  size: number
+}
+
 /** A page the `/` menu can link to. */
 export interface PageRef {
   id: string

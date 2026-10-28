@@ -8,6 +8,7 @@ import type {
   KindOption,
   PageRef,
   SlashOption,
+  StoredUpload,
   TableRef,
   TextBlock,
 } from './types'
@@ -118,10 +119,7 @@ function uploadOptions(needle: string): Extract<SlashOption, { type: 'data' }>[]
 }
 
 /** The block an upload becomes: a picture, a player, or a document line. */
-export function uploadNode(
-  as: UploadKind,
-  file: { id: string; name: string; size: number },
-): WsxElement {
+export function uploadNode(as: UploadKind, file: StoredUpload): WsxElement {
   const src = `file:${file.id}`
   if (as === 'image') return element('Figure', { src, alt: file.name }, [])
   if (as === 'video') return element('Video', { src, title: file.name }, [])
@@ -143,7 +141,7 @@ export function pickFiles(accept: string, isMany = false): Promise<File[]> {
 }
 
 /** Pictures already stored, as a Gallery of Figures. */
-export function galleryNode(files: { id: string; name: string }[]): WsxElement {
+export function galleryNode(files: StoredUpload[]): WsxElement {
   return element(
     'Gallery',
     {},
