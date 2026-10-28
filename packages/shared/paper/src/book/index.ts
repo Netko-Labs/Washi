@@ -1,3 +1,5 @@
+export type { CompiledSheet, Limit, Placement, PropRow, Recipe } from './guide'
+export { compileSheet, pageLimits, placementOf, propRows, RECIPES, SUMMARIES } from './guide'
 export type { MemoryTable, Say, SeedTable } from './host'
 export {
   createBookHost,
