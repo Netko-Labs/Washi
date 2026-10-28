@@ -21,6 +21,8 @@ export const SUMMARIES: Record<string, string> = {
   Stack: 'Lays blocks top to bottom with an even gap.',
   Grid: 'A twelve-column field; children take span. One column under 400px.',
   Divider: 'A quiet rule between parts of a page.',
+  Embed:
+    'Another site in a sandboxed frame — https only; YouTube, Spotify, Figma and the other built-ins play, any other host only if the workspace lists it.',
   PageLink: 'A link to one page as a block: its icon and title, opened on a press.',
   Subpages:
     'Every page under this one (or of), live, in the sidebar’s order: a list, cards, or a gallery of covers.',

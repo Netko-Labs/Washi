@@ -54,6 +54,19 @@ export interface PageEntryProps {
   onOpen: () => void
 }
 
+export interface EmbedProps extends BlockProps {
+  src: string
+  title?: string
+  ratio?: '16:9' | '4:3' | '3:2' | '1:1'
+  height?: number
+}
+
+/** Asking the workspace's list, refused by it, or playing at the frame's address. */
+export type EmbedState =
+  | { status: 'asking' }
+  | { status: 'blocked' }
+  | { status: 'playing'; player: string }
+
 export type TileShape = 'square' | 'wide' | 'tall' | 'big' | 'banner'
 
 export interface ColumnsProps extends BlockProps {

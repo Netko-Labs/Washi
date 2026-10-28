@@ -20,6 +20,8 @@ export interface PaperHost {
   listPages?(parentId: string): PageCard[]
   /** Calls back when the page tree moved; returns the unsubscribe. */
   onPagesChange?(listener: () => void): () => void
+  /** Whether the workspace lists `host` for embeds; without it only built-in providers play. */
+  embedAllowed?(host: string): Promise<boolean>
   /** Makes a page under `parentId` and opens it, as Notion's + New page does. */
   newPage?(parentId: string): Promise<void>
   /** Who a person cell can name. A host with no members (one person, offline) leaves it out. */

@@ -1,4 +1,5 @@
 import {
+  forgetEmbedHosts,
   useAgentStore,
   useFavoritesStore,
   useSheetsStore,
@@ -14,6 +15,7 @@ import type { WorkspaceSummary } from '@/lib/types'
 /** Runs in the loader, before any route under the workspace renders. */
 export function enterWorkspace(workspace: WorkspaceSummary): void {
   setActiveWorkspace(workspace.id)
+  forgetEmbedHosts()
   useAgentStore.getState().reset()
   useSheetsStore.getState().reset()
   useThemesStore.getState().reset()

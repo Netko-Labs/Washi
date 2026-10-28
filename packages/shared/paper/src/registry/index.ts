@@ -1,3 +1,5 @@
+export { EMBED_PROVIDERS, embedHost, knownEmbed } from './embed-providers'
+export type { EmbedProvider, EmbedRatio, KnownEmbed } from './embed-types'
 export {
   COVER_PICTURES,
   COVER_PRESETS,

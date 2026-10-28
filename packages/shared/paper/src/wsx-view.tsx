@@ -16,6 +16,7 @@ import {
 } from './components/data'
 import { Database } from './components/database'
 import { Drawer, Schema } from './components/drawer'
+import { Embed } from './components/embed'
 import { Reveal, Show, Tab, Tabs } from './components/flow'
 import { Form } from './components/form'
 import { Divider, Grid, Row, Section, SheetFrame, Stack } from './components/frame'
@@ -97,6 +98,7 @@ const COMPONENTS: Record<string, ComponentType<never>> = {
   Tile,
   PageLink,
   Subpages,
+  Embed,
   Title,
   Text,
   List,

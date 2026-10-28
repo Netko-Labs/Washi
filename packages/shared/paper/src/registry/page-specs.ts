@@ -6,9 +6,19 @@ export const SUBPAGE_LAYOUTS = ['list', 'cards', 'gallery'] as const
 
 const pageId = z.string().min(1).max(80).describe('page id')
 
-/** A hub page's way out: one page linked as a block, or every child of a page, live. */
+/** A hub page's way out — one page linked, every child of a page — and what another site shows. */
 export const PAGE_SPECS: Record<string, ComponentSpec> = {
   PageLink: p({ sheet: pageId }, 'none'),
+  Embed: p(
+    {
+      src: z.url({ protocol: /^https$/ }),
+      title: z.string().min(1).max(120).optional(),
+      ratio: z.enum(['16:9', '4:3', '3:2', '1:1']).optional(),
+      height: z.number().int().min(80).max(900).optional(),
+    },
+    'none',
+    { hints: { url: 'the address is src, https only' } },
+  ),
   Subpages: p(
     {
       of: pageId.optional(),

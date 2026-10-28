@@ -27,6 +27,7 @@ export const SPECIMENS: Record<string, Specimen> = {
   },
   Divider: {},
   PageLink: { props: { sheet: 'budget' } },
+  Embed: { props: { src: 'https://www.youtube.com/watch?v=jNQXAC9IVRw', title: 'Me at the zoo' } },
   Subpages: { props: { layout: 'gallery' } },
   Columns: {
     children:

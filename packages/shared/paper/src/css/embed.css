@@ -1,0 +1,41 @@
+/* Another site in a frame: the paper's corner, a hairline, nothing of its own chrome. */
+.wsx-embed {
+  margin: 0;
+}
+.wsx-embed iframe,
+.wsx-embed-wait {
+  display: block;
+  width: 100%;
+  border: 0;
+  border-radius: var(--r-card);
+}
+/* A player draws its own card; only the wait shows ours. */
+.wsx-embed-wait {
+  background: var(--muted-bg);
+}
+.wsx-embed-blocked {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 12px 14px;
+  border: 1px dashed var(--border);
+  border-radius: var(--r-card);
+  color: var(--muted);
+  font-size: 0.9em;
+}
+.wsx-embed-blocked strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+.wsx-embed-blocked a {
+  color: var(--tone-accent-text);
+  font-weight: 600;
+  text-decoration: none;
+}
+.wsx-embed figcaption {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.82em;
+}

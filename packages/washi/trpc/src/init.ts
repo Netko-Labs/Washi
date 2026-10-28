@@ -5,6 +5,7 @@ import {
   type AgentHost,
   CommentError,
   CustomEmojiError,
+  EmbedHostError,
   InkError,
   ReminderError,
   requireReadable,
@@ -190,6 +191,7 @@ export const workspaceProcedure = t.procedure
         result.error.cause instanceof SheetAccessError ||
         result.error.cause instanceof CommentError ||
         result.error.cause instanceof CustomEmojiError ||
+        result.error.cause instanceof EmbedHostError ||
         result.error.cause instanceof WorkspaceThemeError ||
         result.error.cause instanceof ReminderError)
     ) {

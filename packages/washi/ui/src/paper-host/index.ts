@@ -1,1 +1,1 @@
-export { paperHost } from './paper-host'
+export { forgetEmbedHosts, paperHost } from './paper-host'
