@@ -159,6 +159,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
     tables: [],
     setTables: (tables) => set({ tables }),
     insertData: async (id, pick) => {
+      if (!get().blocks.some((block) => block.id === id)) return
       if (pick.kind === 'database') {
         await api.tables.define.mutate({ spec: NEW_DATABASE(pick.name) })
       }
@@ -175,10 +176,14 @@ export const useEditorStore = create<EditorState>((set, get) => {
       if (!node) return
       const { blocks } = get()
       const at = blocks.findIndex((block) => block.id === id)
-      if (at < 0) return
       const next = newBlock()
+      // The `/` block may have gone while the table or page was made: what was made lands last.
+      const landed = [lockedBlock(node), next]
       set({
-        blocks: [...blocks.slice(0, at), lockedBlock(node), next, ...blocks.slice(at + 1)],
+        blocks:
+          at < 0
+            ? [...blocks, ...landed]
+            : [...blocks.slice(0, at), ...landed, ...blocks.slice(at + 1)],
         focus: { id: next.id, caret: 0 },
       })
     },

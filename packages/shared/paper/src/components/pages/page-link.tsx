@@ -14,6 +14,7 @@ export function PageLink({ sheet, ...rest }: PageLinkProps) {
     host
       .resolveSheet(sheet)
       .then((found) => alive && setPage(found ? { id: sheet, cover: null, ...found } : null))
+      .catch(() => alive && setPage(null))
     return () => {
       alive = false
     }
