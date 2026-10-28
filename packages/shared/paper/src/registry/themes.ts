@@ -25,3 +25,29 @@ export interface ThemePair {
 
 /** A theme is 8 tokens × 2 modes and nothing else. Fonts, radii and spacing belong to `feel`. */
 export const THEMES: Record<ThemeId, ThemePair> = { ...HOUSE_THEMES, ...PORTED_THEMES }
+
+export type ThemeMode = 'light' | 'dark'
+export type ThemeVerdict = 'pass' | 'warn' | 'refuse'
+
+/** `fg` read on `on`: below `warn` it is flagged, below `refuse` it cannot be saved. */
+export interface ThemeRule {
+  fg: keyof ThemeTokens
+  on: keyof ThemeTokens
+  label: string
+  warn: number
+  refuse: number
+}
+
+export interface ThemeCheck {
+  mode: ThemeMode
+  rule: ThemeRule
+  ratio: number
+  verdict: ThemeVerdict
+}
+
+/** A theme as read off a file: whatever tokens it named, per mode. */
+export interface ThemeDraft {
+  name: string | null
+  light: Partial<ThemeTokens>
+  dark: Partial<ThemeTokens>
+}

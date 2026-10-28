@@ -35,6 +35,14 @@ export const gapSchema = z.enum(GAPS)
 export const feelSchema = z.enum(FEELS)
 export const widthSchema = z.enum(WIDTHS)
 export const themeIdSchema = z.enum(THEME_IDS)
+/** A theme the workspace made is `ws:<slug>`; the host lends its tokens. */
+export const WORKSPACE_THEME_KEY = /^ws:[a-z0-9-]{1,40}$/
+export const sheetThemeSchema = z
+  .string()
+  .refine(
+    (key) => (THEME_IDS as readonly string[]).includes(key) || WORKSPACE_THEME_KEY.test(key),
+    { message: `a theme is ${THEME_IDS.join(' · ')}, or ws:<name> for one the workspace made` },
+  )
 
 const FLOW = ['row', 'col', 'wrap', 'nowrap', 'grid-2', 'grid-3', 'grid-4']
 const SPACING = [

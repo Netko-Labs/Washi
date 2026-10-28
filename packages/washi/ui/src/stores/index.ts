@@ -5,6 +5,7 @@ export { useNoticeStore } from './notice/notice-store'
 export { useRowOpenerStore } from './row-opener/row-opener-store'
 export type { RowOpener } from './row-opener/types'
 export { useSheetsStore } from './sheets/sheets-store'
+export { useThemesStore } from './themes/themes-store'
 export {
   type AppView,
   type Identity,

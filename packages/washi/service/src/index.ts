@@ -104,3 +104,10 @@ export {
 } from './tables/service'
 export { seedTeamSpace } from './tables/team-space'
 export type { TeamSpace, TeamSpaceOptions } from './tables/types'
+export {
+  addWorkspaceTheme,
+  editWorkspaceTheme,
+  removeWorkspaceTheme,
+  themeSlug,
+  WorkspaceThemeError,
+} from './themes/service'

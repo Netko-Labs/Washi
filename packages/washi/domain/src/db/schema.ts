@@ -242,6 +242,18 @@ export const customEmojiTable = sqliteTable('custom_emojis', {
   hlcCreated: text('hlc_created').notNull(),
 })
 
+/** A page theme the workspace made: eight tokens per mode, stored as JSON. */
+export const workspaceThemeTable = sqliteTable('workspace_themes', {
+  id: text('id').primaryKey(),
+  slug: text('slug').notNull().unique(),
+  name: text('name').notNull(),
+  light: text('light').notNull(),
+  dark: text('dark').notNull(),
+  createdBy: text('created_by').notNull(),
+  hlcCreated: text('hlc_created').notNull(),
+  hlcUpdated: text('hlc_updated').notNull(),
+})
+
 /** One row per person mentioned: their Inbox, read or not. */
 export const mentionInboxTable = sqliteTable(
   'mention_inbox',

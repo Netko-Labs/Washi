@@ -14,6 +14,7 @@ import { sheetsRouter } from './routers/sheets'
 import { storageRouter } from './routers/storage'
 import { systemRouter } from './routers/system'
 import { tablesRouter } from './routers/tables'
+import { themesRouter } from './routers/themes'
 import { workspacesRouter } from './routers/workspaces'
 
 /**
@@ -27,6 +28,7 @@ export const appRouter = router({
   files: filesRouter,
   storage: storageRouter,
   emojis: emojisRouter,
+  themes: themesRouter,
   tables: tablesRouter,
   agents: agentsRouter,
   capabilities: capabilitiesRouter,

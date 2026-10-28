@@ -14,6 +14,7 @@ import {
   SheetNotFoundError,
   SheetUndoError,
   SheetValidationError,
+  WorkspaceThemeError,
 } from '@washi/service'
 import type { EventBus } from './shared/events'
 import type { PresenceBoard } from './shared/presence'
@@ -167,6 +168,7 @@ const CHANGES: Record<string, ('page' | 'data')[]> = {
   sheets: ['page'],
   tables: ['data', 'page'],
   capabilities: ['data', 'page'],
+  themes: ['page'],
 }
 
 /**
@@ -188,6 +190,7 @@ export const workspaceProcedure = t.procedure
         result.error.cause instanceof SheetAccessError ||
         result.error.cause instanceof CommentError ||
         result.error.cause instanceof CustomEmojiError ||
+        result.error.cause instanceof WorkspaceThemeError ||
         result.error.cause instanceof ReminderError)
     ) {
       throw new TRPCError({

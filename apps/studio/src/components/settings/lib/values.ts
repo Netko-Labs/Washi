@@ -4,6 +4,7 @@ import {
   IconBuildingCommunity,
   IconGauge,
   IconMoodSmile,
+  IconPalette,
   IconServer,
   IconSparkles,
   IconUserCircle,
@@ -98,6 +99,12 @@ export const SETTINGS_GROUPS: SettingsGroup[] = [
         icon: IconMoodSmile,
         desc: 'The team’s own pictures, for page icons, by :name:.',
       },
+      {
+        key: 'themes',
+        label: 'Themes',
+        icon: IconPalette,
+        desc: 'Page themes the team made or brought in — eight colours a mode, checked for contrast.',
+      },
     ],
   },
   {
@@ -143,6 +150,7 @@ export const SETTINGS_TAB_KEYS = [
   'people',
   'storage',
   'emojis',
+  'themes',
   'models',
   'outside',
   'usage',

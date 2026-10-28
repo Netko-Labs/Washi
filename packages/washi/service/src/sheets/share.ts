@@ -12,6 +12,7 @@ import {
   liveShareFor,
   shareByToken,
   type Workspace,
+  workspaceThemeBySlug,
 } from '@washi/repository'
 import { parse, parseExpr, serialize, type WsxElement } from '@washi/wsx'
 import { runHistory } from '../tables/history'
@@ -66,7 +67,15 @@ export function sharedPage(ws: Workspace, token: string) {
     fullWidth: sheet.fullWidth,
     hlcUpdated: sheet.hlcUpdated,
     source: serialize(redactForShare({ ...root, props })),
+    theme: wornTheme(ws, props.theme),
   }
+}
+
+/** A workspace theme travels with the link; the reader has no session to fetch it with. */
+function wornTheme(ws: Workspace, key: unknown) {
+  if (typeof key !== 'string' || !key.startsWith('ws:')) return null
+  const theme = workspaceThemeBySlug(ws, key.slice(3))
+  return theme && { name: theme.name, light: theme.light, dark: theme.dark }
 }
 
 function namesIn(node: unknown, into: Set<string>): Set<string> {

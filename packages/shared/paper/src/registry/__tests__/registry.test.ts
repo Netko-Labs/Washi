@@ -152,3 +152,13 @@ describe('the team week', () => {
     ).not.toBe('')
   })
 })
+
+describe('the page theme', () => {
+  test('a registry id or a workspace key; anything else names both', () => {
+    expect(messages(`<Sheet title="t" theme="nord"><Text>x</Text></Sheet>`)).toBe('')
+    expect(messages(`<Sheet title="t" theme="ws:our-sumi"><Text>x</Text></Sheet>`)).toBe('')
+    expect(messages(`<Sheet title="t" theme="neon"><Text>x</Text></Sheet>`)).toMatch(
+      /washi · sumi.*ws:<name>/,
+    )
+  })
+})

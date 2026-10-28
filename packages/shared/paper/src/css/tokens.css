@@ -29,7 +29,8 @@
   --tone-neutral: #6f685d;
   --tone-neutral-text: #5c564c;
   --tone-neutral-on: #fbf9f4;
-  --tone-accent-text: #9e4a20;
+  /* The accent deepened toward ink, so tinted fills keep it readable; Washi lands near #9e4a20. */
+  --tone-accent-text: color-mix(in oklab, var(--accent) 80%, var(--ink));
 
   --chart-1: #c25f2c;
   --chart-2: #3d5a73;

@@ -1,6 +1,6 @@
 import type { Scalar } from '@washi/ink'
 import type { ReactNode } from 'react'
-import type { ThemeId } from '../registry/themes'
+import type { ThemePair } from '../registry/themes'
 
 export type Variant = 'plain' | 'outline' | 'filled' | 'raised' | 'tape'
 export type Tone = 'neutral' | 'accent' | 'info' | 'success' | 'warning' | 'danger'
@@ -54,7 +54,8 @@ export interface PaperSurfaceProps {
 }
 
 export interface SheetLook {
-  theme?: ThemeId
+  /** A registry theme id, or `ws:<slug>` the host lends through `SheetLookHost.theme`. */
+  theme?: string
   feel?: Feel
   accent?: Tone
   icon?: string
@@ -74,6 +75,8 @@ export interface SheetLookHost {
   drawIcon?(name: string): ReactNode
   fileUrl?(id: string): string
   pictureUrl?(slug: string): string
+  /** A workspace theme's tokens by its `ws:<slug>` key; unknown keys wear Washi. */
+  theme?(key: string): ThemePair | undefined
   /** A read-only host leaves it out and the look stays still. */
   edit?(part: LookPart, anchor: HTMLElement): void
 }

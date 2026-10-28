@@ -142,3 +142,11 @@ export {
   listTables,
   updateRecords,
 } from './storage/tables'
+export {
+  createWorkspaceTheme,
+  deleteWorkspaceTheme,
+  getWorkspaceTheme,
+  listWorkspaceThemes,
+  updateWorkspaceTheme,
+  workspaceThemeBySlug,
+} from './storage/workspace-themes'

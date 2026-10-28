@@ -165,6 +165,16 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   frees an emoji's file; removing the emoji frees it only if nothing wears it (`isUploadWorn`).
   The picker's Unicode set is generated (`apps/studio/scripts/emoji-values.ts` from
   `emoji-test.txt`, ≤ Emoji 15.1) into `components/shared/emoji/values/` — never hand-edit it.
+- **A person picks a page's theme (D88).** `<Sheet theme>` is a registry id — the house eight and
+  seven ported palettes (`theme-values/`, a light tone nudged in lightness where it missed the rules)
+  — or `ws:<slug>`, a theme the workspace made: `workspace_themes` (workspace file), eight tokens a
+  mode, `themes.list/add/update/remove`, its maker or a steward changes it, a rename keeps the slug.
+  Written like the look (`updateMeta` → the source; ⋯ → Theme). Paper resolves a `ws:` key through
+  `SheetLookHost.theme` (`useThemesStore.pairOf` in `SheetView`; a public link carries the tokens in
+  its payload); a key nobody lends wears Washi. `themeChecks` is the one contrast gate: below `refuse`
+  a save is refused, below `warn` the editor flags it. Import reads shadcn/tweakcn CSS (`:root` ·
+  `.dark`, oklch/hsl/hex) or a Washi theme file (`readTheme`, `fillDraft` names what it filled);
+  Export writes the file back. Washi leaves `theme` unset unless asked.
 - **Who reads a page is the page's (D65).** `<Sheet visibility access>`, cached in
   `sheets.visibility/access` like the look: `shared` (default) = the workspace, `private` = the
   member ids in `access` + owners (a page is as closed as its most closed ancestor), `public` =
