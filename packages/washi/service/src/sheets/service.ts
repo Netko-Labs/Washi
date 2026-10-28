@@ -12,6 +12,7 @@ import {
 } from '@washi/repository'
 import {
   type Diagnostic,
+  extractFiles,
   extractMissing,
   extractRefs,
   extractText,
@@ -144,8 +145,9 @@ export function undoWashiWrite(ws: Workspace, id: string): SheetDetail {
   return requireSheet(ws, id)
 }
 
-function indexOf(root: ReturnType<typeof parse>) {
-  return { body: extractText(root), refs: extractRefs(root) }
+/** What search, backlinks and purge read off a page: its words, its links, its uploads. */
+export function indexOf(root: ReturnType<typeof parse>) {
+  return { body: extractText(root), refs: extractRefs(root), files: extractFiles(root) }
 }
 
 export function removeSheet(ws: Workspace, id: string): void {

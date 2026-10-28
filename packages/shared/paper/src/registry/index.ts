@@ -7,6 +7,7 @@ export {
   FILE_KEY,
   pageIconSchema,
 } from './looks'
+export { mediaSrcSchema } from './media-specs'
 export {
   exprTables,
   pageTables,

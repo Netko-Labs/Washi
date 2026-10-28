@@ -28,6 +28,21 @@ export const SPECIMENS: Record<string, Specimen> = {
   Divider: {},
   PageLink: { props: { sheet: 'budget' } },
   Include: { props: { sheet: 'budget' } },
+  Video: {
+    props: {
+      src: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+      title: 'A flower, opening',
+    },
+  },
+  Audio: {
+    props: {
+      src: 'https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3',
+      title: 'T-rex roar',
+    },
+  },
+  File: {
+    props: { src: 'https://example.com/budget-2026.pdf', name: 'budget-2026.pdf', bytes: 482113 },
+  },
   Bookmark: {
     props: {
       href: 'https://bun.com/docs',

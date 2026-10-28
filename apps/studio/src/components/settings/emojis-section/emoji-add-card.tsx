@@ -1,4 +1,5 @@
 import { IconUpload } from '@tabler/icons-react'
+import { acceptFor } from '@washi/domain'
 import { useEmojiDraft } from '@/components/shared/emoji'
 import { SettingsCard } from '../shared/card'
 import type { EmojiAddCardProps } from './lib'
@@ -8,7 +9,10 @@ export function EmojiAddCard({ add }: EmojiAddCardProps) {
   const draft = useEmojiDraft(add)
 
   return (
-    <SettingsCard title="Add an emoji" desc="JPG · PNG · WebP, up to 5 MB. Square works best.">
+    <SettingsCard
+      title="Add an emoji"
+      desc="JPG · PNG · WebP · GIF, up to 10 MB. Square works best."
+    >
       <form
         className="flex flex-wrap items-center gap-2 px-4 py-3"
         onSubmit={(event) => {
@@ -23,7 +27,7 @@ export function EmojiAddCard({ add }: EmojiAddCardProps) {
           </span>
           <input
             type="file"
-            accept="image/jpeg,image/png,image/webp"
+            accept={acceptFor('image')}
             className="sr-only"
             disabled={draft.busy}
             onChange={(event) => draft.setFile(event.target.files?.[0] ?? null)}

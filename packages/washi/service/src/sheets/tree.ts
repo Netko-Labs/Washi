@@ -9,8 +9,8 @@ import {
   updateSheetMeta,
   type Workspace,
 } from '@washi/repository'
-import { extractRefs, extractText, parse } from '@washi/wsx'
-import { createSheetFromSource, requireSheet } from './service'
+import { parse } from '@washi/wsx'
+import { createSheetFromSource, indexOf, requireSheet } from './service'
 
 export class SheetMoveError extends Error {
   constructor(message: string) {
@@ -44,7 +44,7 @@ export function restoreSheetTree(ws: Workspace, id: string): string[] {
     const sheet = getSheet(ws, each)
     if (!sheet) continue
     const root = parse(sheet.source)
-    indexSheet(ws, each, sheet.title, { body: extractText(root), refs: extractRefs(root) })
+    indexSheet(ws, each, sheet.title, indexOf(root))
   }
   return ids
 }

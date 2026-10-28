@@ -1,4 +1,4 @@
-import type { SheetDetail } from '@washi/domain'
+import type { SheetDetail, UploadKind } from '@washi/domain'
 import type { WsxElement, WsxValue } from '@washi/wsx'
 
 export type TextKind =
@@ -138,6 +138,8 @@ export type DataPick =
   | { kind: 'link'; sheet: string }
   | { kind: 'embed'; src: string }
   | { kind: 'bookmark'; href: string }
+  /** `file` arrives once the person picked one; the menu offers the kind. */
+  | { kind: 'upload'; as: UploadKind; file?: File }
 
 /** What `links.preview` read off a site, before it becomes a Bookmark's props. */
 export interface BookmarkPreview {

@@ -35,7 +35,7 @@ redact={["column"]}; on a public page keep every one. Never pin light/dark — r
 Primitives — Frame: Section Row Stack Grid Divider Columns/Column(ratio 1–6) Bento(columns 3·4·6)/Tile(shape
 square·wide·tall·big·banner, title) · Text: Title(level) Text(lead) List(marker)/Item
 Quote Code Pair(term) Note Source Money(value|expr, currency) + inline Mark Kbd Ref(sheet) Tag ·
-Surface: Card(title) Callout(title) Hero(title subtitle align) Figure(https src, alt) Embed(https src title ratio height — YouTube Vimeo Spotify Loom Figma CodePen
+Surface: Card(title) Callout(title) Hero(title subtitle align) Figure(src: https or file:<id>, alt) Video(src title poster) Audio(src title) File(src name bytes) Embed(https src title ratio height — YouTube Vimeo Spotify Loom Figma CodePen
 CodeSandbox Miro Google Maps Indify play; any other site only if the workspace lists it)
 Bookmark(https href title description image site — a link as a card; fill what fetch_url told you) · Data out:
 Repeat(bind) Agenda(bind date title time end badge add addLabel view state — a week or a month) Table(bind columns) Database(table views — tabs: table · board(groupBy) · timeline(date) ·

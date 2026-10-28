@@ -36,6 +36,20 @@ export function extractRefs(root: WsxElement): string[] {
   return [...refs]
 }
 
+const FILE_KEY = /^file:[a-z0-9-]{1,48}$/
+
+/** Every upload the page uses, by key — a cover, an icon, a file, a video, a picture in a gallery. */
+export function extractFiles(root: WsxElement): string[] {
+  const files = new Set<string>()
+  walk(root, (node) => {
+    if (node.kind !== 'element') return
+    for (const value of Object.values(node.props)) {
+      if (typeof value === 'string' && FILE_KEY.test(value)) files.add(value)
+    }
+  })
+  return [...files]
+}
+
 /** Capabilities a sheet asked for that the registry lacks — each is a registry request. */
 export function extractMissing(root: WsxElement): WsxMissing[] {
   const out: WsxMissing[] = []

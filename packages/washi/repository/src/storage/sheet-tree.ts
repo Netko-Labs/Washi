@@ -117,6 +117,7 @@ function purge(ws: Workspace, ids: string[]): number {
   ws.sqlite.transaction(() => {
     for (const id of ids) {
       ws.sqlite.query('DELETE FROM sheet_links WHERE src = ?').run(id)
+      ws.sqlite.query('DELETE FROM sheet_files WHERE src = ?').run(id)
       ws.sqlite.query('DELETE FROM sheets WHERE id = ?').run(id)
       ws.sqlite.query('DELETE FROM sheet_revisions WHERE sheet_id = ?').run(id)
       deleteSheetComments(ws, id)
@@ -141,12 +142,14 @@ export function emptyTrash(ws: Workspace): number {
   )
 }
 
-// Every upload a page wears, cover or icon, with the batch that page sits in; `kept` is what the
-// workspace's emojis hold, which no purge frees.
+// Every upload a page wears — cover, icon, or a block's file — with the batch that page sits in;
+// `kept` is what the workspace's emojis hold, which no purge frees.
 const WORN_FILES = `WITH worn AS (
   SELECT deleted_at, cover AS key FROM sheets WHERE cover LIKE 'file:%'
   UNION ALL
   SELECT deleted_at, icon AS key FROM sheets WHERE icon LIKE 'file:%'
+  UNION ALL
+  SELECT s.deleted_at, f.key FROM sheet_files f JOIN sheets s ON s.id = f.src
 ),
 kept AS (SELECT 'file:' || file_id AS key FROM custom_emojis)`
 

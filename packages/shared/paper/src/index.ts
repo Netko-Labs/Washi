@@ -37,6 +37,7 @@ export {
 export { Button, Compose, Field, Slider, Switch, Task } from './components/input'
 export { Chip, Mascot, Missing } from './components/kit'
 export { Bento, Column, Columns, Tile } from './components/layout'
+export { Audio, File, Video } from './components/media'
 export { Backlinks, Include, Outline, PageLink, Subpages } from './components/pages'
 export { Redact } from './components/redact'
 export { Roadmap } from './components/roadmap'

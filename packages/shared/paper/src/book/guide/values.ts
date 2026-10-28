@@ -23,6 +23,9 @@ export const SUMMARIES: Record<string, string> = {
   Divider: 'A quiet rule between parts of a page.',
   Embed:
     'Another site in a sandboxed frame — https only; YouTube, Spotify, Figma and the other built-ins play, any other host only if the workspace lists it.',
+  Video: 'A video that plays in place — an upload (file:<id>) or an https address.',
+  Audio: 'A sound with the browser’s player, its title above.',
+  File: 'A document as a line: its kind, name and size; it opens or downloads.',
   Bookmark: 'A link as a card — title, a line about it, its picture — read once when it was made.',
   Include: 'Another page drawn here and kept current — its blocks, not its cover; never nested.',
   Backlinks: 'Every page that links here and the reader can open, live.',

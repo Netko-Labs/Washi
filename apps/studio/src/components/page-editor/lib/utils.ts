@@ -1,3 +1,4 @@
+import type { UploadKind } from '@washi/domain'
 import type { WsxElement, WsxNode, WsxValue } from '@washi/wsx'
 import { element, turnInto } from './convert'
 import type {
@@ -10,7 +11,7 @@ import type {
   TableRef,
   TextBlock,
 } from './types'
-import { KIND_OPTIONS, LINK_MATCHES, SHORTCUTS } from './values'
+import { KIND_OPTIONS, LINK_MATCHES, SHORTCUTS, UPLOAD_OPTIONS } from './values'
 
 /** `# `, `- `, `[] `… at the start of a plain text block turn it into that kind. */
 export function applyShortcut(block: TextBlock): TextBlock | null {
@@ -90,6 +91,44 @@ function linkOptions(query: string): Extract<SlashOption, { type: 'data' }>[] {
     pick: { kind: 'bookmark' as const, href: url.href },
   }
   return asked === 'bookmark' ? [bookmark, embed] : [embed, bookmark]
+}
+
+/** Image, Video, Audio, File: each opens the picker and lands as its block once uploaded. */
+function uploadOptions(needle: string): Extract<SlashOption, { type: 'data' }>[] {
+  return UPLOAD_OPTIONS.filter(
+    (option) =>
+      !needle || option.label.toLowerCase().includes(needle) || option.words.includes(needle),
+  ).map((option) => ({
+    type: 'data',
+    key: `upload:${option.as}`,
+    label: option.label,
+    hint: 'upload',
+    pick: { kind: 'upload', as: option.as },
+  }))
+}
+
+/** The block an upload becomes: a picture, a player, or a document line. */
+export function uploadNode(
+  as: UploadKind,
+  file: { id: string; name: string; size: number },
+): WsxElement {
+  const src = `file:${file.id}`
+  if (as === 'image') return element('Figure', { src, alt: file.name }, [])
+  if (as === 'video') return element('Video', { src, title: file.name }, [])
+  if (as === 'audio') return element('Audio', { src, title: file.name }, [])
+  return element('File', { src, name: file.name, bytes: file.size }, [])
+}
+
+/** A hidden picker, opened inside the press that chose it — browsers refuse one opened later. */
+export function pickFile(accept: string): Promise<File | null> {
+  return new Promise((resolve) => {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = accept
+    input.addEventListener('change', () => resolve(input.files?.[0] ?? null), { once: true })
+    input.addEventListener('cancel', () => resolve(null), { once: true })
+    input.click()
+  })
 }
 
 function pageOptions(needle: string, pages: PageRef[]): Extract<SlashOption, { type: 'data' }>[] {
@@ -172,7 +211,13 @@ export function slashMatches(
       option.label.toLowerCase().includes(needle) ||
       (option.key === 'database' && /^(new\s+)?database/.test(needle)),
   )
-  return [...kinds, ...linkOptions(query), ...pageOptions(needle, pages), ...matching]
+  return [
+    ...kinds,
+    ...linkOptions(query),
+    ...uploadOptions(needle),
+    ...pageOptions(needle, pages),
+    ...matching,
+  ]
 }
 
 /** The live block a pick becomes, as WSX the page keeps whole. */
@@ -187,6 +232,7 @@ export function bookmarkNode(href: string, seen: BookmarkPreview | null): WsxEle
 }
 
 export function dataNode(pick: DataPick): WsxElement {
+  if (pick.kind === 'upload') throw new Error('an upload lands once its file is stored')
   if (pick.kind === 'bookmark') return bookmarkNode(pick.href, null)
   if (pick.kind === 'embed') return element('Embed', { src: pick.src }, [])
   if (pick.kind === 'link') return element('PageLink', { sheet: pick.sheet }, [])

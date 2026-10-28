@@ -128,6 +128,13 @@ function createTables(sqlite: Database) {
       PRIMARY KEY (src, dst)
     )
   `)
+  sqlite.exec(`
+    CREATE TABLE IF NOT EXISTS sheet_files (
+      src TEXT NOT NULL,
+      key TEXT NOT NULL,
+      PRIMARY KEY (src, key)
+    )
+  `)
 
   sqlite.exec(`
     CREATE TABLE IF NOT EXISTS user_tables (

@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import { z } from 'zod'
 import {
+  extractFiles,
   extractRefs,
   extractText,
   parse,
@@ -123,6 +124,13 @@ describe('extract', () => {
 })
 
 describe('links between pages', () => {
+  test('every upload a page uses is found by its key, wherever it sits', () => {
+    const root = parse(
+      `<Sheet title="Trip" cover="file:a1"><Video src="file:b2" /><Figure src="https://x.test/c.png" alt="c" /><File src="file:c3" name="plan.pdf" /></Sheet>`,
+    )
+    expect(extractFiles(root).sort()).toEqual(['file:a1', 'file:b2', 'file:c3'])
+  })
+
   test('a page link and an include point at their page, so backlinks count them', () => {
     const root = parse(
       `<Sheet title="Hub"><PageLink sheet="budget" /><Include sheet="income" /><Text>x</Text></Sheet>`,

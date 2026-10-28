@@ -9,6 +9,7 @@ import {
   dataNode,
   slashMatches,
   titleOf,
+  uploadNode,
 } from '../lib/utils'
 
 const SOURCE = `<Sheet title="Plan" feel="note">
@@ -139,6 +140,30 @@ describe('the / menu drops live data on the page', () => {
     })
     expect(page(bookmarkNode('https://bun.com', seen))).toEqual([])
     expect(page(bookmarkNode('https://bun.com', null))).toEqual([])
+  })
+
+  test('an upload is offered by kind and lands as its own block', () => {
+    const labels = (query: string) =>
+      slashMatches(query, [])
+        .filter((option) => option.type === 'data' && option.key.startsWith('upload'))
+        .map((option) => option.label)
+    expect(labels('vid')).toEqual(['Video'])
+    expect(labels('pdf')).toEqual(['File'])
+    const file = { id: 'f1', name: 'plan.pdf', size: 2048 }
+    for (const as of ['image', 'video', 'audio', 'file'] as const) {
+      const sheet = {
+        kind: 'element' as const,
+        name: 'Sheet',
+        props: { title: 't' },
+        children: [uploadNode(as, file)],
+      }
+      expect(validate(sheet, paperRegistry)).toEqual([])
+    }
+    expect(uploadNode('file', file).props).toEqual({
+      src: 'file:f1',
+      name: 'plan.pdf',
+      bytes: 2048,
+    })
   })
 
   test('what lands is valid WSX: a Database, or a Chart over the done statuses', () => {

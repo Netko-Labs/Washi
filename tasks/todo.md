@@ -11,7 +11,8 @@ Specs were dropped for a rewrite (#118); this list is the plan until they return
 - [x] Embed: https only, provider allowlist + the workspace's hosts, sandboxed iframe; http refused — D92
 - [x] Include · Backlinks · Outline — D93
 - [x] Bookmark (a link as a card) — D94
-- [ ] File · Video · Audio · Gallery (uploads)
+- [x] File · Video · Audio + wider uploads — D95
+- [ ] Gallery (pictures in a grid, a lightbox)
 - [ ] scripting: script blocks in QuickJS (worker), then server hooks on the same engine; iframe
       widgets later behind an owner switch — waiting on: authors, inline vs named, language
 

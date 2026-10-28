@@ -55,6 +55,25 @@ export interface PageEntryProps {
   onOpen: () => void
 }
 
+export interface VideoProps extends BlockProps {
+  src: string
+  title?: string
+  poster?: string
+  ratio?: '16:9' | '4:3' | '3:2' | '1:1'
+}
+
+export interface AudioProps extends BlockProps {
+  src: string
+  title?: string
+}
+
+export interface FileProps extends BlockProps {
+  src: string
+  name: string
+  /** Its length; `size` is the styled enum every primitive takes. */
+  bytes?: number
+}
+
 export interface BookmarkProps extends BlockProps {
   href: string
   title?: string
