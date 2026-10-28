@@ -56,3 +56,8 @@ export interface TokenGroup {
   label: string
   tokens: { key: keyof ThemeTokens; label: string }[]
 }
+
+export interface EditorSaveState {
+  busy: boolean
+  error: string | null
+}

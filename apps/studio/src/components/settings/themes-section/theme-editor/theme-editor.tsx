@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Dialog } from '@/components/shared/dialog'
 import { Segmented } from '../../shared/card'
 import {
+  type EditorSaveState,
   filledNames,
   MODE_OPTIONS,
   type ThemeEditorProps,
@@ -18,10 +19,7 @@ import { TokenRow } from './token-row'
 export function ThemeEditor({ initial, onSave, onClose }: ThemeEditorProps) {
   const editor = useThemeEditor(initial)
   const own = useThemesStore((store) => store.themes)
-  const [state, setState] = useState<{ busy: boolean; error: string | null }>({
-    busy: false,
-    error: null,
-  })
+  const [state, setState] = useState<EditorSaveState>({ busy: false, error: null })
   const { draft, mode } = editor
   const save = async () => {
     setState({ busy: true, error: null })

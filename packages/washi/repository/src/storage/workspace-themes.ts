@@ -20,9 +20,7 @@ export function ensureWorkspaceThemes(sqlite: Database): void {
   `)
 }
 
-type Row = typeof workspaceThemeTable.$inferSelect
-
-const fromRow = (row: Row): WorkspaceTheme => ({
+const fromRow = (row: typeof workspaceThemeTable.$inferSelect): WorkspaceTheme => ({
   ...row,
   light: JSON.parse(row.light),
   dark: JSON.parse(row.dark),

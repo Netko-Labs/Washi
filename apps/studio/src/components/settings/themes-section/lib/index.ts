@@ -2,6 +2,7 @@ export { useThemeEditor } from './hooks/use-theme-editor'
 export { useWorkspaceThemes } from './hooks/use-workspace-themes'
 export type {
   EditorDraft,
+  EditorSaveState,
   ThemeCardProps,
   ThemeChecksProps,
   ThemeEditorProps,
