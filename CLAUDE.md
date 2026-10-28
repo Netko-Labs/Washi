@@ -207,7 +207,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   `sheet_files` on each write (`extractFiles`), so a purge frees a block's upload like a cover's
   (`trashedUploads`), `isUploadWorn` keeps one still used, and a shared link serves only uploads its
   own (redacted) page uses. `<Gallery columns gap>` holds Figures as squares; a press opens a native
-  `<dialog>` lightbox read off the grid as drawn (‹ › and the arrow keys walk, Escape closes);
+  `<dialog>` lightbox read off the grid as drawn (each picture a focusable button — Enter or Space
+  opens it; ‹ › and the arrow keys walk, Escape closes);
   `/gallery` uploads several pictures at once (one refused refuses all, in its words). The desktop
   renders no covers or uploaded icons yet.
 - **A workspace may bring its own bucket (D70).** Settings → Workspace → Storage: endpoint,
@@ -423,8 +424,10 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   tree moves); inside an included page, or pointing at itself, it is a PageLink — includes never nest.
   `<Backlinks of?>` lists readable pages linking here (`PaperHost.backlinks` → `sheets.backlinks`);
   `extractRefs` counts Ref, PageLink, Include and a canvas node's page, indexed on each write.
-  `<Outline title>` reads the drawn page's headings (Titles and Section titles, not an include's)
-  and scrolls to one.
+  `<Outline title>` reads the drawn page's headings (Titles and Section titles, not an include's —
+  while editing, the heading fields' own values, re-read on input) and scrolls to one. Pages written
+  before these were indexed are read again once per workspace at open (`reindexPages`, app meta
+  `index_links_files`).
 - **A bookmark is read once (D94).** `<Bookmark href title description image site>` is a link as a
   card; its words are the page's own props, so drawing it fetches nothing (the picture loads with no
   referrer). `/bookmark <url>` (or an https address after `/`, beside Embed) asks `links.preview`
