@@ -1,5 +1,16 @@
 import { describe, expect, test } from 'bun:test'
-import { eventTime, eventTitle, isoDay, rowsByDay, weekLabel, weekQuery, weekStartOf } from '../lib'
+import {
+  eventTime,
+  eventTitle,
+  isoDay,
+  monthKey,
+  monthOf,
+  monthSpan,
+  rangeQuery,
+  rowsByDay,
+  weekLabel,
+  weekStartOf,
+} from '../lib'
 
 describe('agenda week', () => {
   test('a week starts on its Monday, or Sunday, on the local clock', () => {
@@ -17,7 +28,7 @@ describe('agenda week', () => {
   })
 
   test('the query keeps its filters and adds the week', () => {
-    const query = weekQuery(
+    const query = rangeQuery(
       { table: 'events', where: [{ column: 'kind', op: 'eq', value: 'work' }] },
       'date',
       '2026-10-26',
@@ -47,5 +58,34 @@ describe('agenda week', () => {
     const columns = { date: 'date', time: 'start', end: 'end' }
     expect(eventTime({ start: '09:00', end: '2026-10-28T10:30' }, columns)).toBe('09:00–10:30')
     expect(eventTitle({ id: 'x', date: '2026-10-28', title: 'Dentist' }, columns)).toBe('Dentist')
+  })
+})
+
+describe('agenda month', () => {
+  test('the grid is whole weeks around the month, its neighbours marked outside', () => {
+    const span = monthSpan(new Date(2026, 10, 1), 'monday', '2026-11-04', 'en-US')
+    expect(span.label).toBe('November 2026')
+    expect(span.days[0]?.key).toBe('2026-10-26')
+    expect(span.days.length).toBe(42)
+    expect(span.days.at(-1)?.key).toBe('2026-12-06')
+    expect(span.days[0]?.isOutside).toBe(true)
+    expect(span.days.find((day) => day.key === '2026-11-04')).toMatchObject({
+      isOutside: false,
+      isToday: true,
+    })
+  })
+
+  test('a month that starts on the week start needs no leading days', () => {
+    const span = monthSpan(new Date(2027, 1, 1), 'monday', '2027-02-10', 'en-US')
+    expect(span.days[0]?.key).toBe('2027-02-01')
+    expect(span.days.length).toBe(28)
+  })
+
+  test('page state names a month as YYYY-MM, or a day in it; anything else is none', () => {
+    expect(monthKey(monthOf('2026-11') ?? new Date(0))).toBe('2026-11')
+    expect(monthKey(monthOf('2026-11-18') ?? new Date(0))).toBe('2026-11')
+    expect(monthOf('2026-13')).toBeNull()
+    expect(monthOf('All months')).toBeNull()
+    expect(monthOf(null)).toBeNull()
   })
 })

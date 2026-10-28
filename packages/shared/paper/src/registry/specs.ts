@@ -211,7 +211,8 @@ const dataOut: Record<string, ComponentSpec> = {
     { noNest: true },
   ),
   /**
-   * A week of rows on their `date`, ‹ › to move, today marked; a row opens where the reader is.
+   * A week (or `view="month"`, a month grid) of rows on their `date`, ‹ › to move, today marked;
+   * a row opens where the reader is. `state` names a `YYYY-MM` key a month follows and writes.
    * `add` names the fields of each day's + — a modal Form with that day already in `date`.
    */
   Agenda: p(
@@ -227,6 +228,8 @@ const dataOut: Record<string, ComponentSpec> = {
       addLabel: z.string().min(1).max(40).optional(),
       empty: z.string().max(60).optional(),
       weekStart: z.enum(['monday', 'sunday']).optional(),
+      view: z.enum(['week', 'month']).optional(),
+      state: stateKey.optional(),
       redact,
     },
     'none',

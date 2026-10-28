@@ -2,6 +2,7 @@ import type { BindState, BlockProps, Row } from '../../../lib/types'
 import type { BindQuery } from '../../../registry'
 
 export type WeekStart = 'monday' | 'sunday'
+export type AgendaView = 'week' | 'month'
 
 export interface AgendaProps extends BlockProps {
   bind: BindQuery
@@ -19,6 +20,9 @@ export interface AgendaProps extends BlockProps {
   addLabel?: string
   empty?: string
   weekStart?: WeekStart
+  view?: AgendaView
+  /** A page-state key holding `YYYY-MM`: the month shown follows it, and ‹ › Today write it. */
+  state?: string
 }
 
 export interface AgendaColumns {
@@ -35,22 +39,32 @@ export interface AgendaDayInfo {
   day: number
   long: string
   isToday: boolean
+  /** A month grid's leading or trailing day from the months beside it. */
+  isOutside: boolean
 }
 
-export interface AgendaWeek {
+export interface AgendaPeriod {
   days: AgendaDayInfo[]
   label: string
   state: BindState
-  isThisWeek: boolean
-  shift: (weeks: number) => void
+  isCurrent: boolean
+  shift: (steps: number) => void
   reset: () => void
 }
 
-export interface AgendaWeekOptions {
+export interface AgendaPeriodOptions {
   bind: BindQuery
   date: string
   weekStart: WeekStart
+  view: AgendaView
+  stateKey?: string
   locale?: string
+}
+
+export interface AgendaSpan {
+  start: Date
+  days: AgendaDayInfo[]
+  label: string
 }
 
 export interface AgendaDayProps {
@@ -58,6 +72,8 @@ export interface AgendaDayProps {
   rows: Row[]
   columns: AgendaColumns
   empty: string
+  /** Events shown before the rest fold under "+N more". */
+  limit?: number
   onAdd?: () => void
   onOpen?: (id: string) => void
 }

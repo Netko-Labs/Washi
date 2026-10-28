@@ -1,8 +1,9 @@
 import type { BindQuery } from '../../../registry'
 import { AGENDA_HUES, AGENDA_ROW_LIMIT } from './constants'
-import type { AgendaColumns, AgendaDayInfo, Row, WeekStart } from './types'
+import type { AgendaColumns, AgendaDayInfo, AgendaSpan, Row, WeekStart } from './types'
 
 const DAY_KEY = /^(\d{4}-\d{2}-\d{2})/
+const MONTH_KEY = /^(\d{4})-(\d{2})(?:-\d{2})?$/
 
 /** A calendar day on the reader's own clock — never UTC's, or a late evening lands tomorrow. */
 export function isoDay(date: Date): string {
@@ -22,8 +23,15 @@ export function weekStartOf(now: Date, weekStart: WeekStart, offset: number): Da
   return addDays(now, offset * 7 - back)
 }
 
-export function weekDays(start: Date, today: string, locale?: string): AgendaDayInfo[] {
-  return Array.from({ length: 7 }, (_, index) => {
+/** `count` days from `start`; with `month`, the days of other months are marked outside it. */
+export function spanDays(
+  start: Date,
+  count: number,
+  today: string,
+  locale?: string,
+  month?: number,
+): AgendaDayInfo[] {
+  return Array.from({ length: count }, (_, index) => {
     const date = addDays(start, index)
     const key = isoDay(date)
     return {
@@ -32,8 +40,50 @@ export function weekDays(start: Date, today: string, locale?: string): AgendaDay
       day: date.getDate(),
       long: date.toLocaleDateString(locale, { weekday: 'long', month: 'long', day: 'numeric' }),
       isToday: key === today,
+      isOutside: month !== undefined && date.getMonth() !== month,
     }
   })
+}
+
+export function weekSpan(start: Date, today: string, locale?: string): AgendaSpan {
+  return { start, days: spanDays(start, 7, today, locale), label: weekLabel(start, locale) }
+}
+
+/** Whole weeks around the month, so its grid is a rectangle: four to six rows. */
+export function monthSpan(
+  first: Date,
+  weekStart: WeekStart,
+  today: string,
+  locale?: string,
+): AgendaSpan {
+  const start = weekStartOf(first, weekStart, 0)
+  const last = new Date(first.getFullYear(), first.getMonth() + 1, 0)
+  const weeks = Math.ceil((daysBetween(start, last) + 1) / 7)
+  return {
+    start,
+    days: spanDays(start, weeks * 7, today, locale, first.getMonth()),
+    label: first.toLocaleDateString(locale, { month: 'long', year: 'numeric' }),
+  }
+}
+
+function daysBetween(from: Date, to: Date): number {
+  return Math.round((to.getTime() - from.getTime()) / 86_400_000)
+}
+
+/** The first of the month a `YYYY-MM` (or a whole day) names; anything else is no month. */
+export function monthOf(value: unknown): Date | null {
+  const match = typeof value === 'string' ? MONTH_KEY.exec(value) : null
+  if (!match) return null
+  const month = Number(match[2])
+  return month >= 1 && month <= 12 ? new Date(Number(match[1]), month - 1, 1) : null
+}
+
+export function monthKey(date: Date): string {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+}
+
+export function addMonths(date: Date, months: number): Date {
+  return new Date(date.getFullYear(), date.getMonth() + months, 1)
 }
 
 /** "Oct 26 – Nov 1, 2026", "Nov 2 – 8, 2026": the locale's own range, each part said once. */
@@ -45,8 +95,8 @@ export function weekLabel(start: Date, locale?: string): string {
   }).formatRange(start, addDays(start, 6))
 }
 
-/** The page's own query, held to one week and read in date order. */
-export function weekQuery(bind: BindQuery, date: string, from: string, to: string): BindQuery {
+/** The page's own query, held to the days on screen and read in date order. */
+export function rangeQuery(bind: BindQuery, date: string, from: string, to: string): BindQuery {
   return {
     ...bind,
     where: [

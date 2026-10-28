@@ -1,12 +1,13 @@
-export { AGENDA_HUES, AGENDA_ROW_LIMIT } from './constants'
-export { useAgendaWeek } from './hooks/use-agenda-week'
+export { AGENDA_HUES, AGENDA_MONTH_LIMIT, AGENDA_ROW_LIMIT } from './constants'
+export { useAgendaPeriod } from './hooks/use-agenda-period'
 export type {
   AgendaColumns,
   AgendaDayInfo,
   AgendaDayProps,
   AgendaEventProps,
+  AgendaPeriod,
   AgendaProps,
-  AgendaWeek,
+  AgendaView,
   WeekStart,
 } from './types'
 export {
@@ -16,9 +17,12 @@ export {
   eventTitle,
   hueOf,
   isoDay,
+  monthKey,
+  monthOf,
+  monthSpan,
+  rangeQuery,
   rowsByDay,
-  weekDays,
+  spanDays,
   weekLabel,
-  weekQuery,
   weekStartOf,
 } from './utils'

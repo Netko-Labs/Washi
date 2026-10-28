@@ -339,6 +339,9 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
 - **Pages are apps, not forms laid flat (D83).** `<Agenda bind date title time end badge add>` is a
   week (‹ › Today, the week the reader's, never saved; a list under 720px); a row opens in the peek;
   each day's + opens a modal Form seeded with that day (`seed`, written even when not shown).
+  `view="month"` (D86) draws whole weeks as a grid (`monthSpan`; neighbours dimmed, three events a
+  day then +N more, a list of busy days under 720px); `state` names a `YYYY-MM` page-state key it
+  follows and ‹ › Today write, so it moves with a month `Select`.
   `<Form trigger>` puts a form behind one button in a native `<dialog>` (`FormDialog`: top layer,
   Escape, a bottom sheet under 560px, closes when the row lands). An empty data view is a quiet
   filled line, not a dashed box.
