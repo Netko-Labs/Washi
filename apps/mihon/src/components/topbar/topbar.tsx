@@ -1,3 +1,4 @@
+import { matrixAxes } from '@washi/paper/book'
 import { THEME_IDS, THEMES, type ThemeId } from '@washi/paper/registry'
 import { SegmentedControl } from '@washi/ui'
 import {
@@ -13,7 +14,6 @@ import {
   WIDTHS,
   type Width,
 } from '@/components/shared/book'
-import { matrixAxes } from '@/components/shared/specimen'
 
 function Label({ children }: { children: string }) {
   return (

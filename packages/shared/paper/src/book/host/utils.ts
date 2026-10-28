@@ -8,7 +8,7 @@ import {
   type TableSpec,
   validateRecord,
 } from '@washi/ink'
-import type { PaperHost } from '@washi/paper'
+import type { PaperHost } from '../../provider'
 import type { MemoryTable, Say, SeedTable } from './types'
 import { PEOPLE, SEED_TABLES, WELCOME_SHEET } from './values'
 

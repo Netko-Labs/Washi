@@ -1,6 +1,6 @@
-import { paperRegistry, TONES, VARIANTS } from '@washi/paper/registry'
 import { parse, serialize, type WsxElement, type WsxNode, type WsxValue } from '@washi/wsx'
 import { z } from 'zod'
+import { paperRegistry, TONES, VARIANTS } from '../../registry'
 import type { MatrixAxes, PageInput, SpecimenInput } from './types'
 import { SPECIMEN_STATE, SPECIMENS } from './values'
 

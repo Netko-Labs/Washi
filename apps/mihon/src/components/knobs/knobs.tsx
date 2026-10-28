@@ -1,8 +1,7 @@
+import { knobsFor, specimenChildren, specimenProps } from '@washi/paper/book'
 import { paperRegistry } from '@washi/paper/registry'
 import { useMemo } from 'react'
 import { useBookStore } from '@/components/shared/book'
-import { knobsFor } from '@/components/shared/knobs'
-import { specimenChildren, specimenProps } from '@/components/shared/specimen'
 import { KnobField } from './knob-field'
 
 function Heading({ children }: { children: string }) {

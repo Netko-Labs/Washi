@@ -1,5 +1,5 @@
-import { paperRegistry } from '@washi/paper/registry'
 import { z } from 'zod'
+import { paperRegistry } from '../../registry'
 import type { KnobDef, KnobKind } from './types'
 import { STYLED_KEYS } from './values'
 

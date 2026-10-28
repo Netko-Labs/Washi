@@ -27,7 +27,7 @@ export const actionRefSchema = z
   .catchall(z.union([actionEntry, z.array(z.union([scalarSchema, actionRecord])), actionRecord]))
 
 const exprSchema = z.string().min(1).max(512)
-const stateKey = z.string().min(1).max(64)
+const stateKey = z.string().min(1).max(64).describe('state key')
 const stateBag = z.record(stateKey, scalarSchema)
 
 /**
@@ -47,7 +47,7 @@ export type StateRef = z.infer<typeof stateRefSchema>
 export type BindFilter = z.infer<typeof bindFilterSchema>
 export type BindQuery = z.infer<typeof bindQuerySchema>
 export type BindHistoryQuery = z.infer<typeof bindHistorySchema>
-const columnName = z.string().min(1).max(64)
+const columnName = z.string().min(1).max(64).describe('column')
 const rowRef = z.string().min(1).max(80)
 const memberId = z.string().min(1).max(80)
 /** Columns hidden from a shared link (D65); one view's redact hides them from the whole page. */
