@@ -2,6 +2,8 @@
 export const MIN_HEIGHT = 40
 export const MAX_HEIGHT = 4000
 export const FIRST_HEIGHT = 160
+/** How often a running widget asks again whether widgets are still allowed. */
+export const RECHECK_MS = 30_000
 
 /**
  * No network at all — not even pictures, which could carry data out in their address. Scripts and

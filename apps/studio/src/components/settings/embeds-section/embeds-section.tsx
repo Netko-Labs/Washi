@@ -92,7 +92,7 @@ export function EmbedsSection() {
       <SettingsCard
         title="Widgets"
         desc="A widget is a page’s own HTML and JavaScript, run in a frame with no network and no reach but the page’s. Off, a widget shows as a note."
-        tag={widgets ? { tone: 'off', label: 'On' } : { tone: 'ok', label: 'Off' }}
+        tag={widgets ? { tone: 'ok', label: 'On' } : { tone: 'off', label: 'Off' }}
       >
         <div className="flex items-center justify-between gap-3 px-4 py-3">
           <p className="text-[13px] text-muted-foreground">

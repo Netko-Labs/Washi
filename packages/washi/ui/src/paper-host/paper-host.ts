@@ -33,11 +33,13 @@ function compileOnce(source: string): Promise<CompiledScript> {
   return found
 }
 
+// Shorter than the embed list's minute: a widget switched off must stop soon on every open page.
+const WIDGETS_FRESH_MS = 15_000
 let widgets: { at: number; on: Promise<boolean> } | null = null
 
-/** Whether an owner lets pages run widgets, asked once a minute at most; a failed read is not kept. */
+/** Whether an owner lets pages run widgets; a failed read is not kept. */
 function widgetsOn(): Promise<boolean> {
-  if (!widgets || Date.now() - widgets.at > 60_000) {
+  if (!widgets || Date.now() - widgets.at > WIDGETS_FRESH_MS) {
     const asked = { at: Date.now(), on: api.embeds.widgets.query() }
     widgets = asked
     asked.on.catch(() => {

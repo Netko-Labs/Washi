@@ -3,7 +3,7 @@ import type { ActionRef, WidgetGate, WidgetMessage } from '../../../../lib/types
 import { usePaperHost } from '../../../../provider'
 import { useSheetState } from '../../../../state'
 import { isScalar, tokensOf } from '../utils'
-import { FIRST_HEIGHT, MAX_HEIGHT, MIN_HEIGHT } from '../values'
+import { FIRST_HEIGHT, MAX_HEIGHT, MIN_HEIGHT, RECHECK_MS } from '../values'
 
 /**
  * Whether widgets run here, and the frame's bridge: rows read as the reader, page state both ways,
@@ -18,12 +18,18 @@ export function useWidget(frame: RefObject<HTMLIFrameElement | null>) {
   const latest = useRef(values)
   latest.current = values
 
+  // Asked again while it runs: an owner turning widgets off stops this frame too, not just new ones.
   useEffect(() => {
     let alive = true
-    const asked = host.widgetsAllowed?.() ?? Promise.resolve(false)
-    asked.then((ok) => alive && setGate(ok ? 'on' : 'off')).catch(() => alive && setGate('off'))
+    const ask = () => {
+      const asked = host.widgetsAllowed?.() ?? Promise.resolve(false)
+      asked.then((ok) => alive && setGate(ok ? 'on' : 'off')).catch(() => alive && setGate('off'))
+    }
+    ask()
+    const timer = setInterval(ask, RECHECK_MS)
     return () => {
       alive = false
+      clearInterval(timer)
     }
   }, [host])
 
