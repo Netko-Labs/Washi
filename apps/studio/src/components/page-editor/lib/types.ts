@@ -81,6 +81,15 @@ export type DataPick =
   | { kind: 'view'; table: string }
   | { kind: 'progress'; table: TableRef }
   | { kind: 'database'; name: string }
+  | { kind: 'subpage' }
+  | { kind: 'subpages'; layout: 'list' | 'gallery' }
+  | { kind: 'link'; sheet: string }
+
+/** A page the `/` menu can link to. */
+export interface PageRef {
+  id: string
+  title: string
+}
 
 export type SlashOption =
   | ({ type: 'text' } & KindOption)

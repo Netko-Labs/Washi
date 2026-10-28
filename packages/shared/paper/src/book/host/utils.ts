@@ -10,7 +10,7 @@ import {
 } from '@washi/ink'
 import type { PaperHost } from '../../provider'
 import type { MemoryTable, Say, SeedTable } from './types'
-import { PEOPLE, SEED_TABLES, WELCOME_SHEET } from './values'
+import { BOOK_PAGES, PEOPLE, SEED_TABLES, WELCOME_SHEET } from './values'
 
 const RANGE_DAYS = { '7d': 7, '14d': 14, '30d': 30, '90d': 90 } as const
 
@@ -170,7 +170,11 @@ export function createBookHost(say: Say, seeds?: SeedTable[]): PaperHost {
       say(`${action.verb} landed in memory`)
       notify()
     },
-    resolveSheet: async () => WELCOME_SHEET,
+    resolveSheet: async (id) => BOOK_PAGES.find((page) => page.id === id) ?? WELCOME_SHEET,
+    pageId: 'finances',
+    listPages: () => BOOK_PAGES,
+    onPagesChange: () => () => {},
+    newPage: async () => say('would make a page here and open it'),
     openSheet: (id) => say(`would open page ${id}`),
     describePeople: async () => PEOPLE,
     replaceNode: async () => say('canvas edit received — a host would save it'),

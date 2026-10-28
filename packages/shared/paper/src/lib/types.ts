@@ -24,6 +24,36 @@ export interface BlockProps extends StyledProps {
   children?: ReactNode
 }
 
+/** What a link to a page shows: its title and look, never its content. */
+export interface PageCard {
+  id: string
+  title: string
+  icon: string | null
+  cover: string | null
+}
+
+export type SubpagesLayout = 'list' | 'cards' | 'gallery'
+
+export interface PageLinkProps extends BlockProps {
+  sheet: string
+}
+
+export interface SubpagesProps extends BlockProps {
+  of?: string
+  layout?: SubpagesLayout
+  empty?: string
+}
+
+export interface PageGlyphProps {
+  icon: string | null
+}
+
+export interface PageEntryProps {
+  page: PageCard
+  layout: SubpagesLayout
+  onOpen: () => void
+}
+
 export type TileShape = 'square' | 'wide' | 'tall' | 'big' | 'banner'
 
 export interface ColumnsProps extends BlockProps {

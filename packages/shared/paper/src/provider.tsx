@@ -1,7 +1,7 @@
 import type { HistoryQuery, InkQuery, QueryResult, TableSpec } from '@washi/ink'
 import type { WsxElement } from '@washi/wsx'
 import { createContext, type ReactNode, useContext } from 'react'
-import type { ActionRef } from './lib/types'
+import type { ActionRef, PageCard } from './lib/types'
 
 /**
  * The capability surface a rendered sheet may touch. The host app wires these
@@ -14,6 +14,14 @@ export interface PaperHost {
   runAction(action: ActionRef): Promise<void>
   resolveSheet(id: string): Promise<{ title: string; icon: string | null } | null>
   openSheet(id: string): void
+  /** The page being drawn; `<Subpages>` without `of` lists its children. */
+  pageId?: string
+  /** A page's children in tree order. A host with no page tree (a shared link) leaves it out. */
+  listPages?(parentId: string): PageCard[]
+  /** Calls back when the page tree moved; returns the unsubscribe. */
+  onPagesChange?(listener: () => void): () => void
+  /** Makes a page under `parentId` and opens it, as Notion's + New page does. */
+  newPage?(parentId: string): Promise<void>
   /** Who a person cell can name. A host with no members (one person, offline) leaves it out. */
   describePeople?(): Promise<{ id: string; name: string }[]>
   /**

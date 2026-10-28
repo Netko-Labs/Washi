@@ -35,6 +35,7 @@ export {
 export { Button, Compose, Field, Slider, Switch, Task } from './components/input'
 export { Chip, Mascot, Missing } from './components/kit'
 export { Bento, Column, Columns, Tile } from './components/layout'
+export { PageLink, Subpages } from './components/pages'
 export { Redact } from './components/redact'
 export { Roadmap } from './components/roadmap'
 export { Select } from './components/select'
@@ -60,6 +61,7 @@ export { frameOf } from './lib/sheet-look'
 export type {
   ActionRef,
   LookPart,
+  PageCard,
   Row as PaperRow,
   SheetLook,
   SheetLookHost,

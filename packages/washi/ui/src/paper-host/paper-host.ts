@@ -1,6 +1,8 @@
 import type { PaperHost } from '@washi/paper'
 import { api } from '../api'
+import { childrenOf } from '../page-tree'
 import { useLiveStore } from '../stores/live/live-store'
+import { useSheetsStore } from '../stores/sheets/sheets-store'
 
 /** Wires the closed capability surface of rendered sheets to the main process. */
 export const paperHost: PaperHost = {
@@ -32,6 +34,22 @@ export const paperHost: PaperHost = {
     ),
 
   describePeople: () => api.workspaces.members.query(),
+
+  // The store holds every page this reader may open (D65), so a hub never lists one they cannot.
+  listPages: (parentId) =>
+    childrenOf(useSheetsStore.getState().sheets, parentId).map(({ id, title, icon, cover }) => ({
+      id,
+      title,
+      icon,
+      cover,
+    })),
+
+  onPagesChange: (listener) =>
+    useSheetsStore.subscribe((state, previous) => {
+      if (state.sheets !== previous.sheets) listener()
+    }),
+
+  newPage: (parentId) => useSheetsStore.getState().createSheet(parentId),
 
   openRow: (recordId) =>
     void api.tables.openRow

@@ -88,6 +88,27 @@ describe('the / menu drops live data on the page', () => {
     expect(pickOf('database issues')).toMatchObject({ pick: { name: 'issues_2' } })
   })
 
+  test('pages: a new one inside, a live list or gallery, or a link found by title', () => {
+    const pages = [
+      { id: 'b1', title: 'Monthly budget' },
+      { id: 'i1', title: 'Income' },
+    ]
+    const of = (query: string) =>
+      slashMatches(query, [], pages)
+        .filter((option) => option.type === 'data')
+        .map((option) => option.label)
+    expect(of('page')).toEqual(['New page inside', 'Subpages', 'Subpage gallery'])
+    expect(of('link budget')).toContain('Link to page · Monthly budget')
+    expect(of('income')).toEqual(['Link to page · Income'])
+    const sheet = (node: ReturnType<typeof dataNode>) =>
+      validate(
+        { kind: 'element', name: 'Sheet', props: { title: 'Hub' }, children: [node] },
+        paperRegistry,
+      )
+    expect(sheet(dataNode({ kind: 'link', sheet: 'b1' }))).toEqual([])
+    expect(sheet(dataNode({ kind: 'subpages', layout: 'gallery' }))).toEqual([])
+  })
+
   test('what lands is valid WSX: a Database, or a Chart over the done statuses', () => {
     const root = parse('<Sheet title="Review" wsx="1"><Title>Review</Title></Sheet>')
     const blocks = [

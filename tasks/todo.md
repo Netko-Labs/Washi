@@ -3,14 +3,14 @@
 Specs were dropped for a rewrite (#118); this list is the plan until they return.
 
 - [x] themes: a person picks (⋯ → Theme), seven ported palettes, workspace themes + shadcn/JSON import — #119 #120
-- [ ] layout: `Columns`/`Column`, `Bento`/`Tile` in paper — D89
+- [x] layout: `Columns`/`Column`, `Bento`/`Tile` in paper — D89 · #121
 - [ ] layout in the editor: drag a block beside another makes columns; drag the gap resizes; blocks
       inside a column edit like the top level
-- [ ] home: a person makes any page their Home (the sidebar's Home opens it)
+- [x] hub pages: `Subpages` (list · cards · gallery, live) + `PageLink`; `/` New page inside — D90
 - [ ] Database `gallery` view: cards with a cover column, like Notion's
 - [ ] Embed: https only, provider allowlist + the workspace's hosts, sandboxed iframe; http refused
 - [ ] Bookmark (a link as a card) · Include (another page's blocks, live)
-- [ ] Backlinks · Subpages · Outline
+- [ ] Backlinks · Outline
 - [ ] File · Video · Audio · Gallery (uploads)
 - [ ] scripting: script blocks in QuickJS (worker), then server hooks on the same engine; iframe
       widgets later behind an owner switch — waiting on: authors, inline vs named, language

@@ -3,12 +3,13 @@ import type {
   Block,
   DataPick,
   KindOption,
+  PageRef,
   SlashOption,
   TableRef,
   TextBlock,
   TextKind,
 } from './types'
-import { HEADING_LEVELS, KIND_OPTIONS, LIST_MARKERS, SHORTCUTS } from './values'
+import { HEADING_LEVELS, KIND_OPTIONS, LINK_MATCHES, LIST_MARKERS, SHORTCUTS } from './values'
 
 function element(name: string, props: Record<string, WsxValue>, children: WsxNode[]): WsxElement {
   return { kind: 'element', name, props, children }
@@ -159,7 +160,46 @@ function newDatabaseName(query: string, taken: string[]): string {
 }
 
 /** Text kinds first, then what can live on the page: a new database, a view, a progress chart. */
-export function slashMatches(query: string, tables: TableRef[]): SlashOption[] {
+function pageOptions(needle: string, pages: PageRef[]): Extract<SlashOption, { type: 'data' }>[] {
+  const subpages = [
+    { key: 'subpage', label: 'New page inside', hint: 'page', pick: { kind: 'subpage' as const } },
+    {
+      key: 'subpages',
+      label: 'Subpages',
+      hint: 'live list',
+      pick: { kind: 'subpages' as const, layout: 'list' as const },
+    },
+    {
+      key: 'subpage-gallery',
+      label: 'Subpage gallery',
+      hint: 'covers',
+      pick: { kind: 'subpages' as const, layout: 'gallery' as const },
+    },
+  ].map((option) => ({ type: 'data' as const, ...option }))
+  const term = needle.replace(/^(link( to)?( page)?)\s*/, '')
+  const links = term
+    ? pages
+        .filter((page) => page.title.toLowerCase().includes(term))
+        .slice(0, LINK_MATCHES)
+        .map((page) => ({
+          type: 'data' as const,
+          key: `link:${page.id}`,
+          label: `Link to page · ${page.title || 'Untitled'}`,
+          hint: 'link',
+          pick: { kind: 'link' as const, sheet: page.id },
+        }))
+    : []
+  const shown = subpages.filter(
+    (option) => option.label.toLowerCase().includes(needle) || /^(sub)?pages?/.test(needle),
+  )
+  return [...shown, ...links]
+}
+
+export function slashMatches(
+  query: string,
+  tables: TableRef[],
+  pages: PageRef[] = [],
+): SlashOption[] {
   const needle = query.trim().toLowerCase()
   const kinds = kindMatches(query).map((option) => ({ type: 'text' as const, ...option }))
   const name = newDatabaseName(
@@ -200,11 +240,15 @@ export function slashMatches(query: string, tables: TableRef[]): SlashOption[] {
       option.label.toLowerCase().includes(needle) ||
       (option.key === 'database' && /^(new\s+)?database/.test(needle)),
   )
-  return [...kinds, ...matching]
+  return [...kinds, ...pageOptions(needle, pages), ...matching]
 }
 
 /** The live block a pick becomes, as WSX the page keeps whole. */
 export function dataNode(pick: DataPick): WsxElement {
+  if (pick.kind === 'link') return element('PageLink', { sheet: pick.sheet }, [])
+  if (pick.kind === 'subpages') {
+    return element('Subpages', pick.layout === 'list' ? {} : { layout: pick.layout }, [])
+  }
   if (pick.kind === 'progress' && pick.table.done) {
     const { column, values } = pick.table.done
     return element(
@@ -221,7 +265,13 @@ export function dataNode(pick: DataPick): WsxElement {
     )
   }
   const table =
-    pick.kind === 'progress' ? pick.table.name : pick.kind === 'view' ? pick.table : pick.name
+    pick.kind === 'progress'
+      ? pick.table.name
+      : pick.kind === 'view'
+        ? pick.table
+        : pick.kind === 'database'
+          ? pick.name
+          : ''
   return element('Database', { table }, [])
 }
 

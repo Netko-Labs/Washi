@@ -1,14 +1,7 @@
-import type { CSSProperties } from 'react'
-import type { SheetCoverProps, SheetLookHost, SheetMarkProps } from '../lib/types'
+import { coverStyle } from '../lib'
+import type { SheetCoverProps, SheetMarkProps } from '../lib/types'
 import { useSheetLook } from '../look'
-import { COVER_PICTURES, COVER_PRESETS } from '../registry/looks'
-
-function coverStyle(cover: string, look: SheetLookHost): CSSProperties {
-  const [kind, key] = [cover.slice(0, cover.indexOf(':')), cover.slice(cover.indexOf(':') + 1)]
-  if (kind === 'preset') return { background: COVER_PRESETS[key]?.background }
-  const url = kind === 'picture' ? look.pictureUrl?.(key) : look.fileUrl?.(key)
-  return url ? { backgroundImage: `url(${url})` } : {}
-}
+import { COVER_PICTURES } from '../registry/looks'
 
 /** The page's cover, full bleed above its column. A picture names itself; Washi shipped it. */
 export function SheetCover({ cover }: SheetCoverProps) {

@@ -1,3 +1,4 @@
+import { useSheetsStore } from '@washi/ui'
 import type { WsxElement } from '@washi/wsx'
 import { create } from 'zustand'
 import { api } from '@/integrations/trpc'
@@ -11,7 +12,7 @@ import {
   swapNode,
   turnInto,
 } from './utils'
-import { LIST_MARKERS, NEW_DATABASE } from './values'
+import { LIST_MARKERS, NEW_DATABASE, NEW_SUBPAGE_SOURCE } from './values'
 
 function isTyped(block: Block | undefined): block is TextBlock {
   return block !== undefined && block.kind !== 'locked' && block.kind !== 'divider'
@@ -161,17 +162,23 @@ export const useEditorStore = create<EditorState>((set, get) => {
       if (pick.kind === 'database') {
         await api.tables.define.mutate({ spec: NEW_DATABASE(pick.name) })
       }
+      let node = pick.kind === 'subpage' ? null : dataNode(pick)
+      if (pick.kind === 'subpage') {
+        // Made under the page being typed into, linked where the `/` was; the typing carries on here.
+        const made = await api.sheets.create.mutate({
+          write: { title: 'Untitled', source: NEW_SUBPAGE_SOURCE },
+          parentId: get().editingId,
+        })
+        void useSheetsStore.getState().refresh()
+        node = dataNode({ kind: 'link', sheet: made.id })
+      }
+      if (!node) return
       const { blocks } = get()
       const at = blocks.findIndex((block) => block.id === id)
       if (at < 0) return
       const next = newBlock()
       set({
-        blocks: [
-          ...blocks.slice(0, at),
-          lockedBlock(dataNode(pick)),
-          next,
-          ...blocks.slice(at + 1),
-        ],
+        blocks: [...blocks.slice(0, at), lockedBlock(node), next, ...blocks.slice(at + 1)],
         focus: { id: next.id, caret: 0 },
       })
     },

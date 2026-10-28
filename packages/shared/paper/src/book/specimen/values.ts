@@ -26,6 +26,8 @@ export const SPECIMENS: Record<string, Specimen> = {
       '<Card span={8} variant="outline"><Text size="sm">span 8</Text></Card><Card span={4} variant="filled"><Text size="sm">span 4</Text></Card><Card span={4} variant="filled"><Text size="sm">4</Text></Card><Card span={4} variant="filled"><Text size="sm">4</Text></Card><Card span={4} variant="filled"><Text size="sm">4</Text></Card>',
   },
   Divider: {},
+  PageLink: { props: { sheet: 'budget' } },
+  Subpages: { props: { layout: 'gallery' } },
   Columns: {
     children:
       '<Column><Card title="Rail"><Text size="sm">Narrow.</Text></Card></Column><Column ratio={2}><Card title="Main"><Text size="sm">Twice as wide.</Text></Card></Column>',

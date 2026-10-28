@@ -1,9 +1,15 @@
+import { useSheetsStore } from '@washi/ui'
 import { type SlashMenuProps, slashMatches, useEditorStore } from './lib'
 
 /** Typed `/` in an empty block: pick what the block becomes. Enter takes the first match. */
 export function SlashMenu({ query, onPick }: SlashMenuProps) {
   const tables = useEditorStore((state) => state.tables)
-  const options = slashMatches(query, tables)
+  const sheets = useSheetsStore((state) => state.sheets)
+  const options = slashMatches(
+    query,
+    tables,
+    sheets.filter((sheet) => !sheet.rowOf),
+  )
 
   return (
     <div
