@@ -12,6 +12,9 @@ export const ENTRY_WORDS: Record<ScriptEntry, string> = {
 export const AUTOMATION_DEADLINE_MS = 100
 export const AUTOMATION_MEMORY_BYTES = 16 * 1024 * 1024
 export const AUTOMATION_MAX_ACTIONS = 50
+/** How many compiled automations the server keeps at once. */
+export const COMPILED_KEPT = 64
+
 /** The author an automation's writes carry; a write signed so never runs automations itself. */
 export const AUTOMATION_AUTHOR = 'automation'
 

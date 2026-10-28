@@ -18,6 +18,7 @@ import {
   AUTOMATION_MAX_ACTIONS,
   AUTOMATION_MEMORY_BYTES,
   AUTOMATION_PRELUDE,
+  COMPILED_KEPT,
 } from './values'
 
 let engine: Promise<QuickJSWASMModule> | null = null
@@ -38,13 +39,17 @@ function loadEngine(): Promise<QuickJSWASMModule> {
 
 const compiled = new Map<string, CompiledScript>()
 
+/** Compiled once per source; the oldest goes when the cache is full, so editing never grows it forever. */
 function compileOnce(source: string): CompiledScript {
-  let found = compiled.get(source)
-  if (!found) {
-    found = compileScript(source, 'run')
-    compiled.set(source, found)
+  const found = compiled.get(source)
+  if (found) return found
+  const made = compileScript(source, 'run')
+  if (compiled.size >= COMPILED_KEPT) {
+    const oldest = compiled.keys().next().value
+    if (oldest !== undefined) compiled.delete(oldest)
   }
-  return found
+  compiled.set(source, made)
+  return made
 }
 
 /**
@@ -122,11 +127,12 @@ async function fireOne(ws: Workspace, automation: StoredAutomation, event: Autom
   let applied = 0
   let error = run.ok ? null : run.error
   if (run.ok) {
+    // All of it or none: one action that fails takes back the ones before it.
     try {
-      for (const action of run.actions) {
-        apply(ws, action)
-        applied += 1
-      }
+      ws.sqlite.transaction(() => {
+        for (const action of run.actions) apply(ws, action)
+      })()
+      applied = run.actions.length
     } catch (cause) {
       error = cause instanceof Error ? cause.message : String(cause)
     }

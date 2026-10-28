@@ -113,6 +113,17 @@ describe('automations', () => {
     })
   })
 
+  test('all or nothing: one action that fails takes back the ones before it', async () => {
+    page(
+      'insert',
+      "function run(event) { act({ verb: 'table.insert', table: 'log', data: { note: 'first' } }); act({ verb: 'table.update', table: 'nowhere', row: 'x', set: {} }) }",
+    )
+    runMutation(ws, { kind: 'insert', table: 'tasks', data: { title: 'T' } }, 'p1')
+    await settled()
+    expect(runQuery(ws, { table: 'log' }).rows).toHaveLength(0)
+    expect(listCapabilityCalls(ws)[0]).toMatchObject({ decision: 'denied' })
+  })
+
   test('only rows: a verb that reaches past the table is refused', async () => {
     page('insert', "function run() { act({ verb: 'url.open', url: 'https://example.com' }) }")
     runMutation(ws, { kind: 'insert', table: 'tasks', data: { title: 'X' } }, 'p1')
