@@ -2,7 +2,14 @@ import { describe, expect, test } from 'bun:test'
 import { paperRegistry } from '@washi/paper/registry'
 import { hasErrors, parse, serialize, validate } from '@washi/wsx'
 import { lockedBlock, newBlock, toBlocks, toSheet } from '../lib/convert'
-import { applyShortcut, blockFrame, dataNode, slashMatches, titleOf } from '../lib/utils'
+import {
+  applyShortcut,
+  blockFrame,
+  bookmarkNode,
+  dataNode,
+  slashMatches,
+  titleOf,
+} from '../lib/utils'
 
 const SOURCE = `<Sheet title="Plan" feel="note">
   <Title>Plan</Title>
@@ -112,6 +119,26 @@ describe('the / menu drops live data on the page', () => {
     expect(embed('https://tally.so/r/abc')).toMatchObject({ label: 'Embed · tally.so' })
     expect(embed('http://tally.so/r/abc')).toBeUndefined()
     expect(embed('embed')).toMatchObject({ hint: 'paste an https address' })
+    const first = (query: string) =>
+      slashMatches(query, []).find((option) => option.type === 'data')
+    expect(first('bookmark https://bun.com/docs')).toMatchObject({ label: 'Bookmark · bun.com' })
+    expect(first('https://bun.com/docs')).toMatchObject({ label: 'Embed · bun.com' })
+  })
+
+  test('a bookmark keeps only what the site said, and stays valid without any of it', () => {
+    const page = (node: ReturnType<typeof bookmarkNode>) =>
+      validate(
+        { kind: 'element', name: 'Sheet', props: { title: 'Links' }, children: [node] },
+        paperRegistry,
+      )
+    const seen = { title: 'Bun', description: null, image: 'https://bun.com/og.png', site: null }
+    expect(bookmarkNode('https://bun.com', seen).props).toEqual({
+      href: 'https://bun.com',
+      title: 'Bun',
+      image: 'https://bun.com/og.png',
+    })
+    expect(page(bookmarkNode('https://bun.com', seen))).toEqual([])
+    expect(page(bookmarkNode('https://bun.com', null))).toEqual([])
   })
 
   test('what lands is valid WSX: a Database, or a Chart over the done statuses', () => {

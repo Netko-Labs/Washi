@@ -39,3 +39,60 @@
   color: var(--muted);
   font-size: 0.82em;
 }
+
+/* A link as a card: its words on the left, its picture on the right, the whole card the link. */
+.wsx-bookmark {
+  display: flex;
+  overflow: hidden;
+  min-height: 92px;
+  border: var(--card-border) solid var(--border);
+  border-radius: var(--r-card);
+  background: var(--card);
+  color: var(--ink);
+  text-decoration: none;
+  transition: border-color var(--ease);
+}
+.wsx-bookmark:hover {
+  border-color: color-mix(in oklab, var(--accent) 45%, var(--border));
+}
+.wsx-bookmark-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding: 12px 14px;
+}
+.wsx-bookmark-title {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wsx-bookmark-description {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 0.86em;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.wsx-bookmark-site {
+  margin-top: auto;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 0.8em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wsx-bookmark-image {
+  flex: none;
+  width: 32%;
+  max-width: 220px;
+  object-fit: cover;
+}
+@container wsx (max-width: 400px) {
+  .wsx-bookmark-image {
+    display: none;
+  }
+}

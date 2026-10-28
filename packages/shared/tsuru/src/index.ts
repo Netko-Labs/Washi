@@ -13,3 +13,4 @@ export {
   isPrivateAddress,
   type PolicyVerdict,
 } from './policy'
+export { type LinkPreview, linkPreview, readPreview } from './preview'

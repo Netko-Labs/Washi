@@ -7,6 +7,7 @@ import { embedsRouter } from './routers/embeds'
 import { emojisRouter } from './routers/emojis'
 import { filesRouter } from './routers/files'
 import { instanceRouter } from './routers/instance'
+import { linksRouter } from './routers/links'
 import { liveRouter } from './routers/live'
 import { modelsRouter } from './routers/models'
 import { remindersRouter } from './routers/reminders'
@@ -30,6 +31,7 @@ export const appRouter = router({
   storage: storageRouter,
   embeds: embedsRouter,
   emojis: emojisRouter,
+  links: linksRouter,
   themes: themesRouter,
   tables: tablesRouter,
   agents: agentsRouter,

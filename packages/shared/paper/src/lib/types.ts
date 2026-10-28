@@ -55,6 +55,14 @@ export interface PageEntryProps {
   onOpen: () => void
 }
 
+export interface BookmarkProps extends BlockProps {
+  href: string
+  title?: string
+  description?: string
+  image?: string
+  site?: string
+}
+
 export interface IncludeProps extends BlockProps {
   sheet: string
   /** Draws the included page's body; WsxView lends it, so paper's modules never loop. */

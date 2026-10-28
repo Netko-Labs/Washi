@@ -2,6 +2,7 @@ import type { WsxElement, WsxNode, WsxValue } from '@washi/wsx'
 import { element, turnInto } from './convert'
 import type {
   Block,
+  BookmarkPreview,
   DataPick,
   KindOption,
   PageRef,
@@ -46,35 +47,49 @@ function newDatabaseName(query: string, taken: string[]): string {
 }
 
 /** Text kinds first, then what can live on the page: a new database, a view, a progress chart. */
-/** `/embed https://…`, or an https address typed after `/`: that site in a frame. */
-function embedOptions(query: string): Extract<SlashOption, { type: 'data' }>[] {
-  const typed = query.trim().replace(/^embed\s*/i, '')
-  let url: URL
+/**
+ * `/embed …`, `/bookmark …`, or an https address typed after `/`: that site in a frame, or as a card.
+ * The word typed first leads; a bare address offers the frame first.
+ */
+function linkOptions(query: string): Extract<SlashOption, { type: 'data' }>[] {
+  const asked = query
+    .trim()
+    .match(/^(embed|bookmark)\b\s*/i)?.[1]
+    ?.toLowerCase()
+  const typed = query.trim().replace(/^(embed|bookmark)\b\s*/i, '')
+  let url: URL | null = null
   try {
     url = new URL(typed)
   } catch {
-    return /^embed/i.test(query.trim())
-      ? [
-          {
-            type: 'data',
-            key: 'embed',
-            label: 'Embed',
-            hint: 'paste an https address',
-            pick: { kind: 'embed', src: '' },
-          },
-        ]
-      : []
+    url = null
   }
-  if (url.protocol !== 'https:') return []
-  return [
-    {
-      type: 'data',
-      key: `embed:${url.href}`,
-      label: `Embed · ${url.hostname}`,
-      hint: 'frame',
-      pick: { kind: 'embed', src: url.href },
-    },
-  ]
+  if (url?.protocol !== 'https:') {
+    if (!asked) return []
+    return [
+      {
+        type: 'data',
+        key: asked,
+        label: asked === 'embed' ? 'Embed' : 'Bookmark',
+        hint: 'paste an https address',
+        pick: asked === 'embed' ? { kind: 'embed', src: '' } : { kind: 'bookmark', href: '' },
+      },
+    ]
+  }
+  const embed = {
+    type: 'data' as const,
+    key: `embed:${url.href}`,
+    label: `Embed · ${url.hostname}`,
+    hint: 'frame',
+    pick: { kind: 'embed' as const, src: url.href },
+  }
+  const bookmark = {
+    type: 'data' as const,
+    key: `bookmark:${url.href}`,
+    label: `Bookmark · ${url.hostname}`,
+    hint: 'card',
+    pick: { kind: 'bookmark' as const, href: url.href },
+  }
+  return asked === 'bookmark' ? [bookmark, embed] : [embed, bookmark]
 }
 
 function pageOptions(needle: string, pages: PageRef[]): Extract<SlashOption, { type: 'data' }>[] {
@@ -157,11 +172,22 @@ export function slashMatches(
       option.label.toLowerCase().includes(needle) ||
       (option.key === 'database' && /^(new\s+)?database/.test(needle)),
   )
-  return [...kinds, ...embedOptions(query), ...pageOptions(needle, pages), ...matching]
+  return [...kinds, ...linkOptions(query), ...pageOptions(needle, pages), ...matching]
 }
 
 /** The live block a pick becomes, as WSX the page keeps whole. */
+/** A bookmark carrying whatever the site said about itself; nothing it said is required. */
+export function bookmarkNode(href: string, seen: BookmarkPreview | null): WsxElement {
+  const props: Record<string, WsxValue> = { href }
+  for (const key of ['title', 'description', 'image', 'site'] as const) {
+    const value = seen?.[key]
+    if (value) props[key] = value
+  }
+  return element('Bookmark', props, [])
+}
+
 export function dataNode(pick: DataPick): WsxElement {
+  if (pick.kind === 'bookmark') return bookmarkNode(pick.href, null)
   if (pick.kind === 'embed') return element('Embed', { src: pick.src }, [])
   if (pick.kind === 'link') return element('PageLink', { sheet: pick.sheet }, [])
   if (pick.kind === 'subpages') {
