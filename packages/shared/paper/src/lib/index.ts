@@ -7,6 +7,7 @@ export { useSelectOptions } from './hooks/use-select-options'
 export { columnOf, resolveArgs, resolveRow, resolveRowDeep, toRows } from './rows'
 export { frameOf } from './sheet-look'
 export { reachOf, styled } from './styled'
+export { toneOf } from './tone-of'
 export type {
   ActionRef,
   BindState,

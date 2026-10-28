@@ -1,5 +1,5 @@
+import { toneOf } from '../../../lib/tone-of'
 import type { ActionRef, Row } from '../../../lib/types'
-import { VALUE_TONES } from '../../../lib/values'
 import type { BoardColumn, Move, RankPatch } from './types'
 
 export function rankOf(row: Row, rank: string): number {
@@ -95,7 +95,7 @@ export function naturalBefore(rows: Row[], column: Row[], id: string): string | 
 
 /** A column named for a meaning (done, blocked, in review) wears its tone; others take the ramp. */
 export function columnHue(name: string, index: number): string {
-  const tone = VALUE_TONES[name.toLowerCase()]
+  const tone = toneOf(name)
   if (tone === 'neutral') return 'var(--muted)'
   if (tone === 'accent') return 'var(--k-fill)'
   if (tone) return `var(--tone-${tone})`
