@@ -19,21 +19,20 @@ export const linkMutations = router({
         subject: 'link_preview',
         input,
       }
+      let preview: Awaited<ReturnType<typeof linkPreview>>
       try {
-        const preview = await linkPreview(input.href)
-        recordCapability(ctx.ws, { ...entry, decision: 'auto' })
-        return preview
+        preview = await linkPreview(input.href)
       } catch (cause) {
         const detail = cause instanceof Error ? cause.message : String(cause)
-        recordCapability(ctx.ws, {
-          ...entry,
-          decision: cause instanceof TsuruError ? 'denied' : 'auto',
-          detail,
-        })
+        const decision = cause instanceof TsuruError ? 'denied' : 'auto'
+        recordCapability(ctx.ws, { ...entry, decision, detail })
         if (cause instanceof TsuruError) {
           throw new TRPCError({ code: 'BAD_REQUEST', message: cause.message, cause })
         }
         throw cause
       }
+      // Outside the guarded call: a ledger write that fails must not be logged as a failed preview.
+      recordCapability(ctx.ws, { ...entry, decision: 'auto' })
+      return preview
     }),
 })
