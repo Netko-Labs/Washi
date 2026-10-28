@@ -444,7 +444,9 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   `view()` returns plain data; an `onPress` becomes the action `script.invoke`, which the Script's
   own host turns into a call into the sandbox — it never reaches the server. The tree is validated
   against the registry (scripts never nest) and drawn inside the page's own state and data. Any
-  member — and Washi — may write one; `/script` drops a starter. A host without `compileScript`
+  member — and Washi — may write one; `/script` drops a starter. While the page is open for typing a
+  Script has Code · Preview (`ScriptBlock`): its TSX in CodeMirror, compiled 400 ms after the last
+  key, and only what compiles lands in the block — autosave never sends a script the server refuses. A host without `compileScript`
   (the book, `/learn`, a shared link) says scripts run inside a workspace.
 - **An embed is https and listed (D92).** `<Embed src title ratio height>`: the registry refuses http;
   a built-in provider (`EMBED_PROVIDERS` — YouTube via youtube-nocookie, Vimeo, Spotify, Loom, Figma,
