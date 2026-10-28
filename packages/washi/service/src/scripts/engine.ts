@@ -11,12 +11,15 @@ export function loadEngine(): Promise<QuickJSWASMModule> {
       import('@jitl/quickjs-singlefile-mjs-release-sync'),
     ]).then(([core, variant]) => core.newQuickJSWASMModuleFromVariant(variant.default))
     engine = loading
-    loading.then((module) => {
-      ready = module
-    })
-    loading.catch(() => {
-      if (engine === loading) engine = null
-    })
+    // One handler pair: a failed load is forgotten, and no derived promise is left to reject unheard.
+    loading.then(
+      (module) => {
+        ready = module
+      },
+      () => {
+        if (engine === loading) engine = null
+      },
+    )
   }
   return engine
 }

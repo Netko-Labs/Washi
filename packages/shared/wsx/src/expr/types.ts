@@ -112,7 +112,6 @@ export interface ExprScope {
 }
 
 export interface ExprParseOptions {
-  maxDepth?: number
   /** A formula column may call the workspace's own functions; a page may not. */
   workspaceCalls?: boolean
 }
