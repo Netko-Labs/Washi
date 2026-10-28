@@ -58,6 +58,7 @@ export {
 } from './reminders/service'
 export { runAutomation, watchAutomations } from './scripts/automations'
 export { compileScript, SCRIPT_MAX_CHARS } from './scripts/compile'
+export { installFormulaFunctions } from './scripts/formulas'
 export type { AutomationEvent, CompiledScript, ScriptEntry } from './scripts/types'
 export {
   canRead,

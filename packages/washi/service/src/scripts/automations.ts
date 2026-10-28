@@ -8,9 +8,9 @@ import {
   tableNameOf,
   type Workspace,
 } from '@washi/repository'
-import type { QuickJSWASMModule } from 'quickjs-emscripten-core'
 import { deleteRecord, runMutation, runQuery, updateRecord } from '../tables/service'
 import { compileScript } from './compile'
+import { loadEngine } from './engine'
 import type { AutomationEvent, AutomationRun, CompiledScript } from './types'
 import {
   AUTOMATION_AUTHOR,
@@ -20,22 +20,6 @@ import {
   AUTOMATION_PRELUDE,
   COMPILED_KEPT,
 } from './values'
-
-let engine: Promise<QuickJSWASMModule> | null = null
-
-function loadEngine(): Promise<QuickJSWASMModule> {
-  if (!engine) {
-    const loading = Promise.all([
-      import('quickjs-emscripten-core'),
-      import('@jitl/quickjs-singlefile-mjs-release-sync'),
-    ]).then(([core, variant]) => core.newQuickJSWASMModuleFromVariant(variant.default))
-    engine = loading
-    loading.catch(() => {
-      if (engine === loading) engine = null
-    })
-  }
-  return engine
-}
 
 const compiled = new Map<string, CompiledScript>()
 

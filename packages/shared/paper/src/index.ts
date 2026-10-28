@@ -42,7 +42,7 @@ export { Audio, File, Video } from './components/media'
 export { Backlinks, Include, Outline, PageLink, Subpages } from './components/pages'
 export { Redact } from './components/redact'
 export { Roadmap } from './components/roadmap'
-export { Automation, Script } from './components/script'
+export { Automation, Formula, Script } from './components/script'
 export { Select } from './components/select'
 export { Callout, Card, Figure, Hero } from './components/surface'
 export {

@@ -17,6 +17,7 @@ import {
   LINK_MATCHES,
   SHORTCUTS,
   STARTER_AUTOMATION,
+  STARTER_FORMULA,
   STARTER_SCRIPT,
   STARTER_WIDGET,
   UPLOAD_OPTIONS,
@@ -138,7 +139,15 @@ function uploadOptions(needle: string): Extract<SlashOption, { type: 'data' }>[]
   }
   const code = !needle || 'script code typescript program'.includes(needle) ? [script] : []
   const html = !needle || 'widget html embed code'.includes(needle) ? [widget] : []
-  return [...uploads, ...pictures, ...code, ...html]
+  const formula: Extract<SlashOption, { type: 'data' }> = {
+    type: 'data',
+    key: 'formula',
+    label: 'Formula function',
+    hint: 'TypeScript',
+    pick: { kind: 'formula' },
+  }
+  const fn = !needle || 'formula function fn'.includes(needle) ? [formula] : []
+  return [...uploads, ...pictures, ...code, ...html, ...fn]
 }
 
 /** The block an upload becomes: a picture, a player, or a document line. */
@@ -287,6 +296,9 @@ export function dataNode(pick: DataPick): WsxElement {
   }
   if (pick.kind === 'script')
     return element('Script', {}, [{ kind: 'text', value: STARTER_SCRIPT }])
+  if (pick.kind === 'formula') {
+    return element('Formula', { name: 'with_tax' }, [{ kind: 'text', value: STARTER_FORMULA }])
+  }
   if (pick.kind === 'widget') {
     return element('Widget', { title: 'A clock' }, [{ kind: 'text', value: STARTER_WIDGET }])
   }

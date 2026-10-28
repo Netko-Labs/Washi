@@ -9,6 +9,7 @@ import {
   type TableSpec,
 } from '@washi/ink'
 import { type ExprAst, evaluateExpr, parseExpr } from '@washi/wsx'
+import type { FormulaCall } from './formula-functions'
 
 /** How many rows a query that filters, sorts or groups on a formula may read before computing. */
 export const MEMORY_ROW_CAP = 5000
@@ -18,7 +19,7 @@ const parsed = new Map<string, ExprAst | null>()
 function astOf(expr: string): ExprAst | null {
   if (!parsed.has(expr)) {
     try {
-      parsed.set(expr, parseExpr(expr))
+      parsed.set(expr, parseExpr(expr, undefined, { workspaceCalls: true }))
     } catch {
       parsed.set(expr, null)
     }
@@ -59,7 +60,12 @@ export function needsMemory(
  * scalars, so they read as absent). A formula that fails — a bad cell, a division by zero — is
  * null for that row, never an error for the whole query.
  */
-export function computeFormulas(spec: TableSpec, rows: QueryRow[], now = Date.now()): void {
+export function computeFormulas(
+  spec: TableSpec,
+  rows: QueryRow[],
+  now = Date.now(),
+  call?: FormulaCall,
+): void {
   const formulas = spec.columns.filter((column) => column.type === 'formula')
   if (formulas.length === 0) return
   for (const row of rows) {
@@ -72,7 +78,13 @@ export function computeFormulas(spec: TableSpec, rows: QueryRow[], now = Date.no
       let value: Scalar = null
       if (ast) {
         try {
-          const result = evaluateExpr(ast, { state: cells, args: {}, rows: () => undefined, now })
+          const result = evaluateExpr(ast, {
+            state: cells,
+            args: {},
+            rows: () => undefined,
+            now,
+            call,
+          })
           value = Array.isArray(result) ? null : (result as Scalar)
         } catch {
           value = null

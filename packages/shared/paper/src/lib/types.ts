@@ -114,6 +114,11 @@ export type WidgetMessage =
 
 export type WidgetGate = 'asking' | 'off' | 'on'
 
+export interface FormulaProps extends BlockProps {
+  name: string
+  title?: string
+}
+
 export interface AutomationProps extends BlockProps {
   table: string
   on: 'insert' | 'update'

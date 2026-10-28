@@ -17,7 +17,7 @@ Specs were dropped for a rewrite (#118); this list is the plan until they return
 - [x] a Script's code edited in place (Code · Preview, kept once it compiles)
 - [x] widgets: a page's own HTML in a sealed frame, behind an owner switch — D98
 - [x] server hooks: `<Automation table on>` runs on row insert/update, server QuickJS — D97
-- [ ] scripting, next: custom formula functions
+- [x] formula functions: `<Formula name>` a table's formulas may call — D99
 
 # D72+ · data that computes — Washi's expense-tracker report (2026-10-27)
 

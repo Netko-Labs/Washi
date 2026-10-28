@@ -29,7 +29,7 @@ import { Audio, File, Video } from './components/media'
 import { Backlinks, Include, Outline, PageLink, Subpages } from './components/pages'
 import { Redact } from './components/redact'
 import { Roadmap } from './components/roadmap'
-import { Automation, Script } from './components/script'
+import { Automation, Formula, Script } from './components/script'
 import { Select } from './components/select'
 import { Callout, Card, Figure, Hero } from './components/surface'
 import {
@@ -108,6 +108,7 @@ const COMPONENTS: Record<string, ComponentType<never>> = {
   Embed,
   Bookmark,
   Automation,
+  Formula,
   Video,
   Audio,
   File,

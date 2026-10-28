@@ -257,6 +257,12 @@ function visit(node: ExprAst, ctx: EvalContext, depth: number): Scalar {
       return aggregate(node, ctx, inner)
     case 'call':
       return call(node, ctx, inner)
+    case 'fn': {
+      const args = node.args.map((argument) => visit(argument, ctx, inner))
+      if (!ctx.scope.call)
+        throw new ExprEvalError(`\`${node.name}\` is the workspace's own — nothing here runs it`)
+      return ctx.scope.call(node.name, args)
+    }
   }
 }
 

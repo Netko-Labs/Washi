@@ -4,7 +4,8 @@ export type CompiledScript = { ok: true; js: string } | { ok: false; error: stri
 /** A `<Script>` found on a page: where it sits and the TSX it holds. */
 export interface FoundScript {
   path: string
-  entry: ScriptEntry
+  /** `view`, `run`, or a Formula's own name. */
+  entry: string
   source: string
 }
 

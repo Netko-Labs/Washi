@@ -1,6 +1,6 @@
 import type { AutomationEntry } from '@washi/repository'
 import type { Diagnostic, WsxElement, WsxNode } from '@washi/wsx'
-import type { CompiledScript, FoundScript, ScriptEntry } from './types'
+import type { CompiledScript, FoundScript } from './types'
 import { ENTRIES, ENTRY_WORDS } from './values'
 
 /** A script is one page block's worth of TSX, not a program. */
@@ -16,7 +16,7 @@ const transpiler = new Bun.Transpiler({
  * exports nothing — everything it may touch arrives as the sandbox's hooks — and names its entry:
  * `view` for a Script a page draws, `run` for an Automation a row write runs.
  */
-export function compileScript(source: string, entry: ScriptEntry = 'view'): CompiledScript {
+export function compileScript(source: string, entry = 'view'): CompiledScript {
   if (source.length > SCRIPT_MAX_CHARS) {
     return { ok: false, error: `a script is at most ${SCRIPT_MAX_CHARS} characters` }
   }
@@ -28,7 +28,12 @@ export function compileScript(source: string, entry: ScriptEntry = 'view'): Comp
       return { ok: false, error: `a script exports nothing — name a function ${entry}` }
     const js = transpiler.transformSync(source)
     const names = new RegExp(`\\bfunction\\s+${entry}\\s*\\(|\\b(?:const|let|var)\\s+${entry}\\s*=`)
-    if (!names.test(js)) return { ok: false, error: ENTRY_WORDS[entry] }
+    if (!names.test(js)) {
+      return {
+        ok: false,
+        error: ENTRY_WORDS[entry] ?? `a formula needs a function ${entry}(…) that returns a value`,
+      }
+    }
     return { ok: true, js }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
@@ -39,7 +44,10 @@ export function compileScript(source: string, entry: ScriptEntry = 'view'): Comp
 function scripts(node: WsxNode, path: string, out: FoundScript[]) {
   if (node.kind !== 'element') return
   const here = path ? `${path} > ${node.name}` : node.name
-  const entry = ENTRIES[node.name]
+  const entry =
+    node.name === 'Formula' && typeof node.props.name === 'string'
+      ? node.props.name
+      : ENTRIES[node.name]
   if (entry) out.push({ path: here, entry, source: textOf(node) })
   for (const child of node.children) scripts(child, here, out)
 }
@@ -100,6 +108,20 @@ export function extractAutomations(root: WsxElement): AutomationEntry[] {
         title: typeof title === 'string' ? title : null,
         source: textOf(node),
       })
+    }
+    for (const child of node.children) walk(child)
+  }
+  walk(root)
+  return out
+}
+
+/** The page's `<Formula>` functions, for the index a formula column calls through. */
+export function extractFormulas(root: WsxElement): { name: string; source: string }[] {
+  const out: { name: string; source: string }[] = []
+  const walk = (node: WsxNode) => {
+    if (node.kind !== 'element') return
+    if (node.name === 'Formula' && typeof node.props.name === 'string') {
+      out.push({ name: node.props.name, source: textOf(node) })
     }
     for (const child of node.children) walk(child)
   }

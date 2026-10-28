@@ -12,6 +12,7 @@ import type {
   AggregateSource,
   BinaryOperator,
   ExprAst,
+  ExprParseOptions,
   FunctionName,
   Scalar,
   Token,
@@ -22,6 +23,9 @@ const ADDITIVE: BinaryOperator[] = ['+', '-']
 const MULTIPLICATIVE: BinaryOperator[] = ['*', '/']
 const KEYWORD_LITERALS: Record<string, Scalar> = { true: true, false: false, null: null }
 const LEGAL_CALLS = [...AGGREGATE_NAMES, ...FUNCTION_NAMES].join(', ')
+/** A workspace function's name, as a `<Formula name>` may give it. */
+const WORKSPACE_NAME = /^[a-z][a-z0-9_]{0,39}$/
+const WORKSPACE_ARITY = 8
 
 function isAggregate(name: string): name is AggregateName {
   return (AGGREGATE_NAMES as readonly string[]).includes(name)
@@ -39,9 +43,11 @@ class Parser {
   private readonly tokens: Token[]
   private index = 0
   private insideWhere = false
+  private readonly workspaceCalls: boolean
 
-  constructor(tokens: Token[]) {
+  constructor(tokens: Token[], workspaceCalls: boolean) {
     this.tokens = tokens
+    this.workspaceCalls = workspaceCalls
   }
 
   parse(): ExprAst {
@@ -190,6 +196,8 @@ class Parser {
   private parseCall(name: Token): ExprAst {
     if (isAggregate(name.value)) return this.parseAggregate(name.value, name)
     if (isFunction(name.value)) return this.parseFunction(name.value)
+    if (this.workspaceCalls && WORKSPACE_NAME.test(name.value))
+      return this.parseWorkspaceCall(name.value)
     return this.fail(`unknown function \`${name.value}\` — only ${LEGAL_CALLS}`, name)
   }
 
@@ -209,6 +217,23 @@ class Parser {
     if (args.length !== arity)
       this.fail(`\`${name}()\` takes ${arity} arguments, got ${args.length}`)
     return { kind: 'call', name, args }
+  }
+
+  private parseWorkspaceCall(name: string): ExprAst {
+    this.expect('(')
+    const args: ExprAst[] = []
+    if (!this.at('punct', ')')) {
+      args.push(this.parseOr())
+      while (this.at('punct', ',')) {
+        this.next()
+        args.push(this.parseOr())
+      }
+    }
+    this.expect(')')
+    this.rejectPostfix()
+    if (args.length > WORKSPACE_ARITY)
+      this.fail(`\`${name}()\` takes at most ${WORKSPACE_ARITY} arguments`)
+    return { kind: 'fn', name, args }
   }
 
   private parseAggregate(name: AggregateName, at: Token): ExprAst {
@@ -269,13 +294,18 @@ export function depthOf(ast: ExprAst): number {
     case 'aggregate':
       return 1 + (ast.where ? depthOf(ast.where) : 0)
     case 'call':
+    case 'fn':
       return 1 + ast.args.reduce((max, arg) => Math.max(max, depthOf(arg)), 0)
   }
 }
 
 /** Parse expr source into an AST. Throws ExprSyntaxError; ExprBudgetError past the depth cap. */
-export function parseExpr(source: string, maxDepth = EXPR_LIMITS.depth): ExprAst {
-  const ast = new Parser(tokenize(source)).parse()
+export function parseExpr(
+  source: string,
+  maxDepth: number = EXPR_LIMITS.depth,
+  options: ExprParseOptions = {},
+): ExprAst {
+  const ast = new Parser(tokenize(source), options.workspaceCalls ?? false).parse()
   if (depthOf(ast) > maxDepth) throw new ExprBudgetError('depth', maxDepth)
   return ast
 }

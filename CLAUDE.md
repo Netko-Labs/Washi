@@ -473,6 +473,16 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   cannot loop. Every run is a ledger row (`automation`, `auto` or `denied` with why); a run that
   changed rows emits `workspaceChanged`. The page draws a note (⚡ when a row is added to …); the
   editor gives it Code · Preview like a Script; `/` offers *Automation · <table>* with a starter.
+- **A workspace may define formula functions (D99).** `<Formula name>` keeps a pure TS function named
+  after it (lowercase, never a built-in's name such as `sum` or `when`); `extractFormulas` indexes it
+  (`sheet_formulas`; on live pages, the first to take a name keeps it). Only a formula column may call
+  one — `parseExpr(…, { workspaceCalls: true })` reads an unknown call as a `fn` node, and
+  `validateExpr` checks it against `shape.functions` at definition (`checkFormulas` gets the
+  workspace's names); a page's `expr` still refuses any call it does not know. Formulas are computed
+  in repository, so service lends a runner through `setFormulaRunner` (a per-workspace callback, like
+  `onRecordWrite`): one QuickJS per query with every function defined once, 20 ms per call, values in
+  and a value out — no rows, state or network. A function gone, slow or throwing makes that cell null,
+  never the query fail. The engine (`scripts/engine.ts`) is shared with automations and loaded at open.
 - **An embed is https and listed (D92).** `<Embed src title ratio height>`: the registry refuses http;
   a built-in provider (`EMBED_PROVIDERS` — YouTube via youtube-nocookie, Vimeo, Spotify, Loom, Figma,
   CodePen, CodeSandbox, Miro, Google Maps, Indify) turns its page URL into its player and always plays;

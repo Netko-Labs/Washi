@@ -2,6 +2,21 @@ import type { ComponentSpec } from '@washi/wsx'
 import { z } from 'zod'
 import { p } from './spec-kit'
 
+/** What a formula already means by these names; a workspace function may not take one. */
+const BUILT_IN_CALLS = [
+  'count',
+  'sum',
+  'avg',
+  'min',
+  'max',
+  'now',
+  'days',
+  'month',
+  'year',
+  'when',
+  'add_months',
+]
+
 export const SUBPAGE_LAYOUTS = ['list', 'cards', 'gallery'] as const
 
 const pageId = z.string().min(1).max(80).describe('page id')
@@ -42,6 +57,21 @@ export const PAGE_SPECS: Record<string, ComponentSpec> = {
   Script: p({ title: z.string().max(80).optional() }, 'text', {
     hints: { code: 'the TSX is the Script’s children: a backtick string with a function view()' },
   }),
+  Formula: p(
+    {
+      name: z
+        .string()
+        .regex(/^[a-z][a-z0-9_]{0,39}$/, 'a function name is lowercase letters, digits or _')
+        .refine((name) => !BUILT_IN_CALLS.includes(name), 'that name is a built-in — pick another'),
+      title: z.string().max(80).optional(),
+    },
+    'text',
+    {
+      hints: {
+        code: 'the TS is the Formula’s children: a backtick string defining function <name>(…)',
+      },
+    },
+  ),
   Automation: p(
     {
       table: z.string().min(1).max(64).describe('table'),

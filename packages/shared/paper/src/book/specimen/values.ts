@@ -33,6 +33,11 @@ export const SPECIMENS: Record<string, Specimen> = {
     children:
       '{`<div id="t" style="font: 600 40px system-ui; color: var(--accent)"></div>\n<script>setInterval(() => { t.textContent = new Date().toLocaleTimeString() }, 1000)</script>`}',
   },
+  Formula: {
+    props: { name: 'with_tax', title: 'Price with tax' },
+    children:
+      '{`function with_tax(amount: number, rate = 0.19) {\n  return Math.round(amount * (1 + rate) * 100) / 100\n}`}',
+  },
   Automation: {
     props: { table: 'tasks', on: 'insert', title: 'Every new task starts as todo' },
     children:

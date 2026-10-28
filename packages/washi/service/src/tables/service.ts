@@ -13,6 +13,7 @@ import {
   deleteRecords,
   executeQuery,
   findRecordTableId,
+  formulaFunctions,
   getTableByName,
   insertRecord,
   listTables,
@@ -35,7 +36,10 @@ function requireTable(ws: Workspace, name: string): UserTable {
 
 export function defineUserTable(ws: Workspace, input: unknown): UserTable {
   const spec: TableSpec = tableSpecSchema.parse(input)
-  checkFormulas(spec)
+  checkFormulas(
+    spec,
+    formulaFunctions(ws).map((formula) => formula.name),
+  )
   checkRollups(ws, spec)
   for (const column of spec.columns) {
     if (column.table && column.table !== spec.name && !getTableByName(ws, column.table)) {

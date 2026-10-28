@@ -31,6 +31,8 @@ export const SUMMARIES: Record<string, string> = {
   Bookmark: 'A link as a card — title, a line about it, its picture — read once when it was made.',
   Widget:
     'A page’s own HTML and JS in a frame with no origin and no network, reaching the page only through washi.rows / state / act — off until an owner allows widgets.',
+  Formula:
+    'A function the workspace’s formula columns may call by name — values in, a value out, nothing else reached.',
   Automation:
     'TypeScript the server runs when a row is added to (or changes in) a table: run(event) reads rows and acts on them. It draws a note, nothing else.',
   Script:

@@ -23,6 +23,8 @@ export interface SheetIndexInput {
   files?: string[]
   /** The `<Automation>` blocks the page holds, in order: what a row write may run. */
   automations?: AutomationEntry[]
+  /** The `<Formula>` functions the page defines, in order: what a formula column may call. */
+  formulas?: { name: string; source: string }[]
 }
 
 export interface AutomationEntry {
@@ -252,6 +254,12 @@ export function indexSheet(ws: Workspace, id: string, title: string, index: Shee
   ws.sqlite.query('DELETE FROM sheet_files WHERE src = ?').run(id)
   for (const key of index.files ?? []) {
     ws.sqlite.query('INSERT OR IGNORE INTO sheet_files (src, key) VALUES (?, ?)').run(id, key)
+  }
+  ws.sqlite.query('DELETE FROM sheet_formulas WHERE src = ?').run(id)
+  for (const [position, formula] of (index.formulas ?? []).entries()) {
+    ws.sqlite
+      .query('INSERT INTO sheet_formulas (src, position, name, source) VALUES (?, ?, ?, ?)')
+      .run(id, position, formula.name, formula.source)
   }
   ws.sqlite.query('DELETE FROM sheet_automations WHERE src = ?').run(id)
   for (const [position, entry] of (index.automations ?? []).entries()) {

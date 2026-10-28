@@ -59,6 +59,13 @@ export {
   isUploadWorn,
   listCustomEmojis,
 } from './storage/custom-emojis'
+export {
+  type FormulaCall,
+  type FormulaCaller,
+  formulaFunctions,
+  type StoredFormula,
+  setFormulaRunner,
+} from './storage/formula-functions'
 export { executeQuery, matchRecordIds } from './storage/ink-executor'
 export { listCapabilityCalls, recordCapability } from './storage/ledger'
 export {

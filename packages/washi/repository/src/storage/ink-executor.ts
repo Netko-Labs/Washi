@@ -9,6 +9,7 @@ import {
 } from '@washi/ink'
 
 import type { Workspace } from './client'
+import { type FormulaCall, openFormulaCaller } from './formula-functions'
 import {
   computeFormulas,
   finishInMemory,
@@ -184,7 +185,9 @@ function rollupFetch(ws: Workspace): RollupFetch {
       undefined,
       MEMORY_ROW_CAP,
     )
-    computeFormulas(target.spec, rows)
+    withFormulaCaller(ws, target.spec, (call) =>
+      computeFormulas(target.spec, rows, Date.now(), call),
+    )
     const rest = filters.filter((filter) => computed.has(filter.column))
     return { spec: target.spec, rows: rows.filter((row) => matchesFilters(row, rest, target.spec)) }
   }
@@ -193,7 +196,22 @@ function rollupFetch(ws: Workspace): RollupFetch {
 /** Rollups first, then formulas: a formula may read a rollup (`budget - spent`). */
 function compute(ws: Workspace, spec: TableSpec, rows: QueryResult['rows'], query: InkQuery) {
   computeRollups(spec, rows, query.params, rollupFetch(ws))
-  computeFormulas(spec, rows)
+  withFormulaCaller(ws, spec, (call) => computeFormulas(spec, rows, Date.now(), call))
+}
+
+/** One caller for a whole query's formulas, closed when they are done; none for a table without. */
+function withFormulaCaller(
+  ws: Workspace,
+  spec: TableSpec,
+  run: (call?: FormulaCall) => void,
+): void {
+  const hasFormulas = spec.columns.some((column) => column.type === 'formula')
+  const caller = hasFormulas ? openFormulaCaller(ws) : null
+  try {
+    run(caller?.call)
+  } finally {
+    caller?.close()
+  }
 }
 
 /**

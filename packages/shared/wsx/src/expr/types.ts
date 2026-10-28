@@ -61,7 +61,15 @@ export interface CallNode {
   args: ExprAst[]
 }
 
+/** A function the workspace defined in a `<Formula>` — only a formula column may call one. */
+export interface WorkspaceCallNode {
+  kind: 'fn'
+  name: string
+  args: ExprAst[]
+}
+
 export type ExprAst =
+  | WorkspaceCallNode
   | LiteralNode
   | IdentifierNode
   | ArgNode
@@ -89,6 +97,8 @@ export interface ExprScopeShape {
   args: string[]
   tables: Record<string, string[]>
   scopeColumns?: string[]
+  /** The workspace's own functions a formula may call. */
+  functions?: string[]
 }
 
 export interface ExprScope {
@@ -97,6 +107,13 @@ export interface ExprScope {
   rows: (table: string) => Row[] | undefined
   scopeRows?: Row[]
   now: number
+  /** Runs a workspace function; a scope without one refuses every workspace call. */
+  call?: (name: string, args: Scalar[]) => Scalar
+}
+
+export interface ExprParseOptions {
+  /** A formula column may call the workspace's own functions; a page may not. */
+  workspaceCalls?: boolean
 }
 
 export interface ExprLimits {
