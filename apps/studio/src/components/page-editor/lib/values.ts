@@ -122,3 +122,8 @@ export const STARTER_AUTOMATION = (table: string) => `function run(event) {
     act({ verb: 'table.update', table: '${table}', row: event.row.id, set: { status: 'todo' } })
   }
 }`
+
+/** What `/formula` drops in: a function any table's formula may call as with_tax(price). */
+export const STARTER_FORMULA = `function with_tax(amount: number, rate = 0.19) {
+  return Math.round(amount * (1 + rate) * 100) / 100
+}`

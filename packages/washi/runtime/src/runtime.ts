@@ -10,6 +10,7 @@ import {
   AgentHost,
   createStoredKeySource,
   forgetUnenforcedVisibility,
+  installFormulaFunctions,
   liftLooksIntoSource,
   reindexPages,
   watchAutomations,
@@ -49,6 +50,7 @@ export function createRuntime(options: RuntimeOptions): Runtime {
     liftLooksIntoSource(workspace)
     forgetUnenforcedVisibility(workspace)
     reindexPages(workspace)
+    installFormulaFunctions(workspace)
     const host = new AgentHost(workspace, keys)
     const workspaceId = workspace.id
     // What an automation changed reaches open pages like any other write.

@@ -116,6 +116,14 @@ function walk(node: ExprAst, ctx: ValidateContext): void {
     case 'call':
       for (const argument of node.args) walk(argument, ctx)
       break
+    case 'fn':
+      if (!(ctx.shape.functions ?? []).includes(node.name)) {
+        ctx.problems.push(
+          `unknown function \`${node.name}\` — the workspace's functions: ${list(ctx.shape.functions ?? [])}`,
+        )
+      }
+      for (const argument of node.args) walk(argument, ctx)
+      break
   }
 }
 

@@ -143,6 +143,7 @@ export type DataPick =
   | { kind: 'gallery'; files?: File[] }
   | { kind: 'script' }
   | { kind: 'widget' }
+  | { kind: 'formula' }
   | { kind: 'automation'; table: string }
 
 /** What `links.preview` read off a site, before it becomes a Bookmark's props. */

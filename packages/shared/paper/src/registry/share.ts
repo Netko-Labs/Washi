@@ -14,6 +14,7 @@ function aggregateTables(ast: ExprAst, out: Set<string>) {
       aggregateTables(ast.operand, out)
       return
     case 'call':
+    case 'fn':
       for (const arg of ast.args) aggregateTables(arg, out)
       return
     default:

@@ -119,6 +119,7 @@ function purge(ws: Workspace, ids: string[]): number {
       ws.sqlite.query('DELETE FROM sheet_links WHERE src = ?').run(id)
       ws.sqlite.query('DELETE FROM sheet_files WHERE src = ?').run(id)
       ws.sqlite.query('DELETE FROM sheet_automations WHERE src = ?').run(id)
+      ws.sqlite.query('DELETE FROM sheet_formulas WHERE src = ?').run(id)
       ws.sqlite.query('DELETE FROM sheets WHERE id = ?').run(id)
       ws.sqlite.query('DELETE FROM sheet_revisions WHERE sheet_id = ?').run(id)
       deleteSheetComments(ws, id)

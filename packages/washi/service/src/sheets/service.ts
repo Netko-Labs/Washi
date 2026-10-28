@@ -22,7 +22,7 @@ import {
   type WsxMissing,
   WsxParseError,
 } from '@washi/wsx'
-import { extractAutomations, scriptDiagnostics } from '../scripts/compile'
+import { extractAutomations, extractFormulas, scriptDiagnostics } from '../scripts/compile'
 import { guardWashiWrite, syncShare } from './access'
 import { accessOf, lookOf } from './look-of'
 
@@ -153,6 +153,7 @@ export function indexOf(root: ReturnType<typeof parse>) {
     refs: extractRefs(root),
     files: extractFiles(root),
     automations: extractAutomations(root),
+    formulas: extractFormulas(root),
   }
 }
 

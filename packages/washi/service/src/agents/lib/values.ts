@@ -80,6 +80,9 @@ step — write <Automation table="tasks" on="insert|update" title="…"> with a 
 function run(event) (event: { table, kind, row, before }); rows(query) reads, act({ verb: 'table.insert'
 | 'table.update' | 'table.delete', … }) changes rows. It runs on the server for everyone; its own
 writes never trigger automations; 100 ms per run.
+When formula columns keep needing the same arithmetic, define it once: <Formula name="with_tax">
+with a backtick string defining function with_tax(amount, rate = 0.19) { … } — then any formula may call
+with_tax(price). Pure: values in, a value out; the name is lowercase and never a built-in's.
 A hub page (Finances, a semester) lists what is under it: <Subpages layout="gallery"/> (live, in
 the sidebar's order; list · cards · gallery of covers) or <PageLink sheet="<id>"/> for one page —
 make the subpages with sheet_create and parentId, never a hand-kept list of Refs. <Include sheet/> draws

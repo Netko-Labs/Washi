@@ -8,7 +8,10 @@ export const scriptQueries = router({
     .input(
       z.object({
         source: z.string().max(SCRIPT_MAX_CHARS + 1),
-        entry: z.enum(['view', 'run']).optional(),
+        entry: z
+          .string()
+          .regex(/^[a-z][A-Za-z0-9_]{0,39}$/)
+          .optional(),
       }),
     )
     .query(({ input }) => compileScript(input.source, input.entry)),

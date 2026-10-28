@@ -56,6 +56,7 @@ export function eraseWorkspace(ws: Workspace): void {
     'sheet_links',
     'sheet_files',
     'sheet_automations',
+    'sheet_formulas',
     'sheets',
     'records',
     'user_tables',

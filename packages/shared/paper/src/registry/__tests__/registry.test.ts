@@ -179,3 +179,45 @@ describe('layout', () => {
     expect(text).toMatch(/ratio/)
   })
 })
+
+describe('the sandbox names', () => {
+  test('no primitive shadows a JavaScript global a script runs on', () => {
+    const globals = [
+      'Object',
+      'Function',
+      'Array',
+      'Error',
+      'Number',
+      'Boolean',
+      'String',
+      'Symbol',
+      'Math',
+      'JSON',
+      'Date',
+      'RegExp',
+      'Promise',
+      'Proxy',
+      'Reflect',
+      'Map',
+      'Set',
+      'WeakMap',
+      'WeakSet',
+      'BigInt',
+      'Intl',
+      'Iterator',
+    ]
+    expect(Object.keys(paperRegistry.components).filter((name) => globals.includes(name))).toEqual(
+      [],
+    )
+  })
+
+  test('a formula function takes a plain name, never a built-in one', () => {
+    const page = (name: string) =>
+      messages(
+        `<Sheet title="t"><Formula name="${name}">{\`function ${name}(x) { return x }\`}</Formula></Sheet>`,
+      )
+    expect(page('with_tax')).toBe('')
+    expect(page('sum')).toContain('built-in')
+    expect(page('Tax')).toContain('lowercase')
+  })
+})

@@ -48,7 +48,7 @@ export function checkListUse(spec: TableSpec, filters: Filter[], groupColumn?: s
  * names. No aggregates — a sum over other rows is a rollup, not a formula. Refused at definition,
  * so a typo is a message now, never a column of nulls later.
  */
-export function checkFormulas(spec: TableSpec): void {
+export function checkFormulas(spec: TableSpec, functions: string[] = []): void {
   const readable = [
     'id',
     ...spec.columns
@@ -59,7 +59,12 @@ export function checkFormulas(spec: TableSpec): void {
     if (column.type === 'formula' && column.expr) {
       let problems: string[]
       try {
-        problems = validateExpr(parseExpr(column.expr), { state: readable, args: [], tables: {} })
+        problems = validateExpr(parseExpr(column.expr, undefined, { workspaceCalls: true }), {
+          state: readable,
+          args: [],
+          tables: {},
+          functions,
+        })
       } catch (cause) {
         problems = [cause instanceof Error ? cause.message : String(cause)]
       }
