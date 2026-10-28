@@ -8,7 +8,8 @@ import { LockedBlock } from './locked-block'
 export function BlockRow({ block, numberAt, rootProps }: BlockRowProps) {
   return (
     <div className="group/block relative">
-      <div className="-left-14 absolute top-0 hidden h-7 items-center gap-0.5 font-sans group-focus-within/block:flex group-hover/block:flex">
+      {/* The whole gutter beside the block, full height: the pointer never leaves the row on its way. */}
+      <div className="-left-14 absolute inset-y-0 hidden w-14 items-start justify-end gap-0.5 pr-1.5 font-sans group-focus-within/block:flex group-hover/block:flex">
         <button
           type="button"
           aria-label="Add a block below"
