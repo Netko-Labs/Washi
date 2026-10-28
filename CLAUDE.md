@@ -431,7 +431,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   once: tsuru's `linkPreview` — the person's press is the consent for that one host, still https
   only, no private ranges, redirects re-checked, 512 KB — reads og/twitter/`<title>` tags; a site
   that will not answer becomes a bare link. The network call lives in tsuru and is wired in trpc,
-  never in `service` (C3).
+  never in `service` (C3). Each preview is a ledger row (`origin: 'sheet'`, `link_preview`, `auto`
+  — or `denied` with tsuru's reason), as every press that reaches out is.
 - **A page may hold a script (D96).** `<Script title>` keeps TypeScript/TSX as its text (a backtick
   string — WSX takes one with nothing interpolated, and writes multi-line text back that way). The
   server compiles it with `Bun.Transpiler` (`compileScript`: JSX → `h(Card, …)`, no imports or
