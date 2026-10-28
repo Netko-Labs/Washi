@@ -17,7 +17,10 @@ function serializeProps(props: Record<string, WsxValue>): string {
 /** JSX text collapses whitespace and reads `<{}>&` as markup, so such text goes in as a string. */
 function serializeText(value: string): string {
   const isPlain = /^[^\s<>{}&]([^\n<>{}&]*[^\s<>{}&])?$/.test(value) && !/\s{2}/.test(value)
-  return isPlain ? value : `{${JSON.stringify(value)}}`
+  if (isPlain) return value
+  // Lines read as lines: a backtick string, whenever nothing in it would need escaping there.
+  const isLines = value.includes('\n') && !/[`\\]|\$\{/.test(value)
+  return isLines ? `{\`${value}\`}` : `{${JSON.stringify(value)}}`
 }
 
 function serializeNode(node: WsxNode, depth: number): string {

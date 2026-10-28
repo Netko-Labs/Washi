@@ -28,6 +28,13 @@ function literalValue(node: t.Node): WsxValue {
   switch (node.type) {
     case 'StringLiteral':
       return node.value
+    // A backtick string with nothing interpolated is a string — how a script or a code block keeps
+    // its lines readable in source. One `${…}` would be an expression, so it is refused.
+    case 'TemplateLiteral':
+      if (node.expressions.length > 0) {
+        return fail('a backtick string may not interpolate — write \\${ to keep one', node)
+      }
+      return node.quasis[0]?.value.cooked ?? ''
     case 'NumericLiteral':
       return node.value
     case 'BooleanLiteral':

@@ -123,6 +123,23 @@ describe('extract', () => {
   })
 })
 
+describe('backtick strings', () => {
+  test('one with nothing interpolated is a string, and multi-line text is written back as one', () => {
+    const root = parse('<Sheet title="t"><Code>{`line one\n  line <two>`}</Code></Sheet>')
+    const code = root.children[0]
+    expect(code?.kind === 'element' && code.children[0]).toEqual({
+      kind: 'text',
+      value: 'line one\n  line <two>',
+    })
+    expect(serialize(root)).toContain('{`line one\n  line <two>`}')
+  })
+
+  test('one that interpolates is an expression, and refused', () => {
+    const interpolated = ['<Sheet title="t"><Code>{`a $', '{b}`}</Code></Sheet>'].join('')
+    expect(() => parse(interpolated)).toThrow(WsxParseError)
+  })
+})
+
 describe('links between pages', () => {
   test('every upload a page uses is found by its key, wherever it sits', () => {
     const root = parse(

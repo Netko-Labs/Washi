@@ -22,6 +22,7 @@ import {
   type WsxMissing,
   WsxParseError,
 } from '@washi/wsx'
+import { scriptDiagnostics } from '../scripts/compile'
 import { guardWashiWrite, syncShare } from './access'
 import { accessOf, lookOf } from './look-of'
 
@@ -36,7 +37,7 @@ export interface WsxCheck {
 export function checkSource(source: string): WsxCheck {
   try {
     const root = parse(source)
-    const diagnostics = validate(root, paperRegistry)
+    const diagnostics = [...validate(root, paperRegistry), ...scriptDiagnostics(root)]
     return { ok: !hasErrors(diagnostics), diagnostics, missing: extractMissing(root) }
   } catch (error) {
     if (error instanceof WsxParseError) {

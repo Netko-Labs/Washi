@@ -1,7 +1,7 @@
 import type { HistoryQuery, InkQuery, QueryResult, TableSpec } from '@washi/ink'
 import type { WsxElement } from '@washi/wsx'
 import { createContext, type ReactNode, useContext } from 'react'
-import type { ActionRef, PageCard } from './lib/types'
+import type { ActionRef, CompiledScript, PageCard } from './lib/types'
 
 /**
  * The capability surface a rendered sheet may touch. The host app wires these
@@ -24,6 +24,8 @@ export interface PaperHost {
   backlinks?(id: string): Promise<PageCard[]>
   /** Another page's parsed source, for `<Include>`; null when the reader cannot open it. */
   loadSheet?(id: string): Promise<{ title: string; root: WsxElement } | null>
+  /** A `<Script>`'s TSX compiled for the sandbox; a host that cannot compile leaves it out. */
+  compileScript?(source: string): Promise<CompiledScript>
   /** Whether the workspace lists `host` for embeds; without it only built-in providers play. */
   embedAllowed?(host: string): Promise<boolean>
   /** Makes a page under `parentId` and opens it, as Notion's + New page does. */

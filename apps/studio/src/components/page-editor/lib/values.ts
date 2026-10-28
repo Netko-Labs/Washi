@@ -95,3 +95,15 @@ export const UPLOAD_OPTIONS = [
   { as: 'audio', label: 'Audio', words: 'audio sound music recording' },
   { as: 'file', label: 'File', words: 'file document pdf attachment upload' },
 ] as const
+
+/** What `/script` drops in: a counter that shows the three things a script does. */
+export const STARTER_SCRIPT = `function view() {
+  const [count, setCount] = useState('count', 0)
+  const open = useRows({ table: 'tasks' }).length
+  return (
+    <Card title="A script">
+      <Text>Pressed {count} times · {open} rows</Text>
+      <Button onPress={() => setCount(count + 1)}>Press</Button>
+    </Card>
+  )
+}`

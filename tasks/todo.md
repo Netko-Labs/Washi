@@ -13,8 +13,9 @@ Specs were dropped for a rewrite (#118); this list is the plan until they return
 - [x] Bookmark (a link as a card) — D94
 - [x] File · Video · Audio + wider uploads — D95
 - [x] Gallery (pictures in a grid, a lightbox) — D95
-- [ ] scripting: script blocks in QuickJS (worker), then server hooks on the same engine; iframe
-      widgets later behind an owner switch — waiting on: authors, inline vs named, language
+- [x] scripting: `<Script>` TSX inline in a page, any member writes, sandboxed in QuickJS — D96
+- [ ] scripting, next: server hooks on the same engine (on row insert, custom formula functions);
+      an in-editor code view for a Script; iframe widgets behind an owner switch
 
 # D72+ · data that computes — Washi's expense-tracker report (2026-10-27)
 

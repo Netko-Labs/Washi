@@ -30,6 +30,9 @@ export const PAGE_SPECS: Record<string, ComponentSpec> = {
     'none',
     { hints: { url: 'the address is href, https only' } },
   ),
+  Script: p({ title: z.string().max(80).optional() }, 'text', {
+    hints: { code: 'the TSX is the Script’s children: a backtick string with a function view()' },
+  }),
   Include: p({ sheet: pageId }, 'none', {
     hints: { children: 'Include draws the other page itself; it takes no children' },
   }),

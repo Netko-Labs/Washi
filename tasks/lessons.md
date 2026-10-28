@@ -44,3 +44,8 @@ closed #65 the moment its base vanished, and a closed PR cannot be retargeted. S
 #21. Rule: **retarget every stacked PR to main (`gh pr edit N --base main`) before merging the
 PR under it** — or do not delete the base branch until the stack is flat.
 
+
+## `git commit -am` leaves new files behind (2026-10-28)
+A review fix moved a type into a new `types.ts` and committed with `-am`; the file stayed untracked, the
+local typecheck passed against the working tree, and CI failed on #130. After any fix that creates a file,
+`git status --short` before committing, or `git add -A`.

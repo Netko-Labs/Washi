@@ -29,6 +29,7 @@ import { Audio, File, Video } from './components/media'
 import { Backlinks, Include, Outline, PageLink, Subpages } from './components/pages'
 import { Redact } from './components/redact'
 import { Roadmap } from './components/roadmap'
+import { Script } from './components/script'
 import { Select } from './components/select'
 import { Callout, Card, Figure, Hero } from './components/surface'
 import {
@@ -183,6 +184,13 @@ function renderElement(node: WsxElement, ctx: Ctx): ReactNode {
       return createElement(Source, { ...p, number: ctx.numbers.get(node) ?? 0 } as never, ...kids)
     case 'Ref':
       return createElement(Ref, p as never, ...(kids.length ? kids : []))
+    case 'Script':
+      // What the script returns is drawn here, inside this page's own state and data.
+      return createElement(Script, {
+        ...p,
+        source: node.children.map((child) => (child.kind === 'text' ? child.value : '')).join(''),
+        render: (drawn: WsxElement) => renderChildren(drawn.children, ctx),
+      } as never)
     case 'Include':
       return createElement(Include, {
         ...p,

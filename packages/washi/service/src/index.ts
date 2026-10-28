@@ -50,6 +50,8 @@ export {
   unreadReminders,
   updateReminderRule,
 } from './reminders/service'
+export { compileScript, SCRIPT_MAX_CHARS } from './scripts/compile'
+export type { CompiledScript } from './scripts/types'
 export {
   canRead,
   guardWashiWrite,
