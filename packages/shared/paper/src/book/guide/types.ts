@@ -35,3 +35,11 @@ export interface CompiledSheet {
   root: WsxElement | null
   errors: string[]
 }
+
+/** What a zod check carries that a bound is read from. */
+export interface CheckDef {
+  check: string
+  minimum?: number
+  maximum?: number
+  value?: unknown
+}

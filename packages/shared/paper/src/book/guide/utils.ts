@@ -9,7 +9,7 @@ import {
 import { z } from 'zod'
 import { CLASS_ALLOWLIST, paperRegistry } from '../../registry'
 import { knobsFor } from '../knobs'
-import type { CompiledSheet, Limit, Placement, PropRow } from './types'
+import type { CheckDef, CompiledSheet, Limit, Placement, PropRow } from './types'
 import { PROP_TYPES } from './values'
 
 function bareOf(schema: z.core.$ZodType): z.core.$ZodType {
@@ -28,12 +28,7 @@ function bounds(schema: z.core.$ZodType, unit: string): string {
   let min: number | undefined
   let max: number | undefined
   for (const check of schema._zod.def.checks ?? []) {
-    const def = check._zod.def as {
-      check: string
-      minimum?: number
-      maximum?: number
-      value?: unknown
-    }
+    const def = check._zod.def as CheckDef
     if (def.check === 'min_length') min = def.minimum
     if (def.check === 'max_length') max = def.maximum
     if (def.check === 'greater_than' && typeof def.value === 'number') min = def.value
