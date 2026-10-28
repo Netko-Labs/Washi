@@ -21,6 +21,11 @@ export const SUMMARIES: Record<string, string> = {
   Stack: 'Lays blocks top to bottom with an even gap.',
   Grid: 'A twelve-column field; children take span. One column under 400px.',
   Divider: 'A quiet rule between parts of a page.',
+  Columns:
+    'Notion’s columns: Columns side by side, each its ratio’s share; they stack under 560px.',
+  Column: 'One column inside Columns; ratio 1–6 is its share of the width.',
+  Bento: 'A home of tiles packed densely, 3, 4 or 6 across; two across under 720px, one under 400.',
+  Tile: 'One cell of a Bento: square, wide, tall, big or a banner across the row.',
   Title: 'A heading, level 1 to 3.',
   Text: 'A paragraph; lead makes it the page’s intro.',
   List: 'Bullets, numbers or checks around Items.',
@@ -77,6 +82,34 @@ export const SUMMARIES: Record<string, string> = {
 
 /** Primitives that only work together; each source validates and renders over the book's `tasks`. */
 export const RECIPES: Recipe[] = [
+  {
+    id: 'home',
+    title: 'A home in tiles',
+    why: 'A command centre: figures, today, the board and the way in, each a tile sized by what it holds.',
+    uses: ['Bento', 'Tile', 'Stat', 'Agenda', 'Board'],
+    source: `<Sheet title="Home" feel="board">
+  <Bento width="wide">
+    <Tile shape="big" title="This week"><Agenda bind={{ table: 'tasks' }} date="due" title="title" badge="priority" /></Tile>
+    <Tile title="Open"><Stat label="Tasks" expr="count(tasks where status != 'done')" /></Tile>
+    <Tile title="Points"><Stat label="Points" expr="sum(tasks.points)" trend="up" /></Tile>
+    <Tile shape="wide" variant="filled" tone="accent" title="Reminders"><List><Item>Notes due Friday</Item><Item>Review at 17:00</Item></List></Tile>
+    <Tile shape="banner" title="Board"><Board bind={{ table: 'tasks' }} groupBy="status" groups={['todo', 'doing', 'done']} title="title" /></Tile>
+  </Bento>
+</Sheet>`,
+  },
+  {
+    id: 'columns',
+    title: 'A page in three columns',
+    why: 'Notion’s layout: a narrow rail, the work in the middle, the glance on the right.',
+    uses: ['Columns', 'Column', 'Card', 'Table', 'Stat'],
+    source: `<Sheet title="Semester">
+  <Columns width="wide">
+    <Column><Card title="Navigation"><List><Item>Assignments</Item><Item>Planners</Item><Item>Study room</Item></List></Card></Column>
+    <Column ratio={3}><Table bind={{ table: 'tasks', limit: 5 }} columns={['title', 'status', 'due']} /></Column>
+    <Column ratio={1}><Stat label="Open" expr="count(tasks where status != 'done')" /><Callout tone="accent" title="Reminders">First day of classes.</Callout></Column>
+  </Columns>
+</Sheet>`,
+  },
   {
     id: 'dashboard',
     title: 'A dashboard',

@@ -26,6 +26,24 @@ export const SPECIMENS: Record<string, Specimen> = {
       '<Card span={8} variant="outline"><Text size="sm">span 8</Text></Card><Card span={4} variant="filled"><Text size="sm">span 4</Text></Card><Card span={4} variant="filled"><Text size="sm">4</Text></Card><Card span={4} variant="filled"><Text size="sm">4</Text></Card><Card span={4} variant="filled"><Text size="sm">4</Text></Card>',
   },
   Divider: {},
+  Columns: {
+    children:
+      '<Column><Card title="Rail"><Text size="sm">Narrow.</Text></Card></Column><Column ratio={2}><Card title="Main"><Text size="sm">Twice as wide.</Text></Card></Column>',
+  },
+  Column: {
+    props: { ratio: 2 },
+    children: '<Card title="This column"><Text size="sm">Two shares.</Text></Card>',
+    wrap: '<Columns><Column><Card title="Beside"><Text size="sm">One share.</Text></Card></Column><Here /></Columns>',
+  },
+  Bento: {
+    children:
+      '<Tile shape="big" title="Big"><Stat label="Open" value="12" /></Tile><Tile title="Square"><Text size="sm">One cell.</Text></Tile><Tile shape="tall" title="Tall"><Text size="sm">Two rows.</Text></Tile><Tile title="Square"><Text size="sm">One cell.</Text></Tile><Tile shape="banner" variant="filled" tone="accent" title="Banner"><Text size="sm">The whole row.</Text></Tile>',
+  },
+  Tile: {
+    props: { shape: 'wide', title: 'Wide' },
+    children: '<Text size="sm">Two cells across.</Text>',
+    wrap: '<Bento><Here /><Tile title="Beside"><Text size="sm">One.</Text></Tile></Bento>',
+  },
 
   Title: { props: { level: 1 }, children: 'Weekly review' },
   Text: {

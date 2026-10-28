@@ -21,6 +21,7 @@ import { Form } from './components/form'
 import { Divider, Grid, Row, Section, SheetFrame, Stack } from './components/frame'
 import { Button, Compose, Field, Slider, Switch, Task } from './components/input'
 import { Chip, Mascot, Missing } from './components/kit'
+import { Bento, Column, Columns, Tile } from './components/layout'
 import { Redact } from './components/redact'
 import { Roadmap } from './components/roadmap'
 import { Select } from './components/select'
@@ -89,6 +90,10 @@ const COMPONENTS: Record<string, ComponentType<never>> = {
   Stack,
   Grid,
   Divider,
+  Columns,
+  Column,
+  Bento,
+  Tile,
   Title,
   Text,
   List,

@@ -150,7 +150,7 @@ export const STYLE_PROP_HINTS: Record<string, string> = {
   fontSize: 'use size',
   weight: 'use emphasis',
   width:
-    'only wide blocks take width (page · wide · full): Board Agenda Table Database Roadmap Chart Canvas Grid — elsewhere use span inside Grid',
+    'only wide blocks take width (page · wide · full): Board Agenda Table Database Roadmap Chart Canvas Grid Columns Bento — elsewhere use span inside Grid',
   height: 'not addressable',
   margin: 'rhythm belongs to the parent — use Section, Stack or gap',
   padding: 'padding belongs to the component — use size',

@@ -26,7 +26,17 @@
   --reach: max(100%, var(--sheet-w) - 2 * var(--pad-x));
 }
 /* Inside a card, a grid cell or a drawer the column is the box itself: stay in it. */
-:is(.wsx-card, .wsx-grid, .wsx-stack, .wsx-row, .wsx-callout, .wsx-reveal, .wsx-drawer)
+:is(
+    .wsx-card,
+    .wsx-grid,
+    .wsx-stack,
+    .wsx-row,
+    .wsx-callout,
+    .wsx-reveal,
+    .wsx-drawer,
+    .wsx-cols,
+    .wsx-bento
+  )
   :is(.wsx-section, .wsx-tab)
   > [data-width] {
   width: auto;

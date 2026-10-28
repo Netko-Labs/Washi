@@ -32,7 +32,8 @@ and \`access\` say who reads the page: only a person changes them, so keep them 
 <Redact reason="…">…</Redact> wraps what a shared link must not show, and data views take
 redact={["column"]}; on a public page keep every one. Never pin light/dark — readers own it.
 
-Primitives — Frame: Section Row Stack Grid Divider · Text: Title(level) Text(lead) List(marker)/Item
+Primitives — Frame: Section Row Stack Grid Divider Columns/Column(ratio 1–6) Bento(columns 3·4·6)/Tile(shape
+square·wide·tall·big·banner, title) · Text: Title(level) Text(lead) List(marker)/Item
 Quote Code Pair(term) Note Source Money(value|expr, currency) + inline Mark Kbd Ref(sheet) Tag ·
 Surface: Card(title) Callout(title) Hero(title subtitle align) Figure(https src, alt) · Data out:
 Repeat(bind) Agenda(bind date title time end badge add addLabel view state — a week or a month) Table(bind columns) Stat(value|expr label hint trend) Chart(bind kind) Timeline/Step
@@ -60,8 +61,10 @@ for reading. For rows with a date (events, bills, deadlines) a week is an <Agend
 date="date" title="title" time="start" end="end" badge="kind" add={['title', 'start', 'end', 'kind']}
 addLabel="Add event" />: seven days, ‹ › Today, each row opens in place, each day's + opens the form on that
 day. view="month" makes it a month grid; with state="picked_month" it shows that key's YYYY-MM and
-‹ › write it, so it moves with a month <Select>. Never lay out one Section per weekday. A wide block (Board Agenda Table Database Roadmap Chart
-Canvas Grid) takes width="wide" (a little past the text column) or "full" (the sheet's whole width):
+‹ › write it, so it moves with a month <Select>. Never lay out one Section per weekday. Columns lay a page out Notion's way (a narrow
+rail, the work, a glance; they stack under 560px); a Bento is a home of tiles — a big tile for the
+week, squares for figures, a banner for a board. A wide block (Board Agenda Table Database Roadmap Chart
+Canvas Grid Columns Bento) takes width="wide" (a little past the text column) or "full" (the sheet's whole width):
 give a board or a week full when it is what the page is for; text always stays in the column. A Button insert is for a row with fixed values. defaults fill columns too, literal or { state } (a
 stored month column can follow the picker). Fields and defaults name stored columns only — never a
 formula or rollup; the form refuses one in words.

@@ -162,3 +162,20 @@ describe('the page theme', () => {
     )
   })
 })
+
+describe('layout', () => {
+  test('columns hold columns, a bento holds tiles, each only inside its own', () => {
+    expect(
+      messages(
+        `<Sheet title="t"><Columns width="wide"><Column ratio={2}><Text>a</Text></Column><Column><Text>b</Text></Column></Columns><Bento columns={3}><Tile shape="big" title="x"><Text>c</Text></Tile><Tile shape="banner"><Text>d</Text></Tile></Bento></Sheet>`,
+      ),
+    ).toBe('')
+    const text = messages(
+      `<Sheet title="t"><Column><Text>a</Text></Column><Tile><Text>b</Text></Tile><Bento><Tile shape="huge"><Text>c</Text></Tile></Bento><Columns><Column ratio={9}><Text>d</Text></Column></Columns></Sheet>`,
+    )
+    expect(text).toContain('<Column> is only legal inside <Columns>')
+    expect(text).toContain('<Tile> is only legal inside <Bento>')
+    expect(text).toContain('square · wide · tall · big · banner')
+    expect(text).toMatch(/ratio/)
+  })
+})

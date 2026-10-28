@@ -1,0 +1,87 @@
+/* Columns: Notion's side by side. Each takes its ratio's share and stacks on a narrow sheet. */
+.wsx-cols {
+  display: flex;
+  gap: var(--gap);
+  align-items: flex-start;
+}
+.wsx-col {
+  flex: var(--ratio, 1) 1 0;
+  min-width: 0;
+}
+/* A column or a tile is the width its blocks reflow to, as the sheet is for the page (D80). */
+.wsx-col,
+.wsx-tile {
+  container: wsx / inline-size;
+}
+.wsx-col > * + * {
+  margin-top: var(--rhythm);
+}
+@container wsx (max-width: 559px) {
+  .wsx-cols {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* Bento: tiles packed densely on a cell grid; a shape is cells, never pixels. */
+.wsx-bento {
+  --cols: 4;
+  display: grid;
+  gap: var(--gap);
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  grid-auto-rows: minmax(132px, auto);
+  grid-auto-flow: row dense;
+}
+.wsx-bento[data-columns="3"] {
+  --cols: 3;
+}
+.wsx-bento[data-columns="6"] {
+  --cols: 6;
+}
+.wsx-tile {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.wsx-tile[data-shape="wide"] {
+  grid-column: span 2;
+}
+.wsx-tile[data-shape="tall"] {
+  grid-row: span 2;
+}
+.wsx-tile[data-shape="big"] {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+.wsx-tile[data-shape="banner"] {
+  grid-column: 1 / -1;
+}
+.wsx-tile-title {
+  margin: 0 0 calc(var(--rhythm) * 0.6);
+  font-size: 0.78em;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+}
+.wsx-tile-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--rhythm);
+  min-height: 0;
+}
+@container wsx (max-width: 719px) {
+  .wsx-bento[data-columns] {
+    --cols: 2;
+  }
+}
+@container wsx (max-width: 400px) {
+  .wsx-bento[data-columns] {
+    --cols: 1;
+    grid-auto-rows: auto;
+  }
+  .wsx-tile[data-shape] {
+    grid-column: auto;
+    grid-row: auto;
+  }
+}

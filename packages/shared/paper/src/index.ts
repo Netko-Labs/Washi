@@ -34,6 +34,7 @@ export {
 } from './components/frame'
 export { Button, Compose, Field, Slider, Switch, Task } from './components/input'
 export { Chip, Mascot, Missing } from './components/kit'
+export { Bento, Column, Columns, Tile } from './components/layout'
 export { Redact } from './components/redact'
 export { Roadmap } from './components/roadmap'
 export { Select } from './components/select'
