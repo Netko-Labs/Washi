@@ -19,6 +19,11 @@ export const PAGE_SPECS: Record<string, ComponentSpec> = {
     'none',
     { hints: { url: 'the address is src, https only' } },
   ),
+  Include: p({ sheet: pageId }, 'none', {
+    hints: { children: 'Include draws the other page itself; it takes no children' },
+  }),
+  Backlinks: p({ of: pageId.optional(), empty: z.string().max(160).optional() }, 'none'),
+  Outline: p({ title: z.string().max(80).optional() }, 'none'),
   Subpages: p(
     {
       of: pageId.optional(),

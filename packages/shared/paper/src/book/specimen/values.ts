@@ -27,6 +27,12 @@ export const SPECIMENS: Record<string, Specimen> = {
   },
   Divider: {},
   PageLink: { props: { sheet: 'budget' } },
+  Include: { props: { sheet: 'budget' } },
+  Backlinks: {},
+  Outline: {
+    props: { title: 'On this page' },
+    wrap: '<Here /><Title level={2}>Fixed costs</Title><Text>Rent first.</Text><Title level={3}>Phone</Title><Text>Then the rest.</Text>',
+  },
   Embed: { props: { src: 'https://www.youtube.com/watch?v=jNQXAC9IVRw', title: 'Me at the zoo' } },
   Subpages: { props: { layout: 'gallery' } },
   Columns: {

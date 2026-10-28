@@ -123,6 +123,13 @@ describe('extract', () => {
 })
 
 describe('links between pages', () => {
+  test('a page link and an include point at their page, so backlinks count them', () => {
+    const root = parse(
+      `<Sheet title="Hub"><PageLink sheet="budget" /><Include sheet="income" /><Text>x</Text></Sheet>`,
+    )
+    expect(extractRefs(root).sort()).toEqual(['budget', 'income'])
+  })
+
   test('a canvas node that opens a page links to it, like a Ref', () => {
     const root = parse(
       '<Sheet title="t"><Text><Ref sheet="a">A</Ref></Text><Canvas><Node id="n" x={0} y={0} page="b">B</Node></Canvas></Sheet>',

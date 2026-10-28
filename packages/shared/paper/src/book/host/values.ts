@@ -10,6 +10,13 @@ export const BOOK_PAGES = [
   { id: 'travel', title: 'Travel', icon: '✈️', cover: 'picture:fjord' },
 ]
 
+/** What an `<Include>` in the book draws: another page's blocks. */
+export const INCLUDED_SOURCE = `<Sheet title="Monthly budget">
+  <Title level={2}>Fixed costs</Title>
+  <Text>Rent, power and the phone, paid on the first.</Text>
+  <Stat label="Open tasks" expr="count(tasks where status != 'done')" />
+</Sheet>`
+
 export const PEOPLE = [
   { id: 'p1', name: 'Peje' },
   { id: 'p2', name: 'Mira Kaneko' },

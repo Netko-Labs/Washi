@@ -65,7 +65,9 @@ addLabel="Add event" />: seven days, ‹ › Today, each row opens in place, eac
 day. view="month" makes it a month grid; with state="picked_month" it shows that key's YYYY-MM and
 ‹ › write it, so it moves with a month <Select>. Never lay out one Section per weekday. A hub page (Finances, a semester) lists what is under it: <Subpages layout="gallery"/> (live, in
 the sidebar's order; list · cards · gallery of covers) or <PageLink sheet="<id>"/> for one page —
-make the subpages with sheet_create and parentId, never a hand-kept list of Refs. Columns lay a page out Notion's way (a narrow
+make the subpages with sheet_create and parentId, never a hand-kept list of Refs. <Include sheet/> draws
+another page's blocks live (never nested), <Backlinks/> lists who links here, <Outline title/> the
+page's own headings. Columns lay a page out Notion's way (a narrow
 rail, the work, a glance; they stack under 560px); a Bento is a home of tiles — a big tile for the
 week, squares for figures, a banner for a board. A wide block (Board Agenda Table Database Roadmap Chart
 Canvas Grid Columns Bento) takes width="wide" (a little past the text column) or "full" (the sheet's whole width):

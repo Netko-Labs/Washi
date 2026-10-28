@@ -1,4 +1,5 @@
 import type { PaperHost } from '@washi/paper'
+import { parse } from '@washi/wsx'
 import { api } from '../api'
 import { childrenOf } from '../page-tree'
 import { useLiveStore } from '../stores/live/live-store'
@@ -68,6 +69,19 @@ export const paperHost: PaperHost = {
     useSheetsStore.subscribe((state, previous) => {
       if (state.sheets !== previous.sheets) listener()
     }),
+
+  backlinks: async (id) =>
+    (await api.sheets.backlinks.query({ id })).map(({ id: page, title, icon, cover }) => ({
+      id: page,
+      title,
+      icon,
+      cover,
+    })),
+
+  loadSheet: async (id) => {
+    const sheet = await api.sheets.get.query({ id }).catch(() => null)
+    return sheet ? { title: sheet.title, root: parse(sheet.source) } : null
+  },
 
   embedAllowed: async (host) => (await listedEmbedHosts()).includes(host),
 
