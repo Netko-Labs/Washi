@@ -1,4 +1,4 @@
-import type { SheetAccess, SheetLook } from '@washi/domain'
+import type { SheetAccess, SheetLook, SheetLookPatch } from '@washi/domain'
 import type { WsxElement } from '@washi/wsx'
 
 /** A page's icon and cover are its `<Sheet>` props (D64); the columns only cache them. */
@@ -10,7 +10,7 @@ export function lookOf(root: WsxElement): SheetLook {
   return { icon: read('icon'), cover: read('cover') }
 }
 
-export function withLook(root: WsxElement, look: Partial<SheetLook>): WsxElement {
+export function withLook(root: WsxElement, look: SheetLookPatch): WsxElement {
   const props = { ...root.props }
   for (const [name, value] of Object.entries(look)) {
     if (value === undefined) continue

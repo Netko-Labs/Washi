@@ -45,6 +45,8 @@ export interface SheetLook {
   icon: string | null
   cover: string | null
 }
+/** `<Sheet>` look props to set; null drops one, undefined leaves it. */
+export type SheetLookPatch = Partial<Record<'icon' | 'cover' | 'theme', string | null>>
 /** Who reads a page (D65): `<Sheet visibility access>`, cached like the look. */
 export interface SheetAccess {
   visibility: SheetSummary['visibility']
@@ -75,6 +77,12 @@ export const sheetMetaPatchSchema = z.object({
   cover: z
     .string()
     .regex(/^(preset|picture|file):[a-z0-9-]{1,48}$/)
+    .nullable()
+    .optional(),
+  // A registry theme id, or `ws:<slug>` for one the workspace made; the registry has the last word.
+  theme: z
+    .string()
+    .regex(/^(ws:)?[a-z][a-z0-9-]{0,40}$/)
     .nullable()
     .optional(),
   fullWidth: z.boolean().optional(),

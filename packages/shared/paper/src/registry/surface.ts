@@ -18,6 +18,13 @@ export const THEME_IDS = [
   'kraft',
   'yukiwa',
   'yozora',
+  'catppuccin',
+  'rose-pine',
+  'nord',
+  'gruvbox',
+  'tokyo-night',
+  'kanagawa',
+  'everforest',
 ] as const
 
 export const variantSchema = z.enum(VARIANTS)

@@ -4,6 +4,7 @@ import {
   IconCopy,
   IconCornerDownRight,
   IconCursorText,
+  IconPalette,
   IconTrash,
 } from '@tabler/icons-react'
 import { useSheetsStore } from '@washi/ui'
@@ -44,6 +45,10 @@ export function PageMenuList({ sheet, onMode, onDone, compact }: PageMenuListPro
             }`}
           />
         </span>
+      </button>
+      <button type="button" onClick={() => onMode('theme')} className={ITEM}>
+        <IconPalette className="size-4 text-muted-foreground" />
+        Theme
       </button>
       <button
         type="button"

@@ -16,7 +16,7 @@ import { checkSource, requireSheet, updateSheetFromSource } from './service'
 const LIFTED = 'look_in_source'
 
 /**
- * Title and width stay metadata; an icon or a cover is written into the page itself, so it
+ * Title and width stay metadata; an icon, a cover or a theme is written into the page itself, so it
  * merges, shows in source, and counts as the person's edit.
  */
 export function updateSheetMetaAndLook(
@@ -24,10 +24,10 @@ export function updateSheetMetaAndLook(
   id: string,
   patch: SheetMetaPatch,
 ): SheetDetail {
-  const { icon, cover, title, fullWidth } = patch
-  if (icon !== undefined || cover !== undefined) {
+  const { icon, cover, theme, title, fullWidth } = patch
+  if (icon !== undefined || cover !== undefined || theme !== undefined) {
     const sheet = requireSheet(ws, id)
-    const source = serialize(withLook(parse(sheet.source), { icon, cover }))
+    const source = serialize(withLook(parse(sheet.source), { icon, cover, theme }))
     updateSheetFromSource(ws, id, { title: sheet.title, tags: sheet.tags, source })
   }
   if (title !== undefined || fullWidth !== undefined) updateSheetMeta(ws, id, { title, fullWidth })
