@@ -16,17 +16,35 @@ function read(from: HTMLElement): OutlineEntry[] {
     .filter((entry) => entry.text)
 }
 
-/** The page's headings as drawn, re-read whenever the page around the outline changes. */
+const signature = (entries: OutlineEntry[]) =>
+  entries.map((entry) => `${entry.level}:${entry.text}`).join('\n')
+
+/** The page's headings as drawn: re-read at most once a frame, set only when they changed. */
 export function useOutline(ref: RefObject<HTMLElement | null>): OutlineEntry[] {
   const [entries, setEntries] = useState<OutlineEntry[]>([])
   useEffect(() => {
     const at = ref.current
     const page = at?.closest('[data-sheet-id]') ?? at?.closest('.wsx')
     if (!at || !page) return
-    setEntries(read(at))
-    const watch = new MutationObserver(() => setEntries(read(at)))
+    let shown = ''
+    let frame = 0
+    const refresh = () => {
+      frame = 0
+      const next = read(at)
+      const key = signature(next)
+      if (key === shown) return
+      shown = key
+      setEntries(next)
+    }
+    refresh()
+    const watch = new MutationObserver(() => {
+      if (!frame) frame = requestAnimationFrame(refresh)
+    })
     watch.observe(page, { childList: true, subtree: true, characterData: true })
-    return () => watch.disconnect()
+    return () => {
+      watch.disconnect()
+      cancelAnimationFrame(frame)
+    }
   }, [ref])
   return entries
 }
