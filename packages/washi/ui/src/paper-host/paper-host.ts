@@ -9,9 +9,14 @@ let listed: { at: number; hosts: Promise<string[]> } | null = null
 /** The workspace's embed list, asked once a minute at most; every embed on a page shares it. */
 function listedEmbedHosts(): Promise<string[]> {
   if (!listed || Date.now() - listed.at > 60_000) {
-    listed = { at: Date.now(), hosts: api.embeds.hosts.query().catch(() => []) }
+    const asked = { at: Date.now(), hosts: api.embeds.hosts.query() }
+    listed = asked
+    // A failed read is not a list: the next embed asks again instead of trusting an empty one.
+    asked.hosts.catch(() => {
+      if (listed === asked) listed = null
+    })
   }
-  return listed.hosts
+  return listed.hosts.catch(() => [])
 }
 
 /** A new workspace, or a changed list: the next embed asks again. */
