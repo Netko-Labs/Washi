@@ -4,7 +4,7 @@ Specs were dropped for a rewrite (#118); this list is the plan until they return
 
 - [x] themes: a person picks (⋯ → Theme), seven ported palettes, workspace themes + shadcn/JSON import — #119 #120
 - [x] layout: `Columns`/`Column`, `Bento`/`Tile` in paper — D89 · #121
-- [ ] layout in the editor: drag a block beside another makes columns; drag the gap resizes; blocks
+- [x] layout in the editor: drag a block beside another makes columns; drag the gap resizes; blocks
       inside a column edit like the top level
 - [x] hub pages: `Subpages` (list · cards · gallery, live) + `PageLink`; `/` New page inside — D90
 - [ ] Database `gallery` view: cards with a cover column, like Notion's

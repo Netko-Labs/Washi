@@ -389,7 +389,11 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   · big · banner; 2 across under 720px, 1 under 400). Specs in `registry/layout-specs.ts`, CSS in
   `css/layout-kit.css` (`.wsx-cols`/`.wsx-col` — `.wsx-columns` is the column chart's). A Column and
   a Tile are each a `wsx` container, so what sits in one reflows to its own width. Both take `width`.
-  The editor keeps them as locked blocks for now.
+  The editor edits Columns in place (a `ColumnsBlock`: each column its own run of blocks; every store
+  op finds its block's list through `locate`/`writeList`, then `tidy` drops an emptied column and
+  unwraps a lone one). Drag ⋮⋮ onto a block's outer fifth to put it beside (a new row of columns,
+  or a new column, ≤5), the rest drops above or below (`moveBlock`); the gap between columns drags
+  or takes ← → (`resizeColumns`, shares in sixths). Rows of columns never nest; a Bento stays locked.
 - **A hub page lists its pages (D90).** `<Subpages of? layout="list|cards|gallery">` draws a page's
   children live (`PaperHost.listPages` + `onPagesChange` over the sheets store, so a reader never sees
   one they cannot open; `pageId` is the page being drawn; `newPage` gives + New page), `<PageLink

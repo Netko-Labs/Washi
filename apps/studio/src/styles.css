@@ -42,6 +42,21 @@ body {
   padding: 0;
 }
 
+/* Columns while editing stack as paper's do (D89). */
+.page-editor-cols {
+  display: flex;
+  align-items: flex-start;
+}
+@container wsx (max-width: 559px) {
+  .page-editor-cols {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .page-editor-gap {
+    display: none;
+  }
+}
+
 /*
  * iOS Safari zooms the page into any field under 16px when it focuses, and never zooms back.
  * A floor on phones keeps the layout still; capping the viewport's scale would do the same but

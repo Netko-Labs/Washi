@@ -30,7 +30,57 @@ export interface LockedBlock {
   node: WsxElement
 }
 
-export type Block = TextBlock | LockedBlock
+/** One column of a Columns block: its share of the width and its own run of blocks. */
+export interface ColumnSlot {
+  id: string
+  ratio: number
+  props: Record<string, WsxValue>
+  blocks: Block[]
+}
+
+/** Notion's columns, edited in place: each column types like the page. Never nested. */
+export interface ColumnsBlock {
+  id: string
+  kind: 'columns'
+  props: Record<string, WsxValue>
+  columns: ColumnSlot[]
+}
+
+export type Block = TextBlock | LockedBlock | ColumnsBlock
+
+/** Where a dragged block lands against another: above, below, or beside as a new column. */
+export type DropPlace = 'before' | 'after' | 'left' | 'right'
+
+export interface DropZone {
+  id: string
+  place: DropPlace
+}
+
+/** Where a block sits: its list, its index, and the column holding it (null at the top level). */
+export interface BlockPlace {
+  list: Block[]
+  at: number
+  columnsId: string | null
+  columnId: string | null
+}
+
+export interface BlockListProps {
+  blocks: Block[]
+  rootProps: Record<string, WsxValue>
+  isNested?: boolean
+}
+
+export interface ColumnsRowProps {
+  block: ColumnsBlock
+  rootProps: Record<string, WsxValue>
+}
+
+export interface ColumnGapProps {
+  columnsId: string
+  index: number
+  /** The left column's part of the pair, 0–100. */
+  share: number
+}
 
 export type SaveState = 'saved' | 'saving' | 'failed' | 'invalid'
 
@@ -51,6 +101,8 @@ export interface BlockRowProps {
   block: Block
   numberAt: number
   rootProps: Record<string, WsxValue>
+  /** Inside a column: a narrower handle, and no columns within columns. */
+  isNested?: boolean
 }
 
 export interface BlockInputProps {
@@ -146,4 +198,13 @@ export interface EditorState {
   insertData: (id: string, pick: DataPick) => Promise<void>
   /** A live block that edits itself (a canvas) — its new markup rides the next save. */
   replaceInBlock: (id: string, from: WsxElement, to: WsxElement) => void
+  /** The block a ⋮⋮ is dragging, and where it would land now. */
+  dragging: string | null
+  drop: DropZone | null
+  setDragging: (id: string | null) => void
+  setDrop: (drop: DropZone | null) => void
+  /** Lands the dragged block above, below or beside `targetId`. */
+  moveTo: (id: string, targetId: string, place: DropPlace) => void
+  /** The gap after column `index` dragged to `fraction` of that column and the next. */
+  resize: (columnsId: string, index: number, fraction: number) => void
 }

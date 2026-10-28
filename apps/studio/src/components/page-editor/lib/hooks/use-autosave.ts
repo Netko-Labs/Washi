@@ -4,8 +4,9 @@ import { parse, serialize, type WsxElement } from '@washi/wsx'
 import { useEffect } from 'react'
 import { api } from '@/integrations/trpc'
 import { SAVE_DELAY_MS } from '../constants'
+import { sourceOver, toBlocks, toSheet } from '../convert'
 import { useEditorStore } from '../editor-store'
-import { sourceOver, titleOf, toBlocks, toSheet } from '../utils'
+import { titleOf } from '../utils'
 
 /** A pause in typing saves the page; leaving the editor saves whatever is still pending. */
 export function useAutosave(sheet: SheetDetail, root: WsxElement) {

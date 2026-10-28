@@ -2,9 +2,9 @@ import type { SheetDetail } from '@washi/domain'
 import { parse, type WsxElement } from '@washi/wsx'
 import { useEffect } from 'react'
 import { api } from '@/integrations/trpc'
+import { sourceOver, toBlocks } from '../convert'
 import { useEditorStore } from '../editor-store'
 import type { TableRef } from '../types'
-import { sourceOver, toBlocks } from '../utils'
 
 /**
  * Once per page; after that, only an edit that came from someone else — a teammate's save, or

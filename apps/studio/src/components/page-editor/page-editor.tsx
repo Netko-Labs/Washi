@@ -1,30 +1,16 @@
 import { frameOf, SheetFrame } from '@washi/paper'
-import { BlockRow } from './block-row'
-import {
-  numberedPositions,
-  type PageEditorProps,
-  useAutosave,
-  useEditorStore,
-  useLoadBlocks,
-} from './lib'
+import { BlockList } from './block-list'
+import { type PageEditorProps, useAutosave, useEditorStore, useLoadBlocks } from './lib'
 
 /** The page as blocks: type into text, Enter for the next block, `/` or `#`, `-`, `[]` to change kind. */
 export function PageEditor({ sheet, root }: PageEditorProps) {
   const blocks = useEditorStore((state) => state.blocks)
   useLoadBlocks(sheet, root)
   useAutosave(sheet, root)
-  const numbers = numberedPositions(blocks)
 
   return (
     <SheetFrame {...frameOf(root)}>
-      {blocks.map((block, index) => (
-        <BlockRow
-          key={block.id}
-          block={block}
-          numberAt={numbers[index] ?? 0}
-          rootProps={root.props}
-        />
-      ))}
+      <BlockList blocks={blocks} rootProps={root.props} />
       <button
         type="button"
         aria-label="Add a block at the end"
