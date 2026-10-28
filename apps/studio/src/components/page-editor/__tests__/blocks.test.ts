@@ -1,17 +1,8 @@
 import { describe, expect, test } from 'bun:test'
 import { paperRegistry } from '@washi/paper/registry'
 import { hasErrors, parse, serialize, validate } from '@washi/wsx'
-import {
-  applyShortcut,
-  blockFrame,
-  dataNode,
-  lockedBlock,
-  newBlock,
-  slashMatches,
-  titleOf,
-  toBlocks,
-  toSheet,
-} from '../lib/utils'
+import { lockedBlock, newBlock, toBlocks, toSheet } from '../lib/convert'
+import { applyShortcut, blockFrame, dataNode, slashMatches, titleOf } from '../lib/utils'
 
 const SOURCE = `<Sheet title="Plan" feel="note">
   <Title>Plan</Title>

@@ -21,10 +21,19 @@ export function BlockMenu({ block }: BlockMenuProps) {
     <div ref={root} className="relative">
       <button
         type="button"
-        aria-label="Block options"
+        aria-label="Block options — drag to move"
         aria-expanded={isOpen}
+        draggable
+        onDragStart={(event) => {
+          event.dataTransfer.effectAllowed = 'move'
+          event.dataTransfer.setData('text/plain', block.id)
+          const row = event.currentTarget.closest('[data-block-row]')
+          if (row) event.dataTransfer.setDragImage(row, 16, 16)
+          store().setDragging(block.id)
+        }}
+        onDragEnd={() => store().setDragging(null)}
         onClick={() => setOpen(!isOpen)}
-        className="grid size-6 place-items-center rounded text-muted-foreground hover:bg-black/5 dark:hover:bg-white/10"
+        className="grid size-6 cursor-grab place-items-center rounded text-muted-foreground hover:bg-black/5 active:cursor-grabbing dark:hover:bg-white/10"
       >
         <IconGripVertical className="size-4" />
       </button>
@@ -33,7 +42,7 @@ export function BlockMenu({ block }: BlockMenuProps) {
           role="menu"
           className="absolute top-full left-0 z-30 mt-1 w-[220px] rounded-xl border border-border bg-popover p-1 font-sans text-popover-foreground shadow-[0_16px_48px_rgb(0_0_0/0.18)]"
         >
-          {block.kind !== 'locked' && (
+          {block.kind !== 'locked' && block.kind !== 'columns' && (
             <>
               <div className="px-2 pt-1 pb-1 font-semibold text-[11px] text-muted-foreground uppercase tracking-[0.06em]">
                 Turn into
