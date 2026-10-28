@@ -10,16 +10,27 @@ server — Better Auth sessions, organizations, invitations, BYOK). Both serve t
 the studio over HTTP + `/trpc-ws`, the desktop over mirin IPC. Team collaboration ships first;
 local-only mode is deferred to phase 7, not cut.
 
-Specs (visual, canonical — `docs/index.html` is the hub; all of them wear `docs/_kit`):
+The old `docs/` spec set (PRD, primitives, design canvas) was dropped for a rewrite (2026-10-27); its
+decisions log (D1–D87, still cited below) is in git history before that date. Brand and washi-chan
+guidelines live in `Netko-Labs/brand-assets` (`washi/guidelines/`). Until the rewrite lands, `/learn`
+is the primitives reference and these rules stand — a PR that breaks one does not ship:
 
-- `docs/prd.html` — **what Washi is and what must be true.** Nouns, golden flows, the rules
-  that cannot bend (**C1–C4** are law, not guidance — they keep phase 7 a redeployment, not a
-  second implementation), architecture, status, the decisions log. Design every flow against it.
-- `docs/wsx-primitives.html` — the page format and the closed registry, primitive by primitive.
-- `docs/brand.html` · `docs/mascot.html` — identity and washi-chan (faces, motions, agent states).
-- `docs/design/` — every screen as a frame on a Figma-like canvas, one page per area
-  (shell · pages · data · work · agent · account · desktop). Real code is the truth; a frame
-  named `· proposed` is a change. When the canvas and the PRD disagree, the PRD wins.
+- **C1** A workspace is one SQLite file, hosted too; Postgres holds identity only.
+- **C2** One binary, `hosted | embedded` asserted once at boot, never per request.
+- **C3** `repository` and `service` never see a request, a user or the network.
+- **C4** The desktop is the web client in a mirin window: same `appRouter`, no desktop-only paths.
+- **W1** WSX is inert data: registry primitives, literal props, the closed `expr` grammar; validated
+  before persist and before render. A prompt-injected page is wrong content, never code.
+- **W2** The registry is closed and additive; components own appearance, pages own content. A gap is
+  `<Missing kind reason />`, never an escape hatch.
+- **W3** Pages size to their container, never the window.
+- **A1** Agent tools (ink · tsuru · hanko) are the only capability surface; never fs, shell or raw SQL.
+- **A2** Reads pass, page and table writes land with an undo stack, whatever leaves stops at the desk.
+- **A3** A team server never bills one person's plan.
+- **A4** Washi never reviews code.
+- **P1** Every record write goes through `insertRecord · updateRecords · deleteRecords`.
+- **P2** Writes merge (Loro, `baseVersion`); a merge that breaks WSX is `SheetConflictError`.
+- **P3** Nothing on screen is invented; empty states are the honest default.
 
 Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the studio architecture
 (template-based web, desktop over mirin IPC) is the current block.
@@ -365,7 +376,7 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   the page editor each live block is its own sheet, so a wide block sits in the column while editing.
 - WSX is inert data: registry primitives, literal props, the closed `expr` grammar only. Components
   own appearance (four enums: `variant tone size emphasis`); pages own content. Validation before
-  persist and before render. Format reference: `docs/wsx-primitives.html`.
+  persist and before render. Format reference: `/learn` and the registry specs.
 - tRPC v11. Routers live in `packages/washi/trpc/src/routers/{entity}/` per conventions §3.
   Web subscriptions ride `/trpc-ws` (the template's crossws bridge, cookie on the upgrade); the
   desktop's ride mirin events. Both yield `tracked()` and arrive as `{ id, data }`. Phase 8's
