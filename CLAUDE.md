@@ -403,6 +403,13 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   sheet>` one page as a block. A host with no page tree (a shared link) leaves `listPages` out and
   Subpages draws nothing. `/` in the editor: New page inside (made under the page, linked in place),
   Subpages, Subpage gallery, Link to page · <title>.
+- **Pages know each other (D93).** `<Include sheet>` draws another page's blocks without its frame
+  (`WsxView` lends the render, its own state and data kept; `PaperHost.loadSheet`, refetched when the
+  tree moves); inside an included page, or pointing at itself, it is a PageLink — includes never nest.
+  `<Backlinks of?>` lists readable pages linking here (`PaperHost.backlinks` → `sheets.backlinks`);
+  `extractRefs` counts Ref, PageLink, Include and a canvas node's page, indexed on each write.
+  `<Outline title>` reads the drawn page's headings (Titles and Section titles, not an include's)
+  and scrolls to one.
 - **An embed is https and listed (D92).** `<Embed src title ratio height>`: the registry refuses http;
   a built-in provider (`EMBED_PROVIDERS` — YouTube via youtube-nocookie, Vimeo, Spotify, Loom, Figma,
   CodePen, CodeSandbox, Miro, Google Maps, Indify) turns its page URL into its player and always plays;

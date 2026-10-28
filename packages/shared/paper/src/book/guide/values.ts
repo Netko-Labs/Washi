@@ -23,6 +23,9 @@ export const SUMMARIES: Record<string, string> = {
   Divider: 'A quiet rule between parts of a page.',
   Embed:
     'Another site in a sandboxed frame — https only; YouTube, Spotify, Figma and the other built-ins play, any other host only if the workspace lists it.',
+  Include: 'Another page drawn here and kept current — its blocks, not its cover; never nested.',
+  Backlinks: 'Every page that links here and the reader can open, live.',
+  Outline: 'The page’s own headings as contents; a press scrolls to one.',
   PageLink: 'A link to one page as a block: its icon and title, opened on a press.',
   Subpages:
     'Every page under this one (or of), live, in the sidebar’s order: a list, cards, or a gallery of covers.',
@@ -107,6 +110,8 @@ export const RECIPES: Recipe[] = [
     <Column ratio={2}><Text emphasis="quiet">Start from the budget; everything else is one press away.</Text><PageLink sheet="budget" /></Column>
   </Columns>
   <Section title="Pages"><Subpages layout="gallery" /></Section>
+  <Section title="This month"><Include sheet="budget" /></Section>
+  <Section title="Linked from"><Backlinks /></Section>
 </Sheet>`,
   },
   {

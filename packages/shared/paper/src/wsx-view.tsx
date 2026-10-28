@@ -23,7 +23,7 @@ import { Divider, Grid, Row, Section, SheetFrame, Stack } from './components/fra
 import { Button, Compose, Field, Slider, Switch, Task } from './components/input'
 import { Chip, Mascot, Missing } from './components/kit'
 import { Bento, Column, Columns, Tile } from './components/layout'
-import { PageLink, Subpages } from './components/pages'
+import { Backlinks, Include, Outline, PageLink, Subpages } from './components/pages'
 import { Redact } from './components/redact'
 import { Roadmap } from './components/roadmap'
 import { Select } from './components/select'
@@ -98,6 +98,8 @@ const COMPONENTS: Record<string, ComponentType<never>> = {
   Tile,
   PageLink,
   Subpages,
+  Backlinks,
+  Outline,
   Embed,
   Title,
   Text,
@@ -173,6 +175,11 @@ function renderElement(node: WsxElement, ctx: Ctx): ReactNode {
       return createElement(Source, { ...p, number: ctx.numbers.get(node) ?? 0 } as never, ...kids)
     case 'Ref':
       return createElement(Ref, p as never, ...(kids.length ? kids : []))
+    case 'Include':
+      return createElement(Include, {
+        ...p,
+        render: (included: WsxElement) => <WsxBody root={included} />,
+      } as never)
     case 'Canvas':
       // The canvas reads its Node/Edge markup itself: it has to write the same markup back.
       return <Canvas node={node} />
@@ -195,8 +202,7 @@ function initialState(root: WsxElement): Record<string, SheetStateValue> {
   return { ...(state?.stored ?? {}), ...(state?.local ?? {}) }
 }
 
-/** Render a parsed, validated WSX tree. Validate first — this trusts its input. */
-export function WsxView({ root }: { root: WsxElement }) {
+function Tree({ root, isBody }: { root: WsxElement; isBody?: boolean }) {
   const tables = useMemo(() => exprTables(root), [root])
   const numbers = useMemo(() => numberFootnotes(root), [root])
   const now = useMemo(() => Date.now(), [root])
@@ -205,9 +211,23 @@ export function WsxView({ root }: { root: WsxElement }) {
     <SheetStateProvider initial={initialState(root)}>
       <DataProvider tables={tables}>
         <NowContext.Provider value={now}>
-          <Element node={root} ctx={{ numbers }} />
+          {isBody ? (
+            renderChildren(root.children, { numbers })
+          ) : (
+            <Element node={root} ctx={{ numbers }} />
+          )}
         </NowContext.Provider>
       </DataProvider>
     </SheetStateProvider>
   )
+}
+
+/** Render a parsed, validated WSX tree. Validate first — this trusts its input. */
+export function WsxView({ root }: { root: WsxElement }) {
+  return <Tree root={root} />
+}
+
+/** A page's blocks without its frame, its own state and data kept: what an Include draws. */
+function WsxBody({ root }: { root: WsxElement }) {
+  return <Tree root={root} isBody />
 }

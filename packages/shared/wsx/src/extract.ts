@@ -23,7 +23,13 @@ export function extractRefs(root: WsxElement): string[] {
   const refs = new Set<string>()
   walk(root, (node) => {
     if (node.kind !== 'element') return
-    if (node.name === 'Ref' && typeof node.props.sheet === 'string') refs.add(node.props.sheet)
+    // A Ref, a PageLink and an Include all point at the page they name.
+    if (
+      (node.name === 'Ref' || node.name === 'PageLink' || node.name === 'Include') &&
+      typeof node.props.sheet === 'string'
+    ) {
+      refs.add(node.props.sheet)
+    }
     // A canvas node that opens a page links to it as surely as a Ref does.
     if (node.name === 'Node' && typeof node.props.page === 'string') refs.add(node.props.page)
   })

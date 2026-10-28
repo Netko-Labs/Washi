@@ -1,2 +1,5 @@
+export { Backlinks } from './backlinks'
+export { Include } from './include'
+export { Outline } from './outline'
 export { PageLink } from './page-link'
 export { Subpages } from './subpages'

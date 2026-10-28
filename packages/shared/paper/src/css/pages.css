@@ -104,3 +104,59 @@
   color: var(--muted);
   cursor: default;
 }
+
+/* Another page drawn in this one: a quiet rule on its left, where it came from above it. */
+.wsx-include {
+  padding-left: 14px;
+  border-left: 2px solid var(--border);
+}
+.wsx-include > * + * {
+  margin-top: var(--rhythm);
+}
+.wsx-include-from {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.78em;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+.wsx-include-from:hover {
+  color: var(--tone-accent-text);
+}
+
+/* The page's headings as contents: indented by level, the accent on hover. */
+.wsx-outline {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.wsx-outline-title {
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: 0.78em;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.wsx-outline-entry {
+  padding: 3px 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.92em;
+  text-align: left;
+  cursor: pointer;
+}
+.wsx-outline-entry[data-level="2"] {
+  padding-left: 14px;
+}
+.wsx-outline-entry[data-level="3"] {
+  padding-left: 28px;
+}
+.wsx-outline-entry:hover {
+  color: var(--tone-accent-text);
+}

@@ -1,4 +1,5 @@
 import type { Scalar } from '@washi/ink'
+import type { WsxElement } from '@washi/wsx'
 import type { ReactNode } from 'react'
 import type { ThemePair } from '../registry/themes'
 
@@ -52,6 +53,32 @@ export interface PageEntryProps {
   page: PageCard
   layout: SubpagesLayout
   onOpen: () => void
+}
+
+export interface IncludeProps extends BlockProps {
+  sheet: string
+  /** Draws the included page's body; WsxView lends it, so paper's modules never loop. */
+  render?: (root: WsxElement) => ReactNode
+}
+
+export type IncludeState =
+  | { status: 'loading' }
+  | { status: 'gone' }
+  | { status: 'ready'; title: string; root: WsxElement }
+
+export interface BacklinksProps extends BlockProps {
+  of?: string
+  empty?: string
+}
+
+export interface OutlineProps extends BlockProps {
+  title?: string
+}
+
+export interface OutlineEntry {
+  level: number
+  text: string
+  target: HTMLElement
 }
 
 export interface EmbedProps extends BlockProps {

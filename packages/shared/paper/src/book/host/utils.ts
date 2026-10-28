@@ -8,9 +8,10 @@ import {
   type TableSpec,
   validateRecord,
 } from '@washi/ink'
+import { parse } from '@washi/wsx'
 import type { PaperHost } from '../../provider'
 import type { MemoryTable, Say, SeedTable } from './types'
-import { BOOK_PAGES, PEOPLE, SEED_TABLES, WELCOME_SHEET } from './values'
+import { BOOK_PAGES, INCLUDED_SOURCE, PEOPLE, SEED_TABLES, WELCOME_SHEET } from './values'
 
 const RANGE_DAYS = { '7d': 7, '14d': 14, '30d': 30, '90d': 90 } as const
 
@@ -175,6 +176,11 @@ export function createBookHost(say: Say, seeds?: SeedTable[]): PaperHost {
     listPages: () => BOOK_PAGES,
     onPagesChange: () => () => {},
     newPage: async () => say('would make a page here and open it'),
+    backlinks: async () => BOOK_PAGES.slice(0, 2),
+    loadSheet: async (id) => ({
+      title: BOOK_PAGES.find((page) => page.id === id)?.title ?? 'Monthly budget',
+      root: parse(INCLUDED_SOURCE),
+    }),
     openSheet: (id) => say(`would open page ${id}`),
     describePeople: async () => PEOPLE,
     replaceNode: async () => say('canvas edit received — a host would save it'),
