@@ -2,6 +2,7 @@ import type { WsxElement, WsxNode } from '@washi/wsx'
 import { type ComponentType, createElement, type ReactNode, useMemo } from 'react'
 import { Agenda } from './components/agenda'
 import { Board } from './components/board'
+import { Bookmark } from './components/bookmark'
 import { Canvas } from './components/canvas'
 import {
   Avatar,
@@ -101,6 +102,7 @@ const COMPONENTS: Record<string, ComponentType<never>> = {
   Backlinks,
   Outline,
   Embed,
+  Bookmark,
   Title,
   Text,
   List,

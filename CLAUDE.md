@@ -410,6 +410,13 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   `extractRefs` counts Ref, PageLink, Include and a canvas node's page, indexed on each write.
   `<Outline title>` reads the drawn page's headings (Titles and Section titles, not an include's)
   and scrolls to one.
+- **A bookmark is read once (D94).** `<Bookmark href title description image site>` is a link as a
+  card; its words are the page's own props, so drawing it fetches nothing (the picture loads with no
+  referrer). `/bookmark <url>` (or an https address after `/`, beside Embed) asks `links.preview`
+  once: tsuru's `linkPreview` — the person's press is the consent for that one host, still https
+  only, no private ranges, redirects re-checked, 512 KB — reads og/twitter/`<title>` tags; a site
+  that will not answer becomes a bare link. The network call lives in tsuru and is wired in trpc,
+  never in `service` (C3).
 - **An embed is https and listed (D92).** `<Embed src title ratio height>`: the registry refuses http;
   a built-in provider (`EMBED_PROVIDERS` — YouTube via youtube-nocookie, Vimeo, Spotify, Loom, Figma,
   CodePen, CodeSandbox, Miro, Google Maps, Indify) turns its page URL into its player and always plays;

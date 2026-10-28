@@ -5,7 +5,7 @@ import { api } from '@/integrations/trpc'
 import { flatten, locate, mapBlocks, moveBlock, resizeColumns, tidy, writeList } from './columns'
 import { lockedBlock, newBlock, reconcile, turnInto } from './convert'
 import type { Block, BlockPlace, EditorState, FocusRequest, TextBlock } from './types'
-import { applyShortcut, dataNode, swapNode } from './utils'
+import { applyShortcut, bookmarkNode, dataNode, swapNode } from './utils'
 import { LIST_MARKERS, NEW_DATABASE, NEW_SUBPAGE_SOURCE } from './values'
 
 function isTyped(block: Block | undefined): block is TextBlock {
@@ -185,10 +185,18 @@ export const useEditorStore = create<EditorState>((set, get) => {
     insertData: async (id, pick) => {
       if (!locate(get().blocks, id)) return
       if (pick.kind === 'embed' && !pick.src) throw new Error('paste an https address after /embed')
+      if (pick.kind === 'bookmark' && !pick.href) {
+        throw new Error('paste an https address after /bookmark')
+      }
       if (pick.kind === 'database') {
         await api.tables.define.mutate({ spec: NEW_DATABASE(pick.name) })
       }
-      let node = pick.kind === 'subpage' ? null : dataNode(pick)
+      let node = pick.kind === 'subpage' || pick.kind === 'bookmark' ? null : dataNode(pick)
+      if (pick.kind === 'bookmark') {
+        // Read once now and kept as the page's own words; a site that will not answer is just its link.
+        const seen = await api.links.preview.mutate({ href: pick.href }).catch(() => null)
+        node = bookmarkNode(pick.href, seen)
+      }
       if (pick.kind === 'subpage') {
         // Made under the page being typed into, linked where the `/` was; the typing carries on here.
         const made = await api.sheets.create.mutate({

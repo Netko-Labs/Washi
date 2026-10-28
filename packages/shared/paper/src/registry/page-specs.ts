@@ -19,6 +19,17 @@ export const PAGE_SPECS: Record<string, ComponentSpec> = {
     'none',
     { hints: { url: 'the address is src, https only' } },
   ),
+  Bookmark: p(
+    {
+      href: z.url({ protocol: /^https$/ }),
+      title: z.string().max(200).optional(),
+      description: z.string().max(400).optional(),
+      image: z.url({ protocol: /^https$/ }).optional(),
+      site: z.string().max(80).optional(),
+    },
+    'none',
+    { hints: { url: 'the address is href, https only' } },
+  ),
   Include: p({ sheet: pageId }, 'none', {
     hints: { children: 'Include draws the other page itself; it takes no children' },
   }),

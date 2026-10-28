@@ -28,6 +28,14 @@ export const SPECIMENS: Record<string, Specimen> = {
   Divider: {},
   PageLink: { props: { sheet: 'budget' } },
   Include: { props: { sheet: 'budget' } },
+  Bookmark: {
+    props: {
+      href: 'https://bun.com/docs',
+      title: 'Bun — a fast all-in-one JavaScript runtime',
+      description: 'Bundle, install and run JavaScript and TypeScript, all in Bun.',
+      site: 'Bun',
+    },
+  },
   Backlinks: {},
   Outline: {
     props: { title: 'On this page' },

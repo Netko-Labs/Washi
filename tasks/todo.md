@@ -10,7 +10,7 @@ Specs were dropped for a rewrite (#118); this list is the plan until they return
 - [x] Database `gallery` view: cards with a cover column, like Notion's — D91
 - [x] Embed: https only, provider allowlist + the workspace's hosts, sandboxed iframe; http refused — D92
 - [x] Include · Backlinks · Outline — D93
-- [ ] Bookmark (a link as a card)
+- [x] Bookmark (a link as a card) — D94
 - [ ] File · Video · Audio · Gallery (uploads)
 - [ ] scripting: script blocks in QuickJS (worker), then server hooks on the same engine; iframe
       widgets later behind an owner switch — waiting on: authors, inline vs named, language

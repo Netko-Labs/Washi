@@ -137,6 +137,15 @@ export type DataPick =
   | { kind: 'subpages'; layout: 'list' | 'gallery' }
   | { kind: 'link'; sheet: string }
   | { kind: 'embed'; src: string }
+  | { kind: 'bookmark'; href: string }
+
+/** What `links.preview` read off a site, before it becomes a Bookmark's props. */
+export interface BookmarkPreview {
+  title: string | null
+  description: string | null
+  image: string | null
+  site: string | null
+}
 
 /** A page the `/` menu can link to. */
 export interface PageRef {

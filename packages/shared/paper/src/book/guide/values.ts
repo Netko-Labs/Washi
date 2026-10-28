@@ -23,6 +23,7 @@ export const SUMMARIES: Record<string, string> = {
   Divider: 'A quiet rule between parts of a page.',
   Embed:
     'Another site in a sandboxed frame — https only; YouTube, Spotify, Figma and the other built-ins play, any other host only if the workspace lists it.',
+  Bookmark: 'A link as a card — title, a line about it, its picture — read once when it was made.',
   Include: 'Another page drawn here and kept current — its blocks, not its cover; never nested.',
   Backlinks: 'Every page that links here and the reader can open, live.',
   Outline: 'The page’s own headings as contents; a press scrolls to one.',

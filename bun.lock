@@ -315,6 +315,7 @@
         "@washi/models": "workspace:*",
         "@washi/repository": "workspace:*",
         "@washi/service": "workspace:*",
+        "@washi/tsuru": "workspace:*",
         "zod": "^4.4.3",
       },
       "devDependencies": {
