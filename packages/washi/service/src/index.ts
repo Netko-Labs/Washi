@@ -68,6 +68,7 @@ export {
   updateSheetAccess,
   updateSheetMetaAndLook,
 } from './sheets/look'
+export { reindexPages } from './sheets/reindex'
 export {
   checkSource,
   createSheetFromSource,

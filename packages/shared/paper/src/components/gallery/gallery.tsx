@@ -15,9 +15,8 @@ export function Gallery({ columns = 3, gap, children, ...rest }: GalleryProps) {
 
   return (
     <div {...styled(rest, 'wsx-gallery')} data-columns={columns} data-gap={gap}>
-      {/* biome-ignore lint/a11y/useKeyWithClickEvents: each picture opens from the dialog's own keys once open; the grid is the pointer's way in */}
       {/* biome-ignore lint/a11y/noStaticElementInteractions: a press anywhere on a picture opens it */}
-      <div ref={grid} className="wsx-gallery-grid" onClick={box.open}>
+      <div ref={grid} className="wsx-gallery-grid" onClick={box.open} onKeyDown={box.press}>
         {children}
       </div>
       <dialog ref={box.dialog} className="wsx-lightbox" onClose={box.close} onKeyDown={keys}>

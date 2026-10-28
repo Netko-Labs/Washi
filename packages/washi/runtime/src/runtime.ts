@@ -11,6 +11,7 @@ import {
   createStoredKeySource,
   forgetUnenforcedVisibility,
   liftLooksIntoSource,
+  reindexPages,
 } from '@washi/service'
 import { createEventBus, createPresenceBoard, type ResolvedWorkspace } from '@washi/trpc'
 import { watchAgentWrites } from './agent-watch'
@@ -46,6 +47,7 @@ export function createRuntime(options: RuntimeOptions): Runtime {
         : undefined
     liftLooksIntoSource(workspace)
     forgetUnenforcedVisibility(workspace)
+    reindexPages(workspace)
     const host = new AgentHost(workspace, keys)
     const workspaceId = workspace.id
     const watch = watchAgentWrites(workspaceId, events, presence)

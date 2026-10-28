@@ -9,8 +9,13 @@ function read(from: HTMLElement): OutlineEntry[] {
   return [...page.querySelectorAll<HTMLElement>('.wsx-title, .wsx-section-title')]
     .filter((heading) => !heading.closest('.wsx-include'))
     .map((heading) => ({
-      level: heading.classList.contains('wsx-section-title') ? 2 : (LEVEL[heading.tagName] ?? 1),
-      text: heading.textContent?.trim() ?? '',
+      level: heading.classList.contains('wsx-section-title')
+        ? 2
+        : Number(heading.dataset.level) || (LEVEL[heading.tagName] ?? 1),
+      // While the page is being typed into, a heading is a textarea: its words are its value.
+      text:
+        (heading instanceof HTMLTextAreaElement ? heading.value : heading.textContent)?.trim() ??
+        '',
       target: heading,
     }))
     .filter((entry) => entry.text)
@@ -37,12 +42,16 @@ export function useOutline(ref: RefObject<HTMLElement | null>): OutlineEntry[] {
       setEntries(next)
     }
     refresh()
-    const watch = new MutationObserver(() => {
+    const schedule = () => {
       if (!frame) frame = requestAnimationFrame(refresh)
-    })
+    }
+    const watch = new MutationObserver(schedule)
     watch.observe(page, { childList: true, subtree: true, characterData: true })
+    // Typing changes a field's value, which no mutation reports.
+    page.addEventListener('input', schedule)
     return () => {
       watch.disconnect()
+      page.removeEventListener('input', schedule)
       cancelAnimationFrame(frame)
     }
   }, [ref])

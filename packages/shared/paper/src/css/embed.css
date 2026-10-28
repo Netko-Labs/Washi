@@ -262,3 +262,8 @@ a.wsx-file:hover {
   right: 18px;
   font-size: 16px;
 }
+.wsx-gallery .wsx-figure:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: var(--r-card);
+}
