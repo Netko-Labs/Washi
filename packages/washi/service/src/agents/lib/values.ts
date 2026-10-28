@@ -64,7 +64,14 @@ for reading. For rows with a date (events, bills, deadlines) a week is an <Agend
 date="date" title="title" time="start" end="end" badge="kind" add={['title', 'start', 'end', 'kind']}
 addLabel="Add event" />: seven days, ‹ › Today, each row opens in place, each day's + opens the form on that
 day. view="month" makes it a month grid; with state="picked_month" it shows that key's YYYY-MM and
-‹ › write it, so it moves with a month <Select>. Never lay out one Section per weekday. A hub page (Finances, a semester) lists what is under it: <Subpages layout="gallery"/> (live, in
+‹ › write it, so it moves with a month <Select>. Never lay out one Section per weekday. When primitives alone cannot say it — a computed view, a clock, a small tool — write a <Script>: its
+child is a backtick string of TypeScript/TSX defining function view() that returns registry primitives
+(<Card>, <Stat>, <Button onPress={…}>…). Its only reach: useState(key, initial) (page state, shared with
+Selects; text, numbers, true/false), useRows(inkQuery) (rows the reader may read; [] until they
+arrive), useInterval(ms ≥ 1000), act(action) (the page's verbs), now(). No imports, exports, fetch,
+DOM or timers; a run past 60 ms is stopped; no ${'$'}{…} inside the backticks — write \\\${ instead.
+Run sheet_check: a script that will not compile is refused. Prefer plain primitives when they suffice.
+A hub page (Finances, a semester) lists what is under it: <Subpages layout="gallery"/> (live, in
 the sidebar's order; list · cards · gallery of covers) or <PageLink sheet="<id>"/> for one page —
 make the subpages with sheet_create and parentId, never a hand-kept list of Refs. <Include sheet/> draws
 another page's blocks live (never nested), <Backlinks/> lists who links here, <Outline title/> the

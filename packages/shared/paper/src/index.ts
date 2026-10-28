@@ -42,6 +42,7 @@ export { Audio, File, Video } from './components/media'
 export { Backlinks, Include, Outline, PageLink, Subpages } from './components/pages'
 export { Redact } from './components/redact'
 export { Roadmap } from './components/roadmap'
+export { Script } from './components/script'
 export { Select } from './components/select'
 export { Callout, Card, Figure, Hero } from './components/surface'
 export {
@@ -64,6 +65,7 @@ export { DataProvider, useData } from './data'
 export { frameOf } from './lib/sheet-look'
 export type {
   ActionRef,
+  CompiledScript,
   LookPart,
   PageCard,
   Row as PaperRow,

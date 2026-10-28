@@ -19,8 +19,12 @@ is the primitives reference and these rules stand — a PR that breaks one does 
 - **C2** One binary, `hosted | embedded` asserted once at boot, never per request.
 - **C3** `repository` and `service` never see a request, a user or the network.
 - **C4** The desktop is the web client in a mirin window: same `appRouter`, no desktop-only paths.
-- **W1** WSX is inert data: registry primitives, literal props, the closed `expr` grammar; validated
-  before persist and before render. A prompt-injected page is wrong content, never code.
+- **W1** WSX is data: registry primitives, literal props, the closed `expr` grammar; validated
+  before persist and before render. The one thing in a page that runs is a `<Script>`, and only
+  inside its QuickJS sandbox: no DOM, network, timers or imports, a deadline and a memory cap, and
+  no reach but the page's own (its state, rows the reader may read, the page's verbs); what it
+  returns is checked like any page before it is drawn. A prompt-injected page is wrong content and
+  at worst a script doing what a button on that page could — never a breach.
 - **W2** The registry is closed and additive; components own appearance, pages own content. A gap is
   `<Missing kind reason />`, never an escape hatch.
 - **W3** Pages size to their container, never the window.
@@ -229,8 +233,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
 - **Source mode** (the `</>` toggle while editing, or *Edit source* in the page menu) edits the
   sheet's raw WSX in CodeMirror. It runs the server's own check client-side (parse + validate
   against `paperRegistry`), autosaves only a valid draft through `sheets.update` with
-  `baseVersion`, and holds Done while the draft has errors. There are no hooks to edit: `state`,
-  `expr`, `bind` and `action` are a page's whole behaviour, and nothing in it executes.
+  `baseVersion`, and holds Done while the draft has errors. `state`, `expr`, `bind` and `action`
+  are a page's behaviour; a `<Script>` (D96) is the one block that runs, sandboxed.
 - **Tables are Notion databases.** Properties: `status` (todo · doing · done groups), `select`,
   `multi_select`, `person` (member id), `date` (`start/end` for a range), `url`, `relation` (record
   ids), `formula` (D73: an `expr` over its own row in the page grammar — `month(date)`, `usd * fx_rate`,
@@ -428,6 +432,20 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   only, no private ranges, redirects re-checked, 512 KB — reads og/twitter/`<title>` tags; a site
   that will not answer becomes a bare link. The network call lives in tsuru and is wired in trpc,
   never in `service` (C3).
+- **A page may hold a script (D96).** `<Script title>` keeps TypeScript/TSX as its text (a backtick
+  string — WSX takes one with nothing interpolated, and writes multi-line text back that way). The
+  server compiles it with `Bun.Transpiler` (`compileScript`: JSX → `h(Card, …)`, no imports or
+  exports, ≤ 20 000 chars, a `function view`) both at save (`checkSource` refuses a page whose
+  script won't compile) and on read (`scripts.compile`, cached per source in `@washi/ui`'s host).
+  Paper runs it in QuickJS (`quickjs-emscripten-core`, the single-file variant, loaded lazily on a
+  page that has one): 16 MB, a 60 ms deadline per run, a prelude that lends `h`, the registry's names
+  and the hooks `useState` (page state), `useRows` (`PaperHost.runQuery`, the reader's rows, fetched
+  after the run that asked, then drawn again), `useInterval` (≥ 1 s), `act` (`runAction`) and `now`.
+  `view()` returns plain data; an `onPress` becomes the action `script.invoke`, which the Script's
+  own host turns into a call into the sandbox — it never reaches the server. The tree is validated
+  against the registry (scripts never nest) and drawn inside the page's own state and data. Any
+  member — and Washi — may write one; `/script` drops a starter. A host without `compileScript`
+  (the book, `/learn`, a shared link) says scripts run inside a workspace.
 - **An embed is https and listed (D92).** `<Embed src title ratio height>`: the registry refuses http;
   a built-in provider (`EMBED_PROVIDERS` — YouTube via youtube-nocookie, Vimeo, Spotify, Loom, Figma,
   CodePen, CodeSandbox, Miro, Google Maps, Indify) turns its page URL into its player and always plays;

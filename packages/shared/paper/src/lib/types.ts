@@ -55,6 +55,49 @@ export interface PageEntryProps {
   onOpen: () => void
 }
 
+/** What compiling a script's TSX gives: the sandbox's JS, or why not, in words. */
+export type CompiledScript = { ok: true; js: string } | { ok: false; error: string }
+
+export interface ScriptProps extends BlockProps {
+  title?: string
+  /** The TSX, the Script's own text. */
+  source: string
+  /** Draws what the script returned inside the page's own state and data; WsxView lends it. */
+  render?: (root: WsxElement) => ReactNode
+}
+
+export type ScriptState =
+  | { status: 'starting' }
+  | { status: 'stopped'; reason: string }
+  | { status: 'drawn'; root: WsxElement }
+
+/** The sandbox's only ways out: each answers with JSON text, or nothing. */
+export interface ScriptBridge {
+  state(key: string): string | undefined
+  set(key: string, json: string): void
+  rows(queryJson: string): string | undefined
+  interval(ms: number): void
+  act(json: string): void
+}
+
+/** What a script's runs share: its sandbox, the rows it asked for, the page as it is now. */
+export interface ScriptLive {
+  sandbox: ScriptSandbox | null
+  /** Query JSON → rows JSON; null while one is being fetched. */
+  rows: Map<string, string | null>
+  values: Record<string, string | number | boolean | null>
+  set: (key: string, value: string | number | boolean | null) => void
+}
+
+/** One script's sandbox: a run gives JSON text or the error, in words. */
+export interface ScriptSandbox {
+  call(
+    code: string,
+    bridge: ScriptBridge,
+  ): { ok: true; value: string } | { ok: false; error: string }
+  dispose(): void
+}
+
 export interface GalleryProps extends BlockProps {
   columns?: 2 | 3 | 4
   gap?: Gap

@@ -12,7 +12,7 @@ import type {
   TableRef,
   TextBlock,
 } from './types'
-import { KIND_OPTIONS, LINK_MATCHES, SHORTCUTS, UPLOAD_OPTIONS } from './values'
+import { KIND_OPTIONS, LINK_MATCHES, SHORTCUTS, STARTER_SCRIPT, UPLOAD_OPTIONS } from './values'
 
 /** `# `, `- `, `[] `… at the start of a plain text block turn it into that kind. */
 export function applyShortcut(block: TextBlock): TextBlock | null {
@@ -113,9 +113,16 @@ function uploadOptions(needle: string): Extract<SlashOption, { type: 'data' }>[]
     hint: 'upload',
     pick: { kind: 'upload' as const, as: option.as },
   }))
-  return !needle || 'gallery photos pictures album'.includes(needle)
-    ? [...uploads, gallery]
-    : uploads
+  const script: Extract<SlashOption, { type: 'data' }> = {
+    type: 'data',
+    key: 'script',
+    label: 'Script',
+    hint: 'TypeScript',
+    pick: { kind: 'script' },
+  }
+  const pictures = !needle || 'gallery photos pictures album'.includes(needle) ? [gallery] : []
+  const code = !needle || 'script code typescript program widget'.includes(needle) ? [script] : []
+  return [...uploads, ...pictures, ...code]
 }
 
 /** The block an upload becomes: a picture, a player, or a document line. */
@@ -250,6 +257,8 @@ export function bookmarkNode(href: string, seen: BookmarkPreview | null): WsxEle
 }
 
 export function dataNode(pick: DataPick): WsxElement {
+  if (pick.kind === 'script')
+    return element('Script', {}, [{ kind: 'text', value: STARTER_SCRIPT }])
   if (pick.kind === 'upload' || pick.kind === 'gallery') {
     throw new Error('an upload lands once its file is stored')
   }

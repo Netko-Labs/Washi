@@ -28,6 +28,11 @@ export const SPECIMENS: Record<string, Specimen> = {
   Divider: {},
   PageLink: { props: { sheet: 'budget' } },
   Include: { props: { sheet: 'budget' } },
+  Script: {
+    props: { title: 'A counter' },
+    children:
+      "{`function view() {\n  const [n, setN] = useState('n', 0)\n  return <Button onPress={() => setN(n + 1)}>Pressed {n}</Button>\n}`}",
+  },
   Gallery: {
     props: { columns: 3 },
     children:

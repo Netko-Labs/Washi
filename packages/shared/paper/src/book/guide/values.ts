@@ -29,6 +29,8 @@ export const SUMMARIES: Record<string, string> = {
   Audio: 'A sound with the browser’s player, its title above.',
   File: 'A document as a line: its kind, name and size; it opens or downloads.',
   Bookmark: 'A link as a card — title, a line about it, its picture — read once when it was made.',
+  Script:
+    'A block written in TypeScript: function view() returns primitives; useState, useRows, useInterval and act are its only reach. Runs sandboxed in a workspace.',
   Include: 'Another page drawn here and kept current — its blocks, not its cover; never nested.',
   Backlinks: 'Every page that links here and the reader can open, live.',
   Outline: 'The page’s own headings as contents; a press scrolls to one.',

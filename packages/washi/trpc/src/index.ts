@@ -12,6 +12,7 @@ import { liveRouter } from './routers/live'
 import { modelsRouter } from './routers/models'
 import { remindersRouter } from './routers/reminders'
 import { routinesRouter } from './routers/routines'
+import { scriptsRouter } from './routers/scripts'
 import { sheetsRouter } from './routers/sheets'
 import { storageRouter } from './routers/storage'
 import { systemRouter } from './routers/system'
@@ -32,6 +33,7 @@ export const appRouter = router({
   embeds: embedsRouter,
   emojis: emojisRouter,
   links: linksRouter,
+  scripts: scriptsRouter,
   themes: themesRouter,
   tables: tablesRouter,
   agents: agentsRouter,

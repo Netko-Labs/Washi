@@ -1,4 +1,4 @@
-import type { PaperHost } from '@washi/paper'
+import type { CompiledScript, PaperHost } from '@washi/paper'
 import { parse } from '@washi/wsx'
 import { api } from '../api'
 import { childrenOf } from '../page-tree'
@@ -18,6 +18,19 @@ function listedEmbedHosts(): Promise<string[]> {
     })
   }
   return listed.hosts.catch(() => [])
+}
+
+const compiled = new Map<string, Promise<CompiledScript>>()
+
+/** The same TSX compiles the same, so a page drawn again never asks twice. */
+function compileOnce(source: string): Promise<CompiledScript> {
+  let found = compiled.get(source)
+  if (!found) {
+    found = api.scripts.compile.query({ source })
+    compiled.set(source, found)
+    found.catch(() => compiled.delete(source))
+  }
+  return found
 }
 
 /** A new workspace, or a changed list: the next embed asks again. */
@@ -82,6 +95,8 @@ export const paperHost: PaperHost = {
     const sheet = await api.sheets.get.query({ id }).catch(() => null)
     return sheet ? { title: sheet.title, root: parse(sheet.source) } : null
   },
+
+  compileScript: (source) => compileOnce(source),
 
   embedAllowed: async (host) => (await listedEmbedHosts()).includes(host),
 
