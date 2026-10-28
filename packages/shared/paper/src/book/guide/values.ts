@@ -86,6 +86,15 @@ export const SUMMARIES: Record<string, string> = {
 /** Primitives that only work together; each source validates and renders over the book's `tasks`. */
 export const RECIPES: Recipe[] = [
   {
+    id: 'gallery',
+    title: 'A gallery of rows',
+    why: 'Notion’s gallery: a card per row wearing its cover, a few properties under the title; a press opens the row.',
+    uses: ['Database'],
+    source: `<Sheet title="Classes">
+  <Database table="classes" width="wide" views={[{ name: 'Gallery', kind: 'gallery', cover: 'cover', columns: ['term', 'grade'] }, { name: 'Table', kind: 'table' }]} />
+</Sheet>`,
+  },
+  {
     id: 'hub',
     title: 'A hub for its pages',
     why: 'A main page for a part of life: its figures on top, every page under it as cards with their covers, one pinned link.',

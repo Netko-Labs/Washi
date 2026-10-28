@@ -379,6 +379,9 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   `onAdd` gets + New per column when the host has `newRow`: the row is made in that group, titled
   Untitled, and opened in the peek. A word that means something (high, blocked, in review, done…) wears
   its tone everywhere it shows — pill, badge, a board column's dot (`VALUE_TONES` in paper's `lib`).
+  A `gallery` view (D91) is a card per row: `cover` names a column holding an https image or a cover
+  key (`preset:` · `picture:` · `file:`), the title, then `columns` (default: the first three) read-only
+  (`CardValue`); a press opens the row; + New adds one.
 - **A wide block reaches past the column (D85).** `width="wide" | "full"` on Board · Agenda · Table ·
   Database · Roadmap · Chart · Canvas · Grid (`css/reach.css`): the sheet's width is `--sheet-w`
   (`100cqi`, an `@property` so it inherits as px), the reach is centred on the column and stops at

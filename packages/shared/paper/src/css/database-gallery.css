@@ -1,0 +1,80 @@
+/* Notion's gallery: cards in a fill grid, the cover on top, the title, a few properties. */
+.wsx-db-gallery {
+  display: grid;
+  gap: var(--gap);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
+  padding-top: 10px;
+}
+.wsx-db-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0;
+  border: var(--card-border) solid var(--border);
+  border-radius: var(--r-card);
+  background: var(--card);
+  box-shadow: var(--shadow-card);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color var(--ease),
+    box-shadow var(--ease);
+}
+.wsx-db-card:hover:not(:disabled) {
+  border-color: color-mix(in oklab, var(--accent) 45%, var(--border));
+}
+.wsx-db-card:disabled {
+  cursor: default;
+}
+.wsx-db-card-cover {
+  display: block;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background-position: center;
+  background-size: cover;
+}
+.wsx-db-card-cover[data-empty] {
+  background: var(--muted-bg);
+}
+.wsx-db-card-cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.wsx-db-card-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 10px 12px 12px;
+  font-size: 0.875em;
+}
+.wsx-db-card-title {
+  max-width: 100%;
+  overflow: hidden;
+  font-weight: 600;
+  font-size: 1.07em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wsx-db-card-text {
+  color: var(--muted);
+}
+.wsx-db-card-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.wsx-db-card-new {
+  display: grid;
+  place-items: center;
+  min-height: 72px;
+  border-style: dashed;
+  background: transparent;
+  box-shadow: none;
+  color: var(--muted);
+}

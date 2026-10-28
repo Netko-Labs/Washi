@@ -351,8 +351,9 @@ const dataIn: Record<string, ComponentSpec> = {
           z
             .object({
               name: z.string().min(1).max(40),
-              kind: z.enum(['table', 'board', 'timeline']),
+              kind: z.enum(['table', 'board', 'timeline', 'gallery']),
               groupBy: columnName.optional(),
+              cover: columnName.optional(),
               date: columnName.optional(),
               where: bindWhere,
               columns: z.array(columnName).max(16).optional(),
@@ -368,7 +369,8 @@ const dataIn: Record<string, ComponentSpec> = {
     'none',
     {
       hints: {
-        views: 'tabs; omit for a table, plus a board grouped by the first status/select column',
+        views:
+          'tabs; omit for a table, plus a board grouped by the first status/select column; a gallery takes cover (a url or cover-key column)',
       },
     },
   ),

@@ -36,7 +36,8 @@ Primitives — Frame: Section Row Stack Grid Divider Columns/Column(ratio 1–6)
 square·wide·tall·big·banner, title) · Text: Title(level) Text(lead) List(marker)/Item
 Quote Code Pair(term) Note Source Money(value|expr, currency) + inline Mark Kbd Ref(sheet) Tag ·
 Surface: Card(title) Callout(title) Hero(title subtitle align) Figure(https src, alt) · Data out:
-Repeat(bind) Agenda(bind date title time end badge add addLabel view state — a week or a month) Table(bind columns) Stat(value|expr label hint trend) Chart(bind kind) Timeline/Step
+Repeat(bind) Agenda(bind date title time end badge add addLabel view state — a week or a month) Table(bind columns) Database(table views — tabs: table · board(groupBy) · timeline(date) ·
+gallery(cover: a url or cover-key column; cards a press opens)) Stat(value|expr label hint trend) Chart(bind kind) Timeline/Step
 Progress(value|expr) Badge Avatar Schema(table) · Data in: Field(field kind table row) Board(bind
 groupBy groups rank kicker badge meta avatar onAdd onOpen) Button(action) Compose(action label —
 $value and $now supplied) Form(table fields defaults submit reset trigger title — a whole row typed and added; trigger = in a modal)

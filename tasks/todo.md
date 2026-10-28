@@ -7,7 +7,7 @@ Specs were dropped for a rewrite (#118); this list is the plan until they return
 - [x] layout in the editor: drag a block beside another makes columns; drag the gap resizes; blocks
       inside a column edit like the top level
 - [x] hub pages: `Subpages` (list · cards · gallery, live) + `PageLink`; `/` New page inside — D90
-- [ ] Database `gallery` view: cards with a cover column, like Notion's
+- [x] Database `gallery` view: cards with a cover column, like Notion's — D91
 - [ ] Embed: https only, provider allowlist + the workspace's hosts, sandboxed iframe; http refused
 - [ ] Bookmark (a link as a card) · Include (another page's blocks, live)
 - [ ] Backlinks · Outline

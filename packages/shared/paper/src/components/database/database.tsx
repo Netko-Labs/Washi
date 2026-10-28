@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { styled } from '../../lib'
 import { Board } from '../board'
 import { Roadmap } from '../roadmap'
+import { DatabaseGallery } from './database-gallery'
 import { DatabaseTable } from './database-table'
 import { choicesFor, type DatabaseProps, defaultViews, titleColumn, useDatabase } from './lib'
 
@@ -57,7 +58,9 @@ export function Database({ table, views, empty, ...rest }: DatabaseProps) {
           </button>
         ))}
       </div>
-      {view.kind === 'timeline' && date ? (
+      {view.kind === 'gallery' ? (
+        <DatabaseGallery db={db} view={view} empty={empty} />
+      ) : view.kind === 'timeline' && date ? (
         <Roadmap
           bind={{ table, where: view.where }}
           date={date}
