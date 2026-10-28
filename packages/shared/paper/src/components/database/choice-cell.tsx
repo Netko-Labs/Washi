@@ -1,3 +1,4 @@
+import { VALUE_TONES } from '../../lib'
 import { type ChoiceCellProps, type ChoiceLookProps, hueAt, initialsOf, statusGroupOf } from './lib'
 
 /** A status reads by its step, a person by their face, a select by its own hue. */
@@ -19,7 +20,11 @@ function ChoiceLook({ column, value, label, index }: ChoiceLookProps) {
     )
   }
   return (
-    <span className="wsx-db-pill" data-hue={hueAt(index)}>
+    <span
+      className="wsx-db-pill"
+      data-tone={VALUE_TONES[label.toLowerCase()]}
+      data-hue={VALUE_TONES[label.toLowerCase()] ? undefined : hueAt(index)}
+    >
       {label}
     </span>
   )

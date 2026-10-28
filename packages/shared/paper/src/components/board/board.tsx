@@ -2,7 +2,7 @@ import { type CSSProperties, Fragment } from 'react'
 import { columnOf, styled, useBind } from '../../lib'
 import { Bound } from '../states'
 import { BoardCard } from './board-card'
-import { type BoardProps, headCount, useBoardDrag, useCardActions } from './lib'
+import { type BoardProps, columnHue, headCount, useBoardDrag, useCardActions } from './lib'
 
 /** Grouped, draggable records: drop a card and the others slide to make room. */
 export function Board({
@@ -43,14 +43,14 @@ export function Board({
                   aria-label={name}
                   className="wsx-board-col"
                   data-hot={drag.target?.group === name || undefined}
-                  style={{ '--col': `var(--chart-${(index % 5) + 1})` } as CSSProperties}
+                  style={{ '--col': columnHue(name, index) } as CSSProperties}
                   onDragOver={(event) => drag.over(name, event)}
                   onDrop={drag.drop}
                 >
                   <div className="wsx-board-head">
                     <span className="wsx-board-head-name">
                       <i />
-                      {name}
+                      <span className="wsx-board-head-label">{name}</span>
                     </span>
                     <span className="wsx-board-head-count">{headCount(items, meta)}</span>
                   </div>

@@ -47,14 +47,14 @@ export function SheetMark({ icon, overCover }: SheetMarkProps) {
     <button
       type="button"
       aria-label="Change the icon"
-      className="wsx-mark"
+      className="wsx-sheet-mark"
       data-over-cover={overCover || undefined}
       onClick={(event) => edit('icon', event.currentTarget)}
     >
       {drawn}
     </button>
   ) : (
-    <span className="wsx-mark" data-over-cover={overCover || undefined}>
+    <span className="wsx-sheet-mark" data-over-cover={overCover || undefined}>
       {drawn}
     </span>
   )

@@ -343,10 +343,10 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   its figure to its own column (`15cqi`), and `.wsx` clips sideways overflow, so a phone never
   scrolls a page horizontally. Coarse pointers get 44px targets and 16px inputs.
 - **Pages are apps, not forms laid flat (D83).** `<Agenda bind date title time end badge add>` is a
-  week (‹ › Today, the week the reader's, never saved; a list under 720px); a row opens in the peek;
+  week (‹ › Today, the week the reader's, never saved; tighter from 720px, a list under 560px); a row opens in the peek;
   each day's + opens a modal Form seeded with that day (`seed`, written even when not shown).
   `view="month"` (D86) draws whole weeks as a grid (`monthSpan`; neighbours dimmed, three events a
-  day then +N more, a list of busy days under 720px); `state` names a `YYYY-MM` page-state key it
+  day then +N more, a list of busy days under 560px); `state` names a `YYYY-MM` page-state key it
   follows and ‹ › Today write, so it moves with a month `Select`.
   `<Form trigger>` puts a form behind one button in a native `<dialog>` (`FormDialog`: top layer,
   Escape, a bottom sheet under 560px, closes when the row lands). An empty data view is a quiet
@@ -356,7 +356,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   face over an invisible native select; dates read "Nov 4, 2026" and numbers group until pressed
   (`DateCell`/`NumberCell` swap to the editor on a press); the foot counts rows. A Board with no
   `onAdd` gets + New per column when the host has `newRow`: the row is made in that group, titled
-  Untitled, and opened in the peek.
+  Untitled, and opened in the peek. A word that means something (high, blocked, in review, done…) wears
+  its tone everywhere it shows — pill, badge, a board column's dot (`VALUE_TONES` in paper's `lib`).
 - **A wide block reaches past the column (D85).** `width="wide" | "full"` on Board · Agenda · Table ·
   Database · Roadmap · Chart · Canvas · Grid (`css/reach.css`): the sheet's width is `--sheet-w`
   (`100cqi`, an `@property` so it inherits as px), the reach is centred on the column and stops at

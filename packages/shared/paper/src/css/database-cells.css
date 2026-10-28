@@ -113,6 +113,26 @@
   --hue: var(--chart-5);
 }
 
+/* A choice that means something wears its tone, not its place in the list. */
+.wsx-db-pill[data-tone="neutral"] {
+  --hue: var(--muted);
+}
+.wsx-db-pill[data-tone="info"] {
+  --hue: var(--tone-info);
+}
+.wsx-db-pill[data-tone="success"] {
+  --hue: var(--tone-success);
+}
+.wsx-db-pill[data-tone="warning"] {
+  --hue: var(--tone-warning);
+}
+.wsx-db-pill[data-tone="danger"] {
+  --hue: var(--tone-danger);
+}
+.wsx-db-pill[data-tone="accent"] {
+  --hue: var(--k-fill);
+}
+
 .wsx-db-status {
   --step: var(--muted);
   display: inline-flex;

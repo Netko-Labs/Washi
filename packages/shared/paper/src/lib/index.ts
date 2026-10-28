@@ -32,3 +32,4 @@ export type {
   Variant,
   Width,
 } from './types'
+export { VALUE_TONES } from './values'
