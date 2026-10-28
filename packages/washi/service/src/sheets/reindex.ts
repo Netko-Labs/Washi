@@ -20,11 +20,15 @@ export function reindexPages(ws: Workspace): void {
   for (const { id } of listSheets(ws)) {
     const sheet = getSheet(ws, id)
     if (!sheet) continue
+    let root: ReturnType<typeof parse>
     try {
-      indexSheet(ws, id, sheet.title, indexOf(parse(sheet.source)))
+      root = parse(sheet.source)
     } catch {
       // A page that no longer parses keeps the index it had.
+      continue
     }
+    // A failed write throws and leaves the flag unset, so the next open tries every page again.
+    indexSheet(ws, id, sheet.title, indexOf(root))
   }
   setAppMeta(ws, REINDEXED, '1')
 }
