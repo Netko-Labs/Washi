@@ -22,3 +22,8 @@ export function coverStyle(cover: string, look: SheetLookHost): CSSProperties {
   const url = kind === 'picture' ? look.pictureUrl?.(key) : look.fileUrl?.(key)
   return url ? { backgroundImage: `url(${url})` } : {}
 }
+
+/** A media src as an address: an upload through the host, an https address as itself. */
+export function mediaUrl(src: string, look: SheetLookHost): string | null {
+  return src.startsWith('file:') ? (look.fileUrl?.(src.slice('file:'.length)) ?? null) : src
+}

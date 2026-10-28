@@ -11,7 +11,8 @@ import {
   updateSheetMeta,
   type Workspace,
 } from '@washi/repository'
-import { extractRefs, extractText, parse } from '@washi/wsx'
+import { parse } from '@washi/wsx'
+import { indexOf } from '../sheets/service'
 import { restoreSheetTree } from '../sheets/tree'
 import { InkError } from './errors'
 
@@ -49,7 +50,7 @@ export function openRowPage(ws: Workspace, recordId: string): string {
   if (!existing) {
     const source = `<Sheet title={${JSON.stringify(title)}} wsx="1">\n</Sheet>\n`
     const root = parse(source)
-    const index = { body: extractText(root), refs: extractRefs(root) }
+    const index = indexOf(root)
     return createSheet(ws, { title, source }, index, null, null, recordId).id
   }
   if (existing.trashed) restoreSheetTree(ws, existing.id)

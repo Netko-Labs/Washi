@@ -54,6 +54,7 @@ export function eraseWorkspace(ws: Workspace): void {
   const tables = [
     'sheets_fts',
     'sheet_links',
+    'sheet_files',
     'sheets',
     'records',
     'user_tables',

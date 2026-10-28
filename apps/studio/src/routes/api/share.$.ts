@@ -6,19 +6,20 @@ import {
   sharedQuery,
   sharedTable,
 } from '@washi/service'
+import { fileResponse } from '@/server/files'
 import { NO_STORE, shareAskSchema, sharedWorkspace, shareFailure } from '@/server/share'
 
 const MAX_ASK_BYTES = 16 * 1024
 
 /**
  * A page's read-only link, with no session (D65). GET `<workspace>/<token>` is the page as the
- * link shows it, GET `<workspace>/<token>/file/<id>` its cover or icon upload, POST
+ * link shows it, GET `<workspace>/<token>/file/<id>` an upload the page uses, POST
  * `<workspace>/<token>/ask` one question about a table the page reads.
  */
 export const Route = createFileRoute('/api/share/$')({
   server: {
     handlers: {
-      GET: async ({ params }) => {
+      GET: async ({ request, params }) => {
         const [workspaceId = '', token = '', part, fileId] = (params._splat ?? '').split('/')
         const resolved = await sharedWorkspace(workspaceId)
         if (!resolved) return Response.json({ error: 'not found' }, { status: 404 })
@@ -29,13 +30,8 @@ export const Route = createFileRoute('/api/share/$')({
             }
             const found = await resolved.files.get(fileId)
             if (!found) return new Response(null, { status: 404 })
-            return new Response(found.bytes.slice(), {
-              headers: {
-                'content-type': found.file.mime,
-                'x-content-type-options': 'nosniff',
-                ...NO_STORE,
-              },
-            })
+            // A link can be turned off: nothing it served may outlive it in a cache.
+            return fileResponse(request, found, NO_STORE)
           }
           if (part) return Response.json({ error: 'not found' }, { status: 404 })
           return Response.json(sharedPage(resolved.workspace, token), { headers: NO_STORE })

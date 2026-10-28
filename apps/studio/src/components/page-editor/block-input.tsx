@@ -1,3 +1,4 @@
+import { acceptFor } from '@washi/domain'
 import { useNoticeStore } from '@washi/ui'
 import type { KeyboardEvent } from 'react'
 import { useRef } from 'react'
@@ -7,6 +8,7 @@ import {
   HEADING_LEVELS,
   KIND_LOOKS,
   KIND_PLACEHOLDERS,
+  pickFile,
   type SlashOption,
   slashMatches,
   useAutoSize,
@@ -24,9 +26,15 @@ export function BlockInput({ block, numberAt }: BlockInputProps) {
 
   const pick = (option: SlashOption) => {
     if (option.type === 'data') {
+      const { pick: chosen } = option
+      // An upload's picker opens inside this press; the block lands once the file is stored.
+      const ready =
+        chosen.kind === 'upload'
+          ? pickFile(acceptFor(chosen.as)).then((file) => (file ? { ...chosen, file } : null))
+          : Promise.resolve(chosen)
       // The `/` text stays put, so a refused name (taken since the menu loaded) can be retyped.
-      store()
-        .insertData(block.id, option.pick)
+      ready
+        .then((landing) => landing && store().insertData(block.id, landing))
         .catch((cause: unknown) =>
           useNoticeStore
             .getState()

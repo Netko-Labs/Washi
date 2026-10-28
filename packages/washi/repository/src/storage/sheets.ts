@@ -19,6 +19,8 @@ export interface SheetIndexInput {
   /** Plain text + outbound refs, extracted by the service before persist. */
   body: string
   refs: string[]
+  /** `file:<id>` keys the page uses, so a purge knows which uploads it frees. */
+  files?: string[]
 }
 
 const SUMMARY = {
@@ -237,6 +239,10 @@ export function indexSheet(ws: Workspace, id: string, title: string, index: Shee
   ws.db.delete(sheetLinkTable).where(eq(sheetLinkTable.src, id)).run()
   for (const dst of index.refs) {
     ws.db.insert(sheetLinkTable).values({ src: id, dst }).onConflictDoNothing().run()
+  }
+  ws.sqlite.query('DELETE FROM sheet_files WHERE src = ?').run(id)
+  for (const key of index.files ?? []) {
+    ws.sqlite.query('INSERT OR IGNORE INTO sheet_files (src, key) VALUES (?, ?)').run(id, key)
   }
 }
 

@@ -1,4 +1,5 @@
 import { IconUpload } from '@tabler/icons-react'
+import { acceptFor } from '@washi/domain'
 import { type UploadDropProps, useImageUpload } from './lib'
 
 /** Drop or browse one picture; it lands in the files store and the page wears its key. */
@@ -25,7 +26,7 @@ export function UploadDrop({ hint, onPick }: UploadDropProps) {
       </span>
       <input
         type="file"
-        accept="image/jpeg,image/png,image/webp"
+        accept={acceptFor('image')}
         className="sr-only"
         disabled={upload.busy}
         onChange={(event) => {

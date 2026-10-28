@@ -96,3 +96,68 @@
     display: none;
   }
 }
+
+/* Media a page holds: the browser's own players inside the paper's corner. */
+.wsx-media {
+  margin: 0;
+}
+.wsx-media video {
+  display: block;
+  width: 100%;
+  max-height: 80cqh;
+  border-radius: var(--r-card);
+  background: #000;
+  object-fit: contain;
+}
+.wsx-media figcaption {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.82em;
+}
+.wsx-audio figcaption {
+  margin: 0 0 6px;
+  color: var(--ink);
+  font-weight: 600;
+}
+.wsx-audio audio {
+  display: block;
+  width: 100%;
+}
+.wsx-file {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  margin-inline: -10px;
+  border-radius: var(--r-cell);
+  color: var(--ink);
+  text-decoration: none;
+}
+a.wsx-file:hover {
+  background: var(--muted-bg);
+}
+.wsx-file-kind {
+  display: grid;
+  flex: none;
+  place-items: center;
+  min-width: 38px;
+  height: 26px;
+  padding: 0 5px;
+  border-radius: 6px;
+  background: var(--muted-bg);
+  color: var(--muted);
+  font-size: 0.68em;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.wsx-file-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wsx-file-size {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 0.82em;
+  white-space: nowrap;
+}

@@ -1,3 +1,4 @@
+import { uploadRefusal } from '@washi/domain'
 import { hostUploadFile } from '@washi/ui'
 import { useState } from 'react'
 import type { UploadState } from '../types'
@@ -9,6 +10,12 @@ export function useImageUpload(onPick: (key: string) => void) {
   const upload = async (file: File) => {
     const send = hostUploadFile()
     if (!send) return
+    // The server takes videos and documents too; a cover or an icon is a picture.
+    const refused = uploadRefusal(file.type, file.size, 'image')
+    if (refused) {
+      setState({ busy: false, error: refused })
+      return
+    }
     setState({ busy: true, error: null })
     try {
       const stored = await send(file)

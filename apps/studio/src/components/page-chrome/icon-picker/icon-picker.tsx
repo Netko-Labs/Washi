@@ -35,7 +35,10 @@ export function IconPicker({ anchor, current, onPick, onClose }: PickerProps) {
 
         {tab === 'emoji' && <EmojiPanel current={current} onPick={onPick} />}
         {tab === 'upload' && (
-          <UploadDrop hint="Square works best · JPG · PNG · WebP · up to 5 MB" onPick={onPick} />
+          <UploadDrop
+            hint="Square works best · JPG · PNG · WebP · GIF · up to 10 MB"
+            onPick={onPick}
+          />
         )}
       </div>
     </Floating>

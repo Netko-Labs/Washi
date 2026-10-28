@@ -85,7 +85,9 @@ export function CoverPicker({ anchor, current, onPick, onClose }: PickerProps) {
         </div>
       )}
 
-      {tab === 'upload' && <UploadDrop hint="JPG · PNG · WebP · up to 5 MB" onPick={onPick} />}
+      {tab === 'upload' && (
+        <UploadDrop hint="JPG · PNG · WebP · GIF · up to 10 MB" onPick={onPick} />
+      )}
     </div>
   )
 }

@@ -4,6 +4,7 @@ import type { ComponentSpec, WsxRegistry } from '@washi/wsx'
 import { z } from 'zod'
 import { LAYOUT_SPECS } from './layout-specs'
 import { coverKeySchema, pageIconSchema } from './looks'
+import { MEDIA_SPECS, mediaSrcSchema } from './media-specs'
 import { PAGE_SPECS } from './page-specs'
 import { p } from './spec-kit'
 import {
@@ -173,7 +174,7 @@ const surface: Record<string, ComponentSpec> = {
   ),
   Figure: p(
     {
-      src: z.url({ protocol: /^https$/ }),
+      src: mediaSrcSchema,
       alt: z.string().min(1).max(300),
       caption: z.string().max(300).optional(),
       ratio: z.enum(['16:9', '4:3', '3:2', '1:1']).optional(),
@@ -492,6 +493,7 @@ export const paperRegistry: WsxRegistry = {
     ...text,
     ...surface,
     ...PAGE_SPECS,
+    ...MEDIA_SPECS,
     ...dataOut,
     ...dataIn,
     ...flow,
@@ -506,6 +508,7 @@ export const PRIMITIVE_GROUPS = {
   text: Object.keys(text),
   surface: Object.keys(surface),
   pages: Object.keys(PAGE_SPECS),
+  media: Object.keys(MEDIA_SPECS),
   dataOut: Object.keys(dataOut),
   dataIn: Object.keys(dataIn),
   flow: Object.keys(flow),

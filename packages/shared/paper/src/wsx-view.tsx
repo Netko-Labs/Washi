@@ -24,6 +24,7 @@ import { Divider, Grid, Row, Section, SheetFrame, Stack } from './components/fra
 import { Button, Compose, Field, Slider, Switch, Task } from './components/input'
 import { Chip, Mascot, Missing } from './components/kit'
 import { Bento, Column, Columns, Tile } from './components/layout'
+import { Audio, File, Video } from './components/media'
 import { Backlinks, Include, Outline, PageLink, Subpages } from './components/pages'
 import { Redact } from './components/redact'
 import { Roadmap } from './components/roadmap'
@@ -103,6 +104,9 @@ const COMPONENTS: Record<string, ComponentType<never>> = {
   Outline,
   Embed,
   Bookmark,
+  Video,
+  Audio,
+  File,
   Title,
   Text,
   List,

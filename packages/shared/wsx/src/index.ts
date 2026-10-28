@@ -31,7 +31,7 @@ export {
   parseExpr,
   validateExpr,
 } from './expr'
-export { extractMissing, extractRefs, extractText } from './extract'
+export { extractFiles, extractMissing, extractRefs, extractText } from './extract'
 export { parse, WsxParseError } from './parse'
 export { serialize } from './serialize'
 export type {

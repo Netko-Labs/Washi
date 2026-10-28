@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react'
-import { styled } from '../lib'
+import { mediaUrl, styled } from '../lib'
 import type { BlockProps, Tone } from '../lib/types'
+import { useSheetLook } from '../look'
 
 const CALLOUT_ICONS: Record<Tone, string> = {
   neutral: 'M12 8v5m0 3h.01M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z',
@@ -82,11 +83,13 @@ export function Figure({
   ratio,
   ...rest
 }: BlockProps & { src: string; alt: string; caption?: string; ratio?: string }) {
+  const look = useSheetLook()
+  const url = mediaUrl(src, look)
   const style = ratio ? ({ '--ratio': RATIOS[ratio] } as CSSProperties) : undefined
   return (
     <figure {...styled(rest, 'wsx-figure')}>
       <div className="wsx-figure-frame" style={style}>
-        <img src={src} alt={alt} loading="lazy" />
+        {url && <img src={url} alt={alt} loading="lazy" referrerPolicy="no-referrer" />}
       </div>
       {caption && <figcaption>{caption}</figcaption>}
     </figure>

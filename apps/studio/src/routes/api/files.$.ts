@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { bodyTooLarge, fileLimits, lengthMissing, workspaceFor } from '@/server/files'
+import { bodyTooLarge, fileLimits, fileResponse, lengthMissing, workspaceFor } from '@/server/files'
 
 /**
  * One route, two verbs. POST `/api/files` takes multipart in and answers `{ id, name, mime,
@@ -14,7 +14,7 @@ export const Route = createFileRoute('/api/files/$')({
         if (resolved instanceof Response) return resolved
         if (lengthMissing(request))
           return Response.json({ error: 'length required' }, { status: 411 })
-        if (bodyTooLarge(request)) return Response.json({ error: 'up to 5 MB' }, { status: 413 })
+        if (bodyTooLarge(request)) return Response.json({ error: 'too large' }, { status: 413 })
         const form = await request.formData().catch(() => null)
         const file = form?.get('file')
         if (!(file instanceof File)) return Response.json({ error: 'no file' }, { status: 400 })
@@ -32,14 +32,7 @@ export const Route = createFileRoute('/api/files/$')({
         if (resolved instanceof Response) return resolved
         const found = await resolved.files.get(params._splat ?? '')
         if (!found) return new Response(null, { status: 404 })
-        return new Response(found.bytes.slice(), {
-          headers: {
-            'content-type': found.file.mime,
-            'x-content-type-options': 'nosniff',
-            'content-length': String(found.bytes.byteLength),
-            'cache-control': 'private, max-age=31536000, immutable',
-          },
-        })
+        return fileResponse(request, found)
       },
     },
   },

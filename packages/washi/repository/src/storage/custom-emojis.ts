@@ -53,12 +53,13 @@ export function deleteCustomEmoji(ws: Workspace, id: string): boolean {
   })()
 }
 
-/** Whether any page, trashed or not, or any emoji still points at the upload. */
+/** Whether any page, trashed or not — its look or a block — or any emoji still points at the upload. */
 export function isUploadWorn(ws: Workspace, fileId: string): boolean {
   const key = `file:${fileId}`
   const row = ws.sqlite
     .query(
       `SELECT 1 FROM sheets WHERE cover = ?1 OR icon = ?1
+       UNION ALL SELECT 1 FROM sheet_files WHERE key = ?1
        UNION ALL SELECT 1 FROM custom_emojis WHERE file_id = ?2 LIMIT 1`,
     )
     .get(key, fileId)

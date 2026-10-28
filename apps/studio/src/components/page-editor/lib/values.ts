@@ -87,3 +87,11 @@ export const NEW_SUBPAGE_SOURCE = `<Sheet title="Untitled" icon="notebook" wsx="
 
 /** How many pages `/` offers to link to at once. */
 export const LINK_MATCHES = 5
+
+/** What `/` offers to upload, and the block each becomes. */
+export const UPLOAD_OPTIONS = [
+  { as: 'image', label: 'Image', words: 'image picture photo' },
+  { as: 'video', label: 'Video', words: 'video movie clip' },
+  { as: 'audio', label: 'Audio', words: 'audio sound music recording' },
+  { as: 'file', label: 'File', words: 'file document pdf attachment upload' },
+] as const

@@ -24,7 +24,14 @@ export type {
   TextBlock,
   TextKind,
 } from './types'
-export { blockFrame, kindMatches, numberedPositions, slashMatches, titleOf } from './utils'
+export {
+  blockFrame,
+  kindMatches,
+  numberedPositions,
+  pickFile,
+  slashMatches,
+  titleOf,
+} from './utils'
 export {
   FIELD_CLASS,
   HEADING_LEVELS,

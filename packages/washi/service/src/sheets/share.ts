@@ -14,7 +14,7 @@ import {
   type Workspace,
   workspaceThemeBySlug,
 } from '@washi/repository'
-import { parse, parseExpr, serialize, type WsxElement } from '@washi/wsx'
+import { extractFiles, parse, parseExpr, serialize, type WsxElement } from '@washi/wsx'
 import { runHistory } from '../tables/history'
 import { runQuery } from '../tables/service'
 import { readableSet } from './access'
@@ -169,9 +169,13 @@ export function sharedTable(ws: Workspace, token: string, name: string): TableSp
 }
 
 /** Only an upload the page wears as its cover or icon leaves through its link. */
+/** A link serves only the uploads its page itself uses — its look, or a block's file. */
 export function sharedFileAllowed(ws: Workspace, token: string, fileId: string): boolean {
-  const { sheet } = sharedSheet(ws, token)
-  return sheet.cover === `file:${fileId}` || sheet.icon === `file:${fileId}`
+  const { sheet, root } = sharedSheet(ws, token)
+  const key = `file:${fileId}`
+  return (
+    sheet.cover === key || sheet.icon === key || extractFiles(redactForShare(root)).includes(key)
+  )
 }
 
 /** Who reads a page, its live link, and what that link leaves out — the Share popover's view. */

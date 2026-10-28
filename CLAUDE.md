@@ -191,10 +191,18 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
 - **Files.** Uploads live in the workspace's files store: a row in the workspace's `files`
   table and the bytes beside the `.db` (`<dataDir>/<workspace>.files/`) or, with
   `WASHI_FILES_S3_*` set, in a bucket under a per-workspace prefix through Bun's own S3 client.
-  `POST /api/files` (multipart, JPG · PNG · WebP, 5 MB) and `GET /api/files/<id>` are studio
-  routes gated like a workspace procedure (`src/server/files.ts`); `files.remove` is tRPC. A
-  purge frees the uploads its pages' covers and icons pointed at (`trashedUploads`). The desktop
-  renders no covers or uploaded icons yet.
+  `POST /api/files` (multipart) and `GET /api/files/<id>` are studio routes gated like a workspace
+  procedure (`src/server/files.ts`); `files.remove` is tRPC. What a workspace takes is `UPLOAD_RULES`
+  in domain (D95): pictures 10 MB, videos 50 MB, audio and documents 25 MB — never HTML or SVG;
+  `uploadRefusal` says why in words, on the server and before a picker uploads (covers, icons and
+  emojis ask for a picture). Served bytes are `nosniff`, `Content-Security-Policy: sandbox`, inline
+  only for media and PDFs (else a download), and honour `Range` (`byteRange` → 206) so a video seeks.
+  `<Video>` `<Audio>` `<File src name bytes>` and `<Figure>` take an https address or `file:<id>`
+  (`mediaUrl` through the host's `fileUrl`); `/image` `/video` `/audio` `/file` open the picker in the
+  press that chose them and land the block once stored. Every `file:` key a page holds is indexed in
+  `sheet_files` on each write (`extractFiles`), so a purge frees a block's upload like a cover's
+  (`trashedUploads`), `isUploadWorn` keeps one still used, and a shared link serves only uploads its
+  own (redacted) page uses. The desktop renders no covers or uploaded icons yet.
 - **A workspace may bring its own bucket (D70).** Settings → Workspace → Storage: endpoint,
   region, bucket, folder and a key pair, in the control plane's `organization_storage` (the
   pair sealed like BYOK, only the key id's last four shown; `storage.*`, writes `ownerProcedure`).
