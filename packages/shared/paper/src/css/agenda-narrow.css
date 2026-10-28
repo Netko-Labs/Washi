@@ -1,0 +1,113 @@
+/* Agenda at narrow widths: a tighter week from 560px, a list under it. */
+
+/* 560–719: still seven columns, set tighter — a week reads best as a week. */
+@container wsx (min-width: 560px) and (max-width: 719px) {
+  .wsx-agenda[data-view="week"] .wsx-agenda-day {
+    min-height: 148px;
+  }
+  .wsx-agenda[data-view="week"] .wsx-agenda-day-head {
+    padding: 8px 4px 6px 8px;
+    gap: 4px;
+  }
+  .wsx-agenda[data-view="week"] .wsx-agenda-weekday {
+    font-size: 10px;
+  }
+  .wsx-agenda[data-view="week"] .wsx-agenda-date {
+    font-size: 15px;
+  }
+  .wsx-agenda[data-view="week"] .wsx-agenda-events {
+    gap: 4px;
+    padding: 0 5px 8px;
+  }
+  .wsx-agenda[data-view="week"] .wsx-agenda-event {
+    padding: 4px 6px 5px 8px;
+    border-radius: 6px;
+  }
+  .wsx-agenda[data-view="week"] .wsx-agenda-title {
+    font-size: 12px;
+  }
+  .wsx-agenda[data-view="week"] .wsx-agenda-badge,
+  .wsx-agenda[data-view="week"] .wsx-agenda-free {
+    display: none;
+  }
+}
+
+/*
+ * Under 560 a calendar is a list, as Calendly and Google show one: the day small on the left, its
+ * events one line each with the time at the end, an empty day a single quiet line.
+ */
+@container wsx (max-width: 559px) {
+  .wsx-agenda-days {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .wsx-agenda-day {
+    display: grid;
+    grid-template-columns: 46px minmax(0, 1fr);
+    align-items: start;
+    min-height: 0;
+    padding-left: 12px;
+  }
+  .wsx-agenda-day + .wsx-agenda-day {
+    border-top: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+    border-left: 0;
+  }
+  .wsx-agenda-day-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding: 10px 0;
+  }
+  .wsx-agenda-weekday {
+    font-size: 10px;
+  }
+  .wsx-agenda-date {
+    font-size: 15px;
+  }
+  .wsx-agenda-day[data-today] .wsx-agenda-date {
+    min-width: 24px;
+    height: 24px;
+    padding: 0 5px;
+    font-size: 12px;
+  }
+  .wsx-agenda-add {
+    position: absolute;
+    top: 8px;
+    right: 6px;
+    opacity: 1;
+  }
+  .wsx-agenda-events {
+    gap: 4px;
+    padding: 10px 40px 10px 0;
+  }
+  .wsx-agenda-free {
+    padding: 2px 0 0;
+  }
+  .wsx-agenda-event {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 8px;
+    padding: 6px 10px 6px 11px;
+    border-radius: 7px;
+  }
+  .wsx-agenda-title {
+    display: block;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    font-size: 13px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .wsx-agenda-time {
+    order: 2;
+    flex: none;
+  }
+  .wsx-agenda-badge {
+    order: 1;
+    flex: none;
+    margin: 0;
+  }
+  .wsx-agenda-range {
+    font-size: 16px;
+  }
+}

@@ -132,7 +132,7 @@ export const SPECIMENS: Record<string, Specimen> = {
   },
   Roadmap: { props: { bind: { table: 'tasks' }, date: 'due', title: 'title' } },
   Progress: { props: { value: 0.6, label: 'done / total' } },
-  Badge: { children: 'doing' },
+  Badge: { props: { tone: 'info' }, children: 'doing' },
   Avatar: { props: { label: 'Mira Kaneko' } },
   Schema: { props: { table: 'tasks' } },
 
@@ -215,5 +215,5 @@ export const SPECIMENS: Record<string, Specimen> = {
 
   Chip: { props: { tone: 'success' }, children: 'shipped' },
   Mascot: { props: { mood: 'happy', size: 'md' } },
-  Missing: { props: { kind: 'Calendar', reason: 'rows placed by date; not in the registry yet' } },
+  Missing: { props: { kind: 'Map', reason: 'rows placed on a map by their address' } },
 }

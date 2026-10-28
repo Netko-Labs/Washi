@@ -1,0 +1,173 @@
+/* Board: columns that share the width before they scroll, cards that sit quietly on them. */
+
+.wsx-board {
+  position: relative;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: 2px;
+}
+/* While columns hide past the edge, the edge fades; scrolled to the end, it doesn't. */
+@supports (animation-timeline: scroll()) {
+  .wsx-board {
+    animation: wsx-board-edge linear both;
+    animation-timeline: scroll(self inline);
+  }
+  @keyframes wsx-board-edge {
+    0%,
+    97% {
+      mask-image: linear-gradient(to right, #000 calc(100% - 48px), transparent);
+    }
+    100% {
+      mask-image: none;
+    }
+  }
+}
+.wsx-board-col {
+  position: relative;
+  flex: 1 0 248px;
+  max-width: 340px;
+  scroll-snap-align: start;
+  background: color-mix(in srgb, var(--muted-bg) 70%, transparent);
+  border: 1px solid transparent;
+  border-radius: var(--r-card);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition:
+    background var(--ease),
+    border-color var(--ease);
+}
+.wsx-board-col[data-hot] {
+  background: color-mix(in srgb, var(--accent) 8%, var(--muted-bg));
+  border-color: color-mix(in srgb, var(--accent) 60%, transparent);
+}
+.wsx-board-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px 2px;
+}
+.wsx-board-head-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.wsx-board-head-label {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.wsx-board-head-label::first-letter {
+  text-transform: uppercase;
+}
+.wsx-board-head-name i {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--col, var(--accent));
+}
+.wsx-board-head-count {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.wsx-board-card {
+  background: var(--card);
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  cursor: grab;
+  transition:
+    box-shadow var(--ease),
+    opacity var(--ease),
+    border-color var(--ease);
+}
+.wsx-board-card:hover {
+  border-color: var(--border);
+  box-shadow: 0 4px 14px rgb(0 0 0 / 0.07);
+}
+.wsx-board-card[data-openable] {
+  cursor: pointer;
+}
+.wsx-board-card[data-openable]:active {
+  cursor: grabbing;
+}
+.wsx-board-card[data-dragging] {
+  display: none;
+}
+.wsx-board-slot {
+  flex: none;
+  border: 1.5px dashed color-mix(in srgb, var(--accent) 55%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+}
+.wsx-board-card-kicker {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+.wsx-board-card-title {
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+.wsx-board-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+.wsx-board-card-note {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+.wsx-board-card-meta .wsx-avatar {
+  margin-left: auto;
+  width: 20px;
+  height: 20px;
+  font-size: 8.5px;
+}
+.wsx-board-drop {
+  border: 1px dashed color-mix(in srgb, var(--border) 80%, transparent);
+  border-radius: 10px;
+  padding: 14px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted);
+}
+.wsx-board-add {
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  color: var(--muted);
+  text-align: left;
+  padding: 6px 6px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    background var(--ease),
+    color var(--ease);
+}
+.wsx-board-add:hover {
+  background: var(--card);
+  color: var(--ink);
+}

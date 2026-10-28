@@ -70,7 +70,7 @@
   position: relative;
   text-align: start;
 }
-.wsx-mark {
+.wsx-sheet-mark {
   display: grid;
   place-items: center;
   width: 72px;
@@ -80,21 +80,21 @@
   font-size: 52px;
   line-height: 1;
 }
-.wsx-mark[data-over-cover] {
+.wsx-sheet-mark[data-over-cover] {
   position: relative;
   margin-top: -36px;
 }
-button.wsx-mark {
+button.wsx-sheet-mark {
   cursor: pointer;
 }
-button.wsx-mark:hover {
+button.wsx-sheet-mark:hover {
   background: var(--muted-bg);
 }
-.wsx-mark > img {
+.wsx-sheet-mark > img {
   width: 64px;
   height: 64px;
 }
-.wsx-mark > svg {
+.wsx-sheet-mark > svg {
   width: 48px;
   height: 48px;
 }

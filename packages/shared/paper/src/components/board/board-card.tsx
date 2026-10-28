@@ -1,6 +1,7 @@
+import { toneOf } from '../../lib'
 import { Avatar, Badge } from '../data'
 import { cell } from '../states'
-import { BADGE_TONES, type BoardCardProps } from './lib'
+import type { BoardCardProps } from './lib'
 
 export function BoardCard({
   row,
@@ -34,7 +35,7 @@ export function BoardCard({
       {(badge || meta || avatar) && (
         <div className="wsx-board-card-meta">
           {badge && row[badge] !== null && row[badge] !== undefined && (
-            <Badge size="sm" tone={BADGE_TONES[String(row[badge]).toLowerCase()]}>
+            <Badge size="sm" tone={toneOf(String(row[badge]))}>
               {actions.shown(row[badge])}
             </Badge>
           )}

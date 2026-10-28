@@ -1,3 +1,4 @@
+import { toneOf } from '../../../lib/tone-of'
 import type { ActionRef, Row } from '../../../lib/types'
 import type { BoardColumn, Move, RankPatch } from './types'
 
@@ -90,4 +91,13 @@ export function naturalBefore(rows: Row[], column: Row[], id: string): string | 
   const at = place.get(id) ?? -1
   const next = column.find((row) => row.id !== id && (place.get(row.id) ?? -1) > at)
   return next ? String(next.id) : null
+}
+
+/** A column named for a meaning (done, blocked, in review) wears its tone; others take the ramp. */
+export function columnHue(name: string, index: number): string {
+  const tone = toneOf(name)
+  if (tone === 'neutral') return 'var(--muted)'
+  if (tone === 'accent') return 'var(--k-fill)'
+  if (tone) return `var(--tone-${tone})`
+  return `var(--chart-${(index % 5) + 1})`
 }

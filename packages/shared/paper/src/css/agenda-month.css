@@ -1,6 +1,6 @@
 /* Agenda view="month": a grid of whole weeks, hairlines between days, events one line each. */
 
-@container wsx (min-width: 720px) {
+@container wsx (min-width: 560px) {
   .wsx-agenda[data-view="month"] .wsx-agenda-days {
     gap: 1px;
     background: color-mix(in srgb, var(--border) 60%, transparent);
@@ -15,7 +15,7 @@
     color: var(--muted);
   }
   .wsx-agenda[data-view="month"] .wsx-agenda-day {
-    min-height: 116px;
+    min-height: clamp(84px, 14cqi, 120px);
     background: var(--card);
   }
   .wsx-agenda[data-view="month"] .wsx-agenda-day + .wsx-agenda-day {
@@ -103,8 +103,8 @@
   display: none;
 }
 
-/* Under 720 a month is the week's list, holding only the days with something on, and today. */
-@container wsx (max-width: 719px) {
+/* Under 560 a month is the week's list, holding only the days with something on, and today. */
+@container wsx (max-width: 559px) {
   .wsx-agenda[data-view="month"] .wsx-agenda-head,
   .wsx-agenda[data-view="month"] .wsx-agenda-day[data-outside],
   .wsx-agenda[data-view="month"] .wsx-agenda-day[data-empty]:not([data-today]) {

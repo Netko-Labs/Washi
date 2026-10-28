@@ -32,9 +32,3 @@
   width: auto;
   margin-inline: 0;
 }
-
-/* A board given room spends it on its columns before it shows empty floor. */
-:is(.wsx-board, .wsx-db):is([data-width="wide"], [data-width="full"]) .wsx-board-col {
-  flex: 1 0 262px;
-  max-width: 360px;
-}
