@@ -48,6 +48,7 @@ import {
   Text,
   Title,
 } from './components/text'
+import { Widget } from './components/widget'
 import { DataProvider } from './data'
 import { NowContext, resolveRow, resolveRowDeep } from './lib'
 import type { Row as DataRow } from './lib/types'
@@ -184,6 +185,11 @@ function renderElement(node: WsxElement, ctx: Ctx): ReactNode {
       return createElement(Source, { ...p, number: ctx.numbers.get(node) ?? 0 } as never, ...kids)
     case 'Ref':
       return createElement(Ref, p as never, ...(kids.length ? kids : []))
+    case 'Widget':
+      return createElement(Widget, {
+        ...p,
+        source: node.children.map((child) => (child.kind === 'text' ? child.value : '')).join(''),
+      } as never)
     case 'Script':
       // What the script returns is drawn here, inside this page's own state and data.
       return createElement(Script, {

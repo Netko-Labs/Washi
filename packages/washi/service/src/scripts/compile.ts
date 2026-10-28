@@ -46,14 +46,38 @@ function scripts(node: WsxNode, path: string, out: FoundScript[]) {
   for (const child of node.children) scripts(child, here, out)
 }
 
+/** A widget is a block's worth of HTML; a page that carries more is refused at save. */
+export const WIDGET_MAX_CHARS = 50_000
+
+function widgetDiagnostics(node: WsxNode, path: string): Diagnostic[] {
+  if (node.kind !== 'element') return []
+  const here = path ? `${path} > ${node.name}` : node.name
+  const own =
+    node.name === 'Widget' &&
+    node.children.reduce(
+      (sum, child) => sum + (child.kind === 'text' ? child.value.length : 0),
+      0,
+    ) > WIDGET_MAX_CHARS
+      ? [
+          {
+            severity: 'error' as const,
+            path: here,
+            message: `widget: at most ${WIDGET_MAX_CHARS} characters`,
+          },
+        ]
+      : []
+  return [...own, ...node.children.flatMap((child) => widgetDiagnostics(child, here))]
+}
+
 /** Every script on the page compiled now, so one that cannot run is refused before it is saved. */
 export function scriptDiagnostics(root: WsxElement): Diagnostic[] {
   const found: FoundScript[] = []
   scripts(root, '', found)
-  return found.flatMap(({ path, source }) => {
+  const scripted = found.flatMap(({ path, source }) => {
     const compiled = compileScript(source)
     return compiled.ok
       ? []
       : [{ severity: 'error' as const, path, message: `script: ${compiled.error}` }]
   })
+  return [...widgetDiagnostics(root, ''), ...scripted]
 }

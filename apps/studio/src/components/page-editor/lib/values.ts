@@ -107,3 +107,11 @@ export const STARTER_SCRIPT = `function view() {
     </Card>
   )
 }`
+
+/** What `/widget` drops in: a clock in the page's own accent, reaching nothing. */
+export const STARTER_WIDGET = `<div id="clock" style="font: 600 40px system-ui; color: var(--accent)"></div>
+<script>
+  const tick = () => { clock.textContent = new Date().toLocaleTimeString() }
+  tick()
+  setInterval(tick, 1000)
+</script>`

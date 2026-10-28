@@ -12,7 +12,14 @@ import type {
   TableRef,
   TextBlock,
 } from './types'
-import { KIND_OPTIONS, LINK_MATCHES, SHORTCUTS, STARTER_SCRIPT, UPLOAD_OPTIONS } from './values'
+import {
+  KIND_OPTIONS,
+  LINK_MATCHES,
+  SHORTCUTS,
+  STARTER_SCRIPT,
+  STARTER_WIDGET,
+  UPLOAD_OPTIONS,
+} from './values'
 
 /** `# `, `- `, `[] `… at the start of a plain text block turn it into that kind. */
 export function applyShortcut(block: TextBlock): TextBlock | null {
@@ -121,8 +128,16 @@ function uploadOptions(needle: string): Extract<SlashOption, { type: 'data' }>[]
     pick: { kind: 'script' },
   }
   const pictures = !needle || 'gallery photos pictures album'.includes(needle) ? [gallery] : []
-  const code = !needle || 'script code typescript program widget'.includes(needle) ? [script] : []
-  return [...uploads, ...pictures, ...code]
+  const widget: Extract<SlashOption, { type: 'data' }> = {
+    type: 'data',
+    key: 'widget',
+    label: 'Widget',
+    hint: 'HTML',
+    pick: { kind: 'widget' },
+  }
+  const code = !needle || 'script code typescript program'.includes(needle) ? [script] : []
+  const html = !needle || 'widget html embed code'.includes(needle) ? [widget] : []
+  return [...uploads, ...pictures, ...code, ...html]
 }
 
 /** The block an upload becomes: a picture, a player, or a document line. */
@@ -259,6 +274,9 @@ export function bookmarkNode(href: string, seen: BookmarkPreview | null): WsxEle
 export function dataNode(pick: DataPick): WsxElement {
   if (pick.kind === 'script')
     return element('Script', {}, [{ kind: 'text', value: STARTER_SCRIPT }])
+  if (pick.kind === 'widget') {
+    return element('Widget', { title: 'A clock' }, [{ kind: 'text', value: STARTER_WIDGET }])
+  }
   if (pick.kind === 'upload' || pick.kind === 'gallery') {
     throw new Error('an upload lands once its file is stored')
   }

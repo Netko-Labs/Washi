@@ -33,9 +33,24 @@ function compileOnce(source: string): Promise<CompiledScript> {
   return found
 }
 
-/** A new workspace, or a changed list: the next embed asks again. */
+let widgets: { at: number; on: Promise<boolean> } | null = null
+
+/** Whether an owner lets pages run widgets, asked once a minute at most; a failed read is not kept. */
+function widgetsOn(): Promise<boolean> {
+  if (!widgets || Date.now() - widgets.at > 60_000) {
+    const asked = { at: Date.now(), on: api.embeds.widgets.query() }
+    widgets = asked
+    asked.on.catch(() => {
+      if (widgets === asked) widgets = null
+    })
+  }
+  return widgets.on.catch(() => false)
+}
+
+/** A new workspace, or a changed list or switch: the next embed or widget asks again. */
 export function forgetEmbedHosts(): void {
   listed = null
+  widgets = null
 }
 
 /** Wires the closed capability surface of rendered sheets to the main process. */
@@ -97,6 +112,8 @@ export const paperHost: PaperHost = {
   },
 
   compileScript: (source) => compileOnce(source),
+
+  widgetsAllowed: () => widgetsOn(),
 
   embedAllowed: async (host) => (await listedEmbedHosts()).includes(host),
 

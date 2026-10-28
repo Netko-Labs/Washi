@@ -30,6 +30,15 @@ export const PAGE_SPECS: Record<string, ComponentSpec> = {
     'none',
     { hints: { url: 'the address is href, https only' } },
   ),
+  Widget: p(
+    { title: z.string().max(80).optional(), height: z.number().int().min(60).max(1600).optional() },
+    'text',
+    {
+      hints: {
+        html: 'the HTML is the Widget’s children: a backtick string; it runs only where an owner allows widgets',
+      },
+    },
+  ),
   Script: p({ title: z.string().max(80).optional() }, 'text', {
     hints: { code: 'the TSX is the Script’s children: a backtick string with a function view()' },
   }),

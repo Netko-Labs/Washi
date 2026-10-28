@@ -452,6 +452,16 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   Script has Code · Preview (`ScriptBlock`): its TSX in CodeMirror, compiled 400 ms after the last
   key, and only what compiles lands in the block — autosave never sends a script the server refuses. A host without `compileScript`
   (the book, `/learn`, a shared link) says scripts run inside a workspace.
+- **A page may hold a widget, where an owner allows (D98).** `<Widget title height>` keeps HTML and JS
+  as its text (≤ 50 000 chars, checked at save) and draws it in an iframe `sandbox="allow-scripts"` —
+  no `allow-same-origin`, so an opaque origin with no cookies, storage or parent — under a CSP with
+  no network at all (`default-src 'none'`; pictures only `data:`/`blob:`, which can carry nothing out).
+  Its only way out is a `postMessage` bridge the prelude lends as `washi.rows(query)` (the reader's
+  rows), `washi.state` / `onState` / `setState` (page state, scalars), `washi.act(action)` (page
+  verbs) and its own height; the page hears only its own frame's messages (`useWidget`). The page's
+  colours arrive on load. App meta `widgets_enabled`, off by default: `embeds.widgets` /
+  `embeds.setWidgets` (owners and admins), Settings → Workspace → Embeds → Widgets; off, or on a
+  shared link, a widget is a note. `/widget` drops a clock.
 - **An embed is https and listed (D92).** `<Embed src title ratio height>`: the registry refuses http;
   a built-in provider (`EMBED_PROVIDERS` — YouTube via youtube-nocookie, Vimeo, Spotify, Loom, Figma,
   CodePen, CodeSandbox, Miro, Google Maps, Indify) turns its page URL into its player and always plays;

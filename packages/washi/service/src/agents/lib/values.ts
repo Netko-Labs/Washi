@@ -71,6 +71,10 @@ Selects; text, numbers, true/false), useRows(inkQuery) (rows the reader may read
 arrive), useInterval(ms ≥ 1000), act(action) (the page's verbs), now(). No imports, exports, fetch,
 DOM or timers; a run past 60 ms is stopped; no ${'$'}{…} inside the backticks — write \\\${ instead.
 Run sheet_check: a script that will not compile is refused. Prefer plain primitives when they suffice.
+A <Widget title height> holds raw HTML/JS (a backtick string) for what primitives cannot draw — a
+canvas game, a custom chart; it reaches the page only through washi.rows(query), washi.state,
+washi.setState(key, value), washi.act(action); no network. It runs only if an owner allowed widgets —
+prefer a <Script> or plain primitives.
 A hub page (Finances, a semester) lists what is under it: <Subpages layout="gallery"/> (live, in
 the sidebar's order; list · cards · gallery of covers) or <PageLink sheet="<id>"/> for one page —
 make the subpages with sheet_create and parentId, never a hand-kept list of Refs. <Include sheet/> draws

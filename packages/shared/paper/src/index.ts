@@ -61,6 +61,7 @@ export {
   Text,
   Title,
 } from './components/text'
+export { Widget } from './components/widget'
 export { DataProvider, useData } from './data'
 export { frameOf } from './lib/sheet-look'
 export type {
