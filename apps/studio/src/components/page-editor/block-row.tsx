@@ -7,6 +7,9 @@ import { type BlockRowProps, useBlockDrop, useEditorStore } from './lib'
 import { LockedBlock } from './locked-block'
 import { ScriptBlock } from './script-block'
 
+/** Blocks whose code is typed in place: what a page draws, and what a row write runs. */
+const SCRIPTED = new Set(['Script', 'Automation'])
+
 const LINE: Record<string, string> = {
   before: '-top-px inset-x-0 h-[3px]',
   after: '-bottom-px inset-x-0 h-[3px]',
@@ -49,10 +52,10 @@ export function BlockRow({ block, numberAt, rootProps, isNested }: BlockRowProps
           className={`pointer-events-none absolute z-20 rounded-full bg-primary ${LINE[drop.place]}`}
         />
       )}
-      {block.kind === 'locked' && block.node.name === 'Script' && (
+      {block.kind === 'locked' && SCRIPTED.has(block.node.name) && (
         <ScriptBlock block={block} rootProps={rootProps} />
       )}
-      {block.kind === 'locked' && block.node.name !== 'Script' && (
+      {block.kind === 'locked' && !SCRIPTED.has(block.node.name) && (
         <LockedBlock block={block} rootProps={rootProps} />
       )}
       {block.kind === 'columns' && <ColumnsRow block={block} rootProps={rootProps} />}

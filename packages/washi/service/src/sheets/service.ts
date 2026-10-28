@@ -22,7 +22,7 @@ import {
   type WsxMissing,
   WsxParseError,
 } from '@washi/wsx'
-import { scriptDiagnostics } from '../scripts/compile'
+import { extractAutomations, scriptDiagnostics } from '../scripts/compile'
 import { guardWashiWrite, syncShare } from './access'
 import { accessOf, lookOf } from './look-of'
 
@@ -148,7 +148,12 @@ export function undoWashiWrite(ws: Workspace, id: string): SheetDetail {
 
 /** What search, backlinks and purge read off a page: its words, its links, its uploads. */
 export function indexOf(root: ReturnType<typeof parse>) {
-  return { body: extractText(root), refs: extractRefs(root), files: extractFiles(root) }
+  return {
+    body: extractText(root),
+    refs: extractRefs(root),
+    files: extractFiles(root),
+    automations: extractAutomations(root),
+  }
 }
 
 export function removeSheet(ws: Workspace, id: string): void {

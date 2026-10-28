@@ -462,6 +462,17 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   colours arrive on load. App meta `widgets_enabled`, off by default: `embeds.widgets` /
   `embeds.setWidgets` (owners and admins), Settings → Workspace → Embeds → Widgets; off, or on a
   shared link, a widget is a note. `/widget` drops a clock.
+- **A page may hold an automation (D97).** `<Automation table on="insert|update" title>` keeps TSX
+  defining `function run(event)` (`{ table, kind, row, before }`). Each write lands it in the index
+  (`sheet_automations`, read off the page by `extractAutomations`; a trashed page's sleep). Every row
+  write — any path, since `insertRecord`/`updateRecords` tell `onRecordWrite` (a per-workspace
+  listener set in repository) — runs the live automations on that table after the write, on the
+  server's own QuickJS (`runAutomation`: 16 MB, 100 ms, `rows(query)` reads synchronously, `act`
+  collects, `now`). Its actions apply only if the run finished: `table.insert · update · delete`
+  (hanko-checked, ≤ 50), signed `automation` — a write so signed never runs automations, so a rule
+  cannot loop. Every run is a ledger row (`automation`, `auto` or `denied` with why); a run that
+  changed rows emits `workspaceChanged`. The page draws a note (⚡ when a row is added to …); the
+  editor gives it Code · Preview like a Script; `/` offers *Automation · <table>* with a starter.
 - **An embed is https and listed (D92).** `<Embed src title ratio height>`: the registry refuses http;
   a built-in provider (`EMBED_PROVIDERS` — YouTube via youtube-nocookie, Vimeo, Spotify, Loom, Figma,
   CodePen, CodeSandbox, Miro, Google Maps, Indify) turns its page URL into its player and always plays;

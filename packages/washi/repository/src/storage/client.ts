@@ -135,6 +135,20 @@ function createTables(sqlite: Database) {
       PRIMARY KEY (src, key)
     )
   `)
+  sqlite.exec(`
+    CREATE TABLE IF NOT EXISTS sheet_automations (
+      src TEXT NOT NULL,
+      position INTEGER NOT NULL,
+      table_name TEXT NOT NULL,
+      event TEXT NOT NULL,
+      title TEXT,
+      source TEXT NOT NULL,
+      PRIMARY KEY (src, position)
+    )
+  `)
+  sqlite.exec(
+    'CREATE INDEX IF NOT EXISTS idx_sheet_automations ON sheet_automations(table_name, event)',
+  )
 
   sqlite.exec(`
     CREATE TABLE IF NOT EXISTS user_tables (

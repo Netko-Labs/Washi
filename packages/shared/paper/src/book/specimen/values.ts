@@ -33,6 +33,11 @@ export const SPECIMENS: Record<string, Specimen> = {
     children:
       '{`<div id="t" style="font: 600 40px system-ui; color: var(--accent)"></div>\n<script>setInterval(() => { t.textContent = new Date().toLocaleTimeString() }, 1000)</script>`}',
   },
+  Automation: {
+    props: { table: 'tasks', on: 'insert', title: 'Every new task starts as todo' },
+    children:
+      "{`function run(event) {\n  if (!event.row.status) act({ verb: 'table.update', table: 'tasks', row: event.row.id, set: { status: 'todo' } })\n}`}",
+  },
   Script: {
     props: { title: 'A counter' },
     children:

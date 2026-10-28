@@ -12,6 +12,7 @@ import {
   forgetUnenforcedVisibility,
   liftLooksIntoSource,
   reindexPages,
+  watchAutomations,
 } from '@washi/service'
 import { createEventBus, createPresenceBoard, type ResolvedWorkspace } from '@washi/trpc'
 import { watchAgentWrites } from './agent-watch'
@@ -50,6 +51,10 @@ export function createRuntime(options: RuntimeOptions): Runtime {
     reindexPages(workspace)
     const host = new AgentHost(workspace, keys)
     const workspaceId = workspace.id
+    // What an automation changed reaches open pages like any other write.
+    watchAutomations(workspace, () =>
+      events.emit('workspaceChanged', { workspaceId, kind: 'data', id: null }),
+    )
     const watch = watchAgentWrites(workspaceId, events, presence)
     host.setEvents({
       update: (sessionId, entry) => {

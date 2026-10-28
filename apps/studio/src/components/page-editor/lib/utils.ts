@@ -16,6 +16,7 @@ import {
   KIND_OPTIONS,
   LINK_MATCHES,
   SHORTCUTS,
+  STARTER_AUTOMATION,
   STARTER_SCRIPT,
   STARTER_WIDGET,
   UPLOAD_OPTIONS,
@@ -228,6 +229,13 @@ export function slashMatches(
     ...tables.flatMap((table): Extract<SlashOption, { type: 'data' }>[] => [
       {
         type: 'data',
+        key: `automation:${table.name}`,
+        label: `Automation · ${table.name.replace(/_/g, ' ')}`,
+        hint: 'server',
+        pick: { kind: 'automation', table: table.name },
+      },
+      {
+        type: 'data',
         key: `view:${table.name}`,
         label: `Linked view · ${table.name.replace(/_/g, ' ')}`,
         hint: 'live',
@@ -272,6 +280,11 @@ export function bookmarkNode(href: string, seen: BookmarkPreview | null): WsxEle
 }
 
 export function dataNode(pick: DataPick): WsxElement {
+  if (pick.kind === 'automation') {
+    return element('Automation', { table: pick.table, on: 'insert' }, [
+      { kind: 'text', value: STARTER_AUTOMATION(pick.table) },
+    ])
+  }
   if (pick.kind === 'script')
     return element('Script', {}, [{ kind: 'text', value: STARTER_SCRIPT }])
   if (pick.kind === 'widget') {

@@ -114,6 +114,12 @@ export type WidgetMessage =
 
 export type WidgetGate = 'asking' | 'off' | 'on'
 
+export interface AutomationProps extends BlockProps {
+  table: string
+  on: 'insert' | 'update'
+  title?: string
+}
+
 export interface GalleryProps extends BlockProps {
   columns?: 2 | 3 | 4
   gap?: Gap

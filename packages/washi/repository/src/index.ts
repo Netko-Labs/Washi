@@ -26,6 +26,7 @@ export {
   resolveApproval,
   updateSession,
 } from './storage/agents'
+export { automationsFor, type StoredAutomation, tableNameOf } from './storage/automations'
 export {
   listChanges,
   listRecordChanges,
@@ -68,6 +69,7 @@ export {
   workspaceStats,
 } from './storage/maintenance'
 export { getAppMeta, setAppMeta } from './storage/meta'
+export { onRecordWrite, type RecordWrite } from './storage/record-writes'
 export { createWorkspaceRegistry, type WorkspaceRegistry } from './storage/registry'
 export {
   countUnreadReminderHits,
@@ -107,6 +109,7 @@ export {
   trashedUploads,
 } from './storage/sheet-tree'
 export {
+  type AutomationEntry,
   createSheet,
   deleteSheet,
   findRowSheet,

@@ -5,6 +5,7 @@ import { and, eq, inArray, isNull } from 'drizzle-orm'
 import { appendChange } from './changes'
 import { newId, type Workspace } from './client'
 import { appendOp } from './oplog'
+import { tellRecordWrite } from './record-writes'
 
 function toUserTable(row: typeof userTableTable.$inferSelect): UserTable {
   return {
@@ -65,6 +66,7 @@ export function insertRecord(
   ws.db.insert(recordTable).values({ id, tableId, data, hlcCreated: now, hlcUpdated: now }).run()
   appendOp(ws, 'record', id, { kind: 'insert', tableId, data })
   appendChange(ws, tableId, id, data, author)
+  tellRecordWrite(ws, { kind: 'insert', tableId, recordId: id, data, before: null, author })
   return id
 }
 
@@ -100,6 +102,14 @@ export function updateRecords(
       .run()
     appendOp(ws, 'record', row.id, { kind: 'update', tableId, patch })
     appendChange(ws, tableId, row.id, merged, author)
+    tellRecordWrite(ws, {
+      kind: 'update',
+      tableId,
+      recordId: row.id,
+      data: merged,
+      before: row.data as RecordData,
+      author,
+    })
   }
   return rows.length
 }

@@ -31,6 +31,8 @@ export const SUMMARIES: Record<string, string> = {
   Bookmark: 'A link as a card — title, a line about it, its picture — read once when it was made.',
   Widget:
     'A page’s own HTML and JS in a frame with no origin and no network, reaching the page only through washi.rows / state / act — off until an owner allows widgets.',
+  Automation:
+    'TypeScript the server runs when a row is added to (or changes in) a table: run(event) reads rows and acts on them. It draws a note, nothing else.',
   Script:
     'A block written in TypeScript: function view() returns primitives; useState, useRows, useInterval and act are its only reach. Runs sandboxed in a workspace.',
   Include: 'Another page drawn here and kept current — its blocks, not its cover; never nested.',
