@@ -1,4 +1,4 @@
-import { IconCheck, IconCopy } from '@tabler/icons-react'
+import { IconArrowUpRight, IconCheck, IconCopy } from '@tabler/icons-react'
 import { getRouteApi } from '@tanstack/react-router'
 import { useState } from 'react'
 import { type GeneralSectionProps, useWorkspaceRename } from './lib'
@@ -45,6 +45,20 @@ export function GeneralSection({ workspaceId }: GeneralSectionProps) {
       </SettingRow>
       <SettingRow label="Your role" hint="Owners steer Washi’s keys, approvals and the stop.">
         <span className="text-[13px] capitalize">{workspace.role}</span>
+      </SettingRow>
+      <SettingRow
+        label="Page primitives"
+        hint="Every block a page is built from, drawn live: how they combine and where they stop."
+      >
+        <a
+          href="/learn"
+          target="_blank"
+          rel="noopener"
+          className="flex h-8 items-center gap-1 rounded-lg border border-border px-3 text-[13px] hover:bg-accent"
+        >
+          Open
+          <IconArrowUpRight className="size-3.5" />
+        </a>
       </SettingRow>
     </SettingsCard>
   )

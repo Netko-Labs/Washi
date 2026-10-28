@@ -55,7 +55,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   Pages are routes: `/sign-in?redirect=`, `/workspaces?invite=`, `/new` (a new workspace: name it ·
   start it · invite people, then the workspace's first run wakes Washi), `/s/$workspaceId/$token` (a
   page's read-only link, no session — D65), `/w/$workspaceId` (dashboard),
-  `/p/$pageId`, `/inbox`, `/chats` · `/chats/new` · `/chats/$chatId` (D67), `/routines` · `/routines/$id` (D68), `/settings?tab=`, `/trash`. Any of them may carry `?peek=<page>`: a row
+  `/p/$pageId`, `/inbox`, `/chats` · `/chats/new` · `/chats/$chatId` (D67), `/routines` · `/routines/$id` (D68), `/settings?tab=`, `/trash`, and `/learn` (D87: every primitive
+  live over the book's in-memory host, recipes, limits — public, no session; Settings → General links it). Any of them may carry `?peek=<page>`: a row
   opened over it (D79, `RowPeek` — side or center, `washi:peek`; Back closes it). The shell
   registers the peek with `useRowOpenerStore`; without one (the desktop) `openRow` opens a tab. The workspace loader resets the shared stores (child
   effects run before the layout's); routes mark their view active, and a page chosen anywhere
@@ -81,7 +82,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   client over `mirinLink`. No port, no token.
 - `apps/mihon` — the WSX sample book: a Vite SPA over `@washi/paper` with a `PaperHost` in memory
   (`tasks` seeded, verbs land, binds refetch). Knobs come from `paperRegistry` (`knobsFor`), one
-  specimen per primitive (`SPECIMENS`, tested to validate), and the stage runs the server's gates
+  specimen per primitive (`SPECIMENS`, tested to validate) — host, specimens, knobs and the guide
+  (`SUMMARIES`, `RECIPES`, `pageLimits`, `propRows`) live in `@washi/paper/book`, which `/learn` reads too, and the stage runs the server's gates
   client-side. Not a host of the runtime; never shipped.
 - `packages/washi/ui` — the UI both hosts wear: tokens + fonts + mascot keyframes
   (`@washi/ui/css`, which `@source`s itself), the mascot, stores (view/sheets/agent), agent panel,

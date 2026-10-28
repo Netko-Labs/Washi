@@ -22,6 +22,9 @@ describe('the guide', () => {
     expect(agenda.bind?.required).toBe(true)
     expect(agenda.addLabel?.type).toBe('text ≤ 40')
     expect(agenda.tone?.styled).toBe(true)
+    expect(agenda.date?.type).toBe('column')
+    expect(agenda.state?.type).toBe('state key')
+    expect(agenda.add?.type).toBe('list of columns ≤ 16')
   })
 
   test('placement and limits come from the registry', () => {

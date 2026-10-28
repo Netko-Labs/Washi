@@ -49,3 +49,17 @@ body {
     font-size: 16px;
   }
 }
+
+/* An example on the learn page: its own small sheet, framed by the figure around it. */
+.learn-sheet .wsx {
+  min-height: 0;
+  --measure: 100%;
+}
+.learn-sheet .wsx-page {
+  padding: 22px 24px;
+}
+.learn-primitive,
+.learn-recipe {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 420px;
+}

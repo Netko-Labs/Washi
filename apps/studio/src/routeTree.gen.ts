@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LearnRouteImport } from './routes/learn'
 import { Route as NewRouteImport } from './routes/new'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as WorkspacesRouteImport } from './routes/workspaces'
@@ -35,6 +36,11 @@ import { Route as WWorkspaceIdRoutinesNewRouteImport } from './routes/w/$workspa
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LearnRoute = LearnRouteImport.update({
+  id: '/learn',
+  path: '/learn',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NewRoute = NewRouteImport.update({
@@ -147,6 +153,7 @@ const WWorkspaceIdRoutinesNewRoute = WWorkspaceIdRoutinesNewRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/learn': typeof LearnRoute
   '/new': typeof NewRoute
   '/sign-in': typeof SignInRoute
   '/workspaces': typeof WorkspacesRoute
@@ -171,6 +178,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/learn': typeof LearnRoute
   '/new': typeof NewRoute
   '/sign-in': typeof SignInRoute
   '/workspaces': typeof WorkspacesRoute
@@ -195,6 +203,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/learn': typeof LearnRoute
   '/new': typeof NewRoute
   '/sign-in': typeof SignInRoute
   '/workspaces': typeof WorkspacesRoute
@@ -221,6 +230,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/learn'
     | '/new'
     | '/sign-in'
     | '/workspaces'
@@ -245,6 +255,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/learn'
     | '/new'
     | '/sign-in'
     | '/workspaces'
@@ -268,6 +279,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/learn'
     | '/new'
     | '/sign-in'
     | '/workspaces'
@@ -293,6 +305,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LearnRoute: typeof LearnRoute
   NewRoute: typeof NewRoute
   SignInRoute: typeof SignInRoute
   WorkspacesRoute: typeof WorkspacesRoute
@@ -312,6 +325,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/learn': {
+      id: '/learn'
+      path: '/learn'
+      fullPath: '/learn'
+      preLoaderRoute: typeof LearnRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/new': {
@@ -498,6 +518,7 @@ const WWorkspaceIdRouteWithChildren = WWorkspaceIdRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LearnRoute: LearnRoute,
   NewRoute: NewRoute,
   SignInRoute: SignInRoute,
   WorkspacesRoute: WorkspacesRoute,

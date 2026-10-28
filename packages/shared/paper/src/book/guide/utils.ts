@@ -45,13 +45,23 @@ function bounds(schema: z.core.$ZodType, unit: string): string {
   return unit
 }
 
+/** A registry schema that names what it holds — `column`, `state key` — says so instead of `text`. */
+function described(schema: z.core.$ZodType): string | undefined {
+  return schema instanceof z.ZodType ? schema.description : undefined
+}
+
 function typeOf(schema: z.core.$ZodType, options: readonly (string | number)[]): string {
   if (options.length > 0) return options.join(' · ')
   const inner = bareOf(schema)
   if (inner instanceof z.ZodBoolean) return 'true · false'
   if (inner instanceof z.ZodNumber) return bounds(inner, 'number')
+  const named = described(inner)
+  if (named) return named
   if (inner instanceof z.ZodString) return bounds(inner, 'text')
-  if (inner instanceof z.ZodArray) return bounds(inner, 'list')
+  if (inner instanceof z.ZodArray) {
+    const element = described(bareOf(inner.element))
+    return bounds(inner, element ? `list of ${element}s` : 'list')
+  }
   if (inner instanceof z.ZodUnion) return 'one of several shapes'
   return 'object'
 }
@@ -61,13 +71,15 @@ export function propRows(name: string): PropRow[] {
   const spec = paperRegistry.components[name]
   if (!spec || !(spec.props instanceof z.ZodObject)) return []
   const shape = spec.props.shape as Record<string, z.core.$ZodType>
-  return knobsFor(name).map((knob) => ({
-    key: knob.key,
-    type:
-      PROP_TYPES[knob.key] ?? (shape[knob.key] ? typeOf(shape[knob.key], knob.options) : 'object'),
-    required: knob.required,
-    styled: knob.styled,
-  }))
+  return knobsFor(name).map((knob) => {
+    const schema = shape[knob.key]
+    return {
+      key: knob.key,
+      type: PROP_TYPES[knob.key] ?? (schema ? typeOf(schema, knob.options) : 'object'),
+      required: knob.required,
+      styled: knob.styled,
+    }
+  })
 }
 
 export function placementOf(name: string): Placement {
