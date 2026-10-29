@@ -1,6 +1,7 @@
 import { IconChevronLeft, IconPlayerPlay } from '@tabler/icons-react'
 import { Link } from '@tanstack/react-router'
 import { describeCron } from '@washi/domain'
+import { useDocumentTitle } from '@/components/shared/document-title'
 import { cronFromSchedule, type RoutinePageProps, useRoutine } from './lib'
 import { RoutineRuns } from './routine-runs'
 import { RoutineSetup } from './routine-setup'
@@ -16,6 +17,7 @@ export function RoutinePage({ workspaceId, routineId, template, tab }: RoutinePa
   const page = useRoutine(workspaceId, routineId, template)
   const isNew = !routineId
   const shown = isNew ? 'setup' : tab
+  useDocumentTitle([isNew ? 'New routine' : page.routine?.title, 'Routines'])
 
   return (
     <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-none">

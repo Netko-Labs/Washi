@@ -1,7 +1,11 @@
-import { useRouteTab } from '@/components/shell'
+import { getRouteApi } from '@tanstack/react-router'
 import { TrashPage } from '@/components/trash'
+import { useScreen } from './lib'
+
+const workspaceRoute = getRouteApi('/w/$workspaceId')
 
 export function TrashView() {
-  useRouteTab('view:trash')
+  const { workspace } = workspaceRoute.useLoaderData()
+  useScreen('view:trash', ['Trash', workspace.name])
   return <TrashPage />
 }

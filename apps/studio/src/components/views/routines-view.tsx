@@ -1,11 +1,11 @@
 import { getRouteApi } from '@tanstack/react-router'
 import { RoutinesPage } from '@/components/routines'
-import { useRouteTab } from '@/components/shell'
+import { useScreen } from './lib'
 
 const workspaceRoute = getRouteApi('/w/$workspaceId')
 
 export function RoutinesView() {
-  const { workspaceId } = workspaceRoute.useParams()
-  useRouteTab('view:routines')
-  return <RoutinesPage workspaceId={workspaceId} />
+  const { workspace } = workspaceRoute.useLoaderData()
+  useScreen('view:routines', ['Routines', workspace.name])
+  return <RoutinesPage workspaceId={workspace.id} />
 }

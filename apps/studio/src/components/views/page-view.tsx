@@ -5,7 +5,7 @@ import { CommentsPanel } from '@/components/comments'
 import { FirstRunGate } from '@/components/first-run'
 import { PageChrome, pageLook } from '@/components/page-chrome'
 import { PageBody } from '@/components/page-editor'
-import { useRouteTab } from '@/components/shell'
+import { usePageScreen } from './lib'
 
 const workspaceRoute = getRouteApi('/w/$workspaceId')
 const pageRoute = getRouteApi('/w/$workspaceId/p/$pageId')
@@ -13,7 +13,7 @@ const pageRoute = getRouteApi('/w/$workspaceId/p/$pageId')
 export function PageView() {
   const { workspace } = workspaceRoute.useLoaderData()
   const { pageId } = pageRoute.useParams()
-  useRouteTab(`note:${pageId}`)
+  usePageScreen(pageId)
   return (
     <FirstRunGate workspace={workspace}>
       <div className="flex min-h-0 flex-1">
