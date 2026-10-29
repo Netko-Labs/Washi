@@ -18,7 +18,7 @@ export function Heatmap({
   const { locale } = usePaperHost()
   const today = new Date().toLocaleDateString('sv')
   const from = firstDay(today, weeks, weekStart)
-  const state = useBind(heatQuery(bind, date, from))
+  const state = useBind(heatQuery(bind, date, from, weeks))
 
   // An empty calendar is an answer — nothing done yet — so once loaded it always draws.
   const draw = (rows: Row[]) => {

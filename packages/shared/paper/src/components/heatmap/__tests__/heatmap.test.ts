@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { firstDay, heatGrid, totalsByDay } from '../lib'
+import { firstDay, heatGrid, heatQuery, totalsByDay } from '../lib'
 
 const DAY = 86_400_000
 const keyOf = (day: number) => new Date(day * DAY).toISOString().slice(0, 10)
@@ -35,5 +35,13 @@ describe('a calendar of days (D103)', () => {
     expect(cells.find((cell) => cell.key === '2026-10-30')?.isFuture).toBe(true)
     expect(grid.total).toBe(5)
     expect(grid.months).toEqual(['Oct', ''])
+  })
+
+  test('the query holds to the days on screen, both ends', () => {
+    const from = firstDay('2026-10-29', 2, 'monday')
+    expect(heatQuery({ table: 'checkins' }, 'date', from, 2).where).toEqual([
+      { column: 'date', op: 'gte', value: '2026-10-19' },
+      { column: 'date', op: 'lt', value: '2026-11-02' },
+    ])
   })
 })

@@ -14,11 +14,15 @@ export function firstDay(today: string, weeks: number, weekStart: 'monday' | 'su
   return now - back - (weeks - 1) * 7
 }
 
-/** The page's query held to the days on screen. */
-export function heatQuery(bind: BindQuery, date: string, from: number): BindQuery {
+/** The page's query held to the days on screen: from the first, before the day after the last. */
+export function heatQuery(bind: BindQuery, date: string, from: number, weeks: number): BindQuery {
   return {
     ...bind,
-    where: [...(bind.where ?? []), { column: date, op: 'gte', value: keyOf(from) }],
+    where: [
+      ...(bind.where ?? []),
+      { column: date, op: 'gte', value: keyOf(from) },
+      { column: date, op: 'lt', value: keyOf(from + weeks * 7) },
+    ],
     limit: Math.min(bind.limit ?? HEAT_ROW_LIMIT, HEAT_ROW_LIMIT),
   }
 }
