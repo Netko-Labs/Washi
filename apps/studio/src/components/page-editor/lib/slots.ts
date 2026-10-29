@@ -1,5 +1,13 @@
 import { newBlock } from './convert'
-import type { Block, BlockPlace, ColumnsBlock, ContainerBlock, TabSlot, TabsBlock } from './types'
+import type {
+  Block,
+  BlockPlace,
+  ColumnsBlock,
+  ContainerBlock,
+  Slot,
+  TabSlot,
+  TabsBlock,
+} from './types'
 
 export const isColumns = (block: Block | undefined): block is ColumnsBlock =>
   block?.kind === 'columns'
@@ -9,13 +17,9 @@ export const isTabs = (block: Block | undefined): block is TabsBlock => block?.k
 export const isContainer = (block: Block | undefined): block is ContainerBlock =>
   isColumns(block) || isTabs(block)
 
-const slotsOf = (block: ContainerBlock): { id: string; blocks: Block[] }[] =>
-  isColumns(block) ? block.columns : block.tabs
+const slotsOf = (block: ContainerBlock): Slot[] => (isColumns(block) ? block.columns : block.tabs)
 
-function mapSlots(
-  block: ContainerBlock,
-  change: (slot: { id: string; blocks: Block[] }) => Block[],
-): ContainerBlock {
+function mapSlots(block: ContainerBlock, change: (slot: Slot) => Block[]): ContainerBlock {
   if (isColumns(block)) {
     return { ...block, columns: block.columns.map((slot) => ({ ...slot, blocks: change(slot) })) }
   }

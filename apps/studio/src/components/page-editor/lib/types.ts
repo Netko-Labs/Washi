@@ -67,6 +67,9 @@ export type Block = TextBlock | LockedBlock | ColumnsBlock | TabsBlock
 /** A block holding runs of blocks. Never inside another. */
 export type ContainerBlock = ColumnsBlock | TabsBlock
 
+/** One run of blocks inside a container: a column or a tab. */
+export type Slot = ColumnSlot | TabSlot
+
 /** Where a dragged block lands against another: above, below, or beside as a new column. */
 export type DropPlace = 'before' | 'after' | 'left' | 'right'
 
