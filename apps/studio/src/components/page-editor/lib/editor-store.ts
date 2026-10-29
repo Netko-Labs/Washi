@@ -222,6 +222,12 @@ export const useEditorStore = create<EditorState>((set, get) => {
     setTables: (tables) => set({ tables }),
     insertData: async (id, pick) => {
       if (!locate(get().blocks, id)) return
+      // A page's code sits above its markup, so it is written where the whole page is: the source.
+      if (pick.kind === 'code') {
+        inList(id, ({ list, at }) => ({ list: [...list.slice(0, at), ...list.slice(at + 1)] }))
+        set({ mode: 'source' })
+        return
+      }
       if (pick.kind === 'embed' && !pick.src) throw new Error('paste an https address after /embed')
       if (pick.kind === 'bookmark' && !pick.href) {
         throw new Error('paste an https address after /bookmark')

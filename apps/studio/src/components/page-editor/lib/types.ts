@@ -141,7 +141,7 @@ export type DataPick =
   /** `file` arrives once the person picked one; the menu offers the kind. */
   | { kind: 'upload'; as: UploadKind; file?: File }
   | { kind: 'gallery'; files?: File[] }
-  | { kind: 'script' }
+  | { kind: 'code' }
   | { kind: 'widget' }
   | { kind: 'formula' }
   | { kind: 'automation'; table: string }

@@ -25,13 +25,13 @@ describe('compiling a script', () => {
     })
   })
 
-  test('a page whose script will not compile is refused before it is saved', () => {
+  test('a page whose automation will not compile is refused before it is saved', () => {
     const good = checkSource(
-      '<Sheet title="t"><Script>{`function view() { return <Text>hi</Text> }`}</Script></Sheet>',
+      '<Sheet title="t"><Automation table="t" on="insert">{`function run(event) { act({}) }`}</Automation></Sheet>',
     )
     expect(good.ok).toBe(true)
     const broken = checkSource(
-      '<Sheet title="t"><Script>{`function view() { return <Text>hi }`}</Script></Sheet>',
+      '<Sheet title="t"><Automation table="t" on="insert">{`function run(event) { act({ }`}</Automation></Sheet>',
     )
     expect(broken.ok).toBe(false)
     expect(broken.diagnostics[0]?.message).toContain('script:')

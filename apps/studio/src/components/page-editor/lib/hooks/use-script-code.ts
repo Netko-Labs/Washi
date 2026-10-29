@@ -9,13 +9,9 @@ import { SCRIPT_CHECK_MS } from '../constants'
 import { useEditorStore } from '../editor-store'
 import type { LockedBlock, ScriptCheck } from '../types'
 
-/** What the code must define: `view`, `run`, or a Formula's own name. */
+/** What the code must define: `run`, or a Formula's own name. */
 const entryOf = (node: WsxElement) =>
-  node.name === 'Automation'
-    ? 'run'
-    : node.name === 'Formula' && typeof node.props.name === 'string'
-      ? node.props.name
-      : 'view'
+  node.name === 'Automation' ? 'run' : String(node.props.name ?? '')
 
 const textOf = (node: WsxElement) =>
   node.children.map((child) => (child.kind === 'text' ? child.value : '')).join('')

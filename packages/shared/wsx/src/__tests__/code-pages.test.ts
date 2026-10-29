@@ -33,7 +33,11 @@ const registry: WsxRegistry = {
     Title: { props: z.strictObject({}), children: 'text' },
     Text: { props: z.strictObject({}), children: 'text' },
     Stat: { props: z.strictObject({ label: z.string(), value: z.number() }), children: 'none' },
-    Button: { props: z.strictObject({ label: z.string() }), children: 'none' },
+    Button: {
+      props: z.strictObject({ label: z.string(), action: z.object({ verb: z.string() }) }),
+      children: 'none',
+    },
+    Press: { props: z.strictObject({ action: z.object({ verb: z.string() }) }), children: 'text' },
   },
 }
 
@@ -85,6 +89,21 @@ describe('a page that runs (D100)', () => {
         .map((each) => each.message)
         .join(),
     ).toContain('label')
+  })
+
+  test('a handler stands in for the action it becomes', () => {
+    expect(
+      validate(parse('<Sheet title="t"><Press onPress={() => go()}>Go</Press></Sheet>'), registry),
+    ).toEqual([])
+    const bare = validate(parse('<Sheet title="t"><Press>Go</Press></Sheet>'), registry)
+    expect(bare.map((each) => each.message).join()).toContain('action')
+    const text = validate(
+      parse('<Sheet title="t"><Title onPress={() => go()}>Go</Title></Sheet>'),
+      registry,
+    )
+    expect(text.map((each) => each.message)).toEqual([
+      '<Title> takes no press — put onPress on a <Button>',
+    ])
   })
 
   test('a literal key is no prop, and an empty prop is an error', () => {

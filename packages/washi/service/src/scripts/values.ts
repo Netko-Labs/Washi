@@ -1,7 +1,7 @@
 import type { ScriptEntry } from './types'
 
 /** Which primitive runs which entry; a Formula's entry is its own name. */
-export const ENTRIES: Record<string, ScriptEntry> = { Script: 'view', Automation: 'run' }
+export const ENTRIES: Record<string, ScriptEntry> = { Automation: 'run' }
 
 export const ENTRY_WORDS: Record<string, string> = {
   view: 'a script needs a function view() that returns what it draws',

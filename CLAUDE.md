@@ -19,12 +19,14 @@ is the primitives reference and these rules stand — a PR that breaks one does 
 - **C2** One binary, `hosted | embedded` asserted once at boot, never per request.
 - **C3** `repository` and `service` never see a request, a user or the network.
 - **C4** The desktop is the web client in a mirin window: same `appRouter`, no desktop-only paths.
-- **W1** WSX is data: registry primitives, literal props, the closed `expr` grammar; validated
-  before persist and before render. The one thing in a page that runs is a `<Script>`, and only
-  inside its QuickJS sandbox: no DOM, network, timers or imports, a deadline and a memory cap, and
-  no reach but the page's own (its state, rows the reader may read, the page's verbs); what it
-  returns is checked like any page before it is drawn. A prompt-injected page is wrong content and
-  at worst a script doing what a button on that page could — never a breach.
+- **W1** WSX is data: registry primitives, the closed `expr` grammar; validated before persist and
+  before render. A page may also run code (D100) — imports and code above its markup, `{…}` in it —
+  and that code runs only in the reader's QuickJS: no DOM, network or timers, every import bundled
+  on the server from a vetted list or a page the reader may read, a deadline and a memory cap, no
+  reach but the page's own (its state, rows the reader may read, its verbs), writes only from a
+  press. What it draws is checked like any page and keeps the page's own literal look and access.
+  A prompt-injected page is wrong content and at worst code doing what a button on that page could
+  — never a breach.
 - **W2** The registry is closed and additive; components own appearance, pages own content. A gap is
   `<Missing kind reason />`, never an escape hatch.
 - **W3** Pages size to their container, never the window.
@@ -235,7 +237,7 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   sheet's raw WSX in CodeMirror. It runs the server's own check client-side (parse + validate
   against `paperRegistry`), autosaves only a valid draft through `sheets.update` with
   `baseVersion`, and holds Done while the draft has errors. `state`, `expr`, `bind` and `action`
-  are a page's behaviour; a `<Script>` (D96) is the one block that runs, sandboxed.
+  are a page's behaviour; a page's own code (D100) is what runs, sandboxed. `/` → Page code opens it.
 - **Tables are Notion databases.** Properties: `status` (todo · doing · done groups), `select`,
   `multi_select`, `person` (member id), `date` (`start/end` for a range), `url`, `relation` (record
   ids), `formula` (D73: an `expr` over its own row in the page grammar — `month(date)`, `usd * fx_rate`,
@@ -436,22 +438,6 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   that will not answer becomes a bare link. The network call lives in tsuru and is wired in trpc,
   never in `service` (C3). Each preview is a ledger row (`origin: 'sheet'`, `link_preview`, `auto`
   — or `denied` with tsuru's reason), as every press that reaches out is.
-- **A page may hold a script (D96).** `<Script title>` keeps TypeScript/TSX as its text (a backtick
-  string — WSX takes one with nothing interpolated, and writes multi-line text back that way). The
-  server compiles it with `Bun.Transpiler` (`compileScript`: JSX → `h(Card, …)`, no imports or
-  exports, ≤ 20 000 chars, a `function view`) both at save (`checkSource` refuses a page whose
-  script won't compile) and on read (`scripts.compile`, cached per source in `@washi/ui`'s host).
-  Paper runs it in QuickJS (`quickjs-emscripten-core`, the single-file variant, loaded lazily on a
-  page that has one): 16 MB, a 60 ms deadline per run, a prelude that lends `h`, the registry's names
-  and the hooks `useState` (page state), `useRows` (`PaperHost.runQuery`, the reader's rows, fetched
-  after the run that asked, then drawn again), `useInterval` (≥ 1 s), `act` (`runAction`) and `now`.
-  `view()` returns plain data; an `onPress` becomes the action `script.invoke`, which the Script's
-  own host turns into a call into the sandbox — it never reaches the server. The tree is validated
-  against the registry (scripts never nest) and drawn inside the page's own state and data. Any
-  member — and Washi — may write one; `/script` drops a starter. While the page is open for typing a
-  Script has Code · Preview (`ScriptBlock`): its TSX in CodeMirror, compiled 400 ms after the last
-  key, and only what compiles lands in the block — autosave never sends a script the server refuses. A host without `compileScript`
-  (the book, `/learn`, a shared link) says scripts run inside a workspace.
 - **A page may hold a widget, where an owner allows (D98).** `<Widget title height>` keeps HTML and JS
   as its text (≤ 50 000 chars, checked at save) and draws it in an iframe `sandbox="allow-scripts"` —
   no `allow-same-origin`, so an opaque origin with no cookies, storage or parent — under a CSP with
@@ -472,7 +458,7 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   (hanko-checked, ≤ 50), signed `automation` — a write so signed never runs automations, so a rule
   cannot loop. Every run is a ledger row (`automation`, `auto` or `denied` with why); a run that
   changed rows emits `workspaceChanged`. The page draws a note (⚡ when a row is added to …); the
-  editor gives it Code · Preview like a Script; `/` offers *Automation · <table>* with a starter.
+  editor gives it Code · Preview; `/` offers *Automation · <table>* with a starter.
 - **A workspace may define formula functions (D99).** `<Formula name>` keeps a pure TS function named
   after it (lowercase, never a built-in's name such as `sum` or `when`); `extractFormulas` indexes it
   (`sheet_formulas`; on live pages, the first to take a name keeps it). Only a formula column may call
@@ -493,7 +479,7 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   sandboxed (scripts, same-origin, popups, presentation, forms). This list is not tsuru's fetch
   allowlist: one is what a reader's browser loads, the other what may leave the server. `/embed <url>`
   or an https address after `/` drops one in the editor.
-- **Pages become programs (D100, in progress — `tasks/todo.md`).** `parse` reads a page MDX-style:
+- **Pages are programs (D100).** `parse` reads a page MDX-style:
   code above the first line-start `<Sheet` whose code parses is `root.prelude` (`source` + the
   capitalized names it binds, the page's own components); a non-literal prop is `element.code[prop]`
   (its source), a non-literal child a `{ kind: 'code', source }` hole; literals stay data, so a page
@@ -522,6 +508,13 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   returns is checked like a page (`checkDrawn`; the `<Sheet>` keeps the page's own literal props;
   adjacent text runs joined); before it runs, where it stops (said once, quietly) or on a host
   without `compilePage` (a shared link, the book), `literalOnly` draws just its literal parts.
+  `<Script>` (D96) left the registry with it: `liftScriptsIntoCode` (app meta `scripts_as_code`,
+  once per workspace at open, quiet) made each one a component of its page — `ScriptN()` holding its
+  code and returning `view()`, drawn where it stood (in a Section of its title), the page importing
+  `usePageState as useState, useRows, useInterval, act` so it runs as it did; a page that would not
+  check keeps its scripts as `<Code lang="tsx">`. A handler (`onPress`) stands in for the `action`
+  it becomes; on a primitive that takes no press it is refused in words. `/` → Page code opens the
+  source editor; Automations and Formulas keep Code · Preview (`ScriptBlock`, `scripts.compile`).
 - WSX is inert data: registry primitives, literal props, the closed `expr` grammar only. Components
   own appearance (four enums: `variant tone size emphasis`); pages own content. Validation before
   persist and before render. Format reference: `/learn` and the registry specs.

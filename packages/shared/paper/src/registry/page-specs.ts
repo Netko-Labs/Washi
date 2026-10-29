@@ -54,9 +54,6 @@ export const PAGE_SPECS: Record<string, ComponentSpec> = {
       },
     },
   ),
-  Script: p({ title: z.string().max(80).optional() }, 'text', {
-    hints: { code: 'the TSX is the Script’s children: a backtick string with a function view()' },
-  }),
   Formula: p(
     {
       name: z

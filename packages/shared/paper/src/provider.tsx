@@ -24,8 +24,6 @@ export interface PaperHost {
   backlinks?(id: string): Promise<PageCard[]>
   /** Another page's parsed source, for `<Include>`; null when the reader cannot open it. */
   loadSheet?(id: string): Promise<{ title: string; root: WsxElement } | null>
-  /** A `<Script>`'s TSX compiled for the sandbox; a host that cannot compile leaves it out. */
-  compileScript?(source: string): Promise<CompiledScript>
   /** A page that runs, bundled for the sandbox (D100); without it, only its literal parts draw. */
   compilePage?(source: string): Promise<CompiledScript>
   /** Who is reading, for a page's `useMe()`; a host with no accounts leaves it out. */

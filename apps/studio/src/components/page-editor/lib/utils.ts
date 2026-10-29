@@ -18,7 +18,6 @@ import {
   SHORTCUTS,
   STARTER_AUTOMATION,
   STARTER_FORMULA,
-  STARTER_SCRIPT,
   STARTER_WIDGET,
   UPLOAD_OPTIONS,
 } from './values'
@@ -122,12 +121,12 @@ function uploadOptions(needle: string): Extract<SlashOption, { type: 'data' }>[]
     hint: 'upload',
     pick: { kind: 'upload' as const, as: option.as },
   }))
-  const script: Extract<SlashOption, { type: 'data' }> = {
+  const pageCode: Extract<SlashOption, { type: 'data' }> = {
     type: 'data',
-    key: 'script',
-    label: 'Script',
+    key: 'code',
+    label: 'Page code',
     hint: 'TypeScript',
-    pick: { kind: 'script' },
+    pick: { kind: 'code' },
   }
   const pictures = !needle || 'gallery photos pictures album'.includes(needle) ? [gallery] : []
   const widget: Extract<SlashOption, { type: 'data' }> = {
@@ -137,7 +136,7 @@ function uploadOptions(needle: string): Extract<SlashOption, { type: 'data' }>[]
     hint: 'HTML',
     pick: { kind: 'widget' },
   }
-  const code = !needle || 'script code typescript program'.includes(needle) ? [script] : []
+  const code = !needle || 'code script typescript program hooks'.includes(needle) ? [pageCode] : []
   const html = !needle || 'widget html embed code'.includes(needle) ? [widget] : []
   const formula: Extract<SlashOption, { type: 'data' }> = {
     type: 'data',
@@ -294,8 +293,6 @@ export function dataNode(pick: DataPick): WsxElement {
       { kind: 'text', value: STARTER_AUTOMATION(pick.table) },
     ])
   }
-  if (pick.kind === 'script')
-    return element('Script', {}, [{ kind: 'text', value: STARTER_SCRIPT }])
   if (pick.kind === 'formula') {
     return element('Formula', { name: 'with_tax' }, [{ kind: 'text', value: STARTER_FORMULA }])
   }
@@ -305,6 +302,7 @@ export function dataNode(pick: DataPick): WsxElement {
   if (pick.kind === 'upload' || pick.kind === 'gallery') {
     throw new Error('an upload lands once its file is stored')
   }
+  if (pick.kind === 'code') throw new Error('page code is written in the source, above the page')
   if (pick.kind === 'bookmark') return bookmarkNode(pick.href, null)
   if (pick.kind === 'embed') return element('Embed', { src: pick.src }, [])
   if (pick.kind === 'link') return element('PageLink', { sheet: pick.sheet }, [])
