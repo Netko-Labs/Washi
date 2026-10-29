@@ -242,6 +242,10 @@ const dataOut: Record<string, ComponentSpec> = {
       hours: z
         .string()
         .regex(/^([01]\d|2[0-3]):[0-5]\d-([01]\d|2[0-3]):[0-5]\d$/, 'hours read like 09:00-17:00')
+        .refine((hours) => {
+          const [open = '', close = ''] = hours.split('-')
+          return open < close
+        }, 'hours open before they close: 09:00-17:00')
         .optional(),
       days: z
         .array(z.enum(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']))

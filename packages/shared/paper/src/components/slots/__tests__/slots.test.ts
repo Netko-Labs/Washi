@@ -36,3 +36,15 @@ describe('free times to book (D102)', () => {
     expect(weekdayOf('2026-11-01')).toBe('sun')
   })
 })
+
+describe('the Slots spec', () => {
+  test('hours that close before they open are refused in words', async () => {
+    const { paperRegistry } = await import('../../../registry/specs')
+    const spec = paperRegistry.components.Slots
+    const base = { bind: { table: 'bookings' }, date: 'when' }
+    expect(spec?.props.safeParse({ ...base, hours: '09:00-17:00' }).success).toBe(true)
+    const reversed = spec?.props.safeParse({ ...base, hours: '17:00-09:00' })
+    expect(reversed?.success).toBe(false)
+    expect(JSON.stringify(reversed?.error?.issues)).toContain('open before they close')
+  })
+})
