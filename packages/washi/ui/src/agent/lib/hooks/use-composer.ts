@@ -13,6 +13,7 @@ export function useComposer() {
     uploading: false,
     error: null,
   })
+  const [attachOpen, setAttachOpen] = useState(false)
 
   const attach = (ref: AttachmentRef) =>
     setState((current) =>
@@ -56,5 +57,7 @@ export function useComposer() {
     detach,
     submit,
     canUpload: hostUploadFile() !== null,
+    attachOpen,
+    setAttachOpen,
   }
 }

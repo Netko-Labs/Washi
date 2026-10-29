@@ -1,8 +1,11 @@
 export {
   account,
+  instanceAdmin,
+  instanceSetting,
   invitation,
   member,
   organization,
+  organizationIntegration,
   organizationSecret,
   organizationStorage,
   session,

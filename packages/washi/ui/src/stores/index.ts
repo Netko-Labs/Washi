@@ -6,12 +6,5 @@ export { useRowOpenerStore } from './row-opener/row-opener-store'
 export type { RowOpener } from './row-opener/types'
 export { useSheetsStore } from './sheets/sheets-store'
 export { useThemesStore } from './themes/themes-store'
-export {
-  type AppView,
-  type Identity,
-  initials,
-  noteIdOf,
-  type TabKey,
-  useViewStore,
-  viewOf,
-} from './view/view-store'
+export type { AppView, Identity, TabKey } from './view/types'
+export { initials, noteIdOf, useViewStore, viewOf } from './view/view-store'

@@ -1,6 +1,6 @@
 import type { SignupMode } from '@washi/trpc'
 import { and, eq, gt, sql } from 'drizzle-orm'
-import { instanceAdmin, instanceSetting, invitation, user } from '../db/schema'
+import { instanceAdmin, instanceSetting, invitation, user } from '../db'
 import type { ControlDB } from './client'
 import { DEFAULT_SIGNUP } from './constants'
 

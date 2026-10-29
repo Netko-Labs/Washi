@@ -1,6 +1,6 @@
 import type { StorageConfig, StorageInfo } from '@washi/trpc'
 import { eq } from 'drizzle-orm'
-import { organizationStorage, user } from '../db/schema'
+import { organizationStorage, user } from '../db'
 import type { ControlDB } from './client'
 import { open, seal } from './crypto'
 import type { HostedStorageStore, StorageKeys } from './types'

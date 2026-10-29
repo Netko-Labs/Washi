@@ -2,8 +2,7 @@ import type { CompiledScript, PaperHost } from '@washi/paper'
 import { parse } from '@washi/wsx'
 import { api } from '../api'
 import { childrenOf } from '../page-tree'
-import { useLiveStore } from '../stores/live/live-store'
-import { useSheetsStore } from '../stores/sheets/sheets-store'
+import { useLiveStore, useSheetsStore } from '../stores'
 
 let listed: { at: number; hosts: Promise<string[]> } | null = null
 

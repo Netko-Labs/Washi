@@ -6,7 +6,7 @@ import {
   IconPlus,
   IconX,
 } from '@tabler/icons-react'
-import { useState } from 'react'
+import { useShallow } from 'zustand/react/shallow'
 import { useAgentStore } from '../stores'
 import { AttachMenu } from './attach-menu'
 import { useComposer, useInference } from './lib'
@@ -16,10 +16,12 @@ import { OptionChips } from './option-chips'
 export function AgentComposer() {
   const composer = useComposer()
   const inference = useInference()
-  const [attachOpen, setAttachOpen] = useState(false)
-  const running = useAgentStore((state) => state.running)
-  const session = useAgentStore(
-    (state) => state.sessions.find((s) => s.id === state.activeSessionId) ?? null,
+  const { attachOpen, setAttachOpen } = composer
+  const { running, session } = useAgentStore(
+    useShallow((state) => ({
+      running: state.running,
+      session: state.sessions.find((s) => s.id === state.activeSessionId) ?? null,
+    })),
   )
 
   return (

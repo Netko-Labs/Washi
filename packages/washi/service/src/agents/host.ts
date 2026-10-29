@@ -1,3 +1,4 @@
+// conventions: >300 lines — one AgentHost class; split when next touched
 import type {
   AgentSession,
   AgentUpdate,
