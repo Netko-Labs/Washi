@@ -90,6 +90,16 @@
   .wsx-repeat:has(> .wsx-row):not(:has(> .wsx-row > .wsx-card)) > .wsx-row > :last-child {
     margin-left: auto;
   }
+  /* The same line drawn by code, row by row, outside a Repeat: led by what grows. */
+  .wsx-row:has(> .grow:first-child):has(> :nth-child(3)) {
+    row-gap: 8px;
+  }
+  .wsx-row:has(> .grow:first-child):has(> :nth-child(3)) > :first-child {
+    flex-basis: 100%;
+  }
+  .wsx-row:has(> .grow:first-child):has(> :nth-child(3)) > :last-child {
+    margin-left: auto;
+  }
 
   /* Bars: each its own block — label and figure on a line, the track under them. */
   .wsx-bars {

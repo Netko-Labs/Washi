@@ -67,7 +67,7 @@ export const SUMMARIES: Record<string, string> = {
   Figure: 'An https image with a caption; its shape is held while it loads.',
   Repeat: 'Draws its children once per row, with $row in scope.',
   Table: 'Rows as a table; stacks into cards on a phone.',
-  Stat: 'One figure with a label, a hint and a trend; reads expr aggregates.',
+  Stat: 'One figure with a label, a hint and a trend; reads expr aggregates, as money with currency.',
   Chart: 'Bars, lines, areas or a donut over rows, or a column over time.',
   Timeline: 'A vertical run of Steps.',
   Step: 'One entry on a Timeline: marker, title, body.',

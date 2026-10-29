@@ -221,3 +221,15 @@ describe('the sandbox names', () => {
     expect(page('Tax')).toContain('lowercase')
   })
 })
+
+describe('Stat currency', () => {
+  test('a three-letter code passes; anything else is refused in words', () => {
+    const spec = paperRegistry.components.Stat
+    expect(spec?.props.safeParse({ label: 'Unbilled', value: 150, currency: 'USD' }).success).toBe(
+      true,
+    )
+    const wrong = spec?.props.safeParse({ label: 'Unbilled', value: 150, currency: 'dollars' })
+    expect(wrong?.success).toBe(false)
+    expect(JSON.stringify(wrong?.error?.issues)).toContain('three-letter currency code')
+  })
+})

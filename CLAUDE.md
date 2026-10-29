@@ -414,9 +414,10 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   a day, a moment, a `start/end` range), `$row` in visible text included; empty cells sort last.
   `<Roadmap end>` runs a bar from `date` to a second column, as trackers keep start and due apart.
   A Board column's head counts its cards and sums a numeric `meta` in the reader's numbers, with no
-  unit it cannot know. `<Stat format="percent">` reads a ratio as one. Inside a Repeat, a Progress
-  takes `value="$row.ratio"` (or `expr` over `$row`); a share nothing real gives — a failed `expr`, an
-  empty cell — reads —, never 0% (`ratioOf`). The book's host computes formula columns as the
+  unit it cannot know. `<Stat format="percent">` reads a ratio as one, `<Stat currency="USD">` an
+  amount as money in the reader's locale. Inside a Repeat, a Progress takes `value="$row.ratio"` (or
+  `expr` over `$row`); a share nothing real gives — a failed `expr`, an empty cell — reads —, never
+  0% (`ratioOf`). The book's host computes formula columns as the
   server does, so `/learn` and the sample book show their real values.
   A `gallery` view (D91) is a card per row: `cover` names a column holding an https image or a cover
   key (`preset:` · `picture:` · `file:`), the title, then `columns` (default: the first three) read-only
