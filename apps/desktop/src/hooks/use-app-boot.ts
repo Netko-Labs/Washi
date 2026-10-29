@@ -11,6 +11,7 @@ export function useAppBoot(): void {
     subscribeDevCommands()
     // From boot, not from the panel: the inbox badge and Inbox need live approvals
     // whether or not the panel was ever opened.
+    useAgentStore.getState().bind('default')
     void useAgentStore.getState().init()
     useLiveStore.getState().connect()
   }, [refresh])

@@ -3,6 +3,7 @@ import type { AgentUpdate } from '@washi/domain'
 import { RestorePage, useDescribeTool } from '../approval'
 import { Markdown } from '../markdown'
 import { Mascot } from '../mascot'
+import { HandoffDivider } from './handoff-divider'
 import {
   type DiffViewProps,
   mergeMessageChunks,
@@ -131,6 +132,8 @@ export function TranscriptView({ transcript }: TranscriptViewProps) {
                 {update.error ?? 'the turn failed'}
               </div>
             ) : null
+          case 'handoff':
+            return <HandoffDivider key={entry.id} handoff={update} />
           default:
             return null
         }

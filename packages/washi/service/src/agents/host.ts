@@ -7,6 +7,7 @@ import type {
   AttachmentRef,
   EnabledModel,
   Member,
+  Viewer,
 } from '@washi/domain'
 import { createModelCatalogue, type ModelCatalogue } from '@washi/models'
 import {
@@ -22,9 +23,11 @@ import {
   updateSession,
   type Workspace,
 } from '@washi/repository'
+import { NOBODY, SheetNotFoundError } from '../sheets/access'
 import { ApprovalDesk } from './approvals'
 import { DailyBudget } from './budget'
 import { CapabilityDesk } from './desk'
+import { ChatMoveError, moveChat } from './handover'
 import { conversationHistory } from './history'
 import { createEmbeddedKeySource } from './inference'
 import type {
@@ -55,7 +58,13 @@ import {
   titleFrom,
 } from './lib'
 import { proposedDiff } from './normalize'
-import { type AgentPort, createAiSdkPort, createClaudeSdkPort, type TurnResult } from './ports'
+import {
+  type AgentPort,
+  createAiSdkPort,
+  createClaudeSdkPort,
+  type HandoverResult,
+  type TurnResult,
+} from './ports'
 import { AgentPreferences } from './preferences'
 import { RoutineBook } from './routines'
 import { recentTurns } from './today'
@@ -285,6 +294,44 @@ export class AgentHost {
     return getSession(this.ws, sessionId)
   }
 
+  /**
+   * Moves a chat to a page, or Home (D110): a divider lands in its transcript and its list
+   * refetches. Washi's move also sends that chat's person to the page.
+   */
+  moveSession(
+    sessionId: string,
+    sheetId: string | null,
+    viewer: Viewer,
+    by: 'washi' | 'person' = 'person',
+    note?: string,
+  ): AgentSession | null {
+    const marker = moveChat(this.ws, sessionId, sheetId, viewer, by, note)
+    if (marker) {
+      this.record(sessionId, marker)
+      this.events?.sessionChanged?.(sessionId)
+      if (by === 'washi' && sheetId) this.events?.openSheet(sheetId, sessionId)
+    }
+    return getSession(this.ws, sessionId)
+  }
+
+  private handover(
+    sessionId: string,
+    viewer: Viewer,
+    sheetId: string,
+    note?: string,
+  ): HandoverResult {
+    try {
+      this.moveSession(sessionId, sheetId, viewer, 'washi', note)
+      return { ok: true, page: getSheet(this.ws, sheetId)?.title ?? sheetId }
+    } catch (error) {
+      if (error instanceof SheetNotFoundError)
+        return { ok: false, reason: `no page ${sheetId} that this person can read` }
+      if (error instanceof ChatMoveError)
+        return { ok: false, reason: 'this conversation is nobody’s own, so it stays where it runs' }
+      throw error
+    }
+  }
+
   /** Refused while a turn runs: the transcript it is writing has nowhere to go. */
   deleteSession(sessionId: string): void {
     if (this.turns.has(sessionId)) {
@@ -359,6 +406,8 @@ export class AgentHost {
             updateSession(this.ws, sessionId, { title })
             this.events?.sessionChanged?.(sessionId)
           },
+          handover: (sheetId, note) =>
+            this.handover(sessionId, ask.viewer ?? NOBODY, sheetId, note),
           history: native ? [] : conversationHistory(getTranscript(this.ws, sessionId)),
           resumeToken: native ? getSdkSessionId(this.ws, sessionId) : null,
           signal: abort.signal,

@@ -120,7 +120,8 @@ export interface AgentHostEvents {
   /** Washi renamed the conversation; the list should refetch. */
   sessionChanged?: (sessionId: string) => void
   approval: (request: ApprovalRequest) => void
-  openSheet: (id: string) => void
+  /** With a chat, only that chat's person is sent there (a handover, D110). */
+  openSheet: (id: string, sessionId?: string) => void
 }
 
 export type EventsRef = () => AgentHostEvents | null

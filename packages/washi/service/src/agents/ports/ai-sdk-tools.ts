@@ -5,9 +5,10 @@ import { tool } from 'ai'
 import { z } from 'zod'
 import { pageCapabilities, tableCapabilities } from '../../capabilities'
 import { NOBODY } from '../../sheets/access'
-import type { SearchKeyLookup } from '../lib'
+import { HANDOVER_DESCRIPTION, type SearchKeyLookup } from '../lib'
 import { webSearch } from '../search'
 import { currentFetchPolicy } from '../tools'
+import type { HandoverResult } from './types'
 
 /** Same surface the Claude port exposes — one capability set, two ports (§05). */
 const READ_ONLY = new Set([
@@ -22,6 +23,7 @@ const READ_ONLY = new Set([
   'db_row_activity',
   'people_list',
   'set_conversation_title',
+  'chat_handover',
 ])
 
 export function isReadTool(name: string): boolean {
@@ -36,6 +38,7 @@ export interface AiToolDeps {
   listPeople?: () => Promise<Member[]>
   searchKey?: SearchKeyLookup
   setTitle?: (title: string) => void
+  handover?: (sheetId: string, note?: string) => HandoverResult
   /** Who asked: Washi reads the pages they can (D65). Absent is a routine — workspace pages. */
   viewer?: Viewer
 }
@@ -52,6 +55,7 @@ export function createAiTools({
   listPeople,
   searchKey,
   setTitle,
+  handover,
   viewer,
 }: AiToolDeps) {
   const shared = { viewer: viewer ?? NOBODY, author: 'washi', listPeople, onCreate: openSheet }
@@ -65,6 +69,12 @@ export function createAiTools({
         setTitle?.(title.trim())
         return { ok: true }
       },
+    }),
+    chat_handover: tool({
+      description: HANDOVER_DESCRIPTION,
+      inputSchema: z.object({ sheetId: z.string().min(1), note: z.string().max(280).optional() }),
+      execute: async ({ sheetId, note }) =>
+        handover?.(sheetId, note) ?? { ok: false, reason: 'nowhere to move' },
     }),
     ...Object.fromEntries(
       capabilities.map((each) => [

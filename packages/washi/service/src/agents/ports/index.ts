@@ -10,6 +10,7 @@ export {
 export { defaultModelFor } from './defaults'
 export type {
   AgentPort,
+  HandoverResult,
   ModelChoice,
   PromptRequest,
   ProviderId,

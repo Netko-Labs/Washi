@@ -31,8 +31,9 @@ export const READ_TOOLS: ReadonlySet<string> = new Set([
   'db_history',
   'db_row_activity',
   'people_list',
-  // Names the chat — nothing leaves the server, nothing in the workspace changes.
+  // Name or move the chat — nothing leaves the server, nothing in the workspace changes.
   'set_conversation_title',
+  'chat_handover',
 ])
 
 /**

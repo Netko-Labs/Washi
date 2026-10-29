@@ -57,6 +57,7 @@ export function createAiSdkPort({
         listPeople,
         searchKey,
         setTitle: request.setTitle,
+        handover: request.handover,
         viewer: request.viewer,
       })
       const model =

@@ -18,6 +18,7 @@ describe('tool calls read like a person asked', () => {
     expect(said('sheet_get', { id: 's1' })).toBe('Read Trip to Kyoto')
     expect(said('sheet_delete', { id: 's1' })).toBe('Moved “Trip to Kyoto” to the trash')
     expect(said('sheet_delete', { id: 'gone' })).toBe('Moved a page to the trash')
+    expect(said('chat_handover', { sheetId: 's1' })).toBe('Moved this chat to Trip to Kyoto')
   })
 
   test('tables name the row, not the mutation', () => {

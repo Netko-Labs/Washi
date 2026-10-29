@@ -1,6 +1,7 @@
 import { getTranscript, isSessionVisible, listSessions, searchChats } from '@washi/repository'
+import { movedFrom } from '@washi/service'
 import { z } from 'zod'
-import { router, workspaceProcedure } from '../../init'
+import { pageProcedure, router, workspaceProcedure } from '../../init'
 import { chatProcedure } from '../../shared/chats'
 
 const SEARCH_LIMIT = 30
@@ -39,6 +40,10 @@ export const agentQueries = router({
       ),
     }
   }),
+  /** The newest of your chats that left this page and is still away (D110). */
+  movedFrom: pageProcedure
+    .input(z.object({ sheetId: z.string() }))
+    .query(({ ctx, input }) => movedFrom(ctx.ws, input.sheetId, ctx.viewer)),
   transcript: chatProcedure
     .input(z.object({ sessionId: z.string() }))
     .query(({ ctx, input }) => getTranscript(ctx.ws, input.sessionId)),

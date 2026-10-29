@@ -4,6 +4,8 @@ import { parse, type WsxElement } from '@washi/wsx'
 // mock.module is process-wide: a stub missing the barrel's other exports breaks later test files.
 const realApi = await import('../../api')
 const realStores = await import('../../stores')
+// Taken before the mock: bindings to a mocked module update in place.
+const realSheets = { ...realStores.useSheetsStore }
 
 const saved: string[] = []
 mock.module('../../api', () => ({
@@ -21,7 +23,10 @@ mock.module('../../api', () => ({
 }))
 mock.module('../../stores', () => ({
   ...realStores,
-  useSheetsStore: { getState: () => ({ refresh: async () => {} }) },
+  useSheetsStore: {
+    ...realSheets,
+    getState: () => ({ ...realSheets.getState(), refresh: async () => {} }),
+  },
 }))
 
 const { pageWriter } = await import('../lib/utils')

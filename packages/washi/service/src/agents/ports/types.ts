@@ -21,6 +21,8 @@ export interface PromptRequest {
   images?: { mime: string; base64: string }[]
   /** Washi names the conversation through a tool; the host stores what it says. */
   setTitle?: (title: string) => void
+  /** Moves this conversation to a page the asker can read (D110); refusals come back in words. */
+  handover?: (sheetId: string, note?: string) => HandoverResult
   /** Who asked; the tools read only the pages they can (D65). */
   viewer?: Viewer
   /** Prior turns, for ports that do not resume server-side. */
@@ -29,6 +31,8 @@ export interface PromptRequest {
   resumeToken?: string | null
   signal?: AbortSignal
 }
+
+export type HandoverResult = { ok: true; page: string } | { ok: false; reason: string }
 
 export interface TurnResult {
   /** Under `plan` this is notional — what the turn would have cost on a key. */

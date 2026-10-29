@@ -6,7 +6,8 @@ import { z } from 'zod'
 import { pageCapabilities, tableCapabilities } from '../capabilities'
 import { serverPolicy } from '../server'
 import { NOBODY } from '../sheets/access'
-import type { SearchKeyLookup } from './lib'
+import { HANDOVER_DESCRIPTION, type SearchKeyLookup } from './lib'
+import type { HandoverResult } from './ports/types'
 import { webSearch } from './search'
 
 export const TSURU_HOSTS_KEY = 'tsuru_allowed_hosts'
@@ -37,6 +38,8 @@ export interface ToolContext {
   searchKey?: SearchKeyLookup
   /** Names the conversation — Washi calls it once, at the start of its first reply (D61). */
   setTitle?: (title: string) => void
+  /** Moves the conversation to a page (D110). */
+  handover?: (sheetId: string, note?: string) => HandoverResult
   /** Who asked: Washi reads the pages they can (D65). Absent is a routine — workspace pages. */
   viewer?: Viewer
 }
@@ -65,6 +68,13 @@ export function createWashiTools(ws: Workspace, context: ToolContext) {
           context.setTitle?.(title.trim())
           return text({ ok: true })
         },
+      ),
+      tool(
+        'chat_handover',
+        HANDOVER_DESCRIPTION,
+        { sheetId: z.string().min(1), note: z.string().max(280).optional() },
+        async ({ sheetId, note }) =>
+          text(context.handover?.(sheetId, note) ?? { ok: false, reason: 'nowhere to move' }),
       ),
       ...capabilities.map((each) =>
         tool(each.name, each.description, each.input, async (input) => text(await each.run(input))),

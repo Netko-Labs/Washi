@@ -17,6 +17,7 @@ export function enterWorkspace(workspace: WorkspaceSummary): void {
   setActiveWorkspace(workspace.id)
   forgetEmbedHosts()
   useAgentStore.getState().reset()
+  useAgentStore.getState().bind(workspace.id)
   useSheetsStore.getState().reset()
   useThemesStore.getState().reset()
   useFavoritesStore.getState().bind(workspace.id)

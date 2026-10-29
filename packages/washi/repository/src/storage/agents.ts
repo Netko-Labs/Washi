@@ -3,6 +3,7 @@ import type {
   AgentUpdate,
   ApprovalRequest,
   ChatAnchor,
+  ChatMove,
   TranscriptEntry,
 } from '@washi/domain'
 import { agentSessionTable, agentTurnTable, approvalTable } from '@washi/domain/db'
@@ -96,6 +97,35 @@ export function updateSession(
     .where(eq(agentSessionTable.id, id))
     .run()
   if (patch.title !== undefined) indexChatSearch(ws, id)
+}
+
+/** Where a chat lives (D110); null is Home. The move counts as activity, so it sorts first. */
+export function setSessionAnchor(ws: Workspace, id: string, anchor: ChatAnchor | null): void {
+  ws.db
+    .update(agentSessionTable)
+    .set({
+      anchorSheetId: anchor?.sheetId ?? null,
+      anchorScope: anchor?.scope ?? null,
+      updatedAt: ws.now(),
+    })
+    .where(eq(agentSessionTable.id, id))
+    .run()
+}
+
+/** The newest of `viewerId`'s chats that left `sheetId` and has not come back (D110). */
+export function latestMoveFrom(ws: Workspace, sheetId: string, viewerId: string): ChatMove | null {
+  const row = ws.sqlite
+    .query(
+      `SELECT s.id AS sessionId, s.anchor_sheet_id AS sheetId, s.title AS title, t.created_at AS at
+       FROM agent_turns t JOIN agent_sessions s ON s.id = t.session_id
+       WHERE json_extract(t.payload, '$.kind') = 'handoff'
+         AND json_extract(t.payload, '$.from') = ?
+         AND s.created_by = ?
+         AND s.anchor_sheet_id IS NOT ?
+       ORDER BY t.created_at DESC LIMIT 1`,
+    )
+    .get(sheetId, viewerId, sheetId) as ChatMove | null
+  return row ?? null
 }
 
 /** The conversation, its turns and its answered questions. A running one is refused upstream. */

@@ -87,4 +87,14 @@ describe('a chat is its starter’s (D67)', () => {
     })
     expect(chat.anchor).toEqual({ sheetId: 'sheet-1', scope: 'subtree' })
   })
+
+  test('only its starter moves it, and only to a page they can read (D110)', async () => {
+    const chat = await callerFor('member').agents.createSession({ title: 'trip' })
+    await expect(
+      callerFor('owner').agents.moveSession({ sessionId: chat.id, sheetId: null }),
+    ).rejects.toMatchObject({ code: 'NOT_FOUND' })
+    await expect(
+      callerFor('member').agents.moveSession({ sessionId: chat.id, sheetId: 'no-such-page' }),
+    ).rejects.toMatchObject({ code: 'NOT_FOUND' })
+  })
 })

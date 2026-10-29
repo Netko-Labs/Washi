@@ -22,8 +22,10 @@ export {
   getSession,
   getTranscript,
   isSessionVisible,
+  latestMoveFrom,
   listSessions,
   resolveApproval,
+  setSessionAnchor,
   updateSession,
 } from './storage/agents'
 export { automationsFor, type StoredAutomation, tableNameOf } from './storage/automations'

@@ -14,7 +14,8 @@ export type DevCommand = 'reload' | 'reset-onboarding' | 'reset-identity' | 'cle
 export interface WashiEvents {
   agentUpdate: { workspaceId: string; sessionId: string; entry: TranscriptEntry }
   approvalRequested: ApprovalRequest & { workspaceId: string }
-  openSheetRequested: { workspaceId: string; id: string }
+  /** With a chat, only its person is sent there (a handover, D110). */
+  openSheetRequested: { workspaceId: string; id: string; sessionId?: string }
   /** Washi named a conversation, or a person did: the list refetches. */
   sessionChanged: { workspaceId: string; sessionId: string }
   /** Something in the workspace moved: a page, or table data. Viewers refetch what they show. */
