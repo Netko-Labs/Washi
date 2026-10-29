@@ -184,7 +184,8 @@
 .wsx-progress-track {
   height: 8px;
   border-radius: 999px;
-  background: var(--muted-bg);
+  /* Ink, not --muted-bg: an empty track stays visible on a dark card. */
+  background: color-mix(in srgb, var(--ink) 9%, transparent);
   overflow: hidden;
 }
 /* Nothing real gives a share: an outline, never a track that reads as 0%. */
