@@ -1009,3 +1009,22 @@ Acceptance (dev, verified): a stranger's sign-up is 403 with the invite-only lin
 (any case) signs up; an expired invitation is refused; the admin's toggle persists; a non-admin
 sees no Server tab.
 
+
+# Lab round (2026-10-29) — apps rebuilt on paper, a PR per fix
+
+Throwaway harness (paper + book host + `/compile`, Vite on :3301, headless Playwright at 1100 and
+390): Trello, Jira, Calendly, calories, finance, wiki, habits (a code page), CRM, OKRs, reading
+list, time tracker (code page), invoices, sprint.
+
+- [x] D102 `<Slots>` (#146) · D103 `<Heatmap>` (#151) · Roadmap `end` (#149) · round-2 fixes (#152)
+- [x] list cells pill per item (#154) · Stat `currency`, Row wraps instead of crushing, no browser
+      margins (#155) · `usePageState` seeds its key (#156) · D104 number `format` (#157) · Board
+      follows its column's order, Progress in a Row (#159) · `<Table>` reads its spec (#160) ·
+      paper `lib/types/` by concern, props named (#158)
+- [ ] later: `data.tsx` props still inline (moves once the stack above merges)
+- [ ] later: change an existing column's format by hand (the panel only adds)
+- [ ] later: Board meta and `<Repeat>` rows don't know a column's format (no spec)
+- [ ] ask Juan: info tone reads grey beside the warm tones; danger ≈ accent in light mode —
+      palette lives in `brand-assets`
+
+Acceptance: every lab app valid at 1100 and 390, no sideways overflow, no page errors.
