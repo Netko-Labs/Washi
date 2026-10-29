@@ -150,6 +150,7 @@ export {
   getTableByName,
   insertRecord,
   listTables,
+  restoreRecords,
   updateRecords,
 } from './storage/tables'
 export {

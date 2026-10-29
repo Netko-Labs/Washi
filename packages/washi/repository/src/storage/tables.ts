@@ -131,3 +131,26 @@ export function deleteRecords(
   }
   return result.changes
 }
+
+/**
+ * Brings deleted records back as they were — the row behind a restored row page. Each return is
+ * written to history like any write, so Activity shows it came back. Returns how many returned.
+ */
+export function restoreRecords(ws: Workspace, ids: string[], author: string | null = null): number {
+  if (ids.length === 0) return 0
+  const placeholders = ids.map(() => '?').join(', ')
+  const deleted = ws.sqlite
+    .query(
+      `SELECT id, table_id, data FROM records WHERE deleted_at IS NOT NULL AND id IN (${placeholders})`,
+    )
+    .all(...ids) as { id: string; table_id: string; data: string }[]
+  const restore = ws.sqlite.query('UPDATE records SET deleted_at = NULL WHERE id = ?')
+  ws.sqlite.transaction(() => {
+    for (const row of deleted) {
+      restore.run(row.id)
+      appendOp(ws, 'record', row.id, { kind: 'restore', tableId: row.table_id })
+      appendChange(ws, row.table_id, row.id, JSON.parse(row.data) as RecordData, author)
+    }
+  })()
+  return deleted.length
+}
