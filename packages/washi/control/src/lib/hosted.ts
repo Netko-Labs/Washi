@@ -2,20 +2,12 @@ import type {
   Actor,
   AgentCredentialInput,
   ControlPlane,
-  InstanceStore,
   Integration,
   OAuthStore,
   SecretStore,
   TokenStore,
   WorkspaceRef,
 } from '@washi/trpc'
-
-export interface AgentCredentialOut {
-  apiKey: string
-  provider: string
-  model: string | null
-}
-
 import { and, eq } from 'drizzle-orm'
 import { member, organization, organizationIntegration, organizationSecret, user } from '../db'
 import { createAuth } from './auth'
@@ -23,16 +15,22 @@ import { type ControlDB, createControlDb } from './client'
 import { open, seal } from './crypto'
 import { isInstanceAdmin, setSignupMode, signupMode } from './instance'
 import { createOAuthStore } from './oauth'
+import { createServerSettings, settingRows, userName } from './server-settings'
 import { createStorageStore } from './storage'
 import { createTokenStore } from './tokens'
-import type { ControlPlaneOptions, HostedStorageStore } from './types'
+import type {
+  AgentCredentialOut,
+  ControlPlaneOptions,
+  HostedInstanceStore,
+  HostedStorageStore,
+} from './types'
 
 const AUTH_PREFIX = '/api/auth'
 
 export interface HostedControlPlane extends ControlPlane {
   db: ControlDB
   secrets: SecretStore
-  instance: InstanceStore
+  instance: HostedInstanceStore
   storage: HostedStorageStore
   tokens: TokenStore
   oauth: OAuthStore
@@ -90,6 +88,11 @@ export function createHostedControlPlane(options: ControlPlaneOptions): HostedCo
       isAdmin: (actorId) => isInstanceAdmin(db, actorId),
       signup: () => signupMode(db),
       setSignup: (mode) => setSignupMode(db, mode),
+      ...createServerSettings({
+        rows: settingRows(db),
+        masterKey: options.masterKey,
+        nameOf: (userId) => userName(db, userId),
+      }),
     },
     storage: createStorageStore(db, options.masterKey),
     tokens: createTokenStore(db),

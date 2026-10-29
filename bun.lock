@@ -231,6 +231,7 @@
       "version": "0.1.0",
       "dependencies": {
         "@better-auth/oauth-provider": "^1.7.14",
+        "@washi/domain": "workspace:*",
         "@washi/trpc": "workspace:*",
         "better-auth": "^1.7.14",
         "drizzle-orm": "^0.45.2",

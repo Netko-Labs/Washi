@@ -54,7 +54,7 @@ export interface InferenceStatus {
   localCli: LocalCliStatus | null
   /** Which model the local CLI runs; null on a hosted server. */
   localModel: LocalModel | null
-  apiKey: { provider: string; source: 'environment' | 'workspace' } | null
+  apiKey: { provider: string; source: 'environment' | 'workspace' | 'server' } | null
   /** Why nothing is active, in words a person can act on. */
   missing: string | null
 }

@@ -6,5 +6,9 @@ export const instanceQueries = router({
     const store = ctx.runtime.control.instance
     return { isAdmin: Boolean(store && ctx.actorId && (await store.isAdmin(ctx.actorId))) }
   }),
-  settings: adminProcedure.query(async ({ ctx }) => ({ signup: await ctx.instance.signup() })),
+  settings: adminProcedure.query(async ({ ctx }) => ({
+    signup: await ctx.instance.signup(),
+    key: await ctx.instance.keyInfo(),
+    ...ctx.instance.policy(),
+  })),
 })

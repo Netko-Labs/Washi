@@ -8,6 +8,7 @@ import {
 import { type BlobStoreFactory, s3BlobStores } from '@washi/repository'
 import { startRoutineClock } from './clock'
 import { DEFAULT_WORKSPACE_ID } from './constants'
+import { keyWithFallback } from './keys'
 import { assertHostedSecrets, assertMode } from './mode'
 import { createRuntime } from './runtime'
 import type { BootedRuntime, RuntimeOptions } from './types'
@@ -55,11 +56,16 @@ export async function bootRuntime(env: Env): Promise<BootedRuntime> {
     const baseUrl = env.WASHI_BASE_URL ?? 'http://localhost:3000'
     const hosted = createHostedControlPlane({ databaseUrl, masterKey, baseUrl, trustedOrigins })
     await ensureControlSchema(hosted.db)
+    await hosted.instance.load()
     options = {
       mode,
       control: hosted,
       dataDir,
-      storedAgentKey: (workspaceId) => hosted.agentKey(workspaceId),
+      storedAgentKey: keyWithFallback(
+        (workspaceId) => hosted.agentKey(workspaceId),
+        () => hosted.instance.agentKey(),
+      ),
+      serverPolicy: () => hosted.instance.policy(),
       searchKey: (workspaceId) => hosted.integrationKey(workspaceId, 'exa'),
       blobs,
       workspaceStorage: (workspaceId) => hosted.storage.config(workspaceId),
