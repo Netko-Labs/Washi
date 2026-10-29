@@ -3,19 +3,17 @@ import { hostUploadFile, useSheetsStore } from '@washi/ui'
 import type { WsxElement } from '@washi/wsx'
 import { create } from 'zustand'
 import { api } from '@/integrations/trpc'
-import { flatten, locate, mapBlocks, moveBlock, resizeColumns, tidy, writeList } from './columns'
+import { moveBlock, resizeColumns } from './columns'
 import { lockedBlock, newBlock, reconcile, turnInto } from './convert'
+import { flatten, isNestedBlock, locate, mapBlocks, tidy, writeList } from './slots'
+import { tabActions } from './tab-actions'
+import { newTabs } from './tabs'
 import type { Block, BlockPlace, EditorState, FocusRequest, TextBlock } from './types'
 import { applyShortcut, bookmarkNode, dataNode, galleryNode, swapNode, uploadNode } from './utils'
 import { LIST_MARKERS, NEW_DATABASE, NEW_SUBPAGE_SOURCE } from './values'
 
 function isTyped(block: Block | undefined): block is TextBlock {
-  return (
-    block !== undefined &&
-    block.kind !== 'locked' &&
-    block.kind !== 'columns' &&
-    block.kind !== 'divider'
-  )
+  return block !== undefined && 'text' in block && block.kind !== 'divider'
 }
 
 /** Stored in the workspace's files, checked first against the kind the menu offered. */
@@ -95,9 +93,10 @@ export const useEditorStore = create<EditorState>((set, get) => {
     savedSource: null,
     load: (blocks, version = null, source = null) => {
       const loaded = blocks.length > 0 ? blocks : [newBlock()]
-      const first = get().focusFirst ? flatten(loaded).find(isTyped) : undefined
+      const first = get().focusFirst ? flatten(loaded, {}).find(isTyped) : undefined
       set({
         blocks: loaded,
+        shownTabs: {},
         focus: first ? { id: first.id, caret: 'end' } : null,
         saveState: 'saved',
         version,
@@ -154,7 +153,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
         }
         // An empty first block of a column goes, and with it the column.
         if ((previous || list.length === 1) && !block.text) {
-          const before = flatten(get().blocks)
+          const before = flatten(get().blocks, get().shownTabs)
           const neighbour = before
             .slice(
               0,
@@ -180,7 +179,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
       }),
 
     remove: (id) => {
-      const order = flatten(get().blocks)
+      const order = flatten(get().blocks, get().shownTabs)
       const at = order.findIndex((block) => block.id === id)
       const neighbour =
         order.slice(0, Math.max(at, 0)).reverse().find(isTyped) ?? order.slice(at + 1).find(isTyped)
@@ -200,7 +199,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
       }),
 
     moveFocus: (id, step) => {
-      const order = flatten(get().blocks)
+      const order = flatten(get().blocks, get().shownTabs)
       const at = order.findIndex((block) => block.id === id)
       const ahead = step < 0 ? order.slice(0, at).reverse() : order.slice(at + 1)
       const target = ahead.find(isTyped)
@@ -226,6 +225,17 @@ export const useEditorStore = create<EditorState>((set, get) => {
       if (pick.kind === 'code') {
         inList(id, ({ list, at }) => ({ list: [...list.slice(0, at), ...list.slice(at + 1)] }))
         set({ mode: 'source' })
+        return
+      }
+      if (pick.kind === 'tabs') {
+        if (isNestedBlock(get().blocks, id))
+          throw new Error('tabs sit on the page itself, not in a column or a tab')
+        const made = newTabs()
+        const first = made.tabs[0]?.blocks[0]
+        inList(id, ({ list, at }) => ({
+          list: [...list.slice(0, at), made, newBlock(), ...list.slice(at + 1)],
+          focus: first ? { id: first.id, caret: 0 } : null,
+        }))
         return
       }
       if (pick.kind === 'embed' && !pick.src) throw new Error('paste an https address after /embed')
@@ -282,5 +292,6 @@ export const useEditorStore = create<EditorState>((set, get) => {
       })),
     resize: (columnsId, index, fraction) =>
       set(({ blocks }) => ({ blocks: resizeColumns(blocks, columnsId, index, fraction) })),
+    ...tabActions(set, get),
   }
 })

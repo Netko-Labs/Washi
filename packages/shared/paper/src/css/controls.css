@@ -65,10 +65,15 @@
 }
 .wsx-button:focus-visible,
 .wsx-switch:focus-visible,
-.wsx-tabs-tab:focus-visible,
 .wsx-ref:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+/* Inside the strip's scroller: an outline past its edge would be clipped. */
+.wsx-tabs-tab:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+  border-radius: 6px;
 }
 
 .wsx-task {

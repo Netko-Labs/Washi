@@ -42,7 +42,7 @@ export function BlockMenu({ block }: BlockMenuProps) {
           role="menu"
           className="absolute top-full left-0 z-30 mt-1 w-[220px] rounded-xl border border-border bg-popover p-1 font-sans text-popover-foreground shadow-[0_16px_48px_rgb(0_0_0/0.18)]"
         >
-          {block.kind !== 'locked' && block.kind !== 'columns' && (
+          {'text' in block && (
             <>
               <div className="px-2 pt-1 pb-1 font-semibold text-[11px] text-muted-foreground uppercase tracking-[0.06em]">
                 Turn into

@@ -1,8 +1,9 @@
 import { describe, expect, test } from 'bun:test'
 import { paperRegistry } from '@washi/paper/registry'
 import { parse, serialize, validate } from '@washi/wsx'
-import { flatten, isColumns, moveBlock, resizeColumns, tidy } from '../lib/columns'
+import { moveBlock, resizeColumns } from '../lib/columns'
 import { newBlock, toBlocks, toSheet } from '../lib/convert'
+import { flatten, isColumns, tidy } from '../lib/slots'
 import type { Block, ColumnsBlock } from '../lib/types'
 
 const SOURCE = `<Sheet title="Hub" wsx="1">

@@ -6,6 +6,7 @@ import {
   type BlockInputProps,
   FIELD_CLASS,
   HEADING_LEVELS,
+  isNestedBlock,
   KIND_LOOKS,
   KIND_PLACEHOLDERS,
   pickFiles,
@@ -58,7 +59,8 @@ export function BlockInput({ block, numberAt }: BlockInputProps) {
     const atEnd = field.selectionStart === field.value.length
     if (event.key === 'Enter' && !event.shiftKey && block.kind !== 'code') {
       event.preventDefault()
-      const [first] = slash === null ? [] : slashMatches(slash, store().tables)
+      const isNested = isNestedBlock(store().blocks, block.id)
+      const [first] = slash === null ? [] : slashMatches(slash, store().tables, [], isNested)
       if (first) pick(first)
       else store().splitAt(block.id, field.selectionStart)
     } else if (event.key === 'Escape' && slash !== null) {
@@ -108,7 +110,7 @@ export function BlockInput({ block, numberAt }: BlockInputProps) {
           block.kind === 'todo' && block.done ? 'line-through opacity-50' : ''
         }`}
       />
-      {slash !== null && <SlashMenu query={slash} onPick={pick} />}
+      {slash !== null && <SlashMenu id={block.id} query={slash} onPick={pick} />}
     </div>
   )
 }

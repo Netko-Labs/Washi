@@ -1,5 +1,5 @@
-export { isColumns, shareOf } from './columns'
-export { SAVE_DELAY_MS, SIDE_DROP } from './constants'
+export { shareOf } from './columns'
+export { MAX_TAB_LABEL, MAX_TABS, SAVE_DELAY_MS, SIDE_DROP } from './constants'
 export { newBlock, toBlocks, toSheet } from './convert'
 export { useEditorStore } from './editor-store'
 export { useAutoSize } from './hooks/use-auto-size'
@@ -8,6 +8,7 @@ export { useBlockDrop } from './hooks/use-block-drop'
 export { useFocusRequest } from './hooks/use-focus-request'
 export { useLoadBlocks } from './hooks/use-load-blocks'
 export { useScriptCode } from './hooks/use-script-code'
+export { isColumns, isNestedBlock, isTabs, shownTab } from './slots'
 export type {
   Block,
   BlockInputProps,
@@ -24,6 +25,9 @@ export type {
   ScriptCodeProps,
   SlashMenuProps,
   SlashOption,
+  TabLabelProps,
+  TabMenuProps,
+  TabsRowProps,
   TextBlock,
   TextKind,
 } from './types'

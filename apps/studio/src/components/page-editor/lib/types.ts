@@ -46,7 +46,26 @@ export interface ColumnsBlock {
   columns: ColumnSlot[]
 }
 
-export type Block = TextBlock | LockedBlock | ColumnsBlock
+/** One tab of a Tabs block: its label and its own run of blocks. */
+export interface TabSlot {
+  id: string
+  label: string
+  props: Record<string, WsxValue>
+  blocks: Block[]
+}
+
+/** Tab sections, edited in place like columns; `props.labels` is rewritten from the tabs on save. */
+export interface TabsBlock {
+  id: string
+  kind: 'tabs'
+  props: Record<string, WsxValue>
+  tabs: TabSlot[]
+}
+
+export type Block = TextBlock | LockedBlock | ColumnsBlock | TabsBlock
+
+/** A block holding runs of blocks. Never inside another. */
+export type ContainerBlock = ColumnsBlock | TabsBlock
 
 /** Where a dragged block lands against another: above, below, or beside as a new column. */
 export type DropPlace = 'before' | 'after' | 'left' | 'right'
@@ -56,12 +75,12 @@ export interface DropZone {
   place: DropPlace
 }
 
-/** Where a block sits: its list, its index, and the column holding it (null at the top level). */
+/** Where a block sits: its list, its index, and the column or tab holding it (null at the top level). */
 export interface BlockPlace {
   list: Block[]
   at: number
-  columnsId: string | null
-  columnId: string | null
+  parentId: string | null
+  slotId: string | null
 }
 
 export interface BlockListProps {
@@ -75,12 +94,34 @@ export interface ColumnsRowProps {
   rootProps: Record<string, WsxValue>
 }
 
+export interface TabsRowProps {
+  block: TabsBlock
+  rootProps: Record<string, WsxValue>
+}
+
+export interface TabLabelProps {
+  tabsId: string
+  tab: TabSlot
+  isActive: boolean
+}
+
+export interface TabMenuProps {
+  tabsId: string
+  tabId: string
+  onRename: () => void
+}
+
 export interface ColumnGapProps {
   columnsId: string
   index: number
   /** The left column's part of the pair, 0–100. */
   share: number
 }
+
+export type TabActions = Pick<
+  EditorState,
+  'shownTabs' | 'showTab' | 'addTab' | 'renameTab' | 'moveTab' | 'removeTab'
+>
 
 export type SaveState = 'saved' | 'saving' | 'failed' | 'invalid'
 
@@ -145,6 +186,7 @@ export type DataPick =
   | { kind: 'widget' }
   | { kind: 'formula' }
   | { kind: 'automation'; table: string }
+  | { kind: 'tabs' }
 
 /** What `links.preview` read off a site, before it becomes a Bookmark's props. */
 export interface BookmarkPreview {
@@ -172,6 +214,7 @@ export type SlashOption =
   | { type: 'data'; key: string; label: string; hint: string; pick: DataPick }
 
 export interface SlashMenuProps {
+  id: string
   query: string
   onPick: (option: SlashOption) => void
 }
@@ -245,4 +288,12 @@ export interface EditorState {
   moveTo: (id: string, targetId: string, place: DropPlace) => void
   /** The gap after column `index` dragged to `fraction` of that column and the next. */
   resize: (columnsId: string, index: number, fraction: number) => void
+  /** The tab each strip shows, by Tabs block id — the editor's own, never saved. */
+  shownTabs: Record<string, string>
+  showTab: (tabsId: string, tabId: string) => void
+  addTab: (tabsId: string) => void
+  renameTab: (tabsId: string, tabId: string, label: string) => void
+  moveTab: (tabsId: string, tabId: string, step: -1 | 1) => void
+  /** Its blocks go with it; down to one tab, the strip unwraps into the page. */
+  removeTab: (tabsId: string, tabId: string) => void
 }

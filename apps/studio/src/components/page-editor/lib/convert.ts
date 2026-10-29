@@ -1,5 +1,13 @@
 import { parse, serialize, type WsxElement, type WsxNode, type WsxValue } from '@washi/wsx'
-import type { Block, ColumnSlot, ColumnsBlock, TextBlock, TextKind } from './types'
+import type {
+  Block,
+  ColumnSlot,
+  ColumnsBlock,
+  TabSlot,
+  TabsBlock,
+  TextBlock,
+  TextKind,
+} from './types'
 import { HEADING_LEVELS, LIST_MARKERS } from './values'
 
 export function element(
@@ -70,10 +78,33 @@ function fromColumns(node: WsxElement): Block[] {
   return [{ id: crypto.randomUUID(), kind: 'columns', props: node.props, columns: slots }]
 }
 
+/** `<Tabs>` edits in place when it has a label per `<Tab>`; each tab is its own run of blocks. */
+function fromTabs(node: WsxElement): Block[] {
+  const tabs = node.children.filter(
+    (child): child is WsxElement => child.kind === 'element' && child.name === 'Tab',
+  )
+  const { labels } = node.props
+  const names =
+    Array.isArray(labels) && labels.every((label) => typeof label === 'string') ? labels : []
+  const isWhole = tabs.length === node.children.length && names.length === tabs.length
+  if (!isWhole || tabs.length < 2) return [lockedBlock(node)]
+  const slots = tabs.map(({ props, children }, at): TabSlot => {
+    const blocks = fromNodes(children)
+    return {
+      id: crypto.randomUUID(),
+      label: String(names[at]),
+      props,
+      blocks: blocks.length > 0 ? blocks : [newBlock()],
+    }
+  })
+  return [{ id: crypto.randomUUID(), kind: 'tabs', props: node.props, tabs: slots }]
+}
+
 function fromElement(node: WsxElement, isNested: boolean): Block[] {
   if (node.name === 'List') return fromList(node)
-  // Columns never nest: one inside a column stays whole.
+  // Columns and tabs never nest: one inside a column or a tab stays whole.
   if (node.name === 'Columns' && !isNested) return fromColumns(node)
+  if (node.name === 'Tabs' && !isNested) return fromTabs(node)
   if (node.name === 'Divider') return [{ ...newBlock('divider'), props: node.props }]
   if (node.name === 'Code') {
     const value = node.children.map((child) => (child.kind === 'text' ? child.value : '')).join('')
@@ -133,14 +164,28 @@ function toColumns(block: ColumnsBlock): WsxElement {
   )
 }
 
+function toTabs(block: TabsBlock): WsxElement {
+  return element(
+    'Tabs',
+    { ...block.props, labels: block.tabs.map((tab) => tab.label) },
+    block.tabs.map((tab) => element('Tab', tab.props, toNodes(tab.blocks))),
+  )
+}
+
 /** Neighbouring list items of one kind share a `<List>`; empty text is dropped. */
 function toNodes(blocks: Block[]): WsxNode[] {
   const children: WsxNode[] = []
   let list: WsxElement | null = null
   for (const block of blocks) {
-    if (block.kind === 'locked' || block.kind === 'columns') {
+    if (block.kind === 'locked' || block.kind === 'columns' || block.kind === 'tabs') {
       list = null
-      children.push(block.kind === 'locked' ? block.node : toColumns(block))
+      children.push(
+        block.kind === 'locked'
+          ? block.node
+          : block.kind === 'columns'
+            ? toColumns(block)
+            : toTabs(block),
+      )
       continue
     }
     const marker = LIST_MARKERS[block.kind]
@@ -171,6 +216,16 @@ export function reconcile(current: Block[], next: Block[]): Block[] {
   const merged = next.map((block, index): Block => {
     const old = current[index]
     if (!old || old.kind !== block.kind) return block
+    if (old.kind === 'tabs' && block.kind === 'tabs') {
+      return {
+        ...block,
+        id: old.id,
+        tabs: block.tabs.map((tab, at) => {
+          const was = old.tabs[at]
+          return was ? { ...tab, id: was.id, blocks: reconcile(was.blocks, tab.blocks) } : tab
+        }),
+      }
+    }
     if (old.kind !== 'columns' || block.kind !== 'columns') return { ...block, id: old.id }
     return {
       ...block,

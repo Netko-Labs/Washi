@@ -114,6 +114,15 @@ function uploadOptions(needle: string): Extract<SlashOption, { type: 'data' }>[]
   return [...uploads, ...pictures, ...code, ...html, ...fn]
 }
 
+/** Tab sections sit on the page itself: never offered inside a column or a tab. */
+function layoutOptions(
+  needle: string,
+  isNested: boolean,
+): Extract<SlashOption, { type: 'data' }>[] {
+  if (isNested || (needle && !'tabs sections'.includes(needle))) return []
+  return [{ type: 'data', key: 'tabs', label: 'Tabs', hint: 'sections', pick: { kind: 'tabs' } }]
+}
+
 function pageOptions(needle: string, pages: PageRef[]): Extract<SlashOption, { type: 'data' }>[] {
   const subpages = [
     { key: 'subpage', label: 'New page inside', hint: 'page', pick: { kind: 'subpage' as const } },
@@ -153,6 +162,7 @@ export function slashMatches(
   query: string,
   tables: TableRef[],
   pages: PageRef[] = [],
+  isNested = false,
 ): SlashOption[] {
   const needle = query.trim().toLowerCase()
   const kinds = kindMatches(query).map((option) => ({ type: 'text' as const, ...option }))
@@ -204,6 +214,7 @@ export function slashMatches(
   return [
     ...kinds,
     ...linkOptions(query),
+    ...layoutOptions(needle, isNested),
     ...uploadOptions(needle),
     ...pageOptions(needle, pages),
     ...matching,

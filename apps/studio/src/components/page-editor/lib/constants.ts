@@ -12,3 +12,7 @@ export const SIDE_DROP = 0.2
 
 /** How long typing in a script waits before it is compiled and, if it compiles, kept. */
 export const SCRIPT_CHECK_MS = 400
+
+/** A Tabs block holds 1–12 tabs, each label 1–60 characters (the registry's bounds). */
+export const MAX_TABS = 12
+export const MAX_TAB_LABEL = 60
