@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { signIn, signUp } from '@/integrations/auth'
+import { continueUrl, signIn, signUp } from '@/integrations/auth'
 import type { AuthFormState, AuthMode } from '../types'
 
 const INITIAL: AuthFormState = {
@@ -30,7 +30,10 @@ export function useAuthForm(onDone: () => void) {
         patch({ error: result.error.message ?? 'That did not work.' })
         return
       }
-      onDone()
+      // An agent's sign-in goes on to its consent, not into the app.
+      const next = continueUrl(result.data)
+      if (next) window.location.assign(next)
+      else onDone()
     } catch (cause) {
       patch({ error: cause instanceof Error ? cause.message : String(cause) })
     } finally {

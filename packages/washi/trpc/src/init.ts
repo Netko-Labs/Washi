@@ -19,6 +19,7 @@ import {
 } from '@washi/service'
 import type { EventBus } from './shared/events'
 import type { InstanceStore } from './shared/instance'
+import type { OAuthStore } from './shared/oauth'
 import type { PresenceBoard } from './shared/presence'
 import type { StorageStore } from './shared/storage'
 import type { TokenStore } from './shared/tokens'
@@ -111,6 +112,7 @@ export interface ControlPlane {
   instance?: InstanceStore
   storage?: StorageStore
   tokens?: TokenStore
+  oauth?: OAuthStore
   close(): Promise<void>
 }
 

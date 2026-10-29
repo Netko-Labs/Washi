@@ -52,7 +52,10 @@ export default defineConfig(({ command }) => ({
       preset: 'bun',
       traceDeps: RUNTIME_FILE_DEPS.map((name) => `${name}*`),
       experimental: { websocket: true },
-      handlers: [{ route: '/trpc-ws', handler: './src/server/trpc-ws.ts' }],
+      handlers: [
+        { route: '/trpc-ws', handler: './src/server/trpc-ws.ts' },
+        { route: '/.well-known/**', handler: './src/server/well-known.ts' },
+      ],
       plugins: ['./src/server/plugins/runtime.ts'],
       routeRules: {
         '/**': {

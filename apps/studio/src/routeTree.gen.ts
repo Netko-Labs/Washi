@@ -15,7 +15,9 @@ import { Route as NewRouteImport } from './routes/new'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as WorkspacesRouteImport } from './routes/workspaces'
 import { Route as ApiHealthRouteImport } from './routes/api/health'
+import { Route as McpIndexRouteImport } from './routes/mcp.index'
 import { Route as McpWorkspaceIdRouteImport } from './routes/mcp.$workspaceId'
+import { Route as OauthConsentRouteImport } from './routes/oauth.consent'
 import { Route as WWorkspaceIdRouteImport } from './routes/w/$workspaceId'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiFilesSplatRouteImport } from './routes/api/files.$'
@@ -64,9 +66,19 @@ const ApiHealthRoute = ApiHealthRouteImport.update({
   path: '/api/health',
   getParentRoute: () => rootRouteImport,
 } as any)
+const McpIndexRoute = McpIndexRouteImport.update({
+  id: '/mcp/',
+  path: '/mcp/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const McpWorkspaceIdRoute = McpWorkspaceIdRouteImport.update({
   id: '/mcp/$workspaceId',
   path: '/mcp/$workspaceId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OauthConsentRoute = OauthConsentRouteImport.update({
+  id: '/oauth/consent',
+  path: '/oauth/consent',
   getParentRoute: () => rootRouteImport,
 } as any)
 const WWorkspaceIdRoute = WWorkspaceIdRouteImport.update({
@@ -165,7 +177,9 @@ export interface FileRoutesByFullPath {
   '/workspaces': typeof WorkspacesRoute
   '/api/health': typeof ApiHealthRoute
   '/mcp/$workspaceId': typeof McpWorkspaceIdRoute
+  '/oauth/consent': typeof OauthConsentRoute
   '/w/$workspaceId': typeof WWorkspaceIdRouteWithChildren
+  '/mcp/': typeof McpIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/files/$': typeof ApiFilesSplatRoute
   '/api/share/$': typeof ApiShareSplatRoute
@@ -191,6 +205,8 @@ export interface FileRoutesByTo {
   '/workspaces': typeof WorkspacesRoute
   '/api/health': typeof ApiHealthRoute
   '/mcp/$workspaceId': typeof McpWorkspaceIdRoute
+  '/oauth/consent': typeof OauthConsentRoute
+  '/mcp': typeof McpIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/files/$': typeof ApiFilesSplatRoute
   '/api/share/$': typeof ApiShareSplatRoute
@@ -217,7 +233,9 @@ export interface FileRoutesById {
   '/workspaces': typeof WorkspacesRoute
   '/api/health': typeof ApiHealthRoute
   '/mcp/$workspaceId': typeof McpWorkspaceIdRoute
+  '/oauth/consent': typeof OauthConsentRoute
   '/w/$workspaceId': typeof WWorkspaceIdRouteWithChildren
+  '/mcp/': typeof McpIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/files/$': typeof ApiFilesSplatRoute
   '/api/share/$': typeof ApiShareSplatRoute
@@ -245,7 +263,9 @@ export interface FileRouteTypes {
     | '/workspaces'
     | '/api/health'
     | '/mcp/$workspaceId'
+    | '/oauth/consent'
     | '/w/$workspaceId'
+    | '/mcp/'
     | '/api/auth/$'
     | '/api/files/$'
     | '/api/share/$'
@@ -271,6 +291,8 @@ export interface FileRouteTypes {
     | '/workspaces'
     | '/api/health'
     | '/mcp/$workspaceId'
+    | '/oauth/consent'
+    | '/mcp'
     | '/api/auth/$'
     | '/api/files/$'
     | '/api/share/$'
@@ -296,7 +318,9 @@ export interface FileRouteTypes {
     | '/workspaces'
     | '/api/health'
     | '/mcp/$workspaceId'
+    | '/oauth/consent'
     | '/w/$workspaceId'
+    | '/mcp/'
     | '/api/auth/$'
     | '/api/files/$'
     | '/api/share/$'
@@ -323,7 +347,9 @@ export interface RootRouteChildren {
   WorkspacesRoute: typeof WorkspacesRoute
   ApiHealthRoute: typeof ApiHealthRoute
   McpWorkspaceIdRoute: typeof McpWorkspaceIdRoute
+  OauthConsentRoute: typeof OauthConsentRoute
   WWorkspaceIdRoute: typeof WWorkspaceIdRouteWithChildren
+  McpIndexRoute: typeof McpIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiFilesSplatRoute: typeof ApiFilesSplatRoute
   ApiShareSplatRoute: typeof ApiShareSplatRoute
@@ -375,11 +401,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiHealthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mcp/': {
+      id: '/mcp/'
+      path: '/mcp'
+      fullPath: '/mcp/'
+      preLoaderRoute: typeof McpIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/mcp/$workspaceId': {
       id: '/mcp/$workspaceId'
       path: '/mcp/$workspaceId'
       fullPath: '/mcp/$workspaceId'
       preLoaderRoute: typeof McpWorkspaceIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/oauth/consent': {
+      id: '/oauth/consent'
+      path: '/oauth/consent'
+      fullPath: '/oauth/consent'
+      preLoaderRoute: typeof OauthConsentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/w/$workspaceId': {
@@ -544,7 +584,9 @@ const rootRouteChildren: RootRouteChildren = {
   WorkspacesRoute: WorkspacesRoute,
   ApiHealthRoute: ApiHealthRoute,
   McpWorkspaceIdRoute: McpWorkspaceIdRoute,
+  OauthConsentRoute: OauthConsentRoute,
   WWorkspaceIdRoute: WWorkspaceIdRouteWithChildren,
+  McpIndexRoute: McpIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiFilesSplatRoute: ApiFilesSplatRoute,
   ApiShareSplatRoute: ApiShareSplatRoute,

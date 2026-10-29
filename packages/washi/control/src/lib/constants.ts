@@ -18,3 +18,8 @@ export const TOKEN_PREFIX = 'washi_pat_'
 export const TOKEN_BYTES = 32
 /** How stale "last used" may be before a use writes it again. */
 export const TOKEN_USE_GRAIN_MS = 60_000
+
+/** Where an OAuth sign-in starts and asks for consent (studio routes). */
+export const SIGN_IN_PAGE = '/sign-in'
+export const CONSENT_PAGE = '/oauth/consent'
+export const OAUTH_SCOPES = ['openid', 'profile', 'email', 'offline_access'] as const

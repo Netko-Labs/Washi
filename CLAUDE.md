@@ -481,6 +481,16 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   row write is signed by the member's id and a page write is a person's (`editedBy` null); reads go
   through `readableSet`; no fetch, web search or hanko verbs. Each write emits `workspaceChanged`, so
   open pages refetch. Embedded has no token store, so no MCP.
+  **Or OAuth** (`@better-auth/oauth-provider` + `jwt`, `disabledPaths: ['/token']`): an agent
+  registers itself (dynamic, public, PKCE), its person signs in (`/sign-in` keeps the signed query;
+  `continueUrl` follows it on) and on `/oauth/consent` picks the workspace — `oauth.grant` keeps it
+  in `oauth_workspace_grant` (person · client), then Better Auth is told yes. Its one resource is
+  `<base>/mcp` (`mcpResource`); `/mcp` checks the JWT against the server's own keys (`auth.api.
+  getJwks`, issuer = auth base URL, audience = the resource) and acts where the grant says; on
+  `/mcp/<id>` only if that is the grant. Discovery (`/.well-known/oauth-authorization-server[/api/
+  auth]`, `openid-configuration`, `oauth-protected-resource[/mcp]`) is a Nitro handler over
+  `control.oauth.discovery`; every 401 names `resource_metadata`. OAuth tables: `db/oauth.ts`, as
+  `npx auth generate` writes them (regenerate, don't hand-edit), DDL in `lib/ddl-oauth.ts`.
 - **An embed is https and listed (D92).** `<Embed src title ratio height>`: the registry refuses http;
   a built-in provider (`EMBED_PROVIDERS` — YouTube via youtube-nocookie, Vimeo, Spotify, Loom, Figma,
   CodePen, CodeSandbox, Miro, Google Maps, Indify) turns its page URL into its player and always plays;

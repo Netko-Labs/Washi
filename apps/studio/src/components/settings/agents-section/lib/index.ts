@@ -6,4 +6,4 @@ export type {
   TokenList,
   TokenRowProps,
 } from './types'
-export { claudeCommand, mcpUrl, whenLabel } from './utils'
+export { claudeCommand, claudeSignInCommand, mcpUrl, whenLabel } from './utils'

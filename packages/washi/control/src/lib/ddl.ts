@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm'
 import type { ControlDB } from './client'
+import { ensureOAuthTables } from './ddl-oauth'
 import { seedInstanceAdmin } from './instance'
 
 /**
@@ -172,5 +173,6 @@ export async function ensureControlSchema(db: ControlDB): Promise<void> {
       user_id TEXT PRIMARY KEY REFERENCES "user"(id) ON DELETE CASCADE,
       created_at TIMESTAMP NOT NULL DEFAULT NOW()
     )`)
+  await ensureOAuthTables(db)
   await seedInstanceAdmin(db)
 }
