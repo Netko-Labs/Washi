@@ -77,8 +77,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   page's read-only link, no session — D65), `/w/$workspaceId` (dashboard),
   `/p/$pageId`, `/inbox`, `/chats` · `/chats/new` · `/chats/$chatId` (D67), `/routines` · `/routines/$id` (D68), `/settings?tab=`, `/trash`, and `/learn` (D87: every primitive
   live over the book's in-memory host, recipes, limits — public, no session; Settings → General links it). Any of them may carry `?peek=<page>`: a row
-  opened over it (D79, `RowPeek` — side or center, `washi:peek`; Back closes it; its bar toggles the mode
-  and its ⋯ copies the row page's link or deletes the row, which trashes its page; the row page's
+  opened over it (D79, `RowPeek` — a floating panel over a dimmed page, never a side panel; Back closes it;
+  its ⋯ copies the row page's link or deletes the row, which trashes its page; the row page's
   "+ Add a property" is paper's `AddProperty`, the database header's own). The shell
   registers the peek with `useRowOpenerStore`; without one (the desktop) `openRow` opens a tab. The workspace loader resets the shared stores (child
   effects run before the layout's); routes mark their view active, and a page chosen anywhere

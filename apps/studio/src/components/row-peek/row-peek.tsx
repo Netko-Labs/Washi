@@ -2,7 +2,7 @@ import { IconArrowUpRight } from '@tabler/icons-react'
 import { SheetView } from '@washi/ui'
 import { pageLook } from '@/components/page-chrome'
 import { RowProperties } from '@/components/row-properties'
-import { PEEK_FRAME, type RowPeekProps, usePeek, usePeekEscape, usePeekMode } from './lib'
+import { PEEK_FRAME, type RowPeekProps, usePeek, usePeekEscape } from './lib'
 import { RowPeekBar } from './row-peek-bar'
 
 /**
@@ -11,29 +11,24 @@ import { RowPeekBar } from './row-peek-bar'
  */
 export function RowPeek({ workspaceId }: RowPeekProps) {
   const peek = usePeek(workspaceId)
-  const [mode, setMode] = usePeekMode()
   usePeekEscape(peek.sheetId !== null, peek.close)
   if (!peek.sheetId) return null
 
   const { edit: _edit, ...look } = pageLook(workspaceId)
   return (
     <>
-      {mode === 'center' && (
-        <div
-          aria-hidden
-          onClick={peek.close}
-          className="fade-in fixed inset-0 z-40 animate-in bg-black/40 backdrop-blur-[2px] duration-200"
-        />
-      )}
+      <div
+        aria-hidden
+        onClick={peek.close}
+        className="fade-in fixed inset-0 z-40 animate-in bg-black/40 backdrop-blur-[2px] duration-200"
+      />
       <aside
         role="dialog"
-        aria-modal={mode === 'center'}
+        aria-modal
         aria-label="Row"
-        className={`fade-in fixed z-50 flex animate-in flex-col overflow-hidden border-border bg-background duration-200 ease-out max-md:inset-x-0 max-md:top-[env(safe-area-inset-top)] max-md:bottom-0 max-md:left-0 max-md:h-auto max-md:w-full max-md:min-w-0 max-md:rounded-t-2xl max-md:border-0 max-md:[--tw-enter-scale:1] max-md:[--tw-enter-translate-x:0] max-md:slide-in-from-bottom-16 ${PEEK_FRAME[mode]}`}
+        className={`fade-in fixed z-50 flex animate-in flex-col overflow-hidden border-border bg-background duration-200 ease-out max-md:inset-x-0 max-md:top-[env(safe-area-inset-top)] max-md:bottom-0 max-md:left-0 max-md:h-auto max-md:w-full max-md:min-w-0 max-md:rounded-t-2xl max-md:border-0 max-md:[--tw-enter-scale:1] max-md:[--tw-enter-translate-x:0] max-md:slide-in-from-bottom-16 ${PEEK_FRAME}`}
       >
         <RowPeekBar
-          mode={mode}
-          onMode={setMode}
           onClose={peek.close}
           onExpand={peek.expand}
           sheetId={peek.sheetId}
@@ -49,7 +44,7 @@ export function RowPeek({ workspaceId }: RowPeekProps) {
           }
           look={look}
           footer={
-            <div className="mx-auto w-full max-w-[760px] px-8 pb-12">
+            <div className="mx-auto w-full max-w-[960px] px-8 pb-12">
               <button
                 type="button"
                 onClick={peek.expand}
