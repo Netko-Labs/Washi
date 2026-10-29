@@ -1,6 +1,7 @@
 import { EventEmitter } from 'node:events'
 import type { AnyRouter } from '@trpc/server'
 import { getWSConnectionHandler, type WSSHandlerOptions } from '@trpc/server/adapters/ws'
+import { processSingleton } from '@washi/domain'
 import { isTrustedOrigin } from '../shared/origin'
 import type {
   CloseDetails,
@@ -58,7 +59,8 @@ class PeerSocket extends EventEmitter {
   }
 }
 
-const openSockets = new Set<PeerSocket>()
+// Registered by the socket route, closed by the server plugin — two bundles, one set.
+const openSockets = processSingleton('open-sockets', () => new Set<PeerSocket>())
 
 /** Closes every live socket, e.g. on SIGTERM, so subscriptions end and presence leaves run. */
 export function closeAllPeers(code = 1001, reason = 'server shutting down'): void {

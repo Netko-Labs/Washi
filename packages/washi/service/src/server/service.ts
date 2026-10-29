@@ -1,4 +1,9 @@
-import { type ServerPolicy, serverPolicySchema, type WorkspaceDefaults } from '@washi/domain'
+import {
+  processSingleton,
+  type ServerPolicy,
+  serverPolicySchema,
+  type WorkspaceDefaults,
+} from '@washi/domain'
 import { setAppMeta, type Workspace } from '@washi/repository'
 import { isPrivateAddress } from '@washi/tsuru'
 import { APPROVAL_MODE_KEY, DAILY_CAP_USD_KEY, DAILY_TURN_CAP_KEY } from '../agents/lib'
@@ -8,7 +13,7 @@ import { FetchHostError } from './errors'
 const NO_POLICY: ServerPolicy = serverPolicySchema.parse({})
 
 // Callbacks, not data: the runtime lends what the server says, read again on every check (C3).
-const lent = new WeakMap<Workspace, () => ServerPolicy>()
+const lent = processSingleton('server-policy', () => new WeakMap<Workspace, () => ServerPolicy>())
 
 export function lendServerPolicy(ws: Workspace, read: () => ServerPolicy): () => void {
   lent.set(ws, read)
