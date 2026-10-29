@@ -108,6 +108,10 @@
   flex: 1 1 0%;
   min-width: 0;
 }
+/* In a Row that wraps, a basis floor makes the rest wrap under it rather than crush it to a sliver. */
+.wsx .wsx-row > .grow {
+  flex-basis: min(100%, 10rem);
+}
 .wsx .none {
   flex: none;
 }
