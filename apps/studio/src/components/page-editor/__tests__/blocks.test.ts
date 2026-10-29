@@ -179,20 +179,12 @@ describe('the / menu drops live data on the page', () => {
     expect(validate(sheet, paperRegistry)).toEqual([])
   })
 
-  test('/script drops a starter that compiles to a valid block', () => {
-    const option = slashMatches('script', []).find(
-      (each) => each.type === 'data' && each.key === 'script',
+  test('/code offers the page’s code, written in the source above the page', () => {
+    const option = slashMatches('code', []).find(
+      (each) => each.type === 'data' && each.key === 'code',
     )
-    expect(option).toMatchObject({ label: 'Script', hint: 'TypeScript' })
-    const node = dataNode({ kind: 'script' })
-    const sheet = {
-      kind: 'element' as const,
-      name: 'Sheet',
-      props: { title: 't' },
-      children: [node],
-    }
-    expect(validate(sheet, paperRegistry)).toEqual([])
-    expect(serialize(sheet)).toContain('{`function view()')
+    expect(option).toMatchObject({ label: 'Page code', hint: 'TypeScript' })
+    expect(() => dataNode({ kind: 'code' })).toThrow('source')
   })
 
   test('what lands is valid WSX: a Database, or a Chart over the done statuses', () => {

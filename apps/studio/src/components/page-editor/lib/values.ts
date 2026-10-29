@@ -96,18 +96,6 @@ export const UPLOAD_OPTIONS = [
   { as: 'file', label: 'File', words: 'file document pdf attachment upload' },
 ] as const
 
-/** What `/script` drops in: a counter that shows the three things a script does. */
-export const STARTER_SCRIPT = `function view() {
-  const [count, setCount] = useState('count', 0)
-  const open = useRows({ table: 'tasks' }).length
-  return (
-    <Card title="A script">
-      <Text>Pressed {count} times · {open} rows</Text>
-      <Button onPress={() => setCount(count + 1)}>Press</Button>
-    </Card>
-  )
-}`
-
 /** What `/widget` drops in: a clock in the page's own accent, reaching nothing. */
 export const STARTER_WIDGET = `<div id="clock" style="font: 600 40px system-ui; color: var(--accent)"></div>
 <script>

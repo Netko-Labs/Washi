@@ -83,6 +83,7 @@ export {
   updateSheetMetaAndLook,
 } from './sheets/look'
 export { reindexPages } from './sheets/reindex'
+export { liftScriptsIntoCode } from './sheets/scripts-to-code'
 export {
   checkSource,
   createSheetFromSource,

@@ -56,3 +56,15 @@ local typecheck passed against the working tree, and CI failed on #130. After an
   retargeting brought it back.
 - Rule: before merging a stack's base, `gh pr edit <child> --base main`; only then merge with
   `--delete-branch`.
+## Restacking a PR stack after fixing its base (2026-10-29)
+- Failure: `git rebase feat/B` on C replayed B's *old* commit (C still carried it) → a conflict
+  against B's new self.
+- Rule: after the base moves, restack each child with `git rebase --onto <new-parent> <old-parent-sha>
+  <child>` — only the child's own commits move.
+
+## A parse error that shows up as a segfault (2026-10-29)
+- Failure: backticks typed inside `agents/lib/values.ts` (one big template literal) ended it early;
+  every test importing it failed to parse, and Bun 1.4 running the files as a set *segfaulted*
+  (address 0x5) instead of reporting it — files run one by one showed the real error.
+- Rule: a crash running many test files → run them one by one before suspecting the runtime. Never
+  write a backtick inside that template; quote code there plainly.

@@ -12,6 +12,7 @@ import {
   forgetUnenforcedVisibility,
   installFormulaFunctions,
   liftLooksIntoSource,
+  liftScriptsIntoCode,
   reindexPages,
   watchAutomations,
 } from '@washi/service'
@@ -49,6 +50,7 @@ export function createRuntime(options: RuntimeOptions): Runtime {
         : undefined
     liftLooksIntoSource(workspace)
     forgetUnenforcedVisibility(workspace)
+    liftScriptsIntoCode(workspace)
     reindexPages(workspace)
     installFormulaFunctions(workspace)
     const host = new AgentHost(workspace, keys)

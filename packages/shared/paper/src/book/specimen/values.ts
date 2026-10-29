@@ -43,11 +43,6 @@ export const SPECIMENS: Record<string, Specimen> = {
     children:
       "{`function run(event) {\n  if (!event.row.status) act({ verb: 'table.update', table: 'tasks', row: event.row.id, set: { status: 'todo' } })\n}`}",
   },
-  Script: {
-    props: { title: 'A counter' },
-    children:
-      "{`function view() {\n  const [n, setN] = useState('n', 0)\n  return <Button onPress={() => setN(n + 1)}>Pressed {n}</Button>\n}`}",
-  },
   Gallery: {
     props: { columns: 3 },
     children:

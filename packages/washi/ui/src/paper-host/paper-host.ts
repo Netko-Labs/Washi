@@ -1,4 +1,4 @@
-import type { CompiledScript, PaperHost } from '@washi/paper'
+import type { PaperHost } from '@washi/paper'
 import { parse } from '@washi/wsx'
 import { api } from '../api'
 import { childrenOf } from '../page-tree'
@@ -18,19 +18,6 @@ function listedEmbedHosts(): Promise<string[]> {
     })
   }
   return listed.hosts.catch(() => [])
-}
-
-const compiled = new Map<string, Promise<CompiledScript>>()
-
-/** The same TSX compiles the same, so a page drawn again never asks twice. */
-function compileOnce(source: string): Promise<CompiledScript> {
-  let found = compiled.get(source)
-  if (!found) {
-    found = api.scripts.compile.query({ source })
-    compiled.set(source, found)
-    found.catch(() => compiled.delete(source))
-  }
-  return found
 }
 
 // Shorter than the embed list's minute: a widget switched off must stop soon on every open page.
@@ -112,8 +99,6 @@ export const paperHost: PaperHost = {
     const sheet = await api.sheets.get.query({ id }).catch(() => null)
     return sheet ? { title: sheet.title, root: parse(sheet.source) } : null
   },
-
-  compileScript: (source) => compileOnce(source),
 
   // Not kept here: the server's cache also keys on the pages it imports, which may have moved.
   compilePage: (source) => api.scripts.page.query({ source }),

@@ -95,12 +95,26 @@ function checkPlacement(
  * (`onPress`) is code by nature, and a code `key` only tells a `.map` its rows apart.
  */
 function checkProps(node: WsxElement, spec: ComponentSpec, nodePath: string, walk: Walk) {
-  const written = Object.keys(node.code ?? {}).filter((key) => !HANDLERS.has(key) && key !== 'key')
+  const keys = Object.keys(node.code ?? {})
+  // A handler becomes the element's `action` once the page runs.
+  const handled = keys.some((key) => HANDLERS.has(key)) ? ['action'] : []
+  const written = [...keys.filter((key) => !HANDLERS.has(key) && key !== 'key'), ...handled]
   const probe = { ...node.props, ...Object.fromEntries(written.map((key) => [key, null])) }
   const parsed = spec.props.safeParse(probe)
   if (parsed.success) return
   for (const issue of parsed.error.issues) {
     if (written.includes(String(issue.path[0]))) continue
+    if (issue.code === 'unrecognized_keys' && handled.length > 0 && issue.keys.includes('action')) {
+      error(walk.out, nodePath, `<${node.name}> takes no press — put onPress on a <Button>`)
+      const rest = issue.keys.filter((key) => key !== 'action')
+      if (rest.length === 0) continue
+      error(
+        walk.out,
+        nodePath,
+        propIssue(node.name, spec, walk.registry, { ...issue, keys: rest }, probe),
+      )
+      continue
+    }
     error(walk.out, nodePath, propIssue(node.name, spec, walk.registry, issue, probe))
   }
 }

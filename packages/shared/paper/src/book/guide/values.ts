@@ -35,8 +35,6 @@ export const SUMMARIES: Record<string, string> = {
     'A function the workspace’s formula columns may call by name — values in, a value out, nothing else reached.',
   Automation:
     'TypeScript the server runs when a row is added to (or changes in) a table: run(event) reads rows and acts on them. It draws a note, nothing else.',
-  Script:
-    'A block written in TypeScript: function view() returns primitives; useState, useRows, useInterval and act are its only reach. Runs sandboxed in a workspace.',
   Include: 'Another page drawn here and kept current — its blocks, not its cover; never nested.',
   Backlinks: 'Every page that links here and the reader can open, live.',
   Outline: 'The page’s own headings as contents; a press scrolls to one.',
@@ -111,6 +109,28 @@ export const RECIPES: Recipe[] = [
     uses: ['Database'],
     source: `<Sheet title="Classes">
   <Database table="classes" width="wide" views={[{ name: 'Gallery', kind: 'gallery', cover: 'cover', columns: ['term', 'grade'] }, { name: 'Table', kind: 'table' }]} />
+</Sheet>`,
+  },
+  {
+    id: 'code',
+    title: 'A page that computes',
+    why: 'When primitives alone cannot say it: the page opens with code — hooks from washi, date-fns, lodash — and its markup takes expressions, its own components and presses that write. It runs inside a workspace, sandboxed.',
+    uses: ['Stat', 'List', 'Item', 'Button'],
+    source: `import { useRows, useInsert } from 'washi'
+import { sumBy } from 'lodash-es'
+
+function Total({ rows }) {
+  return <Stat label="Spent" value={sumBy(rows, 'amount')} />
+}
+
+const rows = useRows({ table: 'expenses' })
+const add = useInsert('expenses')
+
+<Sheet title="Spending">
+  <Title>Spending</Title>
+  <Total rows={rows} />
+  <List>{rows.map((row) => <Item key={row.id}>{row.name} · {row.amount}</Item>)}</List>
+  <Button onPress={() => add({ name: 'Coffee', amount: 4 })}>Add a coffee</Button>
 </Sheet>`,
   },
   {

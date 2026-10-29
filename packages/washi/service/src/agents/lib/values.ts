@@ -64,17 +64,26 @@ for reading. For rows with a date (events, bills, deadlines) a week is an <Agend
 date="date" title="title" time="start" end="end" badge="kind" add={['title', 'start', 'end', 'kind']}
 addLabel="Add event" />: seven days, ‹ › Today, each row opens in place, each day's + opens the form on that
 day. view="month" makes it a month grid; with state="picked_month" it shows that key's YYYY-MM and
-‹ › write it, so it moves with a month <Select>. Never lay out one Section per weekday. When primitives alone cannot say it — a computed view, a clock, a small tool — write a <Script>: its
-child is a backtick string of TypeScript/TSX defining function view() that returns registry primitives
-(<Card>, <Stat>, <Button onPress={…}>…). Its only reach: useState(key, initial) (page state, shared with
-Selects; text, numbers, true/false), useRows(inkQuery) (rows the reader may read; [] until they
-arrive), useInterval(ms ≥ 1000), act(action) (the page's verbs), now(). No imports, exports, fetch,
-DOM or timers; a run past 60 ms is stopped; no ${'$'}{…} inside the backticks — write \\\${ instead.
-Run sheet_check: a script that will not compile is refused. Prefer plain primitives when they suffice.
+‹ › write it, so it moves with a month <Select>. Never lay out one Section per weekday. When primitives alone cannot say it — a computed view, a
+clock, a small tool — the page itself may run code, MDX-style: imports and code above, then the
+<Sheet>, whose props and children take {expressions}, .map(…) and components the page defines.
+From 'washi' import only: useRows(inkQuery) useRow(table, id) useTable(name) useInsert(table)
+useUpdate(table) useDelete(table) · useState(initial) (local) usePageState(key, initial) (the page's
+state, shared with Selects) useStored(key, initial) (the reader's own) useInterval(ms ≥ 1000) useNow()
+· usePage() usePages(of?) useMembers() useMe() useNavigate() · act(action). Other imports: washi/ui,
+date-fns, lodash-es, zod (prefer zod/mini) and page:<id> — another page's exports, so a page may
+export function useBudget() for others. Writes (act, insert/update/delete, a setter, navigate) run
+only from an onPress; one called while the page draws stops it. The <Sheet>'s own props stay literal;
+no fetch, DOM or timers; 100 ms a draw. For example:
+import { useRows } from 'washi'
+const open = useRows({ table: 'tasks', where: [{ column: 'done', op: 'eq', value: false }] })
+<Sheet title="Tasks"><Stat label="Open" value={open.length} /><List>{open.map((task) => <Item key={task.id}>{task.title}</Item>)}</List></Sheet>
+Run sheet_check: code that will not compile, or imports anything else, is refused. Prefer plain
+primitives when they suffice.
 A <Widget title height> holds raw HTML/JS (a backtick string) for what primitives cannot draw — a
 canvas game, a custom chart; it reaches the page only through washi.rows(query), washi.state,
 washi.setState(key, value), washi.act(action); no network. It runs only if an owner allowed widgets —
-prefer a <Script> or plain primitives.
+prefer page code or plain primitives.
 For a rule that should happen whenever rows change — fill a default, log a change, keep two tables in
 step — write <Automation table="tasks" on="insert|update" title="…"> with a backtick string defining
 function run(event) (event: { table, kind, row, before }); rows(query) reads, act({ verb: 'table.insert'

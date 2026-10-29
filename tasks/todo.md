@@ -17,7 +17,7 @@ still has no network.
       actions, validated tree, re-run on state/rows/data; shared links draw the literal parts
 - [x] D · hooks (folded into C): useRows/useRow/useTable/useInsert/useUpdate/useDelete · useState (local)/
       usePageState/useStored/useInterval/useNow · usePage/usePages/useMembers/useMe/useNavigate
-- [ ] E · migrate `<Script>` pages once (app meta), drop Script + ScriptBlock; code pages edit in
+- [x] E · migrate `<Script>` pages once (app meta), drop Script + ScriptBlock; code pages edit in
       source mode; agent instructions, /learn + mihon, CLAUDE.md W1
 
 # Roadmap · layout, knowledge, scripting (2026-10-27)

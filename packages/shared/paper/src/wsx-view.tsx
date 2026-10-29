@@ -30,7 +30,7 @@ import { Backlinks, Include, Outline, PageLink, Subpages } from './components/pa
 import { literalOnly, PageProgram } from './components/program'
 import { Redact } from './components/redact'
 import { Roadmap } from './components/roadmap'
-import { Automation, Formula, Script } from './components/script'
+import { Automation, Formula } from './components/script'
 import { Select } from './components/select'
 import { Callout, Card, Figure, Hero } from './components/surface'
 import {
@@ -191,13 +191,6 @@ function renderElement(node: WsxElement, ctx: Ctx): ReactNode {
       return createElement(Widget, {
         ...p,
         source: node.children.map((child) => (child.kind === 'text' ? child.value : '')).join(''),
-      } as never)
-    case 'Script':
-      // What the script returns is drawn here, inside this page's own state and data.
-      return createElement(Script, {
-        ...p,
-        source: node.children.map((child) => (child.kind === 'text' ? child.value : '')).join(''),
-        render: (drawn: WsxElement) => renderChildren(drawn.children, ctx),
       } as never)
     case 'Include':
       return createElement(Include, {
