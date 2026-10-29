@@ -20,6 +20,10 @@
 .wsx *::after {
   box-sizing: border-box;
 }
+/* No browser margins: rhythm is paper's own, with or without the host's reset. Zero weight. */
+:where(.wsx) :where(p, h1, h2, h3, h4, h5, h6, blockquote, figure, dl, dd) {
+  margin: 0;
+}
 .wsx-page {
   width: 100%;
   max-width: var(--measure);
