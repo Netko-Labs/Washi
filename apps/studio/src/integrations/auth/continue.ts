@@ -6,5 +6,6 @@ export function continueUrl(data: unknown): string | null {
   if (!data || typeof data !== 'object') return null
   const { url, uri } = data as Record<string, unknown>
   const next = typeof url === 'string' ? url : typeof uri === 'string' ? uri : null
-  return next && /^(https?:|\/)/.test(next) ? next : null
+  // An absolute http(s) address or a path here — never `//host`, which leaves for anywhere.
+  return next && /^(https?:\/\/|\/(?!\/))/.test(next) ? next : null
 }

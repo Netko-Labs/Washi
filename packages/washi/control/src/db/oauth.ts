@@ -1,14 +1,5 @@
-import {
-  boolean,
-  index,
-  integer,
-  jsonb,
-  pgTable,
-  primaryKey,
-  text,
-  timestamp,
-} from 'drizzle-orm/pg-core'
-import { organization, session, user } from './schema'
+import { boolean, index, integer, jsonb, pgTable, text, timestamp } from 'drizzle-orm/pg-core'
+import { session, user } from './schema'
 
 /**
  * Better Auth's OAuth provider and JWT plugins (D101), as `npx auth generate` writes them — an
@@ -199,21 +190,3 @@ export const oauthClientAssertion = pgTable('oauth_client_assertion', {
   id: text('id').primaryKey(),
   expiresAt: timestamp('expires_at').notNull(),
 })
-
-/** The workspace a person chose for one client on consent: what its access tokens act in. */
-export const oauthWorkspaceGrant = pgTable(
-  'oauth_workspace_grant',
-  {
-    userId: text('user_id')
-      .notNull()
-      .references(() => user.id, { onDelete: 'cascade' }),
-    clientId: text('client_id')
-      .notNull()
-      .references(() => oauthClient.clientId, { onDelete: 'cascade' }),
-    organizationId: text('organization_id')
-      .notNull()
-      .references(() => organization.id, { onDelete: 'cascade' }),
-    createdAt: timestamp('created_at').notNull().defaultNow(),
-  },
-  (table) => [primaryKey({ columns: [table.userId, table.clientId] })],
-)

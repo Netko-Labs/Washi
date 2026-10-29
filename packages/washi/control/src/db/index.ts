@@ -7,8 +7,8 @@ export {
   oauthConsent,
   oauthRefreshToken,
   oauthResource,
-  oauthWorkspaceGrant,
 } from './oauth'
+export { oauthWorkspaceGrant } from './oauth-grant'
 export {
   accessToken,
   account,
