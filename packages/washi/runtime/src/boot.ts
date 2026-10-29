@@ -83,6 +83,7 @@ export function startRuntime(
     runtime,
     dataDir: options.dataDir,
     trustedOrigins,
+    stopClock,
     async stop() {
       stopClock()
       runtime.close()
