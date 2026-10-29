@@ -126,6 +126,9 @@ export {
   type RowFieldChange,
   type RowOf,
   rowActivityInputSchema,
+  type TableCatalogEntry,
+  type TablePage,
+  type TrashedTable,
   type UserTable,
   userTableSchema,
 } from './entities/tables'

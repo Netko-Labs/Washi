@@ -1,12 +1,22 @@
 import { rowActivityInputSchema } from '@washi/domain'
 import { historyQuerySchema, querySchema } from '@washi/ink'
 import { listTables } from '@washi/repository'
-import { rowActivity, rowOfSheet, runHistory, runQuery } from '@washi/service'
+import {
+  rowActivity,
+  rowOfSheet,
+  runHistory,
+  runQuery,
+  tableCatalog,
+  trashedTables,
+} from '@washi/service'
 import { z } from 'zod'
 import { router, workspaceProcedure } from '../../init'
 
 export const tableQueries = router({
   list: workspaceProcedure.query(({ ctx }) => listTables(ctx.ws)),
+  /** Every table, its size, and the pages this viewer reads that show it (D109). */
+  catalog: workspaceProcedure.query(({ ctx }) => tableCatalog(ctx.ws, ctx.viewer)),
+  trashed: workspaceProcedure.query(({ ctx }) => trashedTables(ctx.ws)),
   query: workspaceProcedure
     .input(z.object({ query: querySchema }))
     .query(({ ctx, input }) => runQuery(ctx.ws, input.query)),

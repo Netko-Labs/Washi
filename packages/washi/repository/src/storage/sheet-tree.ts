@@ -113,13 +113,15 @@ export function restoreSheet(ws: Workspace, id: string): string[] {
   return ids
 }
 
-function purge(ws: Workspace, ids: string[]): number {
+/** Deletes these pages for good, whatever their batch — a purge's last step. */
+export function purgeSheetIds(ws: Workspace, ids: string[]): number {
   ws.sqlite.transaction(() => {
     for (const id of ids) {
       ws.sqlite.query('DELETE FROM sheet_links WHERE src = ?').run(id)
       ws.sqlite.query('DELETE FROM sheet_files WHERE src = ?').run(id)
       ws.sqlite.query('DELETE FROM sheet_automations WHERE src = ?').run(id)
       ws.sqlite.query('DELETE FROM sheet_formulas WHERE src = ?').run(id)
+      ws.sqlite.query('DELETE FROM sheet_tables WHERE src = ?').run(id)
       ws.sqlite.query('DELETE FROM sheets WHERE id = ?').run(id)
       ws.sqlite.query('DELETE FROM sheet_revisions WHERE sheet_id = ?').run(id)
       deleteSheetComments(ws, id)
@@ -131,14 +133,14 @@ function purge(ws: Workspace, ids: string[]): number {
 
 /** Deletes a trashed page and its sub-pages for good. */
 export function purgeSheet(ws: Workspace, id: string): number {
-  return purge(ws, trashedBatch(ws, id).ids)
+  return purgeSheetIds(ws, trashedBatch(ws, id).ids)
 }
 
 export function emptyTrash(ws: Workspace): number {
   const rows = ws.sqlite.query('SELECT id FROM sheets WHERE deleted_at IS NOT NULL').all() as {
     id: string
   }[]
-  return purge(
+  return purgeSheetIds(
     ws,
     rows.map((row) => row.id),
   )

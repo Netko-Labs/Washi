@@ -60,3 +60,29 @@ export const rowActivityInputSchema = z.object({
   limit: z.number().int().min(1).max(ROW_ACTIVITY_MAX).optional(),
 })
 export type RowActivityInput = z.infer<typeof rowActivityInputSchema>
+
+/** A page that shows a table, as the catalog names it. */
+export interface TablePage {
+  id: string
+  title: string
+  icon: string | null
+}
+
+/** A live table in the catalog (D109): what it holds, and the readable pages that show it. */
+export interface TableCatalogEntry {
+  id: string
+  name: string
+  rows: number
+  columns: number
+  /** HLC of the last change to its spec or any of its rows. */
+  updated: string
+  pages: TablePage[]
+}
+
+/** A table in the Trash: its rows wait with it, untouched. */
+export interface TrashedTable {
+  id: string
+  name: string
+  rows: number
+  deletedAt: string
+}

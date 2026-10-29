@@ -4,7 +4,8 @@ import { and, desc, eq, notInArray } from 'drizzle-orm'
 import { newId, type Workspace } from './client'
 import { updateSnapshot } from './loro'
 import { appendOp } from './oplog'
-import { indexSheet, type SheetIndexInput } from './sheets'
+import { indexSheet } from './sheets'
+import type { SheetIndexInput } from './types'
 
 const UNDO_DEPTH = 20
 

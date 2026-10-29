@@ -82,6 +82,16 @@ export function guardWashiWrite(before: WsxElement | null, after: WsxElement): v
   }
 }
 
+/** Only a person takes a page off its public link (A2), and trashing a page takes it off. */
+export function guardWashiDelete(ws: Workspace, ids: string[]): void {
+  const pages = new Set(ids)
+  if (accessRows(ws).some((page) => pages.has(page.id) && page.visibility === 'public')) {
+    throw new SheetAccessError(
+      'This page, or one inside it, is on a public link: only a person moves it to the trash.',
+    )
+  }
+}
+
 /** A page is on a public link exactly while its `<Sheet>` says `public`. */
 export function syncShare(
   ws: Workspace,

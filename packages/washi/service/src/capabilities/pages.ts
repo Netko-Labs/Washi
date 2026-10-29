@@ -3,6 +3,7 @@ import type { Workspace } from '@washi/repository'
 import { z } from 'zod'
 import { pagesFor } from '../agents/lib/pages'
 import { checkSource, createSheetFromSource, updateSheetFromSource } from '../sheets/service'
+import { trashSheetAs } from '../sheets/tree'
 import { capability } from './define'
 import type { Capability, CapabilityContext } from './types'
 
@@ -73,6 +74,13 @@ export function pageCapabilities(ws: Workspace, context: CapabilityContext): Cap
         pages.require(id)
         return updateSheetFromSource(ws, id, write, editedBy, baseVersion)
       },
+    ),
+    capability(
+      'sheet_delete',
+      'Move a sheet and every sub-page under it to the Trash — only when the person asked for that page to go. They can restore it from the Trash.',
+      { id: z.string() },
+      false,
+      ({ id }) => trashSheetAs(ws, id, context.viewer, editedBy),
     ),
   ]
 }

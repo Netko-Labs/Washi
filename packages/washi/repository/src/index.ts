@@ -105,6 +105,7 @@ export {
 } from './storage/routines'
 export { closeShare, liveShareFor, openShare, shareByToken } from './storage/shares'
 export { accessRows, everySheetSource, rewriteSourceQuietly } from './storage/sheet-look'
+export { pagesShowingTables, tableStats } from './storage/sheet-tables'
 export {
   ancestorIds,
   emptyTrash,
@@ -116,7 +117,6 @@ export {
   trashedUploads,
 } from './storage/sheet-tree'
 export {
-  type AutomationEntry,
   createSheet,
   deleteSheet,
   findRowSheet,
@@ -125,7 +125,6 @@ export {
   indexSheet,
   listSheets,
   mergeSheetSource,
-  type SheetIndexInput,
   searchSheets,
   sheetVersion,
   updateSheet,
@@ -144,6 +143,13 @@ export {
   today,
 } from './storage/spend'
 export {
+  isTableNameTrashed,
+  listTrashedTables,
+  purgeTable,
+  restoreTable,
+  trashTable,
+} from './storage/table-trash'
+export {
   defineTable,
   deleteRecords,
   findRecordTableId,
@@ -153,6 +159,7 @@ export {
   restoreRecords,
   updateRecords,
 } from './storage/tables'
+export type { AutomationEntry, SheetIndexInput } from './storage/types'
 export {
   createWorkspaceTheme,
   deleteWorkspaceTheme,

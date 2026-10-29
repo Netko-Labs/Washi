@@ -19,7 +19,9 @@ Tables: db_list_tables shows each table's columns; db_query filters, sorts and g
 db_mutate inserts, updates or deletes them; db_row_activity says who changed a row and when.
 Pages: search or sheet_list, then sheet_get for the WSX source and its version; run sheet_check
 before sheet_create or sheet_replace, and pass the version back as baseVersion so a teammate's
-typing is merged, not overwritten. comment_add speaks on a page, or on a row by its recordId.
+typing is merged, not overwritten. sheet_delete moves a page and its sub-pages to the Trash, only
+when your person asks; they restore it from there. comment_add speaks on a page, or on a row by its
+recordId.
 
 Working a backlog kept in Washi: find the issues table (db_list_tables), query the open rows,
 take one, comment on its row what you are doing and, when done, the pull request — then move its
