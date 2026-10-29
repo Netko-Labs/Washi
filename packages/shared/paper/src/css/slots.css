@@ -1,0 +1,90 @@
+/* Slots — free times to book, a column per day; a list of days in a narrow sheet. */
+
+.wsx-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.wsx-slots-days {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  gap: 10px;
+}
+.wsx-slots-days[aria-busy] {
+  opacity: 0.6;
+}
+.wsx-slots-day {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.wsx-slots-head {
+  margin: 0;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-serif);
+  font-size: 17px;
+  font-weight: 400;
+}
+.wsx-slots-head span {
+  margin-right: 4px;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.wsx-slots-day[data-today] .wsx-slots-head {
+  border-bottom-color: var(--accent);
+  color: var(--accent);
+}
+.wsx-slots-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.wsx-slot {
+  height: 34px;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+  border-radius: var(--r-chip);
+  background: var(--card);
+  color: var(--tone-accent-text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition:
+    background var(--ease),
+    color var(--ease);
+}
+.wsx-slot:hover:not(:disabled) {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.wsx-slot:disabled {
+  cursor: default;
+}
+.wsx-slots-none {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+/* Narrow: each day a line — its name, then its times wrapping beside it. */
+@container wsx (max-width: 520px) {
+  .wsx-slots-days {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .wsx-slots-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .wsx-slot {
+    min-width: 72px;
+    height: 40px;
+  }
+}

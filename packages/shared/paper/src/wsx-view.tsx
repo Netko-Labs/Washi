@@ -32,6 +32,7 @@ import { Redact } from './components/redact'
 import { Roadmap } from './components/roadmap'
 import { Automation, Formula, Script } from './components/script'
 import { Select } from './components/select'
+import { Slots } from './components/slots'
 import { cell } from './components/states'
 import { Callout, Card, Figure, Hero } from './components/surface'
 import {
@@ -141,6 +142,7 @@ const COMPONENTS: Record<string, ComponentType<never>> = {
   Avatar,
   Field,
   Agenda,
+  Slots,
   Board,
   Database,
   Roadmap,

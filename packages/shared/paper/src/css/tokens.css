@@ -261,11 +261,6 @@
     --hero: 32px;
   }
 }
-@container wsx (max-width: 720px) {
-  .wsx-page {
-    --hero: min(var(--hero), 40px);
-  }
-}
 
 @media (prefers-reduced-motion: reduce) {
   .wsx * {
