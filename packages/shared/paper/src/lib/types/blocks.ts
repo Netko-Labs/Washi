@@ -219,3 +219,38 @@ export interface TableValueProps {
   db: DatabaseContext | null
   locale?: string
 }
+
+export interface RepeatProps extends Omit<BlockProps, 'children'> {
+  bind: BindQuery
+  empty?: string
+  children: (row: Row) => ReactNode
+}
+
+export interface StatProps extends BlockProps {
+  value?: string | number
+  expr?: string
+  label: string
+  hint?: string
+  trend?: 'up' | 'down' | 'flat'
+  format?: 'number' | 'percent'
+  currency?: string
+}
+
+export interface StepProps extends BlockProps {
+  marker: string
+  title?: string
+}
+
+export interface ProgressProps extends BlockProps {
+  value?: number | string
+  expr?: string
+  label?: string
+}
+
+export interface BadgeProps extends BlockProps {
+  expr?: string
+}
+
+export interface AvatarProps extends BlockProps {
+  label: string
+}
