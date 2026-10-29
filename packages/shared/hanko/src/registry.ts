@@ -27,6 +27,8 @@ const column = z.object({
   options: options.optional(),
   groups: z.object({ todo: options, doing: options, done: options }).optional(),
   table: z.string().min(1).max(64).optional(),
+  // ink re-checks it: percent or a currency code.
+  format: z.string().min(1).max(16).optional(),
 })
 
 /** ink re-checks the whole copy; a filter value may name one of its params. */

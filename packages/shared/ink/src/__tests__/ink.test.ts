@@ -140,3 +140,23 @@ describe('the copy mutation (D76)', () => {
     expect(json).toContain('"expr"')
   })
 })
+
+describe('number formats (D104)', () => {
+  const spec = (column: Record<string, unknown>) =>
+    tableSpecSchema.safeParse({ name: 'deals', columns: [{ name: 'value', ...column }] })
+
+  test('a number, formula or rollup may read as percent or money', () => {
+    expect(spec({ type: 'number', format: 'USD' }).success).toBe(true)
+    expect(spec({ type: 'number', format: 'percent' }).success).toBe(true)
+    expect(spec({ type: 'formula', expr: 'value * 2', format: 'EUR' }).success).toBe(true)
+  })
+
+  test('anything else is refused in words', () => {
+    expect(JSON.stringify(spec({ type: 'number', format: 'dollars' }).error?.issues)).toContain(
+      'three-letter currency code',
+    )
+    expect(JSON.stringify(spec({ type: 'text', format: 'USD' }).error?.issues)).toContain(
+      'only a number reads in a format',
+    )
+  })
+})

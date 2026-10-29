@@ -1,5 +1,6 @@
 import { useId } from 'react'
 import { needsOptions, PROPERTY_TYPES, type PropertyPanelProps, usePropertyDraft } from './lib'
+import { PropertyFormat } from './property-format'
 import { PropertyIcon } from './property-icon'
 import { PropertyOptions } from './property-options'
 
@@ -52,6 +53,7 @@ export function PropertyPanel(props: PropertyPanelProps) {
         ))}
       </fieldset>
       {needsOptions(draft.type) && <PropertyOptions draft={draft} edit={edit} />}
+      {draft.type === 'number' && <PropertyFormat draft={draft} edit={edit} />}
       {status.error && (
         <p className="wsx-db-panel-error" role="alert">
           {status.error}

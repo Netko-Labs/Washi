@@ -27,7 +27,7 @@ export function useRowActions(table: string) {
         refresh()
       }
     },
-    addProperty: (name: string, type: ColumnSpec['type'], options: string[]) =>
+    addProperty: (name: string, type: ColumnSpec['type'], options: string[], format?: string) =>
       run({
         verb: 'table.column',
         table,
@@ -36,6 +36,7 @@ export function useRowActions(table: string) {
           type,
           ...((type === 'select' || type === 'multi_select') && { options }),
           ...(type === 'status' && { groups: DEFAULT_STATUS_GROUPS }),
+          ...(format && { format }),
         },
       }),
   }

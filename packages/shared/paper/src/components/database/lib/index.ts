@@ -24,6 +24,7 @@ export type {
   GalleryCardProps,
   Person,
   PropertyDraft,
+  PropertyFormatProps,
   PropertyIconProps,
   PropertyOptionsProps,
   PropertyPanelProps,
@@ -52,4 +53,9 @@ export {
   tableLabel,
   titleColumn,
 } from './utils'
-export { DEFAULT_STATUS_GROUPS, PROPERTY_PANEL_WIDTH, PROPERTY_TYPES } from './values'
+export {
+  DEFAULT_STATUS_GROUPS,
+  NUMBER_FORMATS,
+  PROPERTY_PANEL_WIDTH,
+  PROPERTY_TYPES,
+} from './values'

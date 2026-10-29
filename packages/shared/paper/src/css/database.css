@@ -169,3 +169,6 @@
   font-variant-numeric: tabular-nums;
   cursor: default;
 }
+.wsx-db-formula[data-num] {
+  text-align: right;
+}
