@@ -60,7 +60,9 @@ export function Roadmap({ bind, date, end, title = 'title', empty, ...rest }: Ro
                   calendar={calendar}
                   title={String(row[title] ?? '') || 'Untitled'}
                   onMove={(days) =>
-                    span ? write(id, moved(span, days, date, end)) : Promise.resolve()
+                    span
+                      ? write(id, moved(span, days, date, row[end ?? ''] ? end : undefined))
+                      : Promise.resolve()
                   }
                   onPlace={(day) => void write(id, { [date]: toIso(day) })}
                   onOpen={() => host.openRow?.(id)}

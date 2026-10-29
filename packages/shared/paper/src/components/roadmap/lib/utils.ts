@@ -25,7 +25,10 @@ export function rowSpan(row: Record<string, unknown>, date: string, end?: string
     : spanOf(start)
 }
 
-/** What a dragged bar writes: one range column, or its start and end columns each moved. */
+/**
+ * What a dragged bar writes: its start and end columns each moved when the row has an end;
+ * otherwise its date column whole — a range stays a range.
+ */
 export function moved(
   span: Span,
   days: number,

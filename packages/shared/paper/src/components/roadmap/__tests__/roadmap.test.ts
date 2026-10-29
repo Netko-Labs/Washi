@@ -48,6 +48,8 @@ describe('a bar from a start column to a due column', () => {
       start: '2026-10-22',
       due: '2026-11-16',
     })
+    const range = rowSpan({ when: '2026-10-20/2026-10-24', due: null }, 'when', 'due')
+    expect(range && moved(range, 1, 'when')).toEqual({ when: '2026-10-21/2026-10-25' })
     expect(rowSpan({ start: '2026-10-20', due: null }, 'start', 'due')).toEqual(
       rowSpan({ start: '2026-10-20' }, 'start'),
     )
