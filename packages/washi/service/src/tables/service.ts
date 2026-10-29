@@ -16,6 +16,7 @@ import {
   formulaFunctions,
   getTableByName,
   insertRecord,
+  isTableNameTrashed,
   listTables,
   matchRecordIds,
   updateRecords,
@@ -41,6 +42,11 @@ export function defineUserTable(ws: Workspace, input: unknown): UserTable {
     formulaFunctions(ws).map((formula) => formula.name),
   )
   checkRollups(ws, spec)
+  if (!getTableByName(ws, spec.name) && isTableNameTrashed(ws, spec.name)) {
+    throw new InkError(
+      `a table called "${spec.name}" is in the Trash: restore it, or delete it there for good first`,
+    )
+  }
   for (const column of spec.columns) {
     if (column.table && column.table !== spec.name && !getTableByName(ws, column.table)) {
       throw new InkError(`${column.name}: relation to unknown table "${column.table}"`)

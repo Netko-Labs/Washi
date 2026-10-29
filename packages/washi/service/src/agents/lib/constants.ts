@@ -42,6 +42,7 @@ export const READ_TOOLS: ReadonlySet<string> = new Set([
 export const CHANGE_TOOLS: ReadonlySet<string> = new Set([
   'sheet_create',
   'sheet_replace',
+  'sheet_delete',
   'db_define',
   'db_link_column',
   'db_mutate',

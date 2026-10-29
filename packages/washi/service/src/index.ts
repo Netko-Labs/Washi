@@ -123,8 +123,22 @@ export {
   sharedTable,
   shareSettings,
 } from './sheets/share'
-export { duplicateSheet, moveSheetTo, restoreSheetTree, SheetMoveError } from './sheets/tree'
+export {
+  duplicateSheet,
+  moveSheetTo,
+  restoreSheetTree,
+  SheetMoveError,
+  trashSheetAs,
+} from './sheets/tree'
 export { rowActivity } from './tables/activity'
+export {
+  purgeUserTable,
+  restoreUserTable,
+  tableCatalog,
+  tablesWithPages,
+  trashedTables,
+  trashUserTable,
+} from './tables/catalog'
 export { runHistory } from './tables/history'
 export { linkColumn } from './tables/link'
 export { openRowPage, rowOfSheet, rowTitle } from './tables/rows'

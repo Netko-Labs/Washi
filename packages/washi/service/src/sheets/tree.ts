@@ -1,9 +1,10 @@
-import type { SheetDetail } from '@washi/domain'
+import type { SheetAuthor, SheetDetail, Viewer } from '@washi/domain'
 import {
   ancestorIds,
   getSheet,
   indexSheet,
   listSheets,
+  liveSubtree,
   moveSheet,
   restoreRecords,
   restoreSheet,
@@ -11,7 +12,8 @@ import {
   type Workspace,
 } from '@washi/repository'
 import { parse } from '@washi/wsx'
-import { createSheetFromSource, indexOf, requireSheet } from './service'
+import { guardWashiDelete, requireReadable, SheetAccessError } from './access'
+import { createSheetFromSource, indexOf, removeSheet, requireSheet } from './service'
 
 export class SheetMoveError extends Error {
   constructor(message: string) {
@@ -58,6 +60,27 @@ export function restoreSheetTree(
   }
   restoreRecords(ws, rows, author)
   return ids
+}
+
+/**
+ * An agent's delete (D108): the person's own path — one stamp over the subtree, restorable from
+ * the Trash — for a page the asker reads. A routine asks as nobody, so it deletes nothing.
+ */
+export function trashSheetAs(
+  ws: Workspace,
+  id: string,
+  viewer: Viewer,
+  editedBy: SheetAuthor,
+): { id: string; title: string; pages: number } {
+  if (viewer.id === null) {
+    throw new SheetAccessError('A routine cannot delete pages; only a person asking can.')
+  }
+  requireReadable(ws, id, viewer)
+  const sheet = requireSheet(ws, id)
+  const subtree = liveSubtree(ws, id)
+  if (editedBy === 'washi') guardWashiDelete(ws, subtree)
+  removeSheet(ws, id)
+  return { id, title: sheet.title, pages: subtree.length }
 }
 
 /** A copy right below the original, with its look (in its source) and width; not its sub-pages. */

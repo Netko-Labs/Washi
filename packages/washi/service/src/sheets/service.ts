@@ -1,5 +1,5 @@
 import type { SheetAuthor, SheetDetail, SheetWrite } from '@washi/domain'
-import { paperRegistry } from '@washi/paper/registry'
+import { pageTables, paperRegistry } from '@washi/paper/registry'
 import {
   createSheet,
   deleteSheet,
@@ -160,6 +160,7 @@ export function indexOf(root: ReturnType<typeof parse>) {
     files: extractFiles(root),
     automations: extractAutomations(root),
     formulas: extractFormulas(root),
+    tables: [...pageTables(root)],
   }
 }
 

@@ -35,7 +35,7 @@ is the primitives reference and these rules stand — a PR that breaks one does 
 - **A3** A team server never bills one person's plan.
 - **A4** Washi never reviews code.
 - **P1** Every record write goes through `insertRecord · updateRecords · deleteRecords ·
-  restoreRecords`.
+  restoreRecords`, and a purged table's rows only through `purgeRecords`.
 - **P2** Writes merge (Loro, `baseVersion`); a merge that breaks WSX is `SheetConflictError`.
 - **P3** Nothing on screen is invented; empty states are the honest default.
 
@@ -75,7 +75,7 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   Pages are routes: `/sign-in?redirect=`, `/workspaces?invite=`, `/new` (a new workspace: name it ·
   start it · invite people, then the workspace's first run wakes Washi), `/s/$workspaceId/$token` (a
   page's read-only link, no session — D65), `/w/$workspaceId` (dashboard),
-  `/p/$pageId`, `/inbox`, `/chats` · `/chats/new` · `/chats/$chatId` (D67), `/routines` · `/routines/$id` (D68), `/settings?tab=`, `/trash`, and `/learn` (D87: every primitive
+  `/p/$pageId`, `/inbox`, `/chats` · `/chats/new` · `/chats/$chatId` (D67), `/routines` · `/routines/$id` (D68), `/settings?tab=`, `/databases` (D109), `/trash`, and `/learn` (D87: every primitive
   live over the book's in-memory host, recipes, limits — public, no session; Settings → General links it). Any of them may carry `?peek=<page>`: a row
   opened over it (D79, `RowPeek` — a floating panel over a dimmed page, never a side panel; Back closes it;
   its ⋯ copies the row page's link or deletes the row, which trashes its page; the row page's
@@ -87,7 +87,7 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   mascot is Washi's state and opens the panel, the text opens the palette), Home with Inbox ·
   Chats · Routines as icons, Recents (last three pages opened, per workspace in localStorage),
   Favorites, the page tree (native drag and drop; `placementFor` in `@washi/ui` decides where a
-  drop lands and refuses a page into its own subtree), Routines, Trash, and the workspace footer:
+  drop lands and refuses a page into its own subtree), Routines, Databases, Trash, and the workspace footer:
   the name switches workspaces in place (the shell is keyed by workspace id and the route has
   `gcTime: 0`, so every switch reruns the loader and the route effects), the avatar holds theme ·
   settings · sign out. The sidebar **folds** (D59): `⌘\` or its toggle (`SidebarToggle`, top-left at the same pixel open or folded, as
@@ -159,6 +159,21 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   that stamp is the batch Restore and Purge act on. A restored page whose parent is gone comes
   back at the top level; a restored row page brings its row back (`restoreRecords`, history notes who). The service refuses a move into a page's own subtree (`SheetMoveError`
   → 400).
+- **Washi can trash a page (D108).** `sheet_delete` is a page capability (both ports and MCP), a
+  `CHANGE_TOOLS` write: `trashSheetAs` is the person's delete (one stamp over the subtree, Restore
+  in the Trash) for a page the asker reads; a routine (`NOBODY`) deletes nothing, and Washi leaves a
+  subtree holding a public page to a person (`guardWashiDelete`). Asked for only, never on its own.
+  The pill says "Moved “Title” to the trash" and offers Restore (`RestorePage`, `sheets.restore`).
+- **Tables have a catalog and a Trash (D109).** `sheet_tables` indexes which tables a page shows or
+  reads (`pageTables` off the root, in `indexOf`), rebuilt on each write and at open
+  (`index_tables`); only live pages count, and `tables.catalog` lists only pages the viewer reads.
+  Trashing stamps `user_tables.deleted_at` alone — rows and history untouched; `getTableByName` /
+  `listTables` already skip it, so queries, Washi's tools and views stop seeing it and `<Database>`
+  draws a quiet missing state. A trashed name stays taken. `tables.trash/restore` are a member's,
+  `tables.purge` an owner's or admin's: rows, `record_changes` and row pages go (the one erase
+  outside P1). `/databases` lists each table with "Shown on" chips or "Not on any page"; ⋯ opens
+  its first page, or the table alone in a dialog; Trash lists trashed tables beside pages.
+  `db_list_tables` gives each table `shownOn`. Washi never trashes a table.
 - **The look is the page's (D64).** `icon` and `cover` are `<Sheet>` props; the source is the
   truth and `sheets.icon/cover` a cache every write re-reads off the root (`lookOf`). Never set
   the columns any other way — `sheets.updateMeta` writes a picked icon or cover into the doc
@@ -507,7 +522,7 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   `<Outline title>` reads the drawn page's headings (Titles and Section titles, not an include's —
   while editing, the heading fields' own values, re-read on input) and scrolls to one. Pages written
   before these were indexed are read again once per workspace at open (`reindexPages`, app meta
-  `index_links_files`).
+  `index_tables`).
 - **A bookmark is read once (D94).** `<Bookmark href title description image site>` is a link as a
   card; its words are the page's own props, so drawing it fetches nothing (the picture loads with no
   referrer). `/bookmark <url>` (or an https address after `/`, beside Embed) asks `links.preview`

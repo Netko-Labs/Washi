@@ -1,4 +1,4 @@
-import type { TrashEntry } from '@washi/domain'
+import type { TrashEntry, TrashedTable } from '@washi/domain'
 
 export interface TrashRowProps {
   entry: TrashEntry
@@ -10,4 +10,10 @@ export interface ConfirmTextButtonProps {
   idle: string
   armed: string
   onConfirm: () => void
+}
+
+export interface TrashedTableRowProps {
+  table: TrashedTable
+  onRestore: () => void
+  onPurge: () => void
 }

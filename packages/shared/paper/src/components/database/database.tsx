@@ -27,8 +27,8 @@ export function Database({ table, views, empty, ...rest }: DatabaseProps) {
   }
   if (db === 'missing') {
     return (
-      <div className="wsx-empty" data-state="error" role="alert">
-        There is no table called “{table}”.
+      <div className="wsx-empty" data-state="empty">
+        No table called “{table}” — it may be in the Trash.
       </div>
     )
   }

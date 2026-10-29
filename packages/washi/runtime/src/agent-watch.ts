@@ -1,7 +1,7 @@
 import type { TranscriptEntry } from '@washi/domain'
 import { AGENT_PRESENCE_TTL_MS, type EventBus, type PresenceBoard } from '@washi/trpc'
 
-const PAGE_WRITES = new Set(['sheet_create', 'sheet_replace'])
+const PAGE_WRITES = new Set(['sheet_create', 'sheet_replace', 'sheet_delete'])
 const DATA_WRITES = new Set(['db_define', 'db_link_column', 'db_mutate', 'action_run'])
 
 /**

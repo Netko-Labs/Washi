@@ -14,6 +14,7 @@ import {
   IconTable,
   IconTablePlus,
   IconTool,
+  IconTrash,
   IconUsers,
   IconWorld,
   IconWorldSearch,
@@ -117,6 +118,13 @@ export function describeTool(name: string, input: unknown, titleOf: TitleOf): To
         subject: text(args.title) ?? sheetTitle(),
         preview: text(args.source),
       })
+    case 'sheet_delete': {
+      const title = sheetTitle()
+      return base({
+        icon: IconTrash,
+        action: title ? `Moved “${title}” to the trash` : 'Moved a page to the trash',
+      })
+    }
     case 'db_define':
     case 'db_mutate':
       return describeTable(name, args)

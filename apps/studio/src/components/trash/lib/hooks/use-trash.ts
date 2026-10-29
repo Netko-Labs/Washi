@@ -1,16 +1,22 @@
-import type { TrashEntry } from '@washi/domain'
+import type { TrashEntry, TrashedTable } from '@washi/domain'
 import { useSheetsStore } from '@washi/ui'
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '@/integrations/trpc'
 
-/** The Trash is read only here, so its list lives with the page, not in a store. */
+/** The Trash is read only here, so its lists live with the page, not in a store. */
 export function useTrash() {
   const [entries, setEntries] = useState<TrashEntry[] | null>(null)
+  const [tables, setTables] = useState<TrashedTable[]>([])
   const [error, setError] = useState<string | null>(null)
 
   const load = useCallback(async () => {
     try {
-      setEntries(await api.sheets.trash.query())
+      const [pages, trashedTables] = await Promise.all([
+        api.sheets.trash.query(),
+        api.tables.trashed.query(),
+      ])
+      setEntries(pages)
+      setTables(trashedTables)
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : String(cause))
     }
@@ -33,9 +39,12 @@ export function useTrash() {
 
   return {
     entries,
+    tables,
     error,
     restore: (id: string) => act(() => api.sheets.restore.mutate({ id })),
     purge: (id: string) => act(() => api.sheets.purge.mutate({ id })),
     empty: () => act(() => api.sheets.emptyTrash.mutate()),
+    restoreTable: (id: string) => act(() => api.tables.restore.mutate({ id })),
+    purgeTable: (id: string) => act(() => api.tables.purge.mutate({ id })),
   }
 }

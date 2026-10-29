@@ -154,3 +154,12 @@ export function restoreRecords(ws: Workspace, ids: string[], author: string | nu
   })()
   return deleted.length
 }
+
+/**
+ * A purged table's rows and their history, erased for good. Only `purgeTable` calls it: with the
+ * table gone there is nothing left for history to describe.
+ */
+export function purgeRecords(ws: Workspace, tableId: string): void {
+  ws.sqlite.query('DELETE FROM record_changes WHERE table_id = ?').run(tableId)
+  ws.sqlite.query('DELETE FROM records WHERE table_id = ?').run(tableId)
+}

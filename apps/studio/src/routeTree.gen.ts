@@ -25,6 +25,7 @@ import { Route as ApiShareSplatRouteImport } from './routes/api/share.$'
 import { Route as ApiTrpcSplatRouteImport } from './routes/api/trpc/$'
 import { Route as SWorkspaceIdTokenRouteImport } from './routes/s.$workspaceId.$token'
 import { Route as WWorkspaceIdIndexRouteImport } from './routes/w/$workspaceId/index'
+import { Route as WWorkspaceIdDatabasesRouteImport } from './routes/w/$workspaceId/databases'
 import { Route as WWorkspaceIdInboxRouteImport } from './routes/w/$workspaceId/inbox'
 import { Route as WWorkspaceIdSettingsRouteImport } from './routes/w/$workspaceId/settings'
 import { Route as WWorkspaceIdTrashRouteImport } from './routes/w/$workspaceId/trash'
@@ -116,6 +117,11 @@ const WWorkspaceIdIndexRoute = WWorkspaceIdIndexRouteImport.update({
   path: '/',
   getParentRoute: () => WWorkspaceIdRoute,
 } as any)
+const WWorkspaceIdDatabasesRoute = WWorkspaceIdDatabasesRouteImport.update({
+  id: '/databases',
+  path: '/databases',
+  getParentRoute: () => WWorkspaceIdRoute,
+} as any)
 const WWorkspaceIdInboxRoute = WWorkspaceIdInboxRouteImport.update({
   id: '/inbox',
   path: '/inbox',
@@ -185,6 +191,7 @@ export interface FileRoutesByFullPath {
   '/api/share/$': typeof ApiShareSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
   '/s/$workspaceId/$token': typeof SWorkspaceIdTokenRoute
+  '/w/$workspaceId/databases': typeof WWorkspaceIdDatabasesRoute
   '/w/$workspaceId/inbox': typeof WWorkspaceIdInboxRoute
   '/w/$workspaceId/settings': typeof WWorkspaceIdSettingsRoute
   '/w/$workspaceId/trash': typeof WWorkspaceIdTrashRoute
@@ -212,6 +219,7 @@ export interface FileRoutesByTo {
   '/api/share/$': typeof ApiShareSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
   '/s/$workspaceId/$token': typeof SWorkspaceIdTokenRoute
+  '/w/$workspaceId/databases': typeof WWorkspaceIdDatabasesRoute
   '/w/$workspaceId/inbox': typeof WWorkspaceIdInboxRoute
   '/w/$workspaceId/settings': typeof WWorkspaceIdSettingsRoute
   '/w/$workspaceId/trash': typeof WWorkspaceIdTrashRoute
@@ -241,6 +249,7 @@ export interface FileRoutesById {
   '/api/share/$': typeof ApiShareSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
   '/s/$workspaceId/$token': typeof SWorkspaceIdTokenRoute
+  '/w/$workspaceId/databases': typeof WWorkspaceIdDatabasesRoute
   '/w/$workspaceId/inbox': typeof WWorkspaceIdInboxRoute
   '/w/$workspaceId/settings': typeof WWorkspaceIdSettingsRoute
   '/w/$workspaceId/trash': typeof WWorkspaceIdTrashRoute
@@ -271,6 +280,7 @@ export interface FileRouteTypes {
     | '/api/share/$'
     | '/api/trpc/$'
     | '/s/$workspaceId/$token'
+    | '/w/$workspaceId/databases'
     | '/w/$workspaceId/inbox'
     | '/w/$workspaceId/settings'
     | '/w/$workspaceId/trash'
@@ -298,6 +308,7 @@ export interface FileRouteTypes {
     | '/api/share/$'
     | '/api/trpc/$'
     | '/s/$workspaceId/$token'
+    | '/w/$workspaceId/databases'
     | '/w/$workspaceId/inbox'
     | '/w/$workspaceId/settings'
     | '/w/$workspaceId/trash'
@@ -326,6 +337,7 @@ export interface FileRouteTypes {
     | '/api/share/$'
     | '/api/trpc/$'
     | '/s/$workspaceId/$token'
+    | '/w/$workspaceId/databases'
     | '/w/$workspaceId/inbox'
     | '/w/$workspaceId/settings'
     | '/w/$workspaceId/trash'
@@ -471,6 +483,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WWorkspaceIdIndexRouteImport
       parentRoute: typeof WWorkspaceIdRoute
     }
+    '/w/$workspaceId/databases': {
+      id: '/w/$workspaceId/databases'
+      path: '/databases'
+      fullPath: '/w/$workspaceId/databases'
+      preLoaderRoute: typeof WWorkspaceIdDatabasesRouteImport
+      parentRoute: typeof WWorkspaceIdRoute
+    }
     '/w/$workspaceId/inbox': {
       id: '/w/$workspaceId/inbox'
       path: '/inbox'
@@ -545,6 +564,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface WWorkspaceIdRouteChildren {
+  WWorkspaceIdDatabasesRoute: typeof WWorkspaceIdDatabasesRoute
   WWorkspaceIdInboxRoute: typeof WWorkspaceIdInboxRoute
   WWorkspaceIdSettingsRoute: typeof WWorkspaceIdSettingsRoute
   WWorkspaceIdTrashRoute: typeof WWorkspaceIdTrashRoute
@@ -559,6 +579,7 @@ interface WWorkspaceIdRouteChildren {
 }
 
 const WWorkspaceIdRouteChildren: WWorkspaceIdRouteChildren = {
+  WWorkspaceIdDatabasesRoute: WWorkspaceIdDatabasesRoute,
   WWorkspaceIdInboxRoute: WWorkspaceIdInboxRoute,
   WWorkspaceIdSettingsRoute: WWorkspaceIdSettingsRoute,
   WWorkspaceIdTrashRoute: WWorkspaceIdTrashRoute,

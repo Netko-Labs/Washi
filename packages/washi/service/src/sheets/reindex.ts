@@ -9,11 +9,11 @@ import {
 import { parse } from '@washi/wsx'
 import { indexOf } from './service'
 
-const REINDEXED = 'index_links_files'
+const REINDEXED = 'index_tables'
 
 /**
- * Once per workspace: pages written before PageLink, Include and block uploads were indexed carry
- * links and files the index never saw. Read every live page again so backlinks and purges count them.
+ * Once per workspace: pages written before an index existed (links, files, the tables they show)
+ * carry what it never saw. Read every live page again so backlinks, purges and the catalog count them.
  */
 export function reindexPages(ws: Workspace): void {
   if (getAppMeta(ws, REINDEXED)) return

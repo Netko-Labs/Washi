@@ -1,9 +1,10 @@
 import { linkColumnInputSchema, reminderAskSchema, rowActivityInputSchema } from '@washi/domain'
 import { historyQuerySchema, mutationSchema, querySchema, tableSpecSchema } from '@washi/ink'
-import { listTables, type Workspace } from '@washi/repository'
+import type { Workspace } from '@washi/repository'
 import { DB_MUTATE_DESCRIPTION } from '../agents/lib'
 import { askReminder } from '../reminders/service'
 import { rowActivity } from '../tables/activity'
+import { tablesWithPages } from '../tables/catalog'
 import { runHistory } from '../tables/history'
 import { linkColumn } from '../tables/link'
 import { defineUserTable, runMutation, runQuery } from '../tables/service'
@@ -20,8 +21,12 @@ export function tableCapabilities(ws: Workspace, context: CapabilityContext): Ca
       true,
       async () => (await context.listPeople?.()) ?? [],
     ),
-    capability('db_list_tables', 'List user tables and their column specs.', {}, true, () =>
-      listTables(ws),
+    capability(
+      'db_list_tables',
+      'List user tables, their column specs, and shownOn: the pages that show each. An empty shownOn means no page shows that table — say so when it matters, and offer to put it on a page.',
+      {},
+      true,
+      () => tablesWithPages(ws, context.viewer),
     ),
     capability(
       'db_query',

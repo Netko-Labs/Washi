@@ -3,10 +3,11 @@ import { useState } from 'react'
 import { ConfirmTextButton } from './confirm-text-button'
 import { useTrash } from './lib'
 import { TrashRow } from './trash-row'
+import { TrashedTableRow } from './trashed-table-row'
 
 /** Restore puts a page back where it was, with everything that was inside it. */
 export function TrashPage() {
-  const { entries, error, restore, purge, empty } = useTrash()
+  const { entries, tables, error, restore, purge, empty, restoreTable, purgeTable } = useTrash()
   const [term, setTerm] = useState('')
   const shown = (entries ?? []).filter((entry) =>
     entry.title.toLowerCase().includes(term.trim().toLowerCase()),
@@ -19,8 +20,8 @@ export function TrashPage() {
           <div>
             <h1 className="font-semibold text-[26px] tracking-[-0.02em]">Trash</h1>
             <p className="mt-1 text-[13.5px] text-muted-foreground leading-relaxed">
-              Deleted pages wait here, with the pages inside them, until you restore them or delete
-              them for good.
+              Deleted pages and databases wait here, with what was inside them, until you restore
+              them or delete them for good.
             </p>
           </div>
           {entries && entries.length > 0 && (
@@ -40,7 +41,7 @@ export function TrashPage() {
 
         {error && <p className="mt-4 text-[13px] text-destructive">{error}</p>}
 
-        {entries?.length === 0 && (
+        {entries?.length === 0 && tables.length === 0 && (
           <div className="mt-16 flex flex-col items-center gap-3 text-center">
             <Mascot face="sleep" motion="breathe" size={72} className="mascot-motion" />
             <p className="font-serif text-[19px] italic">Nothing in the trash</p>
@@ -65,6 +66,22 @@ export function TrashPage() {
 
         {entries && entries.length > 0 && shown.length === 0 && (
           <p className="mt-6 text-[13px] text-muted-foreground">Nothing deleted matches that.</p>
+        )}
+
+        {tables.length > 0 && (
+          <>
+            <h2 className="mt-8 px-3 font-medium text-[12px] text-muted-foreground">Databases</h2>
+            <ul className="mt-1 space-y-px">
+              {tables.map((table) => (
+                <TrashedTableRow
+                  key={table.id}
+                  table={table}
+                  onRestore={() => void restoreTable(table.id)}
+                  onPurge={() => void purgeTable(table.id)}
+                />
+              ))}
+            </ul>
+          </>
         )}
       </div>
     </div>

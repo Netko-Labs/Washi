@@ -13,26 +13,9 @@ import { newId, type Workspace } from './client'
 import { createSnapshot, mergeText, updateSnapshot, versionOf } from './loro'
 import { appendOp } from './oplog'
 import { clearRevisions, pushRevision } from './revisions'
+import { writeSheetTables } from './sheet-tables'
 import { lastChildPosition, liveSubtree } from './sheet-tree'
-
-export interface SheetIndexInput {
-  /** Plain text + outbound refs, extracted by the service before persist. */
-  body: string
-  refs: string[]
-  /** `file:<id>` keys the page uses, so a purge knows which uploads it frees. */
-  files?: string[]
-  /** The `<Automation>` blocks the page holds, in order: what a row write may run. */
-  automations?: AutomationEntry[]
-  /** The `<Formula>` functions the page defines, in order: what a formula column may call. */
-  formulas?: { name: string; source: string }[]
-}
-
-export interface AutomationEntry {
-  table: string
-  event: 'insert' | 'update'
-  title: string | null
-  source: string
-}
+import type { SheetIndexInput } from './types'
 
 const SUMMARY = {
   id: sheetTable.id,
@@ -269,6 +252,7 @@ export function indexSheet(ws: Workspace, id: string, title: string, index: Shee
       )
       .run(id, position, entry.table, entry.event, entry.title, entry.source)
   }
+  writeSheetTables(ws, id, index.tables ?? [])
 }
 
 /** The page's Loro version — what an editor sends back so its edit merges instead of replacing. */
