@@ -33,6 +33,13 @@ export {
 } from './agents/lib'
 export type { AgentPort, ModelChoice, ProviderId, ToolGate } from './agents/ports'
 export { defaultModelFor, LAST_RESORT_MODELS, PREFERRED_MODELS } from './agents/ports'
+export {
+  type Capability,
+  type CapabilityContext,
+  commentCapabilities,
+  pageCapabilities,
+  tableCapabilities,
+} from './capabilities'
 export { LOCAL_AUTHOR } from './comments/constants'
 export { CommentError, postComment, removeComment, resolveThread } from './comments/service'
 export {
@@ -62,13 +69,6 @@ export {
   unreadReminders,
   updateReminderRule,
 } from './reminders/service'
-export {
-  type Capability,
-  type CapabilityContext,
-  commentCapabilities,
-  pageCapabilities,
-  tableCapabilities,
-} from './capabilities'
 export { runAutomation, watchAutomations } from './scripts/automations'
 export { compileScript, SCRIPT_MAX_CHARS } from './scripts/compile'
 export { installFormulaFunctions } from './scripts/formulas'
