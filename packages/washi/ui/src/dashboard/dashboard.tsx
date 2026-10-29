@@ -1,4 +1,4 @@
-import { usd } from '../agent/lib'
+import { usd } from '../agent'
 import { ApprovalCard } from '../approval'
 import { byRecent, relativeMs, relativeTime } from '../page-time'
 import { SheetIcon } from '../sheet-icon'

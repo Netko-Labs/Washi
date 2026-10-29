@@ -1,6 +1,6 @@
 import { PaperProvider, SheetLookProvider, WsxView } from '@washi/paper'
 import { SheetIcon } from '../sheet-icon'
-import { useThemesStore } from '../stores/themes/themes-store'
+import { useThemesStore } from '../stores'
 import { type SheetViewProps, usePageSheet } from './lib'
 import { SheetEmpty, SheetFailed, SheetLoading, SheetMissing } from './sheet-states'
 

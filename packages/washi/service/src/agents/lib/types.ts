@@ -7,7 +7,7 @@ import type {
   TranscriptEntry,
   Viewer,
 } from '@washi/domain'
-import type { ProviderId } from '../ports/types'
+import type { ProviderId } from '../ports'
 import type { APPROVAL_MODES, EFFORTS, RESUME_BY, SDK_EFFORT } from './constants'
 
 /**

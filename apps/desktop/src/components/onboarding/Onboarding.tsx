@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useProfileStore } from '@/stores/profile'
-import { StepLocalFirst, StepProfile, StepSync, StepVault, StepWrapUp } from './OnboardingSteps'
+import { StepLocalFirst, StepSync, StepVault, StepWrapUp } from './OnboardingSteps'
+import { StepProfile } from './StepProfile'
 import type { OnboardingDraft, PatchDraft } from './types'
 
 const INITIAL_DRAFT: OnboardingDraft = {

@@ -9,6 +9,7 @@ import {
 } from '@tabler/icons-react'
 import { initials, useViewStore } from '@washi/ui'
 import { useState } from 'react'
+import { useShallow } from 'zustand/react/shallow'
 
 const MENU_ROW =
   'flex h-[30px] w-full items-center gap-[9px] rounded-lg px-2 text-left text-[12.5px] hover:bg-accent'
@@ -16,8 +17,9 @@ const MENU_ROW =
 export function UserRow() {
   const [open, setOpen] = useState(false)
   const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'))
-  const openTab = useViewStore((state) => state.openTab)
-  const identity = useViewStore((state) => state.identity)
+  const { openTab, identity } = useViewStore(
+    useShallow((state) => ({ openTab: state.openTab, identity: state.identity })),
+  )
 
   const setTheme = (next: boolean) => {
     document.documentElement.classList.toggle('dark', next)

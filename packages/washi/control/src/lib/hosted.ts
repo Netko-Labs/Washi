@@ -15,13 +15,7 @@ export interface AgentCredentialOut {
 }
 
 import { and, eq } from 'drizzle-orm'
-import {
-  member,
-  organization,
-  organizationIntegration,
-  organizationSecret,
-  user,
-} from '../db/schema'
+import { member, organization, organizationIntegration, organizationSecret, user } from '../db'
 import { createAuth } from './auth'
 import { type ControlDB, createControlDb } from './client'
 import { open, seal } from './crypto'

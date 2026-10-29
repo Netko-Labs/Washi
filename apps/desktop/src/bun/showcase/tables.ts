@@ -1,7 +1,8 @@
 import type { RecordData, TableSpec } from '@washi/ink'
 import { getTableByName, type Workspace } from '@washi/repository'
 import { defineUserTable, runMutation } from '@washi/service'
-import { ISSUE_EXTRAS, ISSUES_SEED } from './jira-seed'
+import { ISSUE_EXTRAS } from './jira-extras'
+import { ISSUES_SEED } from './jira-seed'
 import { LIFE_SEEDS } from './seeds-life'
 import { WORK_SEEDS } from './seeds-work'
 

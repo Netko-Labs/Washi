@@ -6,13 +6,14 @@ import {
   IconPlus,
   IconX,
 } from '@tabler/icons-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { useShallow } from 'zustand/react/shallow'
 import { ApprovalCard } from '../approval'
 import { AgentMascot } from '../mascot'
 import { mascotStateFor, noteIdOf, useAgentStore, useSheetsStore, useViewStore } from '../stores'
 import { AgentComposer } from './agent-composer'
 import { ConversationsMenu } from './conversations-menu'
-import { type AgentPanelProps, usePanelFrame } from './lib'
+import { type AgentPanelProps, useFabShortcut, usePanelFrame } from './lib'
 import { TranscriptView } from './transcript-view'
 
 const FRAME = {
@@ -197,21 +198,15 @@ export function AgentPanel({ placement = 'float', onExpand }: AgentPanelProps) {
  * ⌘J and this button open the panel. `corner-shape` falls back to plain rounding where unknown.
  */
 export function AgentFab() {
-  const togglePanel = useAgentStore((state) => state.togglePanel)
-  const transcript = useAgentStore((state) => state.transcript)
-  const running = useAgentStore((state) => state.running)
-  const approvals = useAgentStore((state) => state.approvals)
-
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'j' && (event.metaKey || event.ctrlKey)) {
-        event.preventDefault()
-        togglePanel()
-      }
-    }
-    document.addEventListener('keydown', onKeyDown)
-    return () => document.removeEventListener('keydown', onKeyDown)
-  }, [togglePanel])
+  const { togglePanel, transcript, running, approvals } = useAgentStore(
+    useShallow((state) => ({
+      togglePanel: state.togglePanel,
+      transcript: state.transcript,
+      running: state.running,
+      approvals: state.approvals,
+    })),
+  )
+  useFabShortcut(togglePanel)
 
   return (
     <button
