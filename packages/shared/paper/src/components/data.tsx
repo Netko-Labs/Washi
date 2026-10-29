@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { styled, toneOf, useBind, useExprValue } from '../lib'
+import { ratioOf, styled, toneOf, useBind, useExprValue } from '../lib'
 import type { BlockProps, Row } from '../lib/types'
 import { usePaperHost } from '../provider'
 import type { BindQuery } from '../registry'
@@ -113,6 +113,7 @@ export function Stat({
   label,
   hint,
   trend,
+  format,
   ...rest
 }: BlockProps & {
   value?: string | number
@@ -120,13 +121,18 @@ export function Stat({
   label: string
   hint?: string
   trend?: keyof typeof TREND_GLYPH
+  format?: 'number' | 'percent'
 }) {
   const host = usePaperHost()
   const computed = useExprValue(expr)
   const raw = expr ? computed : (value ?? null)
+  const asNumber =
+    format === 'percent'
+      ? { style: 'percent' as const, maximumFractionDigits: 1 }
+      : { maximumFractionDigits: 2 }
   const shown =
     typeof raw === 'number'
-      ? new Intl.NumberFormat(host.locale, { maximumFractionDigits: 2 }).format(raw)
+      ? new Intl.NumberFormat(host.locale, asNumber).format(raw)
       : raw === null
         ? '—'
         : String(raw)
@@ -172,15 +178,16 @@ export function Progress({
   expr,
   label,
   ...rest
-}: BlockProps & { value?: number; expr?: string; label?: string }) {
+}: BlockProps & { value?: number | string; expr?: string; label?: string }) {
   const computed = useExprValue(expr)
-  const ratio = Math.min(1, Math.max(0, typeof computed === 'number' ? computed : (value ?? 0)))
-  const percent = Math.round(ratio * 100)
+  const ratio = ratioOf(value, expr, computed)
+  const isUnknown = ratio === null
+  const percent = Math.round((ratio ?? 0) * 100)
   return (
     <div
       {...styled(rest, 'wsx-progress')}
       role="progressbar"
-      aria-valuenow={percent}
+      aria-valuenow={isUnknown ? undefined : percent}
       aria-valuemin={0}
       aria-valuemax={100}
       aria-label={label}
@@ -188,7 +195,7 @@ export function Progress({
       {label && (
         <div className="wsx-progress-label">
           <span>{label}</span>
-          <span>{percent}%</span>
+          <span>{isUnknown ? '—' : `${percent}%`}</span>
         </div>
       )}
       <div className="wsx-progress-track">

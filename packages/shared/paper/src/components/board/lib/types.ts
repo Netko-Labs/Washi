@@ -47,6 +47,8 @@ export interface BoardDrag {
 }
 
 export interface CardActions {
+  /** The host's, so counts and sums read in the reader's numbers. */
+  locale?: string
   openable: boolean
   open: (row: Row) => void
   shown: (value: Row[string] | undefined) => string

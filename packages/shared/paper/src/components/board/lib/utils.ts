@@ -17,14 +17,14 @@ export function rankBetween(items: Row[], before: string | null, rank: string): 
   return (rankOf(prev, rank) + rankOf(next, rank)) / 2
 }
 
-/** Count, plus the column total when `meta` is numeric — the Jira points-per-column read. */
-export function headCount(items: Row[], meta: string | undefined): string {
+/** Count, plus the column's total when `meta` is numeric — points per column, or money in a stage. */
+export function headCount(items: Row[], meta: string | undefined, locale?: string): string {
   if (!meta || !items.some((row) => typeof row[meta] === 'number')) return String(items.length)
   const total = items.reduce(
     (sum, row) => sum + (typeof row[meta] === 'number' ? (row[meta] as number) : 0),
     0,
   )
-  return `${items.length} · ${total} pts`
+  return `${items.length} · ${total.toLocaleString(locale)}`
 }
 
 export function substitute(action: ActionRef, group: string): ActionRef {

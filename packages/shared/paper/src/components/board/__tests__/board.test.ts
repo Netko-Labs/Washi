@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { boardColumns, naturalBefore, rankBetween, rankPatches } from '../lib/utils'
+import { boardColumns, headCount, naturalBefore, rankBetween, rankPatches } from '../lib/utils'
 
 const rows = [
   { id: 'a', status: 'todo', rank: 1 },
@@ -66,5 +66,13 @@ describe('where a drop writes', () => {
     const all = [{ id: 'a' }, { id: 'c' }, { id: 'b' }]
     expect(naturalBefore(all, [{ id: 'a' }, { id: 'b' }], 'c')).toBe('b')
     expect(naturalBefore(all, [{ id: 'a' }], 'c')).toBeNull()
+  })
+})
+
+describe('a column head', () => {
+  test('counts, and sums a numeric meta in the reader’s numbers — no unit it cannot know', () => {
+    const rows = [{ value: 48000 }, { value: 125000 }]
+    expect(headCount(rows, 'value', 'en-US')).toBe('2 · 173,000')
+    expect(headCount(rows, undefined)).toBe('2')
   })
 })
