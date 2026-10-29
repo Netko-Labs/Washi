@@ -2,11 +2,14 @@ import type { McpChange } from './types'
 
 export const SERVER_INFO = { name: 'washi', version: '0.1.0' }
 
-/** Which writes move what an open page shows, by a capability's prefix. */
+/** Which writes move what an open page shows, by a capability's prefix; any other write, a page. */
 export const CHANGES: Record<string, McpChange[]> = {
   sheet: ['page'],
   db: ['data', 'page'],
+  comment: ['page'],
+  reminder: ['data'],
 }
+export const DEFAULT_CHANGE: McpChange[] = ['page']
 
 export const INSTRUCTIONS = `Washi is a team's knowledge base: pages written in WSX (JSX as data, a closed set of
 primitives) and tables that work like Notion databases. You act as one member of one workspace:

@@ -7,7 +7,7 @@ import {
   tableCapabilities,
 } from '@washi/service'
 import type { McpSession } from './types'
-import { CHANGES, INSTRUCTIONS, SERVER_INFO } from './values'
+import { CHANGES, DEFAULT_CHANGE, INSTRUCTIONS, SERVER_INFO } from './values'
 
 /** Everything an outside agent may do: pages, tables and comments, as the member — no fetch, search or verbs. */
 function capabilitiesFor(session: McpSession): Capability[] {
@@ -40,7 +40,9 @@ function serverFor(session: McpSession): McpServer {
       async (input: unknown) => {
         try {
           const result = await each.run(input)
-          if (!each.isReadOnly) session.changed(CHANGES[each.name.split('_')[0] ?? ''] ?? [])
+          if (!each.isReadOnly) {
+            session.changed(CHANGES[each.name.split('_')[0] ?? ''] ?? DEFAULT_CHANGE)
+          }
           return said(result)
         } catch (error) {
           return { ...said(error instanceof Error ? error.message : String(error)), isError: true }

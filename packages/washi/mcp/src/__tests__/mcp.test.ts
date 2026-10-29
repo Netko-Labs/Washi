@@ -108,6 +108,7 @@ describe('Washi over MCP (D101)', () => {
     })
     expect(rowActivity(ws, issue).changes[0]).toMatchObject({ by: MEMBER.id })
     expect(changes).toContainEqual(['data', 'page'])
+    expect(changes[0]).toEqual(['page'])
   })
 
   test('a page written over MCP is the person’s, and a bad call says why without breaking', async () => {
