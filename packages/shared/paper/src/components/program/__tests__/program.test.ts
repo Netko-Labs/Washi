@@ -6,7 +6,7 @@ import type { PaperHost } from '../../../provider'
 import { PAGE_HOOKS } from '../../../registry/page-modules'
 import { paperRegistry } from '../../../registry/specs'
 import { programBridge } from '../lib/bridge'
-import { checkDrawn, literalOnly } from '../lib/utils'
+import { checkDrawn, literalOnly, withNotice } from '../lib/utils'
 import { PROGRAM_BRIDGE, programPrelude } from '../lib/values'
 
 const NAMES = Object.keys(paperRegistry.components)
@@ -163,6 +163,18 @@ describe('a page that runs, in its sandbox (D100)', () => {
       children: [{ name: 'Marquee', props: {}, children: [] }],
     }
     expect(checkDrawn(marquee, PAGE)).toMatchObject({ reason: expect.stringContaining('Marquee') })
+  })
+
+  test('a refusal names each primitive once, and is said inside the page as a callout', () => {
+    const chip = { name: 'Chip', props: { variant: 'solid' }, children: ['a'] }
+    const drawn = checkDrawn({ name: 'Sheet', props: {}, children: [chip, chip] }, PAGE)
+    expect(drawn).toEqual({ reason: expect.stringMatching(/^<Chip> prop variant: "solid"[^;]*$/) })
+    const noticed = withNotice(literalOnly(PAGE), 'it stopped')
+    expect(noticed.children[0]).toMatchObject({
+      name: 'Callout',
+      props: { tone: 'warning' },
+      children: [{ value: 'it stopped' }],
+    })
   })
 
   test('before it runs, or where it cannot, only what is literal draws', () => {

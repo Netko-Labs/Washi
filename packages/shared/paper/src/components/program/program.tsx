@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { INVOKE } from '../../lib/sandbox'
 import type { PageProgramProps } from '../../lib/types'
 import { type PaperHost, PaperProvider, usePaperHost } from '../../provider'
-import { literalOnly, useProgram } from './lib'
+import { literalOnly, useProgram, withNotice } from './lib'
 
 /**
  * A page that runs (D100): its code in QuickJS, what `view()` draws checked like any page, its
@@ -22,14 +22,6 @@ export function PageProgram({ root, draw }: PageProgramProps) {
 
   if (state.status === 'drawn')
     return <PaperProvider host={scoped}>{draw(state.root)}</PaperProvider>
-  return (
-    <>
-      {state.status === 'stopped' && (
-        <p className="wsx-program-stopped" role="status">
-          This page’s code isn’t running — {state.reason}
-        </p>
-      )}
-      {draw(literalOnly(root))}
-    </>
-  )
+  const literal = literalOnly(root)
+  return draw(state.status === 'stopped' ? withNotice(literal, state.reason) : literal)
 }
