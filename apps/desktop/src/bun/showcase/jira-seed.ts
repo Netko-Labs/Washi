@@ -1,4 +1,4 @@
-import type { TableSeed } from './tables'
+import type { TableSeed } from './types'
 
 /** A Jira-shaped project: issues with keys, types, priorities, epics and a sprint. */
 export const ISSUES_SEED: TableSeed = {

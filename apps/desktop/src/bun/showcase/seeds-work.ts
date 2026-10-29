@@ -1,4 +1,4 @@
-import type { TableSeed } from './tables'
+import type { TableSeed } from './types'
 
 /** Board and workout tables (launch_tasks · tasks · sets · sessions). */
 export const WORK_SEEDS: TableSeed[] = [

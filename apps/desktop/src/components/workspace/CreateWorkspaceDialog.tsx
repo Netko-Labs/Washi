@@ -1,6 +1,7 @@
 import { IconFolder } from '@tabler/icons-react'
 import { VAULT_TOPIC_ORDER, VaultIcon } from '@washi/ui'
 import { useState } from 'react'
+import type { CreateWorkspaceDialogProps } from './types'
 
 const VAULT_CHOICES = VAULT_TOPIC_ORDER
 
@@ -9,7 +10,7 @@ const SYNC_NOTES = {
   server: 'Members of this server can be invited once the vault exists.',
 } as const
 
-export function CreateWorkspaceDialog({ onClose }: { onClose: () => void }) {
+export function CreateWorkspaceDialog({ onClose }: CreateWorkspaceDialogProps) {
   const [vault, setVault] = useState('ideas')
   const [sync, setSync] = useState<keyof typeof SYNC_NOTES>('local')
 

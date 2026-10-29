@@ -1,15 +1,9 @@
-import type { RecordData, TableSpec } from '@washi/ink'
 import { getTableByName, type Workspace } from '@washi/repository'
 import { defineUserTable, runMutation } from '@washi/service'
 import { ISSUE_EXTRAS } from './jira-extras'
 import { ISSUES_SEED } from './jira-seed'
 import { LIFE_SEEDS } from './seeds-life'
 import { WORK_SEEDS } from './seeds-work'
-
-export interface TableSeed {
-  spec: TableSpec
-  rows: RecordData[]
-}
 
 /** The tables the reference apps bind to (WSX Apps.dc.html). Seeded once; edits survive reseeds. */
 export function seedTables(ws: Workspace): void {

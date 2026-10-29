@@ -14,8 +14,9 @@ import {
   WIDTHS,
   type Width,
 } from '@/components/shared/book'
+import type { TopbarLabelProps } from './types'
 
-function Label({ children }: { children: string }) {
+function Label({ children }: TopbarLabelProps) {
   return (
     <span className="text-[11px] text-muted-foreground uppercase tracking-[0.08em]">
       {children}

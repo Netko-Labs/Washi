@@ -3,13 +3,13 @@ import { Link } from '@tanstack/react-router'
 import { AgentMascot, VaultIcon } from '@washi/ui'
 import { InviteBanner } from '@/components/invite'
 import { signOut, useSession } from '@/integrations/auth'
-import { topicFor, useWorkspaces } from './lib'
+import { topicFor, useWorkspaces, type WorkspacePickerProps } from './lib'
 
 /**
  * Where an account lands: its workspaces, an invitation to accept, and the way to `/new`. A
  * workspace is one SQLite file and one organization, so making one is starting a team.
  */
-export function WorkspacePicker({ onOpen }: { onOpen: (id: string) => void }) {
+export function WorkspacePicker({ onOpen }: WorkspacePickerProps) {
   const { workspaces, loading, error, open } = useWorkspaces()
   const { data: session } = useSession()
 

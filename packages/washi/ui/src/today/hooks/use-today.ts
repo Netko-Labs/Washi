@@ -1,8 +1,7 @@
 import type { ApprovalDecision } from '@washi/domain'
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '../../api'
-
-type TodayWire = Awaited<ReturnType<typeof api.agents.today.query>>
+import type { TodayWire } from '../types'
 
 const POLL_MS = 10_000
 

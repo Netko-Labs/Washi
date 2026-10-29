@@ -35,6 +35,7 @@ export function useFloatingBox(
     const observer = new ResizeObserver(place)
     if (floating.current) observer.observe(floating.current)
     document.addEventListener('scroll', place, true)
+    // `resize` fires only on window; document has no viewport resize event.
     window.addEventListener('resize', place)
     return () => {
       observer.disconnect()

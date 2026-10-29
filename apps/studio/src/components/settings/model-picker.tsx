@@ -1,21 +1,11 @@
 import { useMemo, useState } from 'react'
-import type { ModelOption } from '@/lib/types'
+import type { ModelPickerProps } from './lib'
 
 /**
  * 317 models is not a dropdown. Filter by provider, then search — and show the
  * price, because the daily cap is denominated in it.
  */
-export function ModelPicker({
-  models,
-  provider,
-  value,
-  onChange,
-}: {
-  models: ModelOption[]
-  provider: string
-  value: string | null
-  onChange: (id: string) => void
-}) {
+export function ModelPicker({ models, provider, value, onChange }: ModelPickerProps) {
   const [term, setTerm] = useState('')
 
   const shown = useMemo(() => {

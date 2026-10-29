@@ -1,4 +1,4 @@
-import type { TableSeed } from './tables'
+import type { TableSeed } from './types'
 
 /** Checklist items and activity for the issues above; comments are activity of kind comment. */
 export const ISSUE_EXTRAS: TableSeed[] = [

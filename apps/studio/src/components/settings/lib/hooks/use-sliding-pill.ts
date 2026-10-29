@@ -1,8 +1,9 @@
 import { type RefObject, useLayoutEffect, useState } from 'react'
+import type { PillBox } from '../types'
 
 /** Where the highlight sits under the item named `activeKey` (`data-key`), kept in step on resize. */
 export function useSlidingPill(row: RefObject<HTMLElement | null>, activeKey: string) {
-  const [box, setBox] = useState<{ left: number; width: number } | null>(null)
+  const [box, setBox] = useState<PillBox | null>(null)
 
   useLayoutEffect(() => {
     const node = row.current

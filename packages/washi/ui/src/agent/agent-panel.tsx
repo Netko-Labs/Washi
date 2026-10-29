@@ -13,7 +13,7 @@ import { AgentMascot } from '../mascot'
 import { mascotStateFor, noteIdOf, useAgentStore, useSheetsStore, useViewStore } from '../stores'
 import { AgentComposer } from './agent-composer'
 import { ConversationsMenu } from './conversations-menu'
-import { type AgentPanelProps, useFabShortcut, usePanelFrame } from './lib'
+import { type AgentPanelProps, type EmptyChatProps, useFabShortcut, usePanelFrame } from './lib'
 import { TranscriptView } from './transcript-view'
 
 const FRAME = {
@@ -45,7 +45,7 @@ function ApprovalBar() {
   )
 }
 
-function EmptyChat({ onStarter }: { onStarter: (text: string) => void }) {
+function EmptyChat({ onStarter }: EmptyChatProps) {
   const identity = useViewStore((state) => state.identity)
   const sheets = useSheetsStore((state) => state.sheets)
   const pageId = useViewStore((state) => noteIdOf(state.activeTab))

@@ -1,5 +1,31 @@
-import type { AgentSession, AttachmentRef, Effort, EnabledModel } from '@washi/domain'
+import type {
+  AgentSession,
+  AgentUpdate,
+  AttachmentRef,
+  Effort,
+  EnabledModel,
+  TranscriptEntry,
+} from '@washi/domain'
 import type { RefObject } from 'react'
+
+export type TurnDone = Extract<AgentUpdate, { kind: 'turn_done' }>
+
+export interface EmptyChatProps {
+  onStarter: (text: string) => void
+}
+
+export interface DiffViewProps {
+  diff: { path: string; oldText: string; newText: string }
+}
+
+export interface ToolPillProps {
+  update: AgentUpdate
+  followups: AgentUpdate[]
+}
+
+export interface TranscriptViewProps {
+  transcript: TranscriptEntry[]
+}
 
 export type PanelPlacement = 'float' | 'dock' | 'sheet' | 'page'
 
