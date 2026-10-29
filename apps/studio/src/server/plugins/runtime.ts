@@ -1,6 +1,7 @@
 import { closeAllPeers } from '@washi/trpc'
 import { definePlugin } from 'nitro'
 import { SERVE_THROUGH_SHUTDOWN_MS } from '../constants'
+import { startDraining } from '../draining'
 import { washiRuntime } from '../runtime'
 
 /**
@@ -24,9 +25,9 @@ export default definePlugin((nitroApp) => {
 })
 
 /**
- * srvx stops listening the moment SIGTERM lands, while the proxy still routes here until the
- * container exits — a 502 every deploy. So routines stop at once (the new container owns them),
- * requests are answered a while longer, then srvx closes as it would have.
+ * srvx stops listening the moment SIGTERM lands, while the proxy still routes here — a 502 every
+ * deploy. So routines stop at once (the new container owns them), health turns 503 so the proxy's
+ * check drops this upstream, requests are answered a while longer, then srvx closes as it would.
  */
 function serveThroughShutdown(booting: ReturnType<typeof washiRuntime>, drain: () => void) {
   const closers = process.listeners('SIGTERM')
@@ -36,6 +37,7 @@ function serveThroughShutdown(booting: ReturnType<typeof washiRuntime>, drain: (
   }
   for (const closer of closers) process.off('SIGTERM', closer)
   process.once('SIGTERM', () => {
+    startDraining()
     // A runtime that never booted has no clock to stop, and its failure was already said.
     booting.then((booted) => booted.stopClock()).catch(() => undefined)
     setTimeout(() => {
