@@ -392,8 +392,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   Calendly's picker: each allowed weekday's `hours` (`09:00-17:00`) cut into `minutes` slots, minus
   rows whose `date` overlaps (a `start/end` range; a lone moment takes `minutes`, a bare day the
   whole day) and minus the past, all in wall-clock strings — zones never enter. A press opens the
-  `add` Form in a dialog with `date` seeded `start/end`; the booked slot is gone on the next
-  fetch. Week paging is Agenda's (`useAgendaPeriod`). Agenda reads a row's times off its own range
+  `add` Form in a dialog with `date` seeded `start/end`; as it is sent the day is read again
+  (`useSlotBooking`, the form's `check`), and a slot taken meanwhile is refused in words. Week paging is Agenda's (`useAgendaPeriod`). Agenda reads a row's times off its own range
   when it has no `time` column.
 - **Database views read like Notion's (D84).** A table's head shows each property's type
   (`PropertyIcon`) and name in sentence case; select/status/person cells draw a pill, a step dot or a
