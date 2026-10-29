@@ -89,3 +89,18 @@ describe('a page compiled for the sandbox (D100)', () => {
     expect(broken.length).toBeGreaterThan(0)
   })
 })
+
+describe('an export that calls a hook', () => {
+  test('is refused at save; one that exports a function calling it is not', () => {
+    const eager = pageCodeDiagnostics(
+      `import { useRows } from 'washi'\nexport const open = useRows({ table: 'tasks' })\n<Sheet title="t" />`,
+    )
+    expect(eager[0]?.message).toContain('an export calls useRows() as the page loads')
+    const lent = [
+      `import { useRows } from 'washi'\nexport function useOpen() { return useRows({ table: 'tasks' }) }\n<Sheet title="t" />`,
+      `import { useRows } from 'washi'\nexport const useOpen = () => useRows({ table: 'tasks' })\n<Sheet title="t" />`,
+      `import { useRows } from 'washi'\nconst open = useRows({ table: 'tasks' })\n<Sheet title="t" />`,
+    ]
+    for (const source of lent) expect(pageCodeDiagnostics(source)).toEqual([])
+  })
+})

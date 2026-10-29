@@ -1,5 +1,5 @@
 import { PAGE_IMPORT } from '@washi/paper/registry'
-import { type Diagnostic, pageModule } from '@washi/wsx'
+import { type Diagnostic, hoistedHookCalls, pageModule } from '@washi/wsx'
 import { IMPORT_WORDS, LIBRARY, PAGE_CODE_MAX_CHARS } from './values'
 
 const transpiler = new Bun.Transpiler({ loader: 'tsx' })
@@ -21,7 +21,15 @@ export function pageCodeDiagnostics(source: string): Diagnostic[] {
       .imports.map((each) => each.path)
       .filter((path) => !isAllowedImport(path))
     transpiler.transformSync(module)
-    return refused.map((path) => problem(`cannot import "${path}" — ${IMPORT_WORDS}`))
+    const hooks = hoistedHookCalls(source).map((hook) =>
+      problem(
+        `an export calls ${hook}() as the page loads, not as it draws — export a function that calls it (export function useTotals() { … })`,
+      ),
+    )
+    return [
+      ...refused.map((path) => problem(`cannot import "${path}" — ${IMPORT_WORDS}`)),
+      ...hooks,
+    ]
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
     return [problem(`code: ${message.split('\n')[0] ?? message}`)]

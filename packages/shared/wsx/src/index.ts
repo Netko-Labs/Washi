@@ -33,7 +33,7 @@ export {
   validateExpr,
 } from './expr'
 export { extractFiles, extractMissing, extractRefs, extractText } from './extract'
-export { pageModule } from './module'
+export { hoistedHookCalls, pageModule } from './module'
 export { parse } from './parse'
 export { serialize } from './serialize'
 export { WsxParseError } from './split'

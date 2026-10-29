@@ -13,6 +13,37 @@ const HOISTED = new Set<t.Statement['type']>([
   'TSEnumDeclaration',
 ])
 
+const HOOK = /^use[A-Z]/
+const FUNCTION = new Set(['ArrowFunctionExpression', 'FunctionExpression', 'FunctionDeclaration'])
+
+/** Hooks a node calls outside any function of its own — what would run when the module loads. */
+function hooksCalled(node: unknown, found: string[]): string[] {
+  if (!node || typeof node !== 'object') return found
+  const each = node as { type?: string; callee?: { type?: string; name?: string } }
+  if (each.type && FUNCTION.has(each.type)) return found
+  if (each.type === 'CallExpression' && each.callee?.type === 'Identifier') {
+    if (HOOK.test(each.callee.name ?? '')) found.push(each.callee.name ?? '')
+  }
+  for (const [key, value] of Object.entries(node)) {
+    if (key === 'loc' || key === 'leadingComments' || key === 'trailingComments') continue
+    if (Array.isArray(value)) for (const item of value) hooksCalled(item, found)
+    else hooksCalled(value, found)
+  }
+  return found
+}
+
+/**
+ * Hooks an exported value calls at the page's top: hoisted out of `view()`, they would run once
+ * as the bundle loads, never as the page draws.
+ */
+export function hoistedHookCalls(source: string): string[] {
+  const { code } = splitPage(source)
+  const hoisted = (code?.statements ?? []).filter(
+    (statement) => statement.type === 'ExportNamedDeclaration',
+  )
+  return [...new Set(hoisted.flatMap((statement) => hooksCalled(statement, [])))]
+}
+
 /**
  * A page as an ES module: its imports, functions and exports at the top; every other statement and
  * the markup become `export default function view()`, run on each draw — so a hook written at the

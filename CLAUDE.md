@@ -540,7 +540,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   (`date-fns`, `lodash-es`, `zod`, resolved off disk) and `page:<id>` (a page the reader can read,
   transitively, ≤ 8 deep) — into one IIFE that sets `globalThis.__page = { view, exports }`; cached
   by source + imported sources (64), ≤ 768 KB. Anything else is refused in words, at save too
-  (`pageCodeDiagnostics`: Transpiler + the allowlist). The studio declares the libraries so Nitro
+  (`pageCodeDiagnostics`: Transpiler + the allowlist; an export may not call a hook — hoisted
+  out of `view()`, it would run once at load — `hoistedHookCalls`). The studio declares the libraries so Nitro
   traces them into `.output` (`RUNTIME_FILE_DEPS`); `zod` alone bundles to ~490 KB.
   Paper runs it (`PageProgram`, from `WsxView` when `hasCode`): `PaperHost.compilePage` (the studio:
   `scripts.page`), then the shared sandbox (`lib/sandbox`: QuickJS, 32 MB, 100 ms a draw) with
