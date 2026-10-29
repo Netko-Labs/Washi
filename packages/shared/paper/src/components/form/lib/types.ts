@@ -27,6 +27,8 @@ export interface FormBodyProps extends Omit<FormInlineProps, 'table'> {
   db: DatabaseContext
   /** Values the opener already knows — the day a calendar's + was pressed on. */
   seed?: Record<string, Cell>
+  /** Asked as the row is sent; a reason refuses it in those words. */
+  check?: () => Promise<string | null>
   onAdded?: () => void
   onCancel?: () => void
 }
@@ -36,6 +38,7 @@ export interface FormDialogProps extends FormInlineProps {
   onClose: () => void
   title: string
   seed?: Record<string, Cell>
+  check?: () => Promise<string | null>
 }
 
 export interface FormUnavailableProps {
@@ -65,6 +68,7 @@ export interface FormDraftOptions {
   defaults?: Record<string, FormDefault>
   seed?: Record<string, Cell>
   reset: boolean
+  check?: () => Promise<string | null>
   onAdded?: () => void
 }
 

@@ -1,2 +1,2 @@
 export { Agenda } from './agenda'
-export { useAgendaPeriod } from './lib'
+export { rangeQuery, useAgendaPeriod } from './lib'

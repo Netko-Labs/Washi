@@ -1,3 +1,4 @@
+export { resolveQuery } from './bind'
 export { DAY, dayLabel, whenLabel } from './days'
 export { useBind } from './hooks/use-bind'
 export { useExprValue } from './hooks/use-expr'

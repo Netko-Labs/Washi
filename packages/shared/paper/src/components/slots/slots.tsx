@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { styled } from '../../lib'
 import { usePaperHost } from '../../provider'
 import { useAgendaPeriod } from '../agenda'
@@ -10,15 +9,16 @@ import {
   SLOT_DAYS,
   SLOT_HOURS,
   SLOT_MINUTES,
-  type Slot,
   type SlotsProps,
   slotsOn,
+  useSlotBooking,
   weekdayOf,
 } from './lib'
 
 /**
  * A week of free times to book, Calendly's way (D102): the hours of each allowed day cut into
- * slots, minus what is booked or past. A press asks `add` in a modal, the slot already filled in.
+ * slots, minus what is booked or past. A press asks `add` in a modal, the slot already filled in,
+ * and the slot is checked again as it is booked.
  */
 export function Slots({
   bind,
@@ -34,7 +34,8 @@ export function Slots({
 }: SlotsProps) {
   const host = usePaperHost()
   const period = useAgendaPeriod({ bind, date, weekStart, view: 'week', locale: host.locale })
-  const [picked, setPicked] = useState<Slot | null>(null)
+  const booking = useSlotBooking(bind, date, minutes)
+  const { picked } = booking
   const busy = busyOf(period.state.rows, date, minutes)
   const now = nowMinutes()
   const open = period.days.filter((day) => days.includes(weekdayOf(day.key)))
@@ -82,7 +83,7 @@ export function Slots({
                         type="button"
                         className="wsx-slot"
                         disabled={!add}
-                        onClick={() => setPicked(slot)}
+                        onClick={() => booking.pick(slot)}
                       >
                         {slot.label}
                       </button>
@@ -101,12 +102,13 @@ export function Slots({
       {add && (
         <FormDialog
           open={picked !== null}
-          onClose={() => setPicked(null)}
+          onClose={booking.close}
           title={`${addLabel}${pickedDay ? ` · ${pickedDay.long}` : ''}${picked ? ` · ${picked.label}` : ''}`}
           table={bind.table}
           fields={add}
           submit={addLabel}
           seed={picked ? { [date]: `${picked.start}/${picked.end}` } : undefined}
+          check={booking.check}
         />
       )}
     </div>

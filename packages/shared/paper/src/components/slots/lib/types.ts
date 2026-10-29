@@ -27,3 +27,10 @@ export interface Busy {
   from: number
   to: number
 }
+
+export interface SlotBooking {
+  picked: Slot | null
+  pick: (slot: Slot) => void
+  close: () => void
+  check: () => Promise<string | null>
+}

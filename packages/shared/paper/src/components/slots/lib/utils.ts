@@ -71,3 +71,16 @@ export function nowMinutes(at: Date = new Date()): number {
 export function isPast(dayKey: string, now: number): boolean {
   return (minutesOf(`${dayKey}T23:59`) ?? 0) < now
 }
+
+/** The day a slot sits on and the day after: the bounds a fresh look reads between. */
+export function dayOf(slot: Slot): { day: string; next: string } {
+  const day = slot.start.slice(0, 10)
+  return { day, next: momentOf((minutesOf(day) ?? 0) + 24 * 60).slice(0, 10) }
+}
+
+/** Whether anything in `rows` now overlaps the slot. */
+export function isTaken(slot: Slot, rows: Row[], date: string, minutes: number): boolean {
+  const from = minutesOf(slot.start) ?? 0
+  const to = minutesOf(slot.end) ?? from
+  return busyOf(rows, date, minutes).some((busy) => busy.from < to && from < busy.to)
+}

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { busyOf, minutesOf, slotsOn, weekdayOf } from '../lib'
+import { busyOf, dayOf, isTaken, minutesOf, slotsOn, weekdayOf } from '../lib'
 
 const at = (moment: string) => minutesOf(moment) ?? 0
 
@@ -46,5 +46,20 @@ describe('the Slots spec', () => {
     const reversed = spec?.props.safeParse({ ...base, hours: '17:00-09:00' })
     expect(reversed?.success).toBe(false)
     expect(JSON.stringify(reversed?.error?.issues)).toContain('open before they close')
+  })
+})
+
+describe('a last look before booking', () => {
+  const slot = { start: '2026-10-31T10:00', end: '2026-10-31T10:30', label: '10:00' }
+
+  test('reads the slot’s own day, the month’s end included', () => {
+    expect(dayOf(slot)).toEqual({ day: '2026-10-31', next: '2026-11-01' })
+  })
+
+  test('a row booked since the week was drawn takes the slot', () => {
+    expect(isTaken(slot, [], 'when', 30)).toBe(false)
+    expect(isTaken(slot, [{ when: '2026-10-31T10:15/2026-10-31T10:45' }], 'when', 30)).toBe(true)
+    expect(isTaken(slot, [{ when: '2026-10-31T10:30' }], 'when', 30)).toBe(false)
+    expect(isTaken(slot, [{ when: '2026-10-31' }], 'when', 30)).toBe(true)
   })
 })

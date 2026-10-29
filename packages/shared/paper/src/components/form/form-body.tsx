@@ -11,6 +11,7 @@ export function FormBody({
   submit,
   reset = true,
   seed,
+  check,
   onAdded,
   onCancel,
   ...rest
@@ -23,6 +24,7 @@ export function FormBody({
     defaults,
     seed,
     reset,
+    check,
     onAdded,
   })
   const id = useId()
