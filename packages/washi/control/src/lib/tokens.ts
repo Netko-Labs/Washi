@@ -1,6 +1,6 @@
 import type { AccessTokenInfo, TokenStore } from '@washi/trpc'
 import { and, desc, eq } from 'drizzle-orm'
-import { accessToken } from '../db/schema'
+import { accessToken } from '../db'
 import type { ControlDB } from './client'
 import { TOKEN_BYTES, TOKEN_PREFIX, TOKEN_USE_GRAIN_MS } from './constants'
 
