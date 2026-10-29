@@ -28,5 +28,6 @@ export interface DataContextValue {
 /** What a view knows of its table beyond the rows: its columns and who a person cell names. */
 export interface TableLook {
   spec: TableSpec | null
-  people: { id: string; name: string }[]
+  /** Null when the host cannot say who is on the team — then nobody is named, nor called gone. */
+  people: { id: string; name: string }[] | null
 }

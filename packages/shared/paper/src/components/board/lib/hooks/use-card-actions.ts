@@ -6,7 +6,7 @@ import { usePaperHost } from '../../../../provider'
 import { cell } from '../../../states'
 import type { CardActions } from '../types'
 import { substitute } from '../utils'
-import { FORMER_MEMBER } from '../values'
+import { FORMER_MEMBER, UNNAMED } from '../values'
 
 export function useCardActions(onOpen: ActionRef | undefined, table: string): CardActions {
   const host = usePaperHost()
@@ -27,6 +27,7 @@ export function useCardActions(onOpen: ActionRef | undefined, table: string): Ca
       const spec = columnOf(column)
       if (typeof value === 'number') return formatNumber(value, host.locale, spec?.format)
       if (spec?.type === 'person' && typeof value === 'string') {
+        if (!look.people) return UNNAMED
         return look.people.find((person) => person.id === value)?.name ?? FORMER_MEMBER
       }
       return cell(value, host.locale)
