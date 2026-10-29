@@ -68,3 +68,9 @@ local typecheck passed against the working tree, and CI failed on #130. After an
   (address 0x5) instead of reporting it — files run one by one showed the real error.
 - Rule: a crash running many test files → run them one by one before suspecting the runtime. Never
   write a backtick inside that template; quote code there plainly.
+
+## A pipeline hid a failed rebase (2026-10-29)
+- Failure: `git rebase … | grep -E "CONFLICT|error"; …&& git add -A && git commit && git push` — grep
+  *found* the conflict, so the chain went on and committed conflict markers mid-rebase. The branch ref
+  had not moved, so nothing bad was pushed; `git rebase --abort` undid it.
+- Rule: run a rebase on its own, check its exit status, and only then edit, commit or push.
