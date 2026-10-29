@@ -51,6 +51,7 @@ function harness(values: Record<string, string | number | boolean | null> = {}) 
     me: false,
     refused: null,
     every: 0,
+    seeds: {},
   }
   const run = (sandbox: Sandbox, code = '__render()') => {
     const isPress = code.startsWith('__invoke')
@@ -119,6 +120,20 @@ describe('a page that runs, in its sandbox (D100)', () => {
     expect('root' in after && after.root.children[0]).toMatchObject({
       children: [{ value: 'n 1' }],
     })
+    sandbox.dispose()
+  })
+
+  test('usePageState’s initial seeds an unset key once drawn — what a Select bound to it shows', async () => {
+    const sandbox = await open(
+      `const [tab] = usePageState('tab', 'week'); const [kind] = usePageState('kind', 'all')
+       return h(Sheet, { title: 'x' }, h(Text, null, tab, ' ', kind))`,
+    )
+    const page = harness({ kind: 'mine' })
+    expect(checkDrawn(page.run(sandbox), PAGE)).toMatchObject({
+      root: { children: [{ children: [{ value: 'week mine' }] }] },
+    })
+    expect(page.needs.seeds).toEqual({ tab: 'week' })
+    expect(page.calls).toEqual([])
     sandbox.dispose()
   })
 

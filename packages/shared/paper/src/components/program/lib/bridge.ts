@@ -39,6 +39,9 @@ export function programBridge(
     rows: (query) => cached(live.rows, query, needs.queries),
     table: (name) => cached(live.tables, name, needs.tables),
     state: (key) => (key in live.values ? JSON.stringify(live.values[key]) : undefined),
+    seed: (key = '', json = 'null') => {
+      if (!(key in needs.seeds)) needs.seeds[key] = stateValue(json)
+    },
     set: pressed('a page state change', (key = '', json = 'null') =>
       live.set(key, stateValue(json)),
     ),

@@ -91,6 +91,8 @@ export interface ProgramNeeds {
   refused: string | null
   /** The shortest clock the page set, in ms; 0 when none. */
   every: number
+  /** Keys the page read with `usePageState(key, initial)` while unset: written once it has drawn. */
+  seeds: Record<string, string | number | boolean | null>
 }
 
 export interface PageProgramProps {
