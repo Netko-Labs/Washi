@@ -135,9 +135,12 @@ function clock(value: unknown): string | null {
   return match?.[1] ?? read
 }
 
+/** Its own time columns, else the times its date holds: `2026-10-29T10:00/2026-10-29T10:15`. */
 export function eventTime(row: Row, columns: AgendaColumns): string | null {
-  const from = columns.time ? clock(row[columns.time]) : null
-  const to = columns.end ? clock(row[columns.end]) : null
+  const [start, end] = String(row[columns.date] ?? '').split('/')
+  const timed = (value: string | undefined) => (value?.includes('T') ? clock(value) : null)
+  const from = columns.time ? clock(row[columns.time]) : timed(start)
+  const to = columns.end ? clock(row[columns.end]) : timed(end)
   if (from && to) return `${from}–${to}`
   return from ?? to
 }

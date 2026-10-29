@@ -71,7 +71,11 @@ export function runQuery(table: MemoryTable, query: InkQuery): QueryResult {
   }
   const ordered = query.orderBy
     ? [...matched].sort((a, b) => {
-        const order = compareCells(a[query.orderBy?.column ?? ''], b[query.orderBy?.column ?? ''])
+        const [x, y] = [a[query.orderBy?.column ?? ''], b[query.orderBy?.column ?? '']]
+        const empties =
+          Number(x === null || x === undefined) - Number(y === null || y === undefined)
+        if (empties !== 0) return empties
+        const order = compareCells(x, y)
         return query.orderBy?.direction === 'desc' ? -order : order
       })
     : matched

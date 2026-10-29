@@ -30,7 +30,7 @@ export function BoardCard({
       tabIndex={actions.openable ? 0 : undefined}
       data-openable={actions.openable ? '' : undefined}
     >
-      {kicker && <div className="wsx-board-card-kicker">{cell(row[kicker])}</div>}
+      {kicker && <div className="wsx-board-card-kicker">{actions.shown(row[kicker])}</div>}
       <div className="wsx-board-card-title">{cell(row[titleKey]) || 'Untitled'}</div>
       {(badge || meta || avatar) && (
         <div className="wsx-board-card-meta">

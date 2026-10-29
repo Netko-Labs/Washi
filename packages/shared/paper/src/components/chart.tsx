@@ -1,4 +1,4 @@
-import { columnOf, styled, useBind, useHistory } from '../lib'
+import { columnOf, DAY, dayLabel, styled, useBind, useHistory } from '../lib'
 import type { BindState, BlockProps, ChartPoint, Row } from '../lib/types'
 import { usePaperHost } from '../provider'
 import type { BindHistoryQuery, BindQuery } from '../registry'
@@ -15,7 +15,6 @@ const RAMP = [
 const W = 320
 const H = 160
 const PAD = 8
-const DAY = /^\d{4}-\d{2}-\d{2}$/
 const TICK = { fontSize: 9, fill: 'var(--muted)', fontFamily: 'var(--font-sans)' }
 const FIGURE = { fontSize: 9, fontWeight: 600, fill: 'var(--ink)', fontFamily: 'var(--font-sans)' }
 
@@ -25,24 +24,19 @@ function pickColumns(rows: Row[], label?: string, value?: string): [string, stri
   return [label ?? columnOf(rows, 'string') ?? 'id', value ?? columnOf(rows, 'number') ?? 'count']
 }
 
-/** A bare day reads as "Oct 3", a calendar day rather than UTC midnight. */
-function readable(label: string, locale?: string): string {
-  if (!DAY.test(label)) return label
-  return new Date(`${label}T00:00:00Z`).toLocaleDateString(locale, {
-    month: 'short',
-    day: 'numeric',
-    timeZone: 'UTC',
-  })
-}
-
 function figure(value: number, locale?: string): string {
   return value.toLocaleString(locale, { maximumFractionDigits: 1 })
 }
 
 function toPoints(rows: Row[], label?: string, value?: string, locale?: string): Point[] {
   const [labelKey, valueKey] = pickColumns(rows, label, value)
-  return rows.map((row) => ({
-    label: row[labelKey] === null ? 'None' : readable(String(row[labelKey] ?? ''), locale),
+  // Days are a time axis: oldest first, whatever order the rows came in.
+  const isDays = rows.length > 0 && rows.every((row) => DAY.test(String(row[labelKey] ?? '')))
+  const ordered = isDays
+    ? [...rows].sort((a, b) => String(a[labelKey]).localeCompare(String(b[labelKey])))
+    : rows
+  return ordered.map((row) => ({
+    label: row[labelKey] === null ? 'None' : dayLabel(String(row[labelKey] ?? ''), locale),
     value: typeof row[valueKey] === 'number' ? (row[valueKey] as number) : 0,
   }))
 }

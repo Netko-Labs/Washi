@@ -20,10 +20,17 @@ export function columnOf(rows: Row[], kind: CellKind, prefer: string[] = []): st
 
 const ROW_REF = /\$row\.([a-z_][a-z0-9_]*)/gi
 
-/** `$row.column` in a string resolves against the row in scope. */
-export function resolveRow(value: string, row: Row | undefined): string {
+/**
+ * `$row.column` in a string resolves against the row in scope — as words through `shown` when it
+ * is text a reader sees, raw when it rides in an action.
+ */
+export function resolveRow(
+  value: string,
+  row: Row | undefined,
+  shown: (cell: unknown) => string = (cell) => String(cell ?? ''),
+): string {
   if (!row || !value.includes('$row.')) return value
-  return value.replace(ROW_REF, (_, column: string) => String(row[column] ?? ''))
+  return value.replace(ROW_REF, (_, column: string) => shown(row[column]))
 }
 
 /** The same, through arrays and objects — verbs carry `$row.id` in their payload. */

@@ -79,7 +79,7 @@ export function Table({
                           data-negative={(isNumber && value < 0) || undefined}
                           data-bool={typeof value === 'boolean' ? String(value) : undefined}
                         >
-                          {isNumber ? number.format(value) : cell(value)}
+                          {isNumber ? number.format(value) : cell(value, locale)}
                         </td>
                       )
                     })}

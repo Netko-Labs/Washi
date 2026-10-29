@@ -59,6 +59,12 @@ describe('agenda week', () => {
     expect(eventTime({ start: '09:00', end: '2026-10-28T10:30' }, columns)).toBe('09:00–10:30')
     expect(eventTitle({ id: 'x', date: '2026-10-28', title: 'Dentist' }, columns)).toBe('Dentist')
   })
+
+  test('with no time columns, a booking reads its times off its own date range', () => {
+    const range = { date: '2026-10-29T10:00/2026-10-29T10:15' }
+    expect(eventTime(range, { date: 'date' })).toBe('10:00–10:15')
+    expect(eventTime({ date: '2026-10-29' }, { date: 'date' })).toBeNull()
+  })
 })
 
 describe('agenda month', () => {

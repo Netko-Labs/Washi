@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { whenLabel } from '../lib'
 import type { BindState } from '../lib/types'
 
 /**
@@ -38,8 +39,10 @@ export function Bound({
   return children(state.rows)
 }
 
-export function cell(value: unknown): string {
+/** A cell in words: a day, a moment or a `start/end` range as dates, a list joined, a tick. */
+export function cell(value: unknown, locale?: string): string {
   if (value === null || value === undefined) return ''
   if (typeof value === 'boolean') return value ? '✓' : '—'
-  return String(value)
+  if (Array.isArray(value)) return value.map((each) => cell(each, locale)).join(', ')
+  return whenLabel(String(value), locale)
 }

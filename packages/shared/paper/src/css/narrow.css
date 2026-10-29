@@ -68,13 +68,16 @@
   }
 }
 
-/* ≤ 480: a ledger line puts its name on top and the rest under it, the last control at the end. */
+/* ≤ 480: a ledger line of three or more puts its name on top and the rest under it, the last
+   control at the end; a name and one value still share their line. */
 @container wsx (max-width: 480px) {
   .wsx-repeat:has(> .wsx-row):not(:has(> .wsx-row > .wsx-card)) > .wsx-row {
     row-gap: 8px;
     padding-block: 12px;
   }
-  .wsx-repeat:has(> .wsx-row):not(:has(> .wsx-row > .wsx-card)) > .wsx-row > :first-child {
+  .wsx-repeat:has(> .wsx-row):not(:has(> .wsx-row > .wsx-card))
+    > .wsx-row:has(> :nth-child(3))
+    > :first-child {
     flex-basis: 100%;
   }
   .wsx-repeat:has(> .wsx-row):not(:has(> .wsx-row > .wsx-card)) > .wsx-row > :last-child {
@@ -137,7 +140,7 @@
   .wsx-grid:has(> .wsx-stat) {
     row-gap: 18px;
   }
-  .wsx-grid > .wsx-stat {
+  .wsx-grid:has(> [style*="--span"]) > .wsx-stat {
     grid-column: span 6;
   }
 }
