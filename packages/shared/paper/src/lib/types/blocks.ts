@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import type { DatabaseContext } from '../../components/database'
 import type { BindHistoryQuery, BindQuery } from '../../registry'
 import type { ChartPoint } from './controls'
 import type { ActionRef, BindState, Row } from './data'
@@ -203,4 +204,18 @@ export interface ChartLinesProps {
 
 export interface ChartDonutProps {
   points: ChartPoint[]
+}
+
+export interface TableProps extends BlockProps {
+  bind: BindQuery
+  columns?: string[]
+  empty?: string
+}
+
+export interface TableValueProps {
+  row: Row
+  name: string
+  isTitle: boolean
+  db: DatabaseContext | null
+  locale?: string
 }

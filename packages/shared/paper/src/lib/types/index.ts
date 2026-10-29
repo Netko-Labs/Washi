@@ -36,6 +36,8 @@ export type {
   SourceProps,
   StackProps,
   SwitchProps,
+  TableProps,
+  TableValueProps,
   TabsProps,
   TaskProps,
   TextProps,
