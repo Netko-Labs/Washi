@@ -22,14 +22,16 @@ export function toRows(rows: QueryRow[]): Row[] {
 /** What a cell holds, one item per pill: a list's items, a value alone, or nothing. */
 export function cellItems(row: Row, column: string): Scalar[] {
   const value = row[column]
-  return listCell(row, column) ?? (value === null || value === undefined ? [] : [value])
+  return (
+    listCell(row, column) ?? (value === null || value === undefined || value === '' ? [] : [value])
+  )
 }
 
 /** A row with some cells changed, its list cells still known. */
 export function patchRow(row: Row, patch: Row): Row {
   const next = { ...row, ...patch }
-  const items = lists.get(row)
-  if (items) lists.set(next, items)
+  const items = Object.entries(lists.get(row) ?? {}).filter(([column]) => !(column in patch))
+  if (items.length > 0) lists.set(next, Object.fromEntries(items))
   return next
 }
 

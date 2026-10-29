@@ -40,5 +40,12 @@ describe('cellItems and patchRow', () => {
     const moved = patchRow(row, { list: 'Done' })
     expect(moved.list).toBe('Done')
     expect(cellItems(moved, 'tags')).toEqual(['bug', 'infra'])
+    expect(cellItems(patchRow(row, { tags: 'bug' }), 'tags')).toEqual(['bug'])
+  })
+
+  test('an empty list holds nothing to pill', () => {
+    const [row] = toRows([{ id: 'a', tags: [] }])
+    expect(row && cellItems(row, 'tags')).toEqual([])
+    expect(cellItems({ note: '' }, 'note')).toEqual([])
   })
 })

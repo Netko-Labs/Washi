@@ -85,7 +85,7 @@ export function Table({
                         >
                           {isNumber ? (
                             number.format(value)
-                          ) : items ? (
+                          ) : items && items.length > 0 ? (
                             <span className="wsx-pills">
                               {items.map((item) => (
                                 <Badge key={item} size="sm" tone={toneOf(item)}>
