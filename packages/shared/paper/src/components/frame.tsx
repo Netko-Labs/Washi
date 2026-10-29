@@ -1,6 +1,14 @@
 import type { CSSProperties } from 'react'
 import { styled } from '../lib'
-import type { BlockProps, Gap, PaperSurfaceProps, SheetFrameProps } from '../lib/types'
+import type {
+  BlockProps,
+  GridProps,
+  PaperSurfaceProps,
+  RowProps,
+  SectionProps,
+  SheetFrameProps,
+  StackProps,
+} from '../lib/types'
 import { useSheetLook } from '../look'
 import { THEMES, type ThemeId, type ThemePair } from '../registry/themes'
 import { SheetCover, SheetMark } from './sheet-look'
@@ -77,12 +85,7 @@ export function PaperSurface({ children }: PaperSurfaceProps) {
   )
 }
 
-export function Section({
-  title,
-  gap,
-  children,
-  ...rest
-}: BlockProps & { title?: string; gap?: Gap }) {
+export function Section({ title, gap, children, ...rest }: SectionProps) {
   return (
     <section {...styled(rest, 'wsx-section')} data-gap={gap}>
       {title && <h2 className="wsx-section-title">{title}</h2>}
@@ -97,7 +100,7 @@ function flowStyle(rest: BlockProps, align: string | undefined, fallback: string
   return { ...base, '--align': (align && ALIGN[align]) || fallback } as CSSProperties
 }
 
-export function Row({ gap, align, children, ...rest }: BlockProps & { gap?: Gap; align?: string }) {
+export function Row({ gap, align, children, ...rest }: RowProps) {
   return (
     <div {...styled(rest, 'wsx-row')} data-gap={gap} style={flowStyle(rest, align, 'flex-start')}>
       {children}
@@ -105,12 +108,7 @@ export function Row({ gap, align, children, ...rest }: BlockProps & { gap?: Gap;
   )
 }
 
-export function Stack({
-  gap,
-  align,
-  children,
-  ...rest
-}: BlockProps & { gap?: Gap; align?: string }) {
+export function Stack({ gap, align, children, ...rest }: StackProps) {
   return (
     <div {...styled(rest, 'wsx-stack')} data-gap={gap} style={flowStyle(rest, align, 'stretch')}>
       {children}
@@ -118,7 +116,7 @@ export function Stack({
   )
 }
 
-export function Grid({ gap, children, ...rest }: BlockProps & { gap?: Gap }) {
+export function Grid({ gap, children, ...rest }: GridProps) {
   return (
     <div {...styled(rest, 'wsx-grid')} data-gap={gap}>
       {children}

@@ -1,29 +1,19 @@
 import { useState } from 'react'
 import { useData } from '../data'
 import { resolveArgs, styled, useRunAction, useSelectOptions } from '../lib'
-import type { ActionRef, BlockProps } from '../lib/types'
+import type {
+  ButtonProps,
+  ComposeProps,
+  FieldProps,
+  SliderProps,
+  SwitchProps,
+  TaskProps,
+} from '../lib/types'
 import { usePaperHost } from '../provider'
 import { useRow, useSheetState } from '../state'
 
-type FieldKind = 'text' | 'number' | 'date' | 'select' | 'boolean'
-
 /** One primitive over every column type. Label, help and error are structural. */
-export function Field({
-  field,
-  kind,
-  label,
-  help,
-  table,
-  row,
-  ...rest
-}: BlockProps & {
-  field: string
-  kind: FieldKind
-  label?: string
-  help?: string
-  table?: string
-  row?: string
-}) {
+export function Field({ field, kind, label, help, table, row, ...rest }: FieldProps) {
   const host = usePaperHost()
   const { refresh } = useData()
   const scoped = useRow()
@@ -100,7 +90,7 @@ export function Field({
   )
 }
 
-export function Button({ action, children, ...rest }: BlockProps & { action: ActionRef }) {
+export function Button({ action, children, ...rest }: ButtonProps) {
   const run = useRunAction()
   const [busy, setBusy] = useState(false)
   return (
@@ -123,13 +113,7 @@ export function Button({ action, children, ...rest }: BlockProps & { action: Act
 }
 
 /** A text box that runs one verb with `$value` and `$now` filled in — the comment box. */
-export function Compose({
-  action,
-  label,
-  placeholder,
-  multiline,
-  ...rest
-}: BlockProps & { action: ActionRef; label?: string; placeholder?: string; multiline?: boolean }) {
+export function Compose({ action, label, placeholder, multiline, ...rest }: ComposeProps) {
   const run = useRunAction()
   const [text, setText] = useState('')
   const [busy, setBusy] = useState(false)
@@ -177,13 +161,7 @@ export function Compose({
   )
 }
 
-export function Task({
-  row,
-  done,
-  field,
-  children,
-  ...rest
-}: BlockProps & { row?: string; done?: boolean; field?: string }) {
+export function Task({ row, done, field, children, ...rest }: TaskProps) {
   const host = usePaperHost()
   const scoped = useRow()
   const rowId = row ?? (scoped?.id as string | undefined)
@@ -208,7 +186,7 @@ export function Task({
   )
 }
 
-export function Switch({ state, label, ...rest }: BlockProps & { state: string; label?: string }) {
+export function Switch({ state, label, ...rest }: SwitchProps) {
   const sheet = useSheetState()
   const on = sheet.values[state] === true
   return (
@@ -227,14 +205,7 @@ export function Switch({ state, label, ...rest }: BlockProps & { state: string; 
   )
 }
 
-export function Slider({
-  state,
-  min = 0,
-  max = 100,
-  step = 1,
-  label,
-  ...rest
-}: BlockProps & { state: string; min?: number; max?: number; step?: number; label?: string }) {
+export function Slider({ state, min = 0, max = 100, step = 1, label, ...rest }: SliderProps) {
   const sheet = useSheetState()
   const value = typeof sheet.values[state] === 'number' ? (sheet.values[state] as number) : min
   return (

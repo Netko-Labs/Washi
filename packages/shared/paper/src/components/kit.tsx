@@ -1,5 +1,5 @@
 import { styled } from '../lib'
-import type { BlockProps, Size } from '../lib/types'
+import type { BlockProps, MascotProps, MissingProps, Size } from '../lib/types'
 
 const MASCOT_FACES: Record<string, string> = {
   happy: '#fHappy',
@@ -16,11 +16,7 @@ export function Chip({ children, ...rest }: BlockProps) {
 }
 
 /** Washi-chan. Geometry lives in the host's <MascotDefs/> symbols (#wBody, #f*). */
-export function Mascot({
-  mood = 'happy',
-  size = 'md',
-  ...rest
-}: BlockProps & { mood?: string; size?: Size }) {
+export function Mascot({ mood = 'happy', size = 'md', ...rest }: MascotProps) {
   const px = MASCOT_SIZES[size]
   return (
     <svg
@@ -37,7 +33,7 @@ export function Mascot({
 }
 
 /** A capability the registry lacks: labelled, valid, and a request on record. */
-export function Missing({ kind, reason }: { kind: string; reason: string }) {
+export function Missing({ kind, reason }: MissingProps) {
   return (
     <div className="wsx-missing" role="note">
       <b>{kind}</b> is not in the registry yet — {reason}
