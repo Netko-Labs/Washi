@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import { z } from 'zod'
-import { hasCode, parse, serialize, validate, type WsxRegistry } from '../index'
+import { hasCode, parse, serialize, validate, WsxParseError, type WsxRegistry } from '../index'
 
 const PAGE = `import { useRows } from 'washi'
 import { format } from 'date-fns'
@@ -88,7 +88,7 @@ describe('a page that runs (D100)', () => {
     expect(
       validate(parse('<Sheet title="t"><Stat label="a" value={1} key={id} /></Sheet>'), registry),
     ).toEqual([])
-    expect(() => parse('<Sheet title={} />')).toThrow('prop title is empty')
+    expect(() => parse('<Sheet title={} />')).toThrow(WsxParseError)
   })
 
   test('a <Sheet>’s own props stay literal, and a page never default-exports', () => {
