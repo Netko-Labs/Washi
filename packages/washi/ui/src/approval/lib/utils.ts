@@ -98,7 +98,6 @@ function describeTable(name: string, input: Record<string, unknown>): ToolDescri
   })
 }
 
-/** Every Washi tool, in words. Unknown tools fall back to their name, de-snake-cased. */
 /** A title the call itself returned — what names a page once it is gone from the store. */
 function outputTitle(output: string | null | undefined): string | null {
   if (!output) return null
@@ -109,6 +108,7 @@ function outputTitle(output: string | null | undefined): string | null {
   }
 }
 
+/** Every Washi tool, in words. Unknown tools fall back to their name, de-snake-cased. */
 export function describeTool(
   name: string,
   input: unknown,
