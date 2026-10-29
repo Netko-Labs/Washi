@@ -56,7 +56,7 @@ export default defineConfig(({ command }) => ({
         { route: '/trpc-ws', handler: './src/server/trpc-ws.ts' },
         { route: '/.well-known/**', handler: './src/server/well-known.ts' },
       ],
-      plugins: ['./src/server/plugins/runtime.ts'],
+      plugins: ['./src/server/plugins/runtime.ts', './src/server/plugins/asset-misses.ts'],
       routeRules: {
         '/**': {
           headers: command === 'build' ? { ...SECURITY_HEADERS, ...HSTS_HEADER } : SECURITY_HEADERS,
