@@ -32,6 +32,7 @@ import { Redact } from './components/redact'
 import { Roadmap } from './components/roadmap'
 import { Automation, Formula, Script } from './components/script'
 import { Select } from './components/select'
+import { cell } from './components/states'
 import { Callout, Card, Figure, Hero } from './components/surface'
 import {
   Code,
@@ -86,7 +87,7 @@ function numberFootnotes(root: WsxElement): Map<WsxElement, number> {
 function renderChildren(nodes: WsxNode[], ctx: Ctx): ReactNode[] {
   return nodes.map((node, index) => {
     if (node.kind === 'code') return null
-    if (node.kind === 'text') return resolveRow(node.value, ctx.row)
+    if (node.kind === 'text') return resolveRow(node.value, ctx.row, cell)
     return <Element key={index} node={node} ctx={ctx} />
   })
 }

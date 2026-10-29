@@ -147,9 +147,11 @@ function selectRows(
     .join(', ')
 
   const where = buildWhere(filters, spec)
-  // Ordering targets the projected alias, so the json path is bound once.
-  const orderSql = orderBy
-    ? ` ORDER BY "${assertIdentifier(orderBy.column)}" ${orderBy.direction === 'desc' ? 'DESC' : 'ASC'}`
+  // Ordering targets the projected alias, so the json path is bound once. Empty cells sort last
+  // either way, as a person expects of "due soonest" or "biggest first".
+  const ordered = orderBy ? `"${assertIdentifier(orderBy.column)}"` : null
+  const orderSql = ordered
+    ? ` ORDER BY ${ordered} IS NULL, ${ordered} ${orderBy?.direction === 'desc' ? 'DESC' : 'ASC'}`
     : ' ORDER BY hlc_created ASC'
   const sql = `
     SELECT id, ${projection}

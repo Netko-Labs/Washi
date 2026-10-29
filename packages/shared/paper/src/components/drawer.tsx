@@ -5,7 +5,7 @@ import type { BlockProps, Row } from '../lib/types'
 import { usePaperHost } from '../provider'
 import type { BindQuery } from '../registry'
 import { RowProvider, useSheetState } from '../state'
-import { Bound } from './states'
+import { Bound, cell } from './states'
 
 /**
  * A side panel whose openness is a state key. With `bind`, the key holds a row id
@@ -48,7 +48,7 @@ export function Drawer({
       <button type="button" className="wsx-drawer-scrim" aria-label="Close" onClick={close} />
       <aside {...styled(rest, 'wsx-drawer')} role="dialog" aria-label={title ?? state}>
         <div className="wsx-drawer-head">
-          <span className="wsx-drawer-title">{resolveRow(title ?? '', row)}</span>
+          <span className="wsx-drawer-title">{resolveRow(title ?? '', row, cell)}</span>
           <button type="button" className="wsx-drawer-close" aria-label="Close" onClick={close}>
             ×
           </button>

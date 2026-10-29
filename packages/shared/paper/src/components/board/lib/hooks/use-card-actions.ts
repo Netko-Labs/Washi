@@ -16,7 +16,8 @@ export function useCardActions(onOpen: ActionRef | undefined): CardActions {
       if (onOpen) void run(resolveRowDeep(onOpen as never, row) as never)
       else if (typeof row.id === 'string') host.openRow?.(row.id)
     },
-    shown: (value) => (typeof value === 'number' ? value.toLocaleString(host.locale) : cell(value)),
+    shown: (value) =>
+      typeof value === 'number' ? value.toLocaleString(host.locale) : cell(value, host.locale),
     add: (action, group) => void run(substitute(action, group)),
     creatable: Boolean(host.newRow),
     // The host tells the reader why a row was not added; the board only refetches.

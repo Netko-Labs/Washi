@@ -110,6 +110,18 @@ describe('ink executor', () => {
     expect(result.rows[0]?.done).toBe(false)
   })
 
+  test('an empty cell sorts last whichever way a column is ordered', () => {
+    const table = seed()
+    insertRecord(ws, table.id, { title: 'd', done: false, status: 'todo' })
+    for (const direction of ['asc', 'desc'] as const) {
+      const result = executeQuery(ws, table.id, spec, {
+        table: 'tasks',
+        orderBy: { column: 'points', direction },
+      })
+      expect(result.rows.at(-1)?.title).toBe('d')
+    }
+  })
+
   test('group-by aggregations: count and sum', () => {
     const table = seed()
     const result = executeQuery(ws, table.id, spec, {

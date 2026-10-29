@@ -1,3 +1,4 @@
+export { DAY, dayLabel, whenLabel } from './days'
 export { useBind } from './hooks/use-bind'
 export { useExprValue } from './hooks/use-expr'
 export { useHistory } from './hooks/use-history'

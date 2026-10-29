@@ -96,6 +96,13 @@ export function computeFormulas(
   }
 }
 
+const isEmpty = (value: unknown) => value === null || value === undefined || value === ''
+
+/** Empty cells sit after the rest whichever way a column is ordered; 0 when both or neither are. */
+function emptiesLast(a: unknown, b: unknown): number {
+  return Number(isEmpty(a)) - Number(isEmpty(b))
+}
+
 function compareCells(a: unknown, b: unknown): number {
   if (a === b) return 0
   if (a === null || a === undefined) return -1
@@ -148,7 +155,9 @@ export function finishInMemory(
   if (query.orderBy) {
     const { column, direction } = query.orderBy
     const sign = direction === 'desc' ? -1 : 1
-    kept.sort((a, b) => sign * compareCells(a[column], b[column]))
+    kept.sort(
+      (a, b) => emptiesLast(a[column], b[column]) || sign * compareCells(a[column], b[column]),
+    )
   }
   const out = kept.slice(0, limit)
   return { rows: out, total: out.length }
