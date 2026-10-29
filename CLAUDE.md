@@ -498,6 +498,9 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   auth]`, `openid-configuration`, `oauth-protected-resource[/mcp]`) is a Nitro handler over
   `control.oauth.discovery`; every 401 names `resource_metadata`. OAuth tables: `db/oauth.ts`, as
   `npx auth generate` writes them (regenerate, don't hand-edit), DDL in `lib/ddl-oauth.ts`.
+  Installable as a Claude Code plugin from this repo (`.claude-plugin/marketplace.json` → `netko-labs`,
+  `plugins/washi`: `.mcp.json` reads `WASHI_MCP_URL` and `WASHI_TOKEN`, and the `backlog` skill —
+  take an issue, fix it here, comment the PR on its row, move its status). `claude plugin validate`.
 - **An embed is https and listed (D92).** `<Embed src title ratio height>`: the registry refuses http;
   a built-in provider (`EMBED_PROVIDERS` — YouTube via youtube-nocookie, Vimeo, Spotify, Loom, Figma,
   CodePen, CodeSandbox, Miro, Google Maps, Indify) turns its page URL into its player and always plays;

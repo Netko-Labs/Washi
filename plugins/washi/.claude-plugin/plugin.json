@@ -1,0 +1,11 @@
+{
+  "name": "washi",
+  "displayName": "Washi",
+  "version": "0.1.0",
+  "description": "Work a Washi workspace from Claude Code: read and write its pages and tables as you, and work an issue backlog kept there.",
+  "author": { "name": "Netko Labs", "url": "https://github.com/Netko-Labs" },
+  "homepage": "https://github.com/Netko-Labs/Washi",
+  "repository": "https://github.com/Netko-Labs/Washi",
+  "license": "AGPL-3.0-only",
+  "keywords": ["washi", "mcp", "backlog", "issues", "knowledge-base"]
+}

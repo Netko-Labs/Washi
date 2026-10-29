@@ -8,7 +8,7 @@ Washi itself still never reviews code (A4).
       Settings → Account → Agents
 - [x] F2 · OAuth: `@better-auth/oauth-provider` (better-auth ≥ 1.7.14), discovery metadata, the
       `claude mcp add` browser sign-in
-- [ ] F3 · `plugins/washi` Claude Code plugin + marketplace, the `backlog` skill
+- [x] F3 · `plugins/washi` Claude Code plugin + marketplace, the `backlog` skill
 
 # D100 · pages are programs — WSX as MDX-style JSX (2026-10-29)
 

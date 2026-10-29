@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "washi": {
+      "type": "http",
+      "url": "${WASHI_MCP_URL}",
+      "headers": {
+        "Authorization": "Bearer ${WASHI_TOKEN:-}"
+      }
+    }
+  }
+}
