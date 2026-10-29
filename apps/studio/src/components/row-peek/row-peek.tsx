@@ -42,7 +42,11 @@ export function RowPeek({ workspaceId }: RowPeekProps) {
         <SheetView
           key={peek.sheetId}
           sheetId={peek.sheetId}
-          chrome={<RowProperties sheetId={peek.sheetId} />}
+          chrome={
+            <div className="pt-5">
+              <RowProperties sheetId={peek.sheetId} />
+            </div>
+          }
           look={look}
           footer={
             <div className="mx-auto w-full max-w-[760px] px-8 pb-12">

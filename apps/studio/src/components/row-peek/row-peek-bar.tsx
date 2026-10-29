@@ -29,7 +29,7 @@ export function RowPeekBar({
   return (
     <div
       ref={bar}
-      className="relative flex h-11 shrink-0 touch-none items-center gap-0.5 px-2 max-md:h-14 max-md:pt-2"
+      className="absolute inset-x-0 top-0 z-10 flex h-11 touch-none items-center gap-0.5 px-2 backdrop-blur-md max-md:h-14 max-md:pt-2"
     >
       <span
         aria-hidden
