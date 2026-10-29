@@ -1,0 +1,231 @@
+/* Explain (D107): a how-to, a choice, the questions people ask, a date coming up. */
+
+.wsx-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: wsx-step;
+  text-align: start;
+}
+.wsx-steps-item {
+  --mark: calc(34px * var(--sz));
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--mark) minmax(0, 1fr);
+  gap: calc(14px * var(--sz));
+  padding-bottom: var(--gap-loose);
+}
+.wsx-steps-item:not([data-marked]) {
+  counter-increment: wsx-step;
+}
+.wsx-steps-item:last-child {
+  padding-bottom: 0;
+}
+.wsx-steps-item:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  top: calc(var(--mark) + 6px);
+  bottom: 6px;
+  left: calc(var(--mark) / 2 - 1px);
+  width: 2px;
+  border-radius: 1px;
+  background: var(--t-line);
+}
+.wsx-steps-marker {
+  width: var(--mark);
+  height: var(--mark);
+  display: grid;
+  place-items: center;
+  border: 1.5px solid var(--t-line);
+  border-radius: 999px;
+  background: var(--t-tint);
+  color: var(--t-text);
+  font-family: var(--font-serif);
+  font-size: calc(17px * var(--sz));
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.wsx-steps-item:not([data-marked]) .wsx-steps-marker::before {
+  content: counter(wsx-step);
+}
+.wsx-steps-item[data-variant="filled"] .wsx-steps-marker {
+  border-color: transparent;
+  background: var(--t-fill);
+  color: var(--t-on);
+}
+.wsx-steps-content {
+  min-width: 0;
+  padding-top: calc(var(--mark) / 2 - 0.7em);
+}
+.wsx-steps-title {
+  font-weight: 700;
+  font-size: calc(var(--body) * 1.05 * var(--sz));
+  line-height: 1.4;
+  color: var(--ink);
+}
+.wsx-steps-body {
+  margin-top: 4px;
+}
+.wsx-steps-body > * + *,
+.wsx-option-body > * + *,
+.wsx-question-body > * + * {
+  margin-top: calc(var(--rhythm) * 0.6);
+}
+
+.wsx-compare {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: var(--gap);
+  text-align: start;
+}
+.wsx-option {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: calc(16px * var(--sz)) calc(18px * var(--sz));
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-card);
+  background: var(--card);
+  box-shadow: var(--shadow-card);
+}
+.wsx-option[data-variant="plain"] {
+  background: transparent;
+  box-shadow: none;
+}
+.wsx-option[data-variant="filled"] {
+  border-color: transparent;
+  background: var(--muted-bg);
+  box-shadow: none;
+}
+.wsx-option[data-variant="filled"][data-tone]:not([data-tone="neutral"]) {
+  background: var(--t-tint);
+}
+.wsx-option[data-tone]:not([data-tone="neutral"]) {
+  border-color: var(--t-line);
+}
+.wsx-option[data-pick] {
+  border-color: var(--t-fill);
+  box-shadow:
+    inset 0 0 0 1px var(--t-fill),
+    var(--shadow-card);
+}
+.wsx-option-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.wsx-option-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: calc(var(--t3) * var(--sz));
+  font-weight: 400;
+  line-height: 1.3;
+  color: var(--ink);
+}
+.wsx-option-pick {
+  flex: none;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--t-fill);
+  color: var(--t-on);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+@container wsx (max-width: 559px) {
+  .wsx-compare {
+    grid-auto-flow: row;
+  }
+}
+
+.wsx-faq {
+  border-top: 1px solid var(--border);
+  text-align: start;
+}
+.wsx-question {
+  border-bottom: 1px solid var(--border);
+}
+.wsx-question summary {
+  list-style: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: calc(12px * var(--sz)) 2px;
+  border-radius: var(--r-cell);
+  font-weight: 700;
+  font-size: calc(var(--body) * var(--sz));
+  color: var(--ink);
+}
+.wsx-question summary::-webkit-details-marker {
+  display: none;
+}
+.wsx-question summary::after {
+  content: "";
+  flex: none;
+  width: 7px;
+  height: 7px;
+  margin-right: 4px;
+  border-right: 1.5px solid var(--muted);
+  border-bottom: 1.5px solid var(--muted);
+  opacity: 0.7;
+  transform: translateY(-2px) rotate(45deg);
+  transition:
+    transform var(--ease),
+    opacity var(--ease);
+}
+.wsx-question summary:hover::after {
+  opacity: 1;
+}
+.wsx-question[open] summary::after {
+  transform: translateY(2px) rotate(-135deg);
+}
+.wsx-question summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.wsx-question-body {
+  padding: 0 2px calc(14px * var(--sz));
+  color: var(--ink);
+}
+
+.wsx-countdown {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.wsx-countdown-figure {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: var(--font-serif);
+  font-size: calc(var(--t1) * 1.25 * var(--sz));
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--ink);
+}
+.wsx-countdown-unit {
+  font-family: var(--font-sans);
+  font-size: calc(var(--body) * var(--sz));
+  font-weight: 700;
+  color: var(--muted);
+}
+.wsx-countdown[data-when="today"] .wsx-countdown-figure,
+.wsx-countdown[data-tone]:not([data-tone="neutral"]) .wsx-countdown-figure {
+  color: var(--t-text);
+}
+.wsx-countdown[data-when="past"] .wsx-countdown-figure {
+  color: var(--muted);
+}
+.wsx-countdown-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}

@@ -1,17 +1,7 @@
 export { Board } from './components/board'
 export { Bookmark } from './components/bookmark'
 export { Canvas } from './components/canvas'
-export {
-  Avatar,
-  Badge,
-  Chart,
-  Progress,
-  Repeat,
-  Stat,
-  Step,
-  Table,
-  Timeline,
-} from './components/data'
+export { Avatar, Badge, Chart, Progress, Repeat, Stat, Table } from './components/data'
 export {
   AddProperty,
   type CellProps,
@@ -25,6 +15,16 @@ export {
 } from './components/database'
 export { Drawer, Schema } from './components/drawer'
 export { Embed } from './components/embed'
+export {
+  Compare,
+  Countdown,
+  Faq,
+  Option,
+  Question,
+  Step,
+  Steps,
+  Timeline,
+} from './components/explain'
 export { Reveal, Show, Tab, Tabs } from './components/flow'
 export { Form } from './components/form'
 export {

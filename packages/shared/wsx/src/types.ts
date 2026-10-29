@@ -57,6 +57,8 @@ export interface ComponentSpec {
   noNest?: boolean
   /** Only legal inside one of these ancestors. */
   within?: string[]
+  /** Props checked instead when the nearest `within` ancestor is this one. */
+  propsWithin?: Record<string, z.ZodType>
 }
 
 export interface WsxRegistry {

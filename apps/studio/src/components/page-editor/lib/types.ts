@@ -141,6 +141,16 @@ export interface KindOption {
   hint: string
 }
 
+/** A block `/` drops in with words to type over (D107). */
+export type StarterBlock = 'steps' | 'compare' | 'faq' | 'countdown'
+
+export interface StarterOption {
+  block: StarterBlock
+  label: string
+  hint: string
+  words: string
+}
+
 export interface BlockRowProps {
   block: Block
   numberAt: number
@@ -188,6 +198,7 @@ export type DataPick =
   | { kind: 'code' }
   | { kind: 'widget' }
   | { kind: 'formula' }
+  | { kind: 'starter'; block: StarterBlock }
   | { kind: 'automation'; table: string }
   | { kind: 'tabs' }
 

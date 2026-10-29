@@ -1,4 +1,4 @@
-import type { KindOption, SaveState, TextKind } from './types'
+import type { KindOption, SaveState, StarterBlock, StarterOption, TextKind } from './types'
 
 /** What `/database` makes: a name, and Notion's three-step status. */
 export const NEW_DATABASE = (name: string) => ({
@@ -115,3 +115,26 @@ export const STARTER_AUTOMATION = (table: string) => `function run(event) {
 export const STARTER_FORMULA = `function with_tax(amount: number, rate = 0.19) {
   return Math.round(amount * (1 + rate) * 100) / 100
 }`
+
+export const STARTER_OPTIONS: StarterOption[] = [
+  { block: 'steps', label: 'Steps', hint: 'how-to', words: 'steps how-to howto guide numbered' },
+  {
+    block: 'compare',
+    label: 'Compare',
+    hint: 'options',
+    words: 'compare options versus pros cons',
+  },
+  { block: 'faq', label: 'FAQ', hint: 'questions', words: 'faq questions answers accordion' },
+  { block: 'countdown', label: 'Countdown', hint: 'days left', words: 'countdown deadline until' },
+]
+
+/** The starter each drops in; a countdown is made on the day, two weeks out. */
+export const STARTER_SOURCES: Record<Exclude<StarterBlock, 'countdown'>, string> = {
+  steps:
+    '<Steps><Step title="First step"><Text>What to do.</Text></Step><Step title="Second step"><Text>What comes next.</Text></Step><Step title="Done"><Text>How to tell it worked.</Text></Step></Steps>',
+  compare:
+    '<Compare><Option title="Option A"><List><Item>A strength</Item><Item>A cost</Item></List></Option><Option title="Option B" pick><List><Item>A strength</Item><Item>A cost</Item></List></Option></Compare>',
+  faq: '<Faq><Question title="A question people ask"><Text>Its answer.</Text></Question><Question title="Another one"><Text>Its answer.</Text></Question></Faq>',
+}
+
+export const COUNTDOWN_DAYS = 14

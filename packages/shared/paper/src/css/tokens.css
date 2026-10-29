@@ -147,7 +147,10 @@
 .wsx .wsx-chip:not([data-tone]),
 .wsx .wsx-quote:not([data-tone]),
 .wsx .wsx-progress:not([data-tone]),
-.wsx .wsx-step:not([data-tone]) {
+.wsx .wsx-step:not([data-tone]),
+.wsx .wsx-steps-item:not([data-tone]),
+.wsx .wsx-option:not([data-tone]),
+.wsx .wsx-countdown:not([data-tone]) {
   --t-fill: var(--k-fill);
   --t-text: var(--k-text);
   --t-on: var(--k-on);

@@ -29,6 +29,16 @@ export const SUMMARIES: Record<string, string> = {
   Audio: 'A sound with the browser’s player, its title above.',
   File: 'A document as a line: its kind, name and size; it opens or downloads.',
   Bookmark: 'A link as a card — title, a line about it, its picture — read once when it was made.',
+  Steps:
+    'A numbered how-to: each Step’s number drawn big, a rail between them, the step’s blocks under its title.',
+  Compare:
+    'Options side by side, 2–4, each a card of what it holds; pick marks the recommended one. They stack under 560px.',
+  Option:
+    'One choice in a Compare: a title over its blocks — a List of pros and cons reads well; pick marks it.',
+  Faq: 'Questions people ask, one answer open at a time; keyboard and screen readers work as the browser’s own.',
+  Question: 'One question in a Faq: the title asks, its children answer.',
+  Countdown:
+    'Days left to a date on the reader’s clock — hours under two days with a time — then “Today”, then days ago.',
   Widget:
     'A page’s own HTML and JS in a frame with no origin and no network, reaching the page only through washi.rows / state / act — off until an owner allows widgets.',
   Formula:
@@ -69,8 +79,8 @@ export const SUMMARIES: Record<string, string> = {
   Table: 'Rows as a table; stacks into cards on a phone.',
   Stat: 'One figure with a label, a hint and a trend; reads expr aggregates, as money with currency.',
   Chart: 'Bars, lines, areas or a donut over rows, or a column over time.',
-  Timeline: 'A vertical run of Steps.',
-  Step: 'One entry on a Timeline: marker, title, body.',
+  Timeline: 'A vertical run of Steps, each with its own marker.',
+  Step: 'One entry on a Timeline (marker, title, body), or one numbered step of Steps (title, body).',
   Progress: 'A bar filled to a ratio, with its percentage.',
   Badge: 'A pill in a tone; can read an expr.',
   Avatar: 'Initials in a circle.',
@@ -106,6 +116,28 @@ export const SUMMARIES: Record<string, string> = {
 
 /** Primitives that only work together; each source validates and renders over the book's `tasks`. */
 export const RECIPES: Recipe[] = [
+  {
+    id: 'guide',
+    title: 'A how-to with its questions',
+    why: 'A knowledge-base page that reads well: the steps in order, the choice made plain, the questions answered, the day it matters by.',
+    uses: ['Steps', 'Compare', 'Faq', 'Countdown'],
+    source: `<Sheet title="Cutting a release" feel="editorial">
+  <Countdown to="2026-12-01" label="Until the freeze" />
+  <Steps>
+    <Step title="Cut the branch"><Code lang="sh">git switch -c release/2026.12</Code></Step>
+    <Step title="Run the checks"><Text>Typecheck, lint and tests, all green.</Text></Step>
+    <Step title="Tag and push"><Text>The tag is what deploys.</Text></Step>
+  </Steps>
+  <Compare>
+    <Option title="Weekly"><List><Item>A rhythm people plan around</Item><Item>Fixes wait for Friday</Item></List></Option>
+    <Option title="On every merge" pick><List><Item>Small, easy to undo</Item><Item>Needs checks you trust</Item></List></Option>
+  </Compare>
+  <Faq>
+    <Question title="What if a check fails?"><Text>Fix it on the branch; never tag around it.</Text></Question>
+    <Question title="Who can tag?"><Text>Anyone who reviewed the release.</Text></Question>
+  </Faq>
+</Sheet>`,
+  },
   {
     id: 'gallery',
     title: 'A gallery of rows',

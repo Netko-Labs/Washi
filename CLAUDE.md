@@ -426,6 +426,14 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   against the busiest day on screen — rows counted, or `value` summed; a moment or a range counts on
   its first day; future days faded. Once loaded it always draws (an empty grid is an answer); the
   query is held to the days shown (≤ 1000 rows; a read back at the cap says its totals are partial).
+- **A page explains itself (D107).** `<Steps><Step title>` is a numbered how-to (the number drawn by
+  CSS counters, a rail between; a `marker` replaces it). `Step` is one name in two places: wsx's
+  `propsWithin` checks it by its nearest `within` ancestor, so a Timeline's still needs `marker`.
+  `<Compare width><Option title pick>` sets 2–4 choices side by side (stacked under 560px; `pick` is
+  the accent border and a Pick badge). `<Faq><Question title>` is native `<details name>`, one open at
+  a time. `<Countdown to label>` reads `YYYY-MM-DD[THH:MM]` on the reader's clock — days, hours under
+  two days, Today, days ago — ticks each minute and draws `—` until mounted, so SSR never guesses.
+  Specs in `registry/explain-specs.ts` (group `explain`); `/steps` `/compare` `/faq` `/countdown`.
 - **Database views read like Notion's (D84).** A table's head shows each property's type
   (`PropertyIcon`) and name in sentence case; select/status/person cells draw a pill, a step dot or a
   face over an invisible native select; dates read "Nov 4, 2026" and numbers group until pressed

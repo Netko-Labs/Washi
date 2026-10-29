@@ -1,5 +1,5 @@
 import type { KindOption, PageRef, SlashOption, TableRef } from '../types'
-import { KIND_OPTIONS, LINK_MATCHES, UPLOAD_OPTIONS } from '../values'
+import { KIND_OPTIONS, LINK_MATCHES, STARTER_OPTIONS, UPLOAD_OPTIONS } from '../values'
 
 export function kindMatches(query: string): KindOption[] {
   const needle = query.trim().toLowerCase()
@@ -123,6 +123,20 @@ function layoutOptions(
   return [{ type: 'data', key: 'tabs', label: 'Tabs', hint: 'sections', pick: { kind: 'tabs' } }]
 }
 
+/** Steps, Compare, FAQ, Countdown: a block with words to type over. */
+function starterOptions(needle: string): Extract<SlashOption, { type: 'data' }>[] {
+  return STARTER_OPTIONS.filter(
+    (option) =>
+      !needle || option.label.toLowerCase().includes(needle) || option.words.includes(needle),
+  ).map((option) => ({
+    type: 'data' as const,
+    key: `starter:${option.block}`,
+    label: option.label,
+    hint: option.hint,
+    pick: { kind: 'starter' as const, block: option.block },
+  }))
+}
+
 function pageOptions(needle: string, pages: PageRef[]): Extract<SlashOption, { type: 'data' }>[] {
   const subpages = [
     { key: 'subpage', label: 'New page inside', hint: 'page', pick: { kind: 'subpage' as const } },
@@ -216,6 +230,7 @@ export function slashMatches(
     ...linkOptions(query),
     ...layoutOptions(needle, isNested),
     ...uploadOptions(needle),
+    ...starterOptions(needle),
     ...pageOptions(needle, pages),
     ...matching,
   ]
