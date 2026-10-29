@@ -2,7 +2,7 @@ import type { QueryRow, Scalar } from '@washi/ink'
 import type { WsxValue } from '@washi/wsx'
 import type { CellKind, Row } from './types'
 
-// Each row's list cells as they arrived, so a view that pills them never re-splits the words.
+// Each row's list cells as they came, once each: a view that pills them never re-splits words.
 const lists = new WeakMap<Row, Record<string, string[]>>()
 
 /** Pages speak scalars: a list cell (labels, related ids) reads as its items, comma-joined. */
@@ -11,7 +11,7 @@ export function toRows(rows: QueryRow[]): Row[] {
     const row: Row = {}
     const items: Record<string, string[]> = {}
     for (const [key, cell] of Object.entries(raw)) {
-      if (Array.isArray(cell)) items[key] = cell.map(String)
+      if (Array.isArray(cell)) items[key] = [...new Set(cell.map(String))]
       row[key] = Array.isArray(cell) ? cell.join(', ') : cell
     }
     if (Object.keys(items).length > 0) lists.set(row, items)

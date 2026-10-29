@@ -43,6 +43,11 @@ describe('cellItems and patchRow', () => {
     expect(cellItems(patchRow(row, { tags: 'bug' }), 'tags')).toEqual(['bug'])
   })
 
+  test('an item held twice pills once', () => {
+    const [row] = toRows([{ id: 'a', tags: ['bug', 'bug', 'infra'] }])
+    expect(row && cellItems(row, 'tags')).toEqual(['bug', 'infra'])
+  })
+
   test('an empty list holds nothing to pill', () => {
     const [row] = toRows([{ id: 'a', tags: [] }])
     expect(row && cellItems(row, 'tags')).toEqual([])
