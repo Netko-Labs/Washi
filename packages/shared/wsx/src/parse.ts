@@ -99,10 +99,14 @@ function convertChildren(children: t.JSXElement['children'], slice: Slice): WsxN
   children.forEach((child, at) => {
     switch (child.type) {
       case 'JSXText': {
-        const keepStart = isHole(children[at - 1], slice)
-        const keepEnd = isHole(children[at + 1], slice)
+        // Beside code or an inline element, text keeps the space JSX keeps: `Read <Ref>…</Ref> first`.
+        const prev = children[at - 1]
+        const next = children[at + 1]
+        const keepStart = isHole(prev, slice) || prev?.type === 'JSXElement'
+        const keepEnd = isHole(next, slice) || next?.type === 'JSXElement'
         const value = textOf(child.value, keepStart, keepEnd)
-        if (value !== null && (value.trim().length > 0 || (keepStart && keepEnd))) {
+        const betweenHoles = isHole(prev, slice) && isHole(next, slice)
+        if (value !== null && (value.trim().length > 0 || betweenHoles)) {
           out.push({ kind: 'text', value })
         }
         break
