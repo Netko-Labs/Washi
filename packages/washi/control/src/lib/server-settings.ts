@@ -2,9 +2,15 @@ import { type ServerPolicy, serverPolicySchema, workspaceDefaultsSchema } from '
 import { eq } from 'drizzle-orm'
 import { instanceSetting, user } from '../db'
 import type { ControlDB } from './client'
-import { SERVER_SEAL_ID, SETTING_KEYS } from './constants'
+import { SERVER_SEAL_ID, SERVER_SEARCH_SEAL_ID, SETTING_KEYS } from './constants'
 import { open, seal } from './crypto'
-import type { SealedServerKey, ServerSettings, ServerSettingsDeps, SettingRows } from './types'
+import type {
+  SealedSearchKey,
+  SealedServerKey,
+  ServerSettings,
+  ServerSettingsDeps,
+  SettingRows,
+} from './types'
 
 function json(value: string | undefined): unknown {
   if (value === undefined) return undefined
@@ -49,6 +55,11 @@ export function createServerSettings({
   const sealedKey = async (): Promise<SealedServerKey | null> => {
     const stored = json((await rows.get(SETTING_KEYS.agentKey)) ?? undefined)
     return stored ? (stored as SealedServerKey) : null
+  }
+
+  const sealedSearchKey = async (): Promise<SealedSearchKey | null> => {
+    const stored = json((await rows.get(SETTING_KEYS.searchKey)) ?? undefined)
+    return stored ? (stored as SealedSearchKey) : null
   }
 
   return {
@@ -102,6 +113,31 @@ export function createServerSettings({
       await rows.put(SETTING_KEYS.agentKey, JSON.stringify(next))
     },
     removeKey: () => rows.drop(SETTING_KEYS.agentKey),
+
+    async searchKey() {
+      const row = await sealedSearchKey()
+      return row ? open(masterKey, SERVER_SEARCH_SEAL_ID, row) : null
+    },
+    async searchKeyInfo() {
+      const row = await sealedSearchKey()
+      if (!row) return null
+      return {
+        last4: row.last4,
+        updatedAt: new Date(row.updatedAt),
+        updatedBy: row.updatedBy ? await nameOf(row.updatedBy) : null,
+      }
+    },
+    async setSearchKey(actorId, key) {
+      const sealed = await seal(masterKey, SERVER_SEARCH_SEAL_ID, key)
+      const row: SealedSearchKey = {
+        ...sealed,
+        updatedBy: actorId,
+        updatedAt: new Date().toISOString(),
+      }
+      await rows.put(SETTING_KEYS.searchKey, JSON.stringify(row))
+      return { last4: sealed.last4 }
+    },
+    removeSearchKey: () => rows.drop(SETTING_KEYS.searchKey),
   }
 }
 

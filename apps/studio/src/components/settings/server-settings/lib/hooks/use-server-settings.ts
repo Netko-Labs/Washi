@@ -76,6 +76,20 @@ export function useServerSettings() {
         await api.instance.setKeyModel.mutate({ model })
         await refresh()
       }),
+    saveSearchKey: async (key: string): Promise<string | null> => {
+      try {
+        await api.instance.setSearchKey.mutate({ key })
+        await refresh()
+        return null
+      } catch (cause) {
+        return messageOf(cause, 'The key did not save.')
+      }
+    },
+    removeSearchKey: () =>
+      attempt(async () => {
+        await api.instance.removeSearchKey.mutate()
+        patch({ searchKey: null })
+      }),
     setHosts: async (kind: 'fetch' | 'embed', hosts: string[]): Promise<string | null> => {
       try {
         if (kind === 'fetch')

@@ -8,9 +8,17 @@ export interface WorkspaceDefaultsState {
   turnCap?: number
 }
 
+/** The server's Exa key as its admins see it: only the last four. */
+export interface ServerSearchKeyState {
+  last4: string
+  updatedAt: string
+  updatedBy: string | null
+}
+
 export interface ServerSettingsState {
   signup: SignupMode
   key: KeyState | null
+  searchKey: ServerSearchKeyState | null
   fetchHosts: string[]
   embedHosts: string[]
   widgets: boolean
@@ -34,6 +42,13 @@ export interface ServerKeyCardProps {
   onSave: (provider: ProviderId, key: string) => Promise<string | null>
   onRemove: () => Promise<unknown>
   onModel: (model: string | null) => Promise<unknown>
+}
+
+export interface ServerSearchKeyCardProps {
+  searchKey: ServerSearchKeyState | null
+  /** Null when it took; otherwise the server's refusal. */
+  onSave: (key: string) => Promise<string | null>
+  onRemove: () => Promise<unknown>
 }
 
 export interface HostListCardProps {

@@ -42,6 +42,28 @@ describe('the server’s own key (D105)', () => {
   })
 })
 
+describe('the server’s own search key', () => {
+  test('is sealed apart from the model key; info never carries it', async () => {
+    const { rows, store } = memoryRows()
+    const settings = settingsOver(store)
+    const exa = 'exa-server-not-real-7c3e'
+    await settings.setKey('u1', { key: KEY, provider: 'anthropic' })
+    expect(await settings.setSearchKey('u1', exa)).toEqual({ last4: '7c3e' })
+    expect(rows.get(SETTING_KEYS.searchKey)).not.toContain('exa-server')
+
+    const info = await settings.searchKeyInfo()
+    expect(info).toMatchObject({ last4: '7c3e', updatedBy: 'First' })
+    expect(JSON.stringify(info)).not.toContain('exa-server')
+    expect(await settings.searchKey()).toBe(exa)
+    expect((await settings.agentKey())?.apiKey).toBe(KEY)
+
+    await settings.removeSearchKey()
+    expect(await settings.searchKey()).toBeNull()
+    expect(await settings.searchKeyInfo()).toBeNull()
+    expect((await settings.agentKey())?.apiKey).toBe(KEY)
+  })
+})
+
 describe('the server policy (D105)', () => {
   test('reads from memory once loaded, and every write updates it', async () => {
     const { store } = memoryRows({ [SETTING_KEYS.fetchHosts]: '["api.example.com"]' })

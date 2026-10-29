@@ -68,6 +68,7 @@ export {
   agentCredentialSchema,
   agentModelSchema,
   hostListSchema,
+  integrationKeySchema,
   type ServerPolicy,
   serverPolicySchema,
   type WorkspaceDefaults,

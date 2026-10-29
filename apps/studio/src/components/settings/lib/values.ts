@@ -194,6 +194,9 @@ export const SIGNUP_OPTIONS: readonly Option<SignupMode>[] = [
   },
 ]
 
+export const ON_SERVER_SEARCH_KEY =
+  'On the server’s key: web search runs on this server’s Exa key until the workspace connects its own, which then wins.'
+
 export const APPROVAL_MODE_OPTIONS: readonly Option<ApprovalMode>[] = [
   {
     id: 'ask',

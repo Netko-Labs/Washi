@@ -22,6 +22,7 @@ export function useAgentSettings() {
   const [key, setKey] = useState<KeyState | null>(null)
   const [serverKey, setServerKey] = useState<ServerKeyUse | null>(null)
   const [searchKey, setSearchKey] = useState<SearchKeyState | null>(null)
+  const [serverSearchKey, setServerSearchKey] = useState(false)
   const [approvalMode, setApprovalModeState] = useState<ApprovalMode>('ask')
   const [spend, setSpend] = useState<SpendState | null>(null)
   const [settings, setSettings] = useState<AgentSettingsState | null>(null)
@@ -32,18 +33,22 @@ export function useAgentSettings() {
 
   const refresh = useCallback(async () => {
     try {
-      const [stored, lent, exa, approvals, today, standing, catalogue] = await Promise.all([
-        api.workspaces.agentKey.query(),
-        api.workspaces.serverKey.query(),
-        api.workspaces.integrationKey.query({ integration: 'exa' }),
-        api.agents.approvalMode.query(),
-        api.agents.spend.query(),
-        api.agents.settings.query(),
-        api.models.list.query(),
-      ])
+      const [stored, lent, exa, lentExa, approvals, today, standing, catalogue] = await Promise.all(
+        [
+          api.workspaces.agentKey.query(),
+          api.workspaces.serverKey.query(),
+          api.workspaces.integrationKey.query({ integration: 'exa' }),
+          api.workspaces.serverSearchKey.query(),
+          api.agents.approvalMode.query(),
+          api.agents.spend.query(),
+          api.agents.settings.query(),
+          api.models.list.query(),
+        ],
+      )
       setKey(stored as KeyState | null)
       setServerKey(lent)
       setSearchKey(exa as SearchKeyState | null)
+      setServerSearchKey(lentExa)
       setApprovalModeState(approvals.mode)
       setSpend(today as SpendState)
       setSettings(standing as AgentSettingsState)
@@ -175,6 +180,7 @@ export function useAgentSettings() {
     key,
     serverKey,
     searchKey,
+    serverSearchKey,
     approvalMode,
     spend,
     settings,

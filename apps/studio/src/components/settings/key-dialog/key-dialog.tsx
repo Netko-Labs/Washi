@@ -115,7 +115,7 @@ export function KeyDialog({
       ) : (
         <p className="text-[12.5px] text-muted-foreground">
           {connected && !replacing
-            ? 'Remove makes Washi fall asleep until another key is connected. Nothing already written changes.'
+            ? `${target === 'exa' ? 'Remove stops searches on this key.' : 'Remove makes Washi fall asleep until another key is connected.'} Nothing already written changes.`
             : `Keys come from ${meta.from}. ${target === 'exa' ? 'Every search still stops at the desk.' : 'The model is chosen in Settings, not here.'}`}
         </p>
       )}

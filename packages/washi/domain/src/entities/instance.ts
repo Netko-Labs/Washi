@@ -30,3 +30,6 @@ export const agentCredentialSchema = z.object({
 
 /** Null takes the provider's default. */
 export const agentModelSchema = z.string().min(1).max(200).nullable()
+
+/** An integration key as an owner or admin pastes it — a workspace's Exa key or the server's. */
+export const integrationKeySchema = z.object({ key: z.string().min(8) })

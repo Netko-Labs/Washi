@@ -8,7 +8,7 @@ import {
 import { type BlobStoreFactory, s3BlobStores } from '@washi/repository'
 import { startRoutineClock } from './clock'
 import { DEFAULT_WORKSPACE_ID } from './constants'
-import { keyWithFallback } from './keys'
+import { keyWithFallback, searchKeyWithFallback } from './keys'
 import { assertHostedSecrets, assertMode } from './mode'
 import { createRuntime } from './runtime'
 import type { BootedRuntime, RuntimeOptions } from './types'
@@ -66,7 +66,10 @@ export async function bootRuntime(env: Env): Promise<BootedRuntime> {
         () => hosted.instance.agentKey(),
       ),
       serverPolicy: () => hosted.instance.policy(),
-      searchKey: (workspaceId) => hosted.integrationKey(workspaceId, 'exa'),
+      searchKey: searchKeyWithFallback(
+        (workspaceId) => hosted.integrationKey(workspaceId, 'exa'),
+        () => hosted.instance.searchKey(),
+      ),
       blobs,
       workspaceStorage: (workspaceId) => hosted.storage.config(workspaceId),
     }

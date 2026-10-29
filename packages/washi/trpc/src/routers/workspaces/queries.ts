@@ -20,6 +20,10 @@ export const workspaceQueries = router({
     const info = await ctx.runtime.control.instance?.keyInfo()
     return info ? { provider: info.provider, model: info.model } : null
   }),
+  /** Whether web search falls back to the server's Exa key here — a yes or no, nothing more. */
+  serverSearchKey: workspaceProcedure.query(
+    async ({ ctx }) => (await ctx.runtime.control.instance?.searchKeyInfo()) != null,
+  ),
   integrationKey: workspaceProcedure
     .input(z.object({ integration: z.enum(INTEGRATIONS) }))
     .query(

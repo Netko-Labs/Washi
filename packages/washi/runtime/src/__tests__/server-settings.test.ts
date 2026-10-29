@@ -6,7 +6,7 @@ import { createEmbeddedControlPlane } from '@washi/control/embedded'
 import { type ServerPolicy, serverPolicySchema } from '@washi/domain'
 import { openWorkspace } from '@washi/repository'
 import { DEFAULT_DAILY_CAP_USD } from '@washi/service'
-import { keyWithFallback } from '../keys'
+import { keyWithFallback, searchKeyWithFallback } from '../keys'
 import { createRuntime } from '../runtime'
 import type { Runtime } from '../types'
 
@@ -53,6 +53,27 @@ describe('which key a hosted workspace runs on (D105)', () => {
     expect(status.apiKey).toEqual({ provider: 'anthropic', source: 'server' })
     runtime.close()
     rmSync(dir, { recursive: true, force: true })
+  })
+})
+
+describe('which Exa key a hosted workspace searches with', () => {
+  const server = async () => 'exa-server-not-real'
+
+  test('its own key wins over the server’s', async () => {
+    const lookup = searchKeyWithFallback(async () => 'exa-own-not-real', server)
+    expect(await lookup('w1')).toBe('exa-own-not-real')
+  })
+
+  test('without one it searches on the server’s', async () => {
+    expect(await searchKeyWithFallback(async () => null, server)('w1')).toBe('exa-server-not-real')
+  })
+
+  test('with neither, there is no key and web_search says where one goes', async () => {
+    const lookup = searchKeyWithFallback(
+      async () => null,
+      async () => null,
+    )
+    expect(await lookup('w1')).toBeNull()
   })
 })
 

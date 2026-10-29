@@ -1,3 +1,10 @@
+# D105+ · the server's own Exa key (2026-10-29)
+
+- [x] Server search key — sealed under `:server:exa`; a workspace's own Exa key wins, else the
+      server's, else `web_search` says where one goes. What leaves says "On the server's key"
+- [x] Tests: fallback order, info never carries the key, admin gate
+- [x] CLAUDE.md D105, PR
+
 # D105 · the server's own settings (2026-10-29)
 
 Settings → Server (the app admin's, D66) grows four server-wide settings. Hosted only; embedded

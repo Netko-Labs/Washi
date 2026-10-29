@@ -17,3 +17,11 @@ export const HOST_LISTS: Record<HostListKind, HostListCopy> = {
     empty: 'None yet: only the built-ins and each workspace’s own sites play.',
   },
 }
+
+export const SEARCH_KEY_COPY = {
+  title: 'Web search',
+  desc: 'Workspaces without an Exa key of their own search the web on this one. A workspace’s own key always wins.',
+  lent: 'Lent to every workspace',
+  none: 'None',
+  blurb: 'One Exa key for every workspace on this server, encrypted on it',
+} as const

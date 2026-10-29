@@ -163,6 +163,8 @@ export interface ModelMenuProps {
 export interface OutsideCardProps {
   approvalMode: ApprovalMode
   searchKey: SearchKeyState | null
+  /** The server lends its Exa key to a workspace without one. */
+  serverSearchKey: boolean
   onApprovalMode: (mode: ApprovalMode) => Promise<unknown>
   onConnect: () => void
   onRemove: () => Promise<unknown>

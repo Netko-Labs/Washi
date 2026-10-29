@@ -47,6 +47,7 @@ export function AgentTab({ part }: AgentTabProps) {
         <OutsideCard
           approvalMode={settings.approvalMode}
           searchKey={searchKey}
+          serverSearchKey={settings.serverSearchKey}
           onApprovalMode={settings.setApprovalMode}
           onConnect={() => setDialog('exa')}
           onRemove={settings.removeSearchKey}
