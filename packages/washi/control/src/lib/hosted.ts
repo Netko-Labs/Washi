@@ -5,6 +5,7 @@ import type {
   InstanceStore,
   Integration,
   SecretStore,
+  TokenStore,
   WorkspaceRef,
 } from '@washi/trpc'
 
@@ -21,6 +22,7 @@ import { type ControlDB, createControlDb } from './client'
 import { open, seal } from './crypto'
 import { isInstanceAdmin, setSignupMode, signupMode } from './instance'
 import { createStorageStore } from './storage'
+import { createTokenStore } from './tokens'
 import type { ControlPlaneOptions, HostedStorageStore } from './types'
 
 const AUTH_PREFIX = '/api/auth'
@@ -30,6 +32,7 @@ export interface HostedControlPlane extends ControlPlane {
   secrets: SecretStore
   instance: InstanceStore
   storage: HostedStorageStore
+  tokens: TokenStore
   /** Decrypted, for the agent host only — never for a route. */
   agentKey(workspaceId: string): Promise<AgentCredentialOut | null>
   setAgentKey(
@@ -86,6 +89,7 @@ export function createHostedControlPlane(options: ControlPlaneOptions): HostedCo
       setSignup: (mode) => setSignupMode(db, mode),
     },
     storage: createStorageStore(db, options.masterKey),
+    tokens: createTokenStore(db),
 
     async authenticate(request) {
       const result = await auth.api.getSession({ headers: request.headers })

@@ -1,4 +1,5 @@
 export {
+  accessToken,
   account,
   instanceAdmin,
   instanceSetting,

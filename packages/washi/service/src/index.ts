@@ -33,6 +33,13 @@ export {
 } from './agents/lib'
 export type { AgentPort, ModelChoice, ProviderId, ToolGate } from './agents/ports'
 export { defaultModelFor, LAST_RESORT_MODELS, PREFERRED_MODELS } from './agents/ports'
+export {
+  type Capability,
+  type CapabilityContext,
+  commentCapabilities,
+  pageCapabilities,
+  tableCapabilities,
+} from './capabilities'
 export { LOCAL_AUTHOR } from './comments/constants'
 export { CommentError, postComment, removeComment, resolveThread } from './comments/service'
 export {

@@ -26,6 +26,7 @@
     "@washi/control": "workspace:*",
     "@washi/domain": "workspace:*",
     "@washi/ink": "workspace:*",
+    "@washi/mcp": "workspace:*",
     "@washi/paper": "workspace:*",
     "@washi/runtime": "workspace:*",
     "@washi/service": "workspace:*",

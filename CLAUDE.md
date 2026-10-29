@@ -469,6 +469,18 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   `onRecordWrite`): one QuickJS per query with every function defined once, 20 ms per call, values in
   and a value out — no rows, state or network. A function gone, slow or throwing makes that cell null,
   never the query fail. The engine (`scripts/engine.ts`) is shared with automations and loaded at open.
+- **Outside agents work a workspace over MCP (D101).** `/mcp/$workspaceId` (studio route, `@washi/mcp`
+  `answerMcp`: Streamable HTTP, stateless, JSON answers) serves one member in one workspace. Auth is a
+  personal access token (`washi_pat_…`, control plane `access_token`, kept only as its SHA-256, last
+  four shown; `tokens.list/create/revoke`, any member for themself; Settings → Account → Agents shows
+  the address and the `claude mcp add` line once). A token speaks only for its workspace and only while
+  its person is a member; anything else is a 401 that says nothing about the workspace. The tools are
+  the **capability table** (`service/capabilities`: `pageCapabilities`, `tableCapabilities` —
+  the same set Washi's Claude and AI SDK ports now build from, signed `washi` there — plus
+  `commentCapabilities`, MCP only: comment on a page or a row by `recordId`, its row page). Over MCP a
+  row write is signed by the member's id and a page write is a person's (`editedBy` null); reads go
+  through `readableSet`; no fetch, web search or hanko verbs. Each write emits `workspaceChanged`, so
+  open pages refetch. Embedded has no token store, so no MCP.
 - **An embed is https and listed (D92).** `<Embed src title ratio height>`: the registry refuses http;
   a built-in provider (`EMBED_PROVIDERS` — YouTube via youtube-nocookie, Vimeo, Spotify, Loom, Figma,
   CodePen, CodeSandbox, Miro, Google Maps, Indify) turns its page URL into its player and always plays;

@@ -1,0 +1,24 @@
+{
+  "name": "@washi/mcp",
+  "license": "AGPL-3.0-only",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "check-types": "tsgo -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "@washi/domain": "workspace:*",
+    "@washi/repository": "workspace:*",
+    "@washi/service": "workspace:*",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@washi/typescript-config": "workspace:*",
+    "@types/bun": "latest"
+  }
+}

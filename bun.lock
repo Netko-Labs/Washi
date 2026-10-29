@@ -114,6 +114,7 @@
         "@washi/control": "workspace:*",
         "@washi/domain": "workspace:*",
         "@washi/ink": "workspace:*",
+        "@washi/mcp": "workspace:*",
         "@washi/paper": "workspace:*",
         "@washi/runtime": "workspace:*",
         "@washi/service": "workspace:*",
@@ -245,6 +246,21 @@
         "@washi/ink": "workspace:*",
         "drizzle-orm": "^0.45.2",
         "drizzle-zod": "^0.8.3",
+        "zod": "^4.4.3",
+      },
+      "devDependencies": {
+        "@types/bun": "latest",
+        "@washi/typescript-config": "workspace:*",
+      },
+    },
+    "packages/washi/mcp": {
+      "name": "@washi/mcp",
+      "version": "0.1.0",
+      "dependencies": {
+        "@modelcontextprotocol/sdk": "^1.30.0",
+        "@washi/domain": "workspace:*",
+        "@washi/repository": "workspace:*",
+        "@washi/service": "workspace:*",
         "zod": "^4.4.3",
       },
       "devDependencies": {
@@ -944,6 +960,8 @@
     "@washi/hanko": ["@washi/hanko@workspace:packages/shared/hanko"],
 
     "@washi/ink": ["@washi/ink@workspace:packages/shared/ink"],
+
+    "@washi/mcp": ["@washi/mcp@workspace:packages/washi/mcp"],
 
     "@washi/mihon": ["@washi/mihon@workspace:apps/mihon"],
 

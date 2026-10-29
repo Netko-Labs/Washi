@@ -1,5 +1,6 @@
 import { z } from 'zod'
-import { adminProcedure, router, SIGNUP_MODES } from '../../init'
+import { adminProcedure, router } from '../../init'
+import { SIGNUP_MODES } from '../../shared/instance'
 
 export const instanceMutations = router({
   setSignup: adminProcedure

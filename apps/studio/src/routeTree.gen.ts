@@ -15,6 +15,7 @@ import { Route as NewRouteImport } from './routes/new'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as WorkspacesRouteImport } from './routes/workspaces'
 import { Route as ApiHealthRouteImport } from './routes/api/health'
+import { Route as McpWorkspaceIdRouteImport } from './routes/mcp.$workspaceId'
 import { Route as WWorkspaceIdRouteImport } from './routes/w/$workspaceId'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiFilesSplatRouteImport } from './routes/api/files.$'
@@ -61,6 +62,11 @@ const WorkspacesRoute = WorkspacesRouteImport.update({
 const ApiHealthRoute = ApiHealthRouteImport.update({
   id: '/api/health',
   path: '/api/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const McpWorkspaceIdRoute = McpWorkspaceIdRouteImport.update({
+  id: '/mcp/$workspaceId',
+  path: '/mcp/$workspaceId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const WWorkspaceIdRoute = WWorkspaceIdRouteImport.update({
@@ -158,6 +164,7 @@ export interface FileRoutesByFullPath {
   '/sign-in': typeof SignInRoute
   '/workspaces': typeof WorkspacesRoute
   '/api/health': typeof ApiHealthRoute
+  '/mcp/$workspaceId': typeof McpWorkspaceIdRoute
   '/w/$workspaceId': typeof WWorkspaceIdRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/files/$': typeof ApiFilesSplatRoute
@@ -183,6 +190,7 @@ export interface FileRoutesByTo {
   '/sign-in': typeof SignInRoute
   '/workspaces': typeof WorkspacesRoute
   '/api/health': typeof ApiHealthRoute
+  '/mcp/$workspaceId': typeof McpWorkspaceIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/files/$': typeof ApiFilesSplatRoute
   '/api/share/$': typeof ApiShareSplatRoute
@@ -208,6 +216,7 @@ export interface FileRoutesById {
   '/sign-in': typeof SignInRoute
   '/workspaces': typeof WorkspacesRoute
   '/api/health': typeof ApiHealthRoute
+  '/mcp/$workspaceId': typeof McpWorkspaceIdRoute
   '/w/$workspaceId': typeof WWorkspaceIdRouteWithChildren
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/files/$': typeof ApiFilesSplatRoute
@@ -235,6 +244,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/workspaces'
     | '/api/health'
+    | '/mcp/$workspaceId'
     | '/w/$workspaceId'
     | '/api/auth/$'
     | '/api/files/$'
@@ -260,6 +270,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/workspaces'
     | '/api/health'
+    | '/mcp/$workspaceId'
     | '/api/auth/$'
     | '/api/files/$'
     | '/api/share/$'
@@ -284,6 +295,7 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/workspaces'
     | '/api/health'
+    | '/mcp/$workspaceId'
     | '/w/$workspaceId'
     | '/api/auth/$'
     | '/api/files/$'
@@ -310,6 +322,7 @@ export interface RootRouteChildren {
   SignInRoute: typeof SignInRoute
   WorkspacesRoute: typeof WorkspacesRoute
   ApiHealthRoute: typeof ApiHealthRoute
+  McpWorkspaceIdRoute: typeof McpWorkspaceIdRoute
   WWorkspaceIdRoute: typeof WWorkspaceIdRouteWithChildren
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiFilesSplatRoute: typeof ApiFilesSplatRoute
@@ -360,6 +373,13 @@ declare module '@tanstack/react-router' {
       path: '/api/health'
       fullPath: '/api/health'
       preLoaderRoute: typeof ApiHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp/$workspaceId': {
+      id: '/mcp/$workspaceId'
+      path: '/mcp/$workspaceId'
+      fullPath: '/mcp/$workspaceId'
+      preLoaderRoute: typeof McpWorkspaceIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/w/$workspaceId': {
@@ -523,6 +543,7 @@ const rootRouteChildren: RootRouteChildren = {
   SignInRoute: SignInRoute,
   WorkspacesRoute: WorkspacesRoute,
   ApiHealthRoute: ApiHealthRoute,
+  McpWorkspaceIdRoute: McpWorkspaceIdRoute,
   WWorkspaceIdRoute: WWorkspaceIdRouteWithChildren,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiFilesSplatRoute: ApiFilesSplatRoute,

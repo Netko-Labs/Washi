@@ -11,6 +11,7 @@ export type ApprovalMode = 'ask' | 'auto'
 export type SettingsTab =
   | 'profile'
   | 'preferences'
+  | 'agents'
   | 'general'
   | 'people'
   | 'storage'
