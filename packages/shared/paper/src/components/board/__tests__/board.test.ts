@@ -76,3 +76,26 @@ describe('a column head', () => {
     expect(headCount(rows, undefined)).toBe('2')
   })
 })
+
+describe('columns no page named', () => {
+  test('follow the column’s own order, empty steps included; an off-list value comes last', () => {
+    const cards = [
+      { id: 'a', status: 'In review', rank: 1 },
+      { id: 'b', status: 'Done', rank: 1 },
+      { id: 'c', status: 'Archived', rank: 1 },
+    ]
+    const steps = ['Backlog', 'In progress', 'In review', 'Done']
+    expect(names(boardColumns(cards, {}, 'status', 'rank', undefined, steps))).toEqual([
+      'Backlog:',
+      'In progress:',
+      'In review:a',
+      'Done:b',
+      'Archived:c',
+    ])
+    expect(names(boardColumns(cards, {}, 'status', 'rank', undefined))).toEqual([
+      'In review:a',
+      'Done:b',
+      'Archived:c',
+    ])
+  })
+})
