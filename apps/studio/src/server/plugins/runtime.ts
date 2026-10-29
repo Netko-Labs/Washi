@@ -36,7 +36,8 @@ function serveThroughShutdown(booting: ReturnType<typeof washiRuntime>, drain: (
   }
   for (const closer of closers) process.off('SIGTERM', closer)
   process.once('SIGTERM', () => {
-    void booting.then((booted) => booted.stopClock())
+    // A runtime that never booted has no clock to stop, and its failure was already said.
+    booting.then((booted) => booted.stopClock()).catch(() => undefined)
     setTimeout(() => {
       drain()
       for (const closer of closers) closer('SIGTERM')
