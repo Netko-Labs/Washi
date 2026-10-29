@@ -61,6 +61,7 @@ export type {
   CellKind,
   DataContextValue,
   Row,
+  TableLook,
 } from './data'
 export type {
   BentoProps,

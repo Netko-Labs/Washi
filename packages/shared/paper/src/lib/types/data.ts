@@ -1,4 +1,4 @@
-import type { Scalar } from '@washi/ink'
+import type { Scalar, TableSpec } from '@washi/ink'
 
 export type Row = Record<string, Scalar>
 
@@ -23,4 +23,11 @@ export interface DataContextValue {
   tables: Record<string, Row[]>
   version: number
   refresh: () => void
+}
+
+/** What a view knows of its table beyond the rows: its columns and who a person cell names. */
+export interface TableLook {
+  spec: TableSpec | null
+  /** Null when the host cannot say who is on the team — then nobody is named, nor called gone. */
+  people: { id: string; name: string }[] | null
 }

@@ -19,13 +19,17 @@ export function rankBetween(items: Row[], before: string | null, rank: string): 
 }
 
 /** Count, plus the column's total when `meta` is numeric — points per column, or money in a stage. */
-export function headCount(items: Row[], meta: string | undefined, locale?: string): string {
+export function headCount(
+  items: Row[],
+  meta: string | undefined,
+  shown: (total: number) => string,
+): string {
   if (!meta || !items.some((row) => typeof row[meta] === 'number')) return String(items.length)
   const total = items.reduce(
     (sum, row) => sum + (typeof row[meta] === 'number' ? (row[meta] as number) : 0),
     0,
   )
-  return `${items.length} · ${total.toLocaleString(locale)}`
+  return `${items.length} · ${shown(total)}`
 }
 
 export function substitute(action: ActionRef, group: string): ActionRef {

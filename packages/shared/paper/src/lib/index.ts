@@ -6,6 +6,7 @@ export { useHistory } from './hooks/use-history'
 export { NowContext, useNow } from './hooks/use-now'
 export { useRunAction } from './hooks/use-run-action'
 export { useSelectOptions } from './hooks/use-select-options'
+export { useTableSpec } from './hooks/use-table-spec'
 export { formatNumber } from './numbers'
 export { ratioOf } from './ratio'
 export {

@@ -72,8 +72,11 @@ describe('where a drop writes', () => {
 describe('a column head', () => {
   test('counts, and sums a numeric meta in the reader’s numbers — no unit it cannot know', () => {
     const rows = [{ value: 48000 }, { value: 125000 }]
-    expect(headCount(rows, 'value', 'en-US')).toBe('2 · 173,000')
-    expect(headCount(rows, undefined)).toBe('2')
+    const plain = (total: number) => total.toLocaleString('en-US')
+    expect(headCount(rows, 'value', plain)).toBe('2 · 173,000')
+    expect(headCount(rows, undefined, plain)).toBe('2')
+    const money = (total: number) => `$${total.toLocaleString('en-US')}`
+    expect(headCount(rows, 'value', money)).toBe('2 · $173,000')
   })
 })
 

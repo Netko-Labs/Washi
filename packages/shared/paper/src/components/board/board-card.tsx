@@ -30,19 +30,19 @@ export function BoardCard({
       tabIndex={actions.openable ? 0 : undefined}
       data-openable={actions.openable ? '' : undefined}
     >
-      {kicker && <div className="wsx-board-card-kicker">{actions.shown(row[kicker])}</div>}
+      {kicker && <div className="wsx-board-card-kicker">{actions.shown(row[kicker], kicker)}</div>}
       <div className="wsx-board-card-title">{cell(row[titleKey]) || 'Untitled'}</div>
       {(badge || meta || avatar) && (
         <div className="wsx-board-card-meta">
           {badge &&
             cellItems(row, badge).map((item) => (
               <Badge key={String(item)} size="sm" tone={toneOf(String(item))}>
-                {actions.shown(item)}
+                {actions.shown(item, badge)}
               </Badge>
             ))}
-          {meta && <span className="wsx-board-card-note">{actions.shown(row[meta])}</span>}
-          {avatar && typeof row[avatar] === 'string' && row[avatar] && (
-            <Avatar label={row[avatar] as string} size="sm" />
+          {meta && <span className="wsx-board-card-note">{actions.shown(row[meta], meta)}</span>}
+          {avatar && actions.isSpecRead && typeof row[avatar] === 'string' && row[avatar] && (
+            <Avatar label={actions.shown(row[avatar], avatar)} size="sm" />
           )}
         </div>
       )}
