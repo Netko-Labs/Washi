@@ -16,7 +16,7 @@ export function StorageForm({ isReplacing, onSaved }: StorageFormProps) {
       title={isReplacing ? 'Use another bucket' : 'Use your own bucket'}
       desc={STORAGE_COPY.formDesc}
     >
-      <div className="grid gap-3 px-4 py-3 sm:grid-cols-2">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,220px),1fr))] gap-3 px-4 py-3">
         {STORAGE_FIELDS.map((field) => (
           <label key={field.key} className="grid gap-1.5 text-[12.5px]">
             <span>{field.label}</span>

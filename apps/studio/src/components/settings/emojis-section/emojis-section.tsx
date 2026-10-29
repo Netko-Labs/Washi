@@ -22,7 +22,7 @@ export function EmojisSection() {
         }
       >
         {emojis.length > 0 && (
-          <ul className="grid grid-cols-2 gap-1.5 border-border border-t p-3 sm:grid-cols-3">
+          <ul className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-1.5 border-border border-t p-3">
             {emojis.map((emoji) => (
               <EmojiCard
                 key={emoji.id}

@@ -57,7 +57,7 @@ export function RoutinesPage({ workspaceId }: RoutinesPageProps) {
         <h2 className="mt-12 mb-3 font-medium text-[12px] text-muted-foreground uppercase tracking-[0.06em]">
           Start from a template
         </h2>
-        <div className="grid gap-2.5 sm:grid-cols-2">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,220px),1fr))] gap-2.5">
           {ROUTINE_TEMPLATES.map((template) => (
             <Link
               key={template.key}
