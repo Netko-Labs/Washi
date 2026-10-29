@@ -30,7 +30,10 @@ export function DatabaseTable({ db, view, empty }: ViewProps) {
         <thead>
           <tr>
             {columns.map((column) => (
-              <th key={column.name} data-num={column.type === 'number' || undefined}>
+              <th
+                key={column.name}
+                data-num={column.type === 'number' || column.format !== undefined || undefined}
+              >
                 <span className="wsx-db-th">
                   <PropertyIcon type={column.type} />
                   {tableLabel(column.name)}

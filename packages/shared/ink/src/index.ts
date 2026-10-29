@@ -24,6 +24,8 @@ export {
   type InkMutation,
   type InkQuery,
   mutationSchema,
+  type NumberFormat,
+  numberFormatSchema,
   type ParamRef,
   paramRefSchema,
   type QueryResult,

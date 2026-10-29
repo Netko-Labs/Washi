@@ -35,6 +35,13 @@ export const statusGroupsSchema = z.object({
 })
 export type StatusGroups = z.infer<typeof statusGroupsSchema>
 
+/** How a number reads (D104): `percent` (a ratio, 0.25 → 25%) or a currency code (`USD`, `EUR`). */
+export const numberFormatSchema = z.union([
+  z.literal('percent'),
+  z.string().regex(/^[A-Z]{3}$/, 'is percent or a three-letter currency code, like USD'),
+])
+export type NumberFormat = z.infer<typeof numberFormatSchema>
+
 export const columnSpecSchema = z
   .object({
     name: identifier('column'),
@@ -51,6 +58,7 @@ export const columnSpecSchema = z
     expr: z.string().min(1).max(500).optional(),
     /** A `rollup`: one aggregate over another table's rows that point at this one (D74). */
     rollup: z.lazy(() => rollupSpecSchema).optional(),
+    format: numberFormatSchema.optional(),
   })
   .superRefine((column, ctx) => {
     // Stored specs are re-parsed on every read: a rule added here must not orphan an old table.
@@ -67,6 +75,9 @@ export const columnSpecSchema = z
     }
     if (column.type === 'rollup' && column.rollup === undefined) {
       ctx.addIssue({ code: 'custom', path: ['rollup'], message: 'a rollup column needs rollup' })
+    }
+    if (column.format !== undefined && !['number', 'formula', 'rollup'].includes(column.type)) {
+      ctx.addIssue({ code: 'custom', path: ['format'], message: 'only a number reads in a format' })
     }
     if (column.type !== 'rollup' && column.rollup !== undefined) {
       ctx.addIssue({ code: 'custom', path: ['rollup'], message: 'only a rollup column has rollup' })

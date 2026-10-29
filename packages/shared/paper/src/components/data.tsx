@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { listCell, ratioOf, styled, toneOf, useBind, useExprValue } from '../lib'
+import { formatNumber, listCell, ratioOf, styled, toneOf, useBind, useExprValue } from '../lib'
 import type { BlockProps, Row } from '../lib/types'
 import { usePaperHost } from '../provider'
 import type { BindQuery } from '../registry'
@@ -137,14 +137,9 @@ export function Stat({
   const host = usePaperHost()
   const computed = useExprValue(expr)
   const raw = expr ? computed : (value ?? null)
-  const asNumber: Intl.NumberFormatOptions = currency
-    ? { style: 'currency', currency }
-    : format === 'percent'
-      ? { style: 'percent', maximumFractionDigits: 1 }
-      : { maximumFractionDigits: 2 }
   const shown =
     typeof raw === 'number'
-      ? new Intl.NumberFormat(host.locale, asNumber).format(raw)
+      ? formatNumber(raw, host.locale, currency ?? (format === 'percent' ? 'percent' : undefined))
       : raw === null
         ? '—'
         : String(raw)

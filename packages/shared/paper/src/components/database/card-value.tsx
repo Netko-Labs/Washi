@@ -1,3 +1,4 @@
+import { formatNumber } from '../../lib'
 import { usePaperHost } from '../../provider'
 import { ChoiceLook } from './choice-cell'
 import { type CardValueProps, choicesFor, dateLabel } from './lib'
@@ -39,7 +40,7 @@ export function CardValue({ db, column, value }: CardValueProps) {
   }
   if (column.type === 'boolean') return <span className="wsx-db-card-text">✓ {column.name}</span>
   if (typeof value === 'number') {
-    return <span className="wsx-db-card-text">{value.toLocaleString(locale)}</span>
+    return <span className="wsx-db-card-text">{formatNumber(value, locale, column.format)}</span>
   }
   return <span className="wsx-db-card-text">{String(value)}</span>
 }

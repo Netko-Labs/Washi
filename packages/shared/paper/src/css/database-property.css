@@ -226,3 +226,46 @@
   opacity: 0.5;
   cursor: progress;
 }
+
+.wsx-db-formats {
+  margin: 0;
+  border: 0;
+  padding: 2px 0 0;
+  box-shadow: inset 0 1px var(--border);
+}
+/* A floated legend is laid out in the flow, not across the fieldset's top edge. */
+.wsx-db-formats > legend {
+  float: left;
+  width: 100%;
+}
+.wsx-db-format-row {
+  clear: both;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0 8px 8px;
+}
+.wsx-db-format {
+  min-width: 32px;
+  padding: 3px 8px;
+  text-align: center;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+.wsx-db-format input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.wsx-db-format:has(input:checked) {
+  border-color: transparent;
+  background: color-mix(in oklab, var(--accent) 12%, transparent);
+  color: var(--tone-accent-text);
+  font-weight: 500;
+}
+.wsx-db-format:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}

@@ -3,7 +3,7 @@ import type { PropertyDraft, PropertyPanelProps, PropertyStatus } from '../types
 import { columnKey, needsOptions, propertyProblem } from '../utils'
 import { PROPERTY_TYPES } from '../values'
 
-const BLANK: PropertyDraft = { label: '', type: 'text', options: [], typing: '' }
+const BLANK: PropertyDraft = { label: '', type: 'text', options: [], typing: '', format: '' }
 
 /** A new property as it is being named and typed, refused in words until it can land. */
 export function usePropertyDraft({ onAdd, taken, onDone }: PropertyPanelProps) {
@@ -32,7 +32,12 @@ export function usePropertyDraft({ onAdd, taken, onDone }: PropertyPanelProps) {
     if (problem) return setStatus({ busy: false, error: problem })
     setStatus({ busy: true, error: null })
     try {
-      await onAdd(columnKey(ready.label), ready.type, needsOptions(ready.type) ? ready.options : [])
+      await onAdd(
+        columnKey(ready.label),
+        ready.type,
+        needsOptions(ready.type) ? ready.options : [],
+        ready.type === 'number' && ready.format ? ready.format : undefined,
+      )
       onDone()
     } catch (error) {
       setStatus({ busy: false, error: error instanceof Error ? error.message : String(error) })

@@ -1,4 +1,4 @@
-import type { PropertyType } from './types'
+import type { NumberFormatChoice, PropertyType } from './types'
 
 export const PROPERTY_TYPES: PropertyType[] = [
   { type: 'text', label: 'Text', hint: 'Words, a name, a note' },
@@ -10,6 +10,16 @@ export const PROPERTY_TYPES: PropertyType[] = [
   { type: 'person', label: 'Person', hint: 'Someone in the workspace' },
   { type: 'boolean', label: 'Checkbox', hint: 'Yes or no' },
   { type: 'url', label: 'URL', hint: 'A link' },
+]
+
+/** The formats a new number offers; Washi may write any currency code. */
+export const NUMBER_FORMATS: NumberFormatChoice[] = [
+  { value: '', label: '1,234', name: 'Plain number' },
+  { value: 'percent', label: '%', name: 'Percent' },
+  { value: 'USD', label: '$', name: 'US dollar' },
+  { value: 'EUR', label: '€', name: 'Euro' },
+  { value: 'GBP', label: '£', name: 'Pound sterling' },
+  { value: 'JPY', label: '¥', name: 'Yen' },
 ]
 
 export const PROPERTY_PANEL_WIDTH = 280

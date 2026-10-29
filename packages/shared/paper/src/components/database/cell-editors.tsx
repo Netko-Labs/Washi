@@ -1,3 +1,5 @@
+import { formatNumber } from '../../lib'
+import { usePaperHost } from '../../provider'
 import { type ChoiceCellProps, hueAt, type ScalarCellProps } from './lib'
 
 /** Text, number and URL: typed in place, written when the cell is left. */
@@ -83,6 +85,7 @@ export function ListCell({ column, value, commit, choices }: ChoiceCellProps) {
 
 /** A formula's or rollup's value, read-only: it is computed on read, never typed. */
 export function FormulaCell({ column, value }: ScalarCellProps) {
+  const { locale } = usePaperHost()
   const shown =
     value === null || value === undefined
       ? '—'
@@ -91,11 +94,12 @@ export function FormulaCell({ column, value }: ScalarCellProps) {
           ? '✓'
           : '—'
         : typeof value === 'number'
-          ? value.toLocaleString()
+          ? formatNumber(value, locale, column.format)
           : String(value)
   return (
     <span
       className="wsx-db-formula"
+      data-num={typeof value === 'number' || undefined}
       title={column.expr ?? (column.rollup && `${column.rollup.fn} of ${column.rollup.table}`)}
       data-formula
     >

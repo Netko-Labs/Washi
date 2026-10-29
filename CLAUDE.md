@@ -238,7 +238,9 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   against `paperRegistry`), autosaves only a valid draft through `sheets.update` with
   `baseVersion`, and holds Done while the draft has errors. `state`, `expr`, `bind` and `action`
   are a page's behaviour; a page's own code (D100) is what runs, sandboxed. `/` → Page code opens it.
-- **Tables are Notion databases.** Properties: `status` (todo · doing · done groups), `select`,
+- **Tables are Notion databases.** A number, formula or rollup may carry `format` (D104): `percent`
+  or a currency code — database cells, cards and Stats read it in the reader's locale
+  (`formatNumber`); the property panel offers it for a new number. Properties: `status` (todo · doing · done groups), `select`,
   `multi_select`, `person` (member id), `date` (`start/end` for a range), `url`, `relation` (record
   ids), `formula` (D73: an `expr` over its own row in the page grammar — `month(date)`, `usd * fx_rate`,
   `when(paid, false, days(now(), due) < 0)` — computed on every read by `ink-formulas.ts`, never

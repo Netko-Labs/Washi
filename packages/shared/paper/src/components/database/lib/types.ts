@@ -76,6 +76,7 @@ export type AddProperty = (
   name: string,
   type: ColumnSpec['type'],
   options: string[],
+  format?: string,
 ) => Promise<void>
 
 export interface AddPropertyProps {
@@ -92,6 +93,8 @@ export interface PropertyDraft {
   type: ColumnSpec['type']
   options: string[]
   typing: string
+  /** A number's format: '' plain, `percent`, or a currency code. */
+  format: string
 }
 
 export interface PropertyStatus {
@@ -102,6 +105,14 @@ export interface PropertyStatus {
 export interface PropertyOptionsProps {
   draft: PropertyDraft
   edit: (patch: Partial<PropertyDraft>) => void
+}
+
+export type PropertyFormatProps = PropertyOptionsProps
+
+export interface NumberFormatChoice {
+  value: string
+  label: string
+  name: string
 }
 
 export interface PropertyType {

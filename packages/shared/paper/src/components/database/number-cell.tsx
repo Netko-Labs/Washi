@@ -1,8 +1,9 @@
 import { useState } from 'react'
+import { formatNumber } from '../../lib'
 import { usePaperHost } from '../../provider'
 import type { ScalarCellProps } from './lib'
 
-/** Reads "3,550,000" in the vault's locale; a press gives the plain number to type over. */
+/** Reads "3,550,000" (or "$3,550,000.00") in the vault's locale; a press gives the plain number. */
 export function NumberCell({ column, value, commit }: ScalarCellProps) {
   const { locale } = usePaperHost()
   const [editing, setEditing] = useState(false)
@@ -19,7 +20,7 @@ export function NumberCell({ column, value, commit }: ScalarCellProps) {
         {number === null ? (
           <span className="wsx-db-placeholder">Empty</span>
         ) : (
-          number.toLocaleString(locale, { maximumFractionDigits: 2 })
+          formatNumber(number, locale, column.format)
         )}
       </button>
     )
