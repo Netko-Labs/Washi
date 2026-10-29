@@ -1,8 +1,14 @@
-import type { ReactNode } from 'react'
 import { formatNumber, ratioOf, styled, useBind, useExprValue } from '../lib'
-import type { BlockProps, Row } from '../lib/types'
+import type {
+  AvatarProps,
+  BadgeProps,
+  BlockProps,
+  ProgressProps,
+  RepeatProps,
+  StatProps,
+  StepProps,
+} from '../lib/types'
 import { usePaperHost } from '../provider'
-import type { BindQuery } from '../registry'
 import { RowProvider } from '../state'
 import { Chart } from './chart'
 import { Bound } from './states'
@@ -11,12 +17,7 @@ import { Table } from './table'
 export { Chart, Table }
 
 /** Renders children once per row with `$row.column` in scope. The power multiplier. */
-export function Repeat({
-  bind,
-  empty,
-  children,
-  ...rest
-}: BlockProps & { bind: BindQuery; empty?: string; children: (row: Row) => ReactNode }) {
+export function Repeat({ bind, empty, children, ...rest }: RepeatProps) {
   const state = useBind(bind)
   return (
     <div {...styled(rest, 'wsx-repeat wsx-stack')}>
@@ -35,24 +36,7 @@ export function Repeat({
 
 const TREND_GLYPH = { up: '↑', down: '↓', flat: '→' } as const
 
-export function Stat({
-  value,
-  expr,
-  label,
-  hint,
-  trend,
-  format,
-  currency,
-  ...rest
-}: BlockProps & {
-  value?: string | number
-  expr?: string
-  label: string
-  hint?: string
-  trend?: keyof typeof TREND_GLYPH
-  format?: 'number' | 'percent'
-  currency?: string
-}) {
+export function Stat({ value, expr, label, hint, trend, format, currency, ...rest }: StatProps) {
   const host = usePaperHost()
   const computed = useExprValue(expr)
   const raw = expr ? computed : (value ?? null)
@@ -82,12 +66,7 @@ export function Timeline({ children, ...rest }: BlockProps) {
   return <ol {...styled(rest, 'wsx-timeline')}>{children}</ol>
 }
 
-export function Step({
-  marker,
-  title,
-  children,
-  ...rest
-}: BlockProps & { marker: string; title?: string }) {
+export function Step({ marker, title, children, ...rest }: StepProps) {
   return (
     <li {...styled(rest, 'wsx-step')}>
       <span className="wsx-step-marker">{marker}</span>
@@ -99,12 +78,7 @@ export function Step({
   )
 }
 
-export function Progress({
-  value,
-  expr,
-  label,
-  ...rest
-}: BlockProps & { value?: number | string; expr?: string; label?: string }) {
+export function Progress({ value, expr, label, ...rest }: ProgressProps) {
   const computed = useExprValue(expr)
   const ratio = ratioOf(value, expr, computed)
   const isUnknown = ratio === null
@@ -132,12 +106,12 @@ export function Progress({
   )
 }
 
-export function Badge({ expr, children, ...rest }: BlockProps & { expr?: string }) {
+export function Badge({ expr, children, ...rest }: BadgeProps) {
   const computed = useExprValue(expr)
   return <span {...styled(rest, 'wsx-badge')}>{expr ? String(computed ?? '') : children}</span>
 }
 
-export function Avatar({ label, ...rest }: BlockProps & { label: string }) {
+export function Avatar({ label, ...rest }: AvatarProps) {
   const initials = label
     .split(/\s+/)
     .map((part) => part[0] ?? '')
