@@ -320,6 +320,16 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   chat on each ask and each finished turn; `searchChats`, matches marked ⟦ ⟧). A chat opens as a
   page at `/chats/$chatId` (the panel's `page` placement; the host's `onExpand` gives the panel ⤢);
   `/chats/new` is the store's `draft` — nothing is created until the first send.
+- **A chat page reads like Claude's (D111).** `/chats/$chatId` is the studio's own `ChatPage`
+  (`components/chats/chat-page`), not the panel: one 768px column, a slim bar (rename in place, ⋯
+  Rename · Delete), Washi's turns as prose under its mark, the person's as a bubble on the right.
+  `chatBlocks` folds a transcript into asks and turns: a run of tool calls is one receipt line in
+  `describeTool`'s words, past tense (`pastTense`), opened for each call; a page a turn made or
+  changed is a card, only while the reader's sheets store holds it. Approvals for this chat sit
+  inline. The composer is a card pinned under the column (the panel's `useComposer`, chips and
+  attach menu; Enter sends). `/chats/new` asks "What should we work on?" with the composer
+  mid-screen and starters named off the newest pages and table (`startersFor`; none → plain asks,
+  P3). The thread follows the end unless the reader scrolled up — then a ↓ New pill.
 - **Who pays for a turn.** A credential is `api_key` or `local_cli`. Embedded finds the
   person's installed `claude` (PATH is empty for a GUI app — known install paths too) and runs
   it via the Agent SDK's `pathToClaudeCodeExecutable` with **no** key in the env, so their own
