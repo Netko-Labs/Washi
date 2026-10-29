@@ -1,3 +1,25 @@
+# D100 · pages are programs — WSX as MDX-style JSX (2026-10-29)
+
+A page may open with `import`s and code; its markup takes `{expressions}`, `.map`, its own
+components and hooks. Literal markup stays data (indexed, shared, block-edited); code runs only in
+the reader's QuickJS. `<Script>` goes away, its pages migrated.
+
+Shape: imports + functions + `export`s = the page's module; other top-level statements + the final
+`<Sheet>` = `view()`, run each draw. Imports: `washi` (hooks), `washi/ui`, `date-fns` · `lodash-es` ·
+`zod`, `page:<id>` (another page's exports) — bundled on the server (`Bun.build`), so the sandbox
+still has no network.
+
+- [ ] A · wsx: `parse` reads a code page — `prelude`, `code` props, `{kind:'code'}` holes; static
+      pages byte-identical; serialize round-trips; validate skips code-valued props
+- [ ] B · compile: `compilePage` (Bun.build + allowlist + `page:` imports, cached), save check,
+      `pages.compile`, curated deps traced into `.output`
+- [ ] C · run: paper draws a code page through QuickJS — `h` calls local components, handlers →
+      actions, validated tree, re-run on state/rows/data; shared links draw the literal parts
+- [ ] D · hooks: useRows/useRow/useTable/useInsert/useUpdate/useDelete · useState (local)/
+      usePageState/useStored/useInterval/useNow · usePage/usePages/useMembers/useMe/useNavigate
+- [ ] E · migrate `<Script>` pages once (app meta), drop Script + ScriptBlock; code pages edit in
+      source mode; agent instructions, /learn + mihon, CLAUDE.md W1
+
 # Roadmap · layout, knowledge, scripting (2026-10-27)
 
 Specs were dropped for a rewrite (#118); this list is the plan until they return.

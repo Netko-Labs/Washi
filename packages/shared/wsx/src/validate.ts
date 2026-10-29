@@ -2,6 +2,7 @@ import type { z } from 'zod'
 import type { ComponentSpec, Diagnostic, WsxElement, WsxNode, WsxRegistry } from './types'
 
 const DEFAULT_BUDGET = { nodes: 400, binds: 8, exprs: 24 }
+const HANDLERS = new Set(['onPress', 'onClick'])
 
 interface Walk {
   registry: WsxRegistry
@@ -10,6 +11,7 @@ interface Walk {
   nodes: number
   binds: number
   exprs: number
+  components: Set<string>
 }
 
 function error(out: Diagnostic[], path: string, message: string) {
@@ -59,7 +61,7 @@ function checkChildren(node: WsxElement, spec: ComponentSpec, path: string, out:
   if (spec.children === 'none' && node.children.length > 0) {
     error(out, path, `<${node.name}> does not take children`)
   }
-  if (spec.children === 'text' && node.children.some((child) => child.kind !== 'text')) {
+  if (spec.children === 'text' && node.children.some((child) => child.kind === 'element')) {
     error(out, path, `<${node.name}> takes text children only`)
   }
 }
@@ -88,14 +90,35 @@ function checkPlacement(
   }
 }
 
+/**
+ * A prop written as code is checked by name here and by value once the page has run; a handler
+ * (`onPress`) is code by nature, and `key` only tells a `.map` its rows apart.
+ */
+function checkProps(node: WsxElement, spec: ComponentSpec, nodePath: string, walk: Walk) {
+  const written = Object.keys(node.code ?? {}).filter((key) => !HANDLERS.has(key) && key !== 'key')
+  const { key: _key, ...props } = node.props
+  const probe = { ...props, ...Object.fromEntries(written.map((key) => [key, null])) }
+  const parsed = spec.props.safeParse(probe)
+  if (parsed.success) return
+  for (const issue of parsed.error.issues) {
+    if (written.includes(String(issue.path[0]))) continue
+    error(walk.out, nodePath, propIssue(node.name, spec, walk.registry, issue, probe))
+  }
+}
+
 function visit(node: WsxNode, ancestors: string[], path: string, walk: Walk) {
-  if (node.kind === 'text') return
+  if (node.kind !== 'element') return
   const nodePath = path ? `${path} > ${node.name}` : node.name
   walk.nodes += 1
   if ('bind' in node.props) walk.binds += 1
   if ('expr' in node.props) walk.exprs += 1
 
+  const next = [...ancestors, node.name]
   const spec = walk.registry.components[node.name]
+  if (!spec && walk.components.has(node.name)) {
+    for (const child of node.children) visit(child, next, nodePath, walk)
+    return
+  }
   if (!spec) {
     error(
       walk.out,
@@ -105,16 +128,9 @@ function visit(node: WsxNode, ancestors: string[], path: string, walk: Walk) {
     return
   }
 
-  const parsed = spec.props.safeParse(node.props)
-  if (!parsed.success) {
-    for (const issue of parsed.error.issues) {
-      error(walk.out, nodePath, propIssue(node.name, spec, walk.registry, issue, node.props))
-    }
-  }
+  checkProps(node, spec, nodePath, walk)
   checkChildren(node, spec, nodePath, walk.out)
   checkPlacement(node, spec, ancestors, nodePath, walk)
-
-  const next = [...ancestors, node.name]
   for (const child of node.children) visit(child, next, nodePath, walk)
 }
 
@@ -136,9 +152,20 @@ function checkBudget(walk: Walk) {
 
 /** Schema-validate a parsed tree against a component registry. Errors name path, prop and alternatives. */
 export function validate(root: WsxElement, registry: WsxRegistry): Diagnostic[] {
-  const walk: Walk = { registry, out: [], seen: new Map(), nodes: 0, binds: 0, exprs: 0 }
+  const walk: Walk = {
+    registry,
+    out: [],
+    seen: new Map(),
+    nodes: 0,
+    binds: 0,
+    exprs: 0,
+    components: new Set(root.prelude?.components),
+  }
   if (root.name !== 'Sheet') {
     error(walk.out, root.name, 'the root element must be <Sheet>')
+  }
+  if (root.code) {
+    error(walk.out, 'Sheet', "a <Sheet>'s own props are literal — its look and who reads it")
   }
   visit(root, [], '', walk)
   checkBudget(walk)

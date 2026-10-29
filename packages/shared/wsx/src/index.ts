@@ -1,3 +1,4 @@
+export { hasCode } from './code'
 export type {
   AggregateName,
   AggregateNode,
@@ -38,9 +39,11 @@ export type {
   ChildPolicy,
   ComponentSpec,
   Diagnostic,
+  WsxCode,
   WsxElement,
   WsxMissing,
   WsxNode,
+  WsxPrelude,
   WsxRegistry,
   WsxText,
   WsxValue,

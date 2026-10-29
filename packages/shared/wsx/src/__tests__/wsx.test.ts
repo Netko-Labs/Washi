@@ -35,15 +35,8 @@ describe('parse', () => {
     })
   })
 
-  test('rejects executable content', () => {
-    expect(() => parse('<Sheet title={window.alert("x")} />')).toThrow(WsxParseError)
-    expect(() => parse('<Sheet onClick={() => 1} />')).toThrow(WsxParseError)
-    expect(() => parse('<Sheet>{1 + 2}</Sheet>')).toThrow(WsxParseError)
-  })
-
-  test('rejects host elements, fragments, spreads', () => {
+  test('host elements and prop spreads are still refused', () => {
     expect(() => parse('<div>hi</div>')).toThrow(WsxParseError)
-    expect(() => parse('<><Sheet /></>')).toThrow(WsxParseError)
     expect(() => parse('<Sheet {...props} />')).toThrow(WsxParseError)
   })
 
@@ -134,9 +127,10 @@ describe('backtick strings', () => {
     expect(serialize(root)).toContain('{`line one\n  line <two>`}')
   })
 
-  test('one that interpolates is an expression, and refused', () => {
+  test('one that interpolates is code, kept as a hole', () => {
     const interpolated = ['<Sheet title="t"><Code>{`a $', '{b}`}</Code></Sheet>'].join('')
-    expect(() => parse(interpolated)).toThrow(WsxParseError)
+    const code = parse(interpolated).children[0]
+    expect(code?.kind === 'element' && code.children[0]?.kind).toBe('code')
   })
 })
 

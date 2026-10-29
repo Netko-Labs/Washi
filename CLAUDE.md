@@ -493,6 +493,14 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   sandboxed (scripts, same-origin, popups, presentation, forms). This list is not tsuru's fetch
   allowlist: one is what a reader's browser loads, the other what may leave the server. `/embed <url>`
   or an https address after `/` drops one in the editor.
+- **Pages become programs (D100, in progress — `tasks/todo.md`).** `parse` reads a page MDX-style:
+  code above the first line-start `<Sheet` whose code parses is `root.prelude` (`source` + the
+  capitalized names it binds, the page's own components); a non-literal prop is `element.code[prop]`
+  (its source), a non-literal child a `{ kind: 'code', source }` hole; literals stay data, so a page
+  of literals parses exactly as before. `validate` checks a code prop by name only, lets
+  `onPress`/`onClick`/`key` through and the prelude's components by; a `<Sheet>`'s own props stay
+  literal. `hasCode` says a page runs. Until it can, `checkSource` refuses code at save; the editor
+  opens a page with code in source mode.
 - WSX is inert data: registry primitives, literal props, the closed `expr` grammar only. Components
   own appearance (four enums: `variant tone size emphasis`); pages own content. Validation before
   persist and before render. Format reference: `/learn` and the registry specs.

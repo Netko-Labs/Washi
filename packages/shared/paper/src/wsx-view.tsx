@@ -81,14 +81,13 @@ function numberFootnotes(root: WsxElement): Map<WsxElement, number> {
   return numbers
 }
 
+/** A `{…}` hole draws nothing until the page has run and filled it. */
 function renderChildren(nodes: WsxNode[], ctx: Ctx): ReactNode[] {
-  return nodes.map((node, index) =>
-    node.kind === 'text' ? (
-      resolveRow(node.value, ctx.row)
-    ) : (
-      <Element key={index} node={node} ctx={ctx} />
-    ),
-  )
+  return nodes.map((node, index) => {
+    if (node.kind === 'code') return null
+    if (node.kind === 'text') return resolveRow(node.value, ctx.row)
+    return <Element key={index} node={node} ctx={ctx} />
+  })
 }
 
 const COMPONENTS: Record<string, ComponentType<never>> = {
