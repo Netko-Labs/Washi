@@ -18,4 +18,4 @@ export type {
   ChatTurnProps,
   Starter,
 } from './types'
-export { chatBlocks, greetingFor, pastTense, receiptSummary } from './utils'
+export { chatBlocks, greetingFor, pastTense, receiptSummary, trashedPages } from './utils'

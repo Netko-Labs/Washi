@@ -8,6 +8,7 @@ import {
   pastTense,
   receiptSummary,
   startersFor,
+  trashedPages,
 } from '../utils'
 import { GENERIC_STARTERS } from '../values'
 
@@ -165,5 +166,25 @@ describe('stick to bottom', () => {
   test('near the end counts as at the end', () => {
     expect(isNearBottom({ scrollTop: 560, scrollHeight: 1000, clientHeight: 400 })).toBe(true)
     expect(isNearBottom({ scrollTop: 300, scrollHeight: 1000, clientHeight: 400 })).toBe(false)
+  })
+})
+
+describe('trashed pages', () => {
+  test('only a finished delete offers Restore', () => {
+    const step = (status: 'completed' | 'failed' | 'in_progress', id: string) => ({
+      id,
+      name: 'sheet_delete',
+      input: { id },
+      status,
+      output: null,
+    })
+    expect(
+      trashedPages([
+        step('completed', 'a'),
+        step('failed', 'b'),
+        step('in_progress', 'c'),
+        { ...step('completed', 'd'), name: 'sheet_get' },
+      ]),
+    ).toEqual(['a'])
   })
 })

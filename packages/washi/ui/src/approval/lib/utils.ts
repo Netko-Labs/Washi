@@ -11,6 +11,7 @@ import {
   IconHistory,
   IconLink,
   IconMessageForward,
+  IconPencil,
   IconSearch,
   IconTable,
   IconTablePlus,
@@ -98,7 +99,22 @@ function describeTable(name: string, input: Record<string, unknown>): ToolDescri
 }
 
 /** Every Washi tool, in words. Unknown tools fall back to their name, de-snake-cased. */
-export function describeTool(name: string, input: unknown, titleOf: TitleOf): ToolDescription {
+/** A title the call itself returned — what names a page once it is gone from the store. */
+function outputTitle(output: string | null | undefined): string | null {
+  if (!output) return null
+  try {
+    return text(record(JSON.parse(output)).title)
+  } catch {
+    return null
+  }
+}
+
+export function describeTool(
+  name: string,
+  input: unknown,
+  titleOf: TitleOf,
+  output?: string | null,
+): ToolDescription {
   const args = record(input)
   const sheetTitle = () => {
     const id = text(args.id)
@@ -120,7 +136,7 @@ export function describeTool(name: string, input: unknown, titleOf: TitleOf): To
         preview: text(args.source),
       })
     case 'sheet_delete': {
-      const title = sheetTitle()
+      const title = sheetTitle() ?? outputTitle(output)
       return base({
         icon: IconTrash,
         action: title ? `Moved “${title}” to the trash` : 'Moved a page to the trash',
@@ -208,6 +224,8 @@ export function describeTool(name: string, input: unknown, titleOf: TitleOf): To
       })
     case 'db_row_activity':
       return base({ icon: IconHistory, action: 'Looked back through a row’s changes' })
+    case 'set_conversation_title':
+      return base({ icon: IconPencil, action: 'Named the chat', subject: text(args.title) })
     case 'chat_handover':
       return base({
         icon: IconMessageForward,

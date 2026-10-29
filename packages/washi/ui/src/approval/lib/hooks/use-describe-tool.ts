@@ -11,8 +11,8 @@ export function useDescribeTool() {
   const seen = useRef(new Map<string, string>())
   for (const sheet of sheets) seen.current.set(sheet.id, sheet.title)
   return useCallback(
-    (name: string, input: unknown) =>
-      describeTool(name, input, (id) => seen.current.get(id) ?? null),
+    (name: string, input: unknown, output?: string | null) =>
+      describeTool(name, input, (id) => seen.current.get(id) ?? null, output),
     [sheets],
   )
 }

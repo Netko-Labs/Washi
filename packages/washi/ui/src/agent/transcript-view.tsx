@@ -32,7 +32,6 @@ function DiffView({ diff }: DiffViewProps) {
 function ToolPill({ update, followups }: ToolPillProps) {
   const describe = useDescribeTool()
   if (update.kind !== 'tool_call') return null
-  const { icon: Icon, action, subject } = describe(update.title, update.input)
   const latest = followups.at(-1)
   const status = latest?.kind === 'tool_call_update' ? latest.status : update.status
   const diff = followups.find(
@@ -45,6 +44,7 @@ function ToolPill({ update, followups }: ToolPillProps) {
         item.kind === 'tool_call_update' && !!item.output,
     )
     .at(-1)?.output
+  const { icon: Icon, action, subject } = describe(update.title, update.input, output)
   const trashed = update.title === 'sheet_delete' && status === 'completed'
   const trashedId = (update.input as { id?: unknown } | undefined)?.id
 
