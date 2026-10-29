@@ -10,4 +10,5 @@ export const PAGE_IMPORT_DEPTH = 8
 
 export const IMPORT_WORDS = `a page imports from washi, washi/ui, ${PAGE_LIBRARIES.join(', ')} or page:<id>`
 
-export const LIBRARY = new RegExp(`^(${PAGE_LIBRARIES.join('|')})(/[\\w./-]+)?$`)
+/** A library or a subpath of it; no segment may start with a dot, so none climbs out (`..`). */
+export const LIBRARY = new RegExp(`^(${PAGE_LIBRARIES.join('|')})(/[\\w-][\\w.-]*)*$`)

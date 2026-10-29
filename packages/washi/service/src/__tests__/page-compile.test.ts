@@ -64,6 +64,23 @@ describe('a page compiled for the sandbox (D100)', () => {
     expect(hidden).toMatchObject({ ok: false, error: expect.stringContaining('page:secret') })
   })
 
+  test('a library path that climbs out of its folder is refused, at save and at compile', async () => {
+    for (const path of [
+      'lodash-es/../../package.json',
+      'zod/../../../etc/hosts',
+      'date-fns/.hidden',
+    ]) {
+      const source = `import x from '${path}'\n<Sheet title="t" />`
+      expect(pageCodeDiagnostics(source)[0]?.message).toContain('cannot import')
+      expect(await compilePage(source, pages)).toMatchObject({ ok: false })
+    }
+    const sub = await compilePage(
+      `import { z } from 'zod/mini'\nconst n = z.number().parse(1)\n<Sheet title="t" />`,
+      pages,
+    )
+    expect(sub.ok).toBe(true)
+  })
+
   test('the save check catches a bad import and code that does not compile', () => {
     expect(pageCodeDiagnostics(PAGE)).toEqual([])
     const net = pageCodeDiagnostics(`import x from 'node:http'\n<Sheet title="t" />`)

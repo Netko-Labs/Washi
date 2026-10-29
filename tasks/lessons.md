@@ -49,3 +49,10 @@ PR under it** — or do not delete the base branch until the stack is flat.
 A review fix moved a type into a new `types.ts` and committed with `-am`; the file stayed untracked, the
 local typecheck passed against the working tree, and CI failed on #130. After any fix that creates a file,
 `git status --short` before committing, or `git add -A`.
+
+## Merging the base of a PR stack closed its child (2026-10-29)
+- Failure: `gh pr merge 138 --squash --delete-branch` deleted the branch #139 was based on, and
+  GitHub *closed* #139 (a closed PR's base cannot change). Restoring the branch, reopening and
+  retargeting brought it back.
+- Rule: before merging a stack's base, `gh pr edit <child> --base main`; only then merge with
+  `--delete-branch`.

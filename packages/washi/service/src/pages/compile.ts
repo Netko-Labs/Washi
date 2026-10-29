@@ -1,3 +1,4 @@
+import { sep } from 'node:path'
 import { PAGE_HOOKS, PAGE_IMPORT, paperRegistry } from '@washi/paper/registry'
 import { pageModule } from '@washi/wsx'
 import { isAllowedImport } from './check'
@@ -21,6 +22,16 @@ const HOOKS = PAGE_HOOKS.map(
 const UI = Object.keys(paperRegistry.components)
   .map((name) => `export const ${name} = '${name}'`)
   .join('\n')
+
+/** Where a library import lands — only ever inside that library's own folder. */
+function insideLibrary(path: string): string {
+  const name = LIBRARY.exec(path)?.[1] ?? ''
+  const resolved = Bun.resolveSync(path, import.meta.dir)
+  if (!resolved.includes(`${sep}node_modules${sep}${name}${sep}`)) {
+    throw new Error(`cannot import "${path}" — ${IMPORT_WORDS}`)
+  }
+  return resolved
+}
 
 /** Every page a module imports, transitively, with its source — the cache key and the bundle's input. */
 function importedPages(module: string, read: PageSource): Map<string, string> {
@@ -47,9 +58,7 @@ function plugin(module: string, pages: Map<string, string>): Bun.BunPlugin {
       build.onResolve({ filter: /^washi:(entry|self)$/ }, ({ path }) => ({ path, namespace: NS }))
       build.onResolve({ filter: /^washi(\/ui)?$/ }, ({ path }) => ({ path, namespace: NS }))
       build.onResolve({ filter: PAGE_IMPORT }, ({ path }) => ({ path, namespace: NS }))
-      build.onResolve({ filter: LIBRARY }, ({ path }) => ({
-        path: Bun.resolveSync(path, import.meta.dir),
-      }))
+      build.onResolve({ filter: LIBRARY }, ({ path }) => ({ path: insideLibrary(path) }))
       build.onResolve({ filter: /.*/, namespace: NS }, ({ path }) => {
         throw new Error(`cannot import "${path}" — ${IMPORT_WORDS}`)
       })
