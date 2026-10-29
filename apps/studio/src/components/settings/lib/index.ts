@@ -48,7 +48,7 @@ export type {
   SpendState,
   UsageCardProps,
 } from './types'
-export { clampInt, clampMoney, refusalFor, sinceLabel } from './utils'
+export { clampInt, clampMoney, refusalFor, settingsLabel, sinceLabel } from './utils'
 export {
   ADMIN_TABS,
   APPROVAL_MODE_OPTIONS,

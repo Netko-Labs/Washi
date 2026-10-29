@@ -1,4 +1,5 @@
-import { PROVIDER_META } from './values'
+import type { SettingsTab } from './types'
+import { PROVIDER_META, SETTINGS_GROUPS } from './values'
 
 const MINUTE = 60_000
 const HOUR = 60 * MINUTE
@@ -33,4 +34,10 @@ export function clampInt(value: string): number | null {
 export function clampMoney(value: string): number | null {
   const parsed = Number(value)
   return Number.isFinite(parsed) && parsed > 0 ? Math.round(parsed * 100) / 100 : null
+}
+
+/** The section a `?tab=` names, as its tab reads. */
+export function settingsLabel(tab: SettingsTab): string {
+  const sections = SETTINGS_GROUPS.flatMap((group) => group.sections)
+  return sections.find((section) => section.key === tab)?.label ?? 'Settings'
 }

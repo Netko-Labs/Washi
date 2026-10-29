@@ -99,6 +99,10 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   pick closes it). The header keeps Edit and ⋯ (`NarrowHeaderActions`; comments, share, copy link and
   the star fold into ⋯ as `PageMenuQuick`); Washi is the mascot FAB under the thumb, no bottom bar. Gestures are `useSwipe` (`components/shared/gestures`): touch
   events, axis-locked, far-or-fast commits; a phone's peek is a sheet its bar pulls down. `useIsNarrow` picks the shell; the workspace routes never SSR.
+  The browser tab says where you are (D112): `<place> · <context>` (`Roadmap · Netko`, a peek
+  `<row> · <page>`, `Settings · People`), set by each view through `useDocumentTitle`
+  (`components/shared/document-title`) from data it already holds — a part still loading is left
+  out, an empty title reads Untitled; routes outside a workspace set theirs in `head`.
 - `apps/desktop` — mirin shell: window, menu, icon, Develop menu. `src/bun/` (main) boots the
   embedded runtime and serves `appRouter` via `createMirinBridge`; the renderer's `api` is a tRPC
   client over `mirinLink`. No port, no token.
