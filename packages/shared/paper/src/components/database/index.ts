@@ -1,3 +1,4 @@
+export { CardValue } from './card-value'
 export { Database } from './database'
 export { DatabaseCell } from './database-cell'
 export type { CellProps, Choice, DatabaseContext, Person } from './lib'

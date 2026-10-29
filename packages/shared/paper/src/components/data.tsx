@@ -1,14 +1,14 @@
 import type { ReactNode } from 'react'
-import { formatNumber, listCell, ratioOf, styled, toneOf, useBind, useExprValue } from '../lib'
+import { formatNumber, ratioOf, styled, useBind, useExprValue } from '../lib'
 import type { BlockProps, Row } from '../lib/types'
 import { usePaperHost } from '../provider'
 import type { BindQuery } from '../registry'
 import { RowProvider } from '../state'
 import { Chart } from './chart'
-import { tableLabel } from './database'
-import { Bound, cell } from './states'
+import { Bound } from './states'
+import { Table } from './table'
 
-export { Chart }
+export { Chart, Table }
 
 /** Renders children once per row with `$row.column` in scope. The power multiplier. */
 export function Repeat({
@@ -30,87 +30,6 @@ export function Repeat({
         }
       </Bound>
     </div>
-  )
-}
-
-export function Table({
-  bind,
-  columns,
-  empty,
-  ...rest
-}: BlockProps & { bind: BindQuery; columns?: string[]; empty?: string }) {
-  const state = useBind(bind)
-  const { openRow, locale } = usePaperHost()
-  return (
-    <Bound state={state} empty={empty}>
-      {(rows) => {
-        const keys = columns ?? Object.keys(rows[0] ?? {}).filter((key) => key !== 'id')
-        const numeric = new Set(
-          keys.filter((key) => rows.some((row) => typeof row[key] === 'number')),
-        )
-        const number = new Intl.NumberFormat(locale, { maximumFractionDigits: 2 })
-        return (
-          <div {...styled(rest, 'wsx-table-wrap')}>
-            <table className="wsx-table">
-              <thead>
-                <tr>
-                  {keys.map((key) => (
-                    <th key={key} data-num={numeric.has(key) || undefined}>
-                      {tableLabel(key)}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((row, index) => (
-                  <tr
-                    key={String(row.id ?? index)}
-                    data-openable={openRow && typeof row.id === 'string' ? '' : undefined}
-                    onClick={() => typeof row.id === 'string' && openRow?.(row.id)}
-                  >
-                    {keys.map((key, column) => {
-                      const value = row[key]
-                      const items = column > 0 ? listCell(row, key) : undefined
-                      const isNumber = typeof value === 'number'
-                      // A word that means something wears its tone here too (D84); a title never.
-                      const tone =
-                        column > 0 && typeof value === 'string' ? toneOf(value) : undefined
-                      return (
-                        <td
-                          key={key}
-                          data-label={tableLabel(key)}
-                          data-num={numeric.has(key) || undefined}
-                          data-negative={(isNumber && value < 0) || undefined}
-                          data-bool={typeof value === 'boolean' ? String(value) : undefined}
-                        >
-                          {isNumber ? (
-                            number.format(value)
-                          ) : items && items.length > 0 ? (
-                            <span className="wsx-pills">
-                              {items.map((item) => (
-                                <Badge key={item} size="sm" tone={toneOf(item)}>
-                                  {item}
-                                </Badge>
-                              ))}
-                            </span>
-                          ) : tone ? (
-                            <Badge size="sm" tone={tone}>
-                              {value}
-                            </Badge>
-                          ) : (
-                            cell(value, locale)
-                          )}
-                        </td>
-                      )
-                    })}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )
-      }}
-    </Bound>
   )
 }
 

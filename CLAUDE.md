@@ -411,7 +411,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   `onAdd` gets + New per column when the host has `newRow`: the row is made in that group, titled
   Untitled, and opened in the peek. A word that means something (high, blocked, in review, done…) wears
   its tone everywhere it shows — pill, badge, a board column's dot, a plain `<Table>` cell past the
-  title (`VALUE_TONES` in paper's `lib`); there, and in a Board card's `badge`, a list cell is a pill per item
+  title (`VALUE_TONES` in paper's `lib`); there (`<Table>` also reads its table's spec once, `useDatabase`: choices and people draw as the
+  database view's do, numbers in their `format`), and in a Board card's `badge`, a list cell is a pill per item
   (`listCell` keeps what `toRows` joined; `patchRow` carries it through an optimistic move), and an untoned `<Badge>` is a neutral pill. Dates read as dates wherever a cell is drawn (`whenLabel`:
   a day, a moment, a `start/end` range), `$row` in visible text included; empty cells sort last.
   `<Roadmap end>` runs a bar from `date` to a second column, as trackers keep start and due apart.
