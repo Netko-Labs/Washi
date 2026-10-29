@@ -38,7 +38,7 @@ Quote Code Pair(term) Note Source Money(value|expr, currency) + inline Mark Kbd 
 Surface: Card(title) Callout(title) Hero(title subtitle align) Figure(src: https or file:<id>, alt) Video(src title poster) Audio(src title) File(src name bytes) Gallery(columns — Figures as a grid, a press opens one large) Embed(https src title ratio height — YouTube Vimeo Spotify Loom Figma CodePen
 CodeSandbox Miro Google Maps Indify play; any other site only if the workspace lists it)
 Bookmark(https href title description image site — a link as a card; fill what fetch_url told you) · Data out:
-Repeat(bind) Agenda(bind date title time end badge add addLabel view state — a week or a month) Slots(bind date minutes hours days add addLabel — free times to book: a booking's date is start/end, e.g. 2026-10-29T10:00/2026-10-29T10:30) Table(bind columns) Database(table views — tabs: table · board(groupBy) · timeline(date) ·
+Repeat(bind) Agenda(bind date title time end badge add addLabel view state — a week or a month) Slots(bind date minutes hours days add addLabel — free times to book: a booking's date is start/end, e.g. 2026-10-29T10:00/2026-10-29T10:30) Roadmap(bind date end title — a bar per row from date to end, or one start/end column) Table(bind columns) Database(table views — tabs: table · board(groupBy) · timeline(date) ·
 gallery(cover: a url or cover-key column; cards a press opens)) Stat(value|expr label hint trend) Chart(bind kind) Timeline/Step
 Progress(value|expr) Badge Avatar Schema(table) · Data in: Field(field kind table row) Board(bind
 groupBy groups rank kicker badge meta avatar onAdd onOpen) Button(action) Compose(action label —

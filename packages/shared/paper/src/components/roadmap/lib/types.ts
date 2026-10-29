@@ -5,6 +5,8 @@ export interface RoadmapProps extends BlockProps {
   bind: BindQuery
   /** The date column: a day, or `start/end`. */
   date: string
+  /** A second date column the bar runs to, as trackers keep start and due apart. */
+  end?: string
   title?: string
   empty?: string
 }

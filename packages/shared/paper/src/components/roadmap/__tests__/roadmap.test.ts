@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { calendarOf, shift, spanOf, ticksOf, toIso } from '../lib'
+import { calendarOf, moved, placed, rowSpan, shift, spanOf, ticksOf, toIso } from '../lib'
 
 const day = (iso: string) => spanOf(iso)?.start ?? Number.NaN
 
@@ -34,6 +34,39 @@ describe('roadmap dates', () => {
 
   test('weekly ticks fall on Mondays', () => {
     const ticks = ticksOf({ first: day('2026-10-01'), days: 28 })
-    expect(ticks.map((tick) => new Date(tick.day * 86_400_000).getUTCDay())).toEqual([1, 1, 1, 1])
+    expect(ticks.map((tick) => new Date(tick.day * 86_400_000).getUTCDay())).toEqual([1, 1, 1])
+    // None in the last stretch, where a label would run off the edge.
+    expect(Math.max(...ticks.map((tick) => tick.day))).toBeLessThan(day('2026-10-01') + 28 * 0.88)
+  })
+})
+
+describe('a bar from a start column to a due column', () => {
+  test('runs date → end, and a drag moves both', () => {
+    const span = rowSpan({ start: '2026-10-20', due: '2026-11-14' }, 'start', 'due')
+    expect(span && span.end - span.start).toBe(25)
+    expect(span && moved(span, 2, 'start', 'due')).toEqual({
+      start: '2026-10-22',
+      due: '2026-11-16',
+    })
+    const range = rowSpan({ when: '2026-10-20/2026-10-24', due: null }, 'when', 'due')
+    expect(range && moved(range, 1, 'when')).toEqual({ when: '2026-10-21/2026-10-25' })
+    expect(rowSpan({ start: '2026-10-20', due: null }, 'start', 'due')).toEqual(
+      rowSpan({ start: '2026-10-20' }, 'start'),
+    )
+  })
+})
+
+describe('placing a bar on a row with only an end', () => {
+  const day = (iso: string) => spanOf(iso)?.start ?? 0
+
+  test('a later end stays; an earlier one moves up to the start', () => {
+    expect(placed(day('2026-10-05'), { due: '2026-10-20' }, 'start', 'due')).toEqual({
+      start: '2026-10-05',
+    })
+    expect(placed(day('2026-10-25'), { due: '2026-10-20' }, 'start', 'due')).toEqual({
+      start: '2026-10-25',
+      due: '2026-10-25',
+    })
+    expect(placed(day('2026-10-25'), {}, 'start')).toEqual({ start: '2026-10-25' })
   })
 })

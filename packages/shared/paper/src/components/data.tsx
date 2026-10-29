@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { styled, useBind, useExprValue } from '../lib'
+import { styled, toneOf, useBind, useExprValue } from '../lib'
 import type { BlockProps, Row } from '../lib/types'
 import { usePaperHost } from '../provider'
 import type { BindQuery } from '../registry'
@@ -68,9 +68,12 @@ export function Table({
                     data-openable={openRow && typeof row.id === 'string' ? '' : undefined}
                     onClick={() => typeof row.id === 'string' && openRow?.(row.id)}
                   >
-                    {keys.map((key) => {
+                    {keys.map((key, column) => {
                       const value = row[key]
                       const isNumber = typeof value === 'number'
+                      // A word that means something wears its tone here too (D84); a title never.
+                      const tone =
+                        column > 0 && typeof value === 'string' ? toneOf(value) : undefined
                       return (
                         <td
                           key={key}
@@ -79,7 +82,15 @@ export function Table({
                           data-negative={(isNumber && value < 0) || undefined}
                           data-bool={typeof value === 'boolean' ? String(value) : undefined}
                         >
-                          {isNumber ? number.format(value) : cell(value, locale)}
+                          {isNumber ? (
+                            number.format(value)
+                          ) : tone ? (
+                            <Badge size="sm" tone={tone}>
+                              {value}
+                            </Badge>
+                          ) : (
+                            cell(value, locale)
+                          )}
                         </td>
                       )
                     })}
