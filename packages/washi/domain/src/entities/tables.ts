@@ -43,7 +43,7 @@ export interface RowFieldChange {
 export interface RowChange {
   atMs: number
   by: string | null
-  kind: 'created' | 'edited' | 'deleted'
+  kind: 'created' | 'edited' | 'deleted' | 'restored'
   fields: RowFieldChange[]
 }
 

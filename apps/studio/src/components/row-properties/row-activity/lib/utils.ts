@@ -77,6 +77,7 @@ function fieldPhrase(field: RowFieldChange, context: PhraseContext, now: number)
 function changePhrase(change: RowChange, context: PhraseContext, now: number): string | null {
   if (change.kind === 'created') return 'added this row'
   if (change.kind === 'deleted') return 'removed this row'
+  if (change.kind === 'restored') return 'restored this row'
   const phrases = change.fields.flatMap((field) => fieldPhrase(field, context, now) ?? [])
   return phrases.length > 0 ? phrases.join(', ') : null
 }
