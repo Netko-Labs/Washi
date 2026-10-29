@@ -403,7 +403,10 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   (`DateCell`/`NumberCell` swap to the editor on a press); the foot counts rows. A Board with no
   `onAdd` gets + New per column when the host has `newRow`: the row is made in that group, titled
   Untitled, and opened in the peek. A word that means something (high, blocked, in review, done…) wears
-  its tone everywhere it shows — pill, badge, a board column's dot (`VALUE_TONES` in paper's `lib`).
+  its tone everywhere it shows — pill, badge, a board column's dot, a plain `<Table>` cell past the
+  title (`VALUE_TONES` in paper's `lib`). Dates read as dates wherever a cell is drawn (`whenLabel`:
+  a day, a moment, a `start/end` range), `$row` in visible text included; empty cells sort last.
+  `<Roadmap end>` runs a bar from `date` to a second column, as trackers keep start and due apart.
   A `gallery` view (D91) is a card per row: `cover` names a column holding an https image or a cover
   key (`preset:` · `picture:` · `file:`), the title, then `columns` (default: the first three) read-only
   (`CardValue`); a press opens the row; + New adds one.

@@ -17,6 +17,26 @@ export function spanOf(value: unknown): Span | null {
 }
 
 /** The days on screen: every bar, a little air either side, and never less than four weeks. */
+/** A row's bar: its `date` alone, or from `date` to a separate `end` column when one is named. */
+export function rowSpan(row: Record<string, unknown>, date: string, end?: string): Span | null {
+  const start = row[date]
+  const until = end ? row[end] : null
+  return typeof start === 'string' && typeof until === 'string' && until
+    ? spanOf(`${start.split('/')[0]}/${until}`)
+    : spanOf(start)
+}
+
+/** What a dragged bar writes: one range column, or its start and end columns each moved. */
+export function moved(
+  span: Span,
+  days: number,
+  date: string,
+  end?: string,
+): Record<string, string> {
+  if (!end) return { [date]: shift(span, days) }
+  return { [date]: toIso(span.start + days), [end]: toIso(span.end + days) }
+}
+
 export function calendarOf(spans: Span[], now = today()): Calendar {
   const first = Math.min(now, ...spans.map((span) => span.start)) - PAD_DAYS
   const last = Math.max(now, ...spans.map((span) => span.end)) + PAD_DAYS
@@ -29,12 +49,15 @@ export function shift(span: Span, days: number): string {
 }
 
 const LABEL = { month: 'short', day: 'numeric', timeZone: 'UTC' } as const
+/** The last days of a track: a tick there would run its label off the edge. */
+const TICK_TAIL = 0.12
 
-/** Mondays for a short calendar, the 1st of each month for a long one. */
+/** Mondays for a short calendar, the 1st of each month for a long one; none in the last stretch. */
 export function ticksOf(calendar: Calendar): Tick[] {
   const monthly = calendar.days > 120
   const ticks: Tick[] = []
-  for (let day = calendar.first; day < calendar.first + calendar.days; day++) {
+  const stop = calendar.first + calendar.days * (1 - TICK_TAIL)
+  for (let day = calendar.first; day < stop; day++) {
     const date = new Date(day * DAY_MS)
     const marks = monthly ? date.getUTCDate() === 1 : date.getUTCDay() === 1
     if (marks) ticks.push({ day, label: date.toLocaleDateString(undefined, LABEL) })

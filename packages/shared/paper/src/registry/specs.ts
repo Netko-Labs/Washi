@@ -318,12 +318,18 @@ const dataOut: Record<string, ComponentSpec> = {
       bind: bindQuerySchema,
       width,
       date: columnName,
+      end: columnName.optional(),
       title: columnName.optional(),
       empty: z.string().max(160).optional(),
       redact,
     },
     'none',
-    { hints: { start: 'one date column holds the range: date="when" with start/end values' } },
+    {
+      hints: {
+        start:
+          'date names the start: date="start", with end="due" or start/end values in one column',
+      },
+    },
   ),
   Step: p({ marker: z.string().min(1).max(8), title: z.string().max(120).optional() }, 'nodes', {
     within: ['Timeline'],

@@ -81,6 +81,7 @@
   font-size: 12px;
   line-height: 22px;
   white-space: nowrap;
+  text-overflow: ellipsis;
   cursor: grab;
   touch-action: none;
   user-select: none;
@@ -111,4 +112,11 @@
 }
 .wsx-roadmap-place:hover {
   background: var(--muted-bg);
+}
+
+/* Narrow: bars keep their shape, not their words — the title column says them already. */
+@container (max-width: 560px) {
+  .wsx-roadmap-bar {
+    color: transparent;
+  }
 }

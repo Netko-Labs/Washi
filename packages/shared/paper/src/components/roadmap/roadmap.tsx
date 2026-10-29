@@ -2,18 +2,27 @@ import { useData } from '../../data'
 import { styled, useBind } from '../../lib'
 import { usePaperHost } from '../../provider'
 import { Bound } from '../states'
-import { calendarOf, percent, type RoadmapProps, shift, spanOf, ticksOf, today, toIso } from './lib'
+import {
+  calendarOf,
+  moved,
+  percent,
+  type RoadmapProps,
+  rowSpan,
+  ticksOf,
+  today,
+  toIso,
+} from './lib'
 import { RoadmapRow } from './roadmap-row'
 
-/** Notion's timeline: one bar per row from its date (or range), on a shared calendar. */
-export function Roadmap({ bind, date, title = 'title', empty, ...rest }: RoadmapProps) {
+/** Notion's timeline: one bar per row from its date (a range, or `date` to `end`) on a shared calendar. */
+export function Roadmap({ bind, date, end, title = 'title', empty, ...rest }: RoadmapProps) {
   const host = usePaperHost()
   const { refresh } = useData()
   const state = useBind(bind)
 
-  const write = async (row: string, value: string) => {
+  const write = async (row: string, set: Record<string, string>) => {
     try {
-      await host.runAction({ verb: 'table.update', table: bind.table, row, set: { [date]: value } })
+      await host.runAction({ verb: 'table.update', table: bind.table, row, set })
     } finally {
       refresh()
     }
@@ -22,7 +31,7 @@ export function Roadmap({ bind, date, title = 'title', empty, ...rest }: Roadmap
   return (
     <Bound state={state} empty={empty}>
       {(rows) => {
-        const spans = rows.map((row) => spanOf(row[date]))
+        const spans = rows.map((row) => rowSpan(row, date, end))
         const calendar = calendarOf(spans.filter((span) => span !== null))
         return (
           <div {...styled(rest, 'wsx-roadmap')}>
@@ -50,8 +59,10 @@ export function Roadmap({ bind, date, title = 'title', empty, ...rest }: Roadmap
                   span={span}
                   calendar={calendar}
                   title={String(row[title] ?? '') || 'Untitled'}
-                  onMove={(days) => (span ? write(id, shift(span, days)) : Promise.resolve())}
-                  onPlace={(day) => void write(id, toIso(day))}
+                  onMove={(days) =>
+                    span ? write(id, moved(span, days, date, end)) : Promise.resolve()
+                  }
+                  onPlace={(day) => void write(id, { [date]: toIso(day) })}
                   onOpen={() => host.openRow?.(id)}
                 />
               )
