@@ -1,6 +1,5 @@
 import { type DragEvent, useEffect, useRef, useState } from 'react'
 import { useData } from '../../../../data'
-import { useSelectOptions } from '../../../../lib'
 import type { Row } from '../../../../lib/types'
 import { usePaperHost } from '../../../../provider'
 import type { BindQuery } from '../../../../registry'
@@ -25,9 +24,8 @@ export function useBoardDrag(bind: BindQuery, rows: Row[], layout: BoardLayout):
     latestRows.current = rows
   }, [rows])
   useSlide(boardRef)
-  const options = useSelectOptions(bind.table, layout.groupBy)
 
-  const { groupBy, rank, groups } = layout
+  const { groupBy, rank, groups, options } = layout
   const columns = boardColumns(rows, moves, groupBy, rank, groups, options)
 
   const start = (id: string, event: DragEvent<HTMLElement>) => {

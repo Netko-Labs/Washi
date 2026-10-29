@@ -21,8 +21,13 @@ export function Board({
   ...rest
 }: BoardProps) {
   const state = useBind(bind)
-  const actions = useCardActions(onOpen)
-  const drag = useBoardDrag(bind, state.rows, { groupBy, rank, groups })
+  const actions = useCardActions(onOpen, bind.table)
+  const drag = useBoardDrag(bind, state.rows, {
+    groupBy,
+    rank,
+    groups,
+    options: actions.optionsOf(groupBy),
+  })
 
   const slot = (group: string, before: string | null) =>
     drag.target?.group === group && drag.target.before === before ? (
@@ -53,7 +58,7 @@ export function Board({
                       <span className="wsx-board-head-label">{name}</span>
                     </span>
                     <span className="wsx-board-head-count">
-                      {headCount(items, meta, actions.locale)}
+                      {headCount(items, meta, (total) => actions.shown(total, meta))}
                     </span>
                   </div>
                   {items.map((row) => (

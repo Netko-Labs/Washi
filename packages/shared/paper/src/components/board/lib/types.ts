@@ -51,7 +51,10 @@ export interface CardActions {
   locale?: string
   openable: boolean
   open: (row: Row) => void
-  shown: (value: Row[string] | undefined) => string
+  /** A cell in words: named people, numbers in their column's format once the spec is read. */
+  shown: (value: Row[string] | undefined, column?: string) => string
+  /** A select or status column's options in their own order; none until the spec is read. */
+  optionsOf: (column: string) => string[]
   add: (action: ActionRef, group: string) => void
   /** Notion's + New in a column: the row is made already in it and opened where the reader is. */
   creatable: boolean
@@ -75,6 +78,8 @@ export interface BoardLayout {
   groupBy: string
   rank: string
   groups?: string[]
+  /** The group column's own options, the order unnamed columns follow. */
+  options: string[]
 }
 
 export interface DragState {
