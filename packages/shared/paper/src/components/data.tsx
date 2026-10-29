@@ -194,6 +194,7 @@ export function Progress({
     <div
       {...styled(rest, 'wsx-progress')}
       role="progressbar"
+      data-unknown={isUnknown || undefined}
       aria-valuenow={isUnknown ? undefined : percent}
       aria-valuemin={0}
       aria-valuemax={100}

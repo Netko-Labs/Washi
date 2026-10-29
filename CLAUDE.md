@@ -415,7 +415,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   (`listCell` keeps what `toRows` joined; `patchRow` carries it through an optimistic move), and an untoned `<Badge>` is a neutral pill. Dates read as dates wherever a cell is drawn (`whenLabel`:
   a day, a moment, a `start/end` range), `$row` in visible text included; empty cells sort last.
   `<Roadmap end>` runs a bar from `date` to a second column, as trackers keep start and due apart.
-  A Board column's head counts its cards and sums a numeric `meta` in the reader's numbers, with no
+  A Board with no `groups` lays its columns out in the column's own order (status steps, select
+  options; empty ones too, so a card can go there), then any value off that list. A Board column's head counts its cards and sums a numeric `meta` in the reader's numbers, with no
   unit it cannot know. `<Stat format="percent">` reads a ratio as one, `<Stat currency="USD">` an
   amount as money in the reader's locale. Inside a Repeat, a Progress takes `value="$row.ratio"` (or
   `expr` over `$row`); a share nothing real gives — a failed `expr`, an empty cell — reads —, never

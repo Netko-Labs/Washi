@@ -42,6 +42,7 @@ export function boardColumns(
   groupBy: string,
   rank: string,
   groups: string[] | undefined,
+  options: string[] = [],
 ): BoardColumn[] {
   const merged = rows.map((row) => {
     const move = moves[String(row.id)]
@@ -52,7 +53,10 @@ export function boardColumns(
       rank ? { [groupBy]: move.group, [rank]: move.rank } : { [groupBy]: move.group },
     )
   })
-  const names = groups ?? [...new Set(merged.map((row) => String(row[groupBy] ?? '—')))]
+  // Unnamed groups follow the column's own order — status steps, select options — empty ones too,
+  // so a card can be dropped where nothing is yet; a value off that list comes after.
+  const present = [...new Set(merged.map((row) => String(row[groupBy] ?? '—')))]
+  const names = groups ?? [...options, ...present.filter((name) => !options.includes(name))]
   return names.map((name) => ({
     name,
     items: merged
