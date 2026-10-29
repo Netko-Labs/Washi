@@ -23,6 +23,18 @@ const sheet = (id: string, title: string, hlcUpdated: string, rowOf: string | nu
 const table = (name: string, hlcUpdated: string) => ({ id: name, name, hlcUpdated }) as UserTable
 
 describe('chat blocks', () => {
+  test('a move to another page is a divider in the turn that made it (D110)', () => {
+    const [, turn] = chatBlocks([
+      entry({ kind: 'user_message', text: 'Make a Lisbon plan' }),
+      entry({ kind: 'message_chunk', text: 'Moving us there.' }),
+      entry({ kind: 'handoff', from: 'trip', to: 'lisbon', title: 'Lisbon', by: 'washi' }),
+    ])
+    expect(turn?.kind === 'washi' && turn.parts.map((part) => part.kind)).toEqual([
+      'text',
+      'handoff',
+    ])
+  })
+
   test('asks and turns alternate; tool runs fold, text merges, pages are carded', () => {
     const blocks = chatBlocks([
       entry({ kind: 'user_message', text: 'Plan Kyoto' }),

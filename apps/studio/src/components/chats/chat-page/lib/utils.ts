@@ -105,6 +105,8 @@ export function chatBlocks(transcript: TranscriptEntry[]): ChatBlock[] {
       const last = parts.at(-1)
       if (last?.kind === 'tools') last.steps.push(step)
       else parts.push({ kind: 'tools', id: entry.id, steps: [step] })
+    } else if (update.kind === 'handoff') {
+      current(entry.id).parts.push({ kind: 'handoff', id: entry.id, handoff: update })
     } else if (update.kind === 'turn_done') {
       if (update.stopReason === 'error') {
         const error = update.error ?? 'The turn failed'

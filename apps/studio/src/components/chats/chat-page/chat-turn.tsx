@@ -1,5 +1,5 @@
 import { IconAlertTriangle } from '@tabler/icons-react'
-import { AgentMascot, Markdown } from '@washi/ui'
+import { AgentMascot, HandoffDivider, Markdown } from '@washi/ui'
 import { ChatPageCard } from './chat-page-card'
 import { ChatReceipts } from './chat-receipts'
 import type { ChatTurnProps } from './lib'
@@ -32,6 +32,8 @@ export function ChatTurn({ block, workspaceId, isLive }: ChatTurnProps) {
                   Stopped
                 </p>
               )
+            case 'handoff':
+              return <HandoffDivider key={part.id} handoff={part.handoff} />
             default:
               return null
           }
