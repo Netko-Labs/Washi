@@ -16,7 +16,6 @@ export function spanOf(value: unknown): Span | null {
   return { start: toDay(start), end: Math.max(toDay(start), toDay(end)) }
 }
 
-/** The days on screen: every bar, a little air either side, and never less than four weeks. */
 /** A row's bar: its `date` alone, or from `date` to a separate `end` column when one is named. */
 export function rowSpan(row: Record<string, unknown>, date: string, end?: string): Span | null {
   const start = row[date]
@@ -37,6 +36,7 @@ export function moved(
   return { [date]: toIso(span.start + days), [end]: toIso(span.end + days) }
 }
 
+/** The days on screen: every bar, a little air either side, and never less than four weeks. */
 export function calendarOf(spans: Span[], now = today()): Calendar {
   const first = Math.min(now, ...spans.map((span) => span.start)) - PAD_DAYS
   const last = Math.max(now, ...spans.map((span) => span.end)) + PAD_DAYS
