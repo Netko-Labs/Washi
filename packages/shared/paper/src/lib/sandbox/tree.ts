@@ -1,4 +1,5 @@
 import type { WsxNode, WsxValue } from '@washi/wsx'
+import type { DrawnHandler, DrawnNode } from '../types'
 import { INVOKE, PRESS_PROPS } from './values'
 
 function propsOf(raw: unknown): Record<string, WsxValue> {
@@ -7,7 +8,7 @@ function propsOf(raw: unknown): Record<string, WsxValue> {
   for (const [key, value] of Object.entries(raw as Record<string, unknown>)) {
     if (key === 'key') continue
     if (value && typeof value === 'object' && 'washiHandler' in value) {
-      const { washiHandler } = value as { washiHandler: number }
+      const { washiHandler } = value as DrawnHandler
       if (PRESS_PROPS.has(key)) out.action = { verb: INVOKE, handler: Number(washiHandler) }
       continue
     }
@@ -35,7 +36,7 @@ export function toNodes(value: unknown): WsxNode[] {
     return [{ kind: 'text', value: String(value) }]
   if (Array.isArray(value)) return value.flatMap(toNodes)
   if (typeof value !== 'object') return []
-  const { name, props, children } = value as { name?: unknown; props?: unknown; children?: unknown }
+  const { name, props, children } = value as DrawnNode
   const kids = Array.isArray(children) ? joinText(children.flatMap(toNodes)) : []
   if (name === '__fragment') return kids
   if (typeof name !== 'string') return []

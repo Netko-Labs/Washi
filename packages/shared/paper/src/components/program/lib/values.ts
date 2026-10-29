@@ -24,10 +24,19 @@ export const PROGRAM_BRIDGE = [
 /**
  * What every page that runs stands on, inside the sandbox: the registry's names as tags, `h` that
  * calls a page's own components and keeps handlers, and `globalThis.__washi` — what
- * `import … from 'washi'` reads. A page acts only from a press, so drawing can never write.
+ * `import … from 'washi'` reads. A page acts only from a press, so drawing can never write — the
+ * host refuses one too (`programBridge`), whatever the page's code calls.
  */
 export const programPrelude = (names: string[]) => `
 for (const name of ${JSON.stringify(names)}) globalThis[name] = name
+;(() => {
+// The bridge is taken in here and its globals removed: page code reaches the host only through
+// the hooks below, never by calling a __bridge_* itself.
+const B = {}
+for (const name of ${JSON.stringify(PROGRAM_BRIDGE)}) {
+  B[name] = globalThis['__bridge_' + name]
+  delete globalThis['__bridge_' + name]
+}
 globalThis.Fragment = '__fragment'
 let __handlers = [], __slots = [], __slot = 0, __drawing = false
 globalThis.h = (name, props, ...children) => {
@@ -48,7 +57,7 @@ const __pressOnly = (what) => {
 }
 const __act = (action) => {
   __pressOnly('act')
-  __bridge_act(JSON.stringify(action))
+  B.act(JSON.stringify(action))
 }
 const __keyed = (get, put, what) => (key, initial) => {
   const value = __read(get(String(key)), initial)
@@ -59,10 +68,10 @@ const __keyed = (get, put, what) => (key, initial) => {
   return [value, set]
 }
 globalThis.__washi = {
-  useRows: (query) => __read(__bridge_rows(JSON.stringify(query)), []),
+  useRows: (query) => __read(B.rows(JSON.stringify(query)), []),
   useRow: (table, id) =>
-    __read(__bridge_rows(JSON.stringify({ table, where: [{ column: 'id', op: 'eq', value: id }], limit: 1 })), [])[0] ?? null,
-  useTable: (name) => __read(__bridge_table(String(name)), null),
+    __read(B.rows(JSON.stringify({ table, where: [{ column: 'id', op: 'eq', value: id }], limit: 1 })), [])[0] ?? null,
+  useTable: (name) => __read(B.table(String(name)), null),
   useInsert: (table) => (data) => __act({ verb: 'table.insert', table, data }),
   useUpdate: (table) => (row, set) => __act({ verb: 'table.update', table, row, set }),
   useDelete: (table) => (row) => __act({ verb: 'table.delete', table, row }),
@@ -75,20 +84,20 @@ globalThis.__washi = {
     }
     return [__slots[at], set]
   },
-  usePageState: __keyed((key) => __bridge_state(key), (key, json) => __bridge_set(key, json), 'a page state change'),
-  useStored: __keyed((key) => __bridge_stored(key), (key, json) => __bridge_store(key, json), 'a stored change'),
-  useInterval: (ms) => void __bridge_interval(String(ms)),
+  usePageState: __keyed((key) => B.state(key), (key, json) => B.set(key, json), 'a page state change'),
+  useStored: __keyed((key) => B.stored(key), (key, json) => B.store(key, json), 'a stored change'),
+  useInterval: (ms) => void B.interval(String(ms)),
   useNow: (ms = 1000) => {
-    __bridge_interval(String(ms))
+    B.interval(String(ms))
     return Date.now()
   },
-  usePage: () => __read(__bridge_page(), null),
-  usePages: (of) => __read(__bridge_pages(of == null ? '' : String(of)), []),
-  useMembers: () => __read(__bridge_members(), []),
-  useMe: () => __read(__bridge_me(), null),
+  usePage: () => __read(B.page(), null),
+  usePages: (of) => __read(B.pages(of == null ? '' : String(of)), []),
+  useMembers: () => __read(B.members(), []),
+  useMe: () => __read(B.me(), null),
   useNavigate: () => (id) => {
     __pressOnly('navigate')
-    __bridge_navigate(String(id))
+    B.navigate(String(id))
   },
   act: __act,
 }
@@ -107,4 +116,5 @@ globalThis.__invoke = (id) => {
   if (handler) handler()
   return 'null'
 }
+})()
 `

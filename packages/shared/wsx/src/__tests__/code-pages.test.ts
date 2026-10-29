@@ -136,6 +136,14 @@ describe('text beside code', () => {
     expect(parse(serialize(root))).toEqual(root)
   })
 
+  test('code ending in a line comment keeps the tag after it', () => {
+    const root = parse(
+      '<Sheet title="t"><Text>{n // the count\n}</Text><Stat label="a" value={n // why\n} /></Sheet>',
+    )
+    expect(parse(serialize(root))).toEqual(root)
+    expect(serialize(root)).toContain('</Text>')
+  })
+
   test('a line break beside code is no space, as in JSX', () => {
     const root = parse('<Sheet title="t"><Text>\n  Total\n  {n}\n</Text></Sheet>')
     expect(root.children[0]).toMatchObject({ children: [{ value: 'Total' }, { source: 'n' }] })

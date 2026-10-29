@@ -40,15 +40,24 @@ function harness(values: Record<string, string | number | boolean | null> = {}) 
     tables: new Map(),
     members: undefined,
     me: undefined,
+    halted: null,
     values,
     set: (key, value) => void calls.push(`set ${key}=${JSON.stringify(value)}`),
   }
-  const needs: ProgramNeeds = { queries: [], tables: [], members: false, me: false, every: 0 }
+  const needs: ProgramNeeds = {
+    queries: [],
+    tables: [],
+    members: false,
+    me: false,
+    refused: null,
+    every: 0,
+  }
   const run = (sandbox: Sandbox, code = '__render()') => {
-    const result = sandbox.call(code, programBridge(live, host, needs))
+    const isPress = code.startsWith('__invoke')
+    const result = sandbox.call(code, programBridge(live, host, needs, isPress))
     return result.ok ? JSON.parse(result.value) : result.error
   }
-  return { calls, live, needs, run }
+  return { calls, host, live, needs, run }
 }
 
 describe('a page that runs, in its sandbox (D100)', () => {
@@ -119,6 +128,23 @@ describe('a page that runs, in its sandbox (D100)', () => {
     expect(page.run(sandbox)).toContain('runs from a press')
     expect(page.calls).toEqual([])
     sandbox.dispose()
+  })
+
+  test('the bridge is out of the page’s reach, and the host refuses a write outside a press', async () => {
+    const sandbox = await open(
+      `return h(Sheet, { title: 'x' }, h(Text, null, [typeof __bridge_act, typeof __bridge_set, typeof __drawing].join()))`,
+    )
+    const page = harness()
+    expect(checkDrawn(page.run(sandbox), PAGE)).toMatchObject({
+      root: { children: [{ children: [{ value: 'undefined,undefined,undefined' }] }] },
+    })
+    sandbox.dispose()
+
+    const bridge = programBridge(page.live, page.host, page.needs, false)
+    bridge.act?.('{"verb":"table.delete","table":"t","row":"a"}')
+    bridge.set?.('tab', '"month"')
+    expect(page.needs.refused).toBe('act')
+    expect(page.calls).toEqual([])
   })
 
   test('what it draws is checked like a page, and keeps the page’s own look', () => {

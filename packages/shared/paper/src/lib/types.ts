@@ -106,6 +106,8 @@ export interface ProgramLive {
   members: string | null | undefined
   /** The reader JSON, the same way. */
   me: string | null | undefined
+  /** Why a press stopped the page; it stays stopped until its code changes. */
+  halted: string | null
   values: Record<string, string | number | boolean | null>
   set: (key: string, value: string | number | boolean | null) => void
 }
@@ -116,6 +118,8 @@ export interface ProgramNeeds {
   tables: string[]
   members: boolean
   me: boolean
+  /** The first write the page tried while it drew, refused; the run stops on it. */
+  refused: string | null
   /** The shortest clock the page set, in ms; 0 when none. */
   every: number
 }
@@ -123,6 +127,18 @@ export interface ProgramNeeds {
 export interface PageProgramProps {
   root: WsxElement
   draw: (root: WsxElement) => ReactNode
+}
+
+/** A drawn element as the sandbox hands it over: plain JSON, every part still unchecked. */
+export interface DrawnNode {
+  name?: unknown
+  props?: unknown
+  children?: unknown
+}
+
+/** A function prop the sandbox kept, by its place in the run's handler list. */
+export interface DrawnHandler {
+  washiHandler: number
 }
 
 /** Named ways out of a sandbox, lent per call; each answers with JSON text, or nothing. */

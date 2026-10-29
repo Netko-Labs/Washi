@@ -31,6 +31,7 @@ export function useProgramSandbox(root: WsxElement) {
     tables: new Map(),
     members: undefined,
     me: undefined,
+    halted: null,
     values,
     set,
   })
@@ -81,6 +82,7 @@ export function useProgramSandbox(root: WsxElement) {
       box.tables.clear()
       box.members = undefined
       box.me = undefined
+      box.halted = null
     }
   }, [host, source])
 

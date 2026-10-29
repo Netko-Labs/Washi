@@ -1,5 +1,8 @@
 import type { WsxElement, WsxNode, WsxValue } from './types'
 
+/** Code in braces; a `//` comment in it ends at a line break, so it can never eat the `}` after. */
+const hole = (source: string) => (source.includes('//') ? `{${source}\n}` : `{${source}}`)
+
 function serializeValue(value: WsxValue): string {
   return JSON.stringify(value)
 }
@@ -10,7 +13,7 @@ function serializeProps({ props, code = {} }: WsxElement): string {
     if (typeof value === 'string') return ` ${key}=${JSON.stringify(value)}`
     return ` ${key}={${serializeValue(value)}}`
   })
-  const written = Object.entries(code).map(([key, source]) => ` ${key}={${source}}`)
+  const written = Object.entries(code).map(([key, source]) => ` ${key}=${hole(source)}`)
   return [...literal, ...written].join('')
 }
 
@@ -30,7 +33,7 @@ function serializeText(value: string): string {
 function serializeInline(children: WsxNode[]): string {
   return children
     .map((child, at) => {
-      if (child.kind === 'code') return `{${child.source}}`
+      if (child.kind === 'code') return hole(child.source)
       if (child.kind !== 'text') return ''
       const value = child.value
       const isRaw =
@@ -46,7 +49,7 @@ function serializeInline(children: WsxNode[]): string {
 function serializeNode(node: WsxNode, depth: number): string {
   const indent = '  '.repeat(depth)
   if (node.kind === 'text') return `${indent}${serializeText(node.value)}`
-  if (node.kind === 'code') return `${indent}{${node.source}}`
+  if (node.kind === 'code') return `${indent}${hole(node.source)}`
 
   const open = `${node.name}${serializeProps(node)}`
   if (node.children.length === 0) return `${indent}<${open} />`

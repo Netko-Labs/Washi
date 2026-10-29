@@ -11,6 +11,7 @@ const noNeeds = (): ProgramNeeds => ({
   tables: [],
   members: false,
   me: false,
+  refused: null,
   every: 0,
 })
 
@@ -25,11 +26,18 @@ export function useProgram(root: WsxElement) {
 
   useEffect(() => {
     const box = live.current
-    if (failure) return setState({ status: 'stopped', reason: failure })
+    const halted = failure ?? box.halted
+    if (halted) return setState({ status: 'stopped', reason: halted })
     if (!box.sandbox) return
     const needs = noNeeds()
-    const result = box.sandbox.call('__render()', programBridge(box, host, needs))
+    const result = box.sandbox.call('__render()', programBridge(box, host, needs, false))
     if (!result.ok) return setState({ status: 'stopped', reason: result.error })
+    if (needs.refused) {
+      return setState({
+        status: 'stopped',
+        reason: `${needs.refused} runs from a press, never while the page draws`,
+      })
+    }
     const checked = checkDrawn(JSON.parse(result.value), root)
     setState(
       'root' in checked
@@ -79,9 +87,12 @@ export function useProgram(root: WsxElement) {
       if (!box.sandbox) return
       const result = box.sandbox.call(
         `__invoke(${Math.trunc(handler)})`,
-        programBridge(box, host, noNeeds()),
+        programBridge(box, host, noNeeds(), true),
       )
-      if (!result.ok) setState({ status: 'stopped', reason: result.error })
+      if (!result.ok) {
+        box.halted = result.error
+        return setState({ status: 'stopped', reason: result.error })
+      }
       redraw((n) => n + 1)
     },
     [host],

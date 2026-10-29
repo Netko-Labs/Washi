@@ -21,7 +21,15 @@ export function programBridge(
   live: ProgramLive,
   host: PaperHost,
   needs: ProgramNeeds,
+  isPress: boolean,
 ): SandboxBridge {
+  // Writes are a press's alone: refused here whatever the page's code called, and the run stops.
+  const pressed =
+    (what: string, write: (...args: string[]) => void) =>
+    (...args: string[]) => {
+      if (isPress) write(...args)
+      else needs.refused ??= what
+    }
   const cached = (map: Map<string, string | null>, key: string, wanted: string[]) => {
     const known = map.get(key)
     if (known === undefined) wanted.push(key)
@@ -31,15 +39,17 @@ export function programBridge(
     rows: (query) => cached(live.rows, query, needs.queries),
     table: (name) => cached(live.tables, name, needs.tables),
     state: (key) => (key in live.values ? JSON.stringify(live.values[key]) : undefined),
-    set: (key, json) => live.set(key, stateValue(json)),
+    set: pressed('a page state change', (key = '', json = 'null') =>
+      live.set(key, stateValue(json)),
+    ),
     stored: (key) => stored(storedKey(host.pageId, key)),
-    store: (key, json) => {
+    store: pressed('a stored change', (key = '', json = 'null') => {
       try {
         localStorage.setItem(storedKey(host.pageId, key), json)
       } catch {
         // Storage full or off: the value lives until the page closes, like any page state.
       }
-    },
+    }),
     interval: (ms) => {
       const asked = Math.max(PROGRAM_MIN_INTERVAL_MS, Number(ms) || 0)
       needs.every = needs.every ? Math.min(needs.every, asked) : asked
@@ -57,7 +67,10 @@ export function programBridge(
       if (live.me === undefined) needs.me = true
       return live.me ?? undefined
     },
-    navigate: (id) => host.openSheet(id),
-    act: (json) => void host.runAction(JSON.parse(json) as ActionRef).catch(() => {}),
+    navigate: pressed('navigate', (id = '') => host.openSheet(id)),
+    act: pressed(
+      'act',
+      (json = '{}') => void host.runAction(JSON.parse(json) as ActionRef).catch(() => {}),
+    ),
   }
 }
