@@ -123,6 +123,7 @@ export function Stat({
   hint,
   trend,
   format,
+  currency,
   ...rest
 }: BlockProps & {
   value?: string | number
@@ -131,13 +132,15 @@ export function Stat({
   hint?: string
   trend?: keyof typeof TREND_GLYPH
   format?: 'number' | 'percent'
+  currency?: string
 }) {
   const host = usePaperHost()
   const computed = useExprValue(expr)
   const raw = expr ? computed : (value ?? null)
-  const asNumber =
-    format === 'percent'
-      ? { style: 'percent' as const, maximumFractionDigits: 1 }
+  const asNumber: Intl.NumberFormatOptions = currency
+    ? { style: 'currency', currency }
+    : format === 'percent'
+      ? { style: 'percent', maximumFractionDigits: 1 }
       : { maximumFractionDigits: 2 }
   const shown =
     typeof raw === 'number'

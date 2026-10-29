@@ -277,6 +277,10 @@ const dataOut: Record<string, ComponentSpec> = {
       hint: z.string().max(80).optional(),
       trend: z.enum(['up', 'down', 'flat']).optional(),
       format: z.enum(['number', 'percent']).optional(),
+      currency: z
+        .string()
+        .regex(/^[A-Z]{3}$/, 'is a three-letter currency code, like USD or EUR')
+        .optional(),
     },
     'none',
   ),
