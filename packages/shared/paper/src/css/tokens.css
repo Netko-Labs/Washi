@@ -205,7 +205,7 @@
 /* feel reproportions every primitive at once — measures are the design's page frames */
 .wsx,
 .wsx[data-feel="note"] {
-  --measure: 960px;
+  --measure: 1200px;
   --pad: 40px 32px;
   --pad-x: 32px;
   --rhythm: 18px;
@@ -217,7 +217,7 @@
   --card-border: 1.5px;
 }
 .wsx[data-feel="editorial"] {
-  --measure: 960px;
+  --measure: 1200px;
   --pad: 56px 40px;
   --pad-x: 40px;
   --rhythm: 22px;
@@ -229,7 +229,7 @@
   --card-border: 0px;
 }
 .wsx[data-feel="board"] {
-  --measure: 1180px;
+  --measure: 1200px;
   --pad: 26px;
   --pad-x: 26px;
   --rhythm: 16px;
@@ -241,7 +241,7 @@
   --card-border: 1.5px;
 }
 .wsx[data-feel="deck"] {
-  --measure: 960px;
+  --measure: 1200px;
   --pad: 56px 48px;
   --pad-x: 48px;
   --rhythm: 32px;
