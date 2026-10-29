@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { firstDay, heatGrid, heatQuery, totalsByDay } from '../lib'
+import { firstDay, heatGrid, heatQuery, isCapped, totalsByDay } from '../lib'
 
 const DAY = 86_400_000
 const keyOf = (day: number) => new Date(day * DAY).toISOString().slice(0, 10)
@@ -43,5 +43,19 @@ describe('a calendar of days (D103)', () => {
       { column: 'date', op: 'gte', value: '2026-10-19' },
       { column: 'date', op: 'lt', value: '2026-11-02' },
     ])
+  })
+})
+
+describe('a capped read', () => {
+  test('rows back at the limit mark the totals partial; fewer are the whole answer', () => {
+    const query = heatQuery(
+      { table: 'meals', limit: 3 },
+      'date',
+      firstDay('2026-10-29', 4, 'monday'),
+      4,
+    )
+    const rows = (n: number) => Array.from({ length: n }, () => ({ date: '2026-10-28' }))
+    expect(isCapped(rows(2), query)).toBe(false)
+    expect(isCapped(rows(3), query)).toBe(true)
   })
 })

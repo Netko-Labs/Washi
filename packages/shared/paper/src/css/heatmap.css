@@ -51,3 +51,6 @@
 .wsx-heatmap-caption strong {
   color: var(--ink);
 }
+.wsx-heatmap-partial {
+  color: var(--tone-warning-text);
+}

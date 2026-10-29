@@ -2,7 +2,15 @@ import { dayLabel, styled, useBind } from '../../lib'
 import type { Row } from '../../lib/types'
 import { usePaperHost } from '../../provider'
 import { Bound } from '../states'
-import { firstDay, HEAT_WEEKS, type HeatmapProps, heatGrid, heatQuery, totalsByDay } from './lib'
+import {
+  firstDay,
+  HEAT_WEEKS,
+  type HeatmapProps,
+  heatGrid,
+  heatQuery,
+  isCapped,
+  totalsByDay,
+} from './lib'
 
 /** GitHub's calendar of days (D103): each a square as dark as what it held, today at the end. */
 export function Heatmap({
@@ -18,14 +26,21 @@ export function Heatmap({
   const { locale } = usePaperHost()
   const today = new Date().toLocaleDateString('sv')
   const from = firstDay(today, weeks, weekStart)
-  const state = useBind(heatQuery(bind, date, from, weeks))
+  const query = heatQuery(bind, date, from, weeks)
+  const state = useBind(query)
 
   // An empty calendar is an answer — nothing done yet — so once loaded it always draws.
   const draw = (rows: Row[]) => {
     const grid = heatGrid(totalsByDay(rows, date, value), from, weeks, today, locale)
     const sum = grid.total.toLocaleString(locale)
+    const partial = isCapped(rows, query)
+      ? `the first ${rows.length.toLocaleString(locale)} rows only`
+      : null
     return (
-      <figure {...styled(rest, 'wsx-heatmap')} aria-label={`${label ?? 'Total'}: ${sum}`}>
+      <figure
+        {...styled(rest, 'wsx-heatmap')}
+        aria-label={`${label ?? 'Total'}: ${sum}${partial ? `, ${partial}` : ''}`}
+      >
         <div className="wsx-heatmap-months" style={{ '--weeks': weeks } as Record<string, number>}>
           {grid.months.map((month, index) => (
             <span key={`${index}-${month}`}>{month}</span>
@@ -44,9 +59,10 @@ export function Heatmap({
             )),
           )}
         </div>
-        {label && (
+        {(label || partial) && (
           <figcaption className="wsx-heatmap-caption">
-            {label} · <strong>{sum}</strong>
+            {label ?? 'Total'} · <strong>{sum}</strong>
+            {partial && <span className="wsx-heatmap-partial"> · {partial}</span>}
           </figcaption>
         )}
       </figure>

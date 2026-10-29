@@ -401,7 +401,7 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   the last `weeks` (4–53, default 16) whole weeks to today, a column per week, each day leveled 1–4
   against the busiest day on screen — rows counted, or `value` summed; a moment or a range counts on
   its first day; future days faded. Once loaded it always draws (an empty grid is an answer); the
-  query is held to the days shown (≤ 1000 rows).
+  query is held to the days shown (≤ 1000 rows; a read back at the cap says its totals are partial).
 - **Database views read like Notion's (D84).** A table's head shows each property's type
   (`PropertyIcon`) and name in sentence case; select/status/person cells draw a pill, a step dot or a
   face over an invisible native select; dates read "Nov 4, 2026" and numbers group until pressed

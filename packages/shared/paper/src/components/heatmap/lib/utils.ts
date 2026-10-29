@@ -27,6 +27,11 @@ export function heatQuery(bind: BindQuery, date: string, from: number, weeks: nu
   }
 }
 
+/** A read that came back at its cap may have left rows out: its totals are a floor, not the sum. */
+export function isCapped(rows: Row[], query: BindQuery): boolean {
+  return rows.length >= (query.limit ?? HEAT_ROW_LIMIT)
+}
+
 /** Each day's total: rows counted, or `value` summed; a moment or a range counts on its first day. */
 export function totalsByDay(rows: Row[], date: string, value?: string): Map<string, number> {
   const totals = new Map<string, number>()
