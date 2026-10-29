@@ -1,4 +1,4 @@
-import { IconPlus, IconTrash } from '@tabler/icons-react'
+import { IconDatabase, IconPlus, IconTrash } from '@tabler/icons-react'
 import { Link } from '@tanstack/react-router'
 import { useFavoritesStore, useSheetsStore, useViewStore } from '@washi/ui'
 import { pathFor } from '@/components/shell'
@@ -7,11 +7,11 @@ import { SidebarPageRow } from './sidebar-page-row'
 import { SidebarRecents } from './sidebar-recents'
 import { SidebarTree } from './sidebar-tree'
 
-/** Recents, Favorites, the page tree with its action, Routines with its action, then the Trash. */
+/** Recents, Favorites, the page tree, Routines, then Databases and the Trash. */
 export function SidebarPages({ workspaceId, onNavigate }: SidebarSectionProps) {
   const sheets = useSheetsStore((state) => state.sheets)
   const favoriteIds = useFavoritesStore((state) => state.ids)
-  const isTrashOpen = useViewStore((state) => state.activeTab === 'view:trash')
+  const activeTab = useViewStore((state) => state.activeTab)
   const favorites = sheets.filter((sheet) => favoriteIds.includes(sheet.id))
 
   return (
@@ -59,6 +59,19 @@ export function SidebarPages({ workspaceId, onNavigate }: SidebarSectionProps) {
         Schedule one
       </Link>
       <a
+        href={pathFor(workspaceId, 'view:databases')}
+        onClick={(event) =>
+          openInPlace(event, () => {
+            useViewStore.getState().openTab('view:databases')
+            onNavigate()
+          })
+        }
+        className={`${ROW} mt-1.5 ${activeTab === 'view:databases' ? ROW_ON : 'opacity-70'}`}
+      >
+        <IconDatabase className="size-3.5" />
+        Databases
+      </a>
+      <a
         href={pathFor(workspaceId, 'view:trash')}
         onClick={(event) =>
           openInPlace(event, () => {
@@ -66,7 +79,7 @@ export function SidebarPages({ workspaceId, onNavigate }: SidebarSectionProps) {
             onNavigate()
           })
         }
-        className={`${ROW} mt-1.5 ${isTrashOpen ? ROW_ON : 'opacity-70'}`}
+        className={`${ROW} ${activeTab === 'view:trash' ? ROW_ON : 'opacity-70'}`}
       >
         <IconTrash className="size-3.5" />
         Trash

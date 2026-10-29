@@ -1058,3 +1058,17 @@ list, time tracker (code page), invoices, sprint.
       palette lives in `brand-assets`
 
 Acceptance: every lab app valid at 1100 and 390, no sideways overflow, no page errors.
+
+
+# Deletes (2026-10-29) — D108 · D109
+
+- [x] D108 `sheet_delete`: the person's trash path, asker-readable only, routines refused, a public
+      page left to a person; pill says it in words + Restore; instructions: only when asked
+- [x] D109 `sheet_tables` index (each write + once at open), `tables.catalog/trashed/trash/restore/
+      purge`, `/databases`, Trash lists tables, quiet `<Database>` missing state, `db_list_tables`
+      marks `shownOn`
+- [ ] later: page code (`useRows`) and widgets don't count toward "Shown on"
+- [ ] later: a purged table's row pages free no uploads (their files stay in the store)
+
+Acceptance: service tests (subtree, unreadable, routine, restore; catalog, trash, restore, purge,
+reindex) pass; typecheck, Biome and `bun test` green.

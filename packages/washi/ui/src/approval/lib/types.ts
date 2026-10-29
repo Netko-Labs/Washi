@@ -25,3 +25,10 @@ export interface ApprovalCardProps {
 export interface PagePreviewProps {
   source: string
 }
+
+export type RestoreState = 'idle' | 'busy' | 'restored' | 'gone'
+
+export interface RestorePageProps {
+  /** The page Washi moved to the trash. */
+  id: string
+}

@@ -6,6 +6,7 @@ export type AppView =
   | 'routines'
   | 'daily'
   | 'settings'
+  | 'databases'
   | 'trash'
 export type TabKey = `note:${string}` | `view:${Exclude<AppView, 'note'>}`
 
