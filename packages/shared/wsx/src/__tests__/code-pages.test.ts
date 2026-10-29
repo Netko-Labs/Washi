@@ -122,3 +122,22 @@ const open = useOpen()
     expect(module.trimEnd().endsWith('</Sheet>\n)\n}')).toBe(true)
   })
 })
+
+describe('text beside code', () => {
+  test('keeps the space JSX keeps, and writes back on one line', () => {
+    const root = parse('<Sheet title="t"><Title>Hello {name}!</Title><Text>{a} {b}</Text></Sheet>')
+    const [title, text] = root.children
+    expect(title).toMatchObject({
+      children: [{ value: 'Hello ' }, { source: 'name' }, { value: '!' }],
+    })
+    expect(text).toMatchObject({ children: [{ source: 'a' }, { value: ' ' }, { source: 'b' }] })
+    expect(serialize(root)).toContain('<Title>Hello {name}!</Title>')
+    expect(serialize(root)).toContain('<Text>{a} {b}</Text>')
+    expect(parse(serialize(root))).toEqual(root)
+  })
+
+  test('a line break beside code is no space, as in JSX', () => {
+    const root = parse('<Sheet title="t"><Text>\n  Total\n  {n}\n</Text></Sheet>')
+    expect(root.children[0]).toMatchObject({ children: [{ value: 'Total' }, { source: 'n' }] })
+  })
+})

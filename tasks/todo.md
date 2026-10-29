@@ -13,9 +13,9 @@ still has no network.
       pages byte-identical; serialize round-trips; validate skips code-valued props
 - [x] B · compile: `compilePage` (Bun.build + allowlist + `page:` imports, cached), save check,
       `pages.compile`, curated deps traced into `.output`
-- [ ] C · run: paper draws a code page through QuickJS — `h` calls local components, handlers →
+- [x] C · run: paper draws a code page through QuickJS — `h` calls local components, handlers →
       actions, validated tree, re-run on state/rows/data; shared links draw the literal parts
-- [ ] D · hooks: useRows/useRow/useTable/useInsert/useUpdate/useDelete · useState (local)/
+- [x] D · hooks (folded into C): useRows/useRow/useTable/useInsert/useUpdate/useDelete · useState (local)/
       usePageState/useStored/useInterval/useNow · usePage/usePages/useMembers/useMe/useNavigate
 - [ ] E · migrate `<Script>` pages once (app meta), drop Script + ScriptBlock; code pages edit in
       source mode; agent instructions, /learn + mihon, CLAUDE.md W1

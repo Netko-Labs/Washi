@@ -1,4 +1,4 @@
-import type { WsxElement, WsxNode } from '@washi/wsx'
+import { hasCode, type WsxElement, type WsxNode } from '@washi/wsx'
 import { type ComponentType, createElement, type ReactNode, useMemo } from 'react'
 import { Agenda } from './components/agenda'
 import { Board } from './components/board'
@@ -27,6 +27,7 @@ import { Chip, Mascot, Missing } from './components/kit'
 import { Bento, Column, Columns, Tile } from './components/layout'
 import { Audio, File, Video } from './components/media'
 import { Backlinks, Include, Outline, PageLink, Subpages } from './components/pages'
+import { literalOnly, PageProgram } from './components/program'
 import { Redact } from './components/redact'
 import { Roadmap } from './components/roadmap'
 import { Automation, Formula, Script } from './components/script'
@@ -235,7 +236,12 @@ function Tree({ root, isBody }: { root: WsxElement; isBody?: boolean }) {
       <DataProvider tables={tables}>
         <NowContext.Provider value={now}>
           {isBody ? (
-            renderChildren(root.children, { numbers })
+            renderChildren(hasCode(root) ? literalOnly(root).children : root.children, { numbers })
+          ) : hasCode(root) ? (
+            <PageProgram
+              root={root}
+              draw={(drawn) => <Element node={drawn} ctx={{ numbers: numberFootnotes(drawn) }} />}
+            />
           ) : (
             <Element node={root} ctx={{ numbers }} />
           )}

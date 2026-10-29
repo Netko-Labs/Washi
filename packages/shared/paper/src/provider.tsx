@@ -26,6 +26,10 @@ export interface PaperHost {
   loadSheet?(id: string): Promise<{ title: string; root: WsxElement } | null>
   /** A `<Script>`'s TSX compiled for the sandbox; a host that cannot compile leaves it out. */
   compileScript?(source: string): Promise<CompiledScript>
+  /** A page that runs, bundled for the sandbox (D100); without it, only its literal parts draw. */
+  compilePage?(source: string): Promise<CompiledScript>
+  /** Who is reading, for a page's `useMe()`; a host with no accounts leaves it out. */
+  describeMe?(): Promise<{ id: string; name: string } | null>
   /** Whether an owner lets this workspace's pages run widgets; without it, none run. */
   widgetsAllowed?(): Promise<boolean>
   /** Whether the workspace lists `host` for embeds; without it only built-in providers play. */

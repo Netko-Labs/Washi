@@ -1,8 +1,9 @@
 import { useMemo } from 'react'
 import { styled } from '../../lib'
+import { INVOKE } from '../../lib/sandbox'
 import type { ScriptProps } from '../../lib/types'
 import { type PaperHost, PaperProvider, usePaperHost } from '../../provider'
-import { INVOKE, useScript } from './lib'
+import { useScript } from './lib'
 
 /**
  * A block a page wrote in TypeScript. It runs in QuickJS with no DOM, network or timers of its

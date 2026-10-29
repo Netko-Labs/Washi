@@ -1,19 +1,16 @@
 import { describe, expect, test } from 'bun:test'
+import { toNodes } from '../../../lib/sandbox'
 import type { ScriptBridge } from '../../../lib/types'
 import { paperRegistry } from '../../../registry/specs'
-import { openSandbox } from '../lib/sandbox'
-import { checkTree, toNodes } from '../lib/utils'
+import { openScriptSandbox as openSandbox } from '../lib/sandbox'
+import { checkTree } from '../lib/utils'
 
 const NAMES = Object.keys(paperRegistry.components)
 
-function bridge(
-  page: Record<string, string> = {},
-): ScriptBridge & { sets: string[][]; wanted: string[] } {
+function recorder(page: Record<string, string> = {}) {
   const sets: string[][] = []
   const wanted: string[] = []
-  return {
-    sets,
-    wanted,
+  const bridge: ScriptBridge = {
     state: (key) => page[key],
     set: (key, json) => void sets.push([key, json]),
     rows: (query) => {
@@ -23,7 +20,10 @@ function bridge(
     interval: () => {},
     act: () => {},
   }
+  return { bridge, sets, wanted }
 }
+
+const bridge = (page?: Record<string, string>) => recorder(page).bridge
 
 const COUNTER = `function view() {
   const [n, setN] = useState('n', 0)
@@ -43,8 +43,8 @@ describe('a script in its sandbox', () => {
       name: 'Button',
       props: { action: { verb: 'script.invoke', handler: 0 } },
     })
-    const seen = bridge({ n: '2' })
-    sandbox.call('__invoke(0)', seen)
+    const seen = recorder({ n: '2' })
+    sandbox.call('__invoke(0)', seen.bridge)
     expect(seen.sets).toEqual([['n', '3']])
     sandbox.dispose()
   })
@@ -76,8 +76,8 @@ describe('a script in its sandbox', () => {
       "function view() { const rows = useRows({ table: 'tasks' }); return h(Stat, { label: 'Open', value: rows.length }) }",
       NAMES,
     )
-    const asked = bridge()
-    const run = sandbox.call('__render()', asked)
+    const asked = recorder()
+    const run = sandbox.call('__render()', asked.bridge)
     expect(asked.wanted).toEqual(['{"table":"tasks"}'])
     expect(run.ok && JSON.parse(run.value)).toMatchObject({ name: 'Stat', props: { value: 0 } })
     sandbox.dispose()

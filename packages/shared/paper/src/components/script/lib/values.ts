@@ -1,7 +1,6 @@
 /** A script's whole budget for one run: past it, QuickJS interrupts it mid-loop. */
 export const RUN_DEADLINE_MS = 60
 export const MEMORY_BYTES = 16 * 1024 * 1024
-export const STACK_BYTES = 512 * 1024
 /** A clock may tick; nothing re-runs more often than this. */
 export const MIN_INTERVAL_MS = 1000
 

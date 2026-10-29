@@ -499,8 +499,9 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   (its source), a non-literal child a `{ kind: 'code', source }` hole; literals stay data, so a page
   of literals parses exactly as before. `validate` checks a code prop by name only, lets
   `onPress`/`onClick`/`key` through and the prelude's components by; a `<Sheet>`'s own props stay
-  literal. `hasCode` says a page runs. Until it can, `checkSource` refuses code at save; the editor
-  opens a page with code in source mode. `pageModule` makes a page an ES module: imports, functions
+  literal. Text beside a hole keeps the space JSX keeps (`Hello {name}`), and `serialize` writes an
+  element of text and holes on one line so it survives. `hasCode` says a page runs; `checkSource`
+  checks its code at save (below); the editor opens a page with code in source mode. `pageModule` makes a page an ES module: imports, functions
   and `export`s on top, every other statement and the markup in `export default function view()`.
   `compilePage` (service `pages/`, `scripts.page`) bundles it with `Bun.build` — `washi` (the hooks,
   `PAGE_HOOKS`, as calls into `globalThis.__washi`), `washi/ui` (registry names), `PAGE_LIBRARIES`
@@ -509,6 +510,18 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   by source + imported sources (64), ≤ 768 KB. Anything else is refused in words, at save too
   (`pageCodeDiagnostics`: Transpiler + the allowlist). The studio declares the libraries so Nitro
   traces them into `.output` (`RUNTIME_FILE_DEPS`); `zod` alone bundles to ~490 KB.
+  Paper runs it (`PageProgram`, from `WsxView` when `hasCode`): `PaperHost.compilePage` (the studio:
+  `scripts.page`), then the shared sandbox (`lib/sandbox`: QuickJS, 32 MB, 100 ms a draw) with
+  `programPrelude` — the registry names, an `h` that calls a page's own components, and
+  `globalThis.__washi`: `useRows` `useRow` `useTable` `useInsert` `useUpdate` `useDelete` · `useState`
+  (local, by call order) `usePageState` (the page's `state`) `useStored` (the reader's, localStorage)
+  `useInterval` `useNow` · `usePage` `usePages` `useMembers` `useMe` (`describeMe`) `useNavigate` ·
+  `act`. Reads answer from what is known and are fetched after the run that asked, then it draws
+  again (also on data or page-tree changes). A write — `act`, an insert, a state change, a
+  navigation — runs only from a press; mid-draw it throws, so drawing never writes. What `view()`
+  returns is checked like a page (`checkDrawn`; the `<Sheet>` keeps the page's own literal props;
+  adjacent text runs joined); before it runs, where it stops (said once, quietly) or on a host
+  without `compilePage` (a shared link, the book), `literalOnly` draws just its literal parts.
 - WSX is inert data: registry primitives, literal props, the closed `expr` grammar only. Components
   own appearance (four enums: `variant tone size emphasis`); pages own content. Validation before
   persist and before render. Format reference: `/learn` and the registry specs.

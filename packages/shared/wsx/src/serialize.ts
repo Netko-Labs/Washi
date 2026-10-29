@@ -23,6 +23,26 @@ function serializeText(value: string): string {
   return isLines ? `{\`${value}\`}` : `{${JSON.stringify(value)}}`
 }
 
+/**
+ * Text and code side by side stay on one line, as written: a line break between them would drop
+ * the space in `Hello {name}`. Text there is raw unless an edge away from code would be trimmed.
+ */
+function serializeInline(children: WsxNode[]): string {
+  return children
+    .map((child, at) => {
+      if (child.kind === 'code') return `{${child.source}}`
+      if (child.kind !== 'text') return ''
+      const value = child.value
+      const isRaw =
+        /^[^<>{}&\n]*$/.test(value) &&
+        !/\s{2}/.test(value) &&
+        (children[at - 1]?.kind === 'code' || !/^\s/.test(value)) &&
+        (children[at + 1]?.kind === 'code' || !/\s$/.test(value))
+      return isRaw ? value : `{${JSON.stringify(value)}}`
+    })
+    .join('')
+}
+
 function serializeNode(node: WsxNode, depth: number): string {
   const indent = '  '.repeat(depth)
   if (node.kind === 'text') return `${indent}${serializeText(node.value)}`
@@ -30,6 +50,11 @@ function serializeNode(node: WsxNode, depth: number): string {
 
   const open = `${node.name}${serializeProps(node)}`
   if (node.children.length === 0) return `${indent}<${open} />`
+
+  const isMixed =
+    node.children.some((child) => child.kind === 'code') &&
+    node.children.every((child) => child.kind !== 'element')
+  if (isMixed) return `${indent}<${open}>${serializeInline(node.children)}</${node.name}>`
 
   const single = node.children.length === 1 && node.children[0]?.kind === 'text'
   if (single && node.children[0]?.kind === 'text') {
