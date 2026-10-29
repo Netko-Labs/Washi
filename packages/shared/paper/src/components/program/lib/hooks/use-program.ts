@@ -13,6 +13,7 @@ const noNeeds = (): ProgramNeeds => ({
   me: false,
   refused: null,
   every: 0,
+  seeds: {},
 })
 
 /**
@@ -44,6 +45,10 @@ export function useProgram(root: WsxElement) {
         ? { status: 'drawn', root: checked.root }
         : { status: 'stopped', reason: checked.reason },
     )
+    // The page's own default for a key Selects show too — the same as declaring it on <Sheet state>.
+    for (const [key, value] of Object.entries(needs.seeds)) {
+      if (!(key in box.values)) box.set(key, value)
+    }
     const again = () => redraw((n) => n + 1)
     for (const query of new Set(needs.queries)) {
       box.rows.set(query, null)

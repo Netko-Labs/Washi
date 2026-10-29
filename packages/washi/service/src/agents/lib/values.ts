@@ -69,7 +69,7 @@ clock, a small tool — the page itself may run code, MDX-style: imports and cod
 <Sheet>, whose props and children take {expressions}, .map(…) and components the page defines.
 From 'washi' import only: useRows(inkQuery) useRow(table, id) useTable(name) useInsert(table)
 useUpdate(table) useDelete(table) · useState(initial) (local) usePageState(key, initial) (the page's
-state, shared with Selects) useStored(key, initial) (the reader's own) useInterval(ms ≥ 1000) useNow()
+state, shared with Selects; initial seeds it) useStored(key, initial) (the reader's own) useInterval(ms ≥ 1000) useNow()
 · usePage() usePages(of?) useMembers() useMe() useNavigate() · act(action). Other imports: washi/ui,
 date-fns, lodash-es, zod (prefer zod/mini) and page:<id> — another page's exports, so a page may
 export function useBudget() for others. Writes (act, insert/update/delete, a setter, navigate) run

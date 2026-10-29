@@ -9,6 +9,7 @@ export const PROGRAM_BRIDGE = [
   'rows',
   'table',
   'state',
+  'seed',
   'set',
   'stored',
   'store',
@@ -67,6 +68,7 @@ const __keyed = (get, put, what) => (key, initial) => {
   }
   return [value, set]
 }
+const __pageState = __keyed((key) => B.state(key), (key, json) => B.set(key, json), 'a page state change')
 globalThis.__washi = {
   useRows: (query) => __read(B.rows(JSON.stringify(query)), []),
   useRow: (table, id) =>
@@ -84,7 +86,10 @@ globalThis.__washi = {
     }
     return [__slots[at], set]
   },
-  usePageState: __keyed((key) => B.state(key), (key, json) => B.set(key, json), 'a page state change'),
+  usePageState: (key, initial) => {
+    if (initial !== undefined && B.state(String(key)) === undefined) B.seed(String(key), JSON.stringify(initial))
+    return __pageState(key, initial)
+  },
   useStored: __keyed((key) => B.stored(key), (key, json) => B.store(key, json), 'a stored change'),
   useInterval: (ms) => void B.interval(String(ms)),
   useNow: (ms = 1000) => {

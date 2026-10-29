@@ -529,7 +529,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   `scripts.page`), then the shared sandbox (`lib/sandbox`: QuickJS, 32 MB, 100 ms a draw) with
   `programPrelude` — the registry names, an `h` that calls a page's own components, and
   `globalThis.__washi`: `useRows` `useRow` `useTable` `useInsert` `useUpdate` `useDelete` · `useState`
-  (local, by call order) `usePageState` (the page's `state`) `useStored` (the reader's, localStorage)
+  (local, by call order) `usePageState` (the page's `state`; an
+  unset key's `initial` is written once the page has drawn, so a Select on it shows the same) `useStored` (the reader's, localStorage)
   `useInterval` `useNow` · `usePage` `usePages` `useMembers` `useMe` (`describeMe`) `useNavigate` ·
   `act`. Reads answer from what is known and are fetched after the run that asked, then it draws
   again (also on data or page-tree changes). A write — `act`, an insert, a state change, a
