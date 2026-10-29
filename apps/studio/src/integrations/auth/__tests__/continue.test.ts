@@ -13,6 +13,7 @@ describe('where a sign-in or consent goes next (D101)', () => {
     expect(continueUrl({ user: { id: 'u' }, token: 't' })).toBeNull()
     expect(continueUrl({ url: 'javascript:alert(1)' })).toBeNull()
     expect(continueUrl({ url: '//evil.example/callback' })).toBeNull()
+    expect(continueUrl({ url: '/\\evil.example/callback' })).toBeNull()
     expect(continueUrl(null)).toBeNull()
   })
 })
