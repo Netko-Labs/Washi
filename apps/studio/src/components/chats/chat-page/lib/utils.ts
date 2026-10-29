@@ -179,3 +179,13 @@ export function greetingFor(name: string): string {
 export function isNearBottom(box: ScrollBox, slack = NEAR_BOTTOM_PX): boolean {
   return box.scrollHeight - box.scrollTop - box.clientHeight <= slack
 }
+
+/** Pages a finished `sheet_delete` in this run moved to the trash — each gets its Restore. */
+export function trashedPages(steps: ToolStep[]): string[] {
+  return steps.flatMap((step) => {
+    const id = (step.input as { id?: unknown } | undefined)?.id
+    return step.name === 'sheet_delete' && step.status === 'completed' && typeof id === 'string'
+      ? [id]
+      : []
+  })
+}

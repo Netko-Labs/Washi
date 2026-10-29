@@ -18,6 +18,16 @@ describe('tool calls read like a person asked', () => {
     expect(said('sheet_get', { id: 's1' })).toBe('Read Trip to Kyoto')
     expect(said('sheet_delete', { id: 's1' })).toBe('Moved “Trip to Kyoto” to the trash')
     expect(said('sheet_delete', { id: 'gone' })).toBe('Moved a page to the trash')
+    const reloaded = describeTool(
+      'sheet_delete',
+      { id: 'gone' },
+      titles,
+      '{"id":"gone","title":"Old notes","pages":1}',
+    )
+    expect(reloaded.action).toBe('Moved “Old notes” to the trash')
+    expect(said('set_conversation_title', { title: 'Lisbon plan' })).toBe(
+      'Named the chat Lisbon plan',
+    )
     expect(said('chat_handover', { sheetId: 's1' })).toBe('Moved this chat to Trip to Kyoto')
   })
 
