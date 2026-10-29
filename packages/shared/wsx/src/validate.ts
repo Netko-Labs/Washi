@@ -92,12 +92,11 @@ function checkPlacement(
 
 /**
  * A prop written as code is checked by name here and by value once the page has run; a handler
- * (`onPress`) is code by nature, and `key` only tells a `.map` its rows apart.
+ * (`onPress`) is code by nature, and a code `key` only tells a `.map` its rows apart.
  */
 function checkProps(node: WsxElement, spec: ComponentSpec, nodePath: string, walk: Walk) {
   const written = Object.keys(node.code ?? {}).filter((key) => !HANDLERS.has(key) && key !== 'key')
-  const { key: _key, ...props } = node.props
-  const probe = { ...props, ...Object.fromEntries(written.map((key) => [key, null])) }
+  const probe = { ...node.props, ...Object.fromEntries(written.map((key) => [key, null])) }
   const parsed = spec.props.safeParse(probe)
   if (parsed.success) return
   for (const issue of parsed.error.issues) {

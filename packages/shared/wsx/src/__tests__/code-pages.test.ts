@@ -79,6 +79,18 @@ describe('a page that runs (D100)', () => {
     ).toContain('label')
   })
 
+  test('a literal key is no prop, and an empty prop is an error', () => {
+    const keyed = validate(
+      parse('<Sheet title="t"><Stat label="a" value={1} key="x" /></Sheet>'),
+      registry,
+    )
+    expect(keyed.map((each) => each.message).join()).toContain('key')
+    expect(
+      validate(parse('<Sheet title="t"><Stat label="a" value={1} key={id} /></Sheet>'), registry),
+    ).toEqual([])
+    expect(() => parse('<Sheet title={} />')).toThrow('prop title is empty')
+  })
+
   test('a <Sheet>’s own props stay literal, and a page never default-exports', () => {
     const coded = validate(parse('<Sheet title={name} />'), registry)
     expect(coded.map((each) => each.message).join()).toContain('literal')

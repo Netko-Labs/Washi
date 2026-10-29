@@ -67,7 +67,9 @@ function convertElement(node: t.JSXElement, slice: Slice): WsxElement {
     if (value == null) props[key] = true
     else if (value.type === 'StringLiteral') props[key] = value.value
     else if (value.type === 'JSXExpressionContainer') {
-      if (value.expression.type === 'JSXEmptyExpression') continue
+      if (value.expression.type === 'JSXEmptyExpression') {
+        return fail(`prop ${key} is empty — give it a value`, attribute)
+      }
       const read = valueOf(value.expression, slice)
       if ('value' in read) props[key] = read.value
       else code[key] = read.code
