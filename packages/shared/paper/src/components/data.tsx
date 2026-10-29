@@ -180,14 +180,16 @@ export function Progress({
   ...rest
 }: BlockProps & { value?: number | string; expr?: string; label?: string }) {
   const computed = useExprValue(expr)
+  // A `$row.x` with no row around it never resolved: unknown, said as such — never an invented 0%.
+  const isUnknown = !expr && typeof value === 'string' && value.startsWith('$row.')
   const given = Number(value ?? 0) || 0
   const ratio = Math.min(1, Math.max(0, typeof computed === 'number' ? computed : given))
-  const percent = Math.round(ratio * 100)
+  const percent = isUnknown ? 0 : Math.round(ratio * 100)
   return (
     <div
       {...styled(rest, 'wsx-progress')}
       role="progressbar"
-      aria-valuenow={percent}
+      aria-valuenow={isUnknown ? undefined : percent}
       aria-valuemin={0}
       aria-valuemax={100}
       aria-label={label}
@@ -195,7 +197,7 @@ export function Progress({
       {label && (
         <div className="wsx-progress-label">
           <span>{label}</span>
-          <span>{percent}%</span>
+          <span>{isUnknown ? '—' : `${percent}%`}</span>
         </div>
       )}
       <div className="wsx-progress-track">
