@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { stateValue, toNodes } from '../../../../lib/sandbox'
 import type { ActionRef, ScriptBridge, ScriptLive, ScriptState } from '../../../../lib/types'
 import { usePaperHost } from '../../../../provider'
 import { paperRegistry } from '../../../../registry/specs'
 import { useSheetState } from '../../../../state'
-import { openSandbox } from '../sandbox'
-import { checkTree, stateValue, toNodes } from '../utils'
+import { openScriptSandbox } from '../sandbox'
+import { checkTree } from '../utils'
 import { MIN_INTERVAL_MS } from '../values'
 
 const NAMES = Object.keys(paperRegistry.components)
@@ -34,7 +35,7 @@ export function useScript(source: string) {
       .compileScript(source)
       .then(async (compiled) => {
         if (!compiled.ok) throw new Error(compiled.error)
-        const sandbox = await openSandbox(compiled.js, NAMES)
+        const sandbox = await openScriptSandbox(compiled.js, NAMES)
         if (!alive) return sandbox.dispose()
         box.sandbox = sandbox
         redraw((n) => n + 1)
@@ -72,7 +73,10 @@ export function useScript(source: string) {
       return rows ?? undefined
     },
     interval: (ms) => {
-      every.ms = Math.max(MIN_INTERVAL_MS, Math.min(every.ms || Number.POSITIVE_INFINITY, ms))
+      every.ms = Math.max(
+        MIN_INTERVAL_MS,
+        Math.min(every.ms || Number.POSITIVE_INFINITY, Number(ms)),
+      )
     },
     act: (json) => void host.runAction(JSON.parse(json) as ActionRef).catch(() => {}),
   })

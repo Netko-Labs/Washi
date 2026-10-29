@@ -64,13 +64,47 @@ function convertElement(node: t.JSXElement, slice: Slice): WsxElement {
   return element
 }
 
+type Child = t.JSXElement['children'][number]
+
+/** Whether a child is code the page runs — a `{…}` that is not a literal, a fragment, a spread. */
+function isHole(child: Child | undefined, slice: Slice): boolean {
+  if (child?.type === 'JSXFragment' || child?.type === 'JSXSpreadChild') return true
+  if (child?.type !== 'JSXExpressionContainer' || child.expression.type === 'JSXEmptyExpression') {
+    return false
+  }
+  const read = valueOf(child.expression, slice)
+  return 'code' in read || (read.value !== null && typeof read.value === 'object')
+}
+
+/**
+ * Text as JSX reads it — whitespace holding a line break goes — then runs of spaces as one. Its
+ * edges are trimmed too, except where they touch code: `Hello {name}` keeps its space.
+ */
+function textOf(raw: string, keepStart: boolean, keepEnd: boolean): string | null {
+  const lines = raw.split(/\r\n|\n|\r/)
+  const kept = lines
+    .map((line, at) => {
+      const start = at > 0 ? line.trimStart() : line
+      return at < lines.length - 1 ? start.trimEnd() : start
+    })
+    .filter((line, at) => line.length > 0 || (lines.length === 1 && at === 0))
+  let value = kept.join(' ').replace(/\s+/g, ' ')
+  if (!keepStart) value = value.trimStart()
+  if (!keepEnd) value = value.trimEnd()
+  return value.length > 0 ? value : null
+}
+
 function convertChildren(children: t.JSXElement['children'], slice: Slice): WsxNode[] {
   const out: WsxNode[] = []
-  for (const child of children) {
+  children.forEach((child, at) => {
     switch (child.type) {
       case 'JSXText': {
-        const value = child.value.replace(/\s+/g, ' ')
-        if (value.trim().length > 0) out.push({ kind: 'text', value: value.trim() })
+        const keepStart = isHole(children[at - 1], slice)
+        const keepEnd = isHole(children[at + 1], slice)
+        const value = textOf(child.value, keepStart, keepEnd)
+        if (value !== null && (value.trim().length > 0 || (keepStart && keepEnd))) {
+          out.push({ kind: 'text', value })
+        }
         break
       }
       case 'JSXElement':
@@ -89,7 +123,7 @@ function convertChildren(children: t.JSXElement['children'], slice: Slice): WsxN
         out.push({ kind: 'code', source: slice(child) })
         break
     }
-  }
+  })
   return out
 }
 

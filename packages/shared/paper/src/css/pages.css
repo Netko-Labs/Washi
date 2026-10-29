@@ -203,3 +203,13 @@
   font-family: var(--font-mono);
   font-size: 0.95em;
 }
+
+/* A page whose code is not running: said once, quietly, above what it could draw. */
+.wsx-program-stopped {
+  margin: 0 0 12px;
+  padding: 8px 12px;
+  border-radius: var(--r-input);
+  background: var(--muted-bg);
+  color: var(--muted);
+  font-size: 13px;
+}

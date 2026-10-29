@@ -72,28 +72,91 @@ export type ScriptState =
   | { status: 'drawn'; root: WsxElement }
 
 /** The sandbox's only ways out: each answers with JSON text, or nothing. */
-export interface ScriptBridge {
+export type ScriptBridge = {
   state(key: string): string | undefined
   set(key: string, json: string): void
   rows(queryJson: string): string | undefined
-  interval(ms: number): void
+  interval(ms: string): void
   act(json: string): void
 }
 
 /** What a script's runs share: its sandbox, the rows it asked for, the page as it is now. */
 export interface ScriptLive {
-  sandbox: ScriptSandbox | null
+  sandbox: Sandbox | null
   /** Query JSON → rows JSON; null while one is being fetched. */
   rows: Map<string, string | null>
   values: Record<string, string | number | boolean | null>
   set: (key: string, value: string | number | boolean | null) => void
 }
 
-/** One script's sandbox: a run gives JSON text or the error, in words. */
-export interface ScriptSandbox {
+export type ProgramState =
+  | { status: 'starting' }
+  | { status: 'stopped'; reason: string }
+  | { status: 'drawn'; root: WsxElement }
+
+/** What a page's runs share: its sandbox, what it fetched, the page as it is now. */
+export interface ProgramLive {
+  sandbox: Sandbox | null
+  title: string
+  /** Query JSON → rows JSON; null while one is being fetched. */
+  rows: Map<string, string | null>
+  /** Table name → its spec JSON; null while fetched, `null` JSON when there is no such table. */
+  tables: Map<string, string | null>
+  /** The members JSON; null while fetched, undefined until asked. */
+  members: string | null | undefined
+  /** The reader JSON, the same way. */
+  me: string | null | undefined
+  /** Why a press stopped the page; it stays stopped until its code changes. */
+  halted: string | null
+  values: Record<string, string | number | boolean | null>
+  set: (key: string, value: string | number | boolean | null) => void
+}
+
+/** What one run asked for that the host fetches after it, then draws again. */
+export interface ProgramNeeds {
+  queries: string[]
+  tables: string[]
+  members: boolean
+  me: boolean
+  /** The first write the page tried while it drew, refused; the run stops on it. */
+  refused: string | null
+  /** The shortest clock the page set, in ms; 0 when none. */
+  every: number
+}
+
+export interface PageProgramProps {
+  root: WsxElement
+  draw: (root: WsxElement) => ReactNode
+}
+
+/** A drawn element as the sandbox hands it over: plain JSON, every part still unchecked. */
+export interface DrawnNode {
+  name?: unknown
+  props?: unknown
+  children?: unknown
+}
+
+/** A function prop the sandbox kept, by its place in the run's handler list. */
+export interface DrawnHandler {
+  washiHandler: number
+}
+
+/** Named ways out of a sandbox, lent per call; each answers with JSON text, or nothing. */
+export type SandboxBridge = Record<string, (...args: string[]) => unknown>
+
+export interface SandboxSetup {
+  prelude: string
+  /** Each is lent as `__bridge_<name>`. */
+  names: string[]
+  deadlineMs: number
+  memoryBytes: number
+}
+
+/** One sandbox: a run gives JSON text or the error, in words. */
+export interface Sandbox {
   call(
     code: string,
-    bridge: ScriptBridge,
+    bridge: SandboxBridge | null,
   ): { ok: true; value: string } | { ok: false; error: string }
   dispose(): void
 }

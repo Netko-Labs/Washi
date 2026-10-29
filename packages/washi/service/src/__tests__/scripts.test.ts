@@ -38,11 +38,15 @@ describe('compiling a script', () => {
   })
 })
 
-describe('a page that runs, before it can (D100)', () => {
-  test('code in a page is refused at save, in words', () => {
-    const check = checkSource('const n = 1\n<Sheet title="t"><Text>{n}</Text></Sheet>')
-    expect(check.ok).toBe(false)
-    expect(check.diagnostics.map((each) => each.message).join()).toContain('not accepted yet')
-    expect(checkSource('<Sheet title="t"><Text>hi</Text></Sheet>').ok).toBe(true)
+describe('a page that runs, at save (D100)', () => {
+  test('code that compiles and imports what a page may is kept; anything else is refused', () => {
+    expect(
+      checkSource(
+        "import { useRows } from 'washi'\nconst n = useRows({ table: 't' }).length\n<Sheet title=\"t\"><Text>{n}</Text></Sheet>",
+      ).ok,
+    ).toBe(true)
+    const net = checkSource('import { get } from \'node:https\'\n<Sheet title="t" />')
+    expect(net.diagnostics.map((each) => each.message).join()).toContain('cannot import')
+    expect(checkSource('<Sheet title="t"><Stat valu={1 + 1} /></Sheet>').ok).toBe(false)
   })
 })
