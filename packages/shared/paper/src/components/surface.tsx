@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react'
 import { mediaUrl, styled } from '../lib'
-import type { BlockProps, Tone } from '../lib/types'
+import type { CalloutProps, CardProps, FigureProps, HeroProps, Tone } from '../lib/types'
 import { useSheetLook } from '../look'
 
 const CALLOUT_ICONS: Record<Tone, string> = {
@@ -20,7 +20,7 @@ const RATIOS: Record<string, string> = {
   '1:1': '1 / 1',
 }
 
-export function Card({ title, children, ...rest }: BlockProps & { title?: string }) {
+export function Card({ title, children, ...rest }: CardProps) {
   return (
     <div {...styled(rest, 'wsx-card')}>
       {rest.variant === 'tape' && (
@@ -35,7 +35,7 @@ export function Card({ title, children, ...rest }: BlockProps & { title?: string
 }
 
 /** Tone is never the only signal — every callout carries an icon beside its text. */
-export function Callout({ title, children, ...rest }: BlockProps & { title?: string }) {
+export function Callout({ title, children, ...rest }: CalloutProps) {
   const tone = rest.tone ?? 'info'
   return (
     <aside
@@ -62,12 +62,7 @@ export function Callout({ title, children, ...rest }: BlockProps & { title?: str
   )
 }
 
-export function Hero({
-  title,
-  subtitle,
-  align = 'left',
-  ...rest
-}: BlockProps & { title: string; subtitle?: string; align?: 'left' | 'center' }) {
+export function Hero({ title, subtitle, align = 'left', ...rest }: HeroProps) {
   return (
     <header {...styled({ size: 'lg', ...rest }, 'wsx-hero')} data-align={align}>
       <h1 className="wsx-hero-title">{title}</h1>
@@ -76,13 +71,7 @@ export function Hero({
   )
 }
 
-export function Figure({
-  src,
-  alt,
-  caption,
-  ratio,
-  ...rest
-}: BlockProps & { src: string; alt: string; caption?: string; ratio?: string }) {
+export function Figure({ src, alt, caption, ratio, ...rest }: FigureProps) {
   const look = useSheetLook()
   const url = mediaUrl(src, look)
   const style = ratio ? ({ '--ratio': RATIOS[ratio] } as CSSProperties) : undefined

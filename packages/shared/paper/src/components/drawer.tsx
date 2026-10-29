@@ -1,9 +1,8 @@
 import type { TableSpec } from '@washi/ink'
-import { type ReactNode, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { resolveRow, styled, useBind } from '../lib'
-import type { BlockProps, Row } from '../lib/types'
+import type { DrawerProps, SchemaProps } from '../lib/types'
 import { usePaperHost } from '../provider'
-import type { BindQuery } from '../registry'
 import { RowProvider, useSheetState } from '../state'
 import { Bound, cell } from './states'
 
@@ -11,18 +10,7 @@ import { Bound, cell } from './states'
  * A side panel whose openness is a state key. With `bind`, the key holds a row id
  * and children render with that row as `$row`; without, any truthy value opens it.
  */
-export function Drawer({
-  state,
-  bind,
-  title,
-  children,
-  ...rest
-}: BlockProps & {
-  state: string
-  bind?: BindQuery
-  title?: string
-  children: (row: Row | null) => ReactNode
-}) {
+export function Drawer({ state, bind, title, children, ...rest }: DrawerProps) {
   const sheet = useSheetState()
   const value = sheet.values[state]
   const open = value !== null && value !== undefined && value !== false && value !== ''
@@ -71,7 +59,7 @@ export function Drawer({
 }
 
 /** A table's columns from the spec: the schema the page is a view of. */
-export function Schema({ table, ...rest }: BlockProps & { table: string }) {
+export function Schema({ table, ...rest }: SchemaProps) {
   const host = usePaperHost()
   const [spec, setSpec] = useState<TableSpec | null>(null)
 

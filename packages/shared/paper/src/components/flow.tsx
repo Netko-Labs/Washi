@@ -1,9 +1,9 @@
-import { type ReactNode, useState } from 'react'
+import { useState } from 'react'
 import { styled, useExprValue } from '../lib'
-import type { BlockProps } from '../lib/types'
+import type { BlockProps, RevealProps, ShowProps, TabsProps } from '../lib/types'
 import { useSheetState } from '../state'
 
-export function Show({ expr, children }: { expr: string; children?: ReactNode }) {
+export function Show({ expr, children }: ShowProps) {
   const value = useExprValue(expr)
   return value === true ||
     (typeof value === 'number' && value !== 0) ||
@@ -12,12 +12,7 @@ export function Show({ expr, children }: { expr: string; children?: ReactNode })
     : null
 }
 
-export function Tabs({
-  labels,
-  state,
-  children,
-  ...rest
-}: BlockProps & { labels: string[]; state?: string }) {
+export function Tabs({ labels, state, children, ...rest }: TabsProps) {
   const sheet = useSheetState()
   const [internal, setInternal] = useState(0)
   const active = state
@@ -52,12 +47,7 @@ export function Tab({ children, ...rest }: BlockProps) {
   return <div {...styled(rest, 'wsx-tab')}>{children}</div>
 }
 
-export function Reveal({
-  label,
-  state,
-  children,
-  ...rest
-}: BlockProps & { label: string; state?: string }) {
+export function Reveal({ label, state, children, ...rest }: RevealProps) {
   const sheet = useSheetState()
   const open = state ? sheet.values[state] === true : undefined
   return (

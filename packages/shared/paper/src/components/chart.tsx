@@ -1,7 +1,15 @@
 import { columnOf, DAY, dayLabel, styled, useBind, useHistory } from '../lib'
-import type { BindState, BlockProps, ChartPoint, Row } from '../lib/types'
+import type {
+  BoundChartProps,
+  ChartBodyProps,
+  ChartDonutProps,
+  ChartLinesProps,
+  ChartPoint,
+  ChartProps,
+  HistoryChartProps,
+  Row,
+} from '../lib/types'
 import { usePaperHost } from '../provider'
-import type { BindHistoryQuery, BindQuery } from '../registry'
 import { ChartBars } from './chart-bars'
 import { Bound } from './states'
 
@@ -18,8 +26,6 @@ const PAD = 8
 const TICK = { fontSize: 9, fill: 'var(--muted)', fontFamily: 'var(--font-sans)' }
 const FIGURE = { fontSize: 9, fontWeight: 600, fill: 'var(--ink)', fontFamily: 'var(--font-sans)' }
 
-type Point = ChartPoint
-
 function pickColumns(rows: Row[], label?: string, value?: string): [string, string] {
   return [label ?? columnOf(rows, 'string') ?? 'id', value ?? columnOf(rows, 'number') ?? 'count']
 }
@@ -28,7 +34,7 @@ function figure(value: number, locale?: string): string {
   return value.toLocaleString(locale, { maximumFractionDigits: 1 })
 }
 
-function toPoints(rows: Row[], label?: string, value?: string, locale?: string): Point[] {
+function toPoints(rows: Row[], label?: string, value?: string, locale?: string): ChartPoint[] {
   const [labelKey, valueKey] = pickColumns(rows, label, value)
   // Days are a time axis: oldest first, whatever order the rows came in.
   const isDays = rows.length > 0 && rows.every((row) => DAY.test(String(row[labelKey] ?? '')))
@@ -42,7 +48,7 @@ function toPoints(rows: Row[], label?: string, value?: string, locale?: string):
 }
 
 /** First, middle and last label under the line; the latest and the peak value over it. */
-function Lines({ points, area, locale }: { points: Point[]; area: boolean; locale?: string }) {
+function Lines({ points, area, locale }: ChartLinesProps) {
   const max = Math.max(1, ...points.map((point) => point.value))
   const step = points.length > 1 ? (W - PAD * 2) / (points.length - 1) : 0
   const coords = points.map(
@@ -102,7 +108,7 @@ function Lines({ points, area, locale }: { points: Point[]; area: boolean; local
   )
 }
 
-function Donut({ points }: { points: Point[] }) {
+function Donut({ points }: ChartDonutProps) {
   const total = Math.max(
     1,
     points.reduce((sum, point) => sum + point.value, 0),
@@ -135,19 +141,8 @@ function Donut({ points }: { points: Point[] }) {
   )
 }
 
-type ChartLook = BlockProps & {
-  kind: 'bar' | 'line' | 'area' | 'donut'
-  label?: string
-  value?: string
-  empty?: string
-}
-
 /** Palette from the chart ramp; series colours are never settable by a page. */
-export function Chart({
-  bind,
-  history,
-  ...look
-}: ChartLook & { bind?: BindQuery; history?: BindHistoryQuery }) {
+export function Chart({ bind, history, ...look }: ChartProps) {
   return history ? (
     <HistoryChart history={history} {...look} />
   ) : (
@@ -155,23 +150,16 @@ export function Chart({
   )
 }
 
-function BoundChart({ bind, label, ...look }: ChartLook & { bind?: BindQuery }) {
+function BoundChart({ bind, label, ...look }: BoundChartProps) {
   return <ChartBody state={useBind(bind)} label={label ?? bind?.groupBy?.column} {...look} />
 }
 
 /** Over time: one point per day, labelled the way a person reads a date. */
-function HistoryChart({ history, ...look }: ChartLook & { history: BindHistoryQuery }) {
+function HistoryChart({ history, ...look }: HistoryChartProps) {
   return <ChartBody state={useHistory(history)} label="day" value="count" {...look} />
 }
 
-function ChartBody({
-  state,
-  kind,
-  label,
-  value,
-  empty,
-  ...rest
-}: ChartLook & { state: BindState }) {
+function ChartBody({ state, kind, label, value, empty, ...rest }: ChartBodyProps) {
   const { locale } = usePaperHost()
   return (
     <Bound state={state} empty={empty}>

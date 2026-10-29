@@ -1,20 +1,11 @@
-import type { ReactNode } from 'react'
 import { whenLabel } from '../lib'
-import type { BindState } from '../lib/types'
+import type { BoundProps } from '../lib/types'
 
 /**
  * Empty, loading and error ship with every bound primitive, designed once. A
  * page may override the empty sentence and nothing else.
  */
-export function Bound({
-  state,
-  empty = 'Nothing here yet.',
-  children,
-}: {
-  state: BindState
-  empty?: string
-  children: (rows: BindState['rows']) => ReactNode
-}) {
+export function Bound({ state, empty = 'Nothing here yet.', children }: BoundProps) {
   if (state.status === 'loading') {
     return (
       <div className="wsx-empty" data-state="loading" aria-busy>
