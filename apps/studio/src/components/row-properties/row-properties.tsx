@@ -43,7 +43,7 @@ export function RowProperties({ sheetId }: RowPropertiesProps) {
                 <div key={column.name} className="contents">
                   <dt className="flex h-8 items-center gap-1.5 text-muted-foreground">
                     <Icon className="size-4" />
-                    {column.name.replace(/_/g, ' ')}
+                    {tableLabel(column.name)}
                   </dt>
                   <dd className="flex min-h-8 items-center [&>.wsx-tokens]:flex-1">
                     <PaperSurface>
