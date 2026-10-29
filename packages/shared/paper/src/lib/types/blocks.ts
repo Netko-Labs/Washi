@@ -237,7 +237,7 @@ export interface StatProps extends BlockProps {
 }
 
 export interface StepProps extends BlockProps {
-  marker: string
+  marker?: string
   title?: string
 }
 

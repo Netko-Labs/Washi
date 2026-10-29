@@ -1,3 +1,12 @@
+# D107 · pages that explain themselves (2026-10-29)
+
+- [x] `<Steps>`/`<Step title>` — numbered how-to; wsx `propsWithin` keeps a Timeline step's marker required
+- [x] `<Compare>`/`<Option title pick>` — 2–4 side by side, stacked under 560px
+- [x] `<Faq>`/`<Question title>` — native `<details name>`, one open at a time
+- [x] `<Countdown to label>` — reader's clock, minute tick, `—` until mounted
+- [x] Book (summaries, specimens, `guide` recipe), registry + countdown tests, `/` starters
+- [x] CLAUDE.md D107, PR
+
 # D105+ · the server's own Exa key (2026-10-29)
 
 - [x] Server search key — sealed under `:server:exa`; a workspace's own Exa key wins, else the

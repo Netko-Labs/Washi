@@ -1,7 +1,13 @@
-import type { WsxElement, WsxNode, WsxValue } from '@washi/wsx'
+import { parse, type WsxElement, type WsxNode, type WsxValue } from '@washi/wsx'
 import { element } from '../convert'
-import type { BookmarkPreview, DataPick } from '../types'
-import { STARTER_AUTOMATION, STARTER_FORMULA, STARTER_WIDGET } from '../values'
+import type { BookmarkPreview, DataPick, StarterBlock } from '../types'
+import {
+  COUNTDOWN_DAYS,
+  STARTER_AUTOMATION,
+  STARTER_FORMULA,
+  STARTER_SOURCES,
+  STARTER_WIDGET,
+} from '../values'
 
 /** The live block a pick becomes, as WSX the page keeps whole. */
 /** A bookmark carrying whatever the site said about itself; nothing it said is required. */
@@ -14,7 +20,23 @@ export function bookmarkNode(href: string, seen: BookmarkPreview | null): WsxEle
   return element('Bookmark', props, [])
 }
 
+function dayKey(day: Date): string {
+  const pad = (value: number) => String(value).padStart(2, '0')
+  return `${day.getFullYear()}-${pad(day.getMonth() + 1)}-${pad(day.getDate())}`
+}
+
+export function starterNode(block: StarterBlock, today = new Date()): WsxElement {
+  if (block === 'countdown') {
+    const soon = new Date(today.getFullYear(), today.getMonth(), today.getDate() + COUNTDOWN_DAYS)
+    return element('Countdown', { to: dayKey(soon), label: 'Until the deadline' }, [])
+  }
+  const [node] = parse(`<Sheet title="s">${STARTER_SOURCES[block]}</Sheet>`).children
+  if (node?.kind !== 'element') throw new Error(`the ${block} starter is not a block`)
+  return node
+}
+
 export function dataNode(pick: DataPick): WsxElement {
+  if (pick.kind === 'starter') return starterNode(pick.block)
   if (pick.kind === 'automation') {
     return element('Automation', { table: pick.table, on: 'insert' }, [
       { kind: 'text', value: STARTER_AUTOMATION(pick.table) },

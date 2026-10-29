@@ -9,6 +9,7 @@ import {
   dataNode,
   galleryNode,
   slashMatches,
+  starterNode,
   titleOf,
   uploadNode,
 } from '../lib/utils'
@@ -125,6 +126,29 @@ describe('the / menu drops live data on the page', () => {
       slashMatches(query, []).find((option) => option.type === 'data')
     expect(first('bookmark https://bun.com/docs')).toMatchObject({ label: 'Bookmark · bun.com' })
     expect(first('https://bun.com/docs')).toMatchObject({ label: 'Embed · bun.com' })
+  })
+
+  test('/steps, /compare, /faq and /countdown drop a block with words to type over', () => {
+    const first = (query: string) =>
+      slashMatches(query, []).find((option) => option.type === 'data')
+    expect(first('steps')).toMatchObject({ pick: { kind: 'starter', block: 'steps' } })
+    expect(first('compare')).toMatchObject({ pick: { kind: 'starter', block: 'compare' } })
+    expect(first('faq')).toMatchObject({ label: 'FAQ' })
+    expect(first('countdown')).toMatchObject({ pick: { kind: 'starter', block: 'countdown' } })
+    for (const block of ['steps', 'compare', 'faq', 'countdown'] as const) {
+      const node = dataNode({ kind: 'starter', block })
+      const sheet = {
+        kind: 'element' as const,
+        name: 'Sheet',
+        props: { title: 't' },
+        children: [node],
+      }
+      expect({ block, diagnostics: validate(sheet, paperRegistry) }).toEqual({
+        block,
+        diagnostics: [],
+      })
+    }
+    expect(starterNode('countdown', new Date(2026, 11, 25)).props.to).toBe('2027-01-08')
   })
 
   test('a bookmark keeps only what the site said, and stays valid without any of it', () => {

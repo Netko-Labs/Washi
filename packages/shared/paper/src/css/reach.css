@@ -35,7 +35,9 @@
     .wsx-reveal,
     .wsx-drawer,
     .wsx-cols,
-    .wsx-bento
+    .wsx-bento,
+    .wsx-option,
+    .wsx-question
   )
   :is(.wsx-section, .wsx-tab)
   > [data-width] {

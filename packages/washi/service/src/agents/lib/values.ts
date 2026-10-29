@@ -37,7 +37,10 @@ square·wide·tall·big·banner, title) · Text: Title(level) Text(lead) List(ma
 Quote Code Pair(term) Note Source Money(value|expr, currency) + inline Mark Kbd Ref(sheet) Tag ·
 Surface: Card(title) Callout(title) Hero(title subtitle align) Figure(src: https or file:<id>, alt) Video(src title poster) Audio(src title) File(src name bytes) Gallery(columns — Figures as a grid, a press opens one large) Embed(https src title ratio height — YouTube Vimeo Spotify Loom Figma CodePen
 CodeSandbox Miro Google Maps Indify play; any other site only if the workspace lists it)
-Bookmark(https href title description image site — a link as a card; fill what fetch_url told you) · Data out:
+Bookmark(https href title description image site — a link as a card; fill what fetch_url told you) ·
+Explain: Steps/Step(title — a how-to; Steps numbers them) Compare(width)/Option(title pick — 2–4 choices side
+by side, pick the recommended one) Faq/Question(title — one open at a time; the answer is its children)
+Countdown(to: YYYY-MM-DD or YYYY-MM-DDTHH:MM, label — days left on the reader's clock) · Data out:
 Repeat(bind) Agenda(bind date title time end badge add addLabel view state — a week or a month) Slots(bind date minutes hours days add addLabel — free times to book: a booking's date is start/end, e.g. 2026-10-29T10:00/2026-10-29T10:30) Roadmap(bind date end title — a bar per row from date to end, or one start/end column) Heatmap(bind date value weeks label — GitHub's calendar of days: habits, workouts, a journal) Table(bind columns) Database(table views — tabs: table · board(groupBy) · timeline(date) ·
 gallery(cover: a url or cover-key column; cards a press opens)) Stat(value|expr label hint trend format=percent currency=USD) Chart(bind kind) Timeline/Step
 Progress(value|expr — in a Repeat, value="$row.ratio" or expr="$row.done / $row.total") Badge Avatar Schema(table) · Data in: Field(field kind table row) Board(bind
@@ -99,7 +102,7 @@ another page's blocks live (never nested), <Backlinks/> lists who links here, <O
 page's own headings. Columns lay a page out Notion's way (a narrow
 rail, the work, a glance; they stack under 560px); a Bento is a home of tiles — a big tile for the
 week, squares for figures, a banner for a board. A wide block (Board Agenda Table Database Roadmap Chart
-Canvas Grid Columns Bento) takes width="wide" (a little past the text column) or "full" (the sheet's whole width):
+Canvas Grid Columns Bento Compare) takes width="wide" (a little past the text column) or "full" (the sheet's whole width):
 give a board or a week full when it is what the page is for; text always stays in the column. A Button insert is for a row with fixed values. defaults fill columns too, literal or { state } (a
 stored month column can follow the picker). Fields and defaults name stored columns only — never a
 formula or rollup; the form refuses one in words.

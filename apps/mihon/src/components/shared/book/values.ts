@@ -12,6 +12,7 @@ export const GROUP_LABELS: Record<string, string> = {
   surface: 'Surface',
   pages: 'Pages',
   media: 'Media',
+  explain: 'Explain',
   dataOut: 'Data out',
   dataIn: 'Data in',
   flow: 'Flow',

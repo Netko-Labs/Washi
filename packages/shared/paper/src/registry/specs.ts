@@ -2,6 +2,7 @@
 import { cellSchema, filterSchema, historyQuerySchema, querySchema, scalarSchema } from '@washi/ink'
 import type { ComponentSpec, WsxRegistry } from '@washi/wsx'
 import { z } from 'zod'
+import { EXPLAIN_SPECS, STEPS_STEP_PROPS } from './explain-specs'
 import { LAYOUT_SPECS } from './layout-specs'
 import { coverKeySchema, pageIconSchema } from './looks'
 import { MEDIA_SPECS, mediaSrcSchema } from './media-specs'
@@ -336,8 +337,10 @@ const dataOut: Record<string, ComponentSpec> = {
       },
     },
   ),
+  /** A Timeline's step names its marker; a step of Steps is numbered and must say what it is. */
   Step: p({ marker: z.string().min(1).max(8), title: z.string().max(120).optional() }, 'nodes', {
-    within: ['Timeline'],
+    within: ['Timeline', 'Steps'],
+    propsWithin: { Steps: STEPS_STEP_PROPS },
   }),
   /**
    * Days as a grid (D103), GitHub's contribution calendar: the last `weeks` weeks to today, each
@@ -557,6 +560,7 @@ export const paperRegistry: WsxRegistry = {
     ...surface,
     ...PAGE_SPECS,
     ...MEDIA_SPECS,
+    ...EXPLAIN_SPECS,
     ...dataOut,
     ...dataIn,
     ...flow,
@@ -572,6 +576,7 @@ export const PRIMITIVE_GROUPS = {
   surface: Object.keys(surface),
   pages: Object.keys(PAGE_SPECS),
   media: Object.keys(MEDIA_SPECS),
+  explain: Object.keys(EXPLAIN_SPECS),
   dataOut: Object.keys(dataOut),
   dataIn: Object.keys(dataIn),
   flow: Object.keys(flow),

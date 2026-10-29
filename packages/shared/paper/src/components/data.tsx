@@ -1,13 +1,5 @@
 import { formatNumber, ratioOf, styled, useBind, useExprValue } from '../lib'
-import type {
-  AvatarProps,
-  BadgeProps,
-  BlockProps,
-  ProgressProps,
-  RepeatProps,
-  StatProps,
-  StepProps,
-} from '../lib/types'
+import type { AvatarProps, BadgeProps, ProgressProps, RepeatProps, StatProps } from '../lib/types'
 import { usePaperHost } from '../provider'
 import { RowProvider } from '../state'
 import { Chart } from './chart'
@@ -59,22 +51,6 @@ export function Stat({ value, expr, label, hint, trend, format, currency, ...res
       <div className="wsx-stat-label">{label}</div>
       {hint && <div className="wsx-stat-hint">{hint}</div>}
     </div>
-  )
-}
-
-export function Timeline({ children, ...rest }: BlockProps) {
-  return <ol {...styled(rest, 'wsx-timeline')}>{children}</ol>
-}
-
-export function Step({ marker, title, children, ...rest }: StepProps) {
-  return (
-    <li {...styled(rest, 'wsx-step')}>
-      <span className="wsx-step-marker">{marker}</span>
-      <div>
-        {title && <div className="wsx-step-title">{title}</div>}
-        <div className="wsx-step-body">{children}</div>
-      </div>
-    </li>
   )
 }
 

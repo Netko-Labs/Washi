@@ -4,20 +4,20 @@ import { Agenda } from './components/agenda'
 import { Board } from './components/board'
 import { Bookmark } from './components/bookmark'
 import { Canvas } from './components/canvas'
-import {
-  Avatar,
-  Badge,
-  Chart,
-  Progress,
-  Repeat,
-  Stat,
-  Step,
-  Table,
-  Timeline,
-} from './components/data'
+import { Avatar, Badge, Chart, Progress, Repeat, Stat, Table } from './components/data'
 import { Database } from './components/database'
 import { Drawer, Schema } from './components/drawer'
 import { Embed } from './components/embed'
+import {
+  Compare,
+  Countdown,
+  Faq,
+  Option,
+  Question,
+  Step,
+  Steps,
+  Timeline,
+} from './components/explain'
 import { Reveal, Show, Tab, Tabs } from './components/flow'
 import { Form } from './components/form'
 import { Divider, Grid, Row, Section, SheetFrame, Stack } from './components/frame'
@@ -110,6 +110,12 @@ const COMPONENTS: Record<string, ComponentType<never>> = {
   Outline,
   Embed,
   Bookmark,
+  Steps,
+  Compare,
+  Option,
+  Faq,
+  Question,
+  Countdown,
   Automation,
   Formula,
   Video,

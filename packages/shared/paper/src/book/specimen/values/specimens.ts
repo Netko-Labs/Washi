@@ -1,5 +1,6 @@
 import type { Specimen } from '../types'
 import { DATA_SPECIMENS } from './data'
+import { EXPLAIN_SPECIMENS } from './explain'
 import { INPUT_SPECIMENS } from './input'
 import { LAYOUT_SPECIMENS } from './layout'
 import { TEXT_SPECIMENS } from './text'
@@ -8,6 +9,7 @@ import { TEXT_SPECIMENS } from './text'
 export const SPECIMENS: Record<string, Specimen> = {
   ...LAYOUT_SPECIMENS,
   ...TEXT_SPECIMENS,
+  ...EXPLAIN_SPECIMENS,
   ...DATA_SPECIMENS,
   ...INPUT_SPECIMENS,
 }

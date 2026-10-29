@@ -141,7 +141,9 @@ function visit(node: WsxNode, ancestors: string[], path: string, walk: Walk) {
     return
   }
 
-  checkProps(node, spec, nodePath, walk)
+  const owner = [...ancestors].reverse().find((name) => spec.within?.includes(name))
+  const props = owner ? spec.propsWithin?.[owner] : undefined
+  checkProps(node, props ? { ...spec, props } : spec, nodePath, walk)
   checkChildren(node, spec, nodePath, walk.out)
   checkPlacement(node, spec, ancestors, nodePath, walk)
   for (const child of node.children) visit(child, next, nodePath, walk)
