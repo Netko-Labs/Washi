@@ -18,8 +18,14 @@ export function RowPeekMenu({ sheetId, workspaceId, onDeleted }: RowPeekMenuProp
     menu.close()
   }
   const copyLink = async () => {
-    await navigator.clipboard.writeText(`${window.location.origin}/w/${workspaceId}/p/${sheetId}`)
-    useNoticeStore.getState().say('Link copied')
+    const link = `${window.location.origin}/w/${workspaceId}/p/${sheetId}`
+    try {
+      await navigator.clipboard.writeText(link)
+      useNoticeStore.getState().say('Link copied')
+    } catch {
+      // No clipboard here (an insecure origin, or permission refused): the link, said instead.
+      useNoticeStore.getState().say(`Copy this link: ${link}`)
+    }
     close()
   }
   const remove = async () => {

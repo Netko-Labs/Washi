@@ -9,7 +9,10 @@ export function useDeleteRow() {
   return async (sheetId: string): Promise<boolean> => {
     try {
       const rowOf = await api.tables.rowOf.query({ sheetId })
-      if (!rowOf) return false
+      if (!rowOf) {
+        useNoticeStore.getState().say('This page is no longer a row — nothing to delete')
+        return false
+      }
       await api.capabilities.runAction.mutate({
         action: { verb: 'table.delete', table: rowOf.table.name, row: rowOf.row.id },
       })
