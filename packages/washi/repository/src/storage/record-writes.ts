@@ -1,3 +1,4 @@
+import { processSingleton } from '@washi/domain'
 import type { RecordData } from '@washi/ink'
 import type { Workspace } from './client'
 
@@ -14,7 +15,7 @@ export interface RecordWrite {
 type Listener = (write: RecordWrite) => void
 
 // Callbacks, not data: who wants to hear about a workspace's row writes, kept per open workspace.
-const listeners = new WeakMap<Workspace, Set<Listener>>()
+const listeners = processSingleton('record-writes', () => new WeakMap<Workspace, Set<Listener>>())
 
 /** Hears every row a write lands — whatever path wrote it; returns the unsubscribe. */
 export function onRecordWrite(ws: Workspace, listener: Listener): () => void {

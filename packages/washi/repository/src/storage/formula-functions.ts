@@ -1,3 +1,4 @@
+import { processSingleton } from '@washi/domain'
 import type { Workspace } from './client'
 
 /** A workspace function, called with a formula's evaluated arguments. */
@@ -18,7 +19,10 @@ export interface StoredFormula {
 }
 
 // Callbacks, not data: who runs a workspace's own formula functions, set once per open workspace.
-const openers = new WeakMap<Workspace, () => FormulaCaller | null>()
+const openers = processSingleton(
+  'formula-runners',
+  () => new WeakMap<Workspace, () => FormulaCaller | null>(),
+)
 
 export function setFormulaRunner(ws: Workspace, open: () => FormulaCaller | null): () => void {
   openers.set(ws, open)

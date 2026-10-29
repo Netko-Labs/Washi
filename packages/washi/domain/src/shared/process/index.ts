@@ -1,0 +1,1 @@
+export { processSingleton } from './utils'

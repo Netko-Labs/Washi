@@ -151,6 +151,7 @@ export {
   wallKey,
   wallMinute,
 } from './shared/cron'
+export { processSingleton } from './shared/process'
 export {
   acceptFor,
   byteRange,

@@ -603,6 +603,11 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   (`RUNTIME_FILE_DEPS` in `apps/studio/vite.config.ts`). Inline them and SSR dies on ENOENT.
   Nitro ships every installed platform binary; the studio `build` script drops the `-musl` ones
   (~285 MB): both hosts are glibc.
+- **The studio's server packages are bundled twice** — Nitro's entry (where the plugin boots the
+  runtime) and the SSR router (where tRPC runs). A module-level registry the runtime fills and a
+  route reads (record-write listeners, formula runners, the server policy, open sockets) must live in
+  `processSingleton` (`@washi/domain`, `globalThis` under `Symbol.for`), or each copy has its own and
+  the route never sees it. Caches may stay per copy. `two-copies.test.ts` proves the split.
 - One React repo-wide (root `overrides`). Bun's isolated linker will otherwise give workspace
   packages a second copy — an invalid hook call.
 - `WASHI_SECRET_KEY` is the session secret **and** the root of every workspace's BYOK key
