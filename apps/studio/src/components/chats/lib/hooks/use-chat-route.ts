@@ -15,12 +15,12 @@ export function useChatRoute(workspaceId: string, chatId: string | undefined) {
   useEffect(() => {
     setMissing(false)
     const store = useAgentStore.getState()
-    if (!chatId) {
-      store.startDraft()
-      return
+    if (!chatId) store.startDraft()
+    else if (store.activeSessionId !== chatId) {
+      store.selectSession(chatId).catch(() => setMissing(true))
     }
-    if (store.activeSessionId === chatId) return
-    store.selectSession(chatId).catch(() => setMissing(true))
+    // After the pick: with nothing picked yet, init would open the newest chat.
+    void store.init()
   }, [chatId])
 
   // Read fresh: the effect above may have just picked this route's chat in the same commit.
