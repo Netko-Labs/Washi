@@ -1,13 +1,6 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-
-export interface WindowState {
-  x: number
-  y: number
-  width: number
-  height: number
-  isMaximized: boolean
-}
+import type { WindowState, WindowStore } from './types'
 
 const DEFAULT_WINDOW_STATE: WindowState = {
   x: 120,
@@ -15,11 +8,6 @@ const DEFAULT_WINDOW_STATE: WindowState = {
   width: 1280,
   height: 820,
   isMaximized: false,
-}
-
-export interface WindowStore {
-  read(): WindowState
-  write(state: WindowState): void
 }
 
 /**

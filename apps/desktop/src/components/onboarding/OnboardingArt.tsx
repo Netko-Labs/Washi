@@ -1,5 +1,5 @@
 import { Mascot, VaultIcon } from '@washi/ui'
-import type { SpeckProps, ToggleProps } from './types'
+import type { HeroSyncProps, SpeckProps, ToggleProps } from './types'
 
 const GOLD = '#E8B36A'
 const INK = '#6B3A1F'
@@ -127,7 +127,7 @@ export function HeroVaults() {
   )
 }
 
-export function HeroSync({ server }: { server: boolean }) {
+export function HeroSync({ server }: HeroSyncProps) {
   if (server) {
     return (
       <div className="relative flex h-[158px] w-[300px] items-end gap-10">

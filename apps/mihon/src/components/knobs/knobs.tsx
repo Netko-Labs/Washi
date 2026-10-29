@@ -3,8 +3,9 @@ import { paperRegistry } from '@washi/paper/registry'
 import { useMemo } from 'react'
 import { useBookStore } from '@/components/shared/book'
 import { KnobField } from './knob-field'
+import type { KnobsHeadingProps } from './lib'
 
-function Heading({ children }: { children: string }) {
+function Heading({ children }: KnobsHeadingProps) {
   return (
     <h2 className="pt-4 pb-1 font-medium text-[11px] text-muted-foreground uppercase tracking-[0.08em]">
       {children}

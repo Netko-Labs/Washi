@@ -22,6 +22,7 @@ export type {
   KeyTarget,
   ModelCardProps,
   ModelMenuProps,
+  ModelPickerProps,
   ModelPrice,
   ModelSwitchProps,
   NameDraft,

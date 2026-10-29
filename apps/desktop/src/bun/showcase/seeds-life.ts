@@ -1,4 +1,4 @@
-import type { TableSeed } from './tables'
+import type { TableSeed } from './types'
 
 /** Habits, split and library tables. */
 export const LIFE_SEEDS: TableSeed[] = [

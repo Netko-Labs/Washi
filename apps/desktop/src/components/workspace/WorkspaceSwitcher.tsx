@@ -2,8 +2,9 @@ import { IconCheck, IconPlus, IconSelector } from '@tabler/icons-react'
 import { VaultIcon } from '@washi/ui'
 import { useState } from 'react'
 import { CreateWorkspaceDialog } from './CreateWorkspaceDialog'
+import type { WorkspaceSwitcherProps } from './types'
 
-export function WorkspaceSwitcher({ pages }: { pages: number }) {
+export function WorkspaceSwitcher({ pages }: WorkspaceSwitcherProps) {
   const [open, setOpen] = useState(false)
   const [creating, setCreating] = useState(false)
 

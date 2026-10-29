@@ -1,11 +1,16 @@
 import { IconAlertTriangle } from '@tabler/icons-react'
-import type { AgentUpdate, TranscriptEntry } from '@washi/domain'
+import type { AgentUpdate } from '@washi/domain'
 import { useDescribeTool } from '../approval'
 import { Markdown } from '../markdown'
 import { Mascot } from '../mascot'
-import { mergeMessageChunks } from './lib'
+import {
+  type DiffViewProps,
+  mergeMessageChunks,
+  type ToolPillProps,
+  type TranscriptViewProps,
+} from './lib'
 
-function DiffView({ diff }: { diff: { path: string; oldText: string; newText: string } }) {
+function DiffView({ diff }: DiffViewProps) {
   return (
     <div className="my-1.5 overflow-hidden rounded-xl border border-agent text-[12px]">
       <div className="border-border border-b bg-muted px-3 py-1.5 font-medium">
@@ -23,7 +28,7 @@ function DiffView({ diff }: { diff: { path: string; oldText: string; newText: st
   )
 }
 
-function ToolPill({ update, followups }: { update: AgentUpdate; followups: AgentUpdate[] }) {
+function ToolPill({ update, followups }: ToolPillProps) {
   const describe = useDescribeTool()
   if (update.kind !== 'tool_call') return null
   const { icon: Icon, action, subject } = describe(update.title, update.input)
@@ -66,7 +71,7 @@ function ToolPill({ update, followups }: { update: AgentUpdate; followups: Agent
   )
 }
 
-export function TranscriptView({ transcript }: { transcript: TranscriptEntry[] }) {
+export function TranscriptView({ transcript }: TranscriptViewProps) {
   const followupsFor = (toolCallId: string) =>
     transcript
       .map((entry) => entry.update)

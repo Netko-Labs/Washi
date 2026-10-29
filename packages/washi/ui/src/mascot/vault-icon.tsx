@@ -1,18 +1,11 @@
-import { OPEN_SMILE, SPARKLE_EYES, VAULT_TOPICS, type VaultTopic } from './lib/vault-topics'
+import type { VaultIconProps, VaultTopic } from './lib/types'
+import { OPEN_SMILE, SPARKLE_EYES, VAULT_TOPICS } from './lib/vault-topics'
 
 const INK = '#6B3A1F'
 const PAPER = '#F7EDD6'
 
 /** Vault tile mascot (1024 rig, squircle rx=220). Unknown topics get the plain look. */
-export function VaultIcon({
-  topic,
-  size = 40,
-  className,
-}: {
-  topic: string
-  size?: number
-  className?: string
-}) {
+export function VaultIcon({ topic, size = 40, className }: VaultIconProps) {
   const def: VaultTopic = VAULT_TOPICS[topic.toLowerCase()] ?? {
     bg: '#DF8552',
     face: (

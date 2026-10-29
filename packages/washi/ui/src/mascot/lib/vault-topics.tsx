@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import type { VaultTopic } from './types'
 
 /**
  * Vault topic definitions from the Washi Vault Icons handoff: one background
@@ -6,14 +6,6 @@ import type { ReactNode } from 'react'
  */
 
 const INK = '#6B3A1F'
-
-export interface VaultTopic {
-  bg: string
-  ear?: string
-  backdrop?: ReactNode
-  face?: ReactNode
-  extra?: ReactNode
-}
 
 export const SPARKLE_EYES = (
   <>
@@ -113,8 +105,6 @@ export const VAULT_TOPICS: Record<string, VaultTopic> = {
     extra: <><path d="M512 452 Q506 400 512 366" fill="none" stroke="#4A6A3A" strokeWidth="18" strokeLinecap="round" /><ellipse cx="462" cy="352" rx="50" ry="27" fill="#7FA06A" stroke="#4A6A3A" strokeWidth="12" transform="rotate(-32 462 352)" /><ellipse cx="562" cy="352" rx="50" ry="27" fill="#7FA06A" stroke="#4A6A3A" strokeWidth="12" transform="rotate(32 562 352)" /></>,
   },
 }
-
-export type VaultTopicName = keyof typeof VAULT_TOPICS
 
 /** Handoff display order — pickers offer every character in the set. */
 export const VAULT_TOPIC_ORDER = [

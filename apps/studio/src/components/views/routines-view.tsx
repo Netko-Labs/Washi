@@ -1,6 +1,7 @@
 import { getRouteApi, useParams, useSearch } from '@tanstack/react-router'
-import { RoutinePage, RoutinesPage, type RoutineTab } from '@/components/routines'
+import { RoutinePage, RoutinesPage } from '@/components/routines'
 import { useRouteTab } from '@/components/shell'
+import type { RoutineSearch } from './lib'
 
 const workspaceRoute = getRouteApi('/w/$workspaceId')
 
@@ -13,7 +14,7 @@ export function RoutinesView() {
 /** `/routines/new` (maybe `?template=`) and `/routines/$id?tab=`; keyed so another is another page. */
 export function RoutineView() {
   const { workspaceId, routineId } = useParams({ strict: false })
-  const search = useSearch({ strict: false }) as { tab?: RoutineTab; template?: string }
+  const search = useSearch({ strict: false }) as RoutineSearch
   useRouteTab('view:routines')
   return (
     <RoutinePage

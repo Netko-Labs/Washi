@@ -239,6 +239,18 @@ export interface ModelSwitchProps {
   onToggle: () => void
 }
 
+export interface ModelPickerProps {
+  models: ModelOption[]
+  provider: string
+  value: string | null
+  onChange: (id: string) => void
+}
+
+export interface PillBox {
+  left: number
+  width: number
+}
+
 export interface NameDraft {
   draft: string
   setDraft: (value: string) => void

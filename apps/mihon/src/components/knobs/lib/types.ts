@@ -9,6 +9,10 @@ export interface KnobFieldProps {
   overridden: boolean
 }
 
+export interface KnobsHeadingProps {
+  children: string
+}
+
 export interface SegmentsProps {
   options: readonly (string | number)[]
   active: WsxValue | undefined

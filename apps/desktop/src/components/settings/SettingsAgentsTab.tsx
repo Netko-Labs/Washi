@@ -3,6 +3,7 @@ import { DailyStopInput } from './DailyStopInput'
 import {
   APPROVAL_MODE_LABELS,
   type InferenceWire,
+  type InUseProps,
   LOCAL_MODEL_LABELS,
   PREFERENCE_LABELS,
   useAgentRuntime,
@@ -18,7 +19,7 @@ function cliLine(cli: InferenceWire['localCli']): string {
   return `${version} · ${plan} · turns ride the plan you already pay for`
 }
 
-function InUse({ on }: { on: boolean }) {
+function InUse({ on }: InUseProps) {
   if (!on) return null
   return (
     <span className="flex h-5 flex-none items-center rounded-full bg-[#16a34a]/10 px-2 font-medium text-[#16a34a] text-[11px]">

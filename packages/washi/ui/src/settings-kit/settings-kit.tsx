@@ -1,6 +1,13 @@
-import type { ReactNode } from 'react'
+import type {
+  DangerButtonProps,
+  RowButtonProps,
+  SegmentedControlProps,
+  SettingsCardProps,
+  SettingsRowProps,
+  StaticToggleProps,
+} from './types'
 
-export function SettingsCard({ children }: { children: ReactNode }) {
+export function SettingsCard({ children }: SettingsCardProps) {
   return (
     <div className="overflow-hidden rounded-[14px] border border-border bg-card">{children}</div>
   )
@@ -13,14 +20,7 @@ export function SettingsRow({
   wrap = false,
   last = false,
   children,
-}: {
-  title: string
-  sub: string
-  mono?: boolean
-  wrap?: boolean
-  last?: boolean
-  children: ReactNode
-}) {
+}: SettingsRowProps) {
   return (
     <div
       className={`flex items-center gap-4 px-[18px] py-4 ${wrap ? 'flex-wrap' : ''} ${
@@ -36,7 +36,7 @@ export function SettingsRow({
   )
 }
 
-export function StaticToggle({ on }: { on: boolean }) {
+export function StaticToggle({ on }: StaticToggleProps) {
   return (
     <span
       className={`flex h-4 w-7 flex-none items-center rounded-full p-0.5 ${
@@ -48,15 +48,7 @@ export function StaticToggle({ on }: { on: boolean }) {
   )
 }
 
-export function SegmentedControl({
-  options,
-  active,
-  onSelect,
-}: {
-  options: string[]
-  active: string
-  onSelect?: (option: string) => void
-}) {
+export function SegmentedControl({ options, active, onSelect }: SegmentedControlProps) {
   return (
     <span className="flex flex-none overflow-hidden rounded-[10px] border border-border">
       {options.map((option, index) => (
@@ -77,7 +69,7 @@ export function SegmentedControl({
   )
 }
 
-export function RowButton({ children, onClick }: { children: ReactNode; onClick?: () => void }) {
+export function RowButton({ children, onClick }: RowButtonProps) {
   return (
     <button
       type="button"
@@ -89,7 +81,7 @@ export function RowButton({ children, onClick }: { children: ReactNode; onClick?
   )
 }
 
-export function DangerButton({ children }: { children: ReactNode }) {
+export function DangerButton({ children }: DangerButtonProps) {
   return (
     <button
       type="button"

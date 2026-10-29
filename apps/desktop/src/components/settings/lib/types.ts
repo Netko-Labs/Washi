@@ -1,4 +1,5 @@
 import type { api } from '@/lib/rpc'
+import type { SETTINGS_TABS } from './values'
 
 export type InferenceWire = Awaited<ReturnType<typeof api.agents.inference.query>>
 export type SpendWire = Awaited<ReturnType<typeof api.agents.spend.query>>
@@ -14,3 +15,14 @@ export interface RoutineDraft {
 }
 
 export type ApprovalMode = 'ask' | 'auto'
+
+export type SettingsTab = (typeof SETTINGS_TABS)[number]['key']
+
+export interface InUseProps {
+  on: boolean
+}
+
+export interface DailyStopInputProps {
+  capUsd: number
+  onSave: (capUsd: number) => void
+}

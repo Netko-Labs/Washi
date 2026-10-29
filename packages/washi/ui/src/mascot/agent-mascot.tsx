@@ -1,11 +1,16 @@
-import type { ReactNode } from 'react'
-import type { AgentMascotState } from './lib/types'
+import type {
+  AgentMascotProps,
+  AgentMascotState,
+  MascotBodyProps,
+  MascotStateContent,
+  RoundEyesProps,
+} from './lib/types'
 
 const INK = '#6B3A1F'
 const BG = '#DF8552'
 
 /** The peeking-from-bottom body used by the app icon and vault tiles (1024 rig). */
-function Body({ children, eyes }: { children?: ReactNode; eyes?: ReactNode }) {
+function Body({ children, eyes }: MascotBodyProps) {
   return (
     <>
       <path
@@ -57,7 +62,7 @@ function Body({ children, eyes }: { children?: ReactNode; eyes?: ReactNode }) {
   )
 }
 
-function RoundEyes({ up = false, blink = false }: { up?: boolean; blink?: boolean }) {
+function RoundEyes({ up = false, blink = false }: RoundEyesProps) {
   const hx = up ? -20 : 18
   const hy = up ? -26 : -18
   return (
@@ -111,7 +116,7 @@ function OpenSmile() {
 }
 
 // biome-ignore format: state table reads better dense
-function stateContent(state: AgentMascotState): { wrap?: string; inner: ReactNode; backdrop?: ReactNode } {
+function stateContent(state: AgentMascotState): MascotStateContent {
   switch (state) {
     case 'idle': return {
       wrap: 'wbob 3.6s ease-in-out infinite',
@@ -221,17 +226,7 @@ function stateContent(state: AgentMascotState): { wrap?: string; inner: ReactNod
  * Agent status mascot (22px chip → full card). One SVG per state, pure CSS motion.
  * `crop` is the FAB close-up from Washi.dc.html: the face at 1.5× filling a circle.
  */
-export function AgentMascot({
-  state,
-  size = 22,
-  className,
-  crop = false,
-}: {
-  state: AgentMascotState
-  size?: number
-  className?: string
-  crop?: boolean
-}) {
+export function AgentMascot({ state, size = 22, className, crop = false }: AgentMascotProps) {
   const { wrap, inner, backdrop } = stateContent(state)
   const radius = crop ? 0 : Math.round(size * 0.3)
   return (

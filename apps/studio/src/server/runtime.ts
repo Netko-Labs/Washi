@@ -1,8 +1,7 @@
 import { type BootedRuntime, bootRuntime } from '@washi/runtime'
 import { contextFromRequest, type EdgeLogger } from '@washi/trpc'
-
-const RUNTIME = Symbol.for('washi.studio.runtime')
-type Holder = typeof globalThis & { [RUNTIME]?: Promise<BootedRuntime> }
+import { RUNTIME } from './constants'
+import type { RuntimeHolder } from './types'
 
 /**
  * One runtime per process, shared by the Nitro plugin, the routes and the socket — they are
@@ -10,7 +9,7 @@ type Holder = typeof globalThis & { [RUNTIME]?: Promise<BootedRuntime> }
  * embedded trusts whoever is at the machine and a studio's machine is the network.
  */
 export function washiRuntime(): Promise<BootedRuntime> {
-  const holder = globalThis as Holder
+  const holder = globalThis as RuntimeHolder
   const mode = process.env.WASHI_MODE ?? 'hosted'
   if (mode !== 'hosted') {
     throw new Error(`the studio serves hosted mode only, got WASHI_MODE="${mode}"`)

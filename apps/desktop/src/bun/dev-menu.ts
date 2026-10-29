@@ -2,20 +2,11 @@ import {
   clearAgentHistory,
   clearCapabilityLedger,
   eraseWorkspace,
-  type Workspace,
   workspaceStats,
 } from '@washi/repository'
-import type { DevCommand } from '@washi/trpc'
 import { dialog, type MenuItemTemplate } from 'mirinjs'
 import { seedShowcase } from './showcase'
-
-export interface DevMenuDeps {
-  /** Where the workspace lives, for "Reveal data folder". */
-  appDataDir: string
-  ws: Workspace
-  /** Broadcasts to the renderer; it owns localStorage and the reload. */
-  send: (command: DevCommand) => void
-}
+import type { DevMenuDeps } from './types'
 
 async function confirmDestructive(message: string, detail: string): Promise<boolean> {
   const { button } = await dialog.message({

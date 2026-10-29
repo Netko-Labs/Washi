@@ -7,11 +7,12 @@ import {
   IconTrash,
   IconX,
 } from '@tabler/icons-react'
-import { type ReactNode, useRef } from 'react'
+import { useRef } from 'react'
 import { SheetIcon } from '../sheet-icon'
 import { type TabKey, useSheetsStore, useViewStore } from '../stores'
+import type { TabInfo } from './types'
 
-const VIEW_TABS: Record<string, { label: string; icon: ReactNode }> = {
+const VIEW_TABS: Record<string, TabInfo> = {
   'view:dashboard': { label: 'Dashboard', icon: <IconLayoutDashboard className="size-[13px]" /> },
   'view:inbox': { label: 'Inbox', icon: <IconInbox className="size-[13px]" /> },
   'view:daily': { label: 'Daily note', icon: <IconCalendar className="size-[13px]" /> },
@@ -25,7 +26,7 @@ export function TabStrip() {
   const { sheets, createSheet } = useSheetsStore()
   const dragged = useRef<TabKey | null>(null)
 
-  const labelFor = (key: TabKey): { label: string; icon: ReactNode } | null => {
+  const labelFor = (key: TabKey): TabInfo | null => {
     if (key.startsWith('view:')) return VIEW_TABS[key] ?? null
     const sheet = sheets.find((item) => item.id === key.slice(5))
     if (!sheet) return null

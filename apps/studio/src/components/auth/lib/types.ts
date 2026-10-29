@@ -8,3 +8,15 @@ export interface AuthFormState {
   error: string | null
   busy: boolean
 }
+
+export interface AuthScreenProps {
+  onDone: () => void
+}
+
+export interface AuthFieldProps {
+  label: string
+  type: string
+  value: string
+  autoComplete: string
+  onChange: (value: string) => void
+}

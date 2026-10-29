@@ -1,12 +1,12 @@
 import { AgentMascot } from '@washi/ui'
-import { PITCH, useAuthForm } from './lib'
+import { type AuthFieldProps, type AuthScreenProps, PITCH, useAuthForm } from './lib'
 
 /**
  * Sign-in and the first half of onboarding, which on the web are the same
  * screen. The second half — naming a workspace — only makes sense once there
  * is an account to own it, so it lives in the workspace picker.
  */
-export function AuthScreen({ onDone }: { onDone: () => void }) {
+export function AuthScreen({ onDone }: AuthScreenProps) {
   const { state, patch, setMode, submit } = useAuthForm(onDone)
   const signingUp = state.mode === 'sign-up'
 
@@ -106,19 +106,7 @@ export function AuthScreen({ onDone }: { onDone: () => void }) {
   )
 }
 
-function Field({
-  label,
-  type,
-  value,
-  autoComplete,
-  onChange,
-}: {
-  label: string
-  type: string
-  value: string
-  autoComplete: string
-  onChange: (value: string) => void
-}) {
+function Field({ label, type, value, autoComplete, onChange }: AuthFieldProps) {
   return (
     <label className="grid gap-1.5">
       <span className="font-semibold text-[13px]">{label}</span>

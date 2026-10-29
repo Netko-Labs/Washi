@@ -1,37 +1,13 @@
-import { IconAdjustmentsHorizontal, IconRefresh, IconRobot, IconUser } from '@tabler/icons-react'
 import { useState } from 'react'
+import { SETTINGS_TABS, type SettingsTab } from './lib'
 import { SettingsAccountTab } from './SettingsAccountTab'
 import { SettingsAgentsTab } from './SettingsAgentsTab'
 import { SettingsGeneralTab } from './SettingsGeneralTab'
 import { SettingsSyncTab } from './SettingsSyncTab'
 
-const TABS = [
-  {
-    key: 'general',
-    label: 'General',
-    icon: IconAdjustmentsHorizontal,
-    desc: 'Theme, files and editor behavior.',
-  },
-  {
-    key: 'agents',
-    label: 'Agents',
-    icon: IconRobot,
-    desc: 'Who Washi thinks with, and what it cost today.',
-  },
-  {
-    key: 'sync',
-    label: 'Sync & sharing',
-    icon: IconRefresh,
-    desc: 'Your server, encryption and who can see what.',
-  },
-  { key: 'account', label: 'Account', icon: IconUser, desc: 'You, your devices and recovery.' },
-] as const
-
-type SettingsTab = (typeof TABS)[number]['key']
-
 export function SettingsView() {
   const [tab, setTab] = useState<SettingsTab>('general')
-  const current = TABS.find((entry) => entry.key === tab) ?? TABS[0]
+  const current = SETTINGS_TABS.find((entry) => entry.key === tab) ?? SETTINGS_TABS[0]
 
   return (
     <section className="mx-auto max-w-[680px] px-10 pt-11 pb-[60px]">
@@ -39,7 +15,7 @@ export function SettingsView() {
       <p className="mb-[22px] text-muted-foreground">{current.desc}</p>
 
       <div className="mb-[26px] flex gap-1 border-border border-b">
-        {TABS.map(({ key, label, icon: Icon }) => (
+        {SETTINGS_TABS.map(({ key, label, icon: Icon }) => (
           <button
             type="button"
             key={key}

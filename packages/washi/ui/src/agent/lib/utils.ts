@@ -1,9 +1,7 @@
-import type { AgentUpdate, TranscriptEntry } from '@washi/domain'
+import type { TranscriptEntry } from '@washi/domain'
 import { hostPlace } from '../../api'
-import type { InferenceView, ModelChoice } from './types'
+import type { InferenceView, ModelChoice, TurnDone } from './types'
 import { RECOMMENDED_MODELS } from './values'
-
-type TurnDone = Extract<AgentUpdate, { kind: 'turn_done' }>
 
 function duration(ms: number): string {
   const tenths = Math.round(ms / 100)

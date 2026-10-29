@@ -1,12 +1,7 @@
 import { useState } from 'react'
+import type { DailyStopInputProps } from './lib'
 
-export function DailyStopInput({
-  capUsd,
-  onSave,
-}: {
-  capUsd: number
-  onSave: (capUsd: number) => void
-}) {
+export function DailyStopInput({ capUsd, onSave }: DailyStopInputProps) {
   const [draft, setDraft] = useState(String(capUsd))
   const value = Number(draft)
   const changed = Number.isFinite(value) && value > 0 && value !== capUsd

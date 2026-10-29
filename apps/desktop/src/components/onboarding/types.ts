@@ -28,6 +28,10 @@ export interface ToggleProps {
   onClick: () => void
 }
 
+export interface HeroSyncProps {
+  server: boolean
+}
+
 export interface SpeckProps {
   className?: string
   size?: number

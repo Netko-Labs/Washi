@@ -1,4 +1,4 @@
-import type { MascotFace, MascotMotion } from './lib/types'
+import type { MascotFace, MascotMotion, MascotProps } from './lib/types'
 
 const FACE_IDS: Record<MascotFace, string> = {
   happy: '#fHappy',
@@ -26,13 +26,7 @@ export function Mascot({
   size = 32,
   className,
   opacity,
-}: {
-  face?: MascotFace
-  motion?: MascotMotion
-  size?: number
-  className?: string
-  opacity?: number
-}) {
+}: MascotProps) {
   return (
     <svg
       viewBox="0 0 240 266"
