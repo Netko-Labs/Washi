@@ -1,0 +1,12 @@
+{
+  "name": "netko-labs",
+  "description": "Netko Labs plugins for Claude Code",
+  "owner": { "name": "Netko Labs", "url": "https://github.com/Netko-Labs" },
+  "plugins": [
+    {
+      "name": "washi",
+      "source": "./plugins/washi",
+      "description": "Work a Washi workspace from Claude Code: read and write its pages and tables, and work an issue backlog kept there."
+    }
+  ]
+}
