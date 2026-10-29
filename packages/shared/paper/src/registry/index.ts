@@ -8,6 +8,7 @@ export {
   pageIconSchema,
 } from './looks'
 export { mediaSrcSchema } from './media-specs'
+export { PAGE_HOOKS, PAGE_IMPORT, PAGE_LIBRARIES } from './page-modules'
 export {
   exprTables,
   pageTables,

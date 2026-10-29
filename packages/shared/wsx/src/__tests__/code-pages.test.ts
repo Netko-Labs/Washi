@@ -1,6 +1,14 @@
 import { describe, expect, test } from 'bun:test'
 import { z } from 'zod'
-import { hasCode, parse, serialize, validate, WsxParseError, type WsxRegistry } from '../index'
+import {
+  hasCode,
+  pageModule,
+  parse,
+  serialize,
+  validate,
+  WsxParseError,
+  type WsxRegistry,
+} from '../index'
 
 const PAGE = `import { useRows } from 'washi'
 import { format } from 'date-fns'
@@ -96,5 +104,21 @@ describe('a page that runs (D100)', () => {
     expect(coded.map((each) => each.message).join()).toContain('literal')
     expect(() => parse('export default 1\n<Sheet title="t" />')).toThrow()
     expect(() => parse('<Sheet title="t" />\nconst after = 1')).toThrow()
+  })
+})
+
+describe('a page as a module', () => {
+  test('imports, functions and exports at the top; the rest runs in view()', () => {
+    const module = pageModule(`import { useRows } from 'washi'
+export function useOpen() { return useRows({ table: 'tasks' }) }
+function Kpi() { return <Stat label="a" value={1} /> }
+const open = useOpen()
+<Sheet title="t"><Text>{open.length}</Text></Sheet>`)
+    const view = module.indexOf('export default function view() {')
+    expect(module.indexOf("import { useRows } from 'washi'")).toBeLessThan(view)
+    expect(module.indexOf('export function useOpen()')).toBeLessThan(view)
+    expect(module.indexOf('function Kpi()')).toBeLessThan(view)
+    expect(module.indexOf('const open = useOpen()')).toBeGreaterThan(view)
+    expect(module.trimEnd().endsWith('</Sheet>\n)\n}')).toBe(true)
   })
 })

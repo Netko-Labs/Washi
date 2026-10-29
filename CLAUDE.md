@@ -500,7 +500,15 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   of literals parses exactly as before. `validate` checks a code prop by name only, lets
   `onPress`/`onClick`/`key` through and the prelude's components by; a `<Sheet>`'s own props stay
   literal. `hasCode` says a page runs. Until it can, `checkSource` refuses code at save; the editor
-  opens a page with code in source mode.
+  opens a page with code in source mode. `pageModule` makes a page an ES module: imports, functions
+  and `export`s on top, every other statement and the markup in `export default function view()`.
+  `compilePage` (service `pages/`, `scripts.page`) bundles it with `Bun.build` — `washi` (the hooks,
+  `PAGE_HOOKS`, as calls into `globalThis.__washi`), `washi/ui` (registry names), `PAGE_LIBRARIES`
+  (`date-fns`, `lodash-es`, `zod`, resolved off disk) and `page:<id>` (a page the reader can read,
+  transitively, ≤ 8 deep) — into one IIFE that sets `globalThis.__page = { view, exports }`; cached
+  by source + imported sources (64), ≤ 768 KB. Anything else is refused in words, at save too
+  (`pageCodeDiagnostics`: Transpiler + the allowlist). The studio declares the libraries so Nitro
+  traces them into `.output` (`RUNTIME_FILE_DEPS`); `zod` alone bundles to ~490 KB.
 - WSX is inert data: registry primitives, literal props, the closed `expr` grammar only. Components
   own appearance (four enums: `variant tone size emphasis`); pages own content. Validation before
   persist and before render. Format reference: `/learn` and the registry specs.
