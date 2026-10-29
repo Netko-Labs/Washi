@@ -50,6 +50,9 @@ export interface SealedServerKey extends SealedSecret {
   updatedAt: string
 }
 
+/** The server's Exa key: one secret, no provider or model beside it. */
+export type SealedSearchKey = SealedSecret & Pick<SealedServerKey, 'updatedBy' | 'updatedAt'>
+
 export interface ServerSettingsDeps {
   rows: SettingRows
   masterKey: string
@@ -63,6 +66,9 @@ export type ServerSettings = Omit<InstanceStore, 'isAdmin' | 'signup' | 'setSign
   load(): Promise<void>
   /** Decrypted, for the agent host only — never for a route. */
   agentKey(): Promise<AgentCredentialOut | null>
+  /** Decrypted, for the web search tool only — never for a route. */
+  searchKey(): Promise<string | null>
 }
 
-export type HostedInstanceStore = InstanceStore & Pick<ServerSettings, 'load' | 'agentKey'>
+export type HostedInstanceStore = InstanceStore &
+  Pick<ServerSettings, 'load' | 'agentKey' | 'searchKey'>

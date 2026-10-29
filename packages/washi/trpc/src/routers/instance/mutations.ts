@@ -2,6 +2,7 @@ import {
   agentCredentialSchema,
   agentModelSchema,
   hostListSchema,
+  integrationKeySchema,
   workspaceDefaultsSchema,
 } from '@washi/domain'
 import { embedHostList, fetchHostList } from '@washi/service'
@@ -27,6 +28,14 @@ export const instanceMutations = router({
     }),
   removeKey: adminProcedure.mutation(async ({ ctx }) => {
     await ctx.instance.removeKey()
+    return { removed: true }
+  }),
+  /** Exa for every workspace without its own; write-only like the model key. */
+  setSearchKey: adminProcedure
+    .input(integrationKeySchema)
+    .mutation(({ ctx, input }) => ctx.instance.setSearchKey(ctx.adminId, input.key)),
+  removeSearchKey: adminProcedure.mutation(async ({ ctx }) => {
+    await ctx.instance.removeSearchKey()
     return { removed: true }
   }),
   /** Hosts every workspace may fetch without asking; tsuru's refusals still refuse. */

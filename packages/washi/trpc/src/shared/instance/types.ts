@@ -13,6 +13,13 @@ export interface ServerKeyInfo {
   updatedBy: string | null
 }
 
+/** The server's own Exa key as its admins see it: never the key, only its last four. */
+export interface ServerSearchKeyInfo {
+  last4: string
+  updatedAt: Date
+  updatedBy: string | null
+}
+
 /** What a workspace without a key of its own runs on — for its members, not even the last four. */
 export interface ServerKeyUse {
   provider: string
@@ -35,4 +42,8 @@ export interface InstanceStore {
   setKeyModel(actorId: string, model: string | null): Promise<void>
   /** Workspaces without a key of their own fall asleep. */
   removeKey(): Promise<void>
+  searchKeyInfo(): Promise<ServerSearchKeyInfo | null>
+  setSearchKey(actorId: string, key: string): Promise<{ last4: string }>
+  /** Workspaces without an Exa key of their own lose web search. */
+  removeSearchKey(): Promise<void>
 }

@@ -10,10 +10,13 @@ export const MIN_SECRET_LENGTH = 32
 
 /** What the server's own key is sealed under — a colon no organization id carries. */
 export const SERVER_SEAL_ID = ':server'
+/** The server's Exa key, under its own id so the two keys never share a derivation. */
+export const SERVER_SEARCH_SEAL_ID = ':server:exa'
 
 /** `instance_setting` keys (D105); `signup` predates them. */
 export const SETTING_KEYS = {
   agentKey: 'agent_key',
+  searchKey: 'search_key',
   fetchHosts: 'fetch_hosts',
   embedHosts: 'embed_hosts',
   widgets: 'widgets',

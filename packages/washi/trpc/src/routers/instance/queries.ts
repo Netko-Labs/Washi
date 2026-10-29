@@ -9,6 +9,7 @@ export const instanceQueries = router({
   settings: adminProcedure.query(async ({ ctx }) => ({
     signup: await ctx.instance.signup(),
     key: await ctx.instance.keyInfo(),
+    searchKey: await ctx.instance.searchKeyInfo(),
     ...ctx.instance.policy(),
   })),
 })

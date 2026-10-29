@@ -1,5 +1,5 @@
 import { TRPCError } from '@trpc/server'
-import { agentCredentialSchema, agentModelSchema } from '@washi/domain'
+import { agentCredentialSchema, agentModelSchema, integrationKeySchema } from '@washi/domain'
 import { z } from 'zod'
 import {
   INTEGRATIONS,
@@ -60,7 +60,7 @@ export const workspaceMutations = router({
     }),
   /** Same shape as the agent key: write-only, `last4` back. */
   setIntegrationKey: ownerProcedure
-    .input(z.object({ integration: z.enum(INTEGRATIONS), key: z.string().min(8) }))
+    .input(integrationKeySchema.extend({ integration: z.enum(INTEGRATIONS) }))
     .mutation(({ ctx, input }) => {
       const secrets = requireSecrets(ctx)
       if (!ctx.actorId) {

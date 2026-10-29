@@ -38,6 +38,7 @@ function store() {
   let signup: SignupMode = 'invite'
   let policy = serverPolicySchema.parse({})
   let key: { last4: string; provider: string; model: string | null } | null = null
+  let searchKey: string | null = null
   const instance: InstanceStore = {
     isAdmin: async (id) => id === 'first',
     signup: async () => signup,
@@ -71,6 +72,15 @@ function store() {
     },
     removeKey: async () => {
       key = null
+    },
+    searchKeyInfo: async () =>
+      searchKey ? { last4: searchKey.slice(-4), updatedAt: new Date(0), updatedBy: 'First' } : null,
+    setSearchKey: async (_actor, secret) => {
+      searchKey = secret
+      return { last4: secret.slice(-4) }
+    },
+    removeSearchKey: async () => {
+      searchKey = null
     },
   }
   return instance
@@ -137,6 +147,33 @@ describe('the server’s own settings', () => {
     ]
     for (const call of refused) await expect(call()).rejects.toThrow(/app admin/)
     expect((await admin.instance.settings()).key?.last4).toBe('9f2c')
+  })
+
+  test('only the app admin sets the server’s search key; members see only that it is lent', async () => {
+    // The workspace query only asks the instance store, so an opened workspace is never touched.
+    const opened = {} as ReturnType<ServerRuntime['resolve']>
+    const runtime = { ...runtimeWith(store()), resolve: () => opened }
+    const admin = callerFor(runtime, 'first')
+    const member = callerFor(runtime, 'second')
+
+    expect(await member.workspaces.serverSearchKey()).toBe(false)
+    expect(await admin.instance.setSearchKey({ key: 'exa-not-real-5a1b' })).toEqual({
+      last4: '5a1b',
+    })
+    const settings = await admin.instance.settings()
+    expect(settings.searchKey).toMatchObject({ last4: '5a1b', updatedBy: 'First' })
+    expect(JSON.stringify(settings)).not.toContain('exa-not-real')
+    expect(await member.workspaces.serverSearchKey()).toBe(true)
+
+    await expect(member.instance.setSearchKey({ key: 'exa-member-key-0000' })).rejects.toThrow(
+      /app admin/,
+    )
+    await expect(member.instance.removeSearchKey()).rejects.toThrow(/app admin/)
+    await expect(admin.instance.setSearchKey({ key: 'short' })).rejects.toThrow()
+    expect((await admin.instance.settings()).searchKey?.last4).toBe('5a1b')
+
+    await admin.instance.removeSearchKey()
+    expect(await member.workspaces.serverSearchKey()).toBe(false)
   })
 
   test('a host list that names an address or a private name is refused in words', async () => {

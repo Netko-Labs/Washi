@@ -86,6 +86,7 @@ export {
   type InstanceStore,
   type ServerKeyInfo,
   type ServerKeyUse,
+  type ServerSearchKeyInfo,
   SIGNUP_MODES,
   type SignupMode,
 } from './shared/instance'

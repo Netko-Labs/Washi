@@ -16,7 +16,7 @@ export interface RuntimeOptions {
   /** Hosted only: the server's say over every workspace, read from memory on each check. */
   serverPolicy?: () => ServerPolicy
   /** The Exa key a workspace searches the web with. Hosted stores one; embedded reads the env. */
-  searchKey?: (workspaceId: string) => Promise<string | null>
+  searchKey?: SearchKeyLookup
   /** Where a workspace's files go. Absent: a folder beside its .db (D60). */
   blobs?: BlobStoreFactory
   /** Hosted only: a workspace's own bucket, which takes its new uploads in front of `blobs`. */
@@ -24,6 +24,7 @@ export interface RuntimeOptions {
 }
 
 export type KeyLookup = (workspaceId: string) => Promise<StoredKey | null>
+export type SearchKeyLookup = (workspaceId: string) => Promise<string | null>
 
 export interface HostedSecrets {
   databaseUrl: string
