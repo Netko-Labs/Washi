@@ -3,6 +3,9 @@ import { Link } from '@tanstack/react-router'
 import { Floating } from '@/components/shared/floating'
 import { type ChatBarProps, useChatBar } from './lib'
 
+/** A stable ref callback: React runs it on mount only, so the title is selected once. */
+const selectOnMount = (node: HTMLInputElement | null) => node?.select()
+
 const ICON_BUTTON =
   'grid size-11 shrink-0 place-items-center rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground md:size-8'
 const ROW =
@@ -35,7 +38,7 @@ export function ChatBar({ workspaceId, chatId }: ChatBarProps) {
           <input
             name="title"
             defaultValue={session.title}
-            ref={(node) => node?.select()}
+            ref={selectOnMount}
             onKeyDown={(event) => {
               if (event.key === 'Escape') bar.setMode('idle')
             }}
