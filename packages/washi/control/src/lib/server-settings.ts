@@ -15,17 +15,21 @@ function json(value: string | undefined): unknown {
   }
 }
 
-/** A row that no longer parses reads as unset rather than taking the server down. */
+/**
+ * Each row parses on its own: one that no longer reads falls back alone, never taking the others
+ * with it. Widgets fail closed — a switch that can't be read is off, not on.
+ */
 function policyOf(values: Map<string, string>): ServerPolicy {
-  const parsed = serverPolicySchema.safeParse({
-    fetchHosts: json(values.get(SETTING_KEYS.fetchHosts)),
-    embedHosts: json(values.get(SETTING_KEYS.embedHosts)),
-    widgets: values.has(SETTING_KEYS.widgets)
-      ? values.get(SETTING_KEYS.widgets) === '1'
-      : undefined,
-    defaults: workspaceDefaultsSchema.safeParse(json(values.get(SETTING_KEYS.defaults))).data,
-  })
-  return parsed.success ? parsed.data : serverPolicySchema.parse({})
+  const field = serverPolicySchema.shape
+  const widgets = values.get(SETTING_KEYS.widgets)
+  return {
+    fetchHosts: field.fetchHosts.safeParse(json(values.get(SETTING_KEYS.fetchHosts))).data ?? [],
+    embedHosts: field.embedHosts.safeParse(json(values.get(SETTING_KEYS.embedHosts))).data ?? [],
+    widgets: widgets === undefined ? true : widgets === '1',
+    defaults:
+      workspaceDefaultsSchema.safeParse(json(values.get(SETTING_KEYS.defaults))).data ??
+      workspaceDefaultsSchema.parse({}),
+  }
 }
 
 export function createServerSettings({

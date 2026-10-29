@@ -68,4 +68,19 @@ describe('the server policy (D105)', () => {
     await settings.load()
     expect(settings.policy()).toMatchObject({ embedHosts: [], defaults: {} })
   })
+
+  test('one bad row falls back alone; a widgets switch that cannot be read is off', async () => {
+    const { store } = memoryRows({
+      [SETTING_KEYS.fetchHosts]: '["api.example.com"]',
+      [SETTING_KEYS.embedHosts]: 'not json',
+      [SETTING_KEYS.widgets]: 'garbled',
+    })
+    const settings = settingsOver(store)
+    await settings.load()
+    expect(settings.policy()).toMatchObject({
+      fetchHosts: ['api.example.com'],
+      embedHosts: [],
+      widgets: false,
+    })
+  })
 })
