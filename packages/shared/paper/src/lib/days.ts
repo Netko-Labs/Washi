@@ -12,6 +12,8 @@ export function dayLabel(value: string, locale?: string): string {
 }
 
 const MOMENT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/
+/** A whole day or moment, nothing after it: `2026-10-31T10:00 kickoff` is text, not a date. */
+const WHEN = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:?\d{2})?)?$/
 
 function momentLabel(value: string, locale?: string): string {
   if (!MOMENT.test(value)) return dayLabel(value, locale)
@@ -30,7 +32,9 @@ function momentLabel(value: string, locale?: string): string {
  */
 export function whenLabel(value: string, locale?: string): string {
   const [start, end, ...rest] = value.split('/')
-  if (!start || rest.length > 0 || !/^\d{4}-\d{2}-\d{2}/.test(start)) return value
+  if (!start || rest.length > 0 || !WHEN.test(start) || (end !== undefined && !WHEN.test(end))) {
+    return value
+  }
   const from = momentLabel(start, locale)
-  return end && /^\d{4}-\d{2}-\d{2}/.test(end) ? `${from} – ${momentLabel(end, locale)}` : from
+  return end ? `${from} – ${momentLabel(end, locale)}` : from
 }
