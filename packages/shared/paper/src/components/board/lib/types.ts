@@ -53,6 +53,8 @@ export interface CardActions {
   open: (row: Row) => void
   /** A cell in words: named people, numbers in their column's format once the spec is read. */
   shown: (value: Row[string] | undefined, column?: string) => string
+  /** Whether the table's spec has arrived — until then a card draws no avatar rather than an id. */
+  isSpecRead: boolean
   /** A select or status column's options in their own order; none until the spec is read. */
   optionsOf: (column: string) => string[]
   add: (action: ActionRef, group: string) => void

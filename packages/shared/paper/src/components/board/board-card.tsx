@@ -41,7 +41,7 @@ export function BoardCard({
               </Badge>
             ))}
           {meta && <span className="wsx-board-card-note">{actions.shown(row[meta], meta)}</span>}
-          {avatar && typeof row[avatar] === 'string' && row[avatar] && (
+          {avatar && actions.isSpecRead && typeof row[avatar] === 'string' && row[avatar] && (
             <Avatar label={actions.shown(row[avatar], avatar)} size="sm" />
           )}
         </div>
