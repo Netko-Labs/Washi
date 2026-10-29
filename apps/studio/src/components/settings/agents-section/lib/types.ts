@@ -1,5 +1,11 @@
 import type { AccessTokenInfo, IssuedAccessToken } from '@washi/domain'
 
+/** What `tokens.list` answers: whether this server takes tokens, and this person's. */
+export interface TokenList {
+  isAvailable: boolean
+  tokens: AccessTokenInfo[]
+}
+
 export interface AgentsSectionProps {
   workspaceId: string
 }

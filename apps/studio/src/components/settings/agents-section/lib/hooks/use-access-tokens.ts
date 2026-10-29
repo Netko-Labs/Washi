@@ -1,14 +1,14 @@
-import type { AccessTokenInfo, IssuedAccessToken } from '@washi/domain'
+import type { IssuedAccessToken } from '@washi/domain'
 import { useEffect, useState } from 'react'
 import { api } from '@/integrations/trpc'
-import type { AccessTokens } from '../types'
+import type { AccessTokens, TokenList } from '../types'
 
 const reasonOf = (cause: unknown, fallback: string) =>
   cause instanceof Error ? cause.message : fallback
 
 /** This person's tokens for this workspace, and the one just made, shown once. */
 export function useAccessTokens(): AccessTokens {
-  const [listed, setListed] = useState<{ isAvailable: boolean; tokens: AccessTokenInfo[] }>({
+  const [listed, setListed] = useState<TokenList>({
     isAvailable: true,
     tokens: [],
   })
