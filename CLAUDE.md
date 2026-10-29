@@ -463,6 +463,14 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   unwraps a lone one). Drag ⋮⋮ onto a block's outer fifth to put it beside (a new row of columns,
   or a new column, ≤5), the rest drops above or below (`moveBlock`); the gap between columns drags
   or takes ← → (`resizeColumns`, shares in sixths). Rows of columns never nest; a Bento stays locked.
+- **A page holds tab sections (D106).** `<Tabs labels state?><Tab>` is a quiet underline strip
+  (`css/flow-kit.css`) that scrolls sideways, never wraps. The editor edits it in place like Columns
+  (a `TabsBlock`, each tab its own run of blocks, through the same `locate`/`writeList`/`tidy` in
+  `lib/slots.ts`); `labels` is rewritten from the tabs on save, the rest of the element kept. `/tabs`
+  drops two; + adds one (≤12); double-press or ⋯ renames, ⋯ moves or deletes one with its blocks, and
+  one left unwraps. A block dragged onto a tab moves in. The tab on screen is the store's
+  `shownTabs`, never saved, and the arrows walk only it. Tabs and Columns never nest in each other:
+  one inside a column or a tab stays locked, and `/` offers Tabs only at the top level.
 - **A hub page lists its pages (D90).** `<Subpages of? layout="list|cards|gallery">` draws a page's
   children live (`PaperHost.listPages` + `onPagesChange` over the sheets store, so a reader never sees
   one they cannot open; `pageId` is the page being drawn; `newPage` gives + New page), `<PageLink

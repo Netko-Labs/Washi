@@ -3,28 +3,50 @@
 .wsx-tabs-list {
   display: flex;
   gap: 2px;
-  border-bottom: 1px solid var(--border);
+  /* An inset line, not a border: the strip scrolls, and a scroller clips what hangs over its edge. */
+  box-shadow: inset 0 -1px var(--border);
   overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+.wsx-tabs-list::-webkit-scrollbar {
+  display: none;
 }
 .wsx-tabs-tab {
-  padding: 8px 12px;
-  margin-bottom: -1px;
+  flex: none;
+  max-width: 240px;
+  padding: 7px 10px;
   border: 0;
   border-bottom: 2px solid transparent;
   background: none;
   font: inherit;
   font-size: 13.5px;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--muted);
   cursor: pointer;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   transition:
     color var(--ease),
     border-color var(--ease);
 }
+.wsx-tabs-tab:hover {
+  color: var(--ink);
+}
 .wsx-tabs-tab[aria-selected="true"] {
   color: var(--ink);
-  border-bottom-color: var(--accent);
+  border-bottom-color: var(--ink);
+}
+@container wsx (max-width: 559px) {
+  .wsx-tabs-list {
+    gap: 0;
+  }
+  .wsx-tabs-tab {
+    max-width: 180px;
+    padding-inline: 8px;
+    font-size: 13px;
+  }
 }
 .wsx-tab {
   padding-top: var(--gap);

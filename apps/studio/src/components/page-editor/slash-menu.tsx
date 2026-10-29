@@ -1,14 +1,16 @@
 import { useSheetsStore } from '@washi/ui'
-import { type SlashMenuProps, slashMatches, useEditorStore } from './lib'
+import { isNestedBlock, type SlashMenuProps, slashMatches, useEditorStore } from './lib'
 
 /** Typed `/` in an empty block: pick what the block becomes. Enter takes the first match. */
-export function SlashMenu({ query, onPick }: SlashMenuProps) {
+export function SlashMenu({ id, query, onPick }: SlashMenuProps) {
   const tables = useEditorStore((state) => state.tables)
   const sheets = useSheetsStore((state) => state.sheets)
+  const isNested = useEditorStore((state) => isNestedBlock(state.blocks, id))
   const options = slashMatches(
     query,
     tables,
     sheets.filter((sheet) => !sheet.rowOf),
+    isNested,
   )
 
   return (

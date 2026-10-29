@@ -95,7 +95,7 @@ export const SUMMARIES: Record<string, string> = {
   Select: 'Writes one choice to a state key; views filtered by it follow.',
   Slider: 'Writes a number to a state key.',
   Show: 'Shows its children while an expression holds.',
-  Tabs: 'Tab labels over panels; may write the open tab to state.',
+  Tabs: 'Tab labels over panels, one label per Tab; may write the open tab to state. A strip wider than the page scrolls sideways.',
   Tab: 'One panel inside Tabs.',
   Reveal: 'A disclosure: a label that opens what it holds.',
   Drawer: 'A side panel that opens while a state key is set; with bind, one row.',

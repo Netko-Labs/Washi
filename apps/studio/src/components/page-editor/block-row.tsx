@@ -6,6 +6,7 @@ import { ColumnsRow } from './columns-row'
 import { type BlockRowProps, useBlockDrop, useEditorStore } from './lib'
 import { LockedBlock } from './locked-block'
 import { ScriptBlock } from './script-block'
+import { TabsRow } from './tabs-row'
 
 /** Blocks whose code is typed in place: what a page draws, and what a row write runs. */
 const SCRIPTED = new Set(['Automation', 'Formula'])
@@ -59,8 +60,9 @@ export function BlockRow({ block, numberAt, rootProps, isNested }: BlockRowProps
         <LockedBlock block={block} rootProps={rootProps} />
       )}
       {block.kind === 'columns' && <ColumnsRow block={block} rootProps={rootProps} />}
+      {block.kind === 'tabs' && <TabsRow block={block} rootProps={rootProps} />}
       {block.kind === 'divider' && <Divider />}
-      {block.kind !== 'locked' && block.kind !== 'columns' && block.kind !== 'divider' && (
+      {'text' in block && block.kind !== 'divider' && (
         <BlockInput block={block} numberAt={numberAt} />
       )}
     </div>
