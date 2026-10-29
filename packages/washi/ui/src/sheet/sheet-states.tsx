@@ -32,7 +32,7 @@ export function SheetLoading() {
       aria-busy="true"
       aria-label="Loading page"
     >
-      <div className="mx-auto max-w-[760px] animate-pulse space-y-4 px-6 pt-14">
+      <div className="mx-auto max-w-[960px] animate-pulse space-y-4 px-6 pt-14">
         <div className="h-9 w-2/5 rounded-lg bg-muted" />
         <div className="h-4 w-3/5 rounded bg-muted" />
         <div className="mt-8 h-24 rounded-xl bg-muted" />

@@ -8,7 +8,7 @@ export function Backlinks({ pageId }: BacklinksProps) {
   if (pages.length === 0) return null
 
   return (
-    <section className="mx-auto max-w-[760px] px-8 pt-6 pb-16" aria-label="Linked from">
+    <section className="mx-auto max-w-[960px] px-8 pt-6 pb-16" aria-label="Linked from">
       <h2 className="mb-2 font-semibold text-[12px] text-muted-foreground uppercase tracking-[0.06em]">
         Linked from
       </h2>
