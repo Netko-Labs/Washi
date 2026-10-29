@@ -1,4 +1,9 @@
 export {
+  type AccessTokenInfo,
+  accessTokenNameSchema,
+  type IssuedAccessToken,
+} from './entities/access-token'
+export {
   type AgentSession,
   type AgentUpdate,
   type ApprovalDecision,

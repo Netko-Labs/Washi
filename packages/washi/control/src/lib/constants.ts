@@ -12,3 +12,9 @@ export const MIN_SECRET_LENGTH = 32
 export const DEFAULT_SIGNUP = 'invite'
 export const SIGNUP_REFUSED =
   'This server is invite-only. Ask a workspace owner to invite this email, then sign up with it.'
+
+/** Every access token starts so — a secret scanner can tell one from noise. */
+export const TOKEN_PREFIX = 'washi_pat_'
+export const TOKEN_BYTES = 32
+/** How stale "last used" may be before a use writes it again. */
+export const TOKEN_USE_GRAIN_MS = 60_000

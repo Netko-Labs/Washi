@@ -62,6 +62,13 @@ export {
   unreadReminders,
   updateReminderRule,
 } from './reminders/service'
+export {
+  type Capability,
+  type CapabilityContext,
+  commentCapabilities,
+  pageCapabilities,
+  tableCapabilities,
+} from './capabilities'
 export { runAutomation, watchAutomations } from './scripts/automations'
 export { compileScript, SCRIPT_MAX_CHARS } from './scripts/compile'
 export { installFormulaFunctions } from './scripts/formulas'

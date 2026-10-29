@@ -18,6 +18,7 @@ import { storageRouter } from './routers/storage'
 import { systemRouter } from './routers/system'
 import { tablesRouter } from './routers/tables'
 import { themesRouter } from './routers/themes'
+import { tokensRouter } from './routers/tokens'
 import { workspacesRouter } from './routers/workspaces'
 
 /**
@@ -30,6 +31,7 @@ export const appRouter = router({
   comments: commentsRouter,
   files: filesRouter,
   storage: storageRouter,
+  tokens: tokensRouter,
   embeds: embedsRouter,
   emojis: emojisRouter,
   links: linksRouter,
@@ -58,14 +60,11 @@ export {
   type ControlPlane,
   createContext,
   INTEGRATIONS,
-  type InstanceStore,
   type Integration,
   type ResolvedWorkspace,
   type SecretStore,
   type ServerMode,
   type ServerRuntime,
-  SIGNUP_MODES,
-  type SignupMode,
   type WorkspaceRef,
 } from './init'
 export { createMirinBridge, type MirinFrame } from './mirin'
@@ -81,6 +80,7 @@ export {
   type EventBus,
   type WashiEvents,
 } from './shared/events'
+export { type InstanceStore, SIGNUP_MODES, type SignupMode } from './shared/instance'
 export { isTrustedOrigin } from './shared/origin'
 export {
   AGENT_PRESENCE_TTL_MS,
@@ -89,4 +89,10 @@ export {
   type PresenceBoard,
 } from './shared/presence'
 export type { StorageConfig, StorageInfo, StorageStore } from './shared/storage'
+export type {
+  AccessTokenInfo,
+  IssuedAccessToken,
+  TokenOwner,
+  TokenStore,
+} from './shared/tokens'
 export { closeAllPeers, createTRPCWebSocketHooks, type PeerLike } from './ws'

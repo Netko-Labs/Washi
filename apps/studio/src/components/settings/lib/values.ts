@@ -6,6 +6,7 @@ import {
   IconGauge,
   IconMoodSmile,
   IconPalette,
+  IconPlugConnected,
   IconServer,
   IconSparkles,
   IconUserCircle,
@@ -70,6 +71,12 @@ export const SETTINGS_GROUPS: SettingsGroup[] = [
         label: 'Preferences',
         icon: IconAdjustments,
         desc: 'How Washi looks for you, on this device.',
+      },
+      {
+        key: 'agents',
+        label: 'Agents',
+        icon: IconPlugConnected,
+        desc: 'Let Claude Code, or any agent that speaks MCP, work in this workspace as you.',
       },
     ],
   },
@@ -153,6 +160,7 @@ export const SETTINGS_GROUPS: SettingsGroup[] = [
 export const SETTINGS_TAB_KEYS = [
   'profile',
   'preferences',
+  'agents',
   'general',
   'people',
   'storage',

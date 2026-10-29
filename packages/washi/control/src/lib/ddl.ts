@@ -146,6 +146,21 @@ export async function ensureControlSchema(db: ControlDB): Promise<void> {
     )`)
 
   await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS "access_token" (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
+      organization_id TEXT NOT NULL REFERENCES "organization"(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      token_hash TEXT NOT NULL UNIQUE,
+      last4 TEXT NOT NULL,
+      created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+      last_used_at TIMESTAMP
+    )`)
+  await db.execute(
+    sql`CREATE INDEX IF NOT EXISTS "access_token_owner" ON "access_token" (user_id, organization_id)`,
+  )
+
+  await db.execute(sql`
     CREATE TABLE IF NOT EXISTS "instance_setting" (
       key TEXT PRIMARY KEY,
       value TEXT NOT NULL,

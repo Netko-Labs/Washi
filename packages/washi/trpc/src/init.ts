@@ -18,8 +18,10 @@ import {
   WorkspaceThemeError,
 } from '@washi/service'
 import type { EventBus } from './shared/events'
+import type { InstanceStore } from './shared/instance'
 import type { PresenceBoard } from './shared/presence'
 import type { StorageStore } from './shared/storage'
+import type { TokenStore } from './shared/tokens'
 
 /**
  * Deployment mode. Asserted once at boot, never per request (C2) — two auth
@@ -92,16 +94,6 @@ export interface SecretStore {
   removeIntegration(workspaceId: string, integration: Integration): Promise<void>
 }
 
-export const SIGNUP_MODES = ['invite', 'open'] as const
-export type SignupMode = (typeof SIGNUP_MODES)[number]
-
-/** The server's own settings, held by its app admins (its first account). Absent in embedded mode. */
-export interface InstanceStore {
-  isAdmin(actorId: string): Promise<boolean>
-  signup(): Promise<SignupMode>
-  setSignup(mode: SignupMode): Promise<void>
-}
-
 export interface ControlPlane {
   /** Null when the request carries no valid session. */
   authenticate(request: Request): Promise<Actor | null>
@@ -118,6 +110,7 @@ export interface ControlPlane {
   secrets?: SecretStore
   instance?: InstanceStore
   storage?: StorageStore
+  tokens?: TokenStore
   close(): Promise<void>
 }
 

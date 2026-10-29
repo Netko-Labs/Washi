@@ -1,5 +1,6 @@
 import { PeopleSection } from '@/components/people'
 import { AgentTab } from './agent-tab'
+import { AgentsSection } from './agents-section'
 import { EmbedsSection } from './embeds-section'
 import { EmojisSection } from './emojis-section'
 import { GeneralSection } from './general-section'
@@ -33,6 +34,7 @@ export function SettingsScreen({ workspaceId, tab, onTab }: SettingsScreenProps)
 
           {shown === 'profile' && <ProfileSection />}
           {shown === 'preferences' && <PreferencesSection />}
+          {shown === 'agents' && <AgentsSection workspaceId={workspaceId} />}
           {shown === 'general' && <GeneralSection workspaceId={workspaceId} />}
           {shown === 'people' && <PeopleSection workspaceId={workspaceId} />}
           {shown === 'storage' && <StorageSection />}
