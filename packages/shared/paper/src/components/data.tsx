@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { styled, toneOf, useBind, useExprValue } from '../lib'
+import { ratioOf, styled, toneOf, useBind, useExprValue } from '../lib'
 import type { BlockProps, Row } from '../lib/types'
 import { usePaperHost } from '../provider'
 import type { BindQuery } from '../registry'
@@ -180,11 +180,9 @@ export function Progress({
   ...rest
 }: BlockProps & { value?: number | string; expr?: string; label?: string }) {
   const computed = useExprValue(expr)
-  // A `$row.x` with no row around it never resolved: unknown, said as such — never an invented 0%.
-  const isUnknown = !expr && typeof value === 'string' && value.startsWith('$row.')
-  const given = Number(value ?? 0) || 0
-  const ratio = Math.min(1, Math.max(0, typeof computed === 'number' ? computed : given))
-  const percent = isUnknown ? 0 : Math.round(ratio * 100)
+  const ratio = ratioOf(value, expr, computed)
+  const isUnknown = ratio === null
+  const percent = Math.round((ratio ?? 0) * 100)
   return (
     <div
       {...styled(rest, 'wsx-progress')}
