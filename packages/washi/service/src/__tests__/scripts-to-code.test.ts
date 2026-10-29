@@ -78,14 +78,12 @@ describe('Scripts become the page’s own code, once (D100)', () => {
     })
   })
 
-  test('a page wrong in some other way still loses its Script, kept as a code block', () => {
+  test('a page wrong in some other way is left as it was, and tried again at the next open', () => {
     const odd = `<Sheet title="Odd"><Marquee /><Script>{\`${CLOCK}\`}</Script></Sheet>`
     const sheet = createSheet(ws, { title: 'Odd', source: odd }, { body: 'Odd', refs: [] })
     liftScriptsIntoCode(ws)
-    const source = getSheet(ws, sheet.id)?.source ?? ''
-    expect(source).not.toContain('<Script')
-    expect(source).toContain('<Code lang="tsx">')
-    expect(source).toContain('<Marquee />')
+    expect(getSheet(ws, sheet.id)?.source).toBe(odd)
+    expect(getAppMeta(ws, 'scripts_as_code')).toBeNull()
   })
 
   test('a page without Scripts is left as it was, and the lift runs once', () => {

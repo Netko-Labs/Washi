@@ -65,11 +65,12 @@ function scriptsAsCodeBlocks(root: WsxElement): string {
 
 /**
  * Once per workspace: `<Script>` left the registry when pages began to run (D100). Each page that
- * held one is rewritten, quietly, into a page that runs the same code; one that would not check
- * keeps its scripts as code blocks, so nothing written is lost.
+ * held one is rewritten, quietly, into a page that runs the same code, or else keeps its scripts as
+ * code blocks — whichever checks — so nothing written is lost.
  */
 export function liftScriptsIntoCode(ws: Workspace): void {
   if (getAppMeta(ws, MIGRATED)) return
+  let isDone = true
   for (const sheet of everySheetSource(ws)) {
     if (!sheet.source.includes('<Script')) continue
     let root: WsxElement
@@ -80,10 +81,11 @@ export function liftScriptsIntoCode(ws: Workspace): void {
     }
     const moved = scriptsAsCode(root)
     if (moved === null) continue
-    // Whatever else is wrong with a page, it never keeps a <Script> the registry no longer has:
-    // the code-block form is written even when something unrelated still fails the check.
-    const source = checkSource(moved).ok ? moved : scriptsAsCodeBlocks(root)
-    rewriteSourceQuietly(ws, sheet.id, source, lookOf(root))
+    const source = [moved, scriptsAsCodeBlocks(root)].find((each) => checkSource(each).ok)
+    // Only what checks is written. A page wrong in some other way keeps its Scripts and is tried
+    // again at the next open, until someone fixes it — never stored invalid, never forgotten.
+    if (source) rewriteSourceQuietly(ws, sheet.id, source, lookOf(root))
+    else isDone = false
   }
-  setAppMeta(ws, MIGRATED, '1')
+  if (isDone) setAppMeta(ws, MIGRATED, '1')
 }
