@@ -1,4 +1,15 @@
 export {
+  jwks,
+  oauthAccessToken,
+  oauthClient,
+  oauthClientAssertion,
+  oauthClientResource,
+  oauthConsent,
+  oauthRefreshToken,
+  oauthResource,
+  oauthWorkspaceGrant,
+} from './oauth'
+export {
   accessToken,
   account,
   instanceAdmin,

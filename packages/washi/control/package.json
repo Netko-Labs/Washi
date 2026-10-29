@@ -12,9 +12,11 @@
     "check-types": "tsgo -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@better-auth/oauth-provider": "^1.7.14",
     "@washi/trpc": "workspace:*",
-    "better-auth": "^1.7.5",
+    "better-auth": "^1.7.14",
     "drizzle-orm": "^0.45.2",
+    "jose": "^6",
     "zod": "^4.4.3"
   },
   "devDependencies": {

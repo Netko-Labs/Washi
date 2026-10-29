@@ -6,7 +6,7 @@ Washi itself still never reviews code (A4).
 
 - [x] F1 · capability table (both ports + MCP), `@washi/mcp`, `/mcp/$workspaceId`, personal tokens,
       Settings → Account → Agents
-- [ ] F2 · OAuth: `@better-auth/oauth-provider` (better-auth ≥ 1.7.14), discovery metadata, the
+- [x] F2 · OAuth: `@better-auth/oauth-provider` (better-auth ≥ 1.7.14), discovery metadata, the
       `claude mcp add` browser sign-in
 - [ ] F3 · `plugins/washi` Claude Code plugin + marketplace, the `backlog` skill
 

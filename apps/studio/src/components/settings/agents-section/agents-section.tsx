@@ -1,7 +1,13 @@
 import { useState } from 'react'
 import { SettingsCard } from '../shared/card'
 import { CopyLine } from './copy-line'
-import { type AgentsSectionProps, claudeCommand, mcpUrl, useAccessTokens } from './lib'
+import {
+  type AgentsSectionProps,
+  claudeCommand,
+  claudeSignInCommand,
+  mcpUrl,
+  useAccessTokens,
+} from './lib'
 import { TokenRow } from './token-row'
 
 /** An outside agent — Claude Code, any MCP client — works here as you, with a token you make. */
@@ -23,7 +29,15 @@ export function AgentsSection({ workspaceId }: AgentsSectionProps) {
         desc="It reads what you can read here and writes as you — pages, tables and comments, each in its history. Nothing it does reaches past this workspace."
       >
         <div className="grid gap-3 px-5 py-4">
-          <CopyLine label="MCP address" value={url} />
+          <CopyLine
+            label="Claude Code, signing in"
+            value={claudeSignInCommand(window.location.origin)}
+          />
+          <p className="text-[12.5px] text-muted-foreground">
+            Then run /mcp in Claude Code: it opens Washi, you pick this workspace and allow it. For
+            an agent with no browser, make a token below.
+          </p>
+          <CopyLine label="MCP address for a token" value={url} />
           {access.issued ? (
             <>
               <CopyLine label="Claude Code" value={claudeCommand(url, access.issued.token)} />

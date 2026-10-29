@@ -10,6 +10,7 @@ import { instanceRouter } from './routers/instance'
 import { linksRouter } from './routers/links'
 import { liveRouter } from './routers/live'
 import { modelsRouter } from './routers/models'
+import { oauthRouter } from './routers/oauth'
 import { remindersRouter } from './routers/reminders'
 import { routinesRouter } from './routers/routines'
 import { scriptsRouter } from './routers/scripts'
@@ -30,6 +31,7 @@ export const appRouter = router({
   sheets: sheetsRouter,
   comments: commentsRouter,
   files: filesRouter,
+  oauth: oauthRouter,
   storage: storageRouter,
   tokens: tokensRouter,
   embeds: embedsRouter,
@@ -81,6 +83,7 @@ export {
   type WashiEvents,
 } from './shared/events'
 export { type InstanceStore, SIGNUP_MODES, type SignupMode } from './shared/instance'
+export type { OAuthCaller, OAuthStore } from './shared/oauth'
 export { isTrustedOrigin } from './shared/origin'
 export {
   AGENT_PRESENCE_TTL_MS,

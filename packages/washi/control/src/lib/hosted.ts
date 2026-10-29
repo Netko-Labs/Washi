@@ -4,6 +4,7 @@ import type {
   ControlPlane,
   InstanceStore,
   Integration,
+  OAuthStore,
   SecretStore,
   TokenStore,
   WorkspaceRef,
@@ -21,6 +22,7 @@ import { createAuth } from './auth'
 import { type ControlDB, createControlDb } from './client'
 import { open, seal } from './crypto'
 import { isInstanceAdmin, setSignupMode, signupMode } from './instance'
+import { createOAuthStore } from './oauth'
 import { createStorageStore } from './storage'
 import { createTokenStore } from './tokens'
 import type { ControlPlaneOptions, HostedStorageStore } from './types'
@@ -33,6 +35,7 @@ export interface HostedControlPlane extends ControlPlane {
   instance: InstanceStore
   storage: HostedStorageStore
   tokens: TokenStore
+  oauth: OAuthStore
   /** Decrypted, for the agent host only — never for a route. */
   agentKey(workspaceId: string): Promise<AgentCredentialOut | null>
   setAgentKey(
@@ -90,6 +93,7 @@ export function createHostedControlPlane(options: ControlPlaneOptions): HostedCo
     },
     storage: createStorageStore(db, options.masterKey),
     tokens: createTokenStore(db),
+    oauth: createOAuthStore(db, auth, options.baseUrl),
 
     async authenticate(request) {
       const result = await auth.api.getSession({ headers: request.headers })
