@@ -1,5 +1,12 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
-import { getSheet, listSheets, openWorkspace, type Workspace } from '@washi/repository'
+import {
+  getSheet,
+  listRecordChanges,
+  listSheets,
+  openWorkspace,
+  type Workspace,
+} from '@washi/repository'
+import { restoreSheetTree } from '../sheets/tree'
 import { openRowPage, rowOfSheet } from '../tables/rows'
 import { defineUserTable, deleteRecord, runMutation, updateRecord } from '../tables/service'
 
@@ -61,5 +68,16 @@ describe('every row is a page', () => {
     deleteRecord(ws, 'issues', issue)
     expect(listSheets(ws).some((sheet) => sheet.id === id)).toBe(false)
     expect(rowOfSheet(ws, id)).toBeNull()
+  })
+
+  test("restoring a deleted row's page brings the row back, and history says so", () => {
+    const id = openRowPage(ws, issue)
+    deleteRecord(ws, 'issues', issue, 'm1')
+    expect(rowOfSheet(ws, id)).toBeNull()
+    restoreSheetTree(ws, id, 'm2')
+    expect(rowOfSheet(ws, id)?.row).toMatchObject({ id: issue, title: 'Fix login', points: 3 })
+    const [gone, back] = listRecordChanges(ws, issue).slice(-2)
+    expect([gone?.author, gone?.data]).toEqual(['m1', null])
+    expect(back).toMatchObject({ author: 'm2', data: { title: 'Fix login', points: 3 } })
   })
 })

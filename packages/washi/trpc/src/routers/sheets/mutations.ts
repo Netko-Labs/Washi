@@ -57,7 +57,7 @@ export const sheetMutations = router({
     }),
   restore: pageProcedure
     .input(byId)
-    .mutation(({ ctx, input }) => restoreSheetTree(ctx.ws, input.id)),
+    .mutation(({ ctx, input }) => restoreSheetTree(ctx.ws, input.id, ctx.viewer.id)),
   purge: pageProcedure.input(byId).mutation(async ({ ctx, input }) => {
     const uploads = trashedUploads(ctx.ws, input.id)
     const purged = purgeSheet(ctx.ws, input.id)

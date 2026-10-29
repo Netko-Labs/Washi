@@ -5,6 +5,7 @@ import {
   indexSheet,
   listSheets,
   moveSheet,
+  restoreRecords,
   restoreSheet,
   updateSheetMeta,
   type Workspace,
@@ -36,16 +37,26 @@ export function moveSheetTo(
   if (!moveSheet(ws, id, parentId, index)) throw new Error(`sheet not found: ${id}`)
 }
 
-/** Restores a trashed page with its sub-pages, and puts them back in search and backlinks. */
-export function restoreSheetTree(ws: Workspace, id: string): string[] {
+/**
+ * Restores a trashed page with its sub-pages, and puts them back in search and backlinks. A row's
+ * page brings its row back too — deleting the row is what trashed it. `author` is who restored.
+ */
+export function restoreSheetTree(
+  ws: Workspace,
+  id: string,
+  author: string | null = null,
+): string[] {
   const ids = restoreSheet(ws, id)
   if (ids.length === 0) throw new Error(`no trashed page: ${id}`)
+  const rows: string[] = []
   for (const each of ids) {
     const sheet = getSheet(ws, each)
     if (!sheet) continue
+    if (sheet.rowOf) rows.push(sheet.rowOf)
     const root = parse(sheet.source)
     indexSheet(ws, each, sheet.title, indexOf(root))
   }
+  restoreRecords(ws, rows, author)
   return ids
 }
 

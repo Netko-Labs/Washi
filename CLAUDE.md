@@ -34,7 +34,8 @@ is the primitives reference and these rules stand — a PR that breaks one does 
 - **A2** Reads pass, page and table writes land with an undo stack, whatever leaves stops at the desk.
 - **A3** A team server never bills one person's plan.
 - **A4** Washi never reviews code.
-- **P1** Every record write goes through `insertRecord · updateRecords · deleteRecords`.
+- **P1** Every record write goes through `insertRecord · updateRecords · deleteRecords ·
+  restoreRecords`.
 - **P2** Writes merge (Loro, `baseVersion`); a merge that breaks WSX is `SheetConflictError`.
 - **P3** Nothing on screen is invented; empty states are the honest default.
 
@@ -150,7 +151,7 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
 - Pages nest Notion-style: `parent_id` + `position`, a fractional key (`positionBetween` in
   domain), so a move rewrites one row. Delete trashes the subtree under one `deleted_at` stamp;
   that stamp is the batch Restore and Purge act on. A restored page whose parent is gone comes
-  back at the top level. The service refuses a move into a page's own subtree (`SheetMoveError`
+  back at the top level; a restored row page brings its row back (`restoreRecords`, history notes who). The service refuses a move into a page's own subtree (`SheetMoveError`
   → 400).
 - **The look is the page's (D64).** `icon` and `cover` are `<Sheet>` props; the source is the
   truth and `sheets.icon/cover` a cache every write re-reads off the root (`lookOf`). Never set
@@ -258,8 +259,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   `ctx.viewer.id`, the person who pressed a page action), `washi` for its tools and agent actions,
   null for versions from before. `rowActivity` diffs consecutive versions (formulas and rollups are
   never stored, so never diffed): the row page's Activity and Washi's `db_row_activity`. Never
-  update `records` without going through `insertRecord`/`updateRecords`/`deleteRecords`, or
-  history silently forgets.
+  update `records` without going through `insertRecord`/`updateRecords`/`deleteRecords`/
+  `restoreRecords`, or history silently forgets.
   A **copy** (D76: ink kind `copy`, page verb `table.copy`, `tables/copy.ts`) makes every row a
   `where` matches a new row, `set` over it — a cell or `{ expr }` over the source row
   (`add_months(date, 1)`); `params` fill `{ param }` filters and read as `$name`, and an unset one
