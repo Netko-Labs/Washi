@@ -1,3 +1,4 @@
+import { patchRow } from '../../../lib/rows'
 import { toneOf } from '../../../lib/tone-of'
 import type { ActionRef, Row } from '../../../lib/types'
 import type { BoardColumn, Move, RankPatch } from './types'
@@ -46,9 +47,10 @@ export function boardColumns(
     const move = moves[String(row.id)]
     const holds = move && (move.against === null || move.against === rows)
     if (!holds) return row
-    return rank
-      ? { ...row, [groupBy]: move.group, [rank]: move.rank }
-      : { ...row, [groupBy]: move.group }
+    return patchRow(
+      row,
+      rank ? { [groupBy]: move.group, [rank]: move.rank } : { [groupBy]: move.group },
+    )
   })
   const names = groups ?? [...new Set(merged.map((row) => String(row[groupBy] ?? '—')))]
   return names.map((name) => ({

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { columnOf, listCell, toRows } from '../rows'
+import { cellItems, columnOf, listCell, patchRow, toRows } from '../rows'
 
 const PLACES = [
   { id: 'a', name: null, kind: null, cost: null },
@@ -27,5 +27,18 @@ describe('toRows', () => {
     expect(row?.tags).toBe('urgent, Smith, Jones')
     expect(row && listCell(row, 'tags')).toEqual(['urgent', 'Smith, Jones'])
     expect(row && listCell(row, 'name')).toBeUndefined()
+  })
+})
+
+describe('cellItems and patchRow', () => {
+  test('a pill per item, a value alone, nothing for an empty cell — kept across a patch', () => {
+    const [row] = toRows([{ id: 'a', tags: ['bug', 'infra'], list: 'Doing', due: null }])
+    if (!row) throw new Error('no row')
+    expect(cellItems(row, 'tags')).toEqual(['bug', 'infra'])
+    expect(cellItems(row, 'list')).toEqual(['Doing'])
+    expect(cellItems(row, 'due')).toEqual([])
+    const moved = patchRow(row, { list: 'Done' })
+    expect(moved.list).toBe('Done')
+    expect(cellItems(moved, 'tags')).toEqual(['bug', 'infra'])
   })
 })

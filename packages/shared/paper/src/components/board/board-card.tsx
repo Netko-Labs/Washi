@@ -1,4 +1,4 @@
-import { toneOf } from '../../lib'
+import { cellItems, toneOf } from '../../lib'
 import { Avatar, Badge } from '../data'
 import { cell } from '../states'
 import type { BoardCardProps } from './lib'
@@ -34,11 +34,12 @@ export function BoardCard({
       <div className="wsx-board-card-title">{cell(row[titleKey]) || 'Untitled'}</div>
       {(badge || meta || avatar) && (
         <div className="wsx-board-card-meta">
-          {badge && row[badge] !== null && row[badge] !== undefined && (
-            <Badge size="sm" tone={toneOf(String(row[badge]))}>
-              {actions.shown(row[badge])}
-            </Badge>
-          )}
+          {badge &&
+            cellItems(row, badge).map((item) => (
+              <Badge key={String(item)} size="sm" tone={toneOf(String(item))}>
+                {actions.shown(item)}
+              </Badge>
+            ))}
           {meta && <span className="wsx-board-card-note">{actions.shown(row[meta])}</span>}
           {avatar && typeof row[avatar] === 'string' && row[avatar] && (
             <Avatar label={row[avatar] as string} size="sm" />

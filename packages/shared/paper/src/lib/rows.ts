@@ -1,4 +1,4 @@
-import type { QueryRow } from '@washi/ink'
+import type { QueryRow, Scalar } from '@washi/ink'
 import type { WsxValue } from '@washi/wsx'
 import type { CellKind, Row } from './types'
 
@@ -17,6 +17,20 @@ export function toRows(rows: QueryRow[]): Row[] {
     if (Object.keys(items).length > 0) lists.set(row, items)
     return row
   })
+}
+
+/** What a cell holds, one item per pill: a list's items, a value alone, or nothing. */
+export function cellItems(row: Row, column: string): Scalar[] {
+  const value = row[column]
+  return listCell(row, column) ?? (value === null || value === undefined ? [] : [value])
+}
+
+/** A row with some cells changed, its list cells still known. */
+export function patchRow(row: Row, patch: Row): Row {
+  const next = { ...row, ...patch }
+  const items = lists.get(row)
+  if (items) lists.set(next, items)
+  return next
 }
 
 /** The items a list cell held before `toRows` joined them; none for a scalar. */

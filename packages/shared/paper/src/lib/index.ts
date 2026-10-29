@@ -8,8 +8,10 @@ export { useRunAction } from './hooks/use-run-action'
 export { useSelectOptions } from './hooks/use-select-options'
 export { ratioOf } from './ratio'
 export {
+  cellItems,
   columnOf,
   listCell,
+  patchRow,
   resolveArgs,
   resolveRow,
   resolveRowDeep,
