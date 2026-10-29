@@ -35,7 +35,7 @@ is the primitives reference and these rules stand — a PR that breaks one does 
 - **A3** A team server never bills one person's plan.
 - **A4** Washi never reviews code.
 - **P1** Every record write goes through `insertRecord · updateRecords · deleteRecords ·
-  restoreRecords`.
+  restoreRecords`, and a purged table's rows only through `purgeRecords`.
 - **P2** Writes merge (Loro, `baseVersion`); a merge that breaks WSX is `SheetConflictError`.
 - **P3** Nothing on screen is invented; empty states are the honest default.
 

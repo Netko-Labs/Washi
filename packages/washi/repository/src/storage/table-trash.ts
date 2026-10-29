@@ -2,6 +2,7 @@ import type { TrashedTable } from '@washi/domain'
 import type { Workspace } from './client'
 import { appendOp } from './oplog'
 import { purgeSheetIds } from './sheet-tree'
+import { purgeRecords } from './tables'
 
 /** Trashing a table stamps the table alone: its rows and their history stay as they are (P1). */
 export function trashTable(ws: Workspace, id: string): boolean {
@@ -41,10 +42,7 @@ export function isTableNameTrashed(ws: Workspace, name: string): boolean {
   )
 }
 
-/**
- * A trashed table gone for good: its rows, their history and their row pages. This is the one
- * write that erases records outside the P1 functions — nothing is left for history to keep.
- */
+/** A trashed table gone for good: its rows, their history and their row pages. */
 export function purgeTable(ws: Workspace, id: string): boolean {
   const trashed = ws.sqlite
     .query('SELECT 1 FROM user_tables WHERE id = ? AND deleted_at IS NOT NULL')
@@ -58,8 +56,7 @@ export function purgeTable(ws: Workspace, id: string): boolean {
       ws,
       rowPages.map((page) => page.id),
     )
-    ws.sqlite.query('DELETE FROM record_changes WHERE table_id = ?').run(id)
-    ws.sqlite.query('DELETE FROM records WHERE table_id = ?').run(id)
+    purgeRecords(ws, id)
     ws.sqlite.query('DELETE FROM user_tables WHERE id = ?').run(id)
     appendOp(ws, 'table', id, { kind: 'purge' })
   })()
