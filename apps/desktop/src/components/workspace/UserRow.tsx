@@ -7,24 +7,18 @@ import {
   IconSun,
   IconUser,
 } from '@tabler/icons-react'
-import { initials, useViewStore } from '@washi/ui'
+import { initials } from '@washi/ui'
 import { useState } from 'react'
-import { useShallow } from 'zustand/react/shallow'
+import { useAccount, useDarkTheme } from './lib'
 
 const MENU_ROW =
   'flex h-[30px] w-full items-center gap-[9px] rounded-lg px-2 text-left text-[12.5px] hover:bg-accent'
 
 export function UserRow() {
   const [open, setOpen] = useState(false)
-  const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'))
-  const { openTab, identity } = useViewStore(
-    useShallow((state) => ({ openTab: state.openTab, identity: state.identity })),
-  )
+  const { dark, setTheme } = useDarkTheme()
+  const { openTab, identity } = useAccount()
 
-  const setTheme = (next: boolean) => {
-    document.documentElement.classList.toggle('dark', next)
-    setDark(next)
-  }
   const ThemeIcon = dark ? IconMoon : IconSun
 
   return (
