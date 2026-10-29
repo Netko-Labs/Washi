@@ -7,7 +7,7 @@ import { useEmbedHosts } from './lib'
 
 /** What a page may put in a frame: the built-ins always, these sites once an owner lists them. */
 export function EmbedsSection() {
-  const { hosts, widgets, error, save, allowWidgets } = useEmbedHosts()
+  const { hosts, widgets, server, error, save, allowWidgets } = useEmbedHosts()
   const isSteward = useIsSteward()
   const [draft, setDraft] = useState('')
   const add = async () => {
@@ -18,7 +18,7 @@ export function EmbedsSection() {
     <div className="grid gap-4">
       <SettingsCard
         title="Built in"
-        desc="Every workspace may embed these. Plain http never plays."
+        desc="Every workspace may embed these, and the sites this server allows. Plain http never plays."
       >
         <ul className="flex flex-wrap gap-1.5 px-4 py-3">
           {EMBED_PROVIDERS.map((provider) => (
@@ -27,6 +27,14 @@ export function EmbedsSection() {
               className="rounded-full bg-muted px-2.5 py-1 text-[12.5px] text-muted-foreground"
             >
               {provider.name}
+            </li>
+          ))}
+          {server.hosts.map((host) => (
+            <li
+              key={host}
+              className="rounded-full bg-muted px-2.5 py-1 font-mono text-[12.5px] text-muted-foreground"
+            >
+              {host}
             </li>
           ))}
         </ul>
@@ -92,15 +100,23 @@ export function EmbedsSection() {
       <SettingsCard
         title="Widgets"
         desc="A widget is a page’s own HTML and JavaScript, run in a frame with no network and no reach but the page’s. Off, a widget shows as a note."
-        tag={widgets ? { tone: 'ok', label: 'On' } : { tone: 'off', label: 'Off' }}
+        tag={
+          !server.widgets
+            ? { tone: 'off', label: 'Off · by the server' }
+            : widgets
+              ? { tone: 'ok', label: 'On' }
+              : { tone: 'off', label: 'Off' }
+        }
       >
         <div className="flex items-center justify-between gap-3 px-4 py-3">
           <p className="text-[13px] text-muted-foreground">
-            {widgets
-              ? 'Pages in this workspace run their widgets.'
-              : 'No page in this workspace runs a widget.'}
+            {!server.widgets
+              ? 'This server keeps widgets off for every workspace. Its admin can change that.'
+              : widgets
+                ? 'Pages in this workspace run their widgets.'
+                : 'No page in this workspace runs a widget.'}
           </p>
-          {isSteward && (
+          {isSteward && server.widgets && (
             <button
               type="button"
               onClick={() => void allowWidgets(!widgets)}

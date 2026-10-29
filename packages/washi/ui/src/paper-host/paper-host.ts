@@ -6,10 +6,10 @@ import { useLiveStore, useSheetsStore } from '../stores'
 
 let listed: { at: number; hosts: Promise<string[]> } | null = null
 
-/** The workspace's embed list, asked once a minute at most; every embed on a page shares it. */
+/** The workspace's sites and the server's, asked once a minute at most; every embed shares it. */
 function listedEmbedHosts(): Promise<string[]> {
   if (!listed || Date.now() - listed.at > 60_000) {
-    const asked = { at: Date.now(), hosts: api.embeds.hosts.query() }
+    const asked = { at: Date.now(), hosts: api.embeds.playable.query() }
     listed = asked
     // A failed read is not a list: the next embed asks again instead of trusting an empty one.
     asked.hosts.catch(() => {

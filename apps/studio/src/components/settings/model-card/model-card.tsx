@@ -1,10 +1,17 @@
-import { EFFORT_OPTIONS, type ModelCardProps, PROVIDER_META, PROVIDERS } from '../lib'
+import {
+  EFFORT_OPTIONS,
+  type ModelCardProps,
+  PROVIDER_META,
+  PROVIDERS,
+  type ProviderId,
+} from '../lib'
 import { ModelMenu } from '../model-menu'
 import { ProviderRow, Segmented, SettingRow, SettingsCard } from '../shared/card'
 
 /** One key for the workspace: a row per provider, then what every conversation starts with. */
 export function ModelCard({
   providerKey,
+  serverKey,
   models,
   catalogueSource,
   effort,
@@ -18,9 +25,19 @@ export function ModelCard({
       title="Model"
       desc="One key for the whole workspace. Nobody on the team needs their own."
       tag={
-        providerKey ? { label: 'Connected', tone: 'ok' } : { label: 'Asleep · no key', tone: 'off' }
+        providerKey
+          ? { label: 'Connected', tone: 'ok' }
+          : serverKey
+            ? { label: 'On the server’s key', tone: 'ok' }
+            : { label: 'Asleep · no key', tone: 'off' }
       }
     >
+      {!providerKey && serverKey && (
+        <p className="px-5 py-4 text-[13px] text-muted-foreground">
+          Washi runs on this server’s {PROVIDER_META[serverKey.provider as ProviderId]?.label} key
+          until the workspace connects its own, which then wins.
+        </p>
+      )}
       {PROVIDERS.map((provider) => (
         <ProviderRow
           key={provider.id}

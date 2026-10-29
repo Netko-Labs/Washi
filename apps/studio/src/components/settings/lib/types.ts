@@ -33,6 +33,12 @@ export interface KeyState {
   updatedBy: string | null
 }
 
+/** The server's key a workspace without its own runs on (D105) — never even its last four. */
+export interface ServerKeyUse {
+  provider: string
+  model: string | null
+}
+
 export interface SearchKeyState {
   last4: string
   updatedAt: string
@@ -131,6 +137,7 @@ export interface ProviderRowProps {
 
 export interface ModelCardProps {
   providerKey: KeyState | null
+  serverKey: ServerKeyUse | null
   models: ModelOption[]
   catalogueSource: string | null
   effort: Effort
@@ -193,6 +200,8 @@ export interface NumberRowProps {
 export interface KeyDialogProps {
   target: KeyTarget
   connected: { last4: string; updatedAt: string; updatedBy?: string | null } | null
+  /** Whose key it is, under the title while nothing is connected. */
+  blurb?: string
   /** Null when it took; otherwise the server's refusal, which the dialog says in words. */
   onSave: (key: string) => Promise<string | null>
   onRemove: () => Promise<unknown>

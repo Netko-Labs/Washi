@@ -23,6 +23,7 @@ export function AgentTab({ part }: AgentTabProps) {
         <>
           <ModelCard
             providerKey={key}
+            serverKey={settings.serverKey}
             models={settings.models}
             catalogueSource={settings.catalogueSource}
             effort={standing?.effort ?? 'balanced'}

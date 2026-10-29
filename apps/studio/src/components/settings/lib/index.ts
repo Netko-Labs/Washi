@@ -3,7 +3,6 @@ export { useInstanceAdmin } from './hooks/use-instance-admin'
 export { useKeyForm } from './hooks/use-key-form'
 export { useMenu } from './hooks/use-menu'
 export { useNameDraft } from './hooks/use-name-draft'
-export { useServerSettings } from './hooks/use-server-settings'
 export { useSlidingPill } from './hooks/use-sliding-pill'
 export { useWorkspaceRename } from './hooks/use-workspace-rename'
 export type {
@@ -37,6 +36,7 @@ export type {
   ResumeBy,
   SearchKeyState,
   SegmentedProps,
+  ServerKeyUse,
   SettingRowProps,
   SettingsCardProps,
   SettingsGroup,

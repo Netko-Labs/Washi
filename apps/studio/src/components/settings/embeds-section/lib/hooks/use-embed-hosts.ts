@@ -1,11 +1,13 @@
 import { forgetEmbedHosts } from '@washi/ui'
 import { useEffect, useState } from 'react'
 import { api } from '@/integrations/trpc'
+import type { ServerEmbeds } from '../types'
 
-/** The sites this workspace's pages may embed past the built-in ones, and whether widgets run. */
+/** The sites this workspace's pages may embed past the built-in ones, whether widgets run, and the server's say. */
 export function useEmbedHosts() {
   const [hosts, setHosts] = useState<string[]>([])
   const [widgets, setWidgets] = useState(false)
+  const [server, setServer] = useState<ServerEmbeds>({ hosts: [], widgets: true })
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -17,6 +19,10 @@ export function useEmbedHosts() {
     api.embeds.widgets
       .query()
       .then((on) => alive && setWidgets(on))
+      .catch(() => {})
+    api.embeds.server
+      .query()
+      .then((said) => alive && setServer(said))
       .catch(() => {})
     return () => {
       alive = false
@@ -47,5 +53,5 @@ export function useEmbedHosts() {
     }
   }
 
-  return { hosts, widgets, error, save, allowWidgets }
+  return { hosts, widgets, server, error, save, allowWidgets }
 }

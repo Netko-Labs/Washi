@@ -10,6 +10,7 @@ import type {
   KeyState,
   ResumeBy,
   SearchKeyState,
+  ServerKeyUse,
   SpendState,
 } from '../types'
 
@@ -19,6 +20,7 @@ import type {
  */
 export function useAgentSettings() {
   const [key, setKey] = useState<KeyState | null>(null)
+  const [serverKey, setServerKey] = useState<ServerKeyUse | null>(null)
   const [searchKey, setSearchKey] = useState<SearchKeyState | null>(null)
   const [approvalMode, setApprovalModeState] = useState<ApprovalMode>('ask')
   const [spend, setSpend] = useState<SpendState | null>(null)
@@ -30,8 +32,9 @@ export function useAgentSettings() {
 
   const refresh = useCallback(async () => {
     try {
-      const [stored, exa, approvals, today, standing, catalogue] = await Promise.all([
+      const [stored, lent, exa, approvals, today, standing, catalogue] = await Promise.all([
         api.workspaces.agentKey.query(),
+        api.workspaces.serverKey.query(),
         api.workspaces.integrationKey.query({ integration: 'exa' }),
         api.agents.approvalMode.query(),
         api.agents.spend.query(),
@@ -39,6 +42,7 @@ export function useAgentSettings() {
         api.models.list.query(),
       ])
       setKey(stored as KeyState | null)
+      setServerKey(lent)
       setSearchKey(exa as SearchKeyState | null)
       setApprovalModeState(approvals.mode)
       setSpend(today as SpendState)
@@ -169,6 +173,7 @@ export function useAgentSettings() {
 
   return {
     key,
+    serverKey,
     searchKey,
     approvalMode,
     spend,
