@@ -27,7 +27,8 @@
 .wsx-heatmap-cell {
   aspect-ratio: 1;
   border-radius: 3px;
-  background: var(--muted-bg);
+  /* From the ink, so an empty day stays visible on a dark card as on a light one. */
+  background: color-mix(in srgb, var(--ink) 9%, transparent);
 }
 .wsx-heatmap-cell[data-level="1"] {
   background: color-mix(in srgb, var(--accent) 28%, var(--muted-bg));
