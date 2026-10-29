@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { columnOf } from '../rows'
+import { columnOf, listCell, toRows } from '../rows'
 
 const PLACES = [
   { id: 'a', name: null, kind: null, cost: null },
@@ -18,5 +18,14 @@ describe('columnOf', () => {
 
   test('ids never title anything', () => {
     expect(columnOf([{ id: 'a' }], 'string')).toBeUndefined()
+  })
+})
+
+describe('toRows', () => {
+  test('a list reads joined, and its items stay whole for a view that pills them', () => {
+    const [row] = toRows([{ id: 'a', tags: ['urgent', 'Smith, Jones'], name: 'Fix login' }])
+    expect(row?.tags).toBe('urgent, Smith, Jones')
+    expect(row && listCell(row, 'tags')).toEqual(['urgent', 'Smith, Jones'])
+    expect(row && listCell(row, 'name')).toBeUndefined()
   })
 })

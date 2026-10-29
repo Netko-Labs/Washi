@@ -7,7 +7,14 @@ export { NowContext, useNow } from './hooks/use-now'
 export { useRunAction } from './hooks/use-run-action'
 export { useSelectOptions } from './hooks/use-select-options'
 export { ratioOf } from './ratio'
-export { columnOf, resolveArgs, resolveRow, resolveRowDeep, toRows } from './rows'
+export {
+  columnOf,
+  listCell,
+  resolveArgs,
+  resolveRow,
+  resolveRowDeep,
+  toRows,
+} from './rows'
 export { coverStyle, frameOf, mediaUrl } from './sheet-look'
 export { reachOf, styled } from './styled'
 export { toneOf } from './tone-of'

@@ -60,11 +60,18 @@
   .wsx-table td:first-child::before {
     content: none;
   }
+  .wsx-table .wsx-pills {
+    justify-content: flex-end;
+  }
   .wsx-table tr:last-child td {
     border-bottom: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
   }
-  .wsx-table tr td:last-child {
+  .wsx-table tr td:last-child,
+  .wsx-table td:not(:has(~ td:not(:empty))) {
     border-bottom: 0;
+  }
+  .wsx-table td:empty:not(:first-child) {
+    display: none;
   }
 }
 
