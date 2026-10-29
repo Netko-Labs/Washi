@@ -111,7 +111,8 @@
   --t-text: var(--tone-danger-text);
   --t-on: var(--tone-danger-on);
 }
-.wsx [data-tone] {
+.wsx [data-tone],
+.wsx .wsx-badge:not([data-tone]) {
   --t-tint: color-mix(in srgb, var(--t-fill) 14%, transparent);
   --t-line: color-mix(in srgb, var(--t-fill) 40%, var(--border));
 }

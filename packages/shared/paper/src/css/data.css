@@ -54,6 +54,11 @@
 .wsx-table td[data-bool="false"] {
   color: var(--muted);
 }
+.wsx-pills {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
 
 /* A repeated row is a ledger line: one card, hairlines between, unless the rows hold cards. */
 .wsx-repeat:has(> .wsx-row):not(:has(> .wsx-row > .wsx-card)) {

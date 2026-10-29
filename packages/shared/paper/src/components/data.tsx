@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { ratioOf, styled, toneOf, useBind, useExprValue } from '../lib'
+import { listCell, ratioOf, styled, toneOf, useBind, useExprValue } from '../lib'
 import type { BlockProps, Row } from '../lib/types'
 import { usePaperHost } from '../provider'
 import type { BindQuery } from '../registry'
@@ -70,6 +70,7 @@ export function Table({
                   >
                     {keys.map((key, column) => {
                       const value = row[key]
+                      const items = column > 0 ? listCell(row, key) : undefined
                       const isNumber = typeof value === 'number'
                       // A word that means something wears its tone here too (D84); a title never.
                       const tone =
@@ -84,6 +85,14 @@ export function Table({
                         >
                           {isNumber ? (
                             number.format(value)
+                          ) : items && items.length > 0 ? (
+                            <span className="wsx-pills">
+                              {items.map((item) => (
+                                <Badge key={item} size="sm" tone={toneOf(item)}>
+                                  {item}
+                                </Badge>
+                              ))}
+                            </span>
                           ) : tone ? (
                             <Badge size="sm" tone={tone}>
                               {value}
