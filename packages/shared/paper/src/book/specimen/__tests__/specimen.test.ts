@@ -15,6 +15,15 @@ function errors(source: string): string[] {
 }
 
 describe('specimens', () => {
+  test('code kept as text is the code, not the literal that spells it', () => {
+    for (const name of ['Automation', 'Formula', 'Widget']) {
+      const source = specimenSource({ ...FRAME, name, knobs: {}, childrenText: null })
+      const element = parse(source).children.find((node) => node.kind === 'element')
+      const text = element?.kind === 'element' ? element.children[0] : undefined
+      expect(text?.kind === 'text' && text.value.startsWith('{`')).toBe(false)
+    }
+  })
+
   test('every primitive but Sheet has one', () => {
     expect(NAMES.filter((name) => !(name in SPECIMENS))).toEqual([])
     expect(Object.keys(SPECIMENS).filter((name) => !NAMES.includes(name))).toEqual([])

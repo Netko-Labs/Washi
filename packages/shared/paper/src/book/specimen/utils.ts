@@ -10,13 +10,16 @@ function innerNodes(wsx: string): WsxNode[] {
   return parse(`<Wrap>${wsx}</Wrap>`).children
 }
 
+/** A text child spelled as a WSX literal, {`…`}: parsed, so the literal's own marks stay out. */
+const isTemplateLiteral = (text: string) => text.startsWith('{`') && text.endsWith('`}')
+
 function element(name: string, props: Record<string, WsxValue>, children?: string): WsxElement {
   const spec = paperRegistry.components[name]
   const policy = spec?.children ?? 'none'
   const kids =
     policy === 'none' || children === undefined || children === ''
       ? []
-      : policy === 'text'
+      : policy === 'text' && !isTemplateLiteral(children)
         ? [{ kind: 'text' as const, value: children }]
         : innerNodes(children)
   return { kind: 'element', name, props, children: kids }
