@@ -32,6 +32,8 @@ export interface BootedRuntime {
   runtime: Runtime
   dataDir: string
   trustedOrigins: string[]
+  /** Routines stop here; the server goes on answering — a replacement is taking over. */
+  stopClock(): void
   stop(): Promise<void>
 }
 
