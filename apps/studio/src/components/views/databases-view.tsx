@@ -1,7 +1,11 @@
+import { getRouteApi } from '@tanstack/react-router'
 import { DatabasesPage } from '@/components/databases'
-import { useRouteTab } from '@/components/shell'
+import { useScreen } from './lib'
+
+const workspaceRoute = getRouteApi('/w/$workspaceId')
 
 export function DatabasesView() {
-  useRouteTab('view:databases')
+  const { workspace } = workspaceRoute.useLoaderData()
+  useScreen('view:databases', ['Databases', workspace.name])
   return <DatabasesPage />
 }
