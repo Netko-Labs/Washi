@@ -1,10 +1,16 @@
-import { APPROVAL_MODE_OPTIONS, type OutsideCardProps, PROVIDER_META } from '../lib'
+import {
+  APPROVAL_MODE_OPTIONS,
+  ON_SERVER_SEARCH_KEY,
+  type OutsideCardProps,
+  PROVIDER_META,
+} from '../lib'
 import { ProviderRow, Segmented, SettingRow, SettingsCard } from '../shared/card'
 
 /** Reads pass and page edits land either way. This card is about the outside. */
 export function OutsideCard({
   approvalMode,
   searchKey,
+  serverSearchKey,
   onApprovalMode,
   onConnect,
   onRemove,
@@ -24,6 +30,11 @@ export function OutsideCard({
           onChange={(mode) => void onApprovalMode(mode)}
         />
       </SettingRow>
+      {!searchKey && serverSearchKey && (
+        <p className="border-border border-t px-5 py-4 text-[13px] text-muted-foreground">
+          {ON_SERVER_SEARCH_KEY}
+        </p>
+      )}
       <ProviderRow
         meta={PROVIDER_META.exa}
         connected={searchKey}

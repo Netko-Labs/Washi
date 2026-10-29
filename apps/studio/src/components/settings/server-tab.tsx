@@ -2,6 +2,7 @@ import { SIGNUP_OPTIONS } from './lib'
 import {
   HostListCard,
   ServerKeyCard,
+  ServerSearchKeyCard,
   ServerWidgetsCard,
   useServerSettings,
   WorkspaceDefaultsCard,
@@ -38,6 +39,11 @@ export function ServerTab() {
             onSave={server.saveKey}
             onRemove={server.removeKey}
             onModel={server.setKeyModel}
+          />
+          <ServerSearchKeyCard
+            searchKey={settings.searchKey}
+            onSave={server.saveSearchKey}
+            onRemove={server.removeSearchKey}
           />
           <WorkspaceDefaultsCard defaults={settings.defaults} onSave={server.setDefaults} />
           <HostListCard

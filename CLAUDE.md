@@ -289,21 +289,23 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   (`mayCreateAccount`). Settings → Server is the admin's alone (`instance.*`, `adminProcedure`);
   embedded has no instance store, and the studio refuses to boot in embedded mode. Washi is
   AGPL-3.0-only (`LICENSE`, every `package.json`).
-- **The server has its own say (D105).** Settings → Server holds four more, all `adminProcedure`
+- **The server has its own say (D105).** Settings → Server holds the rest, all `adminProcedure`
   (`instance.*`) in `instance_setting` (`server-settings.ts`; the policy cached in memory, loaded at
   boot, rewritten on each set). **A model key**: one provider key + default model, sealed like BYOK
   under `:server`, only its last four shown to admins. A workspace's own key wins; one without runs
   on the server's (`keyWithFallback` in runtime → `source: 'server'`), else sleeps — so a new
   workspace wakes with no setup. Members see only that it is the server's (`workspaces.serverKey`:
-  provider and model). Still a key, never a plan (A3). **Fetch hosts** every workspace reaches
-  without asking, merged into tsuru's allowlist (`currentFetchPolicy`; "Always" still writes only
-  the workspace's own list); tsuru's refusals still refuse. **Embed hosts** that play everywhere
-  (`embeds.playable` = the workspace's + the server's) and **a widget switch**: off, no workspace
-  runs or turns on a widget (`widgetsEnabled` = server ∧ own); on, each decides. **Workspace
-  defaults** (approval mode, daily stop, turn cap): written into a workspace's own file when the
-  runtime opens it for the first time (no `.db` yet), never again (C1). The runtime lends the
-  policy to service per workspace (`lendServerPolicy`, C3); embedded lends none and behaves as
-  before.
+  provider and model). Still a key, never a plan (A3). **A search key**: one Exa key, sealed under
+  its own `:server:exa`, the same rule (`searchKeyWithFallback`: the workspace's, else the
+  server's, else none); members see only a yes (`workspaces.serverSearchKey`). **Fetch hosts**
+  every workspace reaches without asking, merged into tsuru's allowlist (`currentFetchPolicy`;
+  "Always" still writes only the workspace's own list); tsuru's refusals still refuse. **Embed
+  hosts** that play everywhere (`embeds.playable` = the workspace's + the server's) and **a widget
+  switch**: off, no workspace runs or turns on a widget (`widgetsEnabled` = server ∧ own); on, each
+  decides. **Workspace defaults** (approval mode, daily stop, turn cap): written into a workspace's
+  own file when the runtime opens it for the first time (no `.db` yet), never again (C1). The
+  runtime lends the policy to service per workspace (`lendServerPolicy`, C3); embedded lends none
+  and behaves as before.
 - **A chat is its starter's (D67).** `agent_sessions.created_by`; null is the workspace's (a
   routine's runs, every chat before D67). `chatProcedure` answers NOT_FOUND for any `sessionId`
   that is someone else's, and the agent subscriptions, `pendingApprovals` and `today` drop their
@@ -393,8 +395,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   The UI says every tool in words (`describeTool` in `@washi/ui`) — never a tool name or JSON.
 - Agent tools are the ONLY capability surface: ink (data), tsuru (network), hanko (actions).
   Never hand agents fs/shell/raw SQL. `web_search` is tsuru's `exaSearch`: hosted runs on the
-  workspace's Exa key (`organization_integration`, sealed like BYOK, `Settings → Agent → Web
-  search`); embedded reads `EXA_API_KEY`. No key → the tool answers with where one goes.
+  workspace's Exa key (`organization_integration`, sealed like BYOK, Settings → Washi → What
+  leaves), else the server's (D105); embedded reads `EXA_API_KEY`. No key → the tool answers with where one goes.
 - **Primitives fit any width (D80).** Paper reads the sheet's own width (`@container wsx`), never
   the window — a phone, the agent panel and a peek reflow alike (`css/narrow.css`): ≤520 a Table
   stacks into cards (first column the title, `data-label` the rest), ≤480 ledger rows wrap, bars put
