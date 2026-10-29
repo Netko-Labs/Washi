@@ -139,31 +139,6 @@
 .wsx-db-plus-cell {
   width: 1%;
 }
-.wsx-db-plus {
-  border: 0;
-  background: none;
-  color: var(--muted);
-  font-size: 15px;
-  cursor: pointer;
-}
-.wsx-db-property {
-  display: flex;
-  gap: 4px;
-  min-width: 420px;
-  text-transform: none;
-  letter-spacing: 0;
-  font-weight: 400;
-}
-.wsx-db-button {
-  padding: 4px 10px;
-  border: 0;
-  border-radius: 6px;
-  background: var(--ink);
-  color: var(--bg);
-  font: inherit;
-  font-size: 12.5px;
-  cursor: pointer;
-}
 .wsx-db-new {
   display: block;
   width: 100%;

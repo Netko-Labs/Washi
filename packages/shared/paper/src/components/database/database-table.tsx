@@ -38,7 +38,10 @@ export function DatabaseTable({ db, view, empty }: ViewProps) {
               </th>
             ))}
             <th className="wsx-db-plus-cell">
-              <AddProperty onAdd={actions.addProperty} />
+              <AddProperty
+                onAdd={actions.addProperty}
+                taken={db.spec.columns.map((column) => column.name)}
+              />
             </th>
           </tr>
         </thead>

@@ -72,8 +72,42 @@ export interface DateInputsProps extends ScalarCellProps {
   onDone: () => void
 }
 
+export type AddProperty = (
+  name: string,
+  type: ColumnSpec['type'],
+  options: string[],
+) => Promise<void>
+
 export interface AddPropertyProps {
-  onAdd: (name: string, type: ColumnSpec['type'], options: string[]) => Promise<void>
+  onAdd: AddProperty
+  taken: string[]
+}
+
+export interface PropertyPanelProps extends AddPropertyProps {
+  onDone: () => void
+}
+
+export interface PropertyDraft {
+  label: string
+  type: ColumnSpec['type']
+  options: string[]
+  typing: string
+}
+
+export interface PropertyStatus {
+  busy: boolean
+  error: string | null
+}
+
+export interface PropertyOptionsProps {
+  draft: PropertyDraft
+  edit: (patch: Partial<PropertyDraft>) => void
+}
+
+export interface PropertyType {
+  type: ColumnSpec['type']
+  label: string
+  hint: string
 }
 
 export interface Choice {
