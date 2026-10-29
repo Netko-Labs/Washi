@@ -70,6 +70,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
 - `apps/studio` — TanStack Start on Nitro (bun preset), from `Netko-Labs/tanstack-solo-server-
   monorepo-template`: SSR, `/api/auth/*`, `/api/trpc/*`, `/trpc-ws`, `/api/health`. A Nitro plugin
   boots the runtime at start (so the routine clock ticks unvisited) and drains sockets on SIGTERM.
+  An `/assets/` miss is `no-store` (`asset-misses.ts`): Nitro marks the folder immutable, so a
+  rollout's 404 for a new chunk would otherwise stick in the browser as a blank app.
   Pages are routes: `/sign-in?redirect=`, `/workspaces?invite=`, `/new` (a new workspace: name it ·
   start it · invite people, then the workspace's first run wakes Washi), `/s/$workspaceId/$token` (a
   page's read-only link, no session — D65), `/w/$workspaceId` (dashboard),
