@@ -1,3 +1,4 @@
+export { ChatMoveError, movedFrom } from './agents/handover'
 export { AgentHost } from './agents/host'
 export {
   CLAUDE_PATH_ENV,

@@ -1,40 +1,19 @@
-import type { ApprovalRequest, TranscriptEntry } from '@washi/domain'
 import { create } from 'zustand'
 import { api } from '../../api'
-import { useSheetsStore } from '../sheets/sheets-store'
-import type { AgentState } from './types'
+import { useViewStore } from '../view/view-store'
+import { rememberChat, rememberedChat } from './chat-memory'
+import { subscribeAgent } from './subscriptions'
+import type { AgentState, ChatScope } from './types'
+import { isTurnLive, pickChat, scopeOfSession, scopeOfTab } from './utils'
 
 let subscriptions: { unsubscribe: () => void }[] | null = null
 /** Bumped by reset: a load issued for the last workspace must not land in this one. */
 let generation = 0
 /** Boot and the panel both call init; the second caller must join the first, not race it. */
 let initializing: Promise<void> | null = null
-let creating: Promise<void> | null = null
+let creating: Promise<string | null> | null = null
 
-/** Header/panel mascot state from the transcript tail (design: agent status lives in chrome). */
-export function mascotStateFor(
-  transcript: TranscriptEntry[],
-  running: boolean,
-  approvals: ApprovalRequest[],
-): 'idle' | 'reading' | 'thinking' | 'writing' | 'suggesting' | 'done' | 'flagged' {
-  if (approvals.length > 0) return 'suggesting'
-  const last = transcript.at(-1)?.update
-  if (!running) {
-    if (last?.kind === 'turn_done') return last.stopReason === 'error' ? 'flagged' : 'done'
-    return 'idle'
-  }
-  for (let index = transcript.length - 1; index >= 0; index--) {
-    const update = transcript[index]?.update
-    if (update?.kind === 'tool_call') {
-      if (update.toolKind === 'read' || update.toolKind === 'search' || update.toolKind === 'fetch')
-        return 'reading'
-      if (update.toolKind === 'edit') return 'writing'
-      return 'thinking'
-    }
-    if (update?.kind === 'user_message') break
-  }
-  return 'thinking'
-}
+const tabOf = (scope: ChatScope) => (scope ? (`note:${scope}` as const) : 'view:dashboard')
 
 export const useAgentStore = create<AgentState>((set, get) => ({
   sessions: [],
@@ -43,7 +22,12 @@ export const useAgentStore = create<AgentState>((set, get) => ({
   approvals: [],
   running: false,
   draft: false,
-  startDraft: () => set({ draft: true, activeSessionId: null, transcript: [], running: false }),
+  startDraft: () =>
+    set({ draft: true, activeSessionId: null, transcript: [], running: false, moved: null }),
+  scope: null,
+  moved: null,
+  workspaceKey: null,
+  bind: (workspaceKey) => set({ workspaceKey }),
   panelOpen: false,
   togglePanel: () => set((state) => ({ panelOpen: !state.panelOpen })),
   docked: true,
@@ -61,45 +45,7 @@ export const useAgentStore = create<AgentState>((set, get) => ({
   },
 
   initialize: async () => {
-    if (!subscriptions) {
-      subscriptions = []
-      const agentUpdates = api.agents.onAgentUpdate.subscribe(undefined, {
-        onData: ({ data: { sessionId, entry } }) => {
-          const { activeSessionId } = get()
-          if (sessionId !== activeSessionId) return
-          set((state) => ({
-            transcript: [...state.transcript, entry],
-            running: entry.update.kind !== 'turn_done' && state.running,
-          }))
-          if (entry.update.kind === 'turn_done') {
-            void useSheetsStore.getState().refresh()
-          }
-        },
-      })
-      const approvalRequests = api.agents.onApprovalRequested.subscribe(undefined, {
-        onData: ({ data: request }) => {
-          set((state) =>
-            state.approvals.some((approval) => approval.id === request.id)
-              ? state
-              : { approvals: [...state.approvals, request] },
-          )
-        },
-      })
-      const openSheetRequests = api.agents.onOpenSheetRequested.subscribe(undefined, {
-        onData: ({ data: { id } }) => {
-          void import('../view/view-store').then(({ useViewStore }) =>
-            useViewStore.getState().openTab(`note:${id}`),
-          )
-          void useSheetsStore.getState().refresh()
-        },
-      })
-      const sessionChanges = api.agents.onSessionChanged.subscribe(undefined, {
-        onData: () => {
-          void api.agents.listSessions.query().then((sessions) => set({ sessions }))
-        },
-      })
-      subscriptions.push(agentUpdates, approvalRequests, openSheetRequests, sessionChanges)
-    }
+    subscriptions ??= subscribeAgent({ getState: get, setState: set })
     const issued = generation
     const [sessions, pending] = await Promise.all([
       api.agents.listSessions.query(),
@@ -114,35 +60,60 @@ export const useAgentStore = create<AgentState>((set, get) => ({
       ],
     }))
     // Re-checked after the await: a conversation chosen meanwhile is the person's choice.
-    if (!get().activeSessionId && !get().draft && !creating && sessions[0]) {
-      await get().selectSession(sessions[0].id)
+    const active = sessions.find((session) => session.id === get().activeSessionId)
+    if (active) set({ scope: scopeOfSession(active) })
+    else if (!get().activeSessionId && !get().draft && !creating) {
+      const scope = scopeOfTab(useViewStore.getState().activeTab)
+      await get().followScope(scope === undefined ? get().scope : scope, true)
     }
+  },
+
+  followScope: async (scope, force = false) => {
+    if (!force && scope === get().scope) return
+    set({ scope, moved: null })
+    const id = pickChat(get().sessions, scope, rememberedChat(get().workspaceKey, scope))
+    if (id) {
+      await get().selectSession(id)
+      return
+    }
+    set({ activeSessionId: null, transcript: [], running: false, draft: false })
+    if (!scope) return
+    const moved = await api.agents.movedFrom.query({ sheetId: scope }).catch(() => null)
+    if (get().scope === scope && !get().activeSessionId) set({ moved })
   },
 
   /**
    * The old conversation stops being active at once, and a send made while the new
    * one is being created joins that creation — otherwise the prompt lands in the old
-   * conversation while the screen shows the new, empty one.
+   * conversation while the screen shows the new, empty one. It is anchored where the panel is;
+   * if the person has moved to another place by the time it exists, it waits in its own.
    */
   createSession: async () => {
     set({ activeSessionId: null, transcript: [] })
     creating ??= (async () => {
+      const { scope, workspaceKey } = get()
       const session = await api.agents.createSession.mutate({
         title: `Session ${get().sessions.length + 1}`,
+        anchor: scope ? { sheetId: scope, scope: 'page' } : null,
       })
       set((state) => ({ sessions: [session, ...state.sessions] }))
-      await get().selectSession(session.id)
+      rememberChat(workspaceKey, scope, session.id)
+      if (get().scope === scope) await get().selectSession(session.id)
+      return session.id
     })().finally(() => {
       creating = null
     })
-    await creating
+    return creating
   },
 
   /** Claims the session before awaiting, so a slower, older selection can never win. */
   selectSession: async (id) => {
-    set({ activeSessionId: id, transcript: [], draft: false })
+    const session = get().sessions.find((each) => each.id === id)
+    const scope = session ? scopeOfSession(session) : get().scope
+    set({ activeSessionId: id, transcript: [], draft: false, moved: null, scope, running: false })
+    if (session) rememberChat(get().workspaceKey, scope, id)
     const transcript = await api.agents.transcript.query({ sessionId: id })
-    if (get().activeSessionId === id) set({ transcript })
+    if (get().activeSessionId === id) set({ transcript, running: isTurnLive(transcript, session) })
   },
 
   renameSession: async (id, title) => {
@@ -151,24 +122,38 @@ export const useAgentStore = create<AgentState>((set, get) => ({
       set((state) => ({ sessions: state.sessions.map((s) => (s.id === id ? session : s)) }))
   },
 
-  /** The next conversation in the list takes over; none left means a fresh one on the next ask. */
+  /** The next conversation in this place takes over; none left means a draft here. */
   deleteSession: async (id) => {
     await api.agents.deleteSession.mutate({ sessionId: id })
     const sessions = get().sessions.filter((session) => session.id !== id)
     set({ sessions })
     if (get().activeSessionId === id) {
-      if (sessions[0]) await get().selectSession(sessions[0].id)
-      else set({ activeSessionId: null, transcript: [] })
+      set({ activeSessionId: null, transcript: [] })
+      await get().followScope(get().scope, true)
     }
   },
 
+  /** The panel goes with the chat: its place opens, and the route's follow finds it there. */
+  moveSession: async (id, sheetId) => {
+    const session = await api.agents.moveSession.mutate({ sessionId: id, sheetId })
+    if (!session) return
+    set((state) => ({ sessions: state.sessions.map((s) => (s.id === id ? session : s)) }))
+    if (get().activeSessionId !== id) return
+    set({ scope: sheetId })
+    rememberChat(get().workspaceKey, sheetId, id)
+    useViewStore.getState().openTab(tabOf(sheetId))
+  },
+
+  visitMoved: () => {
+    const { moved, workspaceKey } = get()
+    if (!moved) return
+    rememberChat(workspaceKey, moved.sheetId, moved.sessionId)
+    useViewStore.getState().openTab(tabOf(moved.sheetId))
+  },
+
   setSessionOptions: async (patch) => {
-    if (creating) await creating
-    let id = get().activeSessionId
-    if (!id) {
-      await get().createSession()
-      id = get().activeSessionId
-    }
+    const joined = creating ? await creating : null
+    const id = joined ?? get().activeSessionId ?? (await get().createSession())
     if (!id) return
     const session = await api.agents.setSessionOptions.mutate({ sessionId: id, ...patch })
     if (session)
@@ -176,12 +161,8 @@ export const useAgentStore = create<AgentState>((set, get) => ({
   },
 
   sendPrompt: async (text, attachments) => {
-    if (creating) await creating
-    let sessionId = get().activeSessionId
-    if (!sessionId) {
-      await get().createSession()
-      sessionId = get().activeSessionId
-    }
+    const joined = creating ? await creating : null
+    const sessionId = joined ?? get().activeSessionId ?? (await get().createSession())
     if (!sessionId || !text.trim()) return
     set({ running: true })
     try {
@@ -219,6 +200,8 @@ export const useAgentStore = create<AgentState>((set, get) => ({
       approvals: [],
       running: false,
       draft: false,
+      scope: null,
+      moved: null,
     })
   },
 }))

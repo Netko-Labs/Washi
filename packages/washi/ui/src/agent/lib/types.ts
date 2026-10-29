@@ -4,9 +4,11 @@ import type {
   AttachmentRef,
   Effort,
   EnabledModel,
+  Handoff,
   TranscriptEntry,
 } from '@washi/domain'
 import type { RefObject } from 'react'
+import type { AgentMascotState } from '../../mascot'
 
 export type TurnDone = Extract<AgentUpdate, { kind: 'turn_done' }>
 
@@ -46,6 +48,29 @@ export interface ConversationsMenuProps {
 export interface ConversationRowState {
   renamingId: string | null
   confirmingId: string | null
+  /** The menu became the page picker for "Move to page…". */
+  isPicking: boolean
+}
+
+export interface PanelHeaderProps extends AgentPanelProps {
+  placement: PanelPlacement
+  title: string
+  mascotState: AgentMascotState
+}
+
+export interface ScopeChipProps {
+  /** A page's id, or null for Home. */
+  sheetId: string | null
+}
+
+export interface MovePickerProps {
+  /** Where the chat is now: not offered again. */
+  current: string | null
+  onPick: (sheetId: string | null) => void
+}
+
+export interface HandoffDividerProps {
+  handoff: Handoff
 }
 
 export interface OptionChipsProps {
@@ -90,5 +115,4 @@ export interface ComposerState {
 
 export interface PanelFrame {
   scrollRef: RefObject<HTMLDivElement | null>
-  activeSheetTitle: string | null
 }

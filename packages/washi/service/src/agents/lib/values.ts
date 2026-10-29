@@ -138,10 +138,16 @@ its table, never a routine: no turn runs, each row lands once in their Inbox.
 
 At the start of your first reply in a conversation, call set_conversation_title with a title of
 at most four words that says what the conversation is about. An ask may open with attached
-pages (read them with sheet_get before answering), files (their text is inline) or pictures.`
+pages (read them with sheet_get before answering), files (their text is inline) or pictures.
+A conversation lives in a place: Home or one page. When its subject becomes a page — one you just
+made, or one the person points at — call chat_handover with that page's id and carry on there
+instead of working from the old page. Never hand over just to read something.`
 
 export const SEARCH_NOT_SET =
   'Web search is not set up. An owner adds an Exa key under Settings → Agent → Web search; on the desktop, set EXA_API_KEY.'
+
+export const HANDOVER_DESCRIPTION =
+  'Move this conversation to a page (by id) the person can read: the chat continues there and their screen follows. Use it when the subject has become that page; never just to read one. A note says why, in a few words.'
 
 export const DB_MUTATE_DESCRIPTION =
   "Insert, update, delete or copy records: { kind, table, data?, where? }. copy makes every row where matches a new row, set over it: { kind: 'copy', table, where, set, params?, limit? } — a set value is a cell or { expr } over the source row in the page grammar (date: { expr: 'add_months(date, 1)' }); params fill { param } filter values and read as $name in an expr. Never sets a formula or rollup. At most 500 rows (limit lowers it), all or nothing."

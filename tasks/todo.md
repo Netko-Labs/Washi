@@ -1,3 +1,12 @@
+# D110 · a conversation lives in a place, and can move (2026-10-29)
+
+- [x] `handoff` transcript entry, `agents.moveSession` (starter only), `agents.movedFrom`
+- [x] `chat_handover` on both ports (a read), instructions, `describeTool`
+- [x] panel follows the active tab (page · Home · peek keeps it), per-scope memory, scope chip + menu
+- [x] tests: service move/handover, store scope resolution
+- [x] CLAUDE.md D110, PR
+- [ ] later: the `/chats` screens don't move the scope (Home there would race the chat route)
+
 # D107 · pages that explain themselves (2026-10-29)
 
 - [x] `<Steps>`/`<Step title>` — numbered how-to; wsx `propsWithin` keeps a Timeline step's marker required

@@ -100,8 +100,29 @@ export const agentUpdateSchema = z.discriminatedUnion('kind', [
     model: z.string().optional(),
     durationMs: z.number().optional(),
   }),
+  /** The chat moved to another place (D110); `null` is Home. Kept as a divider, never sent on. */
+  z.object({
+    kind: z.literal('handoff'),
+    from: z.string().nullable(),
+    to: z.string().nullable(),
+    /** The page's title when it moved, for a reader who cannot open it now. */
+    title: z.string(),
+    by: z.enum(['washi', 'person']),
+    note: z.string().optional(),
+  }),
 ])
 export type AgentUpdate = z.infer<typeof agentUpdateSchema>
+
+export type Handoff = Extract<AgentUpdate, { kind: 'handoff' }>
+
+/** The newest chat that left a page and is still away: where it is now (D110). */
+export interface ChatMove {
+  sessionId: string
+  /** Where the chat is now; null is Home. */
+  sheetId: string | null
+  title: string
+  at: string
+}
 
 export interface TranscriptEntry {
   id: string

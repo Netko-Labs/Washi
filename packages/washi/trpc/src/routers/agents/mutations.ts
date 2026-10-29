@@ -8,6 +8,7 @@ import {
 import { createSession, isSessionVisible } from '@washi/repository'
 import {
   APPROVAL_MODES,
+  ChatMoveError,
   EFFORTS,
   INFERENCE_PREFERENCES,
   LOCAL_MODELS,
@@ -56,6 +57,19 @@ export const agentMutations = router({
   renameSession: chatProcedure
     .input(z.object({ sessionId: z.string(), title: z.string().trim().min(1).max(120) }))
     .mutation(({ ctx, input }) => ctx.host.renameSession(input.sessionId, input.title)),
+  /** Its starter moves a chat to a page they can read, or Home with null (D110). */
+  moveSession: chatProcedure
+    .input(z.object({ sessionId: z.string(), sheetId: z.string().min(1).nullable() }))
+    .mutation(({ ctx, input }) => {
+      try {
+        return ctx.host.moveSession(input.sessionId, input.sheetId, ctx.viewer)
+      } catch (error) {
+        if (error instanceof ChatMoveError) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'no such chat' })
+        }
+        throw error
+      }
+    }),
   /** Refused while it runs — Stop first. */
   deleteSession: chatProcedure
     .input(z.object({ sessionId: z.string() }))

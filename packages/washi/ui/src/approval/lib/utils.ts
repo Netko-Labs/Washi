@@ -10,6 +10,7 @@ import {
   IconFileSearch,
   IconHistory,
   IconLink,
+  IconMessageForward,
   IconSearch,
   IconTable,
   IconTablePlus,
@@ -207,6 +208,12 @@ export function describeTool(name: string, input: unknown, titleOf: TitleOf): To
       })
     case 'db_row_activity':
       return base({ icon: IconHistory, action: 'Looked back through a row’s changes' })
+    case 'chat_handover':
+      return base({
+        icon: IconMessageForward,
+        action: 'Moved this chat to',
+        subject: text(args.sheetId) ? titleOf(String(args.sheetId)) : null,
+      })
     default:
       return base({ icon: IconTool, action: name.replaceAll('_', ' ') })
   }

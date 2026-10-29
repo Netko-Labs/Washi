@@ -1,4 +1,4 @@
-import type { AgentUpdate, AttachmentRef } from '@washi/domain'
+import type { AgentUpdate, AttachmentRef, Handoff } from '@washi/domain'
 import type { useComposer } from '@washi/ui'
 import type { RefObject } from 'react'
 
@@ -29,6 +29,7 @@ export type TurnPart =
   | { kind: 'tools'; id: string; steps: ToolStep[] }
   | { kind: 'error'; id: string; text: string }
   | { kind: 'stopped'; id: string }
+  | { kind: 'handoff'; id: string; handoff: Handoff }
 
 export interface PersonBlock {
   kind: 'person'

@@ -345,6 +345,18 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   attach menu; Enter sends). `/chats/new` asks "What should we work on?" with the composer
   mid-screen and starters named off the newest pages and table (`startersFor`; none → plain asks,
   P3). The thread follows the end unless the reader scrolled up — then a ↓ New pill.
+- **A chat lives in a place, and can move (D110).** Home (no anchor) or one page. The panel follows
+  the active tab (`scopeOfTab`, so the URL on the web and the strip on the desktop alike; a peek
+  never moves it, the chats screens pick their own): the chat last picked there
+  (`washi:chat:<workspace>:<page|home>`), else the newest of the person's own there, else a draft
+  anchored there. A running turn goes on when you leave and streams again when you come back. The
+  header's scope chip lists the place's chats, New chat here, Move to page… (`agents.moveSession`,
+  null = Home, the chat's starter only). Washi moves the chat it is in with `chat_handover` (both
+  ports, a read: nothing in the workspace changes; a page the asker reads, any page): a `handoff`
+  entry lands in the transcript as a divider, and `openSheetRequested` carries the chat, so only its
+  person is sent there, panel open. Washi's own page opened mid-turn keeps its chat on screen. A page
+  left behind shows its newest departed chat under a draft's composer (`agents.movedFrom`, read off
+  the `handoff` entries — no table).
 - **Who pays for a turn.** A credential is `api_key` or `local_cli`. Embedded finds the
   person's installed `claude` (PATH is empty for a GUI app — known install paths too) and runs
   it via the Agent SDK's `pathToClaudeCodeExecutable` with **no** key in the env, so their own
