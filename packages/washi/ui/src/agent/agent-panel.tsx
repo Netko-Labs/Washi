@@ -7,13 +7,13 @@ import {
   IconX,
 } from '@tabler/icons-react'
 import { useState } from 'react'
-import { useShallow } from 'zustand/react/shallow'
-import { ApprovalCard } from '../approval'
 import { AgentMascot } from '../mascot'
-import { mascotStateFor, noteIdOf, useAgentStore, useSheetsStore, useViewStore } from '../stores'
+import { mascotStateFor, useAgentStore } from '../stores'
 import { AgentComposer } from './agent-composer'
+import { ApprovalBar } from './approval-bar'
 import { ConversationsMenu } from './conversations-menu'
-import { type AgentPanelProps, type EmptyChatProps, useFabShortcut, usePanelFrame } from './lib'
+import { EmptyChat } from './empty-chat'
+import { type AgentPanelProps, usePanelFrame } from './lib'
 import { TranscriptView } from './transcript-view'
 
 const FRAME = {
@@ -26,64 +26,6 @@ const FRAME = {
 
 const HEADER_BUTTON =
   'grid size-7 place-items-center rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground'
-
-function ApprovalBar() {
-  const approvals = useAgentStore((state) => state.approvals)
-  const next = approvals[0]
-  if (!next) return null
-
-  return (
-    <div className="mx-3 mb-2" data-approval-bar>
-      <ApprovalCard
-        key={next.id}
-        toolName={next.toolName}
-        input={next.input}
-        more={approvals.length - 1}
-        onDecide={(decision) => useAgentStore.getState().resolveApproval(next.id, decision)}
-      />
-    </div>
-  )
-}
-
-function EmptyChat({ onStarter }: EmptyChatProps) {
-  const identity = useViewStore((state) => state.identity)
-  const sheets = useSheetsStore((state) => state.sheets)
-  const pageId = useViewStore((state) => noteIdOf(state.activeTab))
-  const leaf = sheets.find((sheet) => sheet.id === pageId)?.title ?? 'this workspace'
-  const firstName = identity.name.trim().split(/\s+/)[0] || 'there'
-
-  const starters = [
-    `Summarize ${leaf}`,
-    'Find contradictions with other pages',
-    'Tighten the intro paragraph',
-  ]
-
-  return (
-    <div className="flex flex-col gap-3 px-4 pt-[18px] pb-2">
-      <AgentMascot state="idle" size={52} />
-      <div className="font-semibold text-[15px] tracking-[-0.01em]">Hi {firstName}</div>
-      <p className="text-[12.5px] text-muted-foreground leading-relaxed">
-        I'm watching {leaf}. Ask me anything, or start from one of these:
-      </p>
-      {starters.map((starter) => (
-        <button
-          key={starter}
-          type="button"
-          onClick={() => onStarter(starter)}
-          className="w-full rounded-[11px] border border-border bg-background px-[11px] py-[9px] text-left text-[12.5px] hover:bg-accent"
-        >
-          {starter}
-        </button>
-      ))}
-      <div className="text-[11px] text-muted-foreground">
-        Toggle anytime with{' '}
-        <span className="inline-flex h-[18px] items-center rounded-[5px] border border-border bg-muted px-[5px] font-mono text-[10.5px]">
-          ⌘J
-        </span>
-      </div>
-    </div>
-  )
-}
 
 /** The door's room: a popover, a dock beside the page, or the whole screen on a phone (D61). */
 export function AgentPanel({ placement = 'float', onExpand }: AgentPanelProps) {
@@ -190,34 +132,5 @@ export function AgentPanel({ placement = 'float', onExpand }: AgentPanelProps) {
 
       <AgentComposer />
     </aside>
-  )
-}
-
-/**
- * The mascot door: the whole tile on a squircle, so Washi's face and state read at a glance.
- * ⌘J and this button open the panel. `corner-shape` falls back to plain rounding where unknown.
- */
-export function AgentFab() {
-  const { togglePanel, transcript, running, approvals } = useAgentStore(
-    useShallow((state) => ({
-      togglePanel: state.togglePanel,
-      transcript: state.transcript,
-      running: state.running,
-      approvals: state.approvals,
-    })),
-  )
-  useFabShortcut(togglePanel)
-
-  return (
-    <button
-      type="button"
-      data-agent-fab
-      aria-label="Ask Washi (⌘J)"
-      title="Ask Washi (⌘J)"
-      onClick={togglePanel}
-      className="fixed right-6 bottom-6 z-[48] size-[60px] max-md:right-4 max-md:bottom-[calc(16px+env(safe-area-inset-bottom))] max-md:size-14 overflow-hidden rounded-[22px] bg-card ring-2 ring-card shadow-[0_8px_28px_rgb(0_0_0/0.18)] transition-[transform,box-shadow] duration-150 [corner-shape:squircle] hover:-translate-y-px hover:shadow-[0_12px_34px_rgb(0_0_0/0.24)] supports-[corner-shape:squircle]:rounded-[32%]"
-    >
-      <AgentMascot state={mascotStateFor(transcript, running, approvals)} size={60} />
-    </button>
   )
 }

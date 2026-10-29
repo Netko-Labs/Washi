@@ -1,4 +1,5 @@
 export { useComposer } from './hooks/use-composer'
+export { useComposerSession } from './hooks/use-composer-session'
 export { useFabShortcut } from './hooks/use-fab-shortcut'
 export { useInference } from './hooks/use-inference'
 export { usePanelFrame } from './hooks/use-panel-frame'

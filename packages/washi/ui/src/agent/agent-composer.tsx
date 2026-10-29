@@ -6,10 +6,9 @@ import {
   IconPlus,
   IconX,
 } from '@tabler/icons-react'
-import { useShallow } from 'zustand/react/shallow'
 import { useAgentStore } from '../stores'
 import { AttachMenu } from './attach-menu'
-import { useComposer, useInference } from './lib'
+import { useComposer, useComposerSession, useInference } from './lib'
 import { OptionChips } from './option-chips'
 
 /** The door's keyboard: what rides with the ask, what thinks about it, Send that becomes Stop. */
@@ -17,12 +16,7 @@ export function AgentComposer() {
   const composer = useComposer()
   const inference = useInference()
   const { attachOpen, setAttachOpen } = composer
-  const { running, session } = useAgentStore(
-    useShallow((state) => ({
-      running: state.running,
-      session: state.sessions.find((s) => s.id === state.activeSessionId) ?? null,
-    })),
-  )
+  const { running, session } = useComposerSession()
 
   return (
     <div className="px-3 pb-3">
