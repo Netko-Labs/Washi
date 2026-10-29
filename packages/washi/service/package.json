@@ -16,6 +16,8 @@
     "@washi/tsuru": "workspace:*",
     "@washi/wsx": "workspace:*",
     "ai": "^7",
+    "date-fns": "^4",
+    "lodash-es": "^4",
     "mirinjs": "0.1.0-alpha.19",
     "quickjs-emscripten-core": "0.32.0",
     "zod": "^4.4.3"

@@ -23,6 +23,7 @@ import {
   type WsxMissing,
   WsxParseError,
 } from '@washi/wsx'
+import { pageCodeDiagnostics } from '../pages'
 import { extractAutomations, extractFormulas, scriptDiagnostics } from '../scripts/compile'
 import { guardWashiWrite, syncShare } from './access'
 import { accessOf, lookOf } from './look-of'
@@ -48,7 +49,7 @@ export function checkSource(source: string): WsxCheck {
     const diagnostics = [
       ...validate(root, paperRegistry),
       ...scriptDiagnostics(root),
-      ...(hasCode(root) ? [CODE_NOT_YET] : []),
+      ...(hasCode(root) ? [...pageCodeDiagnostics(source), CODE_NOT_YET] : []),
     ]
     return { ok: !hasErrors(diagnostics), diagnostics, missing: extractMissing(root) }
   } catch (error) {

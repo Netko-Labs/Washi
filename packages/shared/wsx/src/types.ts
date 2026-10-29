@@ -1,3 +1,4 @@
+import type * as t from '@babel/types'
 import type { z } from 'zod'
 
 export type WsxValue = string | number | boolean | null | WsxValue[] | { [key: string]: WsxValue }
@@ -71,3 +72,13 @@ export interface WsxMissing {
   reason: string
   path: string
 }
+
+/** A page cut where its markup starts; `statements` are positioned in `code.text`. */
+export interface PageSplit {
+  code: { text: string; statements: t.Statement[] } | null
+  markup: string
+  lineOffset: number
+}
+
+/** An AST node's own text in the source it was parsed from. */
+export type Slice = (node: t.Node) => string

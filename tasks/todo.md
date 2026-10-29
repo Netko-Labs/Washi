@@ -9,9 +9,9 @@ Shape: imports + functions + `export`s = the page's module; other top-level stat
 `zod`, `page:<id>` (another page's exports) — bundled on the server (`Bun.build`), so the sandbox
 still has no network.
 
-- [ ] A · wsx: `parse` reads a code page — `prelude`, `code` props, `{kind:'code'}` holes; static
+- [x] A · wsx: `parse` reads a code page — `prelude`, `code` props, `{kind:'code'}` holes; static
       pages byte-identical; serialize round-trips; validate skips code-valued props
-- [ ] B · compile: `compilePage` (Bun.build + allowlist + `page:` imports, cached), save check,
+- [x] B · compile: `compilePage` (Bun.build + allowlist + `page:` imports, cached), save check,
       `pages.compile`, curated deps traced into `.output`
 - [ ] C · run: paper draws a code page through QuickJS — `h` calls local components, handlers →
       actions, validated tree, re-run on state/rows/data; shared links draw the literal parts

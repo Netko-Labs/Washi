@@ -1,30 +1,8 @@
-import { parseExpression, parse as parseProgram } from '@babel/parser'
+import { parseExpression } from '@babel/parser'
 import type * as t from '@babel/types'
 import { literalValue, NotLiteral } from './literal'
-import type { Diagnostic, WsxElement, WsxNode, WsxPrelude, WsxValue } from './types'
-
-export class WsxParseError extends Error {
-  readonly diagnostics: Diagnostic[]
-
-  constructor(diagnostics: Diagnostic[]) {
-    super(diagnostics.map((diagnostic) => diagnostic.message).join('; '))
-    this.name = 'WsxParseError'
-    this.diagnostics = diagnostics
-  }
-}
-
-function fail(message: string, node?: { loc?: t.SourceLocation | null }): never {
-  throw new WsxParseError([
-    {
-      severity: 'error',
-      message,
-      line: node?.loc?.start.line,
-      column: node?.loc?.start.column,
-    },
-  ])
-}
-
-type Slice = (node: t.Node) => string
+import { fail, splitPage, syntaxError } from './split'
+import type { Slice, WsxElement, WsxNode, WsxValue } from './types'
 
 function elementName(node: t.JSXElement): string {
   const opening = node.openingElement.name
@@ -139,32 +117,6 @@ function componentsOf(statements: t.Statement[]): string[] {
   return [...names]
 }
 
-function preludeOf(text: string): WsxPrelude {
-  const statements = parseProgram(text, {
-    sourceType: 'module',
-    plugins: ['jsx', 'typescript'],
-  }).program.body
-  for (const statement of statements) {
-    if (statement.type === 'ExportDefaultDeclaration') {
-      fail('a page is its own default export — export named functions only', statement)
-    }
-  }
-  return { source: text.trim(), components: componentsOf(statements) }
-}
-
-function syntaxError(error: unknown, lineOffset: number): WsxParseError {
-  if (error instanceof WsxParseError) return error
-  const parseError = error as { message?: string; loc?: { line: number; column: number } }
-  return new WsxParseError([
-    {
-      severity: 'error',
-      message: parseError.message ?? 'invalid WSX syntax',
-      line: parseError.loc ? parseError.loc.line + lineOffset : undefined,
-      column: parseError.loc?.column,
-    },
-  ])
-}
-
 function markupOf(text: string, lineOffset: number): WsxElement {
   let expression: t.Expression
   try {
@@ -178,32 +130,12 @@ function markupOf(text: string, lineOffset: number): WsxElement {
   return convertElement(expression, (node) => text.slice(node.start ?? 0, node.end ?? 0))
 }
 
-/** Where the markup may start: the text's head, then every line that opens a `<Sheet`. */
-const SHEET_LINE = /^<Sheet\b/gm
-
-/**
- * Parse WSX source into a node tree. A page that runs opens with code; its markup is the first
- * `<Sheet` at a line's start with code above that parses. Throws WsxParseError.
- */
+/** Parse WSX source into a node tree, a page's code (if any) kept as source. Throws WsxParseError. */
 export function parse(source: string): WsxElement {
-  const text = source.trim()
-  if (text.length === 0) throw new WsxParseError([{ severity: 'error', message: 'empty sheet' }])
-  const starts = [...text.matchAll(SHEET_LINE)].map((match) => match.index).filter((at) => at > 0)
-  if (starts.length === 0 || text.startsWith('<')) return markupOf(text, 0)
-
-  let failure: unknown = null
-  for (const start of starts) {
-    const lineOffset = text.slice(0, start).split('\n').length - 1
-    let prelude: WsxPrelude
-    try {
-      prelude = preludeOf(text.slice(0, start))
-    } catch (error) {
-      failure = syntaxError(error, 0)
-      continue
-    }
-    const root = markupOf(text.slice(start), lineOffset)
-    root.prelude = prelude
-    return root
+  const page = splitPage(source)
+  const root = markupOf(page.markup, page.lineOffset)
+  if (page.code) {
+    root.prelude = { source: page.code.text, components: componentsOf(page.code.statements) }
   }
-  throw failure
+  return root
 }

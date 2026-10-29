@@ -13,7 +13,14 @@ const SECURITY_HEADERS = {
 
 // Read their own files at runtime (loro's .wasm, the Agent SDK's native claude binary), so they
 // ship as real packages under .output/server/node_modules instead of being inlined.
-const RUNTIME_FILE_DEPS = ['loro-crdt', '@anthropic-ai/claude-agent-sdk']
+// A page's libraries are bundled per page at runtime (D100), read off disk by Bun.build.
+const RUNTIME_FILE_DEPS = [
+  'loro-crdt',
+  '@anthropic-ai/claude-agent-sdk',
+  'date-fns',
+  'lodash-es',
+  'zod',
+]
 
 // Built servers only: HSTS on a dev https *.localhost would pin every local project for a year.
 const HSTS_HEADER = { 'strict-transport-security': 'max-age=31536000; includeSubDomains' }

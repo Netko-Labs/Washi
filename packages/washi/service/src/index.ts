@@ -46,6 +46,12 @@ export { addCustomEmoji, CustomEmojiError, removeCustomEmoji } from './emojis/se
 export { testStorage } from './files/storage'
 export type { StorageTest } from './files/types'
 export {
+  type CompiledPage,
+  compilePage,
+  PAGE_CODE_MAX_CHARS,
+  type PageSource,
+} from './pages'
+export {
   createReminderRule,
   listReminderRules,
   markRemindersRead,

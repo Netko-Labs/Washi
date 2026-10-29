@@ -33,8 +33,10 @@ export {
   validateExpr,
 } from './expr'
 export { extractFiles, extractMissing, extractRefs, extractText } from './extract'
-export { parse, WsxParseError } from './parse'
+export { pageModule } from './module'
+export { parse } from './parse'
 export { serialize } from './serialize'
+export { WsxParseError } from './split'
 export type {
   ChildPolicy,
   ComponentSpec,
