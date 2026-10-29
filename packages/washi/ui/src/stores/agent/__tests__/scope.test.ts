@@ -31,6 +31,9 @@ const SESSIONS = [
 const MOVE: ChatMove = { sessionId: 'plan-new', sheetId: 'plan', title: 'plan-new', at: '' }
 
 const feed = { subscribe: () => ({ unsubscribe: () => {} }) }
+// A creation the test lets land when it chooses; prompts are recorded by the chat they went to.
+let landCreation: (session: AgentSession) => void = () => {}
+const prompted: string[] = []
 const client = {
   agents: {
     onAgentUpdate: feed,
@@ -40,6 +43,17 @@ const client = {
     listSessions: { query: async () => SESSIONS },
     pendingApprovals: { query: async () => [] },
     transcript: { query: async () => [] },
+    createSession: {
+      mutate: () =>
+        new Promise<AgentSession>((resolve) => {
+          landCreation = resolve
+        }),
+    },
+    prompt: {
+      mutate: async ({ sessionId }: { sessionId: string }) => {
+        prompted.push(sessionId)
+      },
+    },
     movedFrom: {
       query: async ({ sheetId }: { sheetId: string }) => (sheetId === 'kyoto' ? MOVE : null),
     },
@@ -122,5 +136,21 @@ describe('the route picks the chat (D110)', () => {
     expect(agent().scope).toBe('plan')
     expect(agent().activeSessionId).toBe('plan-new')
     unregister()
+  })
+})
+
+describe('a chat made while the person moves (D110)', () => {
+  test('it waits in the place it was made for; the send still goes to it', async () => {
+    await open('note:kyoto')
+    const sending = agent().sendPrompt('plan the trip')
+    await settle()
+    await open('note:plan')
+    landCreation(chat('kyoto-new', 'kyoto'))
+    await sending
+    await settle()
+    expect(agent().scope).toBe('plan')
+    expect(agent().activeSessionId).toBe('plan-new')
+    expect(prompted.at(-1)).toBe('kyoto-new')
+    expect([...memory.values()]).toContain('kyoto-new')
   })
 })

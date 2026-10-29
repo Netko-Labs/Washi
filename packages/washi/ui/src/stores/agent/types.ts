@@ -42,7 +42,8 @@ export interface AgentState {
   toggleDocked: () => void
   init: () => Promise<void>
   initialize: () => Promise<void>
-  createSession: () => Promise<void>
+  /** The new conversation's id, even when the person has moved on before it exists. */
+  createSession: () => Promise<string | null>
   selectSession: (id: string) => Promise<void>
   renameSession: (id: string, title: string) => Promise<void>
   deleteSession: (id: string) => Promise<void>

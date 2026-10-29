@@ -11,7 +11,7 @@ let subscriptions: { unsubscribe: () => void }[] | null = null
 let generation = 0
 /** Boot and the panel both call init; the second caller must join the first, not race it. */
 let initializing: Promise<void> | null = null
-let creating: Promise<void> | null = null
+let creating: Promise<string | null> | null = null
 
 const tabOf = (scope: ChatScope) => (scope ? (`note:${scope}` as const) : 'view:dashboard')
 
@@ -85,22 +85,25 @@ export const useAgentStore = create<AgentState>((set, get) => ({
   /**
    * The old conversation stops being active at once, and a send made while the new
    * one is being created joins that creation — otherwise the prompt lands in the old
-   * conversation while the screen shows the new, empty one. It is anchored where the panel is.
+   * conversation while the screen shows the new, empty one. It is anchored where the panel is;
+   * if the person has moved to another place by the time it exists, it waits in its own.
    */
   createSession: async () => {
     set({ activeSessionId: null, transcript: [] })
     creating ??= (async () => {
-      const { scope } = get()
+      const { scope, workspaceKey } = get()
       const session = await api.agents.createSession.mutate({
         title: `Session ${get().sessions.length + 1}`,
         anchor: scope ? { sheetId: scope, scope: 'page' } : null,
       })
       set((state) => ({ sessions: [session, ...state.sessions] }))
-      await get().selectSession(session.id)
+      rememberChat(workspaceKey, scope, session.id)
+      if (get().scope === scope) await get().selectSession(session.id)
+      return session.id
     })().finally(() => {
       creating = null
     })
-    await creating
+    return creating
   },
 
   /** Claims the session before awaiting, so a slower, older selection can never win. */
@@ -149,12 +152,8 @@ export const useAgentStore = create<AgentState>((set, get) => ({
   },
 
   setSessionOptions: async (patch) => {
-    if (creating) await creating
-    let id = get().activeSessionId
-    if (!id) {
-      await get().createSession()
-      id = get().activeSessionId
-    }
+    const joined = creating ? await creating : null
+    const id = joined ?? get().activeSessionId ?? (await get().createSession())
     if (!id) return
     const session = await api.agents.setSessionOptions.mutate({ sessionId: id, ...patch })
     if (session)
@@ -162,12 +161,8 @@ export const useAgentStore = create<AgentState>((set, get) => ({
   },
 
   sendPrompt: async (text, attachments) => {
-    if (creating) await creating
-    let sessionId = get().activeSessionId
-    if (!sessionId) {
-      await get().createSession()
-      sessionId = get().activeSessionId
-    }
+    const joined = creating ? await creating : null
+    const sessionId = joined ?? get().activeSessionId ?? (await get().createSession())
     if (!sessionId || !text.trim()) return
     set({ running: true })
     try {
