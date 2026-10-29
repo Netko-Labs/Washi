@@ -7,6 +7,23 @@ export interface WsxElement {
   name: string
   props: Record<string, WsxValue>
   children: WsxNode[]
+  /** Props written as code (`count={rows.length}`), by name → the expression's source. */
+  code?: Record<string, string>
+  /** On the root of a page that runs: its imports and code, above the markup. */
+  prelude?: WsxPrelude
+}
+
+/** A page's code above its markup (D100). */
+export interface WsxPrelude {
+  source: string
+  /** Capitalized names it binds — the page's own components, drawn as tags. */
+  components: string[]
+}
+
+/** A `{…}` hole in the markup: code the page runs to fill it. */
+export interface WsxCode {
+  kind: 'code'
+  source: string
 }
 
 export interface WsxText {
@@ -14,7 +31,7 @@ export interface WsxText {
   value: string
 }
 
-export type WsxNode = WsxElement | WsxText
+export type WsxNode = WsxElement | WsxText | WsxCode
 
 export interface Diagnostic {
   severity: 'error' | 'warning'

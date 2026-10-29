@@ -23,6 +23,7 @@ function plainText(node: WsxElement): string | null {
   if (!only) return ''
   if (rest.length > 0) return null
   if (only.kind === 'text') return only.value
+  if (only.kind === 'code') return null
   return only.name === 'Text' ? plainText(only) : null
 }
 
@@ -90,10 +91,12 @@ function fromElement(node: WsxElement, isNested: boolean): Block[] {
   return kind ? [{ ...newBlock(kind, value), props: node.props }] : [lockedBlock(node)]
 }
 
+/** Never handed code: a page that runs is edited as source (`PageBody`). */
 function fromNodes(nodes: WsxNode[], isNested = true): Block[] {
-  return nodes.flatMap((node) =>
-    node.kind === 'text' ? [newBlock('text', node.value)] : fromElement(node, isNested),
-  )
+  return nodes.flatMap((node) => {
+    if (node.kind === 'code') return []
+    return node.kind === 'text' ? [newBlock('text', node.value)] : fromElement(node, isNested)
+  })
 }
 
 /** The sheet's top level as blocks: text a person can type into, anything else kept whole. */

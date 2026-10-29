@@ -16,6 +16,7 @@ import {
   extractMissing,
   extractRefs,
   extractText,
+  hasCode,
   hasErrors,
   parse,
   validate,
@@ -33,11 +34,22 @@ export interface WsxCheck {
   missing: WsxMissing[]
 }
 
+// Until pages run (D100), code in a page is refused at save, never stored half-drawn.
+const CODE_NOT_YET: Diagnostic = {
+  severity: 'error',
+  path: 'Sheet',
+  message: 'props and children are literals — `{…}` code and imports are not accepted yet',
+}
+
 /** Parse + registry-validate WSX source. Warnings (the complexity budget) never block a save. */
 export function checkSource(source: string): WsxCheck {
   try {
     const root = parse(source)
-    const diagnostics = [...validate(root, paperRegistry), ...scriptDiagnostics(root)]
+    const diagnostics = [
+      ...validate(root, paperRegistry),
+      ...scriptDiagnostics(root),
+      ...(hasCode(root) ? [CODE_NOT_YET] : []),
+    ]
     return { ok: !hasErrors(diagnostics), diagnostics, missing: extractMissing(root) }
   } catch (error) {
     if (error instanceof WsxParseError) {

@@ -37,3 +37,12 @@ describe('compiling a script', () => {
     expect(broken.diagnostics[0]?.message).toContain('script:')
   })
 })
+
+describe('a page that runs, before it can (D100)', () => {
+  test('code in a page is refused at save, in words', () => {
+    const check = checkSource('const n = 1\n<Sheet title="t"><Text>{n}</Text></Sheet>')
+    expect(check.ok).toBe(false)
+    expect(check.diagnostics.map((each) => each.message).join()).toContain('not accepted yet')
+    expect(checkSource('<Sheet title="t"><Text>hi</Text></Sheet>').ok).toBe(true)
+  })
+})

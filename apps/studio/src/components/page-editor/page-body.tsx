@@ -1,5 +1,6 @@
 import { WsxView } from '@washi/paper'
 import { useSheetsStore } from '@washi/ui'
+import { hasCode } from '@washi/wsx'
 import { useEffect } from 'react'
 import { type PageBodyProps, useEditorStore } from './lib'
 import { PageEditor } from './page-editor'
@@ -15,7 +16,10 @@ export function PageBody({ sheet, root }: PageBodyProps) {
     }
   }, [sheet.id])
 
-  if (mode === 'source') return <SourceEditor key={sheet.id} sheet={sheet} />
+  // A page that runs code is edited as its source: blocks would have nowhere to keep the code.
+  if (mode === 'source' || (mode === 'blocks' && hasCode(root))) {
+    return <SourceEditor key={sheet.id} sheet={sheet} />
+  }
   if (mode === 'blocks') return <PageEditor key={sheet.id} sheet={sheet} root={root} />
   return <WsxView key={sheet.id} root={root} />
 }
