@@ -19,6 +19,15 @@
   background: var(--muted-bg);
   color: var(--ink);
 }
+.wsx-db-plus[data-labelled] {
+  display: inline-flex;
+  gap: 6px;
+  width: auto;
+  height: 30px;
+  padding: 0 8px 0 6px;
+  font: inherit;
+  font-size: 13.5px;
+}
 .wsx-db-plus svg {
   width: 14px;
   height: 14px;

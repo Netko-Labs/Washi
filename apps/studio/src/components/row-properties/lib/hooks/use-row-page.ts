@@ -1,7 +1,7 @@
 import { useLiveStore, useNoticeStore, useSheetsStore } from '@washi/ui'
 import { useEffect, useState } from 'react'
 import { api } from '@/integrations/trpc'
-import type { CellValue, LoadedRow, RowPage } from '../types'
+import type { CellValue, Column, LoadedRow, RowPage } from '../types'
 import { usePeople } from './use-people'
 
 /** The row behind a page, kept live, and how to write one of its cells. Null for a plain page. */
@@ -30,21 +30,21 @@ export function useRowPage(sheetId: string): RowPage | null {
   const rowOf = loaded?.sheetId === sheetId ? loaded.rowOf : null
   if (!rowOf) return null
 
-  const save = async (column: string, value: CellValue) => {
+  const run = async (action: Record<string, unknown> & { verb: string }) => {
     try {
-      await api.capabilities.runAction.mutate({
-        action: {
-          verb: 'table.update',
-          table: rowOf.table.name,
-          row: rowOf.row.id,
-          set: { [column]: value },
-        },
-      })
+      await api.capabilities.runAction.mutate({ action })
     } catch (cause) {
       const reason = cause instanceof Error ? cause.message : String(cause)
       useNoticeStore.getState().say(`That did not save — ${reason}`)
     }
     setStale((count) => count + 1)
   }
-  return { rowOf, people, save }
+  const table = rowOf.table.name
+  return {
+    rowOf,
+    people,
+    save: (column: string, value: CellValue) =>
+      run({ verb: 'table.update', table, row: rowOf.row.id, set: { [column]: value } }),
+    addColumn: (column: Column) => run({ verb: 'table.column', table, column }),
+  }
 }
