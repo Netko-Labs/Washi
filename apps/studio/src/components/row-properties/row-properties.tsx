@@ -1,4 +1,12 @@
-import { DatabaseCell, isRank, PaperProvider, PaperSurface, tableLabel } from '@washi/paper'
+import {
+  AddProperty,
+  DatabaseCell,
+  isRank,
+  PaperProvider,
+  PaperSurface,
+  propertyColumn,
+  tableLabel,
+} from '@washi/paper'
 import { paperHost } from '@washi/ui'
 import { PROPERTY_ICONS, type RowPropertiesProps, useRowPage } from './lib'
 import { RowActivity } from './row-activity'
@@ -9,7 +17,7 @@ export function RowProperties({ sheetId }: RowPropertiesProps) {
   const page = useRowPage(sheetId)
   if (!page) return null
 
-  const { rowOf, people, save } = page
+  const { rowOf, people, save, addColumn } = page
   const { table, row } = rowOf
   const titleColumn = table.spec.columns.find((column) => column.type === 'text')
   const title = titleColumn ? row[titleColumn.name] : null
@@ -51,6 +59,17 @@ export function RowProperties({ sheetId }: RowPropertiesProps) {
               )
             })}
         </dl>
+        <PaperSurface>
+          <div className="-ml-2 mt-1" data-add-property>
+            <AddProperty
+              label="Add a property"
+              taken={table.spec.columns.map((column) => column.name)}
+              onAdd={(name, type, options, format) =>
+                addColumn(propertyColumn(name, type, options, format))
+              }
+            />
+          </div>
+        </PaperSurface>
       </PaperProvider>
       <RowActivity rowOf={rowOf} people={people} />
     </div>

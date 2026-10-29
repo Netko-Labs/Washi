@@ -13,12 +13,14 @@ export {
   Timeline,
 } from './components/data'
 export {
+  AddProperty,
   type CellProps,
   Database,
   DatabaseCell,
   type DatabaseContext,
   isRank,
   type Person,
+  propertyColumn,
   tableLabel,
 } from './components/database'
 export { Drawer, Schema } from './components/drawer'

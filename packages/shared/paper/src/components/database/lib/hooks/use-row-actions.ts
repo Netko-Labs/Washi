@@ -1,7 +1,7 @@
 import { useData } from '../../../../data'
 import { usePaperHost } from '../../../../provider'
 import type { ColumnSpec } from '../types'
-import { DEFAULT_STATUS_GROUPS } from '../values'
+import { propertyColumn } from '../utils'
 
 /** New rows, new properties, and opening a row as its page. */
 export function useRowActions(table: string) {
@@ -28,16 +28,6 @@ export function useRowActions(table: string) {
       }
     },
     addProperty: (name: string, type: ColumnSpec['type'], options: string[], format?: string) =>
-      run({
-        verb: 'table.column',
-        table,
-        column: {
-          name,
-          type,
-          ...((type === 'select' || type === 'multi_select') && { options }),
-          ...(type === 'status' && { groups: DEFAULT_STATUS_GROUPS }),
-          ...(format && { format }),
-        },
-      }),
+      run({ verb: 'table.column', table, column: propertyColumn(name, type, options, format) }),
   }
 }

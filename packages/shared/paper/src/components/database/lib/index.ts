@@ -48,6 +48,7 @@ export {
   labelOf,
   needsOptions,
   newRow,
+  propertyColumn,
   propertyProblem,
   statusGroupOf,
   tableLabel,

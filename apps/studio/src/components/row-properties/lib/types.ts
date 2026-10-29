@@ -17,6 +17,8 @@ export interface RowPage {
   rowOf: RowOf
   people: Person[]
   save: (column: string, value: CellValue) => Promise<void>
+  /** A new property on the row's table — every row of it gains the column. */
+  addColumn: (column: Column) => Promise<void>
 }
 
 export interface RowTitleProps {

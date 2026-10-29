@@ -82,6 +82,8 @@ export type AddProperty = (
 export interface AddPropertyProps {
   onAdd: AddProperty
   taken: string[]
+  /** Words beside the +, where the button stands alone (a row page) rather than in a header. */
+  label?: string
 }
 
 export interface PropertyPanelProps extends AddPropertyProps {

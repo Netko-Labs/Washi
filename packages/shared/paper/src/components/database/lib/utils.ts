@@ -8,6 +8,7 @@ import type {
   StatusGroup,
   TableSpec,
 } from './types'
+import { DEFAULT_STATUS_GROUPS } from './values'
 
 /** Notion's title property: the first text column names the row. */
 export function titleColumn(spec: TableSpec): ColumnSpec | undefined {
@@ -115,4 +116,20 @@ export function propertyProblem(draft: PropertyDraft, taken: string[]): string |
     return `“${draft.label.trim()}” is already a property.`
   if (needsOptions(draft.type) && draft.options.length === 0) return 'Add at least one option.'
   return null
+}
+
+/** The column a new property becomes: options for a select, Notion's three steps for a status. */
+export function propertyColumn(
+  name: string,
+  type: ColumnSpec['type'],
+  options: string[],
+  format?: string,
+): ColumnSpec {
+  return {
+    name,
+    type,
+    ...((type === 'select' || type === 'multi_select') && { options }),
+    ...(type === 'status' && { groups: DEFAULT_STATUS_GROUPS }),
+    ...(format && { format }),
+  } as ColumnSpec
 }
