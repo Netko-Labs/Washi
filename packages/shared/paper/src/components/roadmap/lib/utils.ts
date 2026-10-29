@@ -39,6 +39,22 @@ export function moved(
   return { [date]: toIso(span.start + days), [end]: toIso(span.end + days) }
 }
 
+/**
+ * What placing a bar on an empty row writes: the day as its start. A stored end before that day
+ * moves up to it, so a row never holds an end before its start.
+ */
+export function placed(
+  day: number,
+  row: Record<string, unknown>,
+  date: string,
+  end?: string,
+): Record<string, string> {
+  const until = end ? spanOf(row[end]) : null
+  return until && until.end < day
+    ? { [date]: toIso(day), [end as string]: toIso(day) }
+    : { [date]: toIso(day) }
+}
+
 /** The days on screen: every bar, a little air either side, and never less than four weeks. */
 export function calendarOf(spans: Span[], now = today()): Calendar {
   const first = Math.min(now, ...spans.map((span) => span.start)) - PAD_DAYS

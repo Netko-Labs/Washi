@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { calendarOf, moved, rowSpan, shift, spanOf, ticksOf, toIso } from '../lib'
+import { calendarOf, moved, placed, rowSpan, shift, spanOf, ticksOf, toIso } from '../lib'
 
 const day = (iso: string) => spanOf(iso)?.start ?? Number.NaN
 
@@ -53,5 +53,20 @@ describe('a bar from a start column to a due column', () => {
     expect(rowSpan({ start: '2026-10-20', due: null }, 'start', 'due')).toEqual(
       rowSpan({ start: '2026-10-20' }, 'start'),
     )
+  })
+})
+
+describe('placing a bar on a row with only an end', () => {
+  const day = (iso: string) => spanOf(iso)?.start ?? 0
+
+  test('a later end stays; an earlier one moves up to the start', () => {
+    expect(placed(day('2026-10-05'), { due: '2026-10-20' }, 'start', 'due')).toEqual({
+      start: '2026-10-05',
+    })
+    expect(placed(day('2026-10-25'), { due: '2026-10-20' }, 'start', 'due')).toEqual({
+      start: '2026-10-25',
+      due: '2026-10-25',
+    })
+    expect(placed(day('2026-10-25'), {}, 'start')).toEqual({ start: '2026-10-25' })
   })
 })

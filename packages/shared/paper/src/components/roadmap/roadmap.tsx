@@ -6,11 +6,11 @@ import {
   calendarOf,
   moved,
   percent,
+  placed,
   type RoadmapProps,
   rowSpan,
   ticksOf,
   today,
-  toIso,
 } from './lib'
 import { RoadmapRow } from './roadmap-row'
 
@@ -64,7 +64,7 @@ export function Roadmap({ bind, date, end, title = 'title', empty, ...rest }: Ro
                       ? write(id, moved(span, days, date, row[end ?? ''] ? end : undefined))
                       : Promise.resolve()
                   }
-                  onPlace={(day) => void write(id, { [date]: toIso(day) })}
+                  onPlace={(day) => void write(id, placed(day, row, date, end))}
                   onOpen={() => host.openRow?.(id)}
                 />
               )
