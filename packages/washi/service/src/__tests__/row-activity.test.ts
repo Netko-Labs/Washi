@@ -1,8 +1,14 @@
 import { afterEach, beforeEach, describe, expect, setSystemTime, test } from 'bun:test'
-import { openWorkspace, type Workspace } from '@washi/repository'
+import { openWorkspace, restoreRecords, type Workspace } from '@washi/repository'
 import { AgentHost } from '../agents/host'
 import { rowActivity } from '../tables/activity'
-import { defineUserTable, runMutation, runQuery, toggleTaskRecord } from '../tables/service'
+import {
+  defineUserTable,
+  deleteRecord,
+  runMutation,
+  runQuery,
+  toggleTaskRecord,
+} from '../tables/service'
 
 let ws: Workspace
 let water: string
@@ -143,5 +149,20 @@ describe('a row says who changed it, when, and from what (D78)', () => {
 
   test('an unknown row is refused', () => {
     expect(() => rowActivity(ws, 'nope')).toThrow('unknown record')
+  })
+})
+
+describe('a row that comes back', () => {
+  test('reads as restored after its removal, never as added again', () => {
+    at(3)
+    deleteRecord(ws, 'bills', water, 'm1')
+    at(4)
+    restoreRecords(ws, [water], 'm2')
+    const { changes } = rowActivity(ws, water)
+    expect(changes.map((each) => [each.kind, each.by])).toEqual([
+      ['restored', 'm2'],
+      ['deleted', 'm1'],
+      ['created', 'juan'],
+    ])
   })
 })

@@ -42,6 +42,7 @@ export function rowActivity(ws: Workspace, recordId: string, limit = DEFAULT_LIM
   const changes: RowChange[] = []
   const createdMs = recordCreatedMs(ws, recordId)
   let previous: RecordData | null = null
+  let wasDeleted = false
   for (const [index, { data, atMs, author }] of listRecordChanges(ws, recordId).entries()) {
     // Rows older than the change log were backfilled from their last edit: that version is only
     // a baseline to diff against, never "added this row" at a time it wasn't.
@@ -51,11 +52,20 @@ export function rowActivity(ws: Workspace, recordId: string, limit = DEFAULT_LIM
       previous = data
       continue
     }
-    const kind = data === null ? 'deleted' : previous === null ? 'created' : 'edited'
+    // A version after a deletion is the row coming back (Trash → Restore), not a new row.
+    const kind =
+      data === null
+        ? 'deleted'
+        : previous === null
+          ? wasDeleted
+            ? 'restored'
+            : 'created'
+          : 'edited'
     const fields = data === null ? [] : diff(previous ?? {}, data, skipped)
-    if (kind === 'created' || kind === 'deleted' || fields.length > 0) {
-      changes.push({ atMs, by: author, kind, fields })
+    if (kind !== 'edited' || fields.length > 0) {
+      changes.push({ atMs, by: author, kind, fields: kind === 'restored' ? [] : fields })
     }
+    if (data === null) wasDeleted = true
     previous = data
   }
   changes.reverse()
