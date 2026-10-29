@@ -52,7 +52,9 @@ export function Board({
                       <i />
                       <span className="wsx-board-head-label">{name}</span>
                     </span>
-                    <span className="wsx-board-head-count">{headCount(items, meta)}</span>
+                    <span className="wsx-board-head-count">
+                      {headCount(items, meta, actions.locale)}
+                    </span>
                   </div>
                   {items.map((row) => (
                     <Fragment key={String(row.id)}>

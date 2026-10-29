@@ -11,6 +11,7 @@ export function useCardActions(onOpen: ActionRef | undefined): CardActions {
   const run = useRunAction()
   const { refresh } = useData()
   return {
+    locale: host.locale,
     openable: Boolean(onOpen ?? host.openRow),
     open: (row: Row) => {
       if (onOpen) void run(resolveRowDeep(onOpen as never, row) as never)

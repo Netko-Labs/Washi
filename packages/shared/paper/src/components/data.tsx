@@ -113,6 +113,7 @@ export function Stat({
   label,
   hint,
   trend,
+  format,
   ...rest
 }: BlockProps & {
   value?: string | number
@@ -120,13 +121,18 @@ export function Stat({
   label: string
   hint?: string
   trend?: keyof typeof TREND_GLYPH
+  format?: 'number' | 'percent'
 }) {
   const host = usePaperHost()
   const computed = useExprValue(expr)
   const raw = expr ? computed : (value ?? null)
+  const asNumber =
+    format === 'percent'
+      ? { style: 'percent' as const, maximumFractionDigits: 1 }
+      : { maximumFractionDigits: 2 }
   const shown =
     typeof raw === 'number'
-      ? new Intl.NumberFormat(host.locale, { maximumFractionDigits: 2 }).format(raw)
+      ? new Intl.NumberFormat(host.locale, asNumber).format(raw)
       : raw === null
         ? '—'
         : String(raw)
@@ -172,9 +178,10 @@ export function Progress({
   expr,
   label,
   ...rest
-}: BlockProps & { value?: number; expr?: string; label?: string }) {
+}: BlockProps & { value?: number | string; expr?: string; label?: string }) {
   const computed = useExprValue(expr)
-  const ratio = Math.min(1, Math.max(0, typeof computed === 'number' ? computed : (value ?? 0)))
+  const given = Number(value ?? 0) || 0
+  const ratio = Math.min(1, Math.max(0, typeof computed === 'number' ? computed : given))
   const percent = Math.round(ratio * 100)
   return (
     <div

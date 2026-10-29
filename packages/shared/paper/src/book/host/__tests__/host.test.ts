@@ -71,3 +71,26 @@ test('an insert the server would refuse is refused here, in ink’s words', asyn
     host.runAction({ verb: 'table.insert', table: 'tasks', data: { points: 'many' } }),
   ).rejects.toThrow('points: expected a number')
 })
+
+describe('formulas in the book', () => {
+  test('a formula column is computed over its row, as the server does, and can be aggregated', () => {
+    const [table] = seedTables([
+      {
+        spec: {
+          name: 'krs',
+          columns: [
+            { name: 'current', type: 'number' },
+            { name: 'target', type: 'number' },
+            { name: 'progress', type: 'formula', expr: 'current / target' },
+          ],
+        },
+        rows: [
+          { current: 3, target: 4 },
+          { current: 1, target: 0 },
+        ],
+      },
+    ]).values()
+    if (!table) throw new Error('no table')
+    expect(runQuery(table, { table: 'krs' }).rows.map((row) => row.progress)).toEqual([0.75, null])
+  })
+})

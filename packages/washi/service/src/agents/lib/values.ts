@@ -39,8 +39,8 @@ Surface: Card(title) Callout(title) Hero(title subtitle align) Figure(src: https
 CodeSandbox Miro Google Maps Indify play; any other site only if the workspace lists it)
 Bookmark(https href title description image site — a link as a card; fill what fetch_url told you) · Data out:
 Repeat(bind) Agenda(bind date title time end badge add addLabel view state — a week or a month) Slots(bind date minutes hours days add addLabel — free times to book: a booking's date is start/end, e.g. 2026-10-29T10:00/2026-10-29T10:30) Roadmap(bind date end title — a bar per row from date to end, or one start/end column) Heatmap(bind date value weeks label — GitHub's calendar of days: habits, workouts, a journal) Table(bind columns) Database(table views — tabs: table · board(groupBy) · timeline(date) ·
-gallery(cover: a url or cover-key column; cards a press opens)) Stat(value|expr label hint trend) Chart(bind kind) Timeline/Step
-Progress(value|expr) Badge Avatar Schema(table) · Data in: Field(field kind table row) Board(bind
+gallery(cover: a url or cover-key column; cards a press opens)) Stat(value|expr label hint trend format=percent) Chart(bind kind) Timeline/Step
+Progress(value|expr — in a Repeat, value="$row.ratio" or expr="$row.done / $row.total") Badge Avatar Schema(table) · Data in: Field(field kind table row) Board(bind
 groupBy groups rank kicker badge meta avatar onAdd onOpen) Button(action) Compose(action label —
 $value and $now supplied) Form(table fields defaults submit reset trigger title — a whole row typed and added; trigger = in a modal)
 Task(row field — the checkbox column it ticks, done when absent) Switch(state) Select(state options all — one choice into state) Slider(state) · Flow: Show(expr) Tabs(labels

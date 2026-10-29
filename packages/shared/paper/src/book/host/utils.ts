@@ -5,10 +5,11 @@ import {
   matchesFilters,
   type QueryResult,
   type QueryRow,
+  type Scalar,
   type TableSpec,
   validateRecord,
 } from '@washi/ink'
-import { parse } from '@washi/wsx'
+import { evaluateExpr, parse, parseExpr } from '@washi/wsx'
 import type { PaperHost } from '../../provider'
 import type { MemoryTable, Say, SeedTable } from './types'
 import { BOOK_PAGES, INCLUDED_SOURCE, PEOPLE, SEED_TABLES, WELCOME_SHEET } from './values'
@@ -43,10 +44,41 @@ function compareCells(a: Cell | undefined, b: Cell | undefined): number {
   return a < b ? -1 : 1
 }
 
-/** The ink executor's semantics over rows in memory: filter, order, limit, group. */
+/** Formula columns over their own row, as the server computes them; one that fails is null. */
+function withFormulas(spec: TableSpec, rows: QueryRow[]): QueryRow[] {
+  const formulas = spec.columns.filter((column) => column.type === 'formula' && column.expr)
+  if (formulas.length === 0) return rows
+  return rows.map((row) => {
+    const out: QueryRow = { ...row }
+    const state = Object.fromEntries(
+      Object.entries(out).filter(([, value]) => !Array.isArray(value)),
+    ) as Record<string, Scalar>
+    for (const column of formulas) {
+      let value: Scalar = null
+      try {
+        const result = evaluateExpr(parseExpr(column.expr ?? ''), {
+          state,
+          args: {},
+          rows: () => undefined,
+          now: Date.now(),
+        })
+        value = Array.isArray(result) ? null : (result as Scalar)
+      } catch {
+        value = null
+      }
+      out[column.name] = value
+      state[column.name] = value
+    }
+    return out
+  })
+}
+
+/** The ink executor's semantics over rows in memory: formulas, filter, order, limit, group. */
 export function runQuery(table: MemoryTable, query: InkQuery): QueryResult {
   const limit = query.limit ?? 200
-  const matched = table.rows.filter((row) => matchesFilters(row, query.where ?? [], table.spec))
+  const matched = withFormulas(table.spec, table.rows).filter((row) =>
+    matchesFilters(row, query.where ?? [], table.spec),
+  )
   if (query.groupBy) {
     const { column, aggregates } = query.groupBy
     const groups = new Map<Cell, QueryRow[]>()

@@ -276,6 +276,7 @@ const dataOut: Record<string, ComponentSpec> = {
       label: z.string().min(1).max(80),
       hint: z.string().max(80).optional(),
       trend: z.enum(['up', 'down', 'flat']).optional(),
+      format: z.enum(['number', 'percent']).optional(),
     },
     'none',
   ),
@@ -352,7 +353,13 @@ const dataOut: Record<string, ComponentSpec> = {
   ),
   Progress: p(
     {
-      value: z.number().min(0).max(1).optional(),
+      // Inside a Repeat, `value="$row.done"` reads each row's own ratio.
+      value: z
+        .union([
+          z.number().min(0).max(1),
+          z.string().regex(/^\$row\.[a-z_][a-z0-9_]*$/i, 'a ratio 0–1, or $row.column in a Repeat'),
+        ])
+        .optional(),
       expr: exprSchema.optional(),
       label: z.string().max(80).optional(),
     },
