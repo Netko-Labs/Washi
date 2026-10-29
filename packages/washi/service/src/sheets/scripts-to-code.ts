@@ -80,8 +80,9 @@ export function liftScriptsIntoCode(ws: Workspace): void {
     }
     const moved = scriptsAsCode(root)
     if (moved === null) continue
+    // Whatever else is wrong with a page, it never keeps a <Script> the registry no longer has:
+    // the code-block form is written even when something unrelated still fails the check.
     const source = checkSource(moved).ok ? moved : scriptsAsCodeBlocks(root)
-    if (!checkSource(source).ok) continue
     rewriteSourceQuietly(ws, sheet.id, source, lookOf(root))
   }
   setAppMeta(ws, MIGRATED, '1')
