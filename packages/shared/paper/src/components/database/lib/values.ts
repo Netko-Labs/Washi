@@ -13,6 +13,10 @@ export const PROPERTY_TYPES: PropertyType[] = [
 ]
 
 export const PROPERTY_PANEL_WIDTH = 280
+export const PROPERTY_PANEL_GAP = 6
+export const PROPERTY_PANEL_MARGIN = 8
+/** Below this much room under the +, the panel opens above it instead (px). */
+export const PROPERTY_PANEL_ROOM = 360
 
 /** A new status property starts with Notion's three steps. */
 export const DEFAULT_STATUS_GROUPS = {

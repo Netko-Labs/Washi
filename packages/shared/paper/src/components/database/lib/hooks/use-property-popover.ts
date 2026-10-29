@@ -1,9 +1,10 @@
 import { type ToggleEvent, useEffect, useRef, useState } from 'react'
-import { PROPERTY_PANEL_WIDTH } from '../values'
-
-const GAP = 6
-const MARGIN = 8
-const ROOM = 360
+import {
+  PROPERTY_PANEL_GAP as GAP,
+  PROPERTY_PANEL_MARGIN as MARGIN,
+  PROPERTY_PANEL_WIDTH,
+  PROPERTY_PANEL_ROOM as ROOM,
+} from '../values'
 
 /**
  * The panel lives in the top layer (Popover API), so the table's sideways scroll never clips it;
