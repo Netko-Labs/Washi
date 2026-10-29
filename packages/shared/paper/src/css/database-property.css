@@ -1,0 +1,228 @@
+/* Add a property — the header's + and the panel it opens in the top layer. */
+
+.wsx-db-plus {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: var(--r-chip);
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  transition:
+    background var(--ease),
+    color var(--ease);
+}
+.wsx-db-plus:hover,
+.wsx-db-plus[aria-expanded="true"] {
+  background: var(--muted-bg);
+  color: var(--ink);
+}
+.wsx-db-plus svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+/* The popover sits under its <th>: undo what a header cell would hand down. */
+.wsx-db-pop {
+  position: fixed;
+  inset: auto;
+  width: 280px;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--r-input);
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: var(--shadow-modal);
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  font-weight: 400;
+  letter-spacing: normal;
+  text-align: left;
+  text-transform: none;
+  white-space: normal;
+}
+.wsx-db-pop:popover-open {
+  animation: wsxFade 120ms ease both;
+}
+
+.wsx-db-panel {
+  display: flex;
+  flex-direction: column;
+}
+.wsx-db-panel-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-chip);
+  background: var(--bg);
+  color: var(--muted);
+  transition: border-color var(--ease);
+}
+.wsx-db-panel-name:focus-within {
+  border-color: var(--accent);
+}
+.wsx-db-panel-name input {
+  flex: 1;
+  min-width: 0;
+  height: 32px;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  outline: none;
+}
+.wsx-db-panel-head {
+  margin: 0;
+  padding: 6px 14px 4px;
+  color: var(--muted);
+  font-size: 11.5px;
+  font-weight: 500;
+}
+
+.wsx-db-types {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0 4px 6px;
+  border: 0;
+  border-top: 1px solid var(--border);
+}
+.wsx-db-types legend {
+  float: left;
+  width: 100%;
+  padding-top: 8px;
+}
+.wsx-db-type {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  border-radius: var(--r-cell);
+  cursor: pointer;
+}
+.wsx-db-type input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.wsx-db-type:hover {
+  background: var(--muted-bg);
+}
+.wsx-db-type:has(input:checked) {
+  background: color-mix(in oklab, var(--accent) 12%, transparent);
+  color: var(--tone-accent-text);
+  font-weight: 500;
+}
+.wsx-db-type:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.wsx-db-type .wsx-db-ptype {
+  opacity: 1;
+}
+
+.wsx-db-panel-options {
+  border-top: 1px solid var(--border);
+  padding-top: 2px;
+}
+.wsx-db-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0 8px 8px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-chip);
+  background: var(--bg);
+}
+.wsx-db-chips:focus-within {
+  border-color: var(--accent);
+}
+.wsx-db-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 4px 2px 8px;
+  border-radius: 999px;
+  background: var(--muted-bg);
+  font-size: 12.5px;
+}
+.wsx-db-chip button {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  line-height: 1;
+  cursor: pointer;
+}
+.wsx-db-chip button:hover {
+  background: color-mix(in oklab, var(--ink) 10%, transparent);
+  color: var(--ink);
+}
+.wsx-db-chips input {
+  flex: 1;
+  min-width: 110px;
+  height: 24px;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  outline: none;
+}
+
+.wsx-db-panel-error {
+  margin: 0 14px 6px;
+  color: var(--tone-danger-text);
+  font-size: 12.5px;
+}
+.wsx-db-panel-foot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 8px 8px 14px;
+  border-top: 1px solid var(--border);
+}
+.wsx-db-panel-hint {
+  flex: 1;
+  min-width: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+.wsx-db-button {
+  flex: none;
+  height: 28px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--r-chip);
+  background: var(--ink);
+  color: var(--bg);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity var(--ease);
+}
+.wsx-db-button:hover {
+  opacity: 0.88;
+}
+.wsx-db-button:disabled {
+  opacity: 0.5;
+  cursor: progress;
+}

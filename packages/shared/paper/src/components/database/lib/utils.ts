@@ -1,5 +1,13 @@
 import { statusOptions } from '@washi/ink'
-import type { Choice, ColumnSpec, DatabaseView, Person, StatusGroup, TableSpec } from './types'
+import type {
+  Choice,
+  ColumnSpec,
+  DatabaseView,
+  Person,
+  PropertyDraft,
+  StatusGroup,
+  TableSpec,
+} from './types'
 
 /** Notion's title property: the first text column names the row. */
 export function titleColumn(spec: TableSpec): ColumnSpec | undefined {
@@ -95,4 +103,16 @@ export function isRank(column: ColumnSpec): boolean {
 export function tableLabel(name: string): string {
   const words = labelOf(name)
   return words.charAt(0).toUpperCase() + words.slice(1)
+}
+
+export const needsOptions = (type: ColumnSpec['type']) =>
+  type === 'select' || type === 'multi_select'
+
+/** Why a new property can't be added yet, in words; null once it can. */
+export function propertyProblem(draft: PropertyDraft, taken: string[]): string | null {
+  if (!draft.label.trim()) return 'Name the property first.'
+  if (taken.includes(columnKey(draft.label)))
+    return `“${draft.label.trim()}” is already a property.`
+  if (needsOptions(draft.type) && draft.options.length === 0) return 'Add at least one option.'
+  return null
 }
