@@ -149,3 +149,29 @@ describe('text beside code', () => {
     expect(root.children[0]).toMatchObject({ children: [{ value: 'Total' }, { source: 'n' }] })
   })
 })
+
+describe('prose with inline elements', () => {
+  test('keeps its spaces, and writes back on one line', () => {
+    const root = parse(
+      '<Sheet title="t"><Text>Read <Ref sheet="a">How we work</Ref> first, then <Mark>ship</Mark>.</Text></Sheet>',
+    )
+    expect(root.children[0]).toMatchObject({
+      children: [
+        { value: 'Read ' },
+        { name: 'Ref' },
+        { value: ' first, then ' },
+        { name: 'Mark' },
+        { value: '.' },
+      ],
+    })
+    expect(serialize(root)).toContain(
+      '<Text>Read <Ref sheet="a">How we work</Ref> first, then <Mark>ship</Mark>.</Text>',
+    )
+    expect(parse(serialize(root))).toEqual(root)
+  })
+
+  test('blocks laid out on their own lines gain no spaces', () => {
+    const root = parse('<Sheet title="t">\n  <Title>A</Title>\n  <Text>B</Text>\n</Sheet>')
+    expect(root.children.map((child) => child.kind)).toEqual(['element', 'element'])
+  })
+})

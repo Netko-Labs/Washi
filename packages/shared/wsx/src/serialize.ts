@@ -26,21 +26,23 @@ function serializeText(value: string): string {
   return isLines ? `{\`${value}\`}` : `{${JSON.stringify(value)}}`
 }
 
+const touches = (node: WsxNode | undefined) => node !== undefined && node.kind !== 'text'
+
 /**
- * Text and code side by side stay on one line, as written: a line break between them would drop
- * the space in `Hello {name}`. Text there is raw unless an edge away from code would be trimmed.
+ * Text beside code or inline elements stays on one line, as written: a line break would drop the
+ * space in `Hello {name}` or `Read <Ref>…</Ref> first`. Text is raw unless a free edge would trim.
  */
 function serializeInline(children: WsxNode[]): string {
   return children
     .map((child, at) => {
       if (child.kind === 'code') return hole(child.source)
-      if (child.kind !== 'text') return ''
+      if (child.kind === 'element') return serializeNode(child, 0)
       const value = child.value
       const isRaw =
         /^[^<>{}&\n]*$/.test(value) &&
         !/\s{2}/.test(value) &&
-        (children[at - 1]?.kind === 'code' || !/^\s/.test(value)) &&
-        (children[at + 1]?.kind === 'code' || !/\s$/.test(value))
+        (touches(children[at - 1]) || !/^\s/.test(value)) &&
+        (touches(children[at + 1]) || !/\s$/.test(value))
       return isRaw ? value : `{${JSON.stringify(value)}}`
     })
     .join('')
@@ -54,9 +56,12 @@ function serializeNode(node: WsxNode, depth: number): string {
   const open = `${node.name}${serializeProps(node)}`
   if (node.children.length === 0) return `${indent}<${open} />`
 
+  const isLeaf = (child: WsxNode) =>
+    child.kind !== 'element' || child.children.every((each) => each.kind === 'text')
   const isMixed =
-    node.children.some((child) => child.kind === 'code') &&
-    node.children.every((child) => child.kind !== 'element')
+    node.children.some((child) => child.kind === 'text') &&
+    node.children.some((child) => child.kind !== 'text') &&
+    node.children.every(isLeaf)
   if (isMixed) return `${indent}<${open}>${serializeInline(node.children)}</${node.name}>`
 
   const single = node.children.length === 1 && node.children[0]?.kind === 'text'
