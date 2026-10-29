@@ -39,7 +39,7 @@ export function StartHere() {
           A backlog, a roadmap, a wiki, an ideas canvas and a weekly review Washi keeps current.
         </span>
       </button>
-      <div className="grid gap-2.5 sm:grid-cols-2">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,220px),1fr))] gap-2.5">
         {STARTERS.map(({ icon: Icon, title, prompt }) => (
           <button
             key={title}

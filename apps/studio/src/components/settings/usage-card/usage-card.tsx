@@ -21,7 +21,7 @@ export function UsageCard({
       desc="A safety stop, not a quota. Washi pauses until tomorrow, or until someone resumes it."
       tag={spend.paused ? { label: 'Paused', tone: 'off' } : { label: 'Running', tone: 'ok' }}
     >
-      <div className="grid gap-5 px-4 py-4 sm:grid-cols-2">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,220px),1fr))] gap-5 px-4 py-4">
         <Gauge
           tone="spend"
           value={spend.costUsd}
