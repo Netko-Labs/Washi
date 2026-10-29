@@ -44,9 +44,12 @@ export { LOCAL_AUTHOR } from './comments/constants'
 export { CommentError, postComment, removeComment, resolveThread } from './comments/service'
 export {
   EmbedHostError,
+  embedHostList,
   embedHosts,
+  playableEmbedHosts,
   setEmbedHosts,
   setWidgetsEnabled,
+  widgetsByServer,
   widgetsEnabled,
 } from './embeds/service'
 export { addCustomEmoji, CustomEmojiError, removeCustomEmoji } from './emojis/service'
@@ -73,6 +76,13 @@ export { runAutomation, watchAutomations } from './scripts/automations'
 export { compileScript, SCRIPT_MAX_CHARS } from './scripts/compile'
 export { installFormulaFunctions } from './scripts/formulas'
 export type { AutomationEvent, CompiledScript, ScriptEntry } from './scripts/types'
+export {
+  applyWorkspaceDefaults,
+  FetchHostError,
+  fetchHostList,
+  lendServerPolicy,
+  serverPolicy,
+} from './server'
 export {
   canRead,
   guardWashiWrite,

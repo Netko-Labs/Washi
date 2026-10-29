@@ -82,7 +82,13 @@ export {
   type EventBus,
   type WashiEvents,
 } from './shared/events'
-export { type InstanceStore, SIGNUP_MODES, type SignupMode } from './shared/instance'
+export {
+  type InstanceStore,
+  type ServerKeyInfo,
+  type ServerKeyUse,
+  SIGNUP_MODES,
+  type SignupMode,
+} from './shared/instance'
 export type { OAuthCaller, OAuthStore } from './shared/oauth'
 export { isTrustedOrigin } from './shared/origin'
 export {

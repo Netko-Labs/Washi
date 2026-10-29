@@ -11,7 +11,14 @@ const PRIMARY =
   'h-[38px] rounded-xl bg-primary px-4 font-semibold text-[13.5px] text-primary-foreground disabled:opacity-50'
 
 /** One provider at a time: connect, or see what is connected and replace or remove it. */
-export function KeyDialog({ target, connected, onSave, onRemove, onClose }: KeyDialogProps) {
+export function KeyDialog({
+  target,
+  connected,
+  blurb = 'One key for the workspace, encrypted on your server',
+  onSave,
+  onRemove,
+  onClose,
+}: KeyDialogProps) {
   const meta = PROVIDER_META[target]
   const form = useKeyDialog(onSave, onClose)
   const error = form.error
@@ -31,9 +38,7 @@ export function KeyDialog({ target, connected, onSave, onRemove, onClose }: KeyD
           <div className="font-semibold text-[15px]">
             {connected ? meta.label : `Connect ${meta.label}`}
           </div>
-          <div className="text-[12px] text-muted-foreground">
-            {connected ? 'Connected' : 'One key for the workspace, encrypted on your server'}
-          </div>
+          <div className="text-[12px] text-muted-foreground">{connected ? 'Connected' : blurb}</div>
         </div>
         <button
           type="button"

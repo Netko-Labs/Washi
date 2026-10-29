@@ -5,4 +5,10 @@ export { open, seal } from './lib/crypto'
 export { ensureControlSchema } from './lib/ddl'
 export { createEmbeddedControlPlane, type EmbeddedControlPlaneOptions } from './lib/embedded'
 export { createHostedControlPlane, type HostedControlPlane } from './lib/hosted'
-export type { ControlPlaneOptions, HostedStorageStore, SealedSecret } from './lib/types'
+export type {
+  AgentCredentialOut,
+  ControlPlaneOptions,
+  HostedInstanceStore,
+  HostedStorageStore,
+  SealedSecret,
+} from './lib/types'

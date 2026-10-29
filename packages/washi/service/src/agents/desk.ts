@@ -5,7 +5,7 @@ import { guardedFetch, isPrivateAddress } from '@washi/tsuru'
 import { createSheetFromSource } from '../sheets/service'
 import { addColumn, deleteRecord, runMutation, updateRecord } from '../tables/service'
 import type { Caller, EventsRef } from './lib'
-import { currentFetchPolicy, TSURU_HOSTS_KEY } from './tools'
+import { currentFetchPolicy, ownFetchHosts, TSURU_HOSTS_KEY } from './tools'
 
 /**
  * The single gate both callers pass through (spec §09 P4). Agent-origin calls
@@ -59,9 +59,8 @@ export class CapabilityDesk {
   allowFetchHost(rawUrl: string): void {
     try {
       const host = new URL(rawUrl).hostname
-      const policy = currentFetchPolicy(this.ws)
-      if (!policy.allowedHosts.includes(host)) {
-        setAppMeta(this.ws, TSURU_HOSTS_KEY, JSON.stringify([...policy.allowedHosts, host]))
+      if (!currentFetchPolicy(this.ws).allowedHosts.includes(host)) {
+        setAppMeta(this.ws, TSURU_HOSTS_KEY, JSON.stringify([...ownFetchHosts(this.ws), host]))
       }
     } catch {
       // unparseable url — the fetch itself will fail loudly

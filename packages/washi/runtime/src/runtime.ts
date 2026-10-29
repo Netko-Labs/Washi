@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 import {
   createFileStore,
@@ -8,9 +9,11 @@ import {
 } from '@washi/repository'
 import {
   AgentHost,
+  applyWorkspaceDefaults,
   createStoredKeySource,
   forgetUnenforcedVisibility,
   installFormulaFunctions,
+  lendServerPolicy,
   liftLooksIntoSource,
   liftScriptsIntoCode,
   reindexPages,
@@ -31,7 +34,8 @@ export function createRuntime(options: RuntimeOptions): Runtime {
   const presence = createPresenceBoard((workspaceId, sheetId, people) =>
     events.emit('presenceChanged', { workspaceId, sheetId, people }),
   )
-  const registry = createWorkspaceRegistry((id) => join(options.dataDir, `${id}.db`))
+  const pathOf = (id: string) => join(options.dataDir, `${id}.db`)
+  const registry = createWorkspaceRegistry(pathOf)
   const blobs =
     options.blobs ?? ((id: string) => localBlobStore(join(options.dataDir, `${id}.files`)))
   const ownBucket = options.workspaceStorage ? workspaceBuckets(options.workspaceStorage) : null
@@ -44,6 +48,7 @@ export function createRuntime(options: RuntimeOptions): Runtime {
     // local Claude login, whatever this machine has installed. Embedded leaves
     // the choice to the host: the person's Claude Code, then the env key.
     const stored = options.storedAgentKey
+    if (options.serverPolicy) lendServerPolicy(workspace, options.serverPolicy)
     const keys =
       options.mode === 'hosted'
         ? createStoredKeySource(async () => (stored ? stored(workspace.id) : null))
@@ -86,7 +91,13 @@ export function createRuntime(options: RuntimeOptions): Runtime {
     resolve(workspaceId) {
       const existing = hosts.get(workspaceId)
       if (existing) return existing
-      const resolved = attachHost(registry.open(workspaceId))
+      const isNew = !existsSync(pathOf(workspaceId))
+      const workspace = registry.open(workspaceId)
+      // Only a file this open created: an existing workspace keeps what its owners chose.
+      if (isNew && options.serverPolicy) {
+        applyWorkspaceDefaults(workspace, options.serverPolicy().defaults)
+      }
+      const resolved = attachHost(workspace)
       hosts.set(workspaceId, resolved)
       return resolved
     },

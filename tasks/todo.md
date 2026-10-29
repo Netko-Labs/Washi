@@ -1,3 +1,17 @@
+# D105 · the server's own settings (2026-10-29)
+
+Settings → Server (the app admin's, D66) grows four server-wide settings. Hosted only; embedded
+behaves exactly as today. Server values live in `instance_setting`; what a workspace starts with is
+written into its own file (C1).
+
+- [x] Server key — one sealed provider key + default model; a workspace's own key wins, else the
+      server's, else asleep. Settings → Washi → Model says when it runs on the server's key
+- [x] Fetch allowlist — server hosts merged into every workspace's (policy refusals still refuse)
+- [x] Embeds & widgets — server embed hosts play everywhere; widgets off on the server = off for all
+- [x] Workspace defaults — approval mode, daily stop, turn cap written once into a new workspace
+- [x] Tests: key fallback, allowlist merge, widgets gate, defaults once, admin gate
+- [x] CLAUDE.md D105, PR
+
 # D101 · outside agents over MCP (2026-10-29)
 
 An agent outside Washi (Claude Code, any MCP client) reads and writes a workspace as one member —

@@ -1,6 +1,6 @@
 import type { AgentKeySource, InferenceStatus } from '../lib'
 import type { ProviderId } from '../ports'
-import type { ApiKeyCredential, StoredKeyLookup } from './types'
+import type { ApiKeyCredential, StoredKey, StoredKeyLookup } from './types'
 import { MISSING } from './values'
 
 const PROVIDERS: readonly ProviderId[] = ['anthropic', 'openrouter']
@@ -11,8 +11,7 @@ const PROVIDERS: readonly ProviderId[] = ['anthropic', 'openrouter']
  * would bill a subscription for everyone's turns.
  */
 export function createStoredKeySource(lookup: StoredKeyLookup): AgentKeySource {
-  const resolve = async (): Promise<ApiKeyCredential | null> => {
-    const stored = await lookup()
+  const credentialOf = (stored: StoredKey | null): ApiKeyCredential | null => {
     if (!stored) return null
     return {
       kind: 'api_key',
@@ -23,15 +22,17 @@ export function createStoredKeySource(lookup: StoredKeyLookup): AgentKeySource {
   }
 
   return {
-    resolve,
+    resolve: async () => credentialOf(await lookup()),
     async status(): Promise<InferenceStatus> {
-      const credential = await resolve()
+      const stored = await lookup()
+      const credential = credentialOf(stored)
+      const source = stored?.source ?? 'workspace'
       return {
         preference: 'api_key',
         active: credential ? 'api_key' : null,
         localCli: null,
         localModel: null,
-        apiKey: credential ? { provider: credential.provider, source: 'workspace' } : null,
+        apiKey: credential ? { provider: credential.provider, source } : null,
         missing: credential ? null : MISSING.workspaceKeyAbsent,
       }
     },

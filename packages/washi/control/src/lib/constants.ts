@@ -8,6 +8,18 @@ export const KEY_BITS = 256
 /** A master key shorter than this is not worth the ceremony around it. */
 export const MIN_SECRET_LENGTH = 32
 
+/** What the server's own key is sealed under — a colon no organization id carries. */
+export const SERVER_SEAL_ID = ':server'
+
+/** `instance_setting` keys (D105); `signup` predates them. */
+export const SETTING_KEYS = {
+  agentKey: 'agent_key',
+  fetchHosts: 'fetch_hosts',
+  embedHosts: 'embed_hosts',
+  widgets: 'widgets',
+  defaults: 'workspace_defaults',
+} as const
+
 /** A fresh server lets its first account in; after that, only invited emails. */
 export const DEFAULT_SIGNUP = 'invite'
 export const SIGNUP_REFUSED =

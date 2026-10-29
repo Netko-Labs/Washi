@@ -6,6 +6,7 @@ import {
   CommentError,
   CustomEmojiError,
   EmbedHostError,
+  FetchHostError,
   InkError,
   ReminderError,
   requireReadable,
@@ -287,10 +288,19 @@ export const ownerProcedure = workspaceProcedure.use(async ({ ctx, next }) => {
 })
 
 /** The server's own settings: its app admins only, whatever workspace the request names. */
-export const adminProcedure = t.procedure.use(async ({ ctx, next }) => {
-  const store = ctx.runtime.control.instance
-  if (!store || !ctx.actorId || !(await store.isAdmin(ctx.actorId))) {
-    throw new TRPCError({ code: 'FORBIDDEN', message: 'only an app admin can change this' })
-  }
-  return next({ ctx: { ...ctx, instance: store } })
-})
+export const adminProcedure = t.procedure
+  .use(async ({ next }) => {
+    const result = await next()
+    const cause = result.ok ? null : result.error.cause
+    if (cause instanceof FetchHostError || cause instanceof EmbedHostError) {
+      throw new TRPCError({ code: 'BAD_REQUEST', message: cause.message, cause })
+    }
+    return result
+  })
+  .use(async ({ ctx, next }) => {
+    const store = ctx.runtime.control.instance
+    if (!store || !ctx.actorId || !(await store.isAdmin(ctx.actorId))) {
+      throw new TRPCError({ code: 'FORBIDDEN', message: 'only an app admin can change this' })
+    }
+    return next({ ctx: { ...ctx, instance: store, adminId: ctx.actorId } })
+  })

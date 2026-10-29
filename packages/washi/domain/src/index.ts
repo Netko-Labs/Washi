@@ -64,6 +64,15 @@ export {
   customEmojiSchema,
   customEmojiWriteSchema,
 } from './entities/emojis'
+export {
+  agentCredentialSchema,
+  agentModelSchema,
+  hostListSchema,
+  type ServerPolicy,
+  serverPolicySchema,
+  type WorkspaceDefaults,
+  workspaceDefaultsSchema,
+} from './entities/instance'
 export type { Member } from './entities/members'
 export {
   type Reminder,

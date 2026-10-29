@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { INTEGRATIONS, publicProcedure, router, workspaceProcedure } from '../../init'
+import type { ServerKeyUse } from '../../shared/instance'
 
 export const workspaceQueries = router({
   /** What this actor may open. Embedded returns its single local workspace. */
@@ -14,6 +15,11 @@ export const workspaceQueries = router({
   agentKey: workspaceProcedure.query(
     ({ ctx }) => ctx.runtime.control.secrets?.info(ctx.workspaceId) ?? null,
   ),
+  /** Whether the server lends its key to a workspace without one (D105) — never even its last four. */
+  serverKey: workspaceProcedure.query(async ({ ctx }): Promise<ServerKeyUse | null> => {
+    const info = await ctx.runtime.control.instance?.keyInfo()
+    return info ? { provider: info.provider, model: info.model } : null
+  }),
   integrationKey: workspaceProcedure
     .input(z.object({ integration: z.enum(INTEGRATIONS) }))
     .query(

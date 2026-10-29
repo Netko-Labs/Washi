@@ -4,15 +4,23 @@ import { getAppMeta, type Workspace } from '@washi/repository'
 import { fetchPolicySchema, guardedFetch } from '@washi/tsuru'
 import { z } from 'zod'
 import { pageCapabilities, tableCapabilities } from '../capabilities'
+import { serverPolicy } from '../server'
 import { NOBODY } from '../sheets/access'
 import type { SearchKeyLookup } from './lib'
 import { webSearch } from './search'
 
 export const TSURU_HOSTS_KEY = 'tsuru_allowed_hosts'
 
-export function currentFetchPolicy(ws: Workspace) {
+/** The hosts this workspace said "always" to, without the server's. */
+export function ownFetchHosts(ws: Workspace): string[] {
   const stored = getAppMeta(ws, TSURU_HOSTS_KEY)
-  return fetchPolicySchema.parse({ allowedHosts: stored ? JSON.parse(stored) : [] })
+  return stored ? (JSON.parse(stored) as string[]) : []
+}
+
+/** The workspace's hosts and the server's (D105); what tsuru refuses outright stays refused. */
+export function currentFetchPolicy(ws: Workspace) {
+  const hosts = new Set([...ownFetchHosts(ws), ...serverPolicy(ws).fetchHosts])
+  return fetchPolicySchema.parse({ allowedHosts: [...hosts] })
 }
 
 function text(value: unknown) {

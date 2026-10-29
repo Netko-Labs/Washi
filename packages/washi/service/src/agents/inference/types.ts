@@ -14,6 +14,8 @@ export interface StoredKey {
   apiKey: string
   provider: string
   model: string | null
+  /** Whose key it is: the workspace's own, or the server's for a workspace without one (D105). */
+  source?: 'workspace' | 'server'
 }
 
 export type StoredKeyLookup = () => Promise<StoredKey | null>

@@ -289,6 +289,21 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   (`mayCreateAccount`). Settings → Server is the admin's alone (`instance.*`, `adminProcedure`);
   embedded has no instance store, and the studio refuses to boot in embedded mode. Washi is
   AGPL-3.0-only (`LICENSE`, every `package.json`).
+- **The server has its own say (D105).** Settings → Server holds four more, all `adminProcedure`
+  (`instance.*`) in `instance_setting` (`server-settings.ts`; the policy cached in memory, loaded at
+  boot, rewritten on each set). **A model key**: one provider key + default model, sealed like BYOK
+  under `:server`, only its last four shown to admins. A workspace's own key wins; one without runs
+  on the server's (`keyWithFallback` in runtime → `source: 'server'`), else sleeps — so a new
+  workspace wakes with no setup. Members see only that it is the server's (`workspaces.serverKey`:
+  provider and model). Still a key, never a plan (A3). **Fetch hosts** every workspace reaches
+  without asking, merged into tsuru's allowlist (`currentFetchPolicy`; "Always" still writes only
+  the workspace's own list); tsuru's refusals still refuse. **Embed hosts** that play everywhere
+  (`embeds.playable` = the workspace's + the server's) and **a widget switch**: off, no workspace
+  runs or turns on a widget (`widgetsEnabled` = server ∧ own); on, each decides. **Workspace
+  defaults** (approval mode, daily stop, turn cap): written into a workspace's own file when the
+  runtime opens it for the first time (no `.db` yet), never again (C1). The runtime lends the
+  policy to service per workspace (`lendServerPolicy`, C3); embedded lends none and behaves as
+  before.
 - **A chat is its starter's (D67).** `agent_sessions.created_by`; null is the workspace's (a
   routine's runs, every chat before D67). `chatProcedure` answers NOT_FOUND for any `sessionId`
   that is someone else's, and the agent subscriptions, `pendingApprovals` and `today` drop their
@@ -301,7 +316,7 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   person's installed `claude` (PATH is empty for a GUI app — known install paths too) and runs
   it via the Agent SDK's `pathToClaudeCodeExecutable` with **no** key in the env, so their own
   login pays. `auto` prefers it over `ANTHROPIC_API_KEY`. Hosted runs on the workspace's stored
-  key and has no local branch at all — a team server must never bill one person's plan.
+  key (or the server's, D105) and has no local branch at all — a team server must never bill one person's plan.
 - A keyed turn's Claude session lives in `<dataDir>/<workspace>.claude/` (`CLAUDE_CONFIG_DIR`), beside
   the `.db` holding its `sdkSessionId` — on the volume, so a redeploy can't orphan it. A resume
   the CLI no longer knows retries once, fresh. A local CLI keeps its own config dir.
