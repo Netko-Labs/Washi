@@ -153,6 +153,15 @@ export const SPECIMENS: Record<string, Specimen> = {
     children:
       '<Row align="center"><Text class="grow">$row.title</Text><Badge>$row.status</Badge><Avatar label="$row.assignee" size="sm" /></Row>',
   },
+  Heatmap: {
+    props: {
+      bind: { table: 'tasks' },
+      date: 'due',
+      value: 'points',
+      weeks: 8,
+      label: 'Points due',
+    },
+  },
   Slots: {
     props: {
       bind: { table: 'tasks' },

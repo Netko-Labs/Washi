@@ -334,6 +334,22 @@ const dataOut: Record<string, ComponentSpec> = {
   Step: p({ marker: z.string().min(1).max(8), title: z.string().max(120).optional() }, 'nodes', {
     within: ['Timeline'],
   }),
+  /**
+   * Days as a grid (D103), GitHub's contribution calendar: the last `weeks` weeks to today, each
+   * day as dark as its rows — counted, or `value` summed — in five steps of the accent.
+   */
+  Heatmap: p(
+    {
+      bind: bindQuerySchema,
+      date: columnName,
+      value: columnName.optional(),
+      weeks: z.number().int().min(4).max(53).optional(),
+      label: z.string().max(60).optional(),
+      weekStart: z.enum(['monday', 'sunday']).optional(),
+      redact,
+    },
+    'none',
+  ),
   Progress: p(
     {
       value: z.number().min(0).max(1).optional(),
