@@ -26,6 +26,15 @@ describe('changes land; only what leaves the server asks', () => {
     expect(desk.list()).toHaveLength(0)
   })
 
+  test('naming the chat never asks — nothing leaves, nothing changes', async () => {
+    expect(desk.isRead('set_conversation_title')).toBe(true)
+    const verdict = await desk.gateSdkTool('s1', 'mcp__washi__set_conversation_title', {
+      title: 'Ops',
+    })
+    expect(verdict.behavior).toBe('allow')
+    expect(desk.list()).toHaveLength(0)
+  })
+
   test('a fetch, a search or an action still asks', async () => {
     expect(await within(desk.approve('s1', 'fetch_url', { url: 'https://x.dev' }))).toBe('waiting')
     expect(await within(desk.approve('s1', 'web_search', { query: 'loro' }))).toBe('waiting')
