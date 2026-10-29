@@ -44,7 +44,7 @@ export function RowPeek({ workspaceId }: RowPeekProps) {
           }
           look={look}
           footer={
-            <div className="mx-auto w-full max-w-[960px] px-8 pb-12">
+            <div className="mx-auto w-full max-w-[1200px] px-8 pb-12">
               <button
                 type="button"
                 onClick={peek.expand}
