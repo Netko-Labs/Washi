@@ -14,6 +14,7 @@ export function useFormDraft({
   defaults,
   seed,
   reset,
+  check,
   onAdded,
 }: FormDraftOptions): FormDraft {
   const run = useRunAction()
@@ -32,6 +33,11 @@ export function useFormDraft({
     if (!canSubmit) return
     setStatus({ kind: 'busy' })
     try {
+      const refusal = await check?.()
+      if (refusal) {
+        setStatus({ kind: 'refused', reason: refusal })
+        return
+      }
       await run({ verb: 'table.insert', table, data: rowOf(written, values) })
       if (reset) setEntries({})
       setStatus({ kind: 'added' })

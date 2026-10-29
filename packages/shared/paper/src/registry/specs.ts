@@ -229,6 +229,36 @@ const dataOut: Record<string, ComponentSpec> = {
     },
     'none',
   ),
+  /**
+   * Free times to book (D102): each allowed day's `hours` cut into `minutes`-long slots, minus
+   * the rows in `bind` whose `date` (`start/end`) overlaps and minus what is past. A press opens a
+   * modal Form of `add` with the slot already in `date`.
+   */
+  Slots: p(
+    {
+      bind: bindQuerySchema,
+      date: columnName,
+      minutes: z.number().int().min(5).max(480).optional(),
+      hours: z
+        .string()
+        .regex(/^([01]\d|2[0-3]):[0-5]\d-([01]\d|2[0-3]):[0-5]\d$/, 'hours read like 09:00-17:00')
+        .refine((hours) => {
+          const [open = '', close = ''] = hours.split('-')
+          return open < close
+        }, 'hours open before they close: 09:00-17:00')
+        .optional(),
+      days: z
+        .array(z.enum(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']))
+        .min(1)
+        .max(7)
+        .optional(),
+      add: z.array(columnName).min(1).max(16).optional(),
+      addLabel: z.string().min(1).max(40).optional(),
+      empty: z.string().max(80).optional(),
+      weekStart: z.enum(['monday', 'sunday']).optional(),
+    },
+    'none',
+  ),
   Table: p(
     {
       bind: bindQuerySchema,

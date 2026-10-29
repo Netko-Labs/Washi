@@ -204,3 +204,10 @@
   background: var(--ink);
   opacity: 0.85;
 }
+
+/* Capped where it is used: `--hero: min(var(--hero), …)` is a cycle, and the size would drop. */
+@container wsx (max-width: 720px) {
+  .wsx-hero-title {
+    font-size: min(var(--hero), 40px);
+  }
+}

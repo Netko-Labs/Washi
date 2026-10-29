@@ -85,6 +85,8 @@ export const SUMMARIES: Record<string, string> = {
   Button: 'Runs one action on click.',
   Compose: 'A text box that runs one action with what was typed, then clears.',
   Form: 'One whole row typed and added; trigger puts it behind a button in a modal.',
+  Slots:
+    'Free times to book, Calendly-style: each allowed day cut into slots of `minutes` within `hours`, minus rows whose date overlaps and minus the past; a press opens a form with the slot filled in.',
   Agenda: 'A calendar: a week or a month of rows on their dates; + on a day adds one there.',
   Task: 'A checkbox bound to a row’s checkbox column.',
   Switch: 'Writes true or false to a state key.',
