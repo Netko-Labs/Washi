@@ -15,6 +15,16 @@ export interface ServerSearchKeyState {
   updatedBy: string | null
 }
 
+/** A page package's row (D116), as the server's installer reports it. */
+export interface PagePackageState {
+  name: string
+  spec: string
+  version: string | null
+  status: 'installing' | 'ready' | 'failed'
+  bytes: number | null
+  error: string | null
+}
+
 export interface ServerSettingsState {
   signup: SignupMode
   key: KeyState | null
@@ -23,6 +33,7 @@ export interface ServerSettingsState {
   embedHosts: string[]
   widgets: boolean
   defaults: WorkspaceDefaultsState
+  pagePackages: PagePackageState[]
 }
 
 export type HostListKind = 'fetch' | 'embed'
@@ -66,4 +77,11 @@ export interface ServerWidgetsCardProps {
 export interface WorkspaceDefaultsCardProps {
   defaults: WorkspaceDefaultsState
   onSave: (defaults: WorkspaceDefaultsState) => Promise<unknown>
+}
+
+export interface PagePackagesCardProps {
+  packages: PagePackageState[]
+  /** Null when it was listed; otherwise the refusal, in words. */
+  onAdd: (spec: string) => Promise<string | null>
+  onRemove: (name: string) => Promise<unknown>
 }

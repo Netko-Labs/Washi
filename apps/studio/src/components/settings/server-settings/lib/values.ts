@@ -25,3 +25,13 @@ export const SEARCH_KEY_COPY = {
   none: 'None',
   blurb: 'One Exa key for every workspace on this server, encrypted on it',
 } as const
+
+export const PAGE_PACKAGES_COPY = {
+  title: 'Page packages',
+  desc: 'npm packages page code and widgets may import, beside date-fns, lodash-es and zod. Installed on this server with no install scripts; a page bundles what it imports.',
+  placeholder: 'nanoid@5 or @scope/name@1.2.3',
+  empty: 'None yet: pages import only Washi’s own libraries.',
+} as const
+
+/** How often the card asks again while a package is still installing. */
+export const INSTALL_POLL_MS = 2000

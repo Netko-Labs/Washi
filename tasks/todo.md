@@ -16,6 +16,17 @@
 - [x] Book (summaries, specimens, `guide` recipe), registry + countdown tests, `/` starters
 - [x] CLAUDE.md D107, PR
 
+# D116 · the server's page packages (2026-10-29)
+
+- [x] Settings → Server → Page packages: `name@version`, installed into `<dataDir>/page-packages`
+      (no install scripts, ESM only, exact version), installing → ready · size, or failed in words
+- [x] List in `instance_setting`; boot keeps what is on disk and re-installs the rest
+- [x] `compilePage` / `compileWidget` / `checkSource` resolve them like `PAGE_LIBRARIES`; off the list
+      says where an admin adds it; Washi's instructions list them
+- [x] Tests: name/version, compile over a fixture cache (no network), refusal words, policy load,
+      installer states; CLAUDE.md D116, PR
+- [ ] later: a hosted boot against Postgres with a real install (smoked by hand: nanoid ^5 → 5.1.16)
+
 # D105+ · the server's own Exa key (2026-10-29)
 
 - [x] Server search key — sealed under `:server:exa`; a workspace's own Exa key wins, else the

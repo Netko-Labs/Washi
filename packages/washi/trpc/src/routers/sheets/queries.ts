@@ -37,5 +37,5 @@ export const sheetQueries = router({
   share: pageProcedure.input(byId).query(({ ctx, input }) => shareSettings(ctx.ws, input.id)),
   check: workspaceProcedure
     .input(z.object({ source: z.string() }))
-    .query(({ input }) => checkSource(input.source)),
+    .query(({ ctx, input }) => checkSource(input.source, ctx.ws)),
 })

@@ -17,7 +17,8 @@ export interface AiSdkPortDeps {
   openSheet?: (id: string) => void
   listPeople?: () => Promise<Member[]>
   searchKey?: SearchKeyLookup
-  instructions: string
+  /** Read as each turn starts, so a change on the server reaches the next one. */
+  instructions: () => string
   /** Prices the turn, so the daily breaker works on a provider that bills tokens. */
   catalogue: ModelCatalogue
 }
@@ -65,7 +66,7 @@ export function createAiSdkPort({
 
       const agent = new ToolLoopAgent({
         model: resolveModel(request.model.provider, model, credential.apiKey),
-        instructions,
+        instructions: instructions(),
         tools,
         stopWhen: stepCountIs(MAX_STEPS),
         // One gate, both ports. Reads and page/table writes pass; what leaves waits for a person,

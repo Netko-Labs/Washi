@@ -58,6 +58,9 @@ function store() {
     setDefaults: async (defaults) => {
       policy = { ...policy, defaults }
     },
+    setPagePackages: async (pagePackages) => {
+      policy = { ...policy, pagePackages }
+    },
     keyInfo: async () => key && { ...key, updatedAt: new Date(0), updatedBy: 'First' },
     setKey: async (_actor, credential) => {
       key = {

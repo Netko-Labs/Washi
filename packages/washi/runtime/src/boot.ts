@@ -10,6 +10,13 @@ import { startRoutineClock } from './clock'
 import { DEFAULT_WORKSPACE_ID } from './constants'
 import { keyWithFallback, searchKeyWithFallback } from './keys'
 import { assertHostedSecrets, assertMode } from './mode'
+import {
+  bunAdd,
+  bunRemove,
+  createPagePackages,
+  PAGE_PACKAGES_DIR,
+  resolveFromRegistry,
+} from './page-packages'
 import { createRuntime } from './runtime'
 import type { BootedRuntime, RuntimeOptions } from './types'
 
@@ -57,6 +64,15 @@ export async function bootRuntime(env: Env): Promise<BootedRuntime> {
     const hosted = createHostedControlPlane({ databaseUrl, masterKey, baseUrl, trustedOrigins })
     await ensureControlSchema(hosted.db)
     await hosted.instance.load()
+    const pagePackages = createPagePackages({
+      dir: join(dataDir, PAGE_PACKAGES_DIR),
+      listed: () => hosted.instance.policy().pagePackages,
+      save: (packages) => hosted.instance.setPagePackages(packages),
+      resolve: resolveFromRegistry,
+      install: bunAdd,
+      uninstall: bunRemove,
+    })
+    void pagePackages.restore()
     options = {
       mode,
       control: hosted,
@@ -66,6 +82,7 @@ export async function bootRuntime(env: Env): Promise<BootedRuntime> {
         () => hosted.instance.agentKey(),
       ),
       serverPolicy: () => hosted.instance.policy(),
+      pagePackages,
       searchKey: searchKeyWithFallback(
         (workspaceId) => hosted.integrationKey(workspaceId, 'exa'),
         () => hosted.instance.searchKey(),

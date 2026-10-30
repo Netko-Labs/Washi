@@ -11,5 +11,6 @@ export const instanceQueries = router({
     key: await ctx.instance.keyInfo(),
     searchKey: await ctx.instance.searchKeyInfo(),
     ...ctx.instance.policy(),
+    pagePackages: ctx.runtime.pagePackages?.list() ?? [],
   })),
 })

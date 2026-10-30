@@ -58,7 +58,7 @@ export function liftLooksIntoSource(ws: Workspace): void {
     if (sheet.cover && !worn.cover) missing.cover = keyed(sheet.cover)
     if (Object.keys(missing).length === 0) continue
     const source = serialize(withLook(root, missing))
-    if (!checkSource(source).ok) continue
+    if (!checkSource(source, ws).ok) continue
     rewriteSourceQuietly(ws, sheet.id, source, { ...worn, ...missing })
   }
   setAppMeta(ws, LIFTED, '1')
@@ -83,7 +83,7 @@ export function forgetUnenforcedVisibility(ws: Workspace): void {
     if (root.props.visibility === undefined && root.props.access === undefined) continue
     const { visibility: _visibility, access: _access, ...props } = root.props
     const source = serialize({ ...root, props })
-    if (!checkSource(source).ok) continue
+    if (!checkSource(source, ws).ok) continue
     rewriteSourceQuietly(ws, sheet.id, source, lookOf(root))
   }
   setAppMeta(ws, ENFORCED, '1')

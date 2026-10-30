@@ -15,7 +15,8 @@
     "@washi/domain": "workspace:*",
     "@washi/repository": "workspace:*",
     "@washi/service": "workspace:*",
-    "@washi/trpc": "workspace:*"
+    "@washi/trpc": "workspace:*",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@trpc/server": "^11",

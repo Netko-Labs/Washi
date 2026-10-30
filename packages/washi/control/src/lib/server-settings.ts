@@ -35,6 +35,8 @@ function policyOf(values: Map<string, string>): ServerPolicy {
     defaults:
       workspaceDefaultsSchema.safeParse(json(values.get(SETTING_KEYS.defaults))).data ??
       workspaceDefaultsSchema.parse({}),
+    pagePackages:
+      field.pagePackages.safeParse(json(values.get(SETTING_KEYS.pagePackages))).data ?? [],
   }
 }
 
@@ -73,6 +75,7 @@ export function createServerSettings({
     setEmbedHosts: (hosts) => write(SETTING_KEYS.embedHosts, JSON.stringify(hosts)),
     setWidgets: (enabled) => write(SETTING_KEYS.widgets, enabled ? '1' : '0'),
     setDefaults: (defaults) => write(SETTING_KEYS.defaults, JSON.stringify(defaults)),
+    setPagePackages: (packages) => write(SETTING_KEYS.pagePackages, JSON.stringify(packages)),
 
     async agentKey() {
       const row = await sealedKey()

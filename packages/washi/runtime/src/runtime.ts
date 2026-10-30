@@ -48,7 +48,10 @@ export function createRuntime(options: RuntimeOptions): Runtime {
     // local Claude login, whatever this machine has installed. Embedded leaves
     // the choice to the host: the person's Claude Code, then the env key.
     const stored = options.storedAgentKey
-    if (options.serverPolicy) lendServerPolicy(workspace, options.serverPolicy)
+    const packages = options.pagePackages
+    if (options.serverPolicy) {
+      lendServerPolicy(workspace, options.serverPolicy, packages && (() => packages.ready()))
+    }
     const keys =
       options.mode === 'hosted'
         ? createStoredKeySource(async () => (stored ? stored(workspace.id) : null))
@@ -88,6 +91,7 @@ export function createRuntime(options: RuntimeOptions): Runtime {
     control: options.control,
     presence,
     defaultWorkspaceId: options.defaultWorkspaceId ?? DEFAULT_WORKSPACE_ID,
+    pagePackages: options.pagePackages,
 
     resolve(workspaceId) {
       const existing = hosts.get(workspaceId)

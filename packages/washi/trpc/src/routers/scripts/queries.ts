@@ -4,6 +4,7 @@ import {
   compileScript,
   compileWidget,
   PAGE_CODE_MAX_CHARS,
+  pagePackagesOf,
   readableSet,
   SCRIPT_MAX_CHARS,
 } from '@washi/service'
@@ -28,8 +29,10 @@ export const scriptQueries = router({
     .input(z.object({ source: z.string().max(PAGE_CODE_MAX_CHARS + 1) }))
     .query(({ ctx, input }) => {
       const readable = readableSet(ctx.ws, ctx.viewer)
-      return compilePage(input.source, (id) =>
-        readable.has(id) ? (getSheet(ctx.ws, id)?.source ?? null) : null,
+      return compilePage(
+        input.source,
+        (id) => (readable.has(id) ? (getSheet(ctx.ws, id)?.source ?? null) : null),
+        pagePackagesOf(ctx.ws),
       )
     }),
   /** One of a page's components bundled with React for a widget's frame (D113), imports as `page`. */
@@ -42,8 +45,11 @@ export const scriptQueries = router({
     )
     .query(({ ctx, input }) => {
       const readable = readableSet(ctx.ws, ctx.viewer)
-      return compileWidget(input.source, input.component, (id) =>
-        readable.has(id) ? (getSheet(ctx.ws, id)?.source ?? null) : null,
+      return compileWidget(
+        input.source,
+        input.component,
+        (id) => (readable.has(id) ? (getSheet(ctx.ws, id)?.source ?? null) : null),
+        pagePackagesOf(ctx.ws),
       )
     }),
 })

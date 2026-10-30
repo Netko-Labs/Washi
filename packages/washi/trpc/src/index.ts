@@ -84,6 +84,8 @@ export {
 } from './shared/events'
 export {
   type InstanceStore,
+  type PagePackageRow,
+  type PagePackageStore,
   type ServerKeyInfo,
   type ServerKeyUse,
   type ServerSearchKeyInfo,

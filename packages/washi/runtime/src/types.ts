@@ -2,6 +2,7 @@ import type { ServerPolicy } from '@washi/domain'
 import type { BlobStore, BlobStoreFactory } from '@washi/repository'
 import type { StoredKey } from '@washi/service'
 import type { ControlPlane, ServerMode, ServerRuntime, StorageConfig } from '@washi/trpc'
+import type { PagePackageInstaller } from './page-packages'
 
 export interface RuntimeOptions {
   mode: ServerMode
@@ -15,6 +16,8 @@ export interface RuntimeOptions {
   storedAgentKey?: KeyLookup
   /** Hosted only: the server's say over every workspace, read from memory on each check. */
   serverPolicy?: () => ServerPolicy
+  /** Hosted only: the npm packages page code may import, installed on the data volume (D116). */
+  pagePackages?: PagePackageInstaller
   /** The Exa key a workspace searches the web with. Hosted stores one; embedded reads the env. */
   searchKey?: SearchKeyLookup
   /** Where a workspace's files go. Absent: a folder beside its .db (D60). */

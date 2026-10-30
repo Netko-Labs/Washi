@@ -84,6 +84,9 @@ export {
   FetchHostError,
   fetchHostList,
   lendServerPolicy,
+  PagePackageError,
+  pagePackageSpec,
+  pagePackagesOf,
   serverPolicy,
 } from './server'
 export {

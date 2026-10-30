@@ -11,12 +11,23 @@ export type WorkspaceDefaults = z.infer<typeof workspaceDefaultsSchema>
 /** A host list as an admin types it: addresses, bare names, or `*.suffix` for fetches. */
 export const hostListSchema = z.array(z.string().trim().min(1).max(260)).max(128)
 
+/** An npm package page code may import (D116): as the admin asked for it, and what it became. */
+export const pagePackageSchema = z.object({
+  name: z.string().min(1).max(214),
+  /** An exact version, a range or a dist-tag, as typed. */
+  spec: z.string().min(1).max(64),
+  /** Exact, once an install resolved it; null until one has. */
+  version: z.string().min(1).max(64).nullable(),
+})
+export type PagePackage = z.infer<typeof pagePackageSchema>
+
 /** The server's say over every workspace on it. Absent (embedded): adds nothing, takes nothing. */
 export const serverPolicySchema = z.object({
   fetchHosts: z.array(z.string()).default([]),
   embedHosts: z.array(z.string()).default([]),
   widgets: z.boolean().default(true),
   defaults: workspaceDefaultsSchema.default({}),
+  pagePackages: z.array(pagePackageSchema).default([]),
 })
 export type ServerPolicy = z.infer<typeof serverPolicySchema>
 
@@ -33,3 +44,9 @@ export const agentModelSchema = z.string().min(1).max(200).nullable()
 
 /** An integration key as an owner or admin pastes it — a workspace's Exa key or the server's. */
 export const integrationKeySchema = z.object({ key: z.string().min(8) })
+
+/** The server's page packages installed and ready, and the folder whose node_modules holds them. */
+export interface PagePackageSet {
+  dir: string
+  packages: { name: string; version: string }[]
+}

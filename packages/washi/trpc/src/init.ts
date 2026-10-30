@@ -1,3 +1,4 @@
+// conventions: >300 lines — context, procedures and their refusals; split when next touched
 import { initTRPC, TRPCError } from '@trpc/server'
 import type { Viewer } from '@washi/domain'
 import type { FileStore, Workspace } from '@washi/repository'
@@ -8,6 +9,7 @@ import {
   EmbedHostError,
   FetchHostError,
   InkError,
+  PagePackageError,
   ReminderError,
   requireReadable,
   SheetAccessError,
@@ -19,7 +21,7 @@ import {
   WorkspaceThemeError,
 } from '@washi/service'
 import type { EventBus } from './shared/events'
-import type { InstanceStore } from './shared/instance'
+import type { InstanceStore, PagePackageStore } from './shared/instance'
 import type { OAuthStore } from './shared/oauth'
 import type { PresenceBoard } from './shared/presence'
 import type { StorageStore } from './shared/storage'
@@ -125,6 +127,8 @@ export interface ServerRuntime {
   control: ControlPlane
   defaultWorkspaceId: string
   presence: PresenceBoard
+  /** Hosted only: the server's page packages (D116), installed on its data volume. */
+  pagePackages?: PagePackageStore
 }
 
 export interface Context {
@@ -287,12 +291,14 @@ export const ownerProcedure = workspaceProcedure.use(async ({ ctx, next }) => {
   return next()
 })
 
+const ADMIN_REFUSALS = [FetchHostError, EmbedHostError, PagePackageError]
+
 /** The server's own settings: its app admins only, whatever workspace the request names. */
 export const adminProcedure = t.procedure
   .use(async ({ next }) => {
     const result = await next()
     const cause = result.ok ? null : result.error.cause
-    if (cause instanceof FetchHostError || cause instanceof EmbedHostError) {
+    if (cause && ADMIN_REFUSALS.some((Refusal) => cause instanceof Refusal)) {
       throw new TRPCError({ code: 'BAD_REQUEST', message: cause.message, cause })
     }
     return result

@@ -1,3 +1,4 @@
+import type { PagePackageSet } from '@washi/domain'
 import { WIDGET_FRAME } from '@washi/paper/registry'
 import { pageModule, parse } from '@washi/wsx'
 import { bundle, failure } from './compile'
@@ -19,13 +20,14 @@ export async function compileWidget(
   source: string,
   component: string,
   read: PageSource,
+  packages: PagePackageSet | null = null,
 ): Promise<CompiledPage> {
   try {
     if (!parse(source).prelude?.components.includes(component)) {
       return failure(`${component} is not one of this page's components`)
     }
     const module = `${pageModule(source)}\nexport { ${component} as __widget }`
-    return await bundle(module, read, WIDGET_TARGET, ['widget', component, source])
+    return await bundle(module, read, WIDGET_TARGET, ['widget', component, source], packages)
   } catch (error) {
     return failure(error)
   }
