@@ -56,6 +56,8 @@ export interface SheetAccess {
   suggest?: boolean
 }
 export type StoredSheetWrite = SheetWrite & Partial<SheetLook> & Partial<SheetAccess>
+/** An update re-reads `suggest` off the page it writes (D120): leaving it out is not "off". */
+export type StoredSheetUpdate = StoredSheetWrite & Required<Pick<SheetAccess, 'suggest'>>
 
 export type AccessRow = Pick<SheetSummary, 'id' | 'parentId' | 'visibility' | 'access'>
 

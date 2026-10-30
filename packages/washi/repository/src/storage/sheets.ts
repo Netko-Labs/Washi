@@ -5,6 +5,7 @@ import {
   type SheetDetail,
   type SheetMetaPatch,
   type SheetSummary,
+  type StoredSheetUpdate,
   type StoredSheetWrite,
 } from '@washi/domain'
 import { sheetLinkTable, sheetTable } from '@washi/domain/db'
@@ -97,7 +98,7 @@ export function createSheet(
 export function updateSheet(
   ws: Workspace,
   id: string,
-  write: StoredSheetWrite,
+  write: StoredSheetUpdate,
   index: SheetIndexInput,
   editedBy: SheetAuthor = null,
 ): SheetDetail | null {
@@ -120,7 +121,7 @@ export function updateSheet(
         cover: write.cover ?? null,
         visibility: write.visibility ?? 'shared',
         access: write.access ?? [],
-        suggest: write.suggest ?? false,
+        suggest: write.suggest,
         tags: write.tags ?? existing.tags,
         source: write.source,
         loroSnapshot: Buffer.from(updateSnapshot(existing.loroSnapshot, write.source)),

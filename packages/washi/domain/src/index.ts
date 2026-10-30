@@ -125,6 +125,7 @@ export {
   type SheetShare,
   type SheetSummary,
   type SheetWrite,
+  type StoredSheetUpdate,
   type StoredSheetWrite,
   sheetDetailSchema,
   sheetIconSchema,

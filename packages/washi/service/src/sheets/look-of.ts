@@ -21,7 +21,7 @@ export function withLook(root: WsxElement, look: SheetLookPatch): WsxElement {
 }
 
 /** Who reads a page is the page's own too (D65): `<Sheet visibility access>`, cached like the look. */
-export function accessOf(root: WsxElement): SheetAccess {
+export function accessOf(root: WsxElement): Required<SheetAccess> {
   const visibility = root.props.visibility
   const access = root.props.access
   return {

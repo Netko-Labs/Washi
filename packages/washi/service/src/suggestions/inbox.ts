@@ -5,10 +5,8 @@ import { readableSet } from '../sheets/access'
 
 /** Pending suggestions on the pages this member reads, newest first; a trashed page's wait. */
 export function suggestionInbox(ws: Workspace, viewer: Viewer): SuggestionInbox {
-  const readable = readableSet(ws, viewer)
-  const items = listPendingSuggestions(ws, viewer.id ?? LOCAL_AUTHOR.id).filter((suggestion) =>
-    readable.has(suggestion.sheetId),
-  )
+  const readable = [...readableSet(ws, viewer)]
+  const items = listPendingSuggestions(ws, viewer.id ?? LOCAL_AUTHOR.id, readable)
   return { items, unread: items.filter((suggestion) => !suggestion.isRead).length }
 }
 

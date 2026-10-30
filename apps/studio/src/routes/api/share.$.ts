@@ -12,13 +12,8 @@ import {
 } from '@washi/service'
 import { fileResponse } from '@/server/files'
 import { washiRuntime } from '@/server/runtime'
-import {
-  NO_STORE,
-  shareAskSchema,
-  sharedWorkspace,
-  shareFailure,
-  visitorHash,
-} from '@/server/share'
+import { NO_STORE, shareAskSchema, sharedWorkspace, shareFailure } from '@/server/share'
+import { visitorHash } from '@/server/visitor'
 
 const MAX_ASK_BYTES = 16 * 1024
 const MAX_SUGGEST_BYTES = 64 * 1024
@@ -72,8 +67,14 @@ export const Route = createFileRoute('/api/share/$')({
               { status: 400 },
             )
           }
+          const ipHash = visitorHash(request, workspaceId)
+          if (!ipHash) {
+            return Response.json(
+              { error: 'This server can’t take suggestions.' },
+              { status: 503, headers: NO_STORE },
+            )
+          }
           try {
-            const ipHash = visitorHash(request, workspaceId)
             const sent = suggestRow(resolved.workspace, token, suggestion.data, ipHash)
             if (sent.id) {
               const { runtime } = await washiRuntime()

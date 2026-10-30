@@ -114,18 +114,29 @@ export function pendingSuggestionsFor(ws: Workspace, table: string): SuggestionR
   return rows.map(recordOf)
 }
 
-/** Pending suggestions on live pages, newest first, with whether this person has read each. */
-export function listPendingSuggestions(ws: Workspace, userId: string, limit = 200): Suggestion[] {
+/**
+ * Pending suggestions on the live pages named, newest first, with whether this person has read
+ * each. The pages filter before the cap, so others' pages never crowd out the reader's.
+ */
+export function listPendingSuggestions(
+  ws: Workspace,
+  userId: string,
+  sheetIds: string[],
+  limit = 200,
+): Suggestion[] {
   const rows = ws.sqlite
     .query(
       `SELECT ${COLUMNS}, p.title AS sheetTitle, x.read_at AS readAt
        FROM suggestions s
        JOIN sheets p ON p.id = s.sheet_id AND p.deleted_at IS NULL
        LEFT JOIN suggestion_reads x ON x.suggestion_id = s.id AND x.user_id = ?1
-       WHERE s.status = 'pending'
+       WHERE s.status = 'pending' AND s.sheet_id IN (SELECT value FROM json_each(?3))
        ORDER BY s.created_at DESC LIMIT ?2`,
     )
-    .all(userId, limit) as (Stored & { sheetTitle: string; readAt: string | null })[]
+    .all(userId, limit, JSON.stringify(sheetIds)) as (Stored & {
+    sheetTitle: string
+    readAt: string | null
+  })[]
   return rows.map(({ readAt, sheetTitle, ...row }) => ({
     ...recordOf(row),
     sheetTitle,

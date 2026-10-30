@@ -11,7 +11,7 @@ import type { ActionRef, Row } from '../../../../lib/types'
 import { usePaperHost } from '../../../../provider'
 import { cell } from '../../../states'
 import type { CardActions } from '../types'
-import { substitute } from '../utils'
+import { newCard, substitute } from '../utils'
 import { FORMER_MEMBER, UNNAMED } from '../values'
 import { useBoardSuggest } from './use-board-suggest'
 
@@ -51,10 +51,12 @@ export function useCardActions(onOpen: ActionRef | undefined, table: string): Ca
     mode,
     suggest,
     // The host tells the reader why a row was not added; the board only refetches.
-    create: (table, data) =>
+    create: (draft) => {
+      if (mode === 'suggest') return suggest.open(draft)
       void host
-        .newRow?.(table, data)
+        .newRow?.(table, newCard(draft))
         .catch(() => undefined)
-        .finally(refresh),
+        .finally(refresh)
+    },
   }
 }

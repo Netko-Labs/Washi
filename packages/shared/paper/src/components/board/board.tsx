@@ -116,12 +116,7 @@ export function Board({
                             type="button"
                             className="wsx-board-add"
                             onClick={() =>
-                              actions.mode === 'suggest'
-                                ? suggest.open({ group: name, groupBy, title: titleKey })
-                                : actions.create(bind.table, {
-                                    ...(name && { [groupBy]: name }),
-                                    [titleKey]: 'Untitled',
-                                  })
+                              actions.create({ group: name, groupBy, title: titleKey })
                             }
                           >
                             + New

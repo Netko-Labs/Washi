@@ -247,10 +247,11 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   dropped pre-D65 visibility props once per workspace (app meta `visibility_enforced`).
 - **A link may take suggestions (D120).** `<Sheet suggest>`, cached in `sheets.suggest`, set only
   by a person (Share → "Visitors can suggest rows", `sheets.setSuggest`; `guardWashiWrite` refuses
-  Washi turning it on), live only while public. Its Forms, Agenda's +, Slots and a Board's + New
+  Washi changing it either way; every update re-reads it off the root), live only while public. Its Forms, Agenda's +, Slots and a Board's + New
   (no `onAdd`) then ask "Your name" and "Your email" (plus a hidden trap) and send through the link
-  host's `suggestRow` → `POST /api/share/<ws>/<token>/suggest`, the address HMAC'd with
-  `WASHI_SECRET_KEY` there (C3). `suggestRow` writes only the columns those elements name or seed
+  host's `suggestRow` → `POST /api/share/<ws>/<token>/suggest`, the address (`visitorAddress`:
+  `cf-connecting-ip`, else the right-most X-Forwarded-For hop, else the peer) HMAC'd with
+  `WASHI_SECRET_KEY` there (C3) — no secret, no suggestions. `suggestRow` writes only the columns those elements name or seed
   (`writableColumns` off the page's own source); a redacted one is writable by type
   (`describeWritable` → `sharedWritable`), never read back. Cells pass `checkData`; refusals are
   words: 5 per address per 10 min, 30 a day, 200 pending a page. Nothing lands: a row in

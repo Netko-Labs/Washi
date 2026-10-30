@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import {
+  getSheet,
   getTableByName,
   insertSuggestion,
   listRecordChanges,
@@ -10,7 +11,7 @@ import {
 import { parse } from '@washi/wsx'
 import { guardWashiWrite, SheetNotFoundError } from '../sheets/access'
 import { updateSheetAccess, updateSheetSuggest } from '../sheets/look'
-import { createSheetFromSource } from '../sheets/service'
+import { createSheetFromSource, updateSheetFromSource } from '../sheets/service'
 import { ShareRefusedError, sharedPage, sharedQuery } from '../sheets/share'
 import { writableColumns } from '../suggestions/allowed'
 import { approveSuggestion, declineSuggestion } from '../suggestions/decide'
@@ -110,10 +111,24 @@ describe('a link that does not take suggestions is read-only', () => {
     expect(() => book(token, '2026-11-03T10:00/2026-11-03T10:30')).toThrow(ShareRefusedError)
   })
 
-  test('only a person turns suggestions on, never Washi', () => {
+  test('only a person turns suggestions on or off, never Washi', () => {
     const before = parse('<Sheet title="T" visibility="public"></Sheet>')
     const after = parse('<Sheet title="T" visibility="public" suggest={true}></Sheet>')
     expect(() => guardWashiWrite(before, after)).toThrow(/Only a person/)
+    expect(() => guardWashiWrite(after, before)).toThrow(/Only a person/)
+  })
+
+  test('the cache follows the page on every write: kept while the source keeps it', () => {
+    const { id } = link(true)
+    const source = (getSheet(ws, id)?.source ?? '').replace(
+      '</Sheet>',
+      '  <Text>More.</Text>\n</Sheet>',
+    )
+    expect(source).toContain('suggest')
+    updateSheetFromSource(ws, id, { title: 'Book a call', source })
+    expect(getSheet(ws, id)?.suggest).toBe(true)
+    updateSheetFromSource(ws, id, { title: 'Book a call', source: source.replace(' suggest', '') })
+    expect(getSheet(ws, id)?.suggest).toBe(false)
   })
 })
 
@@ -248,6 +263,26 @@ describe('a member decides in the Inbox', () => {
     declineSuggestion(ws, id ?? '', MEMBER)
     expect(runQuery(ws, { table: 'appts' }).rows).toHaveLength(1)
     expect(book(token, '2026-11-03T11:00/2026-11-03T11:30', 'ip-b').id).toBeString()
+  })
+
+  test('pages the member cannot read never crowd out the ones they can', () => {
+    const { token } = link(true)
+    book(token, '2026-11-03T11:00/2026-11-03T11:30')
+    const { id: hidden } = link(true)
+    updateSheetAccess(ws, hidden, { visibility: 'private', access: ['mei'] }, 'mei')
+    for (let index = 0; index < 200; index++) {
+      insertSuggestion(ws, {
+        sheetId: hidden,
+        tableName: 'ideas',
+        kind: 'row',
+        dateColumn: null,
+        cells: { idea: `#${index}` },
+        visitorName: 'Bot',
+        visitorEmail: 'bot@example.com',
+        ipHash: `ip-${index}`,
+      })
+    }
+    expect(suggestionInbox(ws, MEMBER).items.map((item) => item.visitorName)).toEqual(['Ana Ruiz'])
   })
 
   test('a member who cannot read the page never sees it', () => {

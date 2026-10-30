@@ -80,9 +80,9 @@ export function guardWashiWrite(before: WsxElement | null, after: WsxElement): v
       'This page is on a public link: keep every <Redact> and redact column it has.',
     )
   }
-  if (now.suggest && !was.suggest) {
+  if (Boolean(now.suggest) !== Boolean(was.suggest)) {
     throw new SheetAccessError(
-      "Only a person lets a page's link take suggestions. Leave the Sheet's suggest prop off.",
+      "Only a person decides whether a page's link takes suggestions. Keep the Sheet's suggest prop as it is.",
     )
   }
 }
