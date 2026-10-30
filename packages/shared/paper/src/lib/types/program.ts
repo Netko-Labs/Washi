@@ -1,5 +1,6 @@
-import type { WsxElement } from '@washi/wsx'
+import type { WsxElement, WsxValue } from '@washi/wsx'
 import type { ReactNode } from 'react'
+import type { PaperHost } from '../../provider'
 import type { BlockProps } from './style'
 
 /** Code compiled for a sandbox: its JS, or why not, in words. */
@@ -82,18 +83,52 @@ export interface Sandbox {
 export interface WidgetProps extends BlockProps {
   title?: string
   height?: number
-  /** The HTML, the Widget's own text. */
-  source: string
+  /** The page's own component it draws; none for a widget written as HTML before D113. */
+  component?: string
+  /** What the page hands that component, as drawn. */
+  args?: Record<string, WsxValue>
 }
+
+export interface WidgetFrameProps extends WidgetProps {
+  component: string
+}
+
+/** What a frame may ask the page; each is answered as the reader, by `id`. */
+export type WidgetAsk =
+  | { type: 'rows'; id: number; query: unknown }
+  | { type: 'table'; id: number; name: string }
+  | { type: 'pages'; id: number; of: string }
+  | { type: 'members'; id: number }
+  | { type: 'me'; id: number }
+  | { type: 'stored'; id: number; key: string }
+
+/** What a frame may change, only from the person's own press inside it. */
+export type WidgetWrite =
+  | { type: 'set'; key: string; value: unknown }
+  | { type: 'store'; key: string; value: unknown }
+  | { type: 'act'; action: unknown }
+  | { type: 'navigate'; id: string }
 
 /** What a widget's frame may say to the page: nothing else is heard. */
 export type WidgetMessage =
+  | WidgetAsk
+  | WidgetWrite
+  | { type: 'seed'; key: string; value: unknown }
   | { type: 'height'; value: number }
-  | { type: 'rows'; id: number; query: unknown }
-  | { type: 'set'; key: string; value: unknown }
-  | { type: 'act'; action: unknown }
 
 export type WidgetGate = 'asking' | 'off' | 'on'
+
+export type WidgetBundle =
+  | { status: 'building' }
+  | { status: 'failed'; reason: string }
+  | { status: 'ready'; document: string }
+
+/** What the page lends a frame's answers and writes. */
+export interface WidgetPage {
+  host: PaperHost
+  values: Record<string, string | number | boolean | null>
+  set: (key: string, value: string | number | boolean | null) => void
+}
 
 export interface FormulaProps extends BlockProps {
   name: string

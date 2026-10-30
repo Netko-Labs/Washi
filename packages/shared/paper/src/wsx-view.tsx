@@ -54,7 +54,7 @@ import {
 } from './components/text'
 import { Widget } from './components/widget'
 import { DataProvider } from './data'
-import { NowContext, resolveRow, resolveRowDeep } from './lib'
+import { NowContext, PageRootContext, resolveRow, resolveRowDeep } from './lib'
 import type { Row as DataRow } from './lib/types'
 import { exprTables } from './registry/share'
 import { SheetStateProvider, type SheetStateValue } from './state'
@@ -198,11 +198,14 @@ function renderElement(node: WsxElement, ctx: Ctx): ReactNode {
       return createElement(Source, { ...p, number: ctx.numbers.get(node) ?? 0 } as never, ...kids)
     case 'Ref':
       return createElement(Ref, p as never, ...(kids.length ? kids : []))
-    case 'Widget':
+    case 'Widget': {
+      const drawn = node.children[0]?.kind === 'element' ? node.children[0] : null
       return createElement(Widget, {
         ...p,
-        source: node.children.map((child) => (child.kind === 'text' ? child.value : '')).join(''),
+        component: drawn?.name,
+        args: drawn ? resolveProps(drawn, ctx.row) : undefined,
       } as never)
+    }
     case 'Include':
       return createElement(Include, {
         ...p,
@@ -239,16 +242,20 @@ function Tree({ root, isBody }: { root: WsxElement; isBody?: boolean }) {
     <SheetStateProvider initial={initialState(root)}>
       <DataProvider tables={tables}>
         <NowContext.Provider value={now}>
-          {isBody ? (
-            renderChildren(hasCode(root) ? literalOnly(root).children : root.children, { numbers })
-          ) : hasCode(root) ? (
-            <PageProgram
-              root={root}
-              draw={(drawn) => <Element node={drawn} ctx={{ numbers: numberFootnotes(drawn) }} />}
-            />
-          ) : (
-            <Element node={root} ctx={{ numbers }} />
-          )}
+          <PageRootContext.Provider value={root}>
+            {isBody ? (
+              renderChildren(hasCode(root) ? literalOnly(root).children : root.children, {
+                numbers,
+              })
+            ) : hasCode(root) ? (
+              <PageProgram
+                root={root}
+                draw={(drawn) => <Element node={drawn} ctx={{ numbers: numberFootnotes(drawn) }} />}
+              />
+            ) : (
+              <Element node={root} ctx={{ numbers }} />
+            )}
+          </PageRootContext.Provider>
         </NowContext.Provider>
       </DataProvider>
     </SheetStateProvider>

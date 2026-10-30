@@ -117,9 +117,14 @@ export type {
   Sandbox,
   SandboxBridge,
   SandboxSetup,
+  WidgetAsk,
+  WidgetBundle,
+  WidgetFrameProps,
   WidgetGate,
   WidgetMessage,
+  WidgetPage,
   WidgetProps,
+  WidgetWrite,
 } from './program'
 export type {
   BlockProps,

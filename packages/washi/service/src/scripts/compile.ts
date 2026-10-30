@@ -52,29 +52,6 @@ function scripts(node: WsxNode, path: string, out: FoundScript[]) {
   for (const child of node.children) scripts(child, here, out)
 }
 
-/** A widget is a block's worth of HTML; a page that carries more is refused at save. */
-export const WIDGET_MAX_CHARS = 50_000
-
-function widgetDiagnostics(node: WsxNode, path: string): Diagnostic[] {
-  if (node.kind !== 'element') return []
-  const here = path ? `${path} > ${node.name}` : node.name
-  const own =
-    node.name === 'Widget' &&
-    node.children.reduce(
-      (sum, child) => sum + (child.kind === 'text' ? child.value.length : 0),
-      0,
-    ) > WIDGET_MAX_CHARS
-      ? [
-          {
-            severity: 'error' as const,
-            path: here,
-            message: `widget: at most ${WIDGET_MAX_CHARS} characters`,
-          },
-        ]
-      : []
-  return [...own, ...node.children.flatMap((child) => widgetDiagnostics(child, here))]
-}
-
 export const textOf = (node: WsxElement) =>
   node.children.map((child) => (child.kind === 'text' ? child.value : '')).join('')
 
@@ -82,13 +59,12 @@ export const textOf = (node: WsxElement) =>
 export function scriptDiagnostics(root: WsxElement): Diagnostic[] {
   const found: FoundScript[] = []
   scripts(root, '', found)
-  const scripted = found.flatMap(({ path, source, entry }) => {
+  return found.flatMap(({ path, source, entry }) => {
     const compiled = compileScript(source, entry)
     return compiled.ok
       ? []
       : [{ severity: 'error' as const, path, message: `script: ${compiled.error}` }]
   })
-  return [...widgetDiagnostics(root, ''), ...scripted]
 }
 
 /** The page's `<Automation>` blocks, for the index a row write reads. */

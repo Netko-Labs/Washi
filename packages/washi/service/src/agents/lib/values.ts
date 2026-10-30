@@ -83,10 +83,12 @@ const open = useRows({ table: 'tasks', where: [{ column: 'done', op: 'eq', value
 <Sheet title="Tasks"><Stat label="Open" value={open.length} /><List>{open.map((task) => <Item key={task.id}>{task.title}</Item>)}</List></Sheet>
 Run sheet_check: code that will not compile, or imports anything else, is refused. Prefer plain
 primitives when they suffice.
-A <Widget title height> holds raw HTML/JS (a backtick string) for what primitives cannot draw — a
-canvas game, a custom chart; it reaches the page only through washi.rows(query), washi.state,
-washi.setState(key, value), washi.act(action); no network. It runs only if an owner allowed widgets —
-prefer page code or plain primitives.
+Only for what no primitive can draw — a canvas game, an svg dial — a <Widget title height> draws one
+of the page's own components with React in a sandboxed frame: define function Dial({ done }) in the
+page's code, then <Widget title="Done"><Dial done={done} /></Widget>. DOM elements (div, svg, canvas)
+and useRef/useEffect from washi belong to a widget's component alone; it gets the props the page hands
+it and the same washi hooks, writes only from a press inside it, and has no network. It runs only if
+an owner allowed widgets — prefer plain page code with registry primitives.
 For a rule that should happen whenever rows change — fill a default, log a change, keep two tables in
 step — write <Automation table="tasks" on="insert|update" title="…"> with a backtick string defining
 function run(event) (event: { table, kind, row, before }); rows(query) reads, act({ verb: 'table.insert'

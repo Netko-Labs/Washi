@@ -8,6 +8,8 @@ export interface Specimen {
   props?: Record<string, WsxValue>
   /** WSX inside the element; omitted for a self-closing primitive. */
   children?: string
+  /** The page's code above its markup: a component the element draws (a Widget's). */
+  code?: string
   /** WSX around the element, `<Here />` marking its place: a `within` parent, or a row scope. */
   wrap?: string
 }

@@ -4,6 +4,7 @@ export { useBind } from './hooks/use-bind'
 export { useExprValue } from './hooks/use-expr'
 export { useHistory } from './hooks/use-history'
 export { NowContext, useNow } from './hooks/use-now'
+export { PageRootContext, usePageRoot } from './hooks/use-page-root'
 export { useRunAction } from './hooks/use-run-action'
 export { useSelectOptions } from './hooks/use-select-options'
 export { useTableSpec } from './hooks/use-table-spec'
@@ -20,6 +21,7 @@ export {
   toRows,
 } from './rows'
 export { coverStyle, frameOf, mediaUrl } from './sheet-look'
+export { readStored, storedKey, writeStored } from './stored'
 export { reachOf, styled } from './styled'
 export { toneOf } from './tone-of'
 export type {

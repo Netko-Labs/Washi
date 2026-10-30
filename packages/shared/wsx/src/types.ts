@@ -44,11 +44,14 @@ export interface Diagnostic {
   path?: string
 }
 
-export type ChildPolicy = 'none' | 'text' | 'nodes'
+/** `component`: exactly one element naming one of the page's own components (a Widget's). */
+export type ChildPolicy = 'none' | 'text' | 'nodes' | 'component'
 
 export interface ComponentSpec {
   props: z.ZodType
   children: ChildPolicy
+  /** What a broken `component` policy says, when the default would not teach. */
+  childWords?: string
   /** Unknown prop → the legal alternative, so errors teach instead of scold. */
   hints?: Record<string, string>
   /** At most one per sheet (Mascot, Timer). */

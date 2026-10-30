@@ -5,6 +5,18 @@ export const FIRST_HEIGHT = 160
 /** How often a running widget asks again whether widgets are still allowed. */
 export const RECHECK_MS = 30_000
 
+/** The page's colours a frame wears, so it can look like it belongs without reading anything. */
+export const TOKENS = [
+  '--ink',
+  '--muted',
+  '--accent',
+  '--accent-ink',
+  '--card',
+  '--bg',
+  '--border',
+  '--muted-bg',
+]
+
 /**
  * No network at all — not even pictures, which could carry data out in their address. Scripts and
  * styles inline only; nothing loads, submits or navigates.
@@ -20,28 +32,26 @@ export const WIDGET_CSP = [
   "base-uri 'none'",
 ].join('; ')
 
-/** Inside the frame: `washi.rows`, `washi.state`, `washi.onState`, `washi.setState`, `washi.act`. */
-export const WIDGET_PRELUDE = `(() => {
-  const pending = new Map()
-  const listeners = new Set()
-  let next = 0
-  let state = {}
-  const send = (message) => parent.postMessage({ washi: true, ...message }, '*')
-  addEventListener('message', (event) => {
-    if (event.source !== parent || !event.data || !event.data.washi) return
-    const message = event.data
-    if (message.type === 'rows') { pending.get(message.id)?.(message.rows); pending.delete(message.id) }
-    if (message.type === 'state') { state = message.values; for (const listener of listeners) listener(state) }
-    if (message.type === 'tokens') document.documentElement.setAttribute('style', message.css)
-  })
-  window.washi = {
-    rows: (query) => new Promise((resolve) => { const id = ++next; pending.set(id, resolve); send({ type: 'rows', id, query }) }),
-    get state() { return state },
-    onState: (listener) => { listeners.add(listener); listener(state); return () => listeners.delete(listener) },
-    setState: (key, value) => send({ type: 'set', key, value }),
-    act: (action) => send({ type: 'act', action }),
-  }
-  const measure = () => send({ type: 'height', value: document.documentElement.scrollHeight })
-  new ResizeObserver(measure).observe(document.documentElement)
-  addEventListener('load', measure)
-})()`
+export const WIDGET_STYLE = `:root { color-scheme: light dark; }
+body { margin: 0; font: 14px/1.5 system-ui, sans-serif; color: var(--ink); background: transparent; }
+.washi-stopped { margin: 0; color: var(--muted); font-size: 13px; }`
+
+/** Code that throws before React has mounted still says why, in the frame. */
+export const WIDGET_ONERROR = `addEventListener('error', (event) => {
+  const said = document.createElement('p')
+  said.className = 'washi-stopped'
+  said.textContent = 'This widget stopped: ' + event.message
+  document.body.replaceChildren(said)
+})`
+
+export const HTML_WORDS = 'This widget was written as HTML; rewrite it as a JSX component.'
+
+/** What an ask answers when the page has nothing to say, or failed to. */
+export const EMPTY_ANSWERS: Record<string, unknown> = {
+  rows: [],
+  pages: [],
+  members: [],
+  table: null,
+  me: null,
+  stored: undefined,
+}

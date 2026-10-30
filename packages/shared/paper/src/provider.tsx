@@ -26,6 +26,8 @@ export interface PaperHost {
   loadSheet?(id: string): Promise<{ title: string; root: WsxElement } | null>
   /** A page that runs, bundled for the sandbox (D100); without it, only its literal parts draw. */
   compilePage?(source: string): Promise<CompiledScript>
+  /** One of the page's components bundled with React for a widget's frame; without it, none draw. */
+  compileWidget?(source: string, component: string): Promise<CompiledScript>
   /** Who is reading, for a page's `useMe()`; a host with no accounts leaves it out. */
   describeMe?(): Promise<{ id: string; name: string } | null>
   /** Whether an owner lets this workspace's pages run widgets; without it, none run. */

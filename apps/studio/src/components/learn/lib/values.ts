@@ -44,6 +44,7 @@ export const CHILD_POLICY_LABELS = {
   none: 'No children',
   text: 'Holds text',
   nodes: 'Holds blocks',
+  component: 'Draws one of the page’s components',
 }
 
 export const NAV_LINK =

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { parse, validate } from '@washi/wsx'
+import { domDiagnostics, parse, validate } from '@washi/wsx'
 import { paperRegistry } from '../../../registry'
 import { knobsFor } from '../../knobs'
 import { matrixAxes, matrixSource, specimenSource } from '../utils'
@@ -16,12 +16,24 @@ function errors(source: string): string[] {
 
 describe('specimens', () => {
   test('code kept as text is the code, not the literal that spells it', () => {
-    for (const name of ['Automation', 'Formula', 'Widget']) {
+    for (const name of ['Automation', 'Formula']) {
       const source = specimenSource({ ...FRAME, name, knobs: {}, childrenText: null })
       const element = parse(source).children.find((node) => node.kind === 'element')
       const text = element?.kind === 'element' ? element.children[0] : undefined
       expect(text?.kind === 'text' && text.value.startsWith('{`')).toBe(false)
     }
+  })
+
+  test('a widget’s specimen draws a component its own code defines, and that code is TSX', () => {
+    const source = specimenSource({ ...FRAME, name: 'Widget', knobs: {}, childrenText: null })
+    const root = parse(source)
+    expect(root.prelude?.components).toEqual(['Clock'])
+    expect(root.children[0]).toMatchObject({ name: 'Widget', children: [{ name: 'Clock' }] })
+    expect(domDiagnostics(root)).toEqual([])
+    const code = SPECIMENS.Widget?.code ?? ''
+    expect(new Bun.Transpiler({ loader: 'tsx' }).scan(code).imports).toEqual([
+      { path: 'washi', kind: 'import-statement' },
+    ])
   })
 
   test('every primitive but Sheet has one', () => {

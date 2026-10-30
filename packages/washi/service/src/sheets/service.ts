@@ -12,6 +12,7 @@ import {
 } from '@washi/repository'
 import {
   type Diagnostic,
+  domDiagnostics,
   extractFiles,
   extractMissing,
   extractRefs,
@@ -42,7 +43,7 @@ export function checkSource(source: string): WsxCheck {
     const diagnostics = [
       ...validate(root, paperRegistry),
       ...scriptDiagnostics(root),
-      ...(hasCode(root) ? pageCodeDiagnostics(source) : []),
+      ...(hasCode(root) ? [...pageCodeDiagnostics(source), ...domDiagnostics(root)] : []),
     ]
     return { ok: !hasErrors(diagnostics), diagnostics, missing: extractMissing(root) }
   } catch (error) {

@@ -1081,3 +1081,17 @@ Acceptance: every lab app valid at 1100 and 390, no sideways overflow, no page e
 
 Acceptance: service tests (subtree, unreadable, routine, restore; catalog, trash, restore, purge,
 reindex) pass; typecheck, Biome and `bun test` green.
+
+
+# Widgets are JSX (2026-10-29) — D113
+
+- [x] `<Widget><Clock /></Widget>`: child policy `component`, text refused in words, an HTML widget
+      draws a note; `widgetsAsNodes` keeps the component out of the page's run, props handed over
+- [x] `scripts.widget` / `compileWidget`: the page pipeline + React + `WIDGET_FRAME` (`washi` over
+      React), React traced into `.output`; `domDiagnostics` keeps DOM in widget components
+- [x] bridge: reads as the reader, writes only under focus + transient activation; `/widget`, book
+      specimen + recipe, `/learn` copy, Washi's instructions
+- [ ] later: a real-browser check of the frame (no DOM test env here — the frame side is untested)
+- [ ] later: one cached React runtime per session instead of ~220 KB per widget bundle
+
+Acceptance: wsx/paper/service/editor tests pass; typecheck, Biome, `bun test`, studio build green.

@@ -14,11 +14,13 @@ export function checkDrawn(
   if (sheet?.kind !== 'element' || sheet.name !== 'Sheet' || rest.length > 0) {
     return { reason: 'view() must draw one <Sheet>' }
   }
+  // The page's own components stay known: a Widget's child names one.
   const root: WsxElement = {
     kind: 'element',
     name: 'Sheet',
     props: page.props,
     children: sheet.children,
+    ...(page.prelude && { prelude: page.prelude }),
   }
   const errors = validate(root, paperRegistry).filter((each) => each.severity === 'error')
   if (errors.length === 0) return { root }
@@ -34,6 +36,8 @@ export function literalOnly(node: WsxElement): WsxElement {
   const children = node.children.flatMap((child): WsxNode[] => {
     if (child.kind === 'code') return []
     if (child.kind === 'text') return [child]
+    // A widget's component draws in its frame, not here: it is known before the page runs.
+    if (node.name === 'Widget') return [{ ...child, code: undefined }]
     if (child.code || !(child.name in paperRegistry.components)) return []
     return [literalOnly(child)]
   })

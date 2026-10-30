@@ -543,16 +543,24 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   that will not answer becomes a bare link. The network call lives in tsuru and is wired in trpc,
   never in `service` (C3). Each preview is a ledger row (`origin: 'sheet'`, `link_preview`, `auto`
   — or `denied` with tsuru's reason), as every press that reaches out is.
-- **A page may hold a widget, where an owner allows (D98).** `<Widget title height>` keeps HTML and JS
-  as its text (≤ 50 000 chars, checked at save) and draws it in an iframe `sandbox="allow-scripts"` —
-  no `allow-same-origin`, so an opaque origin with no cookies, storage or parent — under a CSP with
-  no network at all (`default-src 'none'`; pictures only `data:`/`blob:`, which can carry nothing out).
-  Its only way out is a `postMessage` bridge the prelude lends as `washi.rows(query)` (the reader's
-  rows), `washi.state` / `onState` / `setState` (page state, scalars), `washi.act(action)` (page
-  verbs) and its own height; the page hears only its own frame's messages (`useWidget`). The page's
-  colours arrive on load. App meta `widgets_enabled`, off by default: `embeds.widgets` /
-  `embeds.setWidgets` (owners and admins), Settings → Workspace → Embeds → Widgets; off, or on a
-  shared link, a widget is a note. `/widget` drops a clock.
+- **A widget is JSX, where an owner allows (D113, was D98).** `<Widget title height><Clock /></Widget>`
+  draws one of the page's own components (D100) with real React in an iframe `sandbox="allow-scripts"`
+  — no `allow-same-origin`, so an opaque origin with no cookies, storage or parent — under a CSP with
+  no network (`default-src 'none'`; pictures only `data:`/`blob:`). Its child is exactly one element
+  naming a prelude component (policy `component`); text — a pre-D113 HTML widget — is a warning, not
+  a refusal, so its page still saves: it draws a note in words, its text kept. `pageModule` turns a Widget's child into a drawn node
+  (`widgetsAsNodes`), so the page's sandbox never calls it: its props are evaluated there and handed
+  to the frame. `scripts.widget` (`compileWidget`) bundles the component through `compilePage`'s
+  pipeline — same allowlist, `page:` reads, cap, cache — with React (traced into `.output`,
+  `WIDGET_FILE_DEPS`) and the frame's `washi` (`WIDGET_FRAME`: the page hooks over React, plus
+  `useRef useEffect useLayoutEffect useMemo useCallback`). DOM elements are a widget's alone:
+  `domDiagnostics` refuses one outside a Widget's component, what it reaches, or an export. Reads ask
+  over `postMessage` and are answered as the reader (`useWidgetBridge`; `useStored` is the page's own
+  localStorage); a write — state, store, act, navigate — lands only while the frame holds focus under
+  the person's transient activation (`isPressed`). Colours arrive on load; height reports itself.
+  App meta `widgets_enabled`, off by default: `embeds.widgets` / `embeds.setWidgets` (owners and
+  admins), Settings → Workspace → Embeds → Widgets; off, on a shared link or a host without
+  `compileWidget`, a widget is a note. `/widget` drops a JSX clock, its component above the page.
 - **A page may hold an automation (D97).** `<Automation table on="insert|update" title>` keeps TSX
   defining `function run(event)` (`{ table, kind, row, before }`). Each write lands it in the index
   (`sheet_automations`, read off the page by `extractAutomations`; a trashed page's sleep). Every row

@@ -1,25 +1,42 @@
-import { useMemo, useRef } from 'react'
+import { useRef } from 'react'
 import { styled } from '../../lib'
-import type { WidgetProps } from '../../lib/types'
-import { useWidget, widgetDocument } from './lib'
+import type { WidgetFrameProps, WidgetProps } from '../../lib/types'
+import { HTML_WORDS, useWidget } from './lib'
 
 /**
- * A page's own HTML in a frame with no origin of its own and no network: it reaches the page only
- * through `washi.rows / state / setState / act`, and runs only where an owner turned widgets on.
+ * One of the page's own components, drawn with React in a frame with no origin of its own and no
+ * network (D113): it reaches the page only through `washi`'s hooks, and runs only where an owner
+ * turned widgets on. One written as HTML before D113 is a note; its text stays in the source.
  */
-export function Widget({ title, height, source, ...rest }: WidgetProps) {
+export function Widget({ component, ...props }: WidgetProps) {
+  if (component) return <WidgetFrame component={component} {...props} />
+  const { title, height: _height, args: _args, ...rest } = props
+  return (
+    <figure {...styled(rest, 'wsx-widget')}>
+      <p className="wsx-embed-blocked">
+        <span>
+          {title && <strong>{title} · </strong>}
+          {HTML_WORDS}
+        </span>
+      </p>
+    </figure>
+  )
+}
+
+function WidgetFrame({ title, height, component, args, ...rest }: WidgetFrameProps) {
   const frame = useRef<HTMLIFrameElement>(null)
-  const { gate, height: measured, onLoad } = useWidget(frame)
-  const document = useMemo(() => widgetDocument(source), [source])
+  const { gate, bundle, height: measured, onLoad } = useWidget(frame, component, args)
+  const name = title ?? 'A widget'
+  const isWaiting = gate === 'asking' || (gate === 'on' && bundle.status === 'building')
 
   return (
     <figure {...styled(rest, 'wsx-widget')}>
-      {gate === 'on' && (
+      {gate === 'on' && bundle.status === 'ready' && (
         <iframe
           ref={frame}
-          title={title ?? 'A widget'}
+          title={name}
           sandbox="allow-scripts"
-          srcDoc={document}
+          srcDoc={bundle.document}
           style={{ height: height ?? measured }}
           onLoad={onLoad}
         />
@@ -27,13 +44,19 @@ export function Widget({ title, height, source, ...rest }: WidgetProps) {
       {gate === 'off' && (
         <p className="wsx-embed-blocked">
           <span>
-            <strong>{title ?? 'A widget'}</strong> runs its own code — widgets are off in this
-            workspace.
+            <strong>{name}</strong> runs its own code — widgets are off in this workspace.
           </span>
         </p>
       )}
-      {gate === 'asking' && <div className="wsx-embed-wait" style={{ height: height ?? 80 }} />}
-      {title && gate === 'on' && <figcaption>{title}</figcaption>}
+      {gate === 'on' && bundle.status === 'failed' && (
+        <p className="wsx-embed-blocked">
+          <span>
+            <strong>{name}</strong> can’t draw: {bundle.reason}
+          </span>
+        </p>
+      )}
+      {isWaiting && <div className="wsx-embed-wait" style={{ height: height ?? 80 }} />}
+      {title && gate === 'on' && bundle.status === 'ready' && <figcaption>{title}</figcaption>}
     </figure>
   )
 }

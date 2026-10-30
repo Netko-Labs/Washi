@@ -21,6 +21,8 @@ const RUNTIME_FILE_DEPS = [
   'lodash-es',
   'zod',
 ]
+// React for a widget's frame (D113), bundled at runtime off disk like a page's libraries.
+const WIDGET_FILE_DEPS = ['react', 'react-dom', 'scheduler']
 
 // Built servers only: HSTS on a dev https *.localhost would pin every local project for a year.
 const HSTS_HEADER = { 'strict-transport-security': 'max-age=31536000; includeSubDomains' }
@@ -50,7 +52,7 @@ export default defineConfig(({ command }) => ({
     tanstackStart(),
     nitro({
       preset: 'bun',
-      traceDeps: RUNTIME_FILE_DEPS.map((name) => `${name}*`),
+      traceDeps: [...RUNTIME_FILE_DEPS, ...WIDGET_FILE_DEPS].map((name) => `${name}*`),
       experimental: { websocket: true },
       handlers: [
         { route: '/trpc-ws', handler: './src/server/trpc-ws.ts' },

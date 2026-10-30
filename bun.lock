@@ -324,6 +324,8 @@
         "lodash-es": "^4",
         "mirinjs": "0.1.0-alpha.19",
         "quickjs-emscripten-core": "0.32.0",
+        "react": "^19.2.7",
+        "react-dom": "^19.2.7",
         "zod": "^4.4.3",
       },
       "devDependencies": {

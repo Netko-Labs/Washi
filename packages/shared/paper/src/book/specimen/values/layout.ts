@@ -22,9 +22,9 @@ export const LAYOUT_SPECIMENS: Record<string, Specimen> = {
   PageLink: { props: { sheet: 'budget' } },
   Include: { props: { sheet: 'budget' } },
   Widget: {
+    code: "import { useNow } from 'washi'\n\nfunction Clock() {\n  const now = new Date(useNow())\n  return <div style={{ font: '600 40px system-ui', color: 'var(--accent)' }}>{now.toLocaleTimeString()}</div>\n}",
     props: { title: 'A clock', height: 90 },
-    children:
-      '{`<div id="t" style="font: 600 40px system-ui; color: var(--accent)"></div>\n<script>setInterval(() => { t.textContent = new Date().toLocaleTimeString() }, 1000)</script>`}',
+    children: '<Clock />',
   },
   Formula: {
     props: { name: 'with_tax', title: 'Price with tax' },

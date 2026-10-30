@@ -57,7 +57,18 @@ function propIssue(
   return prop ? `prop ${prop}: ${issue.message}` : issue.message
 }
 
-function checkChildren(node: WsxElement, spec: ComponentSpec, path: string, out: Diagnostic[]) {
+function checkChildren(node: WsxElement, spec: ComponentSpec, path: string, walk: Walk) {
+  const { out } = walk
+  if (spec.children === 'component') {
+    const [only, ...rest] = node.children
+    const isComponent = only?.kind === 'element' && walk.components.has(only.name)
+    const words = spec.childWords ?? `<${node.name}> takes one of the page's own components`
+    // Text from before components (an old widget's HTML) draws a note; refusing it would lock the page.
+    const isOldText =
+      node.children.length > 0 && node.children.every((child) => child.kind === 'text')
+    if (isOldText) out.push({ severity: 'warning', message: words, path })
+    else if (!isComponent || rest.length > 0) error(out, path, words)
+  }
   if (spec.children === 'none' && node.children.length > 0) {
     error(out, path, `<${node.name}> does not take children`)
   }
@@ -144,7 +155,7 @@ function visit(node: WsxNode, ancestors: string[], path: string, walk: Walk) {
   const owner = [...ancestors].reverse().find((name) => spec.within?.includes(name))
   const props = owner ? spec.propsWithin?.[owner] : undefined
   checkProps(node, props ? { ...spec, props } : spec, nodePath, walk)
-  checkChildren(node, spec, nodePath, walk.out)
+  checkChildren(node, spec, nodePath, walk)
   checkPlacement(node, spec, ancestors, nodePath, walk)
   for (const child of node.children) visit(child, next, nodePath, walk)
 }
