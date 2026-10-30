@@ -21,7 +21,7 @@ export function RoutinePage({ workspaceId, routineId, template, tab }: RoutinePa
 
   return (
     <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-none">
-      <div className="mx-auto w-full max-w-[760px] px-6 pt-6 pb-16">
+      <div className="fab-room mx-auto w-full max-w-[760px] px-6 pt-6">
         <Link
           to="/w/$workspaceId/routines"
           params={{ workspaceId }}

@@ -18,7 +18,7 @@ export function DatabasesPage() {
 
   return (
     <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-none">
-      <div className="mx-auto w-full max-w-[760px] px-6 py-10">
+      <div className="fab-room mx-auto w-full max-w-[760px] px-6 pt-10">
         <h1 className="font-semibold text-[26px] tracking-[-0.02em]">Databases</h1>
         <p className="mt-1 text-[13.5px] text-muted-foreground leading-relaxed">
           Every table in this workspace, and the pages that show it. One on no page still keeps its

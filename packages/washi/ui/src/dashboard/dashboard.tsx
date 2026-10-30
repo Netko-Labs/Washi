@@ -31,7 +31,7 @@ export function Dashboard() {
 
   return (
     <div className="flex-1 overflow-y-auto overscroll-y-none">
-      <section className="mx-auto max-w-[940px] px-4 pt-6 pb-[60px] md:px-10 md:pt-11">
+      <section className="fab-room mx-auto max-w-[940px] px-4 pt-6 md:px-10 md:pt-11">
         <h1 className="mb-1 font-semibold text-[28px] tracking-[-0.02em]">
           {greeting()}, {firstName}
         </h1>

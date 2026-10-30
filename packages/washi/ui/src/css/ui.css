@@ -20,6 +20,19 @@
   --measure: 100%;
 }
 
+/*
+ * Washi's button sits over the bottom-right corner (60px, 24px in; 56px, 16px in on a phone):
+ * what scrolls or types under it ends clear of it. Unlayered, so it beats a pb-* utility.
+ */
+.fab-room {
+  padding-bottom: 96px;
+}
+@media (max-width: 767px) {
+  .fab-room {
+    padding-bottom: calc(88px + env(safe-area-inset-bottom));
+  }
+}
+
 /* Native controls and scrollbars follow the mode; without it a dark page wears light chrome. */
 :root {
   color-scheme: light;
