@@ -45,17 +45,20 @@
   cursor: text;
 }
 .wsx-db-reading[data-num] {
-  text-align: right;
   font-variant-numeric: tabular-nums;
 }
 /* A number never widens its column past this; the rest is cut, the whole value one press away. */
 .wsx-db-reading[data-num],
 .wsx-db-formula[data-num] {
   max-width: 240px;
-  margin-left: auto;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+/* Figures line up right in a table's column; a row's own property list reads them left. */
+.wsx-db-table :is(.wsx-db-reading, .wsx-db-input, .wsx-db-formula)[data-num] {
+  margin-left: auto;
+  text-align: right;
 }
 .wsx-db-reading:hover {
   background: var(--muted-bg);

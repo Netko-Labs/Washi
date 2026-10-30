@@ -60,7 +60,6 @@
   background: var(--bg);
 }
 .wsx-db-input[data-num] {
-  text-align: right;
   font-variant-numeric: tabular-nums;
 }
 .wsx-db-table td[data-title] .wsx-db-input {
@@ -168,7 +167,4 @@
   color: var(--ink);
   font-variant-numeric: tabular-nums;
   cursor: default;
-}
-.wsx-db-formula[data-num] {
-  text-align: right;
 }
