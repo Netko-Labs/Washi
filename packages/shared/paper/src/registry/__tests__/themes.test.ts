@@ -7,6 +7,7 @@ import {
   ThemeImportError,
   themeChecks,
   themeFile,
+  themeRefusal,
   toHex,
 } from '../index'
 
@@ -34,6 +35,14 @@ describe('a theme is accepted only when', () => {
     const checks = themeChecks({ light: soft, dark: THEMES.washi.dark })
     expect(isThemeRefused(checks)).toBe(false)
     expect(checks.some((check) => check.verdict === 'warn')).toBe(true)
+  })
+
+  test('a refusal reads as the save says it, naming the mode that fails', () => {
+    const dark = { ...THEMES.washi.dark, ink: THEMES.washi.dark.bg }
+    expect(themeRefusal(themeChecks({ light: THEMES.washi.light, dark }))).toBe(
+      'Ink on the page is 1.0:1 in dark — it needs 4.5:1 to be read',
+    )
+    expect(themeRefusal(themeChecks(THEMES.washi))).toBeNull()
   })
 })
 

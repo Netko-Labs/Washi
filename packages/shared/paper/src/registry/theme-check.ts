@@ -38,3 +38,11 @@ export function themeChecks(pair: Pick<ThemePair, 'light' | 'dark'>): ThemeCheck
 
 export const isThemeRefused = (checks: ThemeCheck[]) =>
   checks.some((check) => check.verdict === 'refuse')
+
+/** The first refused pairing in words, as a save refuses it: which pairing, which mode, how far. */
+export function themeRefusal(checks: ThemeCheck[]): string | null {
+  const refused = checks.find((check) => check.verdict === 'refuse')
+  if (!refused) return null
+  const { rule, ratio, mode } = refused
+  return `${rule.label} is ${ratio.toFixed(1)}:1 in ${mode} — it needs ${rule.refuse}:1 to be read`
+}

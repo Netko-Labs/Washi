@@ -16,6 +16,7 @@ export interface ThemeEditorState {
   setToken: (token: keyof ThemeTokens, color: string) => void
   startFrom: (key: string) => void
   checks: ThemeCheck[]
+  refusal: string | null
   isRefused: boolean
 }
 

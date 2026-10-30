@@ -186,6 +186,7 @@ export {
   wallMinute,
 } from './shared/cron'
 export { processSingleton } from './shared/process'
+export { themeNameClash } from './shared/themes'
 export {
   acceptFor,
   byteRange,

@@ -95,7 +95,12 @@ export function ThemeEditor({ initial, onSave, onClose }: ThemeEditorProps) {
         </p>
       )}
       {state.error && <p className="text-[12.5px] text-destructive">{state.error}</p>}
-      <div className="flex justify-end gap-2">
+      <div className="flex flex-wrap items-center justify-end gap-2">
+        {editor.refusal && (
+          <p role="status" className="mr-auto min-w-0 text-[12.5px] text-destructive">
+            {editor.refusal}
+          </p>
+        )}
         <button
           type="button"
           onClick={onClose}
