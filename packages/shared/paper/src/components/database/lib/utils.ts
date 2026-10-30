@@ -96,9 +96,18 @@ export function dateLabel(start: string, end: string, locale?: string): string {
   const from = new Date(`${start.slice(0, 10)}T00:00:00`)
   if (Number.isNaN(from.getTime())) return start
   const to = end ? new Date(`${end.slice(0, 10)}T00:00:00`) : null
-  return to && !Number.isNaN(to.getTime()) && to > from
-    ? format.formatRange(from, to)
-    : format.format(from)
+  return fullYears(
+    to && !Number.isNaN(to.getTime()) && to > from
+      ? format.formatRangeToParts(from, to)
+      : format.formatToParts(from),
+  )
+}
+
+/** Intl writes year 1 as "1"; a date column means `0001`. */
+function fullYears(parts: Intl.DateTimeFormatPart[]): string {
+  return parts
+    .map((part) => (part.type === 'year' ? part.value.padStart(4, '0') : part.value))
+    .join('')
 }
 
 /** A board's order lives in a number column named `rank`; it orders cards, nobody reads it. */

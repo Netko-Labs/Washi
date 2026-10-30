@@ -108,6 +108,9 @@
 .wsx-form-trigger {
   align-self: flex-start;
 }
+.wsx-form-landed {
+  align-self: flex-start;
+}
 .wsx-form-trigger-plus {
   margin-top: -1px;
   font-size: 17px;

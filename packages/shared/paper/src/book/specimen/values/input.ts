@@ -43,6 +43,7 @@ export const INPUT_SPECIMENS: Record<string, Specimen> = {
     props: {
       table: 'tasks',
       fields: ['title', 'priority', 'due', 'points', 'blocked'],
+      required: ['title'],
       defaults: { status: 'todo', done: false },
       submit: 'Add task',
     },

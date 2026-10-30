@@ -62,6 +62,7 @@ and string props ("$row.title", row="$row.id").
 Actions are objects, never functions: <Button action={{ verb: 'table.insert', table, data }}>.
 When a person types the row (an expense: name, amount, category, date), use a Form, not a Button:
 <Form table="expenses" fields={['name', 'amount', 'category', 'date']} submit="Add expense" />.
+required={['name', 'amount']} names the fields it will not send without (each one it shows).
 trigger="Add expense" puts the form behind one button, in a modal — the default for a page that is mostly
 for reading. For rows with a date (events, bills, deadlines) a week is an <Agenda bind={{ table: 'events' }}
 date="date" title="title" time="start" end="end" badge="kind" add={['title', 'start', 'end', 'kind']}

@@ -545,14 +545,16 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   day then +N more, a list of busy days under 560px); `state` names a `YYYY-MM` page-state key it
   follows and ‹ › Today write, so it moves with a month `Select`.
   `<Form trigger>` puts a form behind one button in a native `<dialog>` (`FormDialog`: top layer,
-  Escape, a bottom sheet under 560px, closes when the row lands). An empty data view is a quiet
-  filled line, not a dashed box.
+  Escape, a bottom sheet under 560px, the first field focused, closes when the row lands and the
+  trigger says Added). `required` names fields it won't send without — each said in words, never a
+  silently disabled button. An empty data view is a quiet filled line, not a dashed box.
 - **A page can take bookings (D102).** `<Slots bind date minutes hours days add addLabel>` is
-  Calendly's picker: each allowed weekday's `hours` (`09:00-17:00`) cut into `minutes` slots, minus
-  rows whose `date` overlaps (a `start/end` range; a lone moment takes `minutes`, a bare day the
-  whole day) and minus the past, all in wall-clock strings — zones never enter. A press opens the
+  Calendly's picker: each allowed weekday's `hours` (`09:00-17:00`) cut into `minutes` slots, those
+  under a row's `date` struck through as booked (a `start/end` range; a lone moment takes `minutes`,
+  a bare day the whole day), the past left out — a week with none left opens on the next
+  (`openingWeek`) — all in wall-clock strings, zones never enter. A press opens the
   `add` Form in a dialog with `date` seeded `start/end`; as it is sent the day is read again
-  (`useSlotBooking`, the form's `check`), and a slot taken meanwhile is refused in words. Week paging is Agenda's (`useAgendaPeriod`). Agenda reads a row's times off its own range
+  (`useSlotBooking`, the form's `check`), and a slot taken meanwhile is refused in words; a booking is said back ("Booked Tue 3 Nov, 10:00"). Week paging is Agenda's (`useAgendaPeriod`). Agenda reads a row's times off its own range
   when it has no `time` column, and draws a range on each day it spans (≤ 31, `AGENDA_SPAN_DAYS`).
 - **Days as a grid (D103).** `<Heatmap bind date value weeks label weekStart>` is GitHub's calendar:
   the last `weeks` (4–53, default 16) whole weeks to today, a column per week, each day leveled 1–4

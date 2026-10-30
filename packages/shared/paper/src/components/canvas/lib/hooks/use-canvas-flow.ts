@@ -11,7 +11,10 @@ export function useCanvasFlow(canvas: WsxElement, commit: (n: IdeaNode[], e: Ide
 
   useEffect(() => {
     const next = fromWsx(canvas)
-    setNodes(next.nodes)
+    setNodes((shown) => {
+      const picked = new Set(shown.filter((node) => node.selected).map((node) => node.id))
+      return next.nodes.map((node) => (picked.has(node.id) ? { ...node, selected: true } : node))
+    })
     setEdges(next.edges)
   }, [canvas, setNodes, setEdges])
 
@@ -43,19 +46,18 @@ export function useCanvasFlow(canvas: WsxElement, commit: (n: IdeaNode[], e: Ide
       const id = `${connection.source}->${connection.target}`
       commit(nodes, addEdge({ ...connection, id }, edges))
     },
-    addNode: (x: number, y: number) =>
-      commit(
-        [
-          ...nodes,
-          {
-            id: nextId(nodes),
-            type: 'idea',
-            position: { x, y },
-            data: { label: 'New idea', tone: null, page: null },
-          },
-        ],
-        edges,
-      ),
+    addNode: (x: number, y: number) => {
+      const added: IdeaNode = {
+        id: nextId(nodes),
+        type: 'idea',
+        position: { x, y },
+        data: { label: 'New idea', tone: null, page: null },
+        selected: true,
+      }
+      const next = [...nodes.map((node) => ({ ...node, selected: false })), added]
+      setNodes(next)
+      commit(next, edges)
+    },
     rename: (id: string, label: string) =>
       commit(
         nodes.map((node) => (node.id === id ? { ...node, data: { ...node.data, label } } : node)),

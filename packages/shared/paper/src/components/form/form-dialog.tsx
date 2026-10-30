@@ -7,17 +7,31 @@ import type { FormDialogProps } from './lib'
 /**
  * A form over the page: the browser's own modal, so focus stays in it, Escape closes it and it
  * sits above everything. It closes once the row lands; each opening starts from a clean draft.
+ * The browser would focus ×, the first thing it can; the first field is where typing starts.
  */
-export function FormDialog({ open, onClose, title, table, seed, ...rest }: FormDialogProps) {
+export function FormDialog({
+  open,
+  onClose,
+  onAdded,
+  title,
+  table,
+  seed,
+  ...rest
+}: FormDialogProps) {
   const db = useDatabase(table)
   const dialog = useRef<HTMLDialogElement>(null)
+  const isReady = db !== null && typeof db === 'object'
 
   useEffect(() => {
     const el = dialog.current
     if (!el) return
     if (open && !el.open) el.showModal()
     if (!open && el.open) el.close()
-  }, [open])
+    const form = el.querySelector('form')
+    if (open && isReady && form && !form.contains(document.activeElement)) {
+      form.querySelector<HTMLElement>('input, select, textarea')?.focus()
+    }
+  }, [open, isReady])
 
   return (
     <dialog
@@ -38,7 +52,16 @@ export function FormDialog({ open, onClose, title, table, seed, ...rest }: FormD
           (db === null || db === 'unreadable' || db === 'missing' ? (
             <FormUnavailable db={db} table={table} />
           ) : (
-            <FormBody db={db} seed={seed} onAdded={onClose} onCancel={onClose} {...rest} />
+            <FormBody
+              db={db}
+              seed={seed}
+              onAdded={() => {
+                onAdded?.()
+                onClose()
+              }}
+              onCancel={onClose}
+              {...rest}
+            />
           ))}
       </div>
     </dialog>

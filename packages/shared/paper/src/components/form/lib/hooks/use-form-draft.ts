@@ -1,16 +1,20 @@
 import { useState } from 'react'
 import { useRunAction } from '../../../../lib'
 import { useSheetState } from '../../../../state'
-import { ADDED_FOR_MS } from '../constants'
+import { ADDED_FOR_MS, NOTHING_TYPED } from '../constants'
 import type { FormDraft, FormDraftOptions, FormEntries, FormStatus } from '../types'
-import { hasEntries, reasonOf, resolveDefaults, rowOf } from '../utils'
+import { hasEntries, missingOf, reasonOf, resolveDefaults, rowOf } from '../utils'
 
 const IDLE: FormStatus = { kind: 'idle' }
 
-/** The row being typed, sent through the page's action path so ink validates it server-side. */
+/**
+ * The row being typed, sent through the page's action path so ink validates it server-side.
+ * A send with a required field empty, or nothing typed at all, is turned back in words.
+ */
 export function useFormDraft({
   table,
   written,
+  required,
   defaults,
   seed,
   reset,
@@ -22,21 +26,32 @@ export function useFormDraft({
   const [entries, setEntries] = useState<FormEntries>({})
   const [status, setStatus] = useState<FormStatus>(IDLE)
   const values = { ...resolveDefaults(defaults, state), ...seed, ...entries }
-  const canSubmit = hasEntries(entries) && status.kind !== 'busy'
 
   const set: FormDraft['set'] = (column, value) => {
     setEntries((previous) => ({ ...previous, [column]: value }))
-    setStatus(IDLE)
+    setStatus((now) => {
+      const left = now.kind === 'missing' ? now.columns.filter((name) => name !== column) : []
+      return left.length > 0 ? { kind: 'missing', columns: left } : IDLE
+    })
   }
 
   const submit = async () => {
-    if (!canSubmit) return
+    if (status.kind === 'busy') return null
+    const missing = missingOf(required, values)
+    if (missing.length > 0) {
+      setStatus({ kind: 'missing', columns: missing })
+      return missing[0] ?? null
+    }
+    if (!hasEntries(entries)) {
+      setStatus({ kind: 'refused', reason: NOTHING_TYPED })
+      return null
+    }
     setStatus({ kind: 'busy' })
     try {
       const refusal = await check?.()
       if (refusal) {
         setStatus({ kind: 'refused', reason: refusal })
-        return
+        return null
       }
       await run({ verb: 'table.insert', table, data: rowOf(written, values) })
       if (reset) setEntries({})
@@ -46,7 +61,8 @@ export function useFormDraft({
     } catch (cause) {
       setStatus({ kind: 'refused', reason: reasonOf(cause) })
     }
+    return null
   }
 
-  return { values, set, status, canSubmit, submit }
+  return { values, set, status, submit }
 }

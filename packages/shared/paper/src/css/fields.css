@@ -126,6 +126,14 @@ select.wsx-field-input {
 .wsx-field-error {
   color: var(--tone-danger-text);
 }
+.wsx-field-required {
+  margin-left: 3px;
+  color: var(--tone-danger-text);
+}
+.wsx-field-input[aria-invalid],
+.wsx-form-list:has([aria-invalid]) {
+  border-color: var(--tone-danger);
+}
 .wsx-field[data-kind="boolean"] {
   flex-direction: row;
   flex-wrap: wrap;
@@ -147,6 +155,10 @@ select.wsx-field-input {
 }
 .wsx-field[data-kind="boolean"] .wsx-form-check {
   margin: 0;
+}
+.wsx-field[data-kind="boolean"] .wsx-field-error {
+  flex-basis: 100%;
+  order: 2;
 }
 
 .wsx-select-row {

@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import type { TableSpec } from '@washi/ink'
 import { hasErrors, parse, validate } from '@washi/wsx'
 import { paperRegistry } from '../../../registry'
-import { formPlan, hasEntries, resolveDefaults, rowOf } from '../lib'
+import { formPlan, hasEntries, missingOf, resolveDefaults, rowOf } from '../lib'
 
 const expenses: TableSpec = {
   name: 'expenses',
@@ -48,6 +48,24 @@ describe('which columns a Form writes (D75)', () => {
   })
 })
 
+describe('a Form’s required fields', () => {
+  test('are shown fields; a required name the form does not show is refused in words', () => {
+    const plan = formPlan(expenses, ['name', 'amount', 'paid'], undefined, ['name', 'paid', 'date'])
+    expect(names(plan.required)).toEqual(['name', 'paid'])
+    expect(plan.refused).toEqual(['“date” is required but is not one of the form’s fields'])
+  })
+
+  test('send nothing while empty — blank text, an empty list, an unticked box', () => {
+    const { required } = formPlan(expenses, undefined, undefined, ['name', 'tags', 'paid'])
+    expect(missingOf(required, { name: '  ', tags: [], paid: false })).toEqual([
+      'name',
+      'tags',
+      'paid',
+    ])
+    expect(missingOf(required, { name: 'Lunch', tags: ['work'], paid: true })).toEqual([])
+  })
+})
+
 describe('what a Form sends', () => {
   test('a `{ state }` default reads the picker; unset state leaves the column alone', () => {
     const defaults = { date: { state: 'picked' }, paid: false }
@@ -82,12 +100,12 @@ describe('the Form primitive', () => {
       paperRegistry,
     )
 
-  test('validates with fields, defaults (literal and state), submit and reset', () => {
+  test('validates with fields, required, defaults (literal and state), submit and reset', () => {
     expect(hasErrors(page(''))).toBe(false)
     expect(
       hasErrors(
         page(
-          `fields={['name', 'amount', 'category', 'date']} defaults={{ date: { state: 'picked' }, paid: false, tags: ['home'] }} submit="Add expense" reset={false}`,
+          `fields={['name', 'amount', 'category', 'date']} required={['name', 'amount']} defaults={{ date: { state: 'picked' }, paid: false, tags: ['home'] }} submit="Add expense" reset={false}`,
         ),
       ),
     ).toBe(false)
@@ -96,6 +114,7 @@ describe('the Form primitive', () => {
   test('refuses a field named twice, no fields, a stray prop or a malformed default', () => {
     expect(hasErrors(page(`fields={['name', 'name']}`))).toBe(true)
     expect(hasErrors(page('fields={[]}'))).toBe(true)
+    expect(hasErrors(page('required={[]}'))).toBe(true)
     expect(hasErrors(page(`action={{ verb: 'table.insert' }}`))).toBe(true)
     expect(hasErrors(page(`defaults={{ date: { state: 'picked', or: 1 } }}`))).toBe(true)
   })

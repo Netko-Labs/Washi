@@ -1,7 +1,15 @@
-import type { FormChoiceProps } from './lib'
+import { type FormChoiceProps, fieldAria } from './lib'
 
 /** Multi-select and relation: chips to drop, a menu to add. */
-export function FormList({ id, column, value, onChange, choices }: FormChoiceProps) {
+export function FormList({
+  id,
+  column,
+  value,
+  onChange,
+  choices,
+  required,
+  error,
+}: FormChoiceProps) {
   const items = Array.isArray(value) ? value : typeof value === 'string' && value ? [value] : []
   const label = (item: string) => choices.find((choice) => choice.value === item)?.label ?? item
   const rest = choices.filter((choice) => !items.includes(choice.value))
@@ -20,6 +28,7 @@ export function FormList({ id, column, value, onChange, choices }: FormChoicePro
       ))}
       <select
         id={id}
+        {...fieldAria(id, required, error)}
         className="wsx-db-add"
         value=""
         disabled={rest.length === 0}

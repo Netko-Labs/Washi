@@ -1,11 +1,12 @@
-import type { FormChoiceProps, FormInputProps } from './lib'
+import { type FormChoiceProps, type FormInputProps, fieldAria } from './lib'
 
 /** Select, status and person: one choice, or none. */
-export function FormChoice({ id, value, onChange, choices }: FormChoiceProps) {
+export function FormChoice({ id, value, onChange, choices, required, error }: FormChoiceProps) {
   const current = typeof value === 'string' ? value : ''
   return (
     <select
       id={id}
+      {...fieldAria(id, required, error)}
       className="wsx-field-input"
       value={current}
       onChange={(event) => onChange(event.currentTarget.value || null)}
@@ -23,10 +24,11 @@ export function FormChoice({ id, value, onChange, choices }: FormChoiceProps) {
   )
 }
 
-export function FormCheck({ id, value, onChange }: FormInputProps) {
+export function FormCheck({ id, value, onChange, required, error }: FormInputProps) {
   return (
     <input
       id={id}
+      {...fieldAria(id, required, error)}
       type="checkbox"
       className="wsx-form-check"
       checked={value === true}

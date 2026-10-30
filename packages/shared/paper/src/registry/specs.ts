@@ -467,6 +467,8 @@ const dataIn: Record<string, ComponentSpec> = {
       defaults: z.record(columnName, z.union([cellSchema, stateRefSchema])).optional(),
       submit: z.string().min(1).max(40).optional(),
       reset: z.boolean().optional(),
+      /** Fields that must be filled before the row is sent; each is one the form shows. */
+      required: z.array(columnName).min(1).max(32).optional(),
       /** A button with these words opens the form in a modal instead of laying it on the page. */
       trigger: z.string().min(1).max(40).optional(),
       title: z.string().min(1).max(80).optional(),
