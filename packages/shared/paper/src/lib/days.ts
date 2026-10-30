@@ -15,26 +15,39 @@ const MOMENT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/
 /** A whole day or moment, nothing after it: `2026-10-31T10:00 kickoff` is text, not a date. */
 const WHEN = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:?\d{2})?)?$/
 
-function momentLabel(value: string, locale?: string): string {
-  if (!MOMENT.test(value)) return dayLabel(value, locale)
-  return new Date(`${value.slice(0, 16)}:00Z`).toLocaleString(locale, {
+/** Intl writes year 1 as "1"; a date column means `0001`. */
+function formatUtc(date: Date, locale: string | undefined, options: Intl.DateTimeFormatOptions) {
+  return new Intl.DateTimeFormat(locale, { ...options, timeZone: 'UTC' })
+    .formatToParts(date)
+    .map((part) => (part.type === 'year' ? part.value.padStart(4, '0') : part.value))
+    .join('')
+}
+
+function momentLabel(value: string, thisYear: number, locale?: string): string {
+  const day = {
     month: 'short',
     day: 'numeric',
+    ...(Number(value.slice(0, 4)) !== thisYear && { year: 'numeric' }),
+  } as const
+  if (!MOMENT.test(value)) return formatUtc(new Date(`${value}T00:00:00Z`), locale, day)
+  return formatUtc(new Date(`${value.slice(0, 16)}:00Z`), locale, {
+    ...day,
     hour: '2-digit',
     minute: '2-digit',
-    timeZone: 'UTC',
   })
 }
 
 /**
  * A date cell in words — "Oct 3", "Oct 3, 10:00", or a `start/end` range as "Oct 3 – Oct 5" —
- * as written, never shifted between zones. Anything else is left as it is.
+ * as written, never shifted between zones; a year other than the reader's is spelled out.
+ * Anything else is left as it is.
  */
-export function whenLabel(value: string, locale?: string): string {
+export function whenLabel(value: string, locale?: string, now = new Date()): string {
   const [start, end, ...rest] = value.split('/')
   if (!start || rest.length > 0 || !WHEN.test(start) || (end !== undefined && !WHEN.test(end))) {
     return value
   }
-  const from = momentLabel(start, locale)
-  return end ? `${from} – ${momentLabel(end, locale)}` : from
+  const thisYear = now.getFullYear()
+  const from = momentLabel(start, thisYear, locale)
+  return end ? `${from} – ${momentLabel(end, thisYear, locale)}` : from
 }
