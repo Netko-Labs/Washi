@@ -1,6 +1,6 @@
 import type { QuickJSContext, QuickJSWASMModule } from 'quickjs-emscripten-core'
 import type { Sandbox, SandboxBridge, SandboxSetup } from '../types'
-import { SANDBOX_STACK_BYTES } from './values'
+import { CRYPTO_SHIM, MAX_RANDOM_BYTES, SANDBOX_STACK_BYTES } from './values'
 
 let engine: Promise<QuickJSWASMModule> | null = null
 
@@ -31,10 +31,21 @@ function lend(vm: QuickJSContext, names: string[], current: { bridge: SandboxBri
   }
 }
 
+/** Random bytes as hex, from the host's `crypto`: what `CRYPTO_SHIM` builds a package's on. */
+function lendRandom(vm: QuickJSContext) {
+  const handle = vm.newFunction('__random', (count) => {
+    const size = Math.min(MAX_RANDOM_BYTES, Math.max(0, Math.floor(vm.getNumber(count)) || 0))
+    const bytes = crypto.getRandomValues(new Uint8Array(size))
+    return vm.newString(Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join(''))
+  })
+  vm.setProp(vm.global, '__random', handle)
+  handle.dispose()
+}
+
 /**
  * A fresh QuickJS: no DOM, no network, no timers, a memory cap and a deadline on every run. Its
  * only ways out are the `__bridge_<name>` functions it was opened with, answered by whatever bridge
- * the current call lends. The code itself runs once, inside the same deadline; a throw closes it.
+ * the current call lends, and `__random` behind a Web `crypto` (random bytes, nothing else). The code itself runs once, inside the same deadline; a throw closes it.
  */
 export async function openSandbox(js: string, setup: SandboxSetup): Promise<Sandbox> {
   const quickjs = await loadEngine()
@@ -44,6 +55,7 @@ export async function openSandbox(js: string, setup: SandboxSetup): Promise<Sand
   const vm = runtime.newContext()
   const current: { bridge: SandboxBridge | null } = { bridge: null }
   lend(vm, setup.names, current)
+  lendRandom(vm)
 
   const run = (code: string, bridge: SandboxBridge | null) => {
     current.bridge = bridge
@@ -66,7 +78,7 @@ export async function openSandbox(js: string, setup: SandboxSetup): Promise<Sand
   }
 
   // `;` first: a bundle opening with `(` would otherwise call whatever the prelude ended on.
-  const opened = run(`${setup.prelude};\n${js}`, null)
+  const opened = run(`${CRYPTO_SHIM};\n${setup.prelude};\n${js}`, null)
   if (!opened.ok) {
     vm.dispose()
     runtime.dispose()
