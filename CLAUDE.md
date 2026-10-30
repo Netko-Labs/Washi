@@ -327,6 +327,22 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   own file when the runtime opens it for the first time (no `.db` yet), never again (C1). The
   runtime lends the policy to service per workspace (`lendServerPolicy`, C3); embedded lends none
   and behaves as before.
+- **A server may lend pages npm packages (D116).** Settings → Server → Page packages: `name@version`
+  (exact, a range or a tag, `pagePackageSpec`: npm names only, never a URL, git, a path or Washi's
+  own). The list is the policy's (`instance_setting` `page_packages`, `{ name, spec, version }`);
+  the files are the runtime's (`runtime/page-packages`): npm's abbreviated metadata picks one exact
+  version and refuses `hasInstallScript` before anything downloads, then `bun add --exact
+  --ignore-scripts --linker=hoisted` into `<dataDir>/page-packages`, with no server env; a package
+  with no ES module entry is taken out again. Installs run one at a time; a row says installing,
+  ready (version · size) or failed in words. At boot what is on disk is ready at once and the rest
+  installs again, so a redeploy keeps them. The admin's own press reaches npm from the runtime,
+  never an agent tool (A1) nor service (C3): service is lent only what is ready
+  (`lendServerPolicy`'s third argument → `pagePackagesOf(ws)`), and `compilePage`, `compileWidget`
+  and `checkSource(source, ws)` resolve those from the cache like `PAGE_LIBRARIES` — inside the
+  package's folder, the same 768 KB cap, versions in the cache key. A package off the list is
+  "not on this server's page packages — an admin can add it in Settings → Server"; removed, its
+  pages stop in those words. Washi's instructions list them each turn (`instructionsFor`).
+  Embedded installs none.
 - **A chat is its starter's (D67).** `agent_sessions.created_by`; null is the workspace's (a
   routine's runs, every chat before D67). `chatProcedure` answers NOT_FOUND for any `sessionId`
   that is someone else's, and the agent subscriptions, `pendingApprovals` and `today` drop their
@@ -633,8 +649,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   markup in `export default function view()`.
   `compilePage` (service `pages/`, `scripts.page`) bundles it with `Bun.build` — `washi` (the hooks,
   `PAGE_HOOKS`, as calls into `globalThis.__washi`), `washi/ui` (registry names), `PAGE_LIBRARIES`
-  (`date-fns`, `lodash-es`, `zod`, resolved off disk) and `page:<id>` (a page the reader can read,
-  transitively, ≤ 8 deep) — into one IIFE that sets `globalThis.__page = { view, exports }`; cached
+  (`date-fns`, `lodash-es`, `zod`, resolved off disk), the server's page packages (D116) and
+  `page:<id>` (a page the reader can read, transitively, ≤ 8 deep) — into one IIFE that sets `globalThis.__page = { view, exports }`; cached
   by source + imported sources (64), ≤ 768 KB. Anything else is refused in words, at save too
   (`pageCodeDiagnostics`: Transpiler + the allowlist; an export may not call a hook — hoisted
   out of `view()`, it would run once at load — `hoistedHookCalls`). The studio declares the libraries so Nitro

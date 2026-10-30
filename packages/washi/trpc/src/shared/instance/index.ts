@@ -1,5 +1,7 @@
 export type {
   InstanceStore,
+  PagePackageRow,
+  PagePackageStore,
   ServerKeyInfo,
   ServerKeyUse,
   ServerSearchKeyInfo,

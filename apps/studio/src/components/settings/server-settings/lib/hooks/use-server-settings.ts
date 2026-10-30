@@ -3,6 +3,7 @@ import { api } from '@/integrations/trpc'
 import type { ModelOption } from '@/lib/types'
 import type { ProviderId, SignupMode } from '../../../lib'
 import type { ServerSettingsState, WorkspaceDefaultsState } from '../types'
+import { INSTALL_POLL_MS } from '../values'
 
 const messageOf = (cause: unknown, fallback: string) =>
   cause instanceof Error ? cause.message : fallback
@@ -33,6 +34,13 @@ export function useServerSettings() {
       )
       .catch(() => {})
   }, [refresh])
+
+  const isInstalling = settings?.pagePackages.some((row) => row.status === 'installing') ?? false
+  useEffect(() => {
+    if (!isInstalling) return
+    const timer = setInterval(() => void refresh(), INSTALL_POLL_MS)
+    return () => clearInterval(timer)
+  }, [isInstalling, refresh])
 
   const patch = (next: Partial<ServerSettingsState>) =>
     setSettings((current) => (current ? { ...current, ...next } : current))
@@ -103,6 +111,20 @@ export function useServerSettings() {
     setWidgets: (enabled: boolean) =>
       attempt(async () => {
         patch({ widgets: await api.instance.setWidgets.mutate({ enabled }) })
+      }),
+    addPagePackage: async (spec: string): Promise<string | null> => {
+      try {
+        await api.instance.addPagePackage.mutate({ spec })
+        await refresh()
+        return null
+      } catch (cause) {
+        return messageOf(cause, 'The package was not added.')
+      }
+    },
+    removePagePackage: (name: string) =>
+      attempt(async () => {
+        await api.instance.removePagePackage.mutate({ name })
+        await refresh()
       }),
     setDefaults: (defaults: WorkspaceDefaultsState) =>
       attempt(async () => {

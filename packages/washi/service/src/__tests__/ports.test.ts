@@ -94,7 +94,7 @@ describe('a Stop pressed before the turn starts', () => {
     const port = createClaudeSdkPort({
       ws,
       catalogue: createModelCatalogue(),
-      instructions: '',
+      instructions: () => '',
       runHankoAction: async () => {},
       canUseTool: async () => ({ behavior: 'deny', message: 'no' }),
     })

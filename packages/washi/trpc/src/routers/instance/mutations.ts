@@ -5,7 +5,7 @@ import {
   integrationKeySchema,
   workspaceDefaultsSchema,
 } from '@washi/domain'
-import { embedHostList, fetchHostList } from '@washi/service'
+import { embedHostList, fetchHostList, PagePackageError, pagePackageSpec } from '@washi/service'
 import { z } from 'zod'
 import { adminProcedure, router } from '../../init'
 import { SIGNUP_MODES } from '../../shared/instance'
@@ -59,6 +59,21 @@ export const instanceMutations = router({
     .mutation(async ({ ctx, input }) => {
       await ctx.instance.setWidgets(input.enabled)
       return input.enabled
+    }),
+  /** Listed at once, installed on the server after (D116): the row says installing, ready or why not. */
+  addPagePackage: adminProcedure
+    .input(z.object({ spec: z.string().max(300) }))
+    .mutation(({ ctx, input }) => {
+      const store = ctx.runtime.pagePackages
+      if (!store) throw new PagePackageError('this server installs no page packages')
+      return store.add(pagePackageSpec(input.spec))
+    }),
+  /** Pages importing it stop running, with the reason in words; nothing else changes. */
+  removePagePackage: adminProcedure
+    .input(z.object({ name: z.string().min(1).max(214) }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.runtime.pagePackages?.remove(input.name)
+      return { removed: true }
     }),
   /** Only a workspace made from now on starts with these; existing ones keep their own. */
   setDefaults: adminProcedure.input(workspaceDefaultsSchema).mutation(async ({ ctx, input }) => {

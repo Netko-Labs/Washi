@@ -26,6 +26,7 @@ import {
 } from '@washi/wsx'
 import { pageCodeDiagnostics } from '../pages'
 import { extractAutomations, extractFormulas, scriptDiagnostics } from '../scripts/compile'
+import { pagePackagesOf } from '../server'
 import { guardWashiWrite, syncShare } from './access'
 import { accessOf, lookOf } from './look-of'
 
@@ -36,14 +37,19 @@ export interface WsxCheck {
   missing: WsxMissing[]
 }
 
-/** Parse + registry-validate WSX source. Warnings (the complexity budget) never block a save. */
-export function checkSource(source: string): WsxCheck {
+/**
+ * Parse + registry-validate WSX source. Warnings (the complexity budget) never block a save.
+ * Without the workspace, page code imports only Washi's own libraries.
+ */
+export function checkSource(source: string, ws?: Workspace): WsxCheck {
   try {
     const root = parse(source)
     const diagnostics = [
       ...validate(root, paperRegistry),
       ...scriptDiagnostics(root),
-      ...(hasCode(root) ? [...pageCodeDiagnostics(source), ...domDiagnostics(root)] : []),
+      ...(hasCode(root)
+        ? [...pageCodeDiagnostics(source, pagePackagesOf(ws)), ...domDiagnostics(root)]
+        : []),
     ]
     return { ok: !hasErrors(diagnostics), diagnostics, missing: extractMissing(root) }
   } catch (error) {
@@ -64,8 +70,8 @@ export class SheetValidationError extends Error {
   }
 }
 
-function parseValidated(source: string) {
-  const check = checkSource(source)
+function parseValidated(ws: Workspace, source: string) {
+  const check = checkSource(source, ws)
   if (!check.ok) throw new SheetValidationError(check.diagnostics)
   return parse(source)
 }
@@ -76,7 +82,7 @@ export function createSheetFromSource(
   parentId: string | null = null,
   editedBy: SheetAuthor = null,
 ): SheetDetail {
-  const root = parseValidated(write.source)
+  const root = parseValidated(ws, write.source)
   if (parentId) requireSheet(ws, parentId)
   if (editedBy === 'washi') guardWashiWrite(null, root)
   const access = accessOf(root)
@@ -108,7 +114,7 @@ function mergedSource(ws: Workspace, id: string, write: SheetWrite, baseVersion?
     throw new SheetConflictError(id)
   }
   if (merged === null) throw new Error(`sheet not found: ${id}`)
-  if (merged !== write.source && !checkSource(merged).ok) throw new SheetConflictError(id)
+  if (merged !== write.source && !checkSource(merged, ws).ok) throw new SheetConflictError(id)
   return merged
 }
 
@@ -119,7 +125,7 @@ export function updateSheetFromSource(
   editedBy: SheetAuthor = null,
   baseVersion?: string,
 ): SheetDetail {
-  parseValidated(write.source)
+  parseValidated(ws, write.source)
   const source = mergedSource(ws, id, write, baseVersion)
   const root = parse(source)
   if (editedBy === 'washi') guardWashiWrite(parse(requireSheet(ws, id).source), root)

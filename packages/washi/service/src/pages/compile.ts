@@ -1,15 +1,17 @@
 import { sep } from 'node:path'
+import type { PagePackageSet } from '@washi/domain'
 import { PAGE_HOOKS, PAGE_IMPORT, paperRegistry, WIDGET_HOOKS } from '@washi/paper/registry'
 import { pageModule } from '@washi/wsx'
-import { isAllowedImport } from './check'
-import type { BundleTarget, CompiledPage, PageSource } from './types'
 import {
-  IMPORT_WORDS,
-  LIBRARY,
-  PAGE_CACHE_SIZE,
-  PAGE_IMPORT_DEPTH,
-  PAGE_JS_MAX_BYTES,
-} from './values'
+  importRefusal,
+  insidePackage,
+  isAllowedImport,
+  packageKey,
+  packagePattern,
+  realDir,
+} from './imports'
+import type { BundleTarget, CompiledPage, PageSource } from './types'
+import { LIBRARY, PAGE_CACHE_SIZE, PAGE_IMPORT_DEPTH, PAGE_JS_MAX_BYTES } from './values'
 
 const NS = 'washi'
 const transpiler = new Bun.Transpiler({ loader: 'tsx' })
@@ -33,7 +35,7 @@ function insideLibrary(path: string): string {
   const name = LIBRARY.exec(path)?.[1] ?? ''
   const resolved = Bun.resolveSync(path, import.meta.dir)
   if (!resolved.includes(`${sep}node_modules${sep}${name}${sep}`)) {
-    throw new Error(`cannot import "${path}" — ${IMPORT_WORDS}`)
+    throw new Error(importRefusal(path, null))
   }
   return resolved
 }
@@ -56,7 +58,17 @@ function importedPages(module: string, read: PageSource): Map<string, string> {
   return found
 }
 
-function plugin(module: string, pages: Map<string, string>, target: BundleTarget): Bun.BunPlugin {
+function plugin(
+  module: string,
+  pages: Map<string, string>,
+  target: BundleTarget,
+  packages: PagePackageSet | null,
+): Bun.BunPlugin {
+  const listed = packagePattern(packages)
+  const root = realDir(packages)
+  // A server package's own React (a component kit's peer) is the frame's, never a second copy.
+  const lendsReact = (importer: string) =>
+    importer === 'washi' || Boolean(root && importer.startsWith(root + sep))
   return {
     name: 'washi-page',
     setup(build) {
@@ -64,13 +76,18 @@ function plugin(module: string, pages: Map<string, string>, target: BundleTarget
       build.onResolve({ filter: /^washi(\/ui)?$/ }, ({ path }) => ({ path, namespace: NS }))
       build.onResolve({ filter: PAGE_IMPORT }, ({ path }) => ({ path, namespace: NS }))
       build.onResolve({ filter: LIBRARY }, ({ path }) => ({ path: insideLibrary(path) }))
+      if (listed && packages && root) {
+        build.onResolve({ filter: listed }, ({ path }) => ({
+          path: insidePackage(path, packages, root),
+        }))
+      }
       build.onResolve({ filter: REACT }, ({ path, importer }) =>
-        target.react && importer === 'washi'
+        target.react && lendsReact(importer)
           ? { path: Bun.resolveSync(path, import.meta.dir) }
           : undefined,
       )
       build.onResolve({ filter: /.*/, namespace: NS }, ({ path }) => {
-        throw new Error(`cannot import "${path}" — ${IMPORT_WORDS}`)
+        throw new Error(importRefusal(path, packages))
       })
       build.onLoad({ filter: /.*/, namespace: NS }, ({ path }) => {
         if (path === 'washi:entry') return { contents: target.entry, loader: 'js' }
@@ -107,23 +124,27 @@ const PAGE_TARGET: BundleTarget = {
 /**
  * A page's module bundled for where it runs: the libraries and pages it imports, `washi` as that
  * place lends it. Nothing in it reaches the network — every import is resolved here, from the
- * vetted list or a page the reader may read. Cached by everything that went in.
+ * vetted list, the server's installed page packages or a page the reader may read. Cached by
+ * everything that went in.
  */
 export async function bundle(
   module: string,
   read: PageSource,
   target: BundleTarget,
   key: string[],
+  packages: PagePackageSet | null,
 ): Promise<CompiledPage> {
   let pages: Map<string, string>
   try {
-    const refused = transpiler.scan(module).imports.find(({ path }) => !isAllowedImport(path))
-    if (refused) return failure(`cannot import "${refused.path}" — ${IMPORT_WORDS}`)
+    const refused = transpiler
+      .scan(module)
+      .imports.find(({ path }) => !isAllowedImport(path, packages))
+    if (refused) return failure(importRefusal(refused.path, packages))
     pages = importedPages(module, read)
   } catch (error) {
     return failure(error)
   }
-  const hash = Bun.hash([...key, ...pages.values()].join('\0')).toString(36)
+  const hash = Bun.hash([...key, packageKey(packages), ...pages.values()].join('\0')).toString(36)
   const known = cache.get(hash)
   if (known) return remember(hash, known)
 
@@ -135,7 +156,7 @@ export async function bundle(
       minify: target.minify,
       define: { 'process.env.NODE_ENV': '"production"' },
       jsx: { runtime: 'classic', factory: 'h', fragment: 'Fragment' },
-      plugins: [plugin(module, pages, target)],
+      plugins: [plugin(module, pages, target, packages)],
       throw: false,
     })
     const output = built.outputs[0]
@@ -151,9 +172,13 @@ export async function bundle(
 }
 
 /** A page bundled for the reader's QuickJS sandbox (D100), `washi`'s hooks calls into its own. */
-export async function compilePage(source: string, read: PageSource): Promise<CompiledPage> {
+export async function compilePage(
+  source: string,
+  read: PageSource,
+  packages: PagePackageSet | null = null,
+): Promise<CompiledPage> {
   try {
-    return await bundle(pageModule(source), read, PAGE_TARGET, ['page', source])
+    return await bundle(pageModule(source), read, PAGE_TARGET, ['page', source], packages)
   } catch (error) {
     return failure(error)
   }

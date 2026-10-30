@@ -21,7 +21,8 @@ export interface ClaudeSdkPortDeps {
   ws: Workspace
   /** Prices a stopped turn, which the SDK never reports a total for. */
   catalogue: ModelCatalogue
-  instructions: string
+  /** Read as each turn starts, so a change on the server reaches the next one. */
+  instructions: () => string
   runHankoAction: (input: unknown) => Promise<void>
   openSheet?: (id: string) => void
   listPeople?: () => Promise<Member[]>
@@ -134,7 +135,7 @@ export function createClaudeSdkPort(deps: ClaudeSdkPortDeps): AgentPort {
             // Replaces the subprocess env rather than merging — see agentEnv. A
             // local CLI gets no key at all, so it authenticates as its own login.
             env: agentEnv(local ? null : credential.apiKey, configDir),
-            systemPrompt: deps.instructions,
+            systemPrompt: deps.instructions(),
             canUseTool: async (toolName, input) =>
               deps.canUseTool(request.sessionId, toolName, input),
           },

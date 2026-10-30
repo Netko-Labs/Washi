@@ -21,6 +21,7 @@ export const SETTING_KEYS = {
   embedHosts: 'embed_hosts',
   widgets: 'widgets',
   defaults: 'workspace_defaults',
+  pagePackages: 'page_packages',
 } as const
 
 /** A fresh server lets its first account in; after that, only invited emails. */

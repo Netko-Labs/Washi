@@ -75,6 +75,7 @@ describe('the server policy (D105)', () => {
       embedHosts: [],
       widgets: true,
       defaults: {},
+      pagePackages: [],
     })
     await settings.setWidgets(false)
     await settings.setDefaults({ turnCap: 40 })
@@ -104,5 +105,24 @@ describe('the server policy (D105)', () => {
       embedHosts: [],
       widgets: false,
     })
+  })
+
+  test('the page packages (D116) load at boot, and one bad entry drops the row, never the rest', async () => {
+    const nanoid = { name: 'nanoid', spec: '^5', version: '5.1.6' }
+    const { store } = memoryRows({
+      [SETTING_KEYS.pagePackages]: JSON.stringify([nanoid]),
+      [SETTING_KEYS.fetchHosts]: '["api.example.com"]',
+    })
+    const settings = settingsOver(store)
+    await settings.load()
+    expect(settings.policy().pagePackages).toEqual([nanoid])
+
+    await settings.setPagePackages([{ name: 'ms', spec: 'latest', version: null }])
+    expect(settings.policy().pagePackages).toEqual([{ name: 'ms', spec: 'latest', version: null }])
+
+    const garbled = memoryRows({ [SETTING_KEYS.pagePackages]: '[{"name":""}]' })
+    const fallen = settingsOver(garbled.store)
+    await fallen.load()
+    expect(fallen.policy()).toMatchObject({ pagePackages: [], widgets: true })
   })
 })

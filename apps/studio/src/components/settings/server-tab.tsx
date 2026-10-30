@@ -1,6 +1,7 @@
 import { SIGNUP_OPTIONS } from './lib'
 import {
   HostListCard,
+  PagePackagesCard,
   ServerKeyCard,
   ServerSearchKeyCard,
   ServerWidgetsCard,
@@ -57,6 +58,11 @@ export function ServerTab() {
             onSave={(hosts) => server.setHosts('embed', hosts)}
           />
           <ServerWidgetsCard widgets={settings.widgets} onChange={server.setWidgets} />
+          <PagePackagesCard
+            packages={settings.pagePackages}
+            onAdd={server.addPagePackage}
+            onRemove={server.removePagePackage}
+          />
         </>
       )}
       {error && <p className="text-[13px] text-destructive">{error}</p>}

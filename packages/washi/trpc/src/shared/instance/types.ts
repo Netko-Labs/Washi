@@ -1,4 +1,4 @@
-import type { ServerPolicy, WorkspaceDefaults } from '@washi/domain'
+import type { PagePackage, ServerPolicy, WorkspaceDefaults } from '@washi/domain'
 import type { AgentCredentialInput } from '../../init'
 import type { SIGNUP_MODES } from './values'
 
@@ -37,6 +37,8 @@ export interface InstanceStore {
   setEmbedHosts(hosts: string[]): Promise<void>
   setWidgets(enabled: boolean): Promise<void>
   setDefaults(defaults: WorkspaceDefaults): Promise<void>
+  /** The admin's list as the installer keeps it (D116); only the runtime's installer writes it. */
+  setPagePackages(packages: PagePackage[]): Promise<void>
   keyInfo(): Promise<ServerKeyInfo | null>
   setKey(actorId: string, credential: AgentCredentialInput): Promise<{ last4: string }>
   setKeyModel(actorId: string, model: string | null): Promise<void>
@@ -46,4 +48,20 @@ export interface InstanceStore {
   setSearchKey(actorId: string, key: string): Promise<{ last4: string }>
   /** Workspaces without an Exa key of their own lose web search. */
   removeSearchKey(): Promise<void>
+}
+
+/** A page package's row in Settings → Server: its install as it stands, in words when it failed. */
+export interface PagePackageRow extends PagePackage {
+  status: 'installing' | 'ready' | 'failed'
+  /** The package's own folder, unpacked; its dependencies not counted. */
+  bytes: number | null
+  error: string | null
+}
+
+/** The server's page packages (D116), installed on the server by the runtime. Absent in embedded. */
+export interface PagePackageStore {
+  list(): PagePackageRow[]
+  /** Listed at once; the install runs on and the row says how it went. */
+  add(wanted: { name: string; spec: string }): Promise<PagePackageRow>
+  remove(name: string): Promise<void>
 }

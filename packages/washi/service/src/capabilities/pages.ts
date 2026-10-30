@@ -32,7 +32,7 @@ export function pageCapabilities(ws: Workspace, context: CapabilityContext): Cap
       'Validate WSX source without saving. Returns diagnostics — run before sheet_create/sheet_replace.',
       { source: z.string() },
       true,
-      ({ source }) => checkSource(source),
+      ({ source }) => checkSource(source, ws),
     ),
     capability(
       'sheet_backlinks',

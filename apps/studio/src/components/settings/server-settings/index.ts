@@ -1,5 +1,6 @@
 export { HostListCard } from './host-list-card'
 export { useServerSettings } from './lib'
+export { PagePackagesCard } from './page-packages-card'
 export { ServerKeyCard } from './server-key-card'
 export { ServerSearchKeyCard } from './server-search-key-card'
 export { ServerWidgetsCard } from './server-widgets-card'

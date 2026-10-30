@@ -81,7 +81,7 @@ export function liftScriptsIntoCode(ws: Workspace): void {
     }
     const moved = scriptsAsCode(root)
     if (moved === null) continue
-    const source = [moved, scriptsAsCodeBlocks(root)].find((each) => checkSource(each).ok)
+    const source = [moved, scriptsAsCodeBlocks(root)].find((each) => checkSource(each, ws).ok)
     // Only what checks is written. A page wrong in some other way keeps its Scripts and is tried
     // again at the next open, until someone fixes it — never stored invalid, never forgotten.
     if (source) rewriteSourceQuietly(ws, sheet.id, source, lookOf(root))

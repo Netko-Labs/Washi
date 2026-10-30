@@ -8,7 +8,8 @@ export const PAGE_CACHE_SIZE = 64
 /** How deep `page:` imports may chain before a loop is assumed. */
 export const PAGE_IMPORT_DEPTH = 8
 
-export const IMPORT_WORDS = `a page imports from washi, washi/ui, ${PAGE_LIBRARIES.join(', ')} or page:<id>`
-
 /** A library or a subpath of it; no segment may start with a dot, so none climbs out (`..`). */
 export const LIBRARY = new RegExp(`^(${PAGE_LIBRARIES.join('|')})(/[\\w-][\\w.-]*)*$`)
+
+export const NOT_LISTED_WORDS =
+  "is not on this server's page packages — an admin can add it in Settings → Server"

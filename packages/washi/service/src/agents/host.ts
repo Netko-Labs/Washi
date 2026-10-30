@@ -30,6 +30,7 @@ import { CapabilityDesk } from './desk'
 import { ChatMoveError, moveChat } from './handover'
 import { conversationHistory } from './history'
 import { createEmbeddedKeySource } from './inference'
+import { instructionsFor } from './instructions'
 import type {
   AgentActivity,
   AgentCredential,
@@ -50,13 +51,7 @@ import type {
   SessionOptions,
   TodayReport,
 } from './lib'
-import {
-  IMAGE_TYPES,
-  MAX_INLINE_FILE_BYTES,
-  SDK_EFFORT,
-  SYSTEM_INSTRUCTIONS,
-  titleFrom,
-} from './lib'
+import { IMAGE_TYPES, MAX_INLINE_FILE_BYTES, SDK_EFFORT, titleFrom } from './lib'
 import { proposedDiff } from './normalize'
 import {
   type AgentPort,
@@ -113,7 +108,7 @@ export class AgentHost {
     this.claudePort = createClaudeSdkPort({
       ws,
       catalogue: models,
-      instructions: SYSTEM_INSTRUCTIONS,
+      instructions: () => instructionsFor(ws),
       runHankoAction,
       openSheet,
       listPeople,
@@ -122,7 +117,7 @@ export class AgentHost {
     })
     this.aiSdkPort = createAiSdkPort({
       ws,
-      instructions: SYSTEM_INSTRUCTIONS,
+      instructions: () => instructionsFor(ws),
       runHankoAction,
       openSheet,
       listPeople,
