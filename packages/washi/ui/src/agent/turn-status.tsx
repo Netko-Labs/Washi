@@ -11,11 +11,11 @@ const sayFailure = (error: unknown) =>
 const retry = () => void useAgentStore.getState().retryTurn().catch(sayFailure)
 const stop = () => void useAgentStore.getState().stopTurn().catch(sayFailure)
 
-/** How the chat on screen stands at its end: working, gone quiet, or failed — each in words (D114). */
+/** The chat on screen at its end: working, gone quiet, stopped or failed — in words (D114). */
 export function TurnStatus({ variant, mark = true }: TurnStatusProps) {
   const view = useTurnView()
   const elapsed = useElapsed(
-    view.state === 'idle' || view.state === 'failed' ? null : view.startedAt,
+    view.state === 'working' || view.state === 'stalled' ? view.startedAt : null,
   )
   const isPage = variant === 'page'
   const type = isPage ? 'text-[14px]' : 'text-[12px]'
@@ -32,6 +32,24 @@ export function TurnStatus({ variant, mark = true }: TurnStatusProps) {
       >
         <IconAlertTriangle className="mt-0.5 size-4 shrink-0 text-destructive" />
         <p className="min-w-0 flex-1 break-words text-destructive">{view.failureText}</p>
+        {view.canRetry && (
+          <button type="button" onClick={retry} className={ACTION}>
+            <IconRefresh className="size-3.5" />
+            Retry
+          </button>
+        )}
+      </div>
+    )
+  }
+
+  if (view.state === 'stopped') {
+    return (
+      <div
+        data-turn-status="stopped"
+        role="status"
+        className={`flex items-center gap-2 text-muted-foreground ${type} ${isPage ? 'sm:pl-[42px]' : 'px-4 pb-3'}`}
+      >
+        <span className="min-w-0 flex-1">Stopped</span>
         {view.canRetry && (
           <button type="button" onClick={retry} className={ACTION}>
             <IconRefresh className="size-3.5" />

@@ -124,6 +124,12 @@ export interface AttachMenuProps {
   canUpload: boolean
 }
 
+/** The page picker's words and the row lit for Enter. */
+export interface PageSearch {
+  term: string
+  active: number
+}
+
 export interface ComposerState {
   draft: string
   attachments: AttachmentRef[]

@@ -106,8 +106,8 @@ export interface ChatTurnProps {
   block: WashiBlock
   workspaceId: string
   isLive: boolean
-  /** The chat's last failure, which the turn status draws instead. */
-  failureId: string | null
+  /** The chat's last failure or stop, which the turn status draws instead. */
+  endId: string | null
 }
 
 export interface ChatPersonProps {

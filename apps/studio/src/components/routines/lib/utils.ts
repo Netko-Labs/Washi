@@ -68,6 +68,7 @@ export function wallLabel(key: string): string {
     weekday: 'short',
     day: 'numeric',
     month: 'short',
+    ...(day.getUTCFullYear() !== new Date().getFullYear() && { year: 'numeric' }),
     timeZone: 'UTC',
   })
   return `${label}, ${time}`

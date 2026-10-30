@@ -32,7 +32,7 @@ export function RoutineListRow({ workspaceId, routine, onToggle }: RoutineListRo
           </span>
         </span>
         <span className="hidden shrink-0 text-right text-[12px] text-muted-foreground sm:block">
-          {routine.enabled ? (next ? `Next ${wallLabel(next)}` : 'Not this week') : 'Paused'}
+          {routine.enabled ? (next ? `Next ${wallLabel(next)}` : 'Never due') : 'Paused'}
         </span>
         <ToggleSwitch
           isOn={routine.enabled}

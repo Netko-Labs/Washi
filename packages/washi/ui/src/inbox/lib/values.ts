@@ -1,4 +1,13 @@
-import type { InboxFilter } from './types'
+import type { InboxFilter, StopReason } from './types'
+
+/** A turn that came to no page and no words, by how it ended: `Washi <verb> <chat>`. */
+export const TURN_LEFT: Record<StopReason, string> = {
+  end_turn: 'worked in',
+  max_tokens: 'ran out of room in',
+  refusal: 'declined in',
+  cancelled: 'was stopped in',
+  error: 'ran into a problem in',
+}
 
 export const FILTER_LABELS: Record<InboxFilter, string> = {
   all: 'All',

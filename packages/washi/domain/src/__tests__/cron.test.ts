@@ -1,5 +1,12 @@
 import { describe, expect, test } from 'bun:test'
-import { describeCron, isCron, latestOccurrence, nextOccurrence, parseCron } from '../index'
+import {
+  cronProblem,
+  describeCron,
+  isCron,
+  latestOccurrence,
+  nextOccurrence,
+  parseCron,
+} from '../index'
 
 describe('cron', () => {
   test('parses lists, ranges and steps; refuses what is out of range', () => {
@@ -29,5 +36,23 @@ describe('cron', () => {
     expect(latestOccurrence('0 11 * * *', 'America/Bogota', now)).toBeNull()
     expect(nextOccurrence('0 11 * * *', 'America/Bogota', now)).toBe('2026-10-08T11:00')
     expect(nextOccurrence('0 9 * * 1', 'UTC', now)).toBe('2026-10-12T09:00')
+  })
+
+  test('the next run is found however far off, and a date that never comes is none', () => {
+    const now = new Date('2026-10-08T15:30:00Z')
+    expect(nextOccurrence('0 3 1 1 *', 'UTC', now)).toBe('2027-01-01T03:00')
+    expect(nextOccurrence('0 0 29 2 *', 'UTC', now)).toBe('2028-02-29T00:00')
+    expect(nextOccurrence('31 15 * * *', 'UTC', now)).toBe('2026-10-08T15:31')
+    expect(nextOccurrence('30 15 * * *', 'UTC', now)).toBe('2026-10-09T15:30')
+    expect(nextOccurrence('0 9 13 * 5', 'UTC', now)).toBe('2026-10-09T09:00')
+    expect(nextOccurrence('0 0 31 2 *', 'UTC', now)).toBeNull()
+  })
+
+  test('says why an expression is not a schedule', () => {
+    expect(cronProblem('0 3 1 1 *')).toBeNull()
+    expect(cronProblem('99 99 * * *')).toBe('Minute “99” is not in 0–59.')
+    expect(cronProblem('0 25 * * *')).toBe('Hour “25” is not in 0–23.')
+    expect(cronProblem('0 9 * *')).toContain('five fields')
+    expect(cronProblem('')).toContain('this has 0')
   })
 })

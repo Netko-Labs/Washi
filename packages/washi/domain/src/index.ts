@@ -173,6 +173,7 @@ export { compareHlc, createHlcClock, type HlcClock } from './hlc'
 export { positionBetween } from './position'
 export {
   type CronFields,
+  cronProblem,
   dailyCron,
   describeCron,
   isCron,

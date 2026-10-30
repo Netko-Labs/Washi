@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, mock, test } from 'bun:test'
 import type { AgentSession, AgentUpdate, TranscriptEntry } from '@washi/domain'
 import { useAgentStore } from '../agent-store'
 import { watchStall } from '../turn-watch'
-import { turnViewOf } from '../utils'
+import { mascotStateFor, turnViewOf } from '../utils'
 import { TURN_CUT_OFF } from '../values'
 
 let seq = 0
@@ -16,6 +16,14 @@ const ask = (text: string) => entry({ kind: 'user_message', text })
 const chunk = (text: string) => entry({ kind: 'message_chunk', text })
 const failed = (error: string) => entry({ kind: 'turn_done', stopReason: 'error', error })
 const done = () => entry({ kind: 'turn_done', stopReason: 'end_turn' })
+const searching: AgentUpdate = {
+  kind: 'tool_call',
+  toolCallId: 't1',
+  title: 'web_search',
+  toolKind: 'search',
+  status: 'in_progress',
+}
+const stopped = () => entry({ kind: 'turn_done', stopReason: 'cancelled' })
 
 const session = (status: AgentSession['status'] = 'idle') =>
   ({
@@ -105,11 +113,29 @@ describe('one state per conversation (D114)', () => {
     expect(turnViewOf({ ...base, transcript: [ask('draft it'), broke], running: false })).toEqual({
       state: 'failed',
       failureText: 'the model provider rejected this key',
-      failureId: broke.id,
+      endId: broke.id,
       startedAt: null,
       canRetry: true,
     })
     expect(turnViewOf({ ...base, transcript: [ask('x'), done()], running: false }).state).toBe(
+      'idle',
+    )
+  })
+
+  test('a stopped turn reads as stopped, with Retry, and the pill never says done', () => {
+    const base = { sessions: [session()], activeSessionId: 's1', stalled: false, running: false }
+    const stop = stopped()
+    const transcript = [ask('search twice'), entry(searching), stop]
+    expect(turnViewOf({ ...base, transcript })).toEqual({
+      state: 'stopped',
+      failureText: null,
+      endId: stop.id,
+      startedAt: null,
+      canRetry: true,
+    })
+    expect(mascotStateFor(transcript, false, [])).toBe('idle')
+    expect(mascotStateFor([ask('x'), done()], false, [])).toBe('done')
+    expect(turnViewOf({ ...base, transcript: [...transcript, ask('again'), done()] }).state).toBe(
       'idle',
     )
   })
@@ -122,7 +148,7 @@ describe('one state per conversation (D114)', () => {
       transcript: [ask('draft it'), chunk('On it')],
       running: false,
     })
-    expect(view).toMatchObject({ state: 'failed', failureText: TURN_CUT_OFF, failureId: null })
+    expect(view).toMatchObject({ state: 'failed', failureText: TURN_CUT_OFF, endId: null })
   })
 })
 

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { useAgentStore } from '../../../stores'
 import { useToday } from '../../../today'
 import type { DayGroup, InboxFilter, InboxRow } from '../types'
-import { groupByDay, matchesFilter } from '../utils'
+import { groupByDay, matchesFilter, turnRow } from '../utils'
 
 /** The list: Washi's questions from the store, its turns from today, the host's rows, one filter. */
 export function useInbox(extra: InboxRow[] | undefined) {
@@ -12,16 +12,7 @@ export function useInbox(extra: InboxRow[] | undefined) {
   const now = Date.now()
 
   const rows = useMemo<InboxRow[]>(() => {
-    const turns = (today?.turns ?? []).map<InboxRow>((turn) => ({
-      id: `${turn.sessionId}-${turn.at}`,
-      kind: 'washi',
-      at: turn.at,
-      who: null,
-      verb: turn.prompt || turn.sessionTitle,
-      where: null,
-      detail: turn.receipt.stopReason === 'error' ? (turn.receipt.error ?? 'failed') : null,
-    }))
-    return [...turns, ...(extra ?? [])]
+    return [...(today?.turns ?? []).map(turnRow), ...(extra ?? [])]
   }, [today, extra])
 
   const groups: DayGroup[] = groupByDay(

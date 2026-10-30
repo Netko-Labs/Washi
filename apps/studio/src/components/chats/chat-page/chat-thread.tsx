@@ -6,7 +6,7 @@ import { type ChatThreadProps, useChatThread } from './lib'
 
 /** The conversation in one reading column; it follows the end unless the reader scrolled away. */
 export function ChatThread({ workspaceId }: ChatThreadProps) {
-  const { blocks, asks, turn, failureId, stick } = useChatThread()
+  const { blocks, asks, turn, endId, stick } = useChatThread()
   const last = blocks.at(-1)
 
   return (
@@ -26,7 +26,7 @@ export function ChatThread({ workspaceId }: ChatThreadProps) {
                 block={block}
                 workspaceId={workspaceId}
                 isLive={turn === 'working' && index === blocks.length - 1}
-                failureId={failureId}
+                endId={endId}
               />
             ),
           )}

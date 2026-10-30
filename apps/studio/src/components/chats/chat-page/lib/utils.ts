@@ -1,6 +1,6 @@
 import type { SheetSummary, TranscriptEntry, UserTable } from '@washi/domain'
 import { mergeMessageChunks } from '@washi/ui'
-import { MAX_STARTERS, NEAR_BOTTOM_PX, RECEIPTS_SHOWN } from './constants'
+import { MAX_STARTERS, NEAR_BOTTOM_PX, RECEIPTS_SHOWN, STARTER_TITLE_CHARS } from './constants'
 import type {
   ChatBlock,
   ScrollBox,
@@ -10,7 +10,7 @@ import type {
   TurnPart,
   WashiBlock,
 } from './types'
-import { GENERIC_STARTERS, MAKE_A_PAGE, PAST_TENSE } from './values'
+import { GENERIC_STARTERS, MAKE_A_PAGE } from './values'
 
 const record = (value: unknown): Record<string, unknown> =>
   value && typeof value === 'object' ? (value as Record<string, unknown>) : {}
@@ -124,12 +124,6 @@ export function chatBlocks(transcript: TranscriptEntry[]): ChatBlock[] {
   return blocks
 }
 
-export function pastTense(action: string): string {
-  const [verb = '', ...rest] = action.split(' ')
-  const past = PAST_TENSE[verb]
-  return past ? [past, ...rest].join(' ') : action
-}
-
 /** "Read Trip Plan · Searched the web" and how many more fold behind them. */
 export function receiptSummary(phrases: string[]): { head: string; more: number } {
   return {
@@ -141,15 +135,26 @@ export function receiptSummary(phrases: string[]): { head: string; more: number 
 const newest = <T extends { hlcUpdated: string }>(items: T[]): T[] =>
   [...items].sort((a, b) => b.hlcUpdated.localeCompare(a.hlcUpdated))
 
-/** Starters name only what is there (P3): the newest pages and table, else plain asks. */
+const isNamed = (title: string) => !!title.trim() && title.trim().toLowerCase() !== 'untitled'
+
+/** A title short enough for a starter's chip, cut at a word. */
+export function shortTitle(title: string, max = STARTER_TITLE_CHARS): string {
+  const plain = title.trim().replace(/\s+/g, ' ')
+  if (plain.length <= max) return plain
+  const cut = plain.slice(0, max)
+  const space = cut.lastIndexOf(' ')
+  return `${(space > max / 2 ? cut.slice(0, space) : cut).trimEnd()}…`
+}
+
+/** Starters name only what is there (P3): the newest named pages and table, else plain asks. */
 export function startersFor(sheets: SheetSummary[], tables: UserTable[]): Starter[] {
-  const pages = newest(sheets.filter((sheet) => !sheet.rowOf && sheet.title.trim()))
+  const pages = newest(sheets.filter((sheet) => !sheet.rowOf && isNamed(sheet.title)))
   const [table] = newest(tables)
   const starters: Starter[] = []
   const [latest, previous] = pages
   if (latest) {
     starters.push({
-      label: `Summarize ${latest.title}`,
+      label: `Summarize ${shortTitle(latest.title)}`,
       prompt: `Summarize ${latest.title}.`,
       sends: true,
       attachments: [{ kind: 'page', id: latest.id, name: latest.title }],
@@ -161,7 +166,7 @@ export function startersFor(sheets: SheetSummary[], tables: UserTable[]): Starte
   }
   if (previous) {
     starters.push({
-      label: `What links to ${previous.title}?`,
+      label: `What links to ${shortTitle(previous.title)}?`,
       prompt: `What links to ${previous.title}?`,
       sends: true,
       attachments: [{ kind: 'page', id: previous.id, name: previous.title }],

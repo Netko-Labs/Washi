@@ -6,7 +6,7 @@ import { useStickToBottom } from './use-stick-to-bottom'
 
 /** The open chat as blocks, its own waiting questions, and the scroll that follows the end. */
 export function useChatThread() {
-  const { transcript, running, approvals, activeSessionId, turn, failureId } = useAgentStore(
+  const { transcript, running, approvals, activeSessionId, turn, endId } = useAgentStore(
     useShallow((state) => {
       const view = turnViewOf(state)
       return {
@@ -15,7 +15,7 @@ export function useChatThread() {
         approvals: state.approvals,
         activeSessionId: state.activeSessionId,
         turn: view.state,
-        failureId: view.failureId,
+        endId: view.endId,
       }
     }),
   )
@@ -25,5 +25,5 @@ export function useChatThread() {
     `${transcript.length}:${asks.length}:${running}:${turn}`,
     transcript.at(-1)?.update.kind === 'user_message',
   )
-  return { blocks, asks, turn, failureId, stick }
+  return { blocks, asks, turn, endId, stick }
 }

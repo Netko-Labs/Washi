@@ -5,8 +5,8 @@ import {
   createdId,
   greetingFor,
   isNearBottom,
-  pastTense,
   receiptSummary,
+  shortTitle,
   startersFor,
   trashedPages,
 } from '../utils'
@@ -117,12 +117,6 @@ describe('chat blocks', () => {
 })
 
 describe('receipts', () => {
-  test('approval phrasing becomes what happened', () => {
-    expect(pastTense('Create a page')).toBe('Made a page')
-    expect(pastTense('Search the web for')).toBe('Searched the web for')
-    expect(pastTense('Read')).toBe('Read')
-  })
-
   test('two shown, the rest counted', () => {
     expect(receiptSummary(['Read A', 'Searched the web', 'Read B', 'Read C'])).toEqual({
       head: 'Read A · Searched the web',
@@ -150,6 +144,23 @@ describe('starters', () => {
     ])
     expect(starters[0]?.attachments).toEqual([{ kind: 'page', id: 'new', name: 'Trip Plan' }])
     expect(starters[3]?.sends).toBe(false)
+  })
+
+  test('an untitled page is never named, and a long title is cut at a word', () => {
+    const long = 'Notes from the quarterly planning offsite with every team lead in Lisbon'
+    const starters = startersFor(
+      [sheet('blank', 'Untitled', '0009'), sheet('long', long, '0005'), sheet('x', '  ', '0008')],
+      [],
+    )
+    expect(starters.map((starter) => starter.label)).toEqual([
+      'Summarize Notes from the quarterly…',
+      'Make a page for …',
+    ])
+    expect(starters[0]?.prompt).toBe(`Summarize ${long}.`)
+    expect(shortTitle('Trip Plan')).toBe('Trip Plan')
+    expect(shortTitle('Supercalifragilisticexpialidocious-and-more')).toBe(
+      'Supercalifragilisticexpialidocio…',
+    )
   })
 
   test('an empty workspace gets plain asks', () => {

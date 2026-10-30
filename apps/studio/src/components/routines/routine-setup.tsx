@@ -1,4 +1,5 @@
-import type { RoutineSetupProps } from './lib'
+import { cronProblem } from '@washi/domain'
+import { cronFromSchedule, type RoutineSetupProps } from './lib'
 import { SchedulePicker } from './schedule-picker'
 
 const LABEL = 'mb-2 block font-medium text-[12px] text-muted-foreground uppercase tracking-[0.06em]'
@@ -16,7 +17,8 @@ export function RoutineSetup({
 }: RoutineSetupProps) {
   // An emptied time box is "", which would save as midnight nobody chose.
   const hasTime = draft.schedule.kind === 'custom' || /^\d{2}:\d{2}$/.test(draft.schedule.time)
-  const canSave = draft.prompt.trim().length > 0 && hasTime && isChanged && !isSaving
+  const isSchedule = !cronProblem(cronFromSchedule(draft.schedule))
+  const canSave = draft.prompt.trim().length > 0 && hasTime && isSchedule && isChanged && !isSaving
 
   return (
     <div className="grid gap-3">

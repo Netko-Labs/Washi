@@ -1,4 +1,4 @@
-import { FIELD_RANGES } from './constants'
+import { FIELD_NAMES, FIELD_RANGES } from './constants'
 import type { CronFields, WallMinute } from './types'
 
 function field(source: string, min: number, max: number): Set<number> | null {
@@ -48,12 +48,29 @@ export function isCron(expression: string): boolean {
   return parseCron(expression) !== null
 }
 
-export function matchesCron(fields: CronFields, at: WallMinute): boolean {
-  if (!fields.minute.has(at.minute) || !fields.hour.has(at.hour)) return false
+/** Why an expression is not a schedule, in words; null when it is one. */
+export function cronProblem(expression: string): string | null {
+  const parts = expression.trim().split(/\s+/).filter(Boolean)
+  if (parts.length !== 5) {
+    return `A schedule has five fields (minute hour day month weekday); this has ${parts.length}.`
+  }
+  for (const [index, part] of parts.entries()) {
+    const [min, max] = FIELD_RANGES[index] ?? [0, 0]
+    if (!field(part, min, max)) return `${FIELD_NAMES[index]} “${part}” is not in ${min}–${max}.`
+  }
+  return null
+}
+
+/** The date alone: month, then day of month and weekday as cron ORs them. */
+export function matchesDay(fields: CronFields, at: Omit<WallMinute, 'hour' | 'minute'>): boolean {
   if (!fields.month.has(at.month)) return false
   const byDate = fields.dayOfMonth.has(at.day)
   const byWeekday = fields.dayOfWeek.has(at.weekday)
   if (fields.isDayOfMonthAny) return byWeekday
   if (fields.isDayOfWeekAny) return byDate
   return byDate || byWeekday
+}
+
+export function matchesCron(fields: CronFields, at: WallMinute): boolean {
+  return fields.minute.has(at.minute) && fields.hour.has(at.hour) && matchesDay(fields, at)
 }

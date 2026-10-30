@@ -1,6 +1,6 @@
 import type { AgentSession, ApprovalRequest, TranscriptEntry } from '@washi/domain'
 import type { TabKey } from '../view/types'
-import type { AgentState, ChatScope, LastAsk, TurnFailure, TurnView } from './types'
+import type { AgentState, ChatScope, LastAsk, TurnFailure, TurnState, TurnView } from './types'
 import { TURN_CUT_OFF, TURN_FAILED } from './values'
 
 /** Header/panel mascot state from the transcript tail (design: agent status lives in chrome). */
@@ -14,8 +14,8 @@ export function mascotStateFor(
   if (running && stalled) return 'flagged'
   const last = transcript.at(-1)?.update
   if (!running) {
-    if (last?.kind === 'turn_done') return last.stopReason === 'error' ? 'flagged' : 'done'
-    return 'idle'
+    if (last?.kind !== 'turn_done' || last.stopReason === 'cancelled') return 'idle'
+    return last.stopReason === 'error' ? 'flagged' : 'done'
   }
   for (let index = transcript.length - 1; index >= 0; index--) {
     const update = transcript[index]?.update
@@ -88,6 +88,14 @@ export function failureOf(
   return session?.status === 'error' ? { entryId: null, text: TURN_CUT_OFF } : null
 }
 
+/** The last turn's receipt when a person stopped it. */
+function stoppedReceipt(transcript: TranscriptEntry[]): string | null {
+  const tail = lastWord(transcript)
+  return tail?.update.kind === 'turn_done' && tail.update.stopReason === 'cancelled'
+    ? tail.id
+    : null
+}
+
 const askEntry = (transcript: TranscriptEntry[]) =>
   [...transcript].reverse().find((entry) => entry.update.kind === 'user_message')
 
@@ -108,10 +116,12 @@ export function turnViewOf(
   const session = state.sessions.find((each) => each.id === state.activeSessionId)
   const ask = askEntry(transcript)
   const failure = running ? null : failureOf(transcript, session)
+  const stop = running || failure ? null : stoppedReceipt(transcript)
+  const ended: TurnState = failure ? 'failed' : stop ? 'stopped' : 'idle'
   return {
-    state: running ? (stalled ? 'stalled' : 'working') : failure ? 'failed' : 'idle',
+    state: running ? (stalled ? 'stalled' : 'working') : ended,
     failureText: failure?.text ?? null,
-    failureId: failure?.entryId ?? null,
+    endId: failure?.entryId ?? stop,
     startedAt: running && ask ? msOf(ask.createdAt) : null,
     canRetry: !!ask,
   }

@@ -1,6 +1,6 @@
 import { IconAlertTriangle } from '@tabler/icons-react'
 import type { AgentUpdate } from '@washi/domain'
-import { RestorePage, useDescribeTool } from '../approval'
+import { pastTense, RestorePage, useDescribeTool } from '../approval'
 import { BUBBLE_PROSE, Markdown } from '../markdown'
 import { Mascot } from '../mascot'
 import { HandoffDivider } from './handoff-divider'
@@ -59,7 +59,7 @@ function ToolPill({ update, followups }: ToolPillProps) {
         >
           <Icon className="size-[13px] shrink-0" />
           <span className="max-w-[260px] truncate" title={update.title}>
-            {action}
+            {status === 'completed' ? pastTense(action) : action}
             {subject && ` ${subject}`}
           </span>
           {status === 'in_progress' && <span className="animate-pulse">…</span>}
@@ -77,7 +77,7 @@ function ToolPill({ update, followups }: ToolPillProps) {
 }
 
 export function TranscriptView({ transcript }: TranscriptViewProps) {
-  const { failureId } = useTurnView()
+  const { endId } = useTurnView()
   const followupsFor = (toolCallId: string) =>
     transcript
       .map((entry) => entry.update)
@@ -124,9 +124,16 @@ export function TranscriptView({ transcript }: TranscriptViewProps) {
               />
             )
           // A turn ends in Washi's words; the receipt is recorded, never shown here (D62).
-          // The last failure is the turn status's, with its Retry (D114).
+          // The last failure or stop is the turn status's, with its Retry (D114).
           case 'turn_done':
-            return update.stopReason === 'error' && entry.id !== failureId ? (
+            if (entry.id === endId) return null
+            if (update.stopReason === 'cancelled')
+              return (
+                <div key={entry.id} className="my-1 text-[12px] text-muted-foreground">
+                  Stopped
+                </div>
+              )
+            return update.stopReason === 'error' ? (
               <div
                 key={entry.id}
                 className="my-1 flex items-center gap-1.5 text-[12px] text-destructive"

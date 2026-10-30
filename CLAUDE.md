@@ -438,8 +438,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   (`contextFromRequest` is the one place both are read). Switching workspace closes the socket.
 - **Routines are pages (D68).** `/routines` (switches, next run, templates) and
   `/routines/$id` (`?tab=setup|runs`; `/routines/new?template=`). A schedule is five-field cron on
-  the wall clock of its IANA zone (`@washi/domain` `shared/cron`: `parseCron`, `latestOccurrence`,
-  `nextOccurrence`, `describeCron`); due = not run since the latest minute it names **today**
+  the wall clock of its IANA zone (`@washi/domain` `shared/cron`: `parseCron`, `cronProblem`,
+  `latestOccurrence`, `nextOccurrence` (up to eight years ahead), `describeCron`); due = not run since the latest minute it names **today**
   (`last_run_at`, a wall key `YYYY-MM-DDTHH:MM`), so a night off never catches up tomorrow.
   `minuteOfDay` is still accepted on create (→ a daily cron) and still returned, for the desktop.
   Every run is a row in `routine_runs` (trigger `schedule`·`manual`) and its own chat (the
@@ -502,8 +502,9 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   15s (`TURN_GRACE_MS`) before the host closes the turn without it — a late result still charges
   the budget. A chat is `running` from its ask, so a process that dies mid-turn leaves a receipt
   at boot (`TURN_INTERRUPTED`). The client reads one state per chat (`turnViewOf`: idle · working
-  · stalled · failed): `TurnStatus` (panel and the D111 page) shows Working… with its clock, the
-  last failure with Retry (`retryTurn` re-sends the ask, Stop first over a stuck turn), and after
+  · stalled · failed · stopped): `TurnStatus` (panel and the D111 page) shows Working… with its
+  clock, the last failure or a Stop (`cancelled`, never "done"; the next ask tells the model,
+  `AFTER_STOP`) with Retry (`retryTurn` re-sends the ask, Stop first over a stuck turn), and after
   90s of silence (`STALL_MS`, `watchStall`) "Washi hasn't said anything for a while" with Stop and
   Retry — the mascot flags it. A stall, a Stop with nothing to stop and every socket reconnect
   (`onStarted` after the first) re-read the chat (`refreshActive`), so a receipt the bus dropped
