@@ -16,6 +16,7 @@ import {
   useAutoSize,
   useEditorStore,
   useFocusRequest,
+  withoutTrailingLines,
 } from './lib'
 import { SlashMenu } from './slash-menu'
 
@@ -71,7 +72,7 @@ export function BlockInput({ block, numberAt }: BlockInputProps) {
       else store().splitAt(block.id, field.selectionStart)
     } else if (event.key === 'Enter' && !event.shiftKey && atEnd && field.value.endsWith('\n')) {
       event.preventDefault()
-      store().setText(block.id, field.value.trimEnd())
+      store().setText(block.id, withoutTrailingLines(field.value))
       store().insertAfter(block.id)
     } else if (event.key === 'Escape' && slash !== null) {
       store().setText(block.id, '')

@@ -45,3 +45,6 @@ export function titleOf(blocks: Block[], sheet: { rowOf: string | null }): strin
   const text = first.text.trim()
   return text ? text.slice(0, 200) : null
 }
+
+/** A code block's trailing blank lines go; its last line's own spaces stay. */
+export const withoutTrailingLines = (code: string) => code.replace(/(\n[ \t]*)+$/, '')

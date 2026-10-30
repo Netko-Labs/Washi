@@ -58,11 +58,11 @@ describe('page editor blocks', () => {
 
   test('a code block saves without the blank lines typed after it', () => {
     const sheet = toSheet(parse('<Sheet title="t"></Sheet>'), [
-      newBlock('code', '  indented\nline two\n\n\n'),
+      newBlock('code', '  indented\nline two  \n  \n\n'),
     ])
     const [code] = sheet.children
     expect(code?.kind === 'element' && code.children).toEqual([
-      { kind: 'text', value: '  indented\nline two' },
+      { kind: 'text', value: '  indented\nline two  ' },
     ])
   })
 

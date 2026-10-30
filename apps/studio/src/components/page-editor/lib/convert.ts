@@ -8,6 +8,7 @@ import type {
   TextBlock,
   TextKind,
 } from './types'
+import { withoutTrailingLines } from './utils'
 import { HEADING_LEVELS, LIST_MARKERS } from './values'
 
 export function element(
@@ -137,7 +138,8 @@ export function toBlocks(root: WsxElement): Block[] {
 
 function toNode(block: TextBlock): WsxElement | null {
   if (block.kind === 'divider') return element('Divider', block.props, [])
-  if (block.kind === 'code') return element('Code', block.props, text(block.text.trimEnd()))
+  if (block.kind === 'code')
+    return element('Code', block.props, text(withoutTrailingLines(block.text)))
   if (!block.text.trim()) return null
   const level = HEADING_LEVELS[block.kind]
   if (level)
