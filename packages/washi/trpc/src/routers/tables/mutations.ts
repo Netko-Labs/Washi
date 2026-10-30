@@ -1,6 +1,7 @@
 import { timeZoneSchema } from '@washi/domain'
-import { mutationSchema, tableSpecSchema } from '@washi/ink'
+import { columnChangeSchema, mutationSchema, tableSpecSchema } from '@washi/ink'
 import {
+  changeColumn,
   defineUserTable,
   openRowPage,
   purgeUserTable,
@@ -19,6 +20,10 @@ export const tableMutations = router({
   define: workspaceProcedure
     .input(z.object({ spec: tableSpecSchema }))
     .mutation(({ ctx, input }) => defineUserTable(ctx.ws, input.spec)),
+  /** A column menu's rename, delete or option edit; the values that must follow are rewritten. */
+  changeColumn: workspaceProcedure
+    .input(z.object({ change: columnChangeSchema }))
+    .mutation(({ ctx, input }) => changeColumn(ctx.ws, input.change, ctx.viewer.id)),
   mutate: workspaceProcedure
     .input(z.object({ mutation: mutationSchema }))
     .mutation(({ ctx, input }) => runMutation(ctx.ws, input.mutation, ctx.viewer.id)),

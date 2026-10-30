@@ -8,9 +8,10 @@ import {
 
 /**
  * The panel lives in the top layer (Popover API), so the table's sideways scroll never clips it;
- * it is placed under its button by hand and closes when anything outside it scrolls.
+ * it is placed under its button by hand — its `align` edge on the button's — and closes when
+ * anything outside it scrolls. Closed with nothing else focused, focus returns to the button.
  */
-export function usePropertyPopover() {
+export function usePropertyPopover(align: 'start' | 'end' = 'end') {
   const button = useRef<HTMLButtonElement>(null)
   const panel = useRef<HTMLDivElement>(null)
   const [open, setOpen] = useState(false)
@@ -30,7 +31,7 @@ export function usePropertyPopover() {
     if (!el || !at) return
     const { clientWidth, clientHeight } = document.documentElement
     const left = Math.min(
-      at.right - PROPERTY_PANEL_WIDTH,
+      align === 'start' ? at.left : at.right - PROPERTY_PANEL_WIDTH,
       clientWidth - PROPERTY_PANEL_WIDTH - MARGIN,
     )
     const below = clientHeight - at.bottom - GAP - MARGIN
@@ -49,6 +50,11 @@ export function usePropertyPopover() {
     open,
     show,
     hide: () => panel.current?.hidePopover(),
-    onToggle: (event: ToggleEvent<HTMLDivElement>) => setOpen(event.newState === 'open'),
+    onToggle: (event: ToggleEvent<HTMLDivElement>) => {
+      setOpen(event.newState === 'open')
+      const focused = document.activeElement
+      const stranded = !focused || focused === document.body || panel.current?.contains(focused)
+      if (event.newState === 'closed' && stranded) button.current?.focus({ preventScroll: true })
+    },
   }
 }

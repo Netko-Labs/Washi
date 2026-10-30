@@ -1,4 +1,5 @@
-export { COPY_ROW_CAP, MAX_TEXT_CELL } from './constants'
+export { changedSpec, rowPatch, titleColumnOf } from './columns'
+export { CHOICE_COLUMN_TYPES, COPY_ROW_CAP, MAX_TEXT_CELL } from './constants'
 export { matchesFilters } from './match'
 export {
   type Aggregate,
@@ -6,10 +7,13 @@ export {
   aggregateFnSchema,
   aggregateSchema,
   type Cell,
+  type ChangedSpec,
+  type ColumnChange,
   type ColumnSpec,
   type ColumnType,
   type CopyValue,
   cellSchema,
+  columnChangeSchema,
   columnSpecSchema,
   columnTypeSchema,
   copyValueSchema,
@@ -26,6 +30,7 @@ export {
   mutationSchema,
   type NumberFormat,
   numberFormatSchema,
+  type OptionChange,
   type ParamRef,
   paramRefSchema,
   type QueryResult,

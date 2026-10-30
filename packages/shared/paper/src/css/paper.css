@@ -25,6 +25,7 @@
 @import "./database.css";
 @import "./database-cells.css";
 @import "./database-property.css";
+@import "./database-column.css";
 @import "./database-gallery.css";
 @import "./roadmap.css";
 @import "./canvas.css";

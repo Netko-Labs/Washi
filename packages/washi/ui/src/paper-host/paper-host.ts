@@ -166,5 +166,9 @@ export const paperHost: PaperHost = {
     return tables.find((table) => table.spec.name === name)?.spec ?? null
   },
 
+  changeColumn: async (change) => {
+    await api.tables.changeColumn.mutate({ change })
+  },
+
   locale: typeof navigator === 'undefined' ? 'en-US' : navigator.language,
 }

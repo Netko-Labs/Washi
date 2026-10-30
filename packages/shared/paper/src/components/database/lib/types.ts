@@ -1,7 +1,7 @@
-import type { Cell, ColumnSpec, Filter, QueryRow, TableSpec } from '@washi/ink'
+import type { Cell, ColumnChange, ColumnSpec, Filter, QueryRow, TableSpec } from '@washi/ink'
 import type { BlockProps } from '../../../lib/types'
 
-export type { Cell, ColumnSpec, QueryRow, TableSpec }
+export type { Cell, ColumnChange, ColumnSpec, QueryRow, TableSpec }
 
 export interface DatabaseView {
   name: string
@@ -168,4 +168,100 @@ export interface CardValueProps {
   db: DatabaseContext
   column: ColumnSpec
   value: Cell | undefined
+}
+
+export type SortDirection = 'asc' | 'desc'
+
+export interface ViewSort {
+  column: string
+  direction: SortDirection
+}
+
+/** A reader's own sort and hidden properties for one view; never written into the page. */
+export interface ViewLocal {
+  sort: ViewSort | null
+  hidden: string[]
+  sortBy: (column: string, direction: SortDirection) => void
+  clearSort: () => void
+  hide: (column: string) => void
+  show: (column: string) => void
+  /** A property renamed from its menu keeps the reader's sort and hide under its new name. */
+  rename: (from: string, to: string) => void
+}
+
+export interface TableView {
+  records: RecordsState
+  rows: QueryRow[]
+  columns: ColumnSpec[]
+  title: ColumnSpec | undefined
+  local: ViewLocal
+}
+
+export interface DatabaseHeadProps {
+  db: DatabaseContext
+  columns: ColumnSpec[]
+  title: ColumnSpec | undefined
+  local: ViewLocal
+  onAdd: AddProperty
+}
+
+export interface ViewChipsProps {
+  db: DatabaseContext
+  local: ViewLocal
+}
+
+export interface ColumnHeadProps {
+  db: DatabaseContext
+  column: ColumnSpec
+  isTitle: boolean
+  local: ViewLocal
+}
+
+export interface ColumnMenuProps extends ColumnHeadProps {
+  onDone: () => void
+}
+
+export type ColumnMenuPage = 'menu' | 'options' | 'delete'
+
+export interface ColumnPageProps {
+  db: DatabaseContext
+  column: ColumnSpec
+  onBack: () => void
+  onDone: () => void
+}
+
+export interface ColumnRenameProps extends ColumnPageProps {
+  onRenamed: (to: string) => void
+}
+
+export interface OptionRowProps {
+  option: string
+  busy: boolean
+  onRename: (to: string) => void
+  onRemove: () => void
+}
+
+export interface OptionAddProps {
+  label: string
+  busy: boolean
+  onAdd: (option: string) => void
+}
+
+export interface OptionGroup {
+  group?: StatusGroup
+  label: string | null
+  options: string[]
+}
+
+/** One option renamed (`from` + `to`), added (`to`, into `group` for a status) or removed. */
+export interface OptionEdit {
+  from?: string
+  to?: string
+  group?: StatusGroup
+}
+
+/** An option about to go, and how many rows hold it; null when they could not be counted. */
+export interface OptionRemoval {
+  option: string
+  count: number | null
 }

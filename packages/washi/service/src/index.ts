@@ -153,6 +153,7 @@ export {
   trashedTables,
   trashUserTable,
 } from './tables/catalog'
+export { changeColumn } from './tables/columns'
 export { runHistory } from './tables/history'
 export { linkColumn } from './tables/link'
 export { openRowPage, rowOfSheet, rowTitle } from './tables/rows'

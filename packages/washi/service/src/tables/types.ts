@@ -17,6 +17,11 @@ export interface LinkColumnResult {
   created: string[]
 }
 
+/** How many rows a column change rewrote. */
+export interface ColumnChangeResult {
+  moved: number
+}
+
 export type CopyMutation = Extract<InkMutation, { kind: 'copy' }>
 
 export interface CopyResult {
