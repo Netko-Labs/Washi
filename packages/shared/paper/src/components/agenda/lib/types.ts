@@ -59,6 +59,8 @@ export interface AgendaPeriodOptions {
   view: AgendaView
   stateKey?: string
   locale?: string
+  /** The week opened on and Today returns to, from this one: a picker skips a spent week. */
+  startOffset?: number
 }
 
 export interface AgendaSpan {

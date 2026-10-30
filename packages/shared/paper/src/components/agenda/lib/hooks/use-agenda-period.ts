@@ -26,8 +26,9 @@ export function useAgendaPeriod({
   view,
   stateKey,
   locale,
+  startOffset = 0,
 }: AgendaPeriodOptions): AgendaPeriod {
-  const [offset, setOffset] = useState(0)
+  const [offset, setOffset] = useState(startOffset)
   const sheet = useSheetState()
   const now = new Date()
   const today = isoDay(now)
@@ -45,7 +46,8 @@ export function useAgendaPeriod({
   const moveTo = (target: Date) => {
     if (stateKey) sheet.set(stateKey, monthKey(target))
   }
-  const isCurrent = view === 'month' ? monthKey(month) === monthKey(thisMonth) : offset === 0
+  const isCurrent =
+    view === 'month' ? monthKey(month) === monthKey(thisMonth) : offset === startOffset
 
   return {
     days: span.days,
@@ -56,6 +58,6 @@ export function useAgendaPeriod({
       view === 'month' && stateKey
         ? moveTo(addMonths(month, steps))
         : setOffset((current) => current + steps),
-    reset: () => (view === 'month' && stateKey ? moveTo(thisMonth) : setOffset(0)),
+    reset: () => (view === 'month' && stateKey ? moveTo(thisMonth) : setOffset(startOffset)),
   }
 }

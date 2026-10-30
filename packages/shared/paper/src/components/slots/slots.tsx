@@ -6,6 +6,7 @@ import {
   busyOf,
   isPast,
   nowMinutes,
+  openingWeek,
   SLOT_DAYS,
   SLOT_HOURS,
   SLOT_MINUTES,
@@ -17,8 +18,8 @@ import {
 
 /**
  * A week of free times to book, Calendly's way (D102): the hours of each allowed day cut into
- * slots, minus what is booked or past. A press asks `add` in a modal, the slot already filled in,
- * and the slot is checked again as it is booked.
+ * slots, the booked struck through, the past left out; a week already spent opens on the next.
+ * A press asks `add` in a modal, the slot filled in, checked again as it is booked and said back.
  */
 export function Slots({
   bind,
@@ -33,11 +34,18 @@ export function Slots({
   ...rest
 }: SlotsProps) {
   const host = usePaperHost()
-  const period = useAgendaPeriod({ bind, date, weekStart, view: 'week', locale: host.locale })
+  const now = nowMinutes()
+  const period = useAgendaPeriod({
+    bind,
+    date,
+    weekStart,
+    view: 'week',
+    locale: host.locale,
+    startOffset: openingWeek(now, weekStart, days, hours, minutes),
+  })
   const booking = useSlotBooking(bind, date, minutes)
   const { picked } = booking
   const busy = busyOf(period.state.rows, date, minutes)
-  const now = nowMinutes()
   const open = period.days.filter((day) => days.includes(weekdayOf(day.key)))
   const pickedDay = picked && period.days.find((day) => picked.start.startsWith(day.key))
 
@@ -57,6 +65,11 @@ export function Slots({
           </button>
         </div>
       </div>
+      {booking.booked && (
+        <p className="wsx-slots-booked" role="status">
+          {booking.booked}
+        </p>
+      )}
       {period.state.status === 'error' ? (
         <div className="wsx-empty" data-state="error" role="alert">
           This week could not load — {period.state.error}
@@ -82,7 +95,9 @@ export function Slots({
                         key={slot.start}
                         type="button"
                         className="wsx-slot"
-                        disabled={!add}
+                        data-booked={slot.isBooked || undefined}
+                        aria-label={slot.isBooked ? `${slot.label}, booked` : undefined}
+                        disabled={!add || slot.isBooked}
                         onClick={() => booking.pick(slot)}
                       >
                         {slot.label}
@@ -109,6 +124,7 @@ export function Slots({
           submit={addLabel}
           seed={picked ? { [date]: `${picked.start}/${picked.end}` } : undefined}
           check={booking.check}
+          onAdded={booking.landed}
         />
       )}
     </div>

@@ -22,6 +22,13 @@ export interface Slot {
   label: string
 }
 
+/** A slot as a day draws it: a booked one stays on screen, struck through. */
+export interface DaySlot extends Slot {
+  isBooked: boolean
+}
+
+export type WeekStart = NonNullable<SlotsProps['weekStart']>
+
 /** A taken stretch of time, in wall-clock minutes since the epoch day. */
 export interface Busy {
   from: number
@@ -33,4 +40,7 @@ export interface SlotBooking {
   pick: (slot: Slot) => void
   close: () => void
   check: () => Promise<string | null>
+  /** "Booked Tue 3 Nov, 10:00" for a few seconds once the row has landed. */
+  booked: string | null
+  landed: () => void
 }

@@ -1,6 +1,6 @@
 import type { Row } from '../../../lib/types'
-import { WEEKDAYS } from './constants'
-import type { Busy, Slot, Weekday } from './types'
+import { DAY_MINUTES, WEEKDAYS } from './constants'
+import type { Busy, DaySlot, Slot, Weekday, WeekStart } from './types'
 
 const MOMENT = /^(\d{4}-\d{2}-\d{2})(?:T(\d{2}):(\d{2}))?/
 
@@ -35,30 +35,64 @@ export function busyOf(rows: Row[], date: string, minutes: number): Busy[] {
     if (from === null) return []
     const until = end ? minutesOf(end) : null
     if (until !== null) return [{ from, to: until }]
-    return [{ from, to: from + (start.includes('T') ? minutes : 24 * 60) }]
+    return [{ from, to: from + (start.includes('T') ? minutes : DAY_MINUTES) }]
   })
 }
 
-/** A day's free slots: its hours cut into `minutes`, none overlapping `busy`, none before `now`. */
+/** A day's slots: its hours cut into `minutes`, none before `now`, those under `busy` booked. */
 export function slotsOn(
   dayKey: string,
   hours: string,
   minutes: number,
   busy: Busy[],
   now: number,
-): Slot[] {
+): DaySlot[] {
   const [open = '09:00', close = '17:00'] = hours.split('-')
   const first = minutesOf(`${dayKey}T${open}`)
   const last = minutesOf(`${dayKey}T${close}`)
   if (first === null || last === null) return []
-  const slots: Slot[] = []
+  const slots: DaySlot[] = []
   for (let from = first; from + minutes <= last; from += minutes) {
     const to = from + minutes
-    if (from < now || busy.some((taken) => taken.from < to && from < taken.to)) continue
+    if (from < now) continue
     const start = momentOf(from)
-    slots.push({ start, end: momentOf(to), label: start.slice(11) })
+    const isBooked = busy.some((taken) => taken.from < to && from < taken.to)
+    slots.push({ start, end: momentOf(to), label: start.slice(11), isBooked })
   }
   return slots
+}
+
+/**
+ * The week a picker opens on, from this one: 0 while a slot is still ahead this week by the
+ * clock, else 1. Only time is read, so it costs no query; a fully booked week still opens.
+ */
+export function openingWeek(
+  now: number,
+  weekStart: WeekStart,
+  days: Weekday[],
+  hours: string,
+  minutes: number,
+): number {
+  const today = momentOf(now).slice(0, 10)
+  const first = weekStart === 'monday' ? 1 : 0
+  const back = (WEEKDAYS.indexOf(weekdayOf(today)) - first + 7) % 7
+  const midnight = minutesOf(today) ?? 0
+  for (let ahead = 0; ahead < 7 - back; ahead++) {
+    const day = momentOf(midnight + ahead * DAY_MINUTES).slice(0, 10)
+    if (days.includes(weekdayOf(day)) && slotsOn(day, hours, minutes, [], now).length > 0) return 0
+  }
+  return 1
+}
+
+/** A booked slot in the reader's words: "Tue 3 Nov, 10:00". */
+export function slotWords(slot: Slot, locale?: string): string {
+  const day = new Date(`${slot.start.slice(0, 10)}T00:00:00Z`).toLocaleDateString(locale, {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    timeZone: 'UTC',
+  })
+  return `${day}, ${slot.label}`
 }
 
 /** The reader's wall clock now, in the same minutes the slots count in. */
@@ -75,7 +109,7 @@ export function isPast(dayKey: string, now: number): boolean {
 /** The day a slot sits on and the day after: the bounds a fresh look reads between. */
 export function dayOf(slot: Slot): { day: string; next: string } {
   const day = slot.start.slice(0, 10)
-  return { day, next: momentOf((minutesOf(day) ?? 0) + 24 * 60).slice(0, 10) }
+  return { day, next: momentOf((minutesOf(day) ?? 0) + DAY_MINUTES).slice(0, 10) }
 }
 
 /** Whether anything in `rows` now overlaps the slot. */
