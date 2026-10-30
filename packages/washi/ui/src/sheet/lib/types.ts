@@ -37,3 +37,9 @@ export interface SheetViewProps {
   /** Draws the sheet instead of the plain view — the web's editor. */
   body?: ComponentType<SheetBodyProps>
 }
+
+export interface ShownSheet {
+  isDrawn: (id: string, version: string | undefined) => boolean
+  loading: () => void
+  drawn: (sheet: SheetDetail) => void
+}

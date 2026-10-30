@@ -1,4 +1,4 @@
-import { useSheetsStore } from '@washi/ui'
+import { forgetReads, useSheetsStore } from '@washi/ui'
 import type { WsxElement } from '@washi/wsx'
 import { create } from 'zustand'
 import { api } from '@/integrations/trpc'
@@ -238,6 +238,7 @@ export const useEditorStore = create<EditorState>((set, get) => {
       }
       if (pick.kind === 'database') {
         await api.tables.define.mutate({ spec: NEW_DATABASE(pick.name) })
+        forgetReads()
       }
       const isLater = ['subpage', 'bookmark', 'upload', 'gallery'].includes(pick.kind)
       let node = isLater ? null : dataNode(pick)

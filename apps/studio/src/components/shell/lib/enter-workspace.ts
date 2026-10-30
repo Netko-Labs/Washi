@@ -1,5 +1,6 @@
 import {
   forgetEmbedHosts,
+  forgetReads,
   useAgentStore,
   useFavoritesStore,
   useSheetsStore,
@@ -17,6 +18,7 @@ import type { WorkspaceSummary } from '@/lib/types'
 export function enterWorkspace(workspace: WorkspaceSummary): void {
   setActiveWorkspace(workspace.id)
   forgetEmbedHosts()
+  forgetReads()
   useAgentStore.getState().reset()
   useAgentStore.getState().bind(workspace.id)
   useSheetsStore.getState().reset()

@@ -3,6 +3,7 @@ import { hostMatches } from '@washi/tsuru/hosts'
 import { parse } from '@washi/wsx'
 import { api } from '../api'
 import { childrenOf } from '../page-tree'
+import { dataReads, pageReads, stableKey } from '../reads'
 import { useLiveStore, useSheetsStore } from '../stores'
 import { readUpload } from './utils'
 
@@ -45,7 +46,8 @@ export function forgetEmbedHosts(): void {
 
 /** Wires the closed capability surface of rendered sheets to the main process. */
 export const paperHost: PaperHost = {
-  runQuery: (query) => api.tables.query.query({ query }),
+  runQuery: (query) =>
+    dataReads.share(`query:${stableKey(query)}`, () => api.tables.query.query({ query })),
 
   runHistory: (query) => api.tables.history.query({ query }),
 
@@ -58,7 +60,9 @@ export const paperHost: PaperHost = {
       )
       return
     }
-    const { opened } = await api.capabilities.runAction.mutate({ action })
+    const { opened } = await api.capabilities.runAction
+      .mutate({ action })
+      .finally(() => dataReads.forget())
     if (opened)
       void import('../stores').then(({ useViewStore }) =>
         useViewStore.getState().openTab(`note:${opened}`),
@@ -76,7 +80,7 @@ export const paperHost: PaperHost = {
       useViewStore.getState().openTab(`note:${id}`),
     ),
 
-  describePeople: () => api.workspaces.members.query(),
+  describePeople: () => dataReads.share('members', () => api.workspaces.members.query()),
 
   // The store holds every page this reader may open (D65), so a hub never lists one they cannot.
   listPages: (parentId) =>
@@ -105,8 +109,7 @@ export const paperHost: PaperHost = {
     return sheet ? { title: sheet.title, root: parse(sheet.source) } : null
   },
 
-  // Not kept here: the server's cache also keys on the pages it imports, which may have moved.
-  compilePage: (source) => api.scripts.page.query({ source }),
+  compilePage: (source) => pageReads.share(source, () => api.scripts.page.query({ source })),
 
   compileWidget: (source, component) => api.scripts.widget.query({ source, component }),
 
@@ -143,7 +146,9 @@ export const paperHost: PaperHost = {
 
   newRow: async (table, data) => {
     try {
-      const { id } = await api.tables.mutate.mutate({ mutation: { kind: 'insert', table, data } })
+      const { id } = await api.tables.mutate
+        .mutate({ mutation: { kind: 'insert', table, data } })
+        .finally(() => dataReads.forget())
       if (id) paperHost.openRow?.(id)
     } catch (cause) {
       const { useNoticeStore } = await import('../stores')
@@ -153,11 +158,11 @@ export const paperHost: PaperHost = {
   },
 
   toggleTask: async (recordId, done, field) => {
-    await api.tables.toggleTask.mutate({ recordId, done, field })
+    await api.tables.toggleTask.mutate({ recordId, done, field }).finally(() => dataReads.forget())
   },
 
   describeTable: async (name) => {
-    const tables = await api.tables.list.query()
+    const tables = await dataReads.share('tables', () => api.tables.list.query())
     return tables.find((table) => table.spec.name === name)?.spec ?? null
   },
 

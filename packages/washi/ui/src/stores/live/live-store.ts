@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { api } from '../../api'
+import { dataReads, pageReads } from '../../reads'
 import { useSheetsStore } from '../sheets/sheets-store'
 import { useThemesStore } from '../themes/themes-store'
 import { useUnsplashStore } from '../unsplash/unsplash-store'
@@ -19,9 +20,12 @@ export const useLiveStore = create<LiveState>(() => ({
     subscription = api.live.onChange.subscribe(undefined, {
       onData: ({ data }) => {
         if (data.kind === 'data') {
+          // Before the listeners: their refetch must ask the server, not the read it replaces.
+          dataReads.forget()
           for (const listener of listeners) listener()
           return
         }
+        pageReads.forget()
         if (pageTimer) clearTimeout(pageTimer)
         pageTimer = setTimeout(() => {
           void useSheetsStore.getState().refresh()
