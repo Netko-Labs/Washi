@@ -163,3 +163,6 @@ export const DB_MUTATE_DESCRIPTION =
 
 export const TURN_STALLED = 'Washi stopped hearing back — the turn was ended'
 export const TURN_INTERRUPTED = 'The server restarted while Washi was working — the turn was ended'
+
+export const AFTER_STOP =
+  'The person pressed Stop on your previous turn. Tool calls it left unfinished were cancelled, not failed: never report them as failures, and run one again only if this ask needs it.'

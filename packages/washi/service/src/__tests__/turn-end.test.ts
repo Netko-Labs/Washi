@@ -9,7 +9,7 @@ import {
   type Workspace,
 } from '@washi/repository'
 import { AgentHost } from '../agents/host'
-import { type AgentKeySource, TURN_INTERRUPTED, TURN_STALLED } from '../agents/lib'
+import { AFTER_STOP, type AgentKeySource, TURN_INTERRUPTED, TURN_STALLED } from '../agents/lib'
 import type { AgentPort, PromptRequest, TurnResult } from '../agents/ports'
 
 let ws: Workspace
@@ -143,6 +143,28 @@ describe('every turn ends in exactly one turn_done (D114)', () => {
     await turn
     expect(receipts(session.id)).toEqual([expect.objectContaining({ stopReason: 'cancelled' })])
     expect(statusOf(session.id)).toBe('idle')
+  })
+})
+
+describe('the ask after a Stop', () => {
+  test('tells the model its last turn was stopped, once', async () => {
+    const said: string[] = []
+    const host = hostWith(
+      (request) =>
+        new Promise((resolve) => {
+          said.push(request.text)
+          if (said.length > 1) resolve({ costUsd: null, billing: 'metered' })
+        }),
+      { quietMs: 60_000, graceMs: 20 },
+    )
+    const session = createSession(ws, 'after stop')
+    const turn = host.prompt(session.id, 'search twice')
+    await Bun.sleep(5)
+    host.cancel(session.id)
+    await turn
+    await host.prompt(session.id, 'again')
+    await host.prompt(session.id, 'and once more')
+    expect(said).toEqual(['search twice', `${AFTER_STOP}\n\nagain`, 'and once more'])
   })
 })
 

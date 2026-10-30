@@ -13,7 +13,7 @@ import type {
 export type ChatScope = string | null
 
 /** One state per conversation (D114). */
-export type TurnState = 'idle' | 'working' | 'stalled' | 'failed'
+export type TurnState = 'idle' | 'working' | 'stalled' | 'failed' | 'stopped'
 
 /** The last turn's failure in words; `entryId` is its receipt, null when it never got one. */
 export interface TurnFailure {
@@ -25,8 +25,8 @@ export interface TurnFailure {
 export interface TurnView {
   state: TurnState
   failureText: string | null
-  /** The failed turn's receipt; the transcript leaves it to the turn status to draw. */
-  failureId: string | null
+  /** The failed or stopped turn's receipt; the transcript leaves it to the turn status to draw. */
+  endId: string | null
   /** The running turn's ask, as the server stamped it (ms). */
   startedAt: number | null
   /** Retry has something to send. */

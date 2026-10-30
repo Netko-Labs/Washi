@@ -56,6 +56,7 @@ export type {
 } from './types'
 export { titleFrom, wordsOf } from './utils'
 export {
+  AFTER_STOP,
   DB_MUTATE_DESCRIPTION,
   HANDOVER_DESCRIPTION,
   SEARCH_NOT_SET,

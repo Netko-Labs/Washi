@@ -28,7 +28,7 @@ import { ApprovalDesk } from './approvals'
 import { DailyBudget } from './budget'
 import { CapabilityDesk } from './desk'
 import { ChatMoveError, chatPlaceLine, moveChat } from './handover'
-import { conversationHistory } from './history'
+import { conversationHistory, followsStop } from './history'
 import { createEmbeddedKeySource } from './inference'
 import { instructionsFor } from './instructions'
 import type {
@@ -54,6 +54,7 @@ import type {
   TurnLimits,
 } from './lib'
 import {
+  AFTER_STOP,
   IMAGE_TYPES,
   MAX_INLINE_FILE_BYTES,
   SDK_EFFORT,
@@ -436,8 +437,11 @@ export class AgentHost {
     })
     // From the ask on: a process that dies before the port starts still leaves a receipt at boot.
     updateSession(this.ws, sessionId, { status: 'running' })
-    const place = chatPlaceLine(this.ws, session?.anchor ?? null, ask.viewer ?? NOBODY)
-    const { prompt, images } = await this.compose(text, attachments, place)
+    const lead = [
+      chatPlaceLine(this.ws, session?.anchor ?? null, ask.viewer ?? NOBODY),
+      followsStop(getTranscript(this.ws, sessionId)) ? AFTER_STOP : null,
+    ].filter((line): line is string => line !== null)
+    const { prompt, images } = await this.compose(text, attachments, lead)
     const refusal = this.budget.refusal()
     if (refusal) {
       this.fail(sessionId, refusal, turn)
@@ -489,9 +493,9 @@ export class AgentHost {
     this.close(sessionId, credential, ended, Date.now() - started, turn)
   }
 
-  /** The chat's page leads; pages ride by id, text files inline, pictures as image blocks. */
-  private async compose(text: string, attachments: AttachmentRef[], place: string | null) {
-    const lines: string[] = place ? [place] : []
+  /** The chat's page and a stop lead; pages ride by id, text files inline, pictures as blocks. */
+  private async compose(text: string, attachments: AttachmentRef[], lead: string[]) {
+    const lines = [...lead]
     const images: { mime: string; base64: string }[] = []
     for (const attachment of attachments) {
       if (attachment.kind === 'page') {
