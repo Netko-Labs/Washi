@@ -405,6 +405,15 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   approvals to `auto` (`agents.setApprovalMode`, Settings → Agent on both hosts): a standing yes
   for what leaves, each call ledgered as `auto`; policy refusals still refuse. Owner or admin
   only (`ownerProcedure`), as is setting an integration key.
+- **A conversation may approve everything (D115).** App meta `yolo_allowed`, off by default
+  (`agents.setYoloAllowed`, owners and admins; Settings → Washi → What leaves). Allowed, a chat's
+  starter flips the composer's ⚡ YOLO chip: `agent_sessions.approvals` (`setSessionOptions`, null
+  follows the workspace's mode, `ask` may opt out of a workspace's `auto`). Its `auto` passes
+  `fetch_url`, `web_search` and `action_run` in that chat alone, each ledgered `auto` and signed
+  by the starter (`standingYes`); policy refusals still refuse. A workspace chat (a routine's) has
+  no say, and turning it off clears every chat's (`clearSessionApprovals`). The composer grows to
+  40% of its room (the panel, else the viewport; `useAutosize`), and the person's bubble is
+  markdown like Washi's (`BUBBLE_PROSE`: their line breaks kept, code scrolls inside it).
 - **The agent panel (D61).** `AgentPanel` takes a `placement`: `float` (the popover), `dock` (a
   flex sibling the studio's wide shell puts beside the page; the default — only an undock is
   remembered, `washi:dock:<id>` = `0`; the FAB, the whole mascot tile on a squircle, steps aside

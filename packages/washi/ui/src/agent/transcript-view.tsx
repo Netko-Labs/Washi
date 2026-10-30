@@ -1,7 +1,7 @@
 import { IconAlertTriangle } from '@tabler/icons-react'
 import type { AgentUpdate } from '@washi/domain'
 import { RestorePage, useDescribeTool } from '../approval'
-import { Markdown } from '../markdown'
+import { BUBBLE_PROSE, Markdown } from '../markdown'
 import { Mascot } from '../mascot'
 import { HandoffDivider } from './handoff-divider'
 import {
@@ -90,7 +90,7 @@ export function TranscriptView({ transcript }: TranscriptViewProps) {
             return (
               <div
                 key={entry.id}
-                className="my-1 max-w-[85%] self-end rounded-2xl rounded-br-md bg-muted px-3.5 py-2 text-[13px] leading-relaxed"
+                className={`my-1 max-w-[85%] self-end rounded-2xl rounded-br-md bg-muted px-3.5 py-2 text-[13px] leading-relaxed ${BUBBLE_PROSE}`}
               >
                 {update.attachments && update.attachments.length > 0 && (
                   <div className="mb-1 flex flex-wrap gap-1">
@@ -104,7 +104,7 @@ export function TranscriptView({ transcript }: TranscriptViewProps) {
                     ))}
                   </div>
                 )}
-                {update.text}
+                <Markdown text={update.text} />
               </div>
             )
           case 'message_chunk':

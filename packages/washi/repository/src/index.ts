@@ -13,6 +13,7 @@ export {
 } from './files'
 export {
   appendTurn,
+  clearSessionApprovals,
   createApproval,
   createSession,
   deleteSession,

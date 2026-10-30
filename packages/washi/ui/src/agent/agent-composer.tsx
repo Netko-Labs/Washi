@@ -8,8 +8,10 @@ import {
 } from '@tabler/icons-react'
 import { useAgentStore } from '../stores'
 import { AttachMenu } from './attach-menu'
+import { AutosizeTextarea } from './autosize-textarea'
 import { useComposer, useComposerSession, useInference } from './lib'
 import { OptionChips } from './option-chips'
+import { YoloNote } from './yolo-chip'
 
 /** The door's keyboard: what rides with the ask, what thinks about it, Send that becomes Stop. */
 export function AgentComposer() {
@@ -46,18 +48,12 @@ export function AgentComposer() {
             ))}
           </div>
         )}
-        <textarea
+        <AutosizeTextarea
           value={composer.draft}
-          onChange={(event) => composer.setDraft(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter' && !event.shiftKey) {
-              event.preventDefault()
-              composer.submit()
-            }
-          }}
+          onChange={composer.setDraft}
+          onSubmit={composer.submit}
           placeholder="Ask, or tell Washi what to write…"
-          rows={2}
-          className="w-full resize-none bg-transparent text-[13px] outline-none placeholder:text-muted-foreground"
+          className="text-[13px] leading-5"
         />
         {composer.error && <p className="pb-1 text-[11.5px] text-destructive">{composer.error}</p>}
         <div className="flex items-center gap-1.5 pt-1">
@@ -104,6 +100,7 @@ export function AgentComposer() {
           )}
         </div>
       </div>
+      <YoloNote session={session} inference={inference} />
     </div>
   )
 }

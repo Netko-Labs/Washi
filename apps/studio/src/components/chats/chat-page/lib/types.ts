@@ -116,11 +116,3 @@ export interface ChatPageCardProps {
   page: TouchedPage
   workspaceId: string
 }
-
-export interface AutosizeTextareaProps {
-  value: string
-  onChange: (value: string) => void
-  onSubmit: () => void
-  placeholder: string
-  inputRef?: RefObject<HTMLTextAreaElement | null>
-}

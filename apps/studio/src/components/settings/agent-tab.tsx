@@ -49,6 +49,8 @@ export function AgentTab({ part }: AgentTabProps) {
           searchKey={searchKey}
           serverSearchKey={settings.serverSearchKey}
           onApprovalMode={settings.setApprovalMode}
+          yoloAllowed={standing?.yoloAllowed ?? false}
+          onYoloAllowed={settings.setYoloAllowed}
           onConnect={() => setDialog('exa')}
           onRemove={settings.removeSearchKey}
         />

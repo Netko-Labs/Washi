@@ -68,6 +68,9 @@ export const ROUTINE_APPROVAL_TIMEOUT_MS = 12 * 60 * 60_000
 export const APPROVAL_MODE_KEY = 'agent_approval_mode'
 export const APPROVAL_MODES = ['ask', 'auto'] as const
 
+/** Whether a conversation may set its own approvals — YOLO (D115). Off unless an owner says so. */
+export const YOLO_ALLOWED_KEY = 'yolo_allowed'
+
 /** Who may clear the breaker: anyone on the team (the default) or an owner. */
 export const RESUME_BY_KEY = 'agent_resume_by'
 export const RESUME_BY = ['anyone', 'owners'] as const

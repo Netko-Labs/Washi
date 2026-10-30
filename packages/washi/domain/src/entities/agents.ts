@@ -5,6 +5,10 @@ import { dailyCron, isCron } from '../shared/cron'
 export const effortSchema = z.enum(['quick', 'balanced', 'deep'])
 export type Effort = z.infer<typeof effortSchema>
 
+/** Whether what leaves the server waits for a person: ask, or a standing yes (auto). */
+export const approvalModeSchema = z.enum(['ask', 'auto'])
+export type ApprovalMode = z.infer<typeof approvalModeSchema>
+
 /** How far a chat's anchor reaches: its page alone, or the page and everything under it (D67). */
 export const chatAnchorScopeSchema = z.enum(['page', 'subtree'])
 export type ChatAnchorScope = z.infer<typeof chatAnchorScopeSchema>
@@ -24,6 +28,8 @@ export const agentSessionSchema = z.object({
   /** A conversation's own choices; null takes the workspace default (D61). */
   model: z.string().nullable(),
   effort: effortSchema.nullable(),
+  /** Its own approvals (D115) while the workspace allows it; null follows the workspace's mode. */
+  approvals: approvalModeSchema.nullable(),
   /** Whose chat it is; null is the workspace's — a routine's runs, and every chat before D67. */
   createdBy: z.string().nullable(),
   anchor: chatAnchorSchema.nullable(),

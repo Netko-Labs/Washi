@@ -7,7 +7,7 @@ import type {
   TranscriptEntry,
 } from '@washi/domain'
 import { agentSessionTable, agentTurnTable, approvalTable } from '@washi/domain/db'
-import { asc, desc, eq, isNull, or } from 'drizzle-orm'
+import { asc, desc, eq, isNotNull, isNull, or } from 'drizzle-orm'
 import { forgetChatSearch, indexChatSearch } from './chat-search'
 import { newId, type Workspace } from './client'
 
@@ -20,6 +20,7 @@ function toSession(row: typeof agentSessionTable.$inferSelect): AgentSession {
     costUsd: row.costUsd,
     model: row.model,
     effort: row.effort as AgentSession['effort'],
+    approvals: row.approvals as AgentSession['approvals'],
     createdBy: row.createdBy,
     anchor:
       row.anchorSheetId && row.anchorScope
@@ -89,6 +90,7 @@ export function updateSession(
     title: string
     model: string | null
     effort: string | null
+    approvals: string | null
   }>,
 ): void {
   ws.db
@@ -97,6 +99,15 @@ export function updateSession(
     .where(eq(agentSessionTable.id, id))
     .run()
   if (patch.title !== undefined) indexChatSearch(ws, id)
+}
+
+/** Every conversation back on the workspace's approvals, as when it stops allowing its own (D115). */
+export function clearSessionApprovals(ws: Workspace): void {
+  ws.db
+    .update(agentSessionTable)
+    .set({ approvals: null })
+    .where(isNotNull(agentSessionTable.approvals))
+    .run()
 }
 
 /** Where a chat lives (D110); null is Home. The move counts as activity, so it sorts first. */

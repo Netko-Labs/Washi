@@ -1,7 +1,9 @@
 import type { ApprovalDecision, ApprovalRequest } from '@washi/domain'
 import {
+  clearSessionApprovals,
   createApproval,
   getAppMeta,
+  getSession,
   recordCapability,
   resolveApproval,
   setAppMeta,
@@ -18,6 +20,7 @@ import {
   type EventsRef,
   READ_TOOLS,
   ROUTINE_APPROVAL_TIMEOUT_MS,
+  YOLO_ALLOWED_KEY,
 } from './lib'
 import { shortToolName } from './normalize'
 import type { ToolGate, ToolVerdict } from './ports'
@@ -28,6 +31,14 @@ function outboundUrl(toolName: string, input: unknown): string | null {
   if (toolName === 'web_search') return EXA_SEARCH_URL
   const url = (input as { url?: unknown } | null)?.url
   return toolName === 'fetch_url' && typeof url === 'string' ? url : null
+}
+
+/** Said as FORBIDDEN: a conversation's approvals are its starter's, where the workspace allows. */
+export class SessionApprovalsError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'SessionApprovalsError'
+  }
 }
 
 /**
@@ -71,6 +82,30 @@ export class ApprovalDesk implements ToolGate {
     return this.mode()
   }
 
+  yoloAllowed(): boolean {
+    return getAppMeta(this.ws, YOLO_ALLOWED_KEY) === '1'
+  }
+
+  /** Off puts every conversation back on the workspace's mode (D115). */
+  setYoloAllowed(allowed: boolean): boolean {
+    setAppMeta(this.ws, YOLO_ALLOWED_KEY, allowed ? '1' : '')
+    if (!allowed) clearSessionApprovals(this.ws)
+    return this.yoloAllowed()
+  }
+
+  /** Null always goes back to the workspace's mode; anything else is the starter's, if allowed. */
+  checkSessionApprovals(sessionId: string, approvals: ApprovalMode | null, actorId: string) {
+    if (approvals === null) return
+    if (!this.yoloAllowed()) {
+      throw new SessionApprovalsError(
+        'this workspace does not let a conversation approve for itself',
+      )
+    }
+    if (getSession(this.ws, sessionId)?.createdBy !== actorId) {
+      throw new SessionApprovalsError('only whoever started this chat can change its approvals')
+    }
+  }
+
   hasPending(): boolean {
     return this.pending.size > 0
   }
@@ -100,8 +135,15 @@ export class ApprovalDesk implements ToolGate {
     const verdict = this.policyVerdict(toolName, input)
     if (verdict?.ok) return true
     if (verdict && !verdict.needsApproval) return false
-    if (this.mode() === 'auto') {
-      recordCapability(this.ws, { origin: 'agent', subject: toolName, input, decision: 'auto' })
+    const standing = this.standingYes(sessionId)
+    if (standing) {
+      recordCapability(this.ws, {
+        origin: 'agent',
+        actorId: standing.actorId,
+        subject: toolName,
+        input,
+        decision: 'auto',
+      })
       return true
     }
     if (this.alwaysAllowed.get(sessionId)?.has(toolName)) return true
@@ -130,6 +172,14 @@ export class ApprovalDesk implements ToolGate {
     return (await this.approve(sessionId, name, input))
       ? { behavior: 'allow', updatedInput: input }
       : { behavior: 'deny', message: 'the user declined this action' }
+  }
+
+  /** A conversation's own say wins while allowed, signed by its starter; a routine has none. */
+  private standingYes(sessionId: string): { actorId: string | null } | null {
+    const session = this.yoloAllowed() ? getSession(this.ws, sessionId) : null
+    const own = session?.createdBy ? session.approvals : null
+    if ((own ?? this.mode()) !== 'auto') return null
+    return { actorId: own === 'auto' ? (session?.createdBy ?? null) : null }
   }
 
   /** What leaves the server, judged by the fetch policy: a listed host passes, an unknown one asks. */
