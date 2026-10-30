@@ -1,6 +1,12 @@
 import type { QuickJSContext, QuickJSWASMModule } from 'quickjs-emscripten-core'
 import type { Sandbox, SandboxBridge, SandboxSetup } from '../types'
-import { CRYPTO_SHIM, INTL_SHIM, MAX_RANDOM_BYTES, SANDBOX_STACK_BYTES } from './values'
+import {
+  CRYPTO_SHIM,
+  INTL_SHIM,
+  MAX_NUMBER_FORMATS,
+  MAX_RANDOM_BYTES,
+  SANDBOX_STACK_BYTES,
+} from './values'
 
 let engine: Promise<QuickJSWASMModule> | null = null
 
@@ -42,10 +48,41 @@ function lendRandom(vm: QuickJSContext) {
   handle.dispose()
 }
 
+/** The host's `Intl.NumberFormat`, by locale and options as JSON: what `INTL_SHIM` reads through. */
+function lendIntl(vm: QuickJSContext) {
+  const formats = new Map<string, Intl.NumberFormat>()
+  const formatOf = (locales: string, options: string) => {
+    const key = `${locales}\u0000${options}`
+    const known = formats.get(key)
+    if (known) return known
+    if (formats.size >= MAX_NUMBER_FORMATS) formats.clear()
+    const format = new Intl.NumberFormat(JSON.parse(locales) ?? undefined, JSON.parse(options))
+    formats.set(key, format)
+    return format
+  }
+  const answer = (name: string, read: (format: Intl.NumberFormat, value: number) => string) => {
+    const handle = vm.newFunction(name, (locales, options, value) => {
+      try {
+        const format = formatOf(vm.getString(locales), vm.getString(options))
+        return vm.newString(read(format, value ? vm.getNumber(value) : Number.NaN))
+      } catch (error) {
+        const failure = error instanceof Error ? error : new Error(String(error))
+        return { error: vm.newError({ name: failure.name, message: failure.message }) }
+      }
+    })
+    vm.setProp(vm.global, name, handle)
+    handle.dispose()
+  }
+  answer('__numberOptions', (format) => JSON.stringify(format.resolvedOptions()))
+  answer('__numberFormat', (format, value) => format.format(value))
+}
+
 /**
  * A fresh QuickJS: no DOM, no network, no timers, a memory cap and a deadline on every run. Its
  * only ways out are the `__bridge_<name>` functions it was opened with, answered by whatever bridge
- * the current call lends, and `__random` behind a Web `crypto` (random bytes, nothing else). The code itself runs once, inside the same deadline; a throw closes it.
+ * the current call lends, `__random` behind a Web `crypto` (random bytes, nothing else) and the
+ * host's number formats behind `Intl`. The code itself runs once, inside the same deadline; a throw
+ * closes it.
  */
 export async function openSandbox(js: string, setup: SandboxSetup): Promise<Sandbox> {
   const quickjs = await loadEngine()
@@ -56,6 +93,7 @@ export async function openSandbox(js: string, setup: SandboxSetup): Promise<Sand
   const current: { bridge: SandboxBridge | null } = { bridge: null }
   lend(vm, setup.names, current)
   lendRandom(vm)
+  lendIntl(vm)
 
   const run = (code: string, bridge: SandboxBridge | null) => {
     current.bridge = bridge
