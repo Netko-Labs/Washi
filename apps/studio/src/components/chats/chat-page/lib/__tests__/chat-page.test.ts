@@ -5,7 +5,6 @@ import {
   createdId,
   greetingFor,
   isNearBottom,
-  pastTense,
   receiptSummary,
   startersFor,
   trashedPages,
@@ -117,12 +116,6 @@ describe('chat blocks', () => {
 })
 
 describe('receipts', () => {
-  test('approval phrasing becomes what happened', () => {
-    expect(pastTense('Create a page')).toBe('Made a page')
-    expect(pastTense('Search the web for')).toBe('Searched the web for')
-    expect(pastTense('Read')).toBe('Read')
-  })
-
   test('two shown, the rest counted', () => {
     expect(receiptSummary(['Read A', 'Searched the web', 'Read B', 'Read C'])).toEqual({
       head: 'Read A · Searched the web',

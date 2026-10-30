@@ -8,4 +8,4 @@ export type {
   TitleOf,
   ToolDescription,
 } from './types'
-export { describeTool } from './utils'
+export { describeTool, pastTense } from './utils'

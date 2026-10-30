@@ -1,6 +1,6 @@
 import { IconChevronRight } from '@tabler/icons-react'
-import { RestorePage, useDescribeTool } from '@washi/ui'
-import { type ChatReceiptsProps, pastTense, receiptSummary, trashedPages } from './lib'
+import { pastTense, RestorePage, useDescribeTool } from '@washi/ui'
+import { type ChatReceiptsProps, receiptSummary, trashedPages } from './lib'
 
 /** A run of tool calls as one quiet line in words; open it for each call. */
 export function ChatReceipts({ steps }: ChatReceiptsProps) {

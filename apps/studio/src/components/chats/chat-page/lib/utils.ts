@@ -10,7 +10,7 @@ import type {
   TurnPart,
   WashiBlock,
 } from './types'
-import { GENERIC_STARTERS, MAKE_A_PAGE, PAST_TENSE } from './values'
+import { GENERIC_STARTERS, MAKE_A_PAGE } from './values'
 
 const record = (value: unknown): Record<string, unknown> =>
   value && typeof value === 'object' ? (value as Record<string, unknown>) : {}
@@ -122,12 +122,6 @@ export function chatBlocks(transcript: TranscriptEntry[]): ChatBlock[] {
     if (block.kind === 'washi') block.pages = pagesOf(block.parts)
   }
   return blocks
-}
-
-export function pastTense(action: string): string {
-  const [verb = '', ...rest] = action.split(' ')
-  const past = PAST_TENSE[verb]
-  return past ? [past, ...rest].join(' ') : action
 }
 
 /** "Read Trip Plan · Searched the web" and how many more fold behind them. */

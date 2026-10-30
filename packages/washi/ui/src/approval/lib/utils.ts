@@ -23,6 +23,7 @@ import {
   IconWorldSearch,
 } from '@tabler/icons-react'
 import type { TitleOf, ToolDescription } from './types'
+import { PAST_TENSE } from './values'
 
 const record = (value: unknown): Record<string, unknown> =>
   value && typeof value === 'object' ? (value as Record<string, unknown>) : {}
@@ -252,4 +253,11 @@ export function describeTool(
     default:
       return base({ icon: IconTool, action: name.replaceAll('_', ' ') })
   }
+}
+
+/** A finished call's words: "Create a page" → "Made a page". */
+export function pastTense(action: string): string {
+  const [verb = '', ...rest] = action.split(' ')
+  const past = PAST_TENSE[verb]
+  return past ? [past, ...rest].join(' ') : action
 }

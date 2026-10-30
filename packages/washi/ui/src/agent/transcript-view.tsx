@@ -1,6 +1,6 @@
 import { IconAlertTriangle } from '@tabler/icons-react'
 import type { AgentUpdate } from '@washi/domain'
-import { RestorePage, useDescribeTool } from '../approval'
+import { pastTense, RestorePage, useDescribeTool } from '../approval'
 import { BUBBLE_PROSE, Markdown } from '../markdown'
 import { Mascot } from '../mascot'
 import { HandoffDivider } from './handoff-divider'
@@ -59,7 +59,7 @@ function ToolPill({ update, followups }: ToolPillProps) {
         >
           <Icon className="size-[13px] shrink-0" />
           <span className="max-w-[260px] truncate" title={update.title}>
-            {action}
+            {status === 'completed' ? pastTense(action) : action}
             {subject && ` ${subject}`}
           </span>
           {status === 'in_progress' && <span className="animate-pulse">…</span>}

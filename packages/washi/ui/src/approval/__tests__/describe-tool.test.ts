@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { describeTool } from '../lib'
+import { describeTool, pastTense } from '../lib'
 
 const titles = (id: string) => (id === 's1' ? 'Trip to Kyoto' : null)
 const said = (name: string, input: unknown) => {
@@ -98,5 +98,14 @@ describe('tool calls read like a person asked', () => {
 
   test('nothing developer-shaped leaks for an unknown tool', () => {
     expect(said('make_coffee', {})).toBe('make coffee')
+  })
+})
+
+describe('a finished call says what happened', () => {
+  test('approval phrasing becomes the past', () => {
+    expect(pastTense('Create a page')).toBe('Made a page')
+    expect(pastTense('Update the page')).toBe('Updated the page')
+    expect(pastTense('Search the web for')).toBe('Searched the web for')
+    expect(pastTense('Read')).toBe('Read')
   })
 })
