@@ -1,6 +1,7 @@
 export { AgentFab } from './agent-fab'
 export { AgentPanel } from './agent-panel'
 export { AttachMenu } from './attach-menu'
+export { AutosizeTextarea } from './autosize-textarea'
 export { HandoffDivider } from './handoff-divider'
 export {
   type AgentPanelProps,
@@ -14,3 +15,4 @@ export {
   useInference,
 } from './lib'
 export { OptionChips } from './option-chips'
+export { YoloChip, YoloNote } from './yolo-chip'

@@ -15,6 +15,8 @@ export function useInference(): InferenceView | null {
           localModel: status.localModel,
           plan: status.localCli?.plan ?? null,
           enabledModels: settings.enabledModels,
+          approvalMode: settings.approvalMode,
+          yoloAllowed: settings.yoloAllowed,
         }),
       )
       .catch(() => setView(null))

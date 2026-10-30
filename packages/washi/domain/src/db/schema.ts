@@ -76,6 +76,7 @@ export const agentSessionTable = sqliteTable('agent_sessions', {
   costUsd: real('cost_usd').notNull().default(0),
   model: text('model'),
   effort: text('effort'),
+  approvals: text('approvals'),
   createdBy: text('created_by'),
   anchorSheetId: text('anchor_sheet_id'),
   anchorScope: text('anchor_scope'),

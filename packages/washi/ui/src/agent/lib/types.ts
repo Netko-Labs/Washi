@@ -1,6 +1,7 @@
 import type {
   AgentSession,
   AgentUpdate,
+  ApprovalMode,
   AttachmentRef,
   Effort,
   EnabledModel,
@@ -73,6 +74,20 @@ export interface HandoffDividerProps {
   handoff: Handoff
 }
 
+export interface AutosizeTextareaProps {
+  value: string
+  onChange: (value: string) => void
+  onSubmit: () => void
+  placeholder: string
+  className: string
+  inputRef?: RefObject<HTMLTextAreaElement | null>
+}
+
+export interface YoloProps {
+  session: AgentSession | null
+  inference: InferenceView | null
+}
+
 export interface OptionChipsProps {
   session: AgentSession | null
   inference: InferenceView | null
@@ -85,6 +100,9 @@ export interface InferenceView {
   plan: string | null
   /** The workspace's picks for the composer; null offers the recommended three. */
   enabledModels: EnabledModel[] | null
+  approvalMode: ApprovalMode
+  /** Whether a conversation may approve everything for itself (D115). */
+  yoloAllowed: boolean
 }
 
 export interface ModelChoice {

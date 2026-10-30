@@ -3,6 +3,7 @@ import {
   ON_SERVER_SEARCH_KEY,
   type OutsideCardProps,
   PROVIDER_META,
+  YOLO_OPTIONS,
 } from '../lib'
 import { ProviderRow, Segmented, SettingRow, SettingsCard } from '../shared/card'
 
@@ -12,6 +13,8 @@ export function OutsideCard({
   searchKey,
   serverSearchKey,
   onApprovalMode,
+  yoloAllowed,
+  onYoloAllowed,
   onConnect,
   onRemove,
 }: OutsideCardProps) {
@@ -28,6 +31,16 @@ export function OutsideCard({
           value={approvalMode}
           options={APPROVAL_MODE_OPTIONS}
           onChange={(mode) => void onApprovalMode(mode)}
+        />
+      </SettingRow>
+      <SettingRow
+        label="Let people approve everything in a conversation"
+        hint="A YOLO switch in the composer: Washi stops asking in that conversation only. Off turns every one back"
+      >
+        <Segmented
+          value={yoloAllowed ? 'on' : 'off'}
+          options={YOLO_OPTIONS}
+          onChange={(choice) => void onYoloAllowed(choice === 'on')}
         />
       </SettingRow>
       {!searchKey && serverSearchKey && (

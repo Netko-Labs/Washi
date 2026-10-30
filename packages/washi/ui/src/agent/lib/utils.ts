@@ -1,7 +1,7 @@
-import type { TranscriptEntry } from '@washi/domain'
+import type { AgentSession, ApprovalMode, TranscriptEntry } from '@washi/domain'
 import { hostPlace } from '../../api'
 import type { InferenceView, ModelChoice, TurnDone } from './types'
-import { RECOMMENDED_MODELS } from './values'
+import { COMPOSER_MIN_CAP_PX, COMPOSER_SHARE, RECOMMENDED_MODELS } from './values'
 
 function duration(ms: number): string {
   const tenths = Math.round(ms / 100)
@@ -58,4 +58,28 @@ export function offeredModels(inference: InferenceView | null): ModelChoice[] {
     label: model.name.replace(/^Claude /, ''),
     desc: recommended.find((pick) => pick.id === model.id)?.desc ?? '',
   }))
+}
+
+/** How tall the composer grows in `room` px before it scrolls; never under a few lines. */
+export function composerCap(room: number): number {
+  return Math.max(COMPOSER_MIN_CAP_PX, Math.round(room * COMPOSER_SHARE))
+}
+
+/** The YOLO chip shows only where the workspace allows it and Washi is awake (D115). */
+export function isYoloOffered(inference: InferenceView | null): boolean {
+  return inference !== null && inference.active !== null && inference.yoloAllowed
+}
+
+/** A conversation's own say, else the workspace's mode. */
+export function approvalsOf(session: AgentSession | null, inference: InferenceView): ApprovalMode {
+  return session?.approvals ?? inference.approvalMode
+}
+
+/** The opposite of what holds now; the workspace's own mode is sent as null, so it follows it. */
+export function nextApprovals(
+  session: AgentSession | null,
+  inference: InferenceView,
+): ApprovalMode | null {
+  const next = approvalsOf(session, inference) === 'auto' ? 'ask' : 'auto'
+  return next === inference.approvalMode ? null : next
 }

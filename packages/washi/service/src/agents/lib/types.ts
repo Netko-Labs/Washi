@@ -113,6 +113,7 @@ export interface AskOptions {
 export interface SessionOptions {
   model?: string | null
   effort?: Effort | null
+  approvals?: ApprovalMode | null
 }
 
 export interface AgentHostEvents {
@@ -160,4 +161,6 @@ export interface AgentSettingsReport {
   effort: Effort
   enabledModels: EnabledModel[] | null
   zone: string
+  approvalMode: ApprovalMode
+  yoloAllowed: boolean
 }

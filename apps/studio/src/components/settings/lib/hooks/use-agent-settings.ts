@@ -137,6 +137,11 @@ export function useAgentSettings() {
       setApprovalModeState((await api.agents.setApprovalMode.mutate({ mode })).mode)
     })
 
+  const setYoloAllowed = (allowed: boolean) =>
+    attempt(async () => {
+      setSettings((await api.agents.setYoloAllowed.mutate({ allowed })) as AgentSettingsState)
+    })
+
   const resume = () =>
     attempt(async () => {
       setSpend((await api.agents.resume.mutate()) as SpendState)
@@ -195,6 +200,7 @@ export function useAgentSettings() {
     saveSearchKey,
     removeSearchKey,
     setApprovalMode,
+    setYoloAllowed,
     resume,
     pause,
     setDailyCap,

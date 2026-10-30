@@ -1,6 +1,7 @@
 import type {
   AgentSession,
   ApprovalDecision,
+  ApprovalMode,
   ApprovalRequest,
   AttachmentRef,
   ChatMove,
@@ -47,7 +48,11 @@ export interface AgentState {
   selectSession: (id: string) => Promise<void>
   renameSession: (id: string, title: string) => Promise<void>
   deleteSession: (id: string) => Promise<void>
-  setSessionOptions: (patch: { model?: string | null; effort?: Effort | null }) => Promise<void>
+  setSessionOptions: (patch: {
+    model?: string | null
+    effort?: Effort | null
+    approvals?: ApprovalMode | null
+  }) => Promise<void>
   sendPrompt: (text: string, attachments?: AttachmentRef[]) => Promise<void>
   stopTurn: () => Promise<void>
   resolveApproval: (id: string, decision: ApprovalDecision) => Promise<void>

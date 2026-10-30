@@ -30,3 +30,7 @@ export const EFFORTS: EffortChoice[] = [
 
 export const MAX_ATTACHMENTS = 8
 export const UPLOAD_ACCEPT = 'image/jpeg,image/png,image/webp,text/*,.csv,.md,.json'
+
+/** The composer grows to this share of its room — the panel, or the page's viewport. */
+export const COMPOSER_SHARE = 0.4
+export const COMPOSER_MIN_CAP_PX = 96

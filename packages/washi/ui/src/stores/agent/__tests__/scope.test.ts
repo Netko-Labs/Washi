@@ -15,6 +15,7 @@ const chat = (id: string, sheetId: string | null, createdBy: string | null = 'ri
     costUsd: 0,
     model: null,
     effort: null,
+    approvals: null,
     createdBy,
     anchor: sheetId ? { sheetId, scope: 'page' } : null,
     createdAt: '',

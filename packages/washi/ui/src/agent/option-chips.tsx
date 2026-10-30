@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { api } from '../api'
 import { useAgentStore } from '../stores'
 import { EFFORTS, LOCAL_MODELS, type OptionChipsProps, offeredModels } from './lib'
+import { YoloChip } from './yolo-chip'
 
 const CHIP =
   'flex h-6 max-w-[150px] items-center gap-1 rounded-full border border-border bg-card px-2 font-medium text-[11px] hover:bg-accent'
@@ -11,7 +12,7 @@ const MENU =
 const ROW =
   'flex w-full items-center gap-2 rounded-lg px-2 py-[6px] text-left text-[12.5px] hover:bg-accent'
 
-/** Model and effort, per conversation, starting from the workspace defaults. */
+/** Model, effort and YOLO, per conversation, starting from the workspace defaults. */
 export function OptionChips({ session, inference }: OptionChipsProps) {
   const [open, setOpen] = useState<'model' | 'effort' | null>(null)
   const local = inference?.active === 'local_cli'
@@ -129,6 +130,7 @@ export function OptionChips({ session, inference }: OptionChipsProps) {
           </div>
         )}
       </div>
+      <YoloChip session={session} inference={inference} />
     </>
   )
 }

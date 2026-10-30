@@ -1,3 +1,4 @@
+export { SessionApprovalsError } from './agents/approvals'
 export { ChatMoveError, movedFrom } from './agents/handover'
 export { AgentHost } from './agents/host'
 export {

@@ -47,6 +47,7 @@ export type {
   SignupMode,
   SpendState,
   UsageCardProps,
+  YoloSetting,
 } from './types'
 export { clampInt, clampMoney, refusalFor, settingsLabel, sinceLabel } from './utils'
 export {
@@ -63,4 +64,5 @@ export {
   SETTINGS_TAB_KEYS,
   SIGNUP_OPTIONS,
   THEME_OPTIONS,
+  YOLO_OPTIONS,
 } from './values'

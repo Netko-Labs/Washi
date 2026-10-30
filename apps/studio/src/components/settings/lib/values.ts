@@ -23,6 +23,7 @@ import type {
   SettingsGroup,
   SettingsTab,
   SignupMode,
+  YoloSetting,
 } from './types'
 
 export const PROVIDERS = [
@@ -207,6 +208,15 @@ export const APPROVAL_MODE_OPTIONS: readonly Option<ApprovalMode>[] = [
     id: 'auto',
     label: 'Auto',
     desc: 'A standing yes from this workspace. Each call is still written to the ledger.',
+  },
+]
+
+export const YOLO_OPTIONS: readonly Option<YoloSetting>[] = [
+  { id: 'off', label: 'Off', desc: 'Every conversation follows the approvals above.' },
+  {
+    id: 'on',
+    label: 'On',
+    desc: 'Whoever starts a conversation may switch on YOLO in it. Each call is still ledgered.',
   },
 ]
 

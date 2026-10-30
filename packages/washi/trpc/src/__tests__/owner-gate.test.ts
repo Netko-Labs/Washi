@@ -146,3 +146,29 @@ describe('where uploads go is the owner’s call', () => {
     })
   })
 })
+
+describe('a conversation approving everything is its starter’s, where an owner allows it', () => {
+  test('a member cannot allow it; refused for a chat while it is off', async () => {
+    const member = callerFor('member')
+    await expect(member.agents.setYoloAllowed({ allowed: true })).rejects.toMatchObject({
+      code: 'FORBIDDEN',
+    })
+    const chat = await member.agents.createSession({ title: 'Mine' })
+    await expect(
+      member.agents.setSessionOptions({ sessionId: chat.id, approvals: 'auto' }),
+    ).rejects.toMatchObject({ code: 'FORBIDDEN' })
+  })
+
+  test('allowed, the starter switches it on; off again resets it', async () => {
+    expect((await callerFor('owner').agents.setYoloAllowed({ allowed: true })).yoloAllowed).toBe(
+      true,
+    )
+    const member = callerFor('member')
+    const chat = await member.agents.createSession({ title: 'Mine' })
+    const set = await member.agents.setSessionOptions({ sessionId: chat.id, approvals: 'auto' })
+    expect(set?.approvals).toBe('auto')
+    await callerFor('owner').agents.setYoloAllowed({ allowed: false })
+    const [listed] = await member.agents.listSessions()
+    expect(listed?.approvals).toBeNull()
+  })
+})

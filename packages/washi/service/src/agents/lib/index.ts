@@ -22,6 +22,7 @@ export {
   SDK_EFFORT,
   TODAY_TURN_LIMIT,
   TODAY_WINDOW_MS,
+  YOLO_ALLOWED_KEY,
 } from './constants'
 export { agentEnv, sessionConfigDir } from './env'
 export type {

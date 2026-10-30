@@ -1,3 +1,4 @@
+export { useAutosize } from './hooks/use-autosize'
 export { useComposer } from './hooks/use-composer'
 export { useComposerSession } from './hooks/use-composer-session'
 export { useFabShortcut } from './hooks/use-fab-shortcut'
@@ -6,6 +7,7 @@ export { usePanelFrame } from './hooks/use-panel-frame'
 export type {
   AgentPanelProps,
   AttachMenuProps,
+  AutosizeTextareaProps,
   ComposerState,
   ConversationRowState,
   ConversationsMenuProps,
@@ -23,6 +25,24 @@ export type {
   ScopeChipProps,
   ToolPillProps,
   TranscriptViewProps,
+  YoloProps,
 } from './types'
-export { mergeMessageChunks, offeredModels, receiptLine, usd } from './utils'
-export { EFFORTS, LOCAL_MODELS, MAX_ATTACHMENTS, RECOMMENDED_MODELS, UPLOAD_ACCEPT } from './values'
+export {
+  approvalsOf,
+  composerCap,
+  isYoloOffered,
+  mergeMessageChunks,
+  nextApprovals,
+  offeredModels,
+  receiptLine,
+  usd,
+} from './utils'
+export {
+  COMPOSER_MIN_CAP_PX,
+  COMPOSER_SHARE,
+  EFFORTS,
+  LOCAL_MODELS,
+  MAX_ATTACHMENTS,
+  RECOMMENDED_MODELS,
+  UPLOAD_ACCEPT,
+} from './values'

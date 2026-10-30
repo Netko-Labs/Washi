@@ -161,6 +161,11 @@ export class AgentHost {
     return this.approvals.setMode(mode)
   }
 
+  setYoloAllowed(allowed: boolean): AgentSettingsReport {
+    this.approvals.setYoloAllowed(allowed)
+    return this.settings()
+  }
+
   setDailyCap(capUsd: number): AgentSpendReport {
     return this.budget.setCap(capUsd)
   }
@@ -185,6 +190,8 @@ export class AgentHost {
       effort: this.prefs.effort(),
       enabledModels: this.prefs.enabledModels(),
       zone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      approvalMode: this.approvals.mode(),
+      yoloAllowed: this.approvals.yoloAllowed(),
     }
   }
 
@@ -281,10 +288,19 @@ export class AgentHost {
     this.files = files
   }
 
-  setSessionOptions(sessionId: string, options: SessionOptions): AgentSession | null {
+  /** `actorId` is who asks: a conversation's approvals are its starter's alone (D115). */
+  setSessionOptions(
+    sessionId: string,
+    options: SessionOptions,
+    actorId: string | null = null,
+  ): AgentSession | null {
+    if (options.approvals !== undefined) {
+      this.approvals.checkSessionApprovals(sessionId, options.approvals, actorId ?? '')
+    }
     updateSession(this.ws, sessionId, {
-      model: options.model === undefined ? undefined : options.model,
-      effort: options.effort === undefined ? undefined : options.effort,
+      model: options.model,
+      effort: options.effort,
+      approvals: options.approvals,
     })
     return getSession(this.ws, sessionId)
   }

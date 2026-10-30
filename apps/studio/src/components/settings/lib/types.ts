@@ -8,6 +8,7 @@ export type KeyTarget = ProviderId | 'exa'
 export type Effort = 'quick' | 'balanced' | 'deep'
 export type ResumeBy = 'anyone' | 'owners'
 export type ApprovalMode = 'ask' | 'auto'
+export type YoloSetting = 'off' | 'on'
 export type SettingsTab =
   | 'profile'
   | 'preferences'
@@ -61,6 +62,8 @@ export interface AgentSettingsState {
   effort: Effort
   enabledModels: EnabledModel[] | null
   zone: string
+  approvalMode: ApprovalMode
+  yoloAllowed: boolean
 }
 
 export interface KeyInput {
@@ -166,6 +169,8 @@ export interface OutsideCardProps {
   /** The server lends its Exa key to a workspace without one. */
   serverSearchKey: boolean
   onApprovalMode: (mode: ApprovalMode) => Promise<unknown>
+  yoloAllowed: boolean
+  onYoloAllowed: (allowed: boolean) => Promise<unknown>
   onConnect: () => void
   onRemove: () => Promise<unknown>
 }

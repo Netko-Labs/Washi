@@ -13,6 +13,7 @@ import {
   INFERENCE_PREFERENCES,
   LOCAL_MODELS,
   RESUME_BY,
+  SessionApprovalsError,
 } from '@washi/service'
 import { z } from 'zod'
 import { isSteward, ownerProcedure, router, workspaceProcedure } from '../../init'
@@ -81,18 +82,27 @@ export const agentMutations = router({
       }
       return { deleted: true }
     }),
-  /** A conversation's own model and effort; null takes the workspace default (D61). */
+  /** A conversation's own model, effort and approvals; null takes the workspace's (D61, D115). */
   setSessionOptions: chatProcedure
     .input(
       z.object({
         sessionId: z.string(),
         model: z.string().min(1).max(200).nullable().optional(),
         effort: effortSchema.nullable().optional(),
+        approvals: z.enum(APPROVAL_MODES).nullable().optional(),
       }),
     )
-    .mutation(({ ctx, input }) =>
-      ctx.host.setSessionOptions(input.sessionId, { model: input.model, effort: input.effort }),
-    ),
+    .mutation(({ ctx, input }) => {
+      const { sessionId, ...options } = input
+      try {
+        return ctx.host.setSessionOptions(sessionId, options, ctx.viewer.id)
+      } catch (error) {
+        if (error instanceof SessionApprovalsError) {
+          throw new TRPCError({ code: 'FORBIDDEN', message: error.message })
+        }
+        throw error
+      }
+    }),
   /** Stop the running turn. Its open approvals are answered "no" on the way out. */
   cancel: chatProcedure
     .input(z.object({ sessionId: z.string() }))
@@ -129,6 +139,10 @@ export const agentMutations = router({
   setApprovalMode: ownerProcedure
     .input(z.object({ mode: z.enum(APPROVAL_MODES) }))
     .mutation(({ ctx, input }) => ({ mode: ctx.host.setApprovalMode(input.mode) })),
+  /** Whether a conversation may approve everything for itself (D115); off resets every one. */
+  setYoloAllowed: ownerProcedure
+    .input(z.object({ allowed: z.boolean() }))
+    .mutation(({ ctx, input }) => ctx.host.setYoloAllowed(input.allowed)),
   /** The daily stop. A person sets it; the breaker reads it before every turn. */
   setDailyCap: workspaceProcedure
     .input(z.object({ capUsd: z.number().positive().max(10_000) }))

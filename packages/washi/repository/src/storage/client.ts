@@ -242,6 +242,7 @@ function createTables(sqlite: Database) {
   ensureColumn(sqlite, 'approvals', 'resolved_by', 'TEXT')
   ensureColumn(sqlite, 'agent_sessions', 'model', 'TEXT')
   ensureColumn(sqlite, 'agent_sessions', 'effort', 'TEXT')
+  ensureColumn(sqlite, 'agent_sessions', 'approvals', 'TEXT')
   ensureColumn(sqlite, 'agent_sessions', 'created_by', 'TEXT')
   ensureColumn(sqlite, 'agent_sessions', 'anchor_sheet_id', 'TEXT')
   ensureColumn(sqlite, 'agent_sessions', 'anchor_scope', 'TEXT')

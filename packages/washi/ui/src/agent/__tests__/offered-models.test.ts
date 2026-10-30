@@ -11,6 +11,8 @@ const on = (
   localModel: null,
   plan: null,
   enabledModels,
+  approvalMode: 'ask',
+  yoloAllowed: false,
 })
 
 describe('the composer’s model chip', () => {
