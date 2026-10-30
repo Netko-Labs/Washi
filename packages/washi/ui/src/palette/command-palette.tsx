@@ -50,6 +50,7 @@ export function CommandPalette() {
         <div className="flex items-center gap-2.5 border-border border-b px-4">
           <IconSearch className="size-4 text-muted-foreground" />
           <Command.Input
+            autoFocus
             value={searchTerm}
             onValueChange={(value) => void search(value)}
             onKeyDown={(event) => {
