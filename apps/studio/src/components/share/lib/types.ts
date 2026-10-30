@@ -1,4 +1,5 @@
 import type { SheetSummary } from '@washi/domain'
+import type { RefObject } from 'react'
 
 export type Audience = SheetSummary['visibility']
 
@@ -34,4 +35,13 @@ export interface SharePeopleProps {
 export interface ShareLinkProps {
   url: string
   hidden: ShareSettings['hidden']
+}
+
+export interface ShareMenu {
+  isOpen: boolean
+  toggle: () => void
+  close: () => void
+  root: RefObject<HTMLDivElement | null>
+  trigger: RefObject<HTMLButtonElement | null>
+  panel: RefObject<HTMLDivElement | null>
 }
