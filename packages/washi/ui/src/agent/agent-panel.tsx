@@ -52,12 +52,14 @@ export function AgentPanel({ placement = 'float', onExpand }: AgentPanelProps) {
       />
 
       <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto overscroll-y-none">
-        {isEmpty ? (
-          <EmptyChat onStarter={(text) => void store().sendPrompt(text)} />
-        ) : (
-          <TranscriptView transcript={transcript} />
-        )}
-        <TurnStatus variant="panel" />
+        <div>
+          {isEmpty ? (
+            <EmptyChat onStarter={(text) => void store().sendPrompt(text)} />
+          ) : (
+            <TranscriptView transcript={transcript} />
+          )}
+          <TurnStatus variant="panel" />
+        </div>
       </div>
 
       <ApprovalBar />

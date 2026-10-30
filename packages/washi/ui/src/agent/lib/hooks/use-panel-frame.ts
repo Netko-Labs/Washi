@@ -5,8 +5,9 @@ import { followsEnd, isAtEnd } from '../utils'
 
 /**
  * What the panel needs besides the store: the subscriptions started, the transcript kept at its
- * tail — on a new entry, a turn's end (Stopped, Retry) and a box shrunk by a keyboard or the
- * composer — while the reader is there; a reader scrolled up stays put.
+ * tail — on a new entry, a turn's end (Stopped, Retry), content growing inside an entry and a box
+ * shrunk by a keyboard or the composer — while the reader is there; a reader scrolled up stays
+ * put. The box holds one wrapper, so the observer sees every entry grow.
  */
 export function usePanelFrame({ length, turn, sessionId, isOwnLast }: PanelSignal): PanelFrame {
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -44,6 +45,7 @@ export function usePanelFrame({ length, turn, sessionId, isOwnLast }: PanelSigna
       if (isPinned.current) box.scrollTop = box.scrollHeight
     })
     observer.observe(box)
+    for (const child of box.children) observer.observe(child)
     box.addEventListener('scroll', onScroll, { passive: true })
     return () => {
       observer.disconnect()
