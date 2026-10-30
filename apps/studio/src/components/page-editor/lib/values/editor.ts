@@ -1,4 +1,4 @@
-import type { KindOption, SaveState, StarterBlock, StarterOption, TextKind } from './types'
+import type { KindOption, SaveState, StarterBlock, TextKind } from '../types'
 
 /** What `/database` makes: a name, and Notion's three-step status. */
 export const NEW_DATABASE = (name: string) => ({
@@ -85,17 +85,6 @@ export const NEW_SUBPAGE_SOURCE = `<Sheet title="Untitled" icon="notebook" wsx="
   <Title></Title>
 </Sheet>`
 
-/** How many pages `/` offers to link to at once. */
-export const LINK_MATCHES = 5
-
-/** What `/` offers to upload, and the block each becomes. */
-export const UPLOAD_OPTIONS = [
-  { as: 'image', label: 'Image', words: 'image picture photo' },
-  { as: 'video', label: 'Video', words: 'video movie clip' },
-  { as: 'audio', label: 'Audio', words: 'audio sound music recording' },
-  { as: 'file', label: 'File', words: 'file document pdf attachment upload' },
-] as const
-
 /** What `/widget` drops above the page: a clock in the page's own accent, reaching nothing. */
 export const STARTER_WIDGET_CODE = `import { useNow } from 'washi'
 
@@ -130,24 +119,14 @@ export const STARTER_FORMULA = `function with_tax(amount: number, rate = 0.19) {
   return Math.round(amount * (1 + rate) * 100) / 100
 }`
 
-export const STARTER_OPTIONS: StarterOption[] = [
-  { block: 'steps', label: 'Steps', hint: 'how-to', words: 'steps how-to howto guide numbered' },
-  {
-    block: 'compare',
-    label: 'Compare',
-    hint: 'options',
-    words: 'compare options versus pros cons',
-  },
-  { block: 'faq', label: 'FAQ', hint: 'questions', words: 'faq questions answers accordion' },
-  { block: 'countdown', label: 'Countdown', hint: 'days left', words: 'countdown deadline until' },
-]
-
 /** The starter each drops in; a countdown is made on the day, two weeks out. */
 export const STARTER_SOURCES: Record<Exclude<StarterBlock, 'countdown'>, string> = {
   steps:
     '<Steps><Step title="First step"><Text>What to do.</Text></Step><Step title="Second step"><Text>What comes next.</Text></Step><Step title="Done"><Text>How to tell it worked.</Text></Step></Steps>',
   compare:
     '<Compare><Option title="Option A"><List><Item>A strength</Item><Item>A cost</Item></List></Option><Option title="Option B" pick><List><Item>A strength</Item><Item>A cost</Item></List></Option></Compare>',
+  bento:
+    '<Bento columns={3}><Tile shape="wide" title="Focus"><Text>What matters most.</Text></Tile><Tile title="Shipped"><Text>What landed.</Text></Tile><Tile title="Next"><Text>What comes after.</Text></Tile></Bento>',
   faq: '<Faq><Question title="A question people ask"><Text>Its answer.</Text></Question><Question title="Another one"><Text>Its answer.</Text></Question></Faq>',
 }
 

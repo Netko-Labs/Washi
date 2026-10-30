@@ -83,19 +83,19 @@ describe('page editor blocks', () => {
 describe('the / menu drops live data on the page', () => {
   const issues = { name: 'issues', done: { column: 'state', values: ['Done'] } }
   const notes = { name: 'notes', done: null }
-  const labels = (query: string) =>
-    slashMatches(query, [issues, notes])
+  const labels = (query: string, step: 'view' | 'progress') =>
+    slashMatches(query, { tables: [issues, notes], step })
       .filter((option) => option.type === 'data')
       .map((option) => option.label)
 
   test('a view of any table; progress only where a status says what shipped', () => {
-    expect(labels('view')).toEqual(['Linked view · issues', 'Linked view · notes'])
-    expect(labels('progress')).toEqual(['Progress · issues'])
+    expect(labels('', 'view')).toEqual(['issues', 'notes'])
+    expect(labels('', 'progress')).toEqual(['issues'])
   })
 
   test('/database names the new table from what was typed, never a taken name', () => {
     const pickOf = (query: string, taken = [issues, notes]) =>
-      slashMatches(query, taken).find((option) => option.type === 'data')
+      slashMatches(query, { tables: taken }).find((option) => option.type === 'data')
     expect(pickOf('database Bug triage')).toMatchObject({ pick: { name: 'bug_triage' } })
     expect(pickOf('database')).toMatchObject({ pick: { name: 'database' } })
     expect(pickOf('database issues')).toMatchObject({ pick: { name: 'issues_2' } })
@@ -107,10 +107,10 @@ describe('the / menu drops live data on the page', () => {
       { id: 'i1', title: 'Income' },
     ]
     const of = (query: string) =>
-      slashMatches(query, [], pages)
+      slashMatches(query, { pages })
         .filter((option) => option.type === 'data')
         .map((option) => option.label)
-    expect(of('page')).toEqual(['New page inside', 'Subpages', 'Subpage gallery'])
+    expect(of('page')).toEqual(['New page inside', 'Subpages', 'Subpage gallery', 'Page code'])
     expect(of('link budget')).toContain('Link to page · Monthly budget')
     expect(of('income')).toEqual(['Link to page · Income'])
     const sheet = (node: ReturnType<typeof dataNode>) =>
@@ -124,9 +124,7 @@ describe('the / menu drops live data on the page', () => {
 
   test('an https address after / embeds it; http is never offered', () => {
     const embed = (query: string) =>
-      slashMatches(query, []).find(
-        (option) => option.type === 'data' && option.key.startsWith('embed'),
-      )
+      slashMatches(query).find((option) => option.type === 'data' && option.key.startsWith('embed'))
     expect(embed('embed https://open.spotify.com/track/x')).toMatchObject({
       label: 'Embed · open.spotify.com',
       pick: { kind: 'embed', src: 'https://open.spotify.com/track/x' },
@@ -134,20 +132,18 @@ describe('the / menu drops live data on the page', () => {
     expect(embed('https://tally.so/r/abc')).toMatchObject({ label: 'Embed · tally.so' })
     expect(embed('http://tally.so/r/abc')).toBeUndefined()
     expect(embed('embed')).toMatchObject({ hint: 'paste an https address' })
-    const first = (query: string) =>
-      slashMatches(query, []).find((option) => option.type === 'data')
+    const first = (query: string) => slashMatches(query).find((option) => option.type === 'data')
     expect(first('bookmark https://bun.com/docs')).toMatchObject({ label: 'Bookmark · bun.com' })
     expect(first('https://bun.com/docs')).toMatchObject({ label: 'Embed · bun.com' })
   })
 
   test('/steps, /compare, /faq and /countdown drop a block with words to type over', () => {
-    const first = (query: string) =>
-      slashMatches(query, []).find((option) => option.type === 'data')
+    const first = (query: string) => slashMatches(query).find((option) => option.type === 'data')
     expect(first('steps')).toMatchObject({ pick: { kind: 'starter', block: 'steps' } })
     expect(first('compare')).toMatchObject({ pick: { kind: 'starter', block: 'compare' } })
     expect(first('faq')).toMatchObject({ label: 'FAQ' })
     expect(first('countdown')).toMatchObject({ pick: { kind: 'starter', block: 'countdown' } })
-    for (const block of ['steps', 'compare', 'faq', 'countdown'] as const) {
+    for (const block of ['steps', 'compare', 'faq', 'countdown', 'bento'] as const) {
       const node = dataNode({ kind: 'starter', block })
       const sheet = {
         kind: 'element' as const,
@@ -181,7 +177,7 @@ describe('the / menu drops live data on the page', () => {
 
   test('an upload is offered by kind and lands as its own block', () => {
     const labels = (query: string) =>
-      slashMatches(query, [])
+      slashMatches(query)
         .filter((option) => option.type === 'data' && option.key.startsWith('upload'))
         .map((option) => option.label)
     expect(labels('vid')).toEqual(['Video'])
@@ -216,10 +212,10 @@ describe('the / menu drops live data on the page', () => {
   })
 
   test('/widget lands a JSX clock: the Widget in place, its component above the page', () => {
-    const option = slashMatches('widget', []).find(
+    const option = slashMatches('widget').find(
       (each) => each.type === 'data' && each.key === 'widget',
     )
-    expect(option).toMatchObject({ label: 'Widget', hint: 'JSX' })
+    expect(option).toMatchObject({ label: 'Widget', hint: 'A live React component' })
     const saved = '<Sheet title="Ops">\n  <Title>Ops</Title>\n</Sheet>\n'
     const blocks = [...toBlocks(parse(saved)), lockedBlock(dataNode({ kind: 'widget' }))]
     const source = sourceOver(withWidgetCode(saved), blocks)
@@ -230,10 +226,10 @@ describe('the / menu drops live data on the page', () => {
   })
 
   test('/code offers the page’s code, written in the source above the page', () => {
-    const option = slashMatches('code', []).find(
-      (each) => each.type === 'data' && each.key === 'code',
+    const option = slashMatches('code').find(
+      (each) => each.type === 'data' && each.key === 'page-code',
     )
-    expect(option).toMatchObject({ label: 'Page code', hint: 'TypeScript' })
+    expect(option).toMatchObject({ label: 'Page code', hint: 'Code that draws this page' })
     expect(() => dataNode({ kind: 'code' })).toThrow('source')
   })
 

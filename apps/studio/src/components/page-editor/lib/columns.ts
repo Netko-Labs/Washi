@@ -1,4 +1,5 @@
 import { MAX_COLUMNS, MAX_RATIO } from './constants'
+import { newBlock } from './convert'
 import { isColumns, isContainer, locate, tidy, writeList } from './slots'
 import type { Block, ColumnSlot, ColumnsBlock, DropPlace } from './types'
 
@@ -7,6 +8,14 @@ const slot = (blocks: Block[], ratio = 1): ColumnSlot => ({
   ratio,
   props: {},
   blocks,
+})
+
+/** What `/2 columns` and `/3 columns` drop in: each column an empty line to type into. */
+export const newColumns = (count: number): ColumnsBlock => ({
+  id: crypto.randomUUID(),
+  kind: 'columns',
+  props: {},
+  columns: Array.from({ length: count }, () => slot([newBlock()])),
 })
 
 function beside(row: ColumnsBlock, at: number, dragged: Block, place: DropPlace): ColumnsBlock {

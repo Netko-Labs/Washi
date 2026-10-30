@@ -2,12 +2,12 @@ export { shareOf } from './columns'
 export { MAX_TAB_LABEL, MAX_TABS, PICKER_KINDS, SAVE_DELAY_MS, SIDE_DROP } from './constants'
 export { newBlock, toBlocks, toSheet } from './convert'
 export { useEditorStore } from './editor-store'
-export { useAutoSize } from './hooks/use-auto-size'
 export { useAutosave } from './hooks/use-autosave'
 export { useBlockDrop } from './hooks/use-block-drop'
-export { useFocusRequest } from './hooks/use-focus-request'
+export { useBlockField } from './hooks/use-block-field'
 export { useLoadBlocks } from './hooks/use-load-blocks'
 export { useScriptCode } from './hooks/use-script-code'
+export { useSlashMenu } from './hooks/use-slash-menu'
 export { useTerminalFiles } from './hooks/use-terminal-files'
 export { isColumns, isNestedBlock, isTabs, shownTab } from './slots'
 export type {
@@ -25,6 +25,7 @@ export type {
   ScriptBlockProps,
   ScriptCodeProps,
   SlashMenuProps,
+  SlashMenuState,
   SlashOption,
   TabLabelProps,
   TabMenuProps,
@@ -35,6 +36,7 @@ export type {
 } from './types'
 export {
   blockFrame,
+  isTitleBlock,
   kindMatches,
   numberedPositions,
   pickFiles,
@@ -51,4 +53,6 @@ export {
   KIND_PLACEHOLDERS,
   LIST_MARKERS,
   SAVE_LABELS,
+  SLASH_GROUP_LABELS,
+  SLASH_STEPS,
 } from './values'

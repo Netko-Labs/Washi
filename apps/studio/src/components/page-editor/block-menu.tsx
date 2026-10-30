@@ -1,4 +1,10 @@
-import { IconArrowDown, IconArrowUp, IconGripVertical, IconTrash } from '@tabler/icons-react'
+import {
+  IconArrowDown,
+  IconArrowUp,
+  IconCopy,
+  IconGripVertical,
+  IconTrash,
+} from '@tabler/icons-react'
 import { useRef, useState } from 'react'
 import { useDismiss } from '@/components/shared/dismiss'
 import { type BlockMenuProps, KIND_OPTIONS, useEditorStore } from './lib'
@@ -6,7 +12,7 @@ import { type BlockMenuProps, KIND_OPTIONS, useEditorStore } from './lib'
 const ITEM =
   'flex h-8 w-full items-center gap-2 rounded-lg px-2 text-left text-[13px] hover:bg-black/5 dark:hover:bg-white/10'
 
-/** The ⋮⋮ beside a block: turn it into another kind, move it, or delete it. */
+/** The ⋮⋮ beside a block: turn it into another kind, move, duplicate or delete it. */
 export function BlockMenu({ block }: BlockMenuProps) {
   const [isOpen, setOpen] = useState(false)
   const root = useRef<HTMLDivElement>(null)
@@ -78,6 +84,15 @@ export function BlockMenu({ block }: BlockMenuProps) {
           >
             <IconArrowDown className="size-4 text-muted-foreground" />
             Move down
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => act(() => store().duplicate(block.id))}
+            className={ITEM}
+          >
+            <IconCopy className="size-4 text-muted-foreground" />
+            Duplicate
           </button>
           <button
             type="button"

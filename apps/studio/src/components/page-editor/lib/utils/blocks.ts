@@ -46,5 +46,9 @@ export function titleOf(blocks: Block[], sheet: { rowOf: string | null }): strin
   return text ? text.slice(0, 200) : null
 }
 
+/** The block `titleOf` names the page by: never merged into, deleted or turned into another kind. */
+export const isTitleBlock = (blocks: Block[], id: string | undefined) =>
+  blocks[0]?.kind === 'h1' && blocks[0].id === id
+
 /** A code block's trailing blank lines go; its last line's own spaces stay. */
 export const withoutTrailingLines = (code: string) => code.replace(/(\n[ \t]*)+$/, '')

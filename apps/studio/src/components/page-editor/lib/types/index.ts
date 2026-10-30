@@ -41,10 +41,19 @@ export type {
 } from './props'
 export type {
   BookmarkPreview,
+  DataOption,
   DataPick,
   PageRef,
+  SlashEntry,
+  SlashGroup,
   SlashMenuProps,
+  SlashMenuState,
+  SlashNav,
   SlashOption,
+  SlashSources,
+  SlashStep,
+  SlashStepCopy,
+  StepOption,
   StoredUpload,
   TableRef,
 } from './slash'

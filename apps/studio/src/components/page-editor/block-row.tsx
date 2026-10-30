@@ -3,7 +3,7 @@ import { Divider } from '@washi/paper'
 import { BlockInput } from './block-input'
 import { BlockMenu } from './block-menu'
 import { ColumnsRow } from './columns-row'
-import { type BlockRowProps, useBlockDrop, useEditorStore } from './lib'
+import { type BlockRowProps, isTitleBlock, useBlockDrop, useEditorStore } from './lib'
 import { LockedBlock } from './locked-block'
 import { ScriptBlock } from './script-block'
 import { TabsRow } from './tabs-row'
@@ -20,6 +20,7 @@ const LINE: Record<string, string> = {
 
 export function BlockRow({ block, numberAt, rootProps, isNested }: BlockRowProps) {
   const drop = useBlockDrop(block.id)
+  const isTitle = useEditorStore((state) => isTitleBlock(state.blocks, block.id))
 
   return (
     <div
@@ -45,7 +46,7 @@ export function BlockRow({ block, numberAt, rootProps, isNested }: BlockRowProps
             <IconPlus className="size-4" />
           </button>
         )}
-        <BlockMenu block={block} />
+        {!isTitle && <BlockMenu block={block} />}
       </div>
       {drop.place && (
         <span

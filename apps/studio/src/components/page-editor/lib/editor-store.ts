@@ -2,14 +2,21 @@ import { useSheetsStore } from '@washi/ui'
 import type { WsxElement } from '@washi/wsx'
 import { create } from 'zustand'
 import { api } from '@/integrations/trpc'
-import { moveBlock, resizeColumns } from './columns'
+import { moveBlock, newColumns, resizeColumns } from './columns'
 import { lockedBlock, newBlock, reconcile, turnInto } from './convert'
-import { flatten, isNestedBlock, locate, mapBlocks, tidy, writeList } from './slots'
+import { copyBlock, flatten, isNestedBlock, locate, mapBlocks, tidy, writeList } from './slots'
 import { tabActions } from './tab-actions'
 import { newTabs } from './tabs'
 import type { Block, BlockPlace, EditorState, FocusRequest, TextBlock } from './types'
 import { uploaded, uploadedGallery } from './upload-blocks'
-import { applyShortcut, bookmarkNode, dataNode, swapNode, withWidgetCode } from './utils'
+import {
+  applyShortcut,
+  bookmarkNode,
+  dataNode,
+  isTitleBlock,
+  swapNode,
+  withWidgetCode,
+} from './utils'
 import { LIST_MARKERS, NEW_DATABASE, NEW_SUBPAGE_SOURCE } from './values'
 
 function isTyped(block: Block | undefined): block is TextBlock {
@@ -99,9 +106,9 @@ export const useEditorStore = create<EditorState>((set, get) => {
       }),
 
     mergeBack: (id) =>
-      inList(id, ({ list, at }) => {
+      inList(id, ({ list, at, parentId }) => {
         const block = list[at]
-        if (!isTyped(block)) return null
+        if (!isTyped(block) || (!parentId && isTitleBlock(list, id))) return null
         if (block.kind !== 'text') {
           const plain = { ...turnInto(block, 'text'), text: block.text }
           return {
@@ -110,6 +117,14 @@ export const useEditorStore = create<EditorState>((set, get) => {
           }
         }
         const previous = list[at - 1]
+        // The page's title takes nothing in; an empty line under it goes, the caret to its end.
+        if (!parentId && isTitleBlock(list, previous?.id)) {
+          if (block.text || !previous) return null
+          return {
+            list: list.filter((each) => each.id !== id),
+            focus: { id: previous.id, caret: 'end' },
+          }
+        }
         if (isTyped(previous)) {
           const joined = { ...previous, text: previous.text + block.text }
           return {
@@ -157,6 +172,17 @@ export const useEditorStore = create<EditorState>((set, get) => {
       }))
     },
 
+    duplicate: (id) =>
+      inList(id, ({ list, at }) => {
+        const block = list[at]
+        if (!block) return null
+        const copy = copyBlock(block)
+        return {
+          list: [...list.slice(0, at + 1), copy, ...list.slice(at + 1)],
+          focus: isTyped(copy) ? { id: copy.id, caret: 'end' } : null,
+        }
+      }),
+
     move: (id, step) =>
       inList(id, ({ list, at }) => {
         const to = at + step
@@ -195,11 +221,11 @@ export const useEditorStore = create<EditorState>((set, get) => {
         set({ mode: 'source' })
         return
       }
-      if (pick.kind === 'tabs') {
+      if (pick.kind === 'tabs' || pick.kind === 'columns') {
         if (isNestedBlock(get().blocks, id))
-          throw new Error('tabs sit on the page itself, not in a column or a tab')
-        const made = newTabs()
-        const first = made.tabs[0]?.blocks[0]
+          throw new Error(`${pick.kind} sit on the page itself, not in a column or a tab`)
+        const made = pick.kind === 'tabs' ? newTabs() : newColumns(pick.count)
+        const first = flatten([made]).find(isTyped)
         inList(id, ({ list, at }) => ({
           list: [...list.slice(0, at), made, newBlock(), ...list.slice(at + 1)],
           focus: first ? { id: first.id, caret: 0 } : null,
