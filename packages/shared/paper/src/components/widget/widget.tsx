@@ -1,7 +1,7 @@
-import { useRef } from 'react'
+import { type CSSProperties, useRef } from 'react'
 import { styled } from '../../lib'
 import type { WidgetFrameProps, WidgetProps } from '../../lib/types'
-import { HTML_WORDS, useWidget } from './lib'
+import { frameHeight, HTML_WORDS, useWidget } from './lib'
 
 /**
  * One of the page's own components, drawn with React in a frame with no origin of its own and no
@@ -24,20 +24,23 @@ export function Widget({ component, ...props }: WidgetProps) {
 }
 
 function WidgetFrame({ title, height, component, args, ...rest }: WidgetFrameProps) {
+  const box = useRef<HTMLElement>(null)
   const frame = useRef<HTMLIFrameElement>(null)
   const { gate, bundle, height: measured, onLoad } = useWidget(frame, component, args)
   const name = title ?? 'A widget'
   const isWaiting = gate === 'asking' || (gate === 'on' && bundle.status === 'building')
+  const isReady = gate === 'on' && bundle.status === 'ready'
+  const tall = { '--widget-h': `${frameHeight(height, measured)}px` } as CSSProperties
 
   return (
-    <figure {...styled(rest, 'wsx-widget')}>
-      {gate === 'on' && bundle.status === 'ready' && (
+    <figure ref={box} {...styled(rest, 'wsx-widget')}>
+      {isReady && (
         <iframe
           ref={frame}
           title={name}
           sandbox="allow-scripts"
           srcDoc={bundle.document}
-          style={{ height: height ?? measured }}
+          style={tall}
           onLoad={onLoad}
         />
       )}
@@ -56,7 +59,19 @@ function WidgetFrame({ title, height, component, args, ...rest }: WidgetFramePro
         </p>
       )}
       {isWaiting && <div className="wsx-embed-wait" style={{ height: height ?? 80 }} />}
-      {title && gate === 'on' && bundle.status === 'ready' && <figcaption>{title}</figcaption>}
+      {isReady && (
+        <figcaption>
+          <span>{title}</span>
+          <button
+            type="button"
+            className="wsx-widget-full"
+            aria-label={`Show ${name} full screen`}
+            onClick={() => void box.current?.requestFullscreen?.()}
+          >
+            ⤢ Full screen
+          </button>
+        </figcaption>
+      )}
     </figure>
   )
 }

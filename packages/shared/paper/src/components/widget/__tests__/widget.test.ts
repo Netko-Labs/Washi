@@ -3,7 +3,15 @@ import { parse } from '@washi/wsx'
 import type { WidgetMessage, WidgetPage } from '../../../lib/types'
 import type { PaperHost } from '../../../provider'
 import { checkDrawn, literalOnly } from '../../program/lib/utils'
-import { answerAsk, applyWrite, isAsk, isPressed, isWrite, widgetDocument } from '../lib/utils'
+import {
+  answerAsk,
+  applyWrite,
+  frameHeight,
+  isAsk,
+  isPressed,
+  isWrite,
+  widgetDocument,
+} from '../lib/utils'
 
 function harness(values: WidgetPage['values'] = {}) {
   const calls: string[] = []
@@ -100,5 +108,13 @@ describe('a widget’s frame and its page (D113)', () => {
     expect(checkDrawn(drawn, page)).toMatchObject({
       root: { children: [{ name: 'Widget', children: [{ name: 'Clock', props: { size: 4 } }] }] },
     })
+  })
+})
+
+describe('a widget is as tall as what it draws', () => {
+  test('height is the least it takes, never a cut', () => {
+    expect(frameHeight(320, 565)).toBe(565)
+    expect(frameHeight(320, 120)).toBe(320)
+    expect(frameHeight(undefined, 200)).toBe(200)
   })
 })

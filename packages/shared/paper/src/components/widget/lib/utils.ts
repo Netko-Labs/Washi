@@ -87,3 +87,7 @@ export function postTo(frame: HTMLIFrameElement | null, message: Record<string, 
     // An answer that cannot be cloned is not sent; the frame keeps what it had.
   }
 }
+
+/** `height` is the least a widget takes: content that draws taller is never cut. */
+export const frameHeight = (height: number | undefined, measured: number) =>
+  Math.max(height ?? 0, measured)
