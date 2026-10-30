@@ -65,6 +65,8 @@ export function createTRPCHttpHandler<TRouter extends AnyRouter>(
       createContext: ({ req, info }) =>
         opts.createContext({ req, connectionParams: info.connectionParams }),
       maxBatchSize: MAX_TRPC_BATCH_SIZE,
+      // A page's code is a query's input; the client posts it rather than put it in a URL.
+      allowMethodOverride: true,
       onError: ({ error, path, type, ctx, input }) =>
         opts.onError?.({ error, path, type, ctx, input }),
     })
