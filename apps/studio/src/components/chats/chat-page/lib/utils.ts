@@ -1,5 +1,5 @@
 import type { SheetSummary, TranscriptEntry, UserTable } from '@washi/domain'
-import { mergeMessageChunks } from '@washi/ui'
+import { mergeMessageChunks, trashedTableId } from '@washi/ui'
 import { MAX_STARTERS, NEAR_BOTTOM_PX, RECEIPTS_SHOWN, STARTER_TITLE_CHARS } from './constants'
 import type {
   ChatBlock,
@@ -197,5 +197,13 @@ export function trashedPages(steps: ToolStep[]): string[] {
     return step.name === 'sheet_delete' && step.status === 'completed' && typeof id === 'string'
       ? [id]
       : []
+  })
+}
+
+/** Tables a finished `db_trash_table` in this run moved to the trash, by the id it answered. */
+export function trashedTables(steps: ToolStep[]): string[] {
+  return steps.flatMap((step) => {
+    const id = step.status === 'completed' ? trashedTableId(step.name, step.output) : null
+    return id ? [id] : []
   })
 }

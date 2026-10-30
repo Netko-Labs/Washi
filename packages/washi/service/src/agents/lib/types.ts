@@ -134,9 +134,10 @@ export interface AgentHostEvents {
 
 export type EventsRef = () => AgentHostEvents | null
 
-/** What a turn came to: the last page it made or changed, else the first line it said. */
+/** What a turn came to: the last page it made or changed or table it trashed, else what it said. */
 export type TurnOutcome =
   | { kind: 'page'; touch: 'made' | 'changed'; id: string; title: string }
+  | { kind: 'table'; touch: 'trashed'; id: string; name: string }
   | { kind: 'reply'; text: string }
 
 export interface TurnSummary {

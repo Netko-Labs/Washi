@@ -185,6 +185,7 @@ export {
 } from './tables/service'
 export { seedTeamSpace } from './tables/team-space'
 export type { TeamSpace, TeamSpaceOptions } from './tables/types'
+export { guardWashiTableTrash, trashTableAs } from './tables/washi-trash'
 export {
   addWorkspaceTheme,
   editWorkspaceTheme,

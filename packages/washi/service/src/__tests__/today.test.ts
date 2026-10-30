@@ -70,6 +70,32 @@ describe('today retells each turn: the ask, what it touched, the receipt', () =>
     expect(stopped?.outcome).toBeNull()
   })
 
+  test('a turn that trashed a table comes to that table (D121)', () => {
+    const session = createSession(ws, 'Cleanup')
+    appendTurn(ws, session.id, { kind: 'user_message', text: 'trash the issues table' })
+    appendTurn(ws, session.id, {
+      kind: 'tool_call',
+      toolCallId: 't1',
+      title: 'db_trash_table',
+      toolKind: 'delete',
+      status: 'pending',
+      input: { table: 'issues' },
+    })
+    appendTurn(ws, session.id, {
+      kind: 'tool_call_update',
+      toolCallId: 't1',
+      status: 'completed',
+      output: '{"id":"tb1","name":"issues","rows":3,"shownOn":[]}',
+    })
+    appendTurn(ws, session.id, { kind: 'turn_done', stopReason: 'end_turn' })
+    expect(recentTurns(ws)[0]?.outcome).toEqual({
+      kind: 'table',
+      touch: 'trashed',
+      id: 'tb1',
+      name: 'issues',
+    })
+  })
+
   test('a reply reads as one plain line, cut to fit', () => {
     expect(plainLine('- [Roadmap](washi://p1) has *three* __open__ items', 140)).toBe(
       'Roadmap has three open items',

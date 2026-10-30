@@ -56,9 +56,11 @@ export function turnRow(turn: TodayTurn): InboxRow {
   const said =
     outcome?.kind === 'page'
       ? { verb: outcome.touch === 'made' ? 'made' : 'updated', where: outcome.title }
-      : outcome?.kind === 'reply'
-        ? { verb: `replied “${outcome.text}”`, where: null }
-        : { verb: TURN_LEFT[receipt.stopReason], where: turn.sessionTitle }
+      : outcome?.kind === 'table'
+        ? { verb: `moved the table “${outcome.name}” to the trash`, where: null }
+        : outcome?.kind === 'reply'
+          ? { verb: `replied “${outcome.text}”`, where: null }
+          : { verb: TURN_LEFT[receipt.stopReason], where: turn.sessionTitle }
   return {
     id: `${turn.sessionId}-${turn.at}`,
     kind: 'washi',

@@ -47,6 +47,7 @@ export const CHANGE_TOOLS: ReadonlySet<string> = new Set([
   'db_define',
   'db_link_column',
   'db_mutate',
+  'db_trash_table',
   'reminder_create',
 ])
 

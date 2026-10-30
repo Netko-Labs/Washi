@@ -1,6 +1,7 @@
 import { linkColumnInputSchema, reminderAskSchema, rowActivityInputSchema } from '@washi/domain'
 import { historyQuerySchema, mutationSchema, querySchema, tableSpecSchema } from '@washi/ink'
 import type { Workspace } from '@washi/repository'
+import { z } from 'zod'
 import { DB_MUTATE_DESCRIPTION } from '../agents/lib'
 import { askReminder } from '../reminders/service'
 import { rowActivity } from '../tables/activity'
@@ -8,6 +9,7 @@ import { tablesWithPages } from '../tables/catalog'
 import { runHistory } from '../tables/history'
 import { linkColumn } from '../tables/link'
 import { defineUserTable, runMutation, runQuery } from '../tables/service'
+import { trashTableAs } from '../tables/washi-trash'
 import { capability } from './define'
 import type { Capability, CapabilityContext } from './types'
 
@@ -62,6 +64,13 @@ export function tableCapabilities(ws: Workspace, context: CapabilityContext): Ca
       { input: linkColumnInputSchema },
       false,
       ({ input }) => linkColumn(ws, input, context.author),
+    ),
+    capability(
+      'db_trash_table',
+      'Move a table to the Trash — only when the person explicitly asked for that table to go, by name; if the ask could mean more than one, ask which first. Call db_list_tables before and tell them the pages in its shownOn: they go quiet, drawing it as missing. Its rows and history wait untouched and a person restores it from the Trash; nothing you have erases a table for good. Refused in a routine, for a table a public page shows, and for one another table reads through a relation or rollup — leave those to a person.',
+      { table: z.string().min(1) },
+      false,
+      ({ table }) => trashTableAs(ws, table, context.viewer, context.author === 'washi'),
     ),
     capability(
       'db_mutate',

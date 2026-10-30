@@ -13,7 +13,7 @@ import { readableSet } from '../sheets/access'
 import { InkError } from './errors'
 
 /** Each table's pages that show it, as this viewer may read them: a private page is not there. */
-function readablePages(ws: Workspace, viewer: Viewer): (table: string) => TablePage[] {
+export function readablePages(ws: Workspace, viewer: Viewer): (table: string) => TablePage[] {
   const readable = readableSet(ws, viewer)
   const shown = pagesShowingTables(ws)
   return (table) => (shown.get(table) ?? []).filter((page) => readable.has(page.id))

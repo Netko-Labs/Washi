@@ -182,8 +182,15 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   `tables.purge` an owner's or admin's: rows, `record_changes` and row pages go (the one erase
   outside P1). `/databases` lists each table with "Shown on" chips or "Not on any page"; ⋯ opens
   its first page, or the table alone in a dialog; Trash lists trashed tables beside pages.
-  `db_list_tables` gives each table `shownOn`. Washi never trashes a table. A column's Rename and
+  `db_list_tables` gives each table `shownOn`. A column's Rename and
   Delete name the pages whose views still name it (`tables.columnPages`, `namesColumn`); none follow.
+- **Washi can trash a table (D121), D108's twin.** `db_trash_table` (by name; both ports and MCP,
+  a `CHANGE_TOOLS` write) is a member's `tables.trash` and answers `{ id, name, rows, shownOn }`;
+  never a purge — Washi has none. Asked for only, the table named, after `db_list_tables` so the
+  pages going quiet are said. `guardWashiTableTrash` refuses in words a routine (`NOBODY`), a table
+  a public page shows, and one another table reads by relation or rollup (it names them); MCP signs
+  as its member and skips it, as `sheet_delete` does. The pill says "Moved “issues” to the trash"
+  with Restore (`RestoreTable`, `tables.restore`); the Inbox says Washi moved the table.
 - **The look is the page's (D64).** `icon` and `cover` are `<Sheet>` props; the source is the
   truth and `sheets.icon/cover` a cache every write re-reads off the root (`lookOf`). Never set
   the columns any other way — `sheets.updateMeta` writes a picked icon or cover into the doc

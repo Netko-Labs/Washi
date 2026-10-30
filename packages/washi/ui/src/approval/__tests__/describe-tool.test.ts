@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { describeTool, pastTense } from '../lib'
+import { describeTool, pastTense, trashedTableId } from '../lib'
 
 const titles = (id: string) => (id === 's1' ? 'Trip to Kyoto' : null)
 const said = (name: string, input: unknown) => {
@@ -60,6 +60,17 @@ describe('tool calls read like a person asked', () => {
       titles,
     )
     expect(define.details).toEqual(['Columns: name, area'])
+  })
+
+  test('a table to the trash, then moved there, with its Restore (D121)', () => {
+    const moving = said('db_trash_table', { table: 'issues' })
+    expect(moving).toBe('Moving “issues” to the trash')
+    expect(pastTense(moving)).toBe('Moved “issues” to the trash')
+    expect(said('db_trash_table', {})).toBe('Moving a table to the trash')
+    const answer = '{"id":"tb1","name":"issues","rows":3,"shownOn":["Backlog"]}'
+    expect(trashedTableId('db_trash_table', answer)).toBe('tb1')
+    expect(trashedTableId('db_mutate', answer)).toBeNull()
+    expect(trashedTableId('db_trash_table', 'unknown table "x"')).toBeNull()
   })
 
   test('a reminder says when it speaks', () => {

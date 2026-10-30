@@ -75,6 +75,13 @@ describe('a turn in the inbox says what Washi did', () => {
     expect(changed.verb).toBe('updated')
     const reply = turnRow(turn({ kind: 'reply', text: 'Three days fit.' }, done))
     expect(reply).toMatchObject({ verb: 'replied “Three days fit.”', where: null })
+    const trashed = turnRow(
+      turn({ kind: 'table', touch: 'trashed', id: 't1', name: 'issues' }, done),
+    )
+    expect(trashed).toMatchObject({
+      verb: 'moved the table “issues” to the trash',
+      where: null,
+    })
   })
 
   test('nothing to show reads how it ended, in its chat', () => {
