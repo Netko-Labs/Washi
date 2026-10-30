@@ -2,7 +2,7 @@ import { Header, useViewStore } from '@washi/ui'
 import { BackHome } from '@/components/sidebar'
 import { AgentLayer } from './agent-layer'
 import { DrawerEdge } from './drawer-edge'
-import type { WorkspaceShellProps } from './lib'
+import { MAIN_ID, type WorkspaceShellProps } from './lib'
 import { MobileDrawer } from './mobile-drawer'
 import { NarrowHeaderActions } from './narrow-header-actions'
 import { SidebarButton } from './sidebar-button'
@@ -18,7 +18,7 @@ export function NarrowShell({ workspace, children }: WorkspaceShellProps) {
 
   return (
     <>
-      <main className="flex min-w-0 flex-1 flex-col">
+      <main id={MAIN_ID} tabIndex={-1} className="flex min-w-0 flex-1 flex-col outline-none">
         <Header
           leading={
             <>

@@ -1,5 +1,16 @@
 import type { TabKey } from '@washi/ui'
-import { DOCK_KEY_PREFIX, FOLD_KEY_PREFIX } from './constants'
+import { DOCK_KEY_PREFIX, FOLD_KEY_PREFIX, MAIN_ID } from './constants'
+
+export function focusMain(): void {
+  document.getElementById(MAIN_ID)?.focus({ preventScroll: true })
+}
+
+/** A field being typed in, or anything inside a dialog or popover, keeps focus through a route change. */
+export function holdsFocus(node: Element | null): boolean {
+  if (!(node instanceof HTMLElement) || node === document.body) return false
+  if (node.isContentEditable || node.matches('input, textarea, select')) return true
+  return node.closest('[role="dialog"], dialog, [data-floating]') !== null
+}
 
 /** Every tab is an address: `/w/<workspace>`, `/inbox`, `/settings` or `/p/<page>`. */
 export function pathFor(workspaceId: string, tab: TabKey | null): string {
