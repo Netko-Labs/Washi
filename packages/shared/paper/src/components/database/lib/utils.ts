@@ -13,6 +13,7 @@ import type {
   SortDirection,
   StatusGroup,
   TableSpec,
+  ViewSort,
 } from './types'
 import {
   CHOICE_TYPES,
@@ -216,6 +217,14 @@ export function sortRows(
       return sign * order || a.at - b.at
     })
     .map(({ row }) => row)
+}
+
+export function renamedSort(sort: ViewSort | null, from: string, to: string): ViewSort | null {
+  return sort?.column === from ? { ...sort, column: to } : sort
+}
+
+export function renamedHidden(hidden: string[], from: string, to: string): string[] {
+  return hidden.map((each) => (each === from ? to : each))
 }
 
 /** A choice column's options as its menu lists them: a status by its three groups. */

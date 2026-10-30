@@ -185,6 +185,8 @@ export interface ViewLocal {
   clearSort: () => void
   hide: (column: string) => void
   show: (column: string) => void
+  /** A property renamed from its menu keeps the reader's sort and hide under its new name. */
+  rename: (from: string, to: string) => void
 }
 
 export interface TableView {
@@ -226,6 +228,10 @@ export interface ColumnPageProps {
   column: ColumnSpec
   onBack: () => void
   onDone: () => void
+}
+
+export interface ColumnRenameProps extends ColumnPageProps {
+  onRenamed: (to: string) => void
 }
 
 export interface OptionRowProps {

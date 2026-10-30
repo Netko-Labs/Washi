@@ -5,7 +5,11 @@ export const COPY_ROW_CAP = 500
 export const COMPUTED_COLUMN_TYPES: ReadonlySet<string> = new Set(['formula', 'rollup'])
 
 /** Columns whose values are picked off a list of options. */
-export const CHOICE_COLUMN_TYPES: ReadonlySet<string> = new Set(['select', 'multi_select', 'status'])
+export const CHOICE_COLUMN_TYPES: ReadonlySet<string> = new Set([
+  'select',
+  'multi_select',
+  'status',
+])
 
 export const STATUS_GROUP_KEYS = ['todo', 'doing', 'done'] as const
 

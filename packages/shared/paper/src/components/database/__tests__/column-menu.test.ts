@@ -1,6 +1,18 @@
 import { describe, expect, test } from 'bun:test'
 import type { ColumnSpec, QueryRow } from '../lib'
-import { optionGroups, optionRemovalWords, sortRows } from '../lib'
+import { optionGroups, optionRemovalWords, renamedHidden, renamedSort, sortRows } from '../lib'
+
+describe('a renamed property', () => {
+  test('keeps the reader’s sort and hide under its new name, and leaves others be', () => {
+    expect(renamedSort({ column: 'qty', direction: 'desc' }, 'qty', 'count')).toEqual({
+      column: 'count',
+      direction: 'desc',
+    })
+    expect(renamedSort({ column: 'name', direction: 'asc' }, 'qty', 'count')?.column).toBe('name')
+    expect(renamedSort(null, 'qty', 'count')).toBeNull()
+    expect(renamedHidden(['qty', 'stage'], 'qty', 'count')).toEqual(['count', 'stage'])
+  })
+})
 
 const rows: QueryRow[] = [
   { id: 'a', name: 'Atlas', qty: 10, stage: 'Won', owner: 'u2' },

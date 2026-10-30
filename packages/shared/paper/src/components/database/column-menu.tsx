@@ -38,7 +38,13 @@ export function ColumnMenu({ db, column, isTitle, local, onDone }: ColumnMenuPro
   return (
     <div className="wsx-db-menu" role="group" aria-label={label} onKeyDown={walkMenu}>
       {editable ? (
-        <ColumnRename db={db} column={column} onBack={back} onDone={onDone} />
+        <ColumnRename
+          db={db}
+          column={column}
+          onBack={back}
+          onDone={onDone}
+          onRenamed={(to) => local.rename(column.name, to)}
+        />
       ) : (
         <p className="wsx-db-panel-head">{label}</p>
       )}
