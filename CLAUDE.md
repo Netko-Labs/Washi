@@ -411,10 +411,15 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   header's scope chip lists the place's chats, New chat here, Move to page… (`agents.moveSession`,
   null = Home, the chat's starter only). Washi moves the chat it is in with `chat_handover` (both
   ports, a read: nothing in the workspace changes; a page the asker reads, any page): a `handoff`
-  entry lands in the transcript as a divider, and `openSheetRequested` carries the chat, so only its
-  person is sent there, panel open. Washi's own page opened mid-turn keeps its chat on screen. A page
-  left behind shows its newest departed chat under a draft's composer (`agents.movedFrom`, read off
-  the `handoff` entries — no table).
+  entry lands in the transcript as a divider, and `openSheetRequested` (`handover: true`) sends only
+  a client showing that chat there, panel open. Every `openSheetRequested` carries its turn's chat
+  (a page `sheet_create` or `action_run` opens, a routine's too) and moves only a client whose
+  active chat it is; a page's own press that opens a page answers it to the presser
+  (`capabilities.runAction` → `opened`). Washi's own page opened mid-turn keeps its chat on screen.
+  Each ask leads with the chat's page — title, id, subtree or not — when the asker reads it
+  (`chatPlaceLine`), so "this page" means it. A page left behind shows its newest departed chat
+  under a draft's composer (`agents.movedFrom`, read off the `handoff` entries — no table). An id
+  naming no chat answers NOT_FOUND (`agents.transcript`), and `/chats/$chatId` says it isn't here.
 - **Who pays for a turn.** A credential is `api_key` or `local_cli`. Embedded finds the
   person's installed `claude` (PATH is empty for a GUI app — known install paths too) and runs
   it via the Agent SDK's `pathToClaudeCodeExecutable` with **no** key in the env, so their own

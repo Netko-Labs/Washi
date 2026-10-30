@@ -28,10 +28,11 @@ describe('the bus keeps delivering after its buffer fills', () => {
   test('a live subscriber still sees new events once the buffer has trimmed', async () => {
     const bus = createEventBus()
     for (let i = 0; i < EVENT_BUFFER_SIZE + 10; i += 1) {
-      bus.emit('openSheetRequested', { workspaceId: 'w', id: `old-${i}` })
+      bus.emit('openSheetRequested', { workspaceId: 'w', sessionId: 's', id: `old-${i}` })
     }
     const seen = await drain(bus, null, () => {
-      for (const id of ['a', 'b', 'c']) bus.emit('openSheetRequested', { workspaceId: 'w', id })
+      for (const id of ['a', 'b', 'c'])
+        bus.emit('openSheetRequested', { workspaceId: 'w', sessionId: 's', id })
     })
     expect(seen).toEqual(['a', 'b', 'c'])
   })
@@ -41,7 +42,7 @@ describe('the bus keeps delivering after its buffer fills', () => {
     const total = EVENT_BUFFER_SIZE * 2
     const seen = await drain(bus, null, () => {
       for (let i = 0; i < total; i += 1) {
-        bus.emit('openSheetRequested', { workspaceId: 'w', id: String(i) })
+        bus.emit('openSheetRequested', { workspaceId: 'w', sessionId: 's', id: String(i) })
       }
     })
     // It may miss nothing it was awake for; at minimum the newest must arrive.
@@ -50,7 +51,8 @@ describe('the bus keeps delivering after its buffer fills', () => {
 
   test('a reconnect resumes after lastEventId', async () => {
     const bus = createEventBus()
-    for (const id of ['a', 'b', 'c']) bus.emit('openSheetRequested', { workspaceId: 'w', id })
+    for (const id of ['a', 'b', 'c'])
+      bus.emit('openSheetRequested', { workspaceId: 'w', sessionId: 's', id })
     const seen = await drain(bus, '1', () => {})
     expect(seen).toEqual(['b', 'c'])
   })
@@ -68,9 +70,9 @@ describe('the bus never sleeps through an event', () => {
       }
     })()
     await Bun.sleep(1)
-    bus.emit('openSheetRequested', { workspaceId: 'w', id: 'first' })
+    bus.emit('openSheetRequested', { workspaceId: 'w', sessionId: 's', id: 'first' })
     await Bun.sleep(1)
-    bus.emit('openSheetRequested', { workspaceId: 'w', id: 'while-busy' })
+    bus.emit('openSheetRequested', { workspaceId: 'w', sessionId: 's', id: 'while-busy' })
     await Bun.sleep(30)
     abort.abort()
     await reading
@@ -80,7 +82,8 @@ describe('the bus never sleeps through an event', () => {
   test('a lastEventId from before a restart resumes at the live edge, not in silence', async () => {
     const bus = createEventBus()
     const seen = await drain(bus, '8123', () => {
-      for (const id of ['a', 'b']) bus.emit('openSheetRequested', { workspaceId: 'w', id })
+      for (const id of ['a', 'b'])
+        bus.emit('openSheetRequested', { workspaceId: 'w', sessionId: 's', id })
     })
     expect(seen).toEqual(['a', 'b'])
   })
@@ -88,10 +91,11 @@ describe('the bus never sleeps through an event', () => {
   test('a lastEventId older than the buffer resumes at the live edge, not mid-gap', async () => {
     const bus = createEventBus()
     for (let i = 0; i < EVENT_BUFFER_SIZE + 10; i += 1) {
-      bus.emit('openSheetRequested', { workspaceId: 'w', id: `old-${i}` })
+      bus.emit('openSheetRequested', { workspaceId: 'w', sessionId: 's', id: `old-${i}` })
     }
     const seen = await drain(bus, '1', () => {
-      for (const id of ['a', 'b']) bus.emit('openSheetRequested', { workspaceId: 'w', id })
+      for (const id of ['a', 'b'])
+        bus.emit('openSheetRequested', { workspaceId: 'w', sessionId: 's', id })
     })
     expect(seen).toEqual(['a', 'b'])
   })
@@ -99,7 +103,8 @@ describe('the bus never sleeps through an event', () => {
   test('a cursor still inside the buffer replays even when other events share the sequence', async () => {
     const bus = createEventBus()
     bus.emit('devCommand', { command: 'reload' })
-    for (const id of ['a', 'b']) bus.emit('openSheetRequested', { workspaceId: 'w', id })
+    for (const id of ['a', 'b'])
+      bus.emit('openSheetRequested', { workspaceId: 'w', sessionId: 's', id })
     const seen = await drain(bus, '2', () => {})
     expect(seen).toEqual(['b'])
   })
@@ -121,12 +126,12 @@ describe('the bus never sleeps through an event', () => {
       }
     })()
     await Bun.sleep(1)
-    bus.emit('openSheetRequested', { workspaceId: 'w', id: '1' })
+    bus.emit('openSheetRequested', { workspaceId: 'w', sessionId: 's', id: '1' })
     await Bun.sleep(1)
     quitter.abort()
     await quitting
     await Bun.sleep(10)
-    bus.emit('openSheetRequested', { workspaceId: 'w', id: '2' })
+    bus.emit('openSheetRequested', { workspaceId: 'w', sessionId: 's', id: '2' })
     await Bun.sleep(20)
     stayer.abort()
     await staying

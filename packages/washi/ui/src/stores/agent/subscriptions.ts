@@ -60,14 +60,13 @@ export function subscribeAgent(store: Store): { unsubscribe: () => void }[] {
     },
   })
   const openSheetRequests = api.agents.onOpenSheetRequested.subscribe(undefined, {
-    onData: ({ data: { id, sessionId } }) => {
-      const { activeSessionId, running, panelOpen } = get()
-      if (sessionId && sessionId !== activeSessionId) return
-      if (sessionId) settleActive(store, sessionId, id)
+    onData: ({ data: { id, sessionId, handover } }) => {
+      if (sessionId !== get().activeSessionId) return
+      if (handover) settleActive(store, sessionId, id)
       // A handover seen on the chat's own page goes on in the panel, beside the page it moved to.
-      if (sessionId && !panelOpen) set({ panelOpen: true })
+      if (handover && !get().panelOpen) set({ panelOpen: true })
       // Washi's page mid-turn opens with its chat still on screen.
-      carrying = !sessionId && running
+      carrying = !handover
       useViewStore.getState().openTab(`note:${id}`)
       carrying = false
       void useSheetsStore.getState().refresh()

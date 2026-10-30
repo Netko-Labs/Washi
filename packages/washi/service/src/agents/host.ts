@@ -27,7 +27,7 @@ import { NOBODY, SheetNotFoundError } from '../sheets/access'
 import { ApprovalDesk } from './approvals'
 import { DailyBudget } from './budget'
 import { CapabilityDesk } from './desk'
-import { ChatMoveError, moveChat } from './handover'
+import { ChatMoveError, chatPlaceLine, moveChat } from './handover'
 import { conversationHistory } from './history'
 import { createEmbeddedKeySource } from './inference'
 import { instructionsFor } from './instructions'
@@ -116,8 +116,10 @@ export class AgentHost {
       appendTurn(ws, sessionId, { kind: 'turn_done', stopReason: 'error', error: TURN_INTERRUPTED })
     }
 
-    const runHankoAction = (action: unknown) => this.desk.execute(action)
-    const openSheet = (id: string) => this.events?.openSheet(id)
+    const runHankoAction = async (action: unknown, sessionId: string) => {
+      await this.desk.execute(action, { origin: 'agent', sessionId })
+    }
+    const openSheet = (id: string, sessionId: string) => this.events?.openSheet(id, sessionId)
     const listPeople = () => this.people?.() ?? Promise.resolve([])
     const searchKey = () => this.search?.() ?? Promise.resolve(null)
     const models = catalogue ?? createModelCatalogue()
@@ -283,7 +285,7 @@ export class AgentHost {
     this.approvals.resolve(id, decision, actorId)
   }
 
-  executeAction(input: unknown, caller: Caller = { origin: 'agent' }): Promise<void> {
+  executeAction(input: unknown, caller: Caller = { origin: 'agent' }): Promise<string | null> {
     return this.desk.execute(input, caller)
   }
 
@@ -337,7 +339,7 @@ export class AgentHost {
     if (marker) {
       this.record(sessionId, marker)
       this.events?.sessionChanged?.(sessionId)
-      if (by === 'washi' && sheetId) this.events?.openSheet(sheetId, sessionId)
+      if (by === 'washi' && sheetId) this.events?.openSheet(sheetId, sessionId, true)
     }
     return getSession(this.ws, sessionId)
   }
@@ -434,7 +436,8 @@ export class AgentHost {
     })
     // From the ask on: a process that dies before the port starts still leaves a receipt at boot.
     updateSession(this.ws, sessionId, { status: 'running' })
-    const { prompt, images } = await this.compose(text, attachments)
+    const place = chatPlaceLine(this.ws, session?.anchor ?? null, ask.viewer ?? NOBODY)
+    const { prompt, images } = await this.compose(text, attachments, place)
     const refusal = this.budget.refusal()
     if (refusal) {
       this.fail(sessionId, refusal, turn)
@@ -486,9 +489,9 @@ export class AgentHost {
     this.close(sessionId, credential, ended, Date.now() - started, turn)
   }
 
-  /** Pages ride by id — Washi reads them; text files ride inline; pictures ride as image blocks. */
-  private async compose(text: string, attachments: AttachmentRef[]) {
-    const lines: string[] = []
+  /** The chat's page leads; pages ride by id, text files inline, pictures as image blocks. */
+  private async compose(text: string, attachments: AttachmentRef[], place: string | null) {
+    const lines: string[] = place ? [place] : []
     const images: { mime: string; base64: string }[] = []
     for (const attachment of attachments) {
       if (attachment.kind === 'page') {

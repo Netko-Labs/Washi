@@ -80,6 +80,52 @@ describe('a chat is its starter’s (D67)', () => {
     expect(await member.agents.transcript({ sessionId: chat.id })).toEqual([])
   })
 
+  test('a chat nobody has, or one deleted, is not there either', async () => {
+    const member = callerFor('member')
+    const chat = await member.agents.createSession({ title: 'short-lived' })
+    await member.agents.deleteSession({ sessionId: chat.id })
+    for (const sessionId of [chat.id, '01a18b1d-0000-7000-8000-000000000000']) {
+      await expect(member.agents.transcript({ sessionId })).rejects.toMatchObject({
+        code: 'NOT_FOUND',
+      })
+    }
+  })
+
+  test('a page Washi opens reaches only its chat’s person (D110)', async () => {
+    const mine = await callerFor('member').agents.createSession({ title: 'mine' })
+    const theirs = await callerFor('owner').agents.createSession({ title: 'theirs' })
+    const abort = new AbortController()
+    const caller = appRouter.createCaller(
+      createContext(runtime, {
+        workspaceId: WORKSPACE,
+        actor: { id: 'member', email: 'member@x', name: 'member' },
+      }),
+      { signal: abort.signal },
+    )
+    const heard: string[] = []
+    const listening = (async () => {
+      // A server-side caller yields the raw `tracked` envelope: [id, data, symbol].
+      for await (const event of await caller.agents.onOpenSheetRequested()) {
+        heard.push((event as unknown as [string, { id: string }])[1].id)
+      }
+    })().catch(() => {})
+    await Bun.sleep(10)
+    runtime.events.emit('openSheetRequested', {
+      workspaceId: WORKSPACE,
+      id: 'their-page',
+      sessionId: theirs.id,
+    })
+    runtime.events.emit('openSheetRequested', {
+      workspaceId: WORKSPACE,
+      id: 'my-page',
+      sessionId: mine.id,
+    })
+    await Bun.sleep(10)
+    abort.abort()
+    await listening
+    expect(heard).toEqual(['my-page'])
+  })
+
   test('a chat may be anchored to a page and its subtree', async () => {
     const chat = await callerFor('member').agents.createSession({
       title: 'roadmap',

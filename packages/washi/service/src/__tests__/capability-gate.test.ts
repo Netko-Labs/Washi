@@ -11,12 +11,12 @@ beforeEach(() => {
 afterEach(() => ws.close())
 
 function makeHost() {
-  const opened: string[] = []
+  const opened: { id: string; sessionId: string }[] = []
   const host = new AgentHost(ws)
   host.setEvents({
     update: () => {},
     approval: () => {},
-    openSheet: (id) => opened.push(id),
+    openSheet: (id, sessionId) => opened.push({ id, sessionId }),
   })
   return { host, opened }
 }
@@ -26,8 +26,9 @@ describe('sheet actions pass the same desk as agent actions', () => {
   test('sheet.create keeps a hostile title as text, not markup', async () => {
     const { host, opened } = makeHost()
     const title = 'a </Title><Missing/> "q" {x} & \\'
-    await host.executeAction({ verb: 'sheet.create', title }, { origin: 'sheet' })
-    const sheet = getSheet(ws, opened[0] ?? '')
+    const made = await host.executeAction({ verb: 'sheet.create', title }, { origin: 'sheet' })
+    expect(opened).toEqual([])
+    const sheet = getSheet(ws, made ?? '')
     expect(sheet?.title).toBe(title)
     const root = parse(sheet?.source ?? '')
     expect(root.props.title).toBe(title)
@@ -108,9 +109,12 @@ describe('sheet actions pass the same desk as agent actions', () => {
   test('the same verb is allowed from the agent, which canUseTool already stamped', async () => {
     const { host, opened } = makeHost()
 
-    await host.executeAction({ verb: 'sheet.open', sheet: '01J8' }, { origin: 'agent' })
+    await host.executeAction(
+      { verb: 'sheet.open', sheet: '01J8' },
+      { origin: 'agent', sessionId: 'chat-1' },
+    )
 
-    expect(opened).toEqual(['01J8'])
+    expect(opened).toEqual([{ id: '01J8', sessionId: 'chat-1' }])
     expect(listCapabilityCalls(ws)[0]?.decision).toBe('allowed')
   })
 

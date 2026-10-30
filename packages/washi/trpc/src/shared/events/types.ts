@@ -15,7 +15,7 @@ export interface WashiEvents {
   agentUpdate: { workspaceId: string; sessionId: string; entry: TranscriptEntry }
   approvalRequested: ApprovalRequest & { workspaceId: string }
   /** With a chat, only its person is sent there (a handover, D110). */
-  openSheetRequested: { workspaceId: string; id: string; sessionId?: string }
+  openSheetRequested: { workspaceId: string; id: string; sessionId: string; handover?: boolean }
   /** Washi named a conversation, or a person did: the list refetches. */
   sessionChanged: { workspaceId: string; sessionId: string }
   /** Something in the workspace moved: a page, or table data. Viewers refetch what they show. */

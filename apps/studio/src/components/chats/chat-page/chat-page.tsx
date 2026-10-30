@@ -3,6 +3,7 @@ import { useComposer } from '@washi/ui'
 import { type ChatPageProps, useChatRoute } from '../lib'
 import { ChatBar } from './chat-bar'
 import { ChatBody } from './chat-body'
+import { ChatMissing } from './chat-missing'
 
 const workspaceRoute = getRouteApi('/w/$workspaceId')
 
@@ -12,16 +13,11 @@ export function ChatPage({ chatId }: ChatPageProps) {
   const { isMissing } = useChatRoute(workspaceId, chatId)
   const composer = useComposer()
 
+  if (isMissing) return <ChatMissing workspaceId={workspaceId} />
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-background">
       <ChatBar workspaceId={workspaceId} chatId={chatId} />
-      {isMissing ? (
-        <p className="mt-16 text-center text-[14px] text-muted-foreground">
-          This chat is gone, or it is someone else's.
-        </p>
-      ) : (
-        <ChatBody workspaceId={workspaceId} composer={composer} isNew={!chatId} />
-      )}
+      <ChatBody workspaceId={workspaceId} composer={composer} isNew={!chatId} />
     </div>
   )
 }

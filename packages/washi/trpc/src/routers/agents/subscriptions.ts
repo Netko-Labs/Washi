@@ -72,8 +72,7 @@ export const agentSubscriptions = router({
       signal,
     })) {
       if (event.data.workspaceId !== ctx.workspaceId) continue
-      const { sessionId } = event.data
-      if (!sessionId || isSessionVisible(ctx.ws, sessionId, ctx.viewer.id)) {
+      if (isSessionVisible(ctx.ws, event.data.sessionId, ctx.viewer.id)) {
         yield tracked(event.id, event.data)
       }
     }

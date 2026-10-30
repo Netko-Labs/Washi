@@ -22,7 +22,8 @@ export class CapabilityDesk {
     this.events = events
   }
 
-  async execute(input: unknown, caller: Caller = { origin: 'agent' }): Promise<void> {
+  /** Resolves to the page a press opened, for the presser's own client to show. */
+  async execute(input: unknown, caller: Caller = { origin: 'agent' }): Promise<string | null> {
     const { origin, actorId = null } = caller
     const checked = checkAction(input)
     if (!checked.ok) {
@@ -39,7 +40,13 @@ export class CapabilityDesk {
     }
 
     this.ledger({ origin, actorId }, verb, input, origin === 'sheet' ? 'auto' : 'allowed')
-    await runAction(checked.action, this.handlers(origin === 'agent' ? 'washi' : actorId))
+    let opened: string | null = null
+    const open = (id: string) => {
+      if (origin === 'sheet') opened = id
+      else if (caller.sessionId) this.events()?.openSheet(id, caller.sessionId)
+    }
+    await runAction(checked.action, this.handlers(origin === 'agent' ? 'washi' : actorId, open))
+    return opened
   }
 
   /** A page-side fetch path — same policy, no approval loop. */
@@ -85,17 +92,17 @@ export class CapabilityDesk {
   }
 
   /** `author` signs the rows a verb writes: the person who pressed, or Washi (D78). */
-  private handlers(author: string | null): HankoHandlers {
+  private handlers(author: string | null, open: (id: string) => void): HankoHandlers {
     return {
       'sheet.open': (action) => {
-        this.events()?.openSheet(action.sheet)
+        open(action.sheet)
       },
       'sheet.create': (action) => {
         // A JS string literal in braces: JSX text and attribute strings have no escapes.
         const title = `{${JSON.stringify(action.title)}}`
         const source = `<Sheet title=${title} wsx="1">\n  <Title>${title}</Title>\n</Sheet>\n`
         const sheet = createSheetFromSource(this.ws, { title: action.title, source })
-        this.events()?.openSheet(sheet.id)
+        open(sheet.id)
       },
       'table.insert': (action) => {
         runMutation(this.ws, { kind: 'insert', table: action.table, data: action.data }, author)

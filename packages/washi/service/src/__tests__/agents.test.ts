@@ -25,12 +25,12 @@ afterEach(() => ws.close())
 function makeHost() {
   const updates: TranscriptEntry[] = []
   const approvals: ApprovalRequest[] = []
-  const opened: string[] = []
+  const opened: { id: string; sessionId: string }[] = []
   const host = new AgentHost(ws)
   host.setEvents({
     update: (_sessionId, entry) => updates.push(entry),
     approval: (request) => approvals.push(request),
-    openSheet: (id) => opened.push(id),
+    openSheet: (id, sessionId) => opened.push({ id, sessionId }),
   })
   return { host, updates, approvals, opened }
 }
@@ -82,9 +82,12 @@ describe('normalize', () => {
 describe('hanko actions through the host', () => {
   test('sheet.create creates and opens; table.insert writes', async () => {
     const { host, opened } = makeHost()
-    await host.executeAction({ verb: 'sheet.create', title: 'From an action' })
-    expect(listSheets(ws).some((sheet) => sheet.title === 'From an action')).toBe(true)
-    expect(opened).toHaveLength(1)
+    await host.executeAction(
+      { verb: 'sheet.create', title: 'From an action' },
+      { origin: 'agent', sessionId: 'chat-1' },
+    )
+    const made = listSheets(ws).find((sheet) => sheet.title === 'From an action')
+    expect(opened).toEqual([{ id: made?.id ?? '', sessionId: 'chat-1' }])
 
     defineUserTable(ws, { name: 'tasks', columns: [{ name: 'title', type: 'text' }] })
     await host.executeAction({ verb: 'table.insert', table: 'tasks', data: { title: 'stamped' } })

@@ -75,6 +75,10 @@ export interface ChatBarProps {
   chatId?: string
 }
 
+export interface ChatMissingProps {
+  workspaceId: string
+}
+
 export interface ChatBodyProps {
   workspaceId: string
   composer: Composer
