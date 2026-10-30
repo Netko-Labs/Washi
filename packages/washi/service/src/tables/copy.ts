@@ -42,13 +42,17 @@ function readableNames(spec: TableSpec): string[] {
   ]
 }
 
+function checkNames(spec: TableSpec, columns: string[], at: string): void {
+  const issues = validateRecord(spec, Object.fromEntries(columns.map((column) => [column, null])))
+  if (issues.length > 0) {
+    throw new InkError(issues.map((issue) => `${at}.${issue.path}: ${issue.message}`).join('; '))
+  }
+}
+
 /** Each `set` names a stored column; an expr reads the source row's names and `$param`s. */
 function checkSet(spec: TableSpec, mutation: CopyMutation): CopyOverride[] {
-  const named = Object.fromEntries(Object.keys(mutation.set).map((column) => [column, null]))
-  const issues = validateRecord(spec, named)
-  if (issues.length > 0) {
-    throw new InkError(issues.map((issue) => `set.${issue.path}: ${issue.message}`).join('; '))
-  }
+  checkNames(spec, Object.keys(mutation.set), 'set')
+  for (const entry of mutation.each ?? []) checkNames(spec, Object.keys(entry), 'each')
   const shape = {
     state: readableNames(spec),
     args: Object.keys(mutation.params ?? {}).map((name) => `$${name}`),
@@ -107,7 +111,8 @@ function copyOf(
 }
 
 /**
- * Every row `where` matches becomes a new row: its stored cells, `set` over them. All or nothing —
+ * Every row `where` matches becomes a new row — one per `each` entry: its stored cells, `set` over
+ * them, then the entry's. All or nothing —
  * past the cap nothing is copied, and each copy is checked like an insert before any lands.
  */
 export function copyRecords(
@@ -132,11 +137,18 @@ export function copyRecords(
   if (rows.length > cap) {
     throw new InkError(`more than ${cap} rows match — nothing copied; narrow where`)
   }
+  const entries = mutation.each ?? [{}]
+  if (rows.length * entries.length > cap) {
+    throw new InkError(`more than ${cap} copies — nothing copied; narrow where or each`)
+  }
 
   const args = Object.fromEntries(
     Object.entries(mutation.params ?? {}).map(([name, value]) => [`$${name}`, value]),
   )
-  const copies = rows.map((row) => copyOf(table.spec, row, overrides, args))
+  const copies = rows.flatMap((row) => {
+    const copy = copyOf(table.spec, row, overrides, args)
+    return entries.map((entry) => ({ ...copy, ...entry }))
+  })
   for (const data of copies) checkData(ws, table.spec, data)
   const ids = ws.sqlite.transaction(() =>
     copies.map((data) => insertRecord(ws, table.id, data, author)),

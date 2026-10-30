@@ -553,6 +553,9 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   `view="month"` (D86) draws whole weeks as a grid (`monthSpan`; neighbours dimmed, three events a
   day then +N more, a list of busy days under 560px); `state` names a `YYYY-MM` page-state key it
   follows and ‹ › Today write, so it moves with a month `Select`.
+  Where the host adds rows (`newRow`), an event's ⋯ duplicates it, copies it to a picked day or
+  repeats it on chosen weekdays through a date (≤ 31, `copyDates`, wall clock): one `table.copy` of
+  the row with `each` (one copy per entry, all or none), its date moved, hours and properties kept.
   `<Form trigger>` puts a form behind one button in a native `<dialog>` (`FormDialog`: top layer,
   Escape, a bottom sheet under 560px, the first field focused, closes when the row lands and the
   trigger says Added). `required` names fields it won't send without — each said in words, never a

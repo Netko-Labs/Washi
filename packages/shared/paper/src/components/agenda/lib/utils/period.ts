@@ -1,6 +1,6 @@
-import type { BindQuery } from '../../../registry'
-import { AGENDA_HUES, AGENDA_ROW_LIMIT, AGENDA_SPAN_DAYS } from './constants'
-import type { AgendaColumns, AgendaDayInfo, AgendaSpan, Row, WeekStart } from './types'
+import type { BindQuery } from '../../../../registry'
+import { AGENDA_HUES, AGENDA_ROW_LIMIT, AGENDA_SPAN_DAYS } from '../constants'
+import type { AgendaColumns, AgendaDayInfo, AgendaSpan, Row, WeekStart } from '../types'
 
 const DAY_KEY = /^(\d{4}-\d{2}-\d{2})/
 const MONTH_KEY = /^(\d{4})-(\d{2})(?:-\d{2})?$/

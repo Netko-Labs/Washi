@@ -3,11 +3,19 @@ import { styled } from '../../lib'
 import { usePaperHost } from '../../provider'
 import { FormDialog } from '../form'
 import { AgendaDay } from './agenda-day'
-import { AGENDA_MONTH_LIMIT, type AgendaProps, rowsByDay, useAgendaPeriod } from './lib'
+import { AgendaEventMenu } from './agenda-event-menu'
+import {
+  AGENDA_MONTH_LIMIT,
+  type AgendaPick,
+  type AgendaProps,
+  rowsByDay,
+  useAgendaPeriod,
+} from './lib'
 
 /**
  * A week or a month of rows on their dates, the way a calendar shows it: today marked, ‹ › to
  * move, each row opening where the reader is. With `add`, a day's + opens a modal Form on that day.
+ * A host that adds rows gives each event a ⋯: Duplicate, Copy to…, Repeat on days….
  */
 export function Agenda({
   bind,
@@ -26,7 +34,8 @@ export function Agenda({
 }: AgendaProps) {
   const host = usePaperHost()
   const period = useAgendaPeriod({ bind, date, weekStart, view, stateKey, locale: host.locale })
-  const [adding, setAdding] = useState<string | null>(null)
+  const [pick, setPick] = useState<AgendaPick>(null)
+  const adding = pick?.kind === 'add' ? pick.day : null
   const byDay = rowsByDay(period.state.rows, date)
   const columns = { date, title, time, end, badge }
   const addingOn = period.days.find((day) => day.key === adding)
@@ -68,8 +77,9 @@ export function Agenda({
               columns={columns}
               empty={empty}
               limit={view === 'month' ? AGENDA_MONTH_LIMIT : undefined}
-              onAdd={add ? () => setAdding(day.key) : undefined}
+              onAdd={add ? () => setPick({ kind: 'add', day: day.key }) : undefined}
               onOpen={host.openRow}
+              onMenu={host.newRow ? (row) => setPick({ kind: 'event', row }) : undefined}
             />
           ))}
         </div>
@@ -77,12 +87,22 @@ export function Agenda({
       {add && (
         <FormDialog
           open={adding !== null}
-          onClose={() => setAdding(null)}
+          onClose={() => setPick(null)}
           title={`${addLabel ?? 'Add'}${addingOn ? ` · ${addingOn.long}` : ''}`}
           table={bind.table}
           fields={add}
           submit={addLabel}
           seed={adding ? { [date]: adding } : undefined}
+        />
+      )}
+      {pick?.kind === 'event' && (
+        <AgendaEventMenu
+          row={pick.row}
+          table={bind.table}
+          columns={columns}
+          weekStart={weekStart}
+          locale={host.locale}
+          onClose={() => setPick(null)}
         />
       )}
     </div>

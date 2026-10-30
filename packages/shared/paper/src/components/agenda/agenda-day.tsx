@@ -2,11 +2,26 @@ import type { Row } from '../../lib'
 import { AgendaEvent } from './agenda-event'
 import type { AgendaDayProps } from './lib'
 
-export function AgendaDay({ day, rows, columns, empty, limit, onAdd, onOpen }: AgendaDayProps) {
+export function AgendaDay({
+  day,
+  rows,
+  columns,
+  empty,
+  limit,
+  onAdd,
+  onOpen,
+  onMenu,
+}: AgendaDayProps) {
   const shown = limit === undefined ? rows : rows.slice(0, limit)
   const folded = rows.slice(shown.length)
   const event = (row: Row, index: number) => (
-    <AgendaEvent key={String(row.id ?? index)} row={row} columns={columns} onOpen={onOpen} />
+    <AgendaEvent
+      key={String(row.id ?? index)}
+      row={row}
+      columns={columns}
+      onOpen={onOpen}
+      onMenu={onMenu}
+    />
   )
 
   return (

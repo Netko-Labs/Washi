@@ -1,0 +1,172 @@
+/* An event's ⋯ and what it opens: Duplicate, Copy to…, Repeat on days…. */
+
+.wsx-agenda-item {
+  position: relative;
+  min-width: 0;
+}
+.wsx-agenda-item > .wsx-agenda-event {
+  padding-right: 26px;
+}
+.wsx-agenda-event-more {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 0;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--card) 80%, transparent);
+  color: var(--muted);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity var(--ease),
+    color var(--ease);
+}
+.wsx-agenda-item:hover .wsx-agenda-event-more,
+.wsx-agenda-item:focus-within .wsx-agenda-event-more {
+  opacity: 1;
+}
+.wsx-agenda-event-more:hover {
+  color: var(--ink);
+}
+.wsx-agenda-event-more:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.wsx-agenda[data-view="month"] .wsx-agenda-event-more {
+  top: 1px;
+  right: 1px;
+  width: 18px;
+  height: 18px;
+}
+@media (hover: none) {
+  .wsx-agenda-event-more {
+    opacity: 1;
+  }
+}
+
+.wsx-agenda-menu {
+  width: min(400px, calc(100vw - 32px));
+}
+.wsx-agenda-menu .wsx-dialog-head {
+  align-items: flex-start;
+}
+.wsx-agenda-menu-when {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+.wsx-agenda-menu-items {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0 -10px;
+}
+.wsx-agenda-menu-item {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  align-items: baseline;
+  column-gap: 8px;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+.wsx-agenda-menu-item > [aria-hidden] {
+  color: var(--muted);
+  text-align: center;
+}
+.wsx-agenda-menu-item:hover:not(:disabled),
+.wsx-agenda-menu-item:focus-visible {
+  background: var(--muted-bg);
+  outline: none;
+}
+.wsx-agenda-menu-item:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}
+.wsx-agenda-menu-hint {
+  grid-column: 2;
+  font-size: 12.5px;
+  font-weight: 400;
+  color: var(--muted);
+}
+.wsx-agenda-menu-error {
+  margin-top: 12px;
+}
+
+.wsx-agenda-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.wsx-agenda-copy-note {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+.wsx-agenda-copy-note[data-over] {
+  color: var(--tone-danger-text);
+}
+.wsx-agenda-copy-limit {
+  margin-right: auto;
+  font-size: 12px;
+  color: var(--muted);
+}
+.wsx-agenda-days-pick {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.wsx-agenda-days-pick legend {
+  padding: 0;
+  margin-bottom: 6px;
+}
+.wsx-agenda-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.wsx-agenda-chip {
+  min-width: 44px;
+  height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.wsx-agenda-chip[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--tone-accent-text);
+}
+.wsx-agenda-chip:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+@media (max-width: 560px) {
+  .wsx-agenda-menu {
+    width: 100%;
+  }
+}

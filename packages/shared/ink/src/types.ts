@@ -189,7 +189,8 @@ export const mutationSchema = z.discriminatedUnion('kind', [
   }),
   /**
    * Every row `where` matches, copied as a new row with `set` over it. `params` fill the `{ param }`
-   * filter values and read as `$name` in a `set` expr (D76).
+   * filter values and read as `$name` in a `set` expr (D76). With `each`, one copy per entry, its
+   * cells over `set` — an event repeated on several days.
    */
   z.object({
     kind: z.literal('copy'),
@@ -197,6 +198,7 @@ export const mutationSchema = z.discriminatedUnion('kind', [
     params: z.record(identifier('param'), scalarSchema).optional(),
     where: z.array(rollupFilterSchema).min(1).max(16),
     set: z.record(z.string(), copyValueSchema).default({}),
+    each: z.array(recordDataSchema).min(1).max(COPY_ROW_CAP).optional(),
     limit: z.number().int().positive().max(COPY_ROW_CAP).optional(),
   }),
 ])

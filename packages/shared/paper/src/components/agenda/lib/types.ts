@@ -78,12 +78,70 @@ export interface AgendaDayProps {
   limit?: number
   onAdd?: () => void
   onOpen?: (id: string) => void
+  /** The event's ⋯: Duplicate, Copy to…, Repeat on days…; without it (a read-only host) none. */
+  onMenu?: (row: Row) => void
 }
 
 export interface AgendaEventProps {
   row: Row
   columns: AgendaColumns
   onOpen?: (id: string) => void
+  onMenu?: (row: Row) => void
+}
+
+/** What a press opened over the agenda: a day's + Form, or an event's ⋯. */
+export type AgendaPick = { kind: 'add'; day: string } | { kind: 'event'; row: Row } | null
+
+/** The new rows a Repeat on days writes, one per day, each its date moved `shifts` days. */
+export interface CopyPlan {
+  days: string[]
+  shifts: number[]
+  cells: string[]
+  /** More days matched than one press may copy; nothing is offered. */
+  isOver: boolean
+}
+
+export interface WeekdayChip {
+  /** 0 = Sunday, as `getUTCDay` counts. */
+  day: number
+  label: string
+}
+
+export type EventMenuPage = 'menu' | 'copy' | 'repeat'
+
+export type EventCopyStatus =
+  | { kind: 'idle' }
+  | { kind: 'busy' }
+  | { kind: 'refused'; reason: string }
+
+/** Each entry is one new row: the event's stored cells, the entry's over them. */
+export type CopyEntries = Record<string, string>[]
+
+export interface EventCopy {
+  status: EventCopyStatus
+  copy: (entries: CopyEntries) => Promise<void>
+}
+
+export interface AgendaEventMenuProps {
+  row: Row
+  table: string
+  columns: AgendaColumns
+  weekStart: WeekStart
+  locale?: string
+  onClose: () => void
+}
+
+export interface AgendaCopyPageProps {
+  row: Row
+  columns: AgendaColumns
+  locale?: string
+  isBusy: boolean
+  onCopy: (entries: CopyEntries) => void
+  onBack: () => void
+}
+
+export interface AgendaRepeatProps extends AgendaCopyPageProps {
+  weekStart: WeekStart
 }
 
 export type { Row }
