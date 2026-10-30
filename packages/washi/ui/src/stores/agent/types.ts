@@ -12,12 +12,40 @@ import type {
 /** Where a chat lives (D110): a page's id, or null for Home. */
 export type ChatScope = string | null
 
+/** One state per conversation (D114). */
+export type TurnState = 'idle' | 'working' | 'stalled' | 'failed'
+
+/** The last turn's failure in words; `entryId` is its receipt, null when it never got one. */
+export interface TurnFailure {
+  entryId: string | null
+  text: string
+}
+
+/** Flat, so a shallow selector can hold it. */
+export interface TurnView {
+  state: TurnState
+  failureText: string | null
+  /** The failed turn's receipt; the transcript leaves it to the turn status to draw. */
+  failureId: string | null
+  /** The running turn's ask, as the server stamped it (ms). */
+  startedAt: number | null
+  /** Retry has something to send. */
+  canRetry: boolean
+}
+
+export interface LastAsk {
+  text: string
+  attachments: AttachmentRef[]
+}
+
 export interface AgentState {
   sessions: AgentSession[]
   activeSessionId: string | null
   transcript: TranscriptEntry[]
   approvals: ApprovalRequest[]
   running: boolean
+  /** A working turn nothing has been heard from for `STALL_MS` (D114). */
+  stalled: boolean
   /** A blank chat on screen: nothing is created until its first send (D67). */
   draft: boolean
   /** A blank chat in the scope on screen; the first send anchors it there. */
@@ -55,6 +83,10 @@ export interface AgentState {
   }) => Promise<void>
   sendPrompt: (text: string, attachments?: AttachmentRef[]) => Promise<void>
   stopTurn: () => Promise<void>
+  /** Re-sends the last ask; over a stuck turn, Stop first. */
+  retryTurn: () => Promise<void>
+  /** Re-reads the chat on screen: a receipt missed while the socket was down lands now. */
+  refreshActive: () => Promise<void>
   resolveApproval: (id: string, decision: ApprovalDecision) => Promise<void>
   reset: () => void
 }

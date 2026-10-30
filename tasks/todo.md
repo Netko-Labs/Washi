@@ -1106,3 +1106,17 @@ reindex) pass; typecheck, Biome and `bun test` green.
 - [ ] later: one cached React runtime per session instead of ~220 KB per widget bundle
 
 Acceptance: wsx/paper/service/editor tests pass; typecheck, Biome, `bun test`, studio build green.
+
+
+# A turn always ends, and says how (2026-10-29) — D114
+
+- [x] causes: no watchdog (an SDK hang ran forever); a death before the port started left a chat
+      `idle` mid-turn; a restart errored the chat with no receipt; the bus resumes at the live edge
+      after a restart or a full buffer, so a missed `turn_done` kept the client `running`
+- [x] server: one `turn_done` per turn, `TurnWatchdog` (5 min quiet, 15s grace after any abort),
+      boot receipts for interrupted chats
+- [x] client: `turnViewOf` (idle · working · stalled · failed), `TurnStatus` in panel + chat page,
+      Retry, Stop, 90s stall, reconnect re-read
+- [ ] later: a real-socket check of the reconnect path (tested against a stub feed only)
+
+Acceptance: service + store tests pass; typecheck, Biome and `bun test` green.

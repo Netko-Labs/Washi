@@ -134,3 +134,10 @@ export interface ComposerState {
 export interface PanelFrame {
   scrollRef: RefObject<HTMLDivElement | null>
 }
+
+export interface TurnStatusProps {
+  /** The panel's small type, or the chat page's reading column. */
+  variant: 'panel' | 'page'
+  /** Draws Washi's mark beside "Working…"; off where the turn above already shows it. */
+  mark?: boolean
+}

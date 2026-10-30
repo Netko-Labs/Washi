@@ -9,6 +9,7 @@ import {
   mergeMessageChunks,
   type ToolPillProps,
   type TranscriptViewProps,
+  useTurnView,
 } from './lib'
 
 function DiffView({ diff }: DiffViewProps) {
@@ -76,6 +77,7 @@ function ToolPill({ update, followups }: ToolPillProps) {
 }
 
 export function TranscriptView({ transcript }: TranscriptViewProps) {
+  const { failureId } = useTurnView()
   const followupsFor = (toolCallId: string) =>
     transcript
       .map((entry) => entry.update)
@@ -122,8 +124,9 @@ export function TranscriptView({ transcript }: TranscriptViewProps) {
               />
             )
           // A turn ends in Washi's words; the receipt is recorded, never shown here (D62).
+          // The last failure is the turn status's, with its Retry (D114).
           case 'turn_done':
-            return update.stopReason === 'error' ? (
+            return update.stopReason === 'error' && entry.id !== failureId ? (
               <div
                 key={entry.id}
                 className="my-1 flex items-center gap-1.5 text-[12px] text-destructive"

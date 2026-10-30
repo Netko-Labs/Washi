@@ -1,5 +1,4 @@
 import { useShallow } from 'zustand/react/shallow'
-import { AgentMascot } from '../mascot'
 import { mascotStateFor, useAgentStore } from '../stores'
 import { AgentComposer } from './agent-composer'
 import { ApprovalBar } from './approval-bar'
@@ -8,6 +7,7 @@ import { type AgentPanelProps, usePanelFrame } from './lib'
 import { MovedNote } from './moved-note'
 import { PanelHeader } from './panel-header'
 import { TranscriptView } from './transcript-view'
+import { TurnStatus } from './turn-status'
 
 const FRAME = {
   float:
@@ -19,12 +19,12 @@ const FRAME = {
 
 /** The door's room: a popover, a dock beside the page, or the whole screen on a phone (D61). */
 export function AgentPanel({ placement = 'float', onExpand }: AgentPanelProps) {
-  const { title, transcript, approvals, running } = useAgentStore(
+  const { title, transcript, mood, isEmpty } = useAgentStore(
     useShallow((state) => ({
       title: state.sessions.find((session) => session.id === state.activeSessionId)?.title,
       transcript: state.transcript,
-      approvals: state.approvals,
-      running: state.running,
+      mood: mascotStateFor(state.transcript, state.running, state.approvals, state.stalled),
+      isEmpty: state.transcript.length === 0 && !state.running,
     })),
   )
   const { scrollRef } = usePanelFrame(transcript.length)
@@ -40,21 +40,16 @@ export function AgentPanel({ placement = 'float', onExpand }: AgentPanelProps) {
         placement={placement}
         onExpand={onExpand}
         title={title ?? 'Washi'}
-        mascotState={mascotStateFor(transcript, running, approvals)}
+        mascotState={mood}
       />
 
       <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto overscroll-y-none">
-        {transcript.length === 0 && !running ? (
+        {isEmpty ? (
           <EmptyChat onStarter={(text) => void store().sendPrompt(text)} />
         ) : (
           <TranscriptView transcript={transcript} />
         )}
-        {running && (
-          <div className="flex items-center gap-2 px-4 pb-3 text-[12px] text-muted-foreground">
-            <AgentMascot state="writing" size={20} />
-            Washi is working…
-          </div>
-        )}
+        <TurnStatus variant="panel" />
       </div>
 
       <ApprovalBar />

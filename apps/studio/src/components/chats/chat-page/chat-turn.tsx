@@ -5,7 +5,7 @@ import { ChatReceipts } from './chat-receipts'
 import type { ChatTurnProps } from './lib'
 
 /** Washi's turn as prose under its mark: words, quiet receipts between them, the pages it wrote. */
-export function ChatTurn({ block, workspaceId, isLive }: ChatTurnProps) {
+export function ChatTurn({ block, workspaceId, isLive, failureId }: ChatTurnProps) {
   return (
     <div className="flex flex-col gap-2 sm:flex-row sm:gap-4" data-chat-washi>
       <AgentMascot state={isLive ? 'writing' : 'idle'} size={26} className="shrink-0 sm:mt-0.5" />
@@ -17,7 +17,8 @@ export function ChatTurn({ block, workspaceId, isLive }: ChatTurnProps) {
             case 'tools':
               return <ChatReceipts key={part.id} steps={part.steps} />
             case 'error':
-              return (
+              // The chat's last failure is drawn under the thread, with Retry (D114).
+              return part.id === failureId ? null : (
                 <p
                   key={part.id}
                   className="my-1.5 flex items-start gap-1.5 text-[13.5px] text-destructive"

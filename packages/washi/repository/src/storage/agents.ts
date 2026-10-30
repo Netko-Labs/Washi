@@ -245,9 +245,13 @@ export function expirePendingApprovals(ws: Workspace): number {
   return result.changes
 }
 
-/** A turn cannot outlive its process: anything still `running` at boot was cut off mid-way. */
-export function failInterruptedSessions(ws: Workspace): number {
-  return ws.sqlite
-    .query("UPDATE agent_sessions SET status = 'error' WHERE status = 'running'")
-    .run().changes
+/**
+ * A turn cannot outlive its process: anything still `running` at boot was cut off mid-way.
+ * Answers their ids, so each gets its receipt.
+ */
+export function failInterruptedSessions(ws: Workspace): string[] {
+  const rows = ws.sqlite
+    .query("UPDATE agent_sessions SET status = 'error' WHERE status = 'running' RETURNING id")
+    .all() as { id: string }[]
+  return rows.map((row) => row.id)
 }

@@ -10,6 +10,16 @@ function duration(ms: number): string {
   return `${Math.floor(seconds / 60)}m ${seconds % 60}s`
 }
 
+/** A running turn's clock: `0:42`, `12:05`, `1:02:03`. A server clock ahead of ours reads 0:00. */
+export function elapsedLabel(ms: number): string {
+  const total = Math.max(0, Math.floor(ms / 1000))
+  const pad = (value: number) => value.toString().padStart(2, '0')
+  const hours = Math.floor(total / 3600)
+  const minutes = Math.floor((total % 3600) / 60)
+  const seconds = total % 60
+  return hours > 0 ? `${hours}:${pad(minutes)}:${pad(seconds)}` : `${minutes}:${pad(seconds)}`
+}
+
 export function usd(amount: number): string {
   return amount > 0 && amount < 0.01 ? '<$0.01' : `$${amount.toFixed(2)}`
 }

@@ -97,6 +97,7 @@ export function createAiSdkPort({
 
       try {
         for await (const part of stream.fullStream) {
+          request.onActivity?.()
           if (part.type === 'text-delta' && part.text) {
             emit({ kind: 'message_chunk', text: part.text })
             continue

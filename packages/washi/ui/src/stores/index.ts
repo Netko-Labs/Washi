@@ -1,6 +1,6 @@
 export { useAgentStore } from './agent/agent-store'
-export type { ChatScope } from './agent/types'
-export { isInScope, mascotStateFor, shownScope } from './agent/utils'
+export type { ChatScope, TurnState, TurnView } from './agent/types'
+export { isInScope, mascotStateFor, shownScope, turnViewOf } from './agent/utils'
 export { useFavoritesStore } from './favorites/favorites-store'
 export { useLiveStore } from './live/live-store'
 export { useNoticeStore } from './notice/notice-store'
