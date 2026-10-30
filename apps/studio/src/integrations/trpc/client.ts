@@ -6,7 +6,12 @@ import {
   type TRPCWebSocketClient,
   wsLink,
 } from '@trpc/client'
-import { type AppRouter, MAX_TRPC_BATCH_SIZE, WORKSPACE_HEADER } from '@washi/trpc/client'
+import {
+  type AppRouter,
+  MAX_TRPC_BATCH_SIZE,
+  MAX_TRPC_URL_LENGTH,
+  WORKSPACE_HEADER,
+} from '@washi/trpc/client'
 import { bindHost } from '@washi/ui'
 import {
   fileUrl,
@@ -41,13 +46,27 @@ export function setActiveWorkspace(id: string | null): void {
  * lazy WebSocket to `/trpc-ws`. SSR never subscribes, so the server build stays HTTP-only.
  */
 function createLinks() {
-  const http = httpBatchLink<AppRouter>({
+  const headers = () => {
+    const workspace = readActiveWorkspace()
+    return workspace ? { [WORKSPACE_HEADER]: workspace } : {}
+  }
+  const queries = httpBatchLink<AppRouter>({
     url: TRPC_HTTP_URL,
     maxItems: MAX_TRPC_BATCH_SIZE,
-    headers: () => {
-      const workspace = readActiveWorkspace()
-      return workspace ? { [WORKSPACE_HEADER]: workspace } : {}
-    },
+    maxURLLength: MAX_TRPC_URL_LENGTH,
+    headers,
+  })
+  // A page's code is the input of `scripts.*`: as a GET it rode the URL, and a long page got a 431.
+  const code = httpBatchLink<AppRouter>({
+    url: TRPC_HTTP_URL,
+    maxItems: MAX_TRPC_BATCH_SIZE,
+    methodOverride: 'POST',
+    headers,
+  })
+  const http = splitLink({
+    condition: (op) => op.path.startsWith('scripts.'),
+    true: code,
+    false: queries,
   })
   if (!wsClient) return [http]
   return [
