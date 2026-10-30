@@ -1,4 +1,10 @@
-import { IconBuildingCommunity, IconLogout, IconUserCircle } from '@tabler/icons-react'
+import {
+  IconArrowUpRight,
+  IconBook,
+  IconBuildingCommunity,
+  IconLogout,
+  IconUserCircle,
+} from '@tabler/icons-react'
 import { Link } from '@tanstack/react-router'
 import { initials, useViewStore } from '@washi/ui'
 import { Floating } from '@/components/shared/floating'
@@ -72,6 +78,18 @@ export function UserMenu({ workspace, onNavigate, placement = 'up' }: UserMenuPr
             <IconBuildingCommunity className="size-4" />
             Workspace settings
           </Link>
+          <a
+            href="/learn"
+            target="_blank"
+            rel="noopener"
+            role="menuitem"
+            onClick={menu.close}
+            className={ROW}
+          >
+            <IconBook className="size-4" />
+            Learn Washi
+            <IconArrowUpRight className="ml-auto size-3.5 text-muted-foreground" />
+          </a>
           <div className="my-1 h-px bg-border" />
           <button
             type="button"
