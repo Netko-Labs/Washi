@@ -37,6 +37,7 @@ export function takenBy(
       { column: date, op: 'gte', value: from },
       { column: date, op: 'lt', value: to },
     ],
+    orderBy: { column: date, direction: 'asc' },
     limit: TAKEN_SCAN_ROWS,
   })
   const overlaps = (cell: unknown) => {
@@ -44,6 +45,8 @@ export function takenBy(
     return held !== null && spansOverlap(held, span)
   }
   if (rows.some((row) => overlaps(row[date]))) return 'booked'
+  // A window too busy to read whole is never called free.
+  if (rows.length >= TAKEN_SCAN_ROWS) return 'booked'
   if (!pending) return null
   const asked = requestedSpans(ws, { table, date, from, to })
   return asked.some(overlaps) ? 'requested' : null
