@@ -1,3 +1,4 @@
+import { INFERENCE_ASK, sharedAsks } from '@washi/ui'
 import { useEffect, useState } from 'react'
 import { api } from '@/integrations/trpc'
 import { SKIPPED_KEY_PREFIX } from '../constants'
@@ -23,8 +24,8 @@ export function useFirstRun(workspaceId: string) {
     let live = true
     setAsleep(null)
     setSkipped(wasSkipped(workspaceId))
-    api.agents.inference
-      .query()
+    sharedAsks
+      .share(INFERENCE_ASK, () => api.agents.inference.query())
       .then((status) => live && setAsleep(status.active === null))
       .catch(() => live && setAsleep(false))
     return () => {

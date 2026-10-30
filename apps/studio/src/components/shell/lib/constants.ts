@@ -8,3 +8,6 @@ export const DRAWER_SWIPE = 72
 export const MAIN_ID = 'main'
 /** The ☰ that opens the drawer; focus goes back to it when Escape closes the drawer. */
 export const DRAWER_OPENER = '[data-drawer-opener]'
+/** What may take focus when the drawer opens: its first control, in document order. */
+export const DRAWER_CONTROLS =
+  'button:not([disabled]), a[href], input:not([disabled]), [tabindex]:not([tabindex="-1"])'

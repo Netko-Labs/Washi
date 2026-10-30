@@ -243,6 +243,13 @@ export function optionRemovalWords({ option, count }: OptionRemoval): string {
   return `${holders} “${option}” — removing it leaves ${count === 1 ? 'it' : 'them'} empty.`
 }
 
+/** What a rename or delete leaves behind: the pages whose views still name the property. */
+export function columnPagesWords(pages: string[], label: string, renaming: boolean): string {
+  const views = pages.length === 1 ? 'its views name' : 'their views name'
+  const after = renaming ? ' and will not follow the new name' : ''
+  return `Shown on ${pages.join(', ')} — ${views} ${label}${after}.`
+}
+
 /** ↑ ↓ walk a menu's fields and items as a native menu does; Home and End jump, outside a field. */
 export function walkMenu(event: KeyboardEvent<HTMLElement>): void {
   const typing = event.target instanceof HTMLInputElement

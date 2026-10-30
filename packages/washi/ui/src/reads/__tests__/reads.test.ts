@@ -22,6 +22,15 @@ describe('a read asked twice is asked once', () => {
     expect(second).toBe(first)
   })
 
+  test('with no freshness, only asks in flight share; a settled one asks again', async () => {
+    const reads = createReads(0)
+    const ask = counted(async () => 'claude')
+    await Promise.all([reads.share('agents.inference', ask), reads.share('agents.inference', ask)])
+    expect(ask.calls).toBe(1)
+    await reads.share('agents.inference', ask)
+    expect(ask.calls).toBe(2)
+  })
+
   test('a settled read answers again while fresh, then asks', async () => {
     let clock = 0
     const reads = createReads(1_000, () => clock)

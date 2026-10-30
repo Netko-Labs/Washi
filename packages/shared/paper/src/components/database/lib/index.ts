@@ -1,4 +1,5 @@
 export { useColumnChange } from './hooks/use-column-change'
+export { useColumnPages } from './hooks/use-column-pages'
 export { useCommit } from './hooks/use-commit'
 export { useDatabase } from './hooks/use-database'
 export { useOptionRemoval } from './hooks/use-option-removal'
@@ -61,6 +62,7 @@ export type {
 export {
   choicesFor,
   columnKey,
+  columnPagesWords,
   dateLabel,
   defaultViews,
   hueAt,

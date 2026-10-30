@@ -1,4 +1,4 @@
-import { useAgentStore } from '@washi/ui'
+import { INFERENCE_ASK, sharedAsks, useAgentStore } from '@washi/ui'
 import { useEffect, useState } from 'react'
 import { api } from '@/integrations/trpc'
 import { INFERENCE_POLL_MS, STATUS_IDLE_POLL_MS } from '../constants'
@@ -32,8 +32,8 @@ export function useAgentStatus(): AgentStatusView | null {
         })
     }
     const wake = () =>
-      void api.agents.inference
-        .query()
+      void sharedAsks
+        .share(INFERENCE_ASK, () => api.agents.inference.query())
         .then((next) => live && setAsleep(next.active === null))
         .catch(() => {})
     tick()

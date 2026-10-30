@@ -8,8 +8,8 @@ import { DRAWER_SWIPE, type MobileDrawerProps, useDrawerOpen, useShellStore } fr
  * pick closes it. It is drawn once and only slides, so opening it is a transform, never a mount.
  */
 export function MobileDrawer({ workspace }: MobileDrawerProps) {
-  const isOpen = useDrawerOpen()
   const panel = useRef<HTMLDivElement>(null)
+  const isOpen = useDrawerOpen(panel)
   const close = () => useShellStore.getState().setDrawer(false)
   useSwipe(panel, {
     axis: 'x',

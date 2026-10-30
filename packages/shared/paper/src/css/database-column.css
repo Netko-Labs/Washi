@@ -79,6 +79,11 @@
 .wsx-db-confirm {
   margin: 12px 14px 8px;
 }
+.wsx-db-column-pages {
+  margin: 0 14px 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
 .wsx-db-ghost {
   flex: none;
   min-width: 28px;
