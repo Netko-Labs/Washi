@@ -1,7 +1,7 @@
 import { Mascot } from '@washi/ui'
 import { useState } from 'react'
 import { ConfirmTextButton } from './confirm-text-button'
-import { useTrash } from './lib'
+import { trashItems, useTrash } from './lib'
 import { TrashRow } from './trash-row'
 import { TrashedTableRow } from './trashed-table-row'
 
@@ -9,9 +9,8 @@ import { TrashedTableRow } from './trashed-table-row'
 export function TrashPage() {
   const { entries, tables, error, restore, purge, empty, restoreTable, purgeTable } = useTrash()
   const [term, setTerm] = useState('')
-  const shown = (entries ?? []).filter((entry) =>
-    entry.title.toLowerCase().includes(term.trim().toLowerCase()),
-  )
+  const hasAny = (entries?.length ?? 0) + tables.length > 0
+  const shown = trashItems(entries ?? [], tables, term)
 
   return (
     <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-none">
@@ -29,7 +28,7 @@ export function TrashPage() {
           )}
         </div>
 
-        {entries && entries.length > 0 && (
+        {hasAny && (
           <input
             value={term}
             onChange={(event) => setTerm(event.target.value)}
@@ -53,35 +52,28 @@ export function TrashPage() {
 
         {shown.length > 0 && (
           <ul className="mt-4 space-y-px">
-            {shown.map((entry) => (
-              <TrashRow
-                key={entry.id}
-                entry={entry}
-                onRestore={() => void restore(entry.id)}
-                onPurge={() => void purge(entry.id)}
-              />
-            ))}
+            {shown.map((item) =>
+              item.kind === 'page' ? (
+                <TrashRow
+                  key={`page:${item.entry.id}`}
+                  entry={item.entry}
+                  onRestore={() => void restore(item.entry.id)}
+                  onPurge={() => void purge(item.entry.id)}
+                />
+              ) : (
+                <TrashedTableRow
+                  key={`table:${item.table.id}`}
+                  table={item.table}
+                  onRestore={() => void restoreTable(item.table.id)}
+                  onPurge={() => void purgeTable(item.table.id)}
+                />
+              ),
+            )}
           </ul>
         )}
 
-        {entries && entries.length > 0 && shown.length === 0 && (
+        {hasAny && shown.length === 0 && (
           <p className="mt-6 text-[13px] text-muted-foreground">Nothing deleted matches that.</p>
-        )}
-
-        {tables.length > 0 && (
-          <>
-            <h2 className="mt-8 px-3 font-medium text-[12px] text-muted-foreground">Databases</h2>
-            <ul className="mt-1 space-y-px">
-              {tables.map((table) => (
-                <TrashedTableRow
-                  key={table.id}
-                  table={table}
-                  onRestore={() => void restoreTable(table.id)}
-                  onPurge={() => void purgeTable(table.id)}
-                />
-              ))}
-            </ul>
-          </>
         )}
       </div>
     </div>

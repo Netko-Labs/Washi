@@ -12,6 +12,8 @@ export interface ConfirmTextButtonProps {
   onConfirm: () => void
 }
 
+export type TrashItem = { kind: 'page'; entry: TrashEntry } | { kind: 'table'; table: TrashedTable }
+
 export interface TrashedTableRowProps {
   table: TrashedTable
   onRestore: () => void
