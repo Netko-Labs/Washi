@@ -16,6 +16,13 @@ describe('the guide', () => {
     }
   })
 
+  test('recipes run beginner-first: the ones that run code come last', () => {
+    const runsCode = RECIPES.map((recipe) =>
+      /^import |<(Widget|Terminal|Automation)\b/m.test(recipe.source),
+    )
+    expect(runsCode.indexOf(true)).toBe(runsCode.length - runsCode.filter(Boolean).length)
+  })
+
   test('props read in words, off the spec', () => {
     const agenda = Object.fromEntries(propRows('Agenda').map((row) => [row.key, row]))
     expect(agenda.view?.type).toBe('week · month')
