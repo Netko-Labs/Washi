@@ -154,9 +154,9 @@ export function pageLimits(): Limit[] {
         'A bind is a query over one table: where, orderBy, limit, groupBy, params. An Agenda reads up to 500 rows a span, a copy writes up to 500, a formula filter finishes over up to 5000. Forms write stored columns only — never a formula or rollup.',
     },
     {
-      title: 'Nothing runs',
+      title: 'Page code',
       detail:
-        'A page is inert data: no scripts, no handlers, no hooks. state, expr, bind and action are its whole behaviour, checked before it is saved and before it is drawn.',
+        'The markup is data — state, expr, bind and action, checked before it is saved and before it is drawn. Code above it runs only in the reader’s sandbox: no DOM or network, imports from a vetted list, a memory cap and a deadline per draw, writes only from a press. What it draws is checked like any page.',
     },
   ]
 }
