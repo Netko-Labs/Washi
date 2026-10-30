@@ -47,8 +47,9 @@ describe('numbers read in the sandbox as in the browser', () => {
     expect(read("(1234567.5).toLocaleString('de-DE')")).toEqual({ ok: true, value: '1.234.567,5' })
     const bad = read("(1).toLocaleString('en', { style: 'currency' })")
     expect(bad.ok).toBe(false)
-    expect(read("(() => { try { Intl.NumberFormat('x-bad-') } catch (e) { return e.name } })()"))
-      .toEqual({ ok: true, value: 'RangeError' })
+    expect(
+      read("(() => { try { Intl.NumberFormat('x-bad-') } catch (e) { return e.name } })()"),
+    ).toEqual({ ok: true, value: 'RangeError' })
     sandbox.dispose()
   })
 })
