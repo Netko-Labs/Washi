@@ -32,6 +32,8 @@ export interface ClaudeSdkPortDeps {
     toolName: string,
     input: Record<string, unknown>,
   ) => Promise<ToolVerdict>
+  /** The desk's `takeFetchGrant`: an approved off-list fetch reaches its one host. */
+  fetchGrant?: (sessionId: string, url: string) => string | null
 }
 
 const REJECTED = {
@@ -120,6 +122,7 @@ export function createClaudeSdkPort(deps: ClaudeSdkPortDeps): AgentPort {
                 setTitle: request.setTitle,
                 handover: request.handover,
                 viewer: request.viewer,
+                fetchGrant: (url) => deps.fetchGrant?.(request.sessionId, url) ?? null,
               }),
             },
             strictMcpConfig: true,

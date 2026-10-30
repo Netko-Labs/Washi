@@ -1,13 +1,12 @@
 import type { Member, Viewer } from '@washi/domain'
 import type { Workspace } from '@washi/repository'
-import { guardedFetch } from '@washi/tsuru'
 import { tool } from 'ai'
 import { z } from 'zod'
 import { pageCapabilities, tableCapabilities } from '../../capabilities'
 import { NOBODY } from '../../sheets/access'
 import { HANDOVER_DESCRIPTION, type SearchKeyLookup } from '../lib'
 import { webSearch } from '../search'
-import { currentFetchPolicy } from '../tools'
+import { agentFetch } from '../tools'
 import type { HandoverResult } from './types'
 
 /** Same surface the Claude port exposes — one capability set, two ports (§05). */
@@ -41,6 +40,8 @@ export interface AiToolDeps {
   handover?: (sheetId: string, note?: string) => HandoverResult
   /** Who asked: Washi reads the pages they can (D65). Absent is a routine — workspace pages. */
   viewer?: Viewer
+  /** The off-list host the desk's yes let this fetch reach, taken once (`takeFetchGrant`). */
+  fetchGrant?: (url: string) => string | null
 }
 
 /**
@@ -57,6 +58,7 @@ export function createAiTools({
   setTitle,
   handover,
   viewer,
+  fetchGrant,
 }: AiToolDeps) {
   const shared = { viewer: viewer ?? NOBODY, author: 'washi', listPeople, onCreate: openSheet }
   const capabilities = [...pageCapabilities(ws, shared), ...tableCapabilities(ws, shared)]
@@ -89,8 +91,7 @@ export function createAiTools({
     fetch_url: tool({
       description: 'Fetch an https URL through the workspace fetch policy (tsuru).',
       inputSchema: z.object({ url: z.url() }),
-      execute: async ({ url }) =>
-        (await guardedFetch(url, currentFetchPolicy(ws))).slice(0, 100_000),
+      execute: async ({ url }) => (await agentFetch(ws, url, fetchGrant)).slice(0, 100_000),
     }),
     web_search: tool({
       description:

@@ -19,15 +19,26 @@ export function ownFetchHosts(ws: Workspace): string[] {
 }
 
 /**
- * The workspace's hosts and the server's (D105), `*` among them meaning every public site; what
- * tsuru refuses outright stays refused, private ranges too unless the server lifted that (D118).
+ * The workspace's hosts and the server's (D105), `*` among them meaning every public site, plus a
+ * host one yes granted this fetch; what tsuru refuses outright stays refused, private ranges too
+ * unless the server lifted that (D118).
  */
-export function currentFetchPolicy(ws: Workspace) {
+export function currentFetchPolicy(ws: Workspace, granted: string | null = null) {
   const hosts = new Set([...ownFetchHosts(ws), ...serverPolicy(ws).fetchHosts])
+  if (granted) hosts.add(granted)
   return fetchPolicySchema.parse({
     allowedHosts: [...hosts],
     allowPrivate: privateNetworkAllowed(ws),
   })
+}
+
+/** `fetch_url` in both ports: the lists, plus the one host a yes granted this call. */
+export function agentFetch(
+  ws: Workspace,
+  url: string,
+  fetchGrant?: (url: string) => string | null,
+) {
+  return guardedFetch(url, currentFetchPolicy(ws, fetchGrant?.(url)))
 }
 
 function text(value: unknown) {
@@ -48,6 +59,8 @@ export interface ToolContext {
   handover?: (sheetId: string, note?: string) => HandoverResult
   /** Who asked: Washi reads the pages they can (D65). Absent is a routine — workspace pages. */
   viewer?: Viewer
+  /** The off-list host the desk's yes let this fetch reach, taken once (`takeFetchGrant`). */
+  fetchGrant?: (url: string) => string | null
 }
 
 /**
@@ -90,7 +103,7 @@ export function createWashiTools(ws: Workspace, context: ToolContext) {
         'Fetch an https URL through the workspace fetch policy (tsuru).',
         { url: z.url() },
         async ({ url }) => {
-          const body = await guardedFetch(url, currentFetchPolicy(ws))
+          const body = await agentFetch(ws, url, context.fetchGrant)
           return { content: [{ type: 'text' as const, text: body.slice(0, 100_000) }] }
         },
       ),

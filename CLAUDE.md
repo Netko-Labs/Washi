@@ -376,7 +376,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   frame never gets `allow-same-origin`. **Private network** (`allowPrivate`): tsuru's fetches and
   link previews may reach private, loopback, link-local and metadata addresses — still asking.
   **Approval desk**: `approveAll` — what leaves never stops, in any workspace, ledgered `auto` with
-  detail `server`; tsuru's refusals still refuse; Settings → Washi says so instead of the choice.
+  detail `server`, and the fetch it passes reaches its host (a grant, see Approvals); tsuru's
+  refusals still refuse; Settings → Washi says so instead of the Approvals and YOLO choices.
   **Code limits** (`codeLimitsSchema`, floors and ceilings): page memory · ms per draw · bundle KB
   (`compilePage` hands the sandbox budget to the reader as `sandbox`), widget bundle KB, automation
   MB · ms, formula ms per call, upload MB per kind (`uploadCaps`; `files.caps` for pickers); service
@@ -460,7 +461,11 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   (tsuru), so a search allowed always is `api.exa.ai` on that list. A workspace may set
   approvals to `auto` (`agents.setApprovalMode`, Settings → Agent on both hosts): a standing yes
   for what leaves, each call ledgered as `auto`; policy refusals still refuse. Owner or admin
-  only (`ownerProcedure`), as is setting an integration key.
+  only (`ownerProcedure`), as is setting an integration key. Any yes to an off-list fetch — Allow
+  once, `auto`, YOLO, the server's desk switch — is a one-shot grant for that host
+  (`takeFetchGrant`): `fetch_url` in both ports takes it through `ToolContext.fetchGrant` and
+  fetches with that one host added (`agentFetch`); https, private ranges and redirects are still
+  tsuru's to refuse, and a turn's end drops its unused grants (`dropSession`).
 - **A conversation may approve everything (D115).** App meta `yolo_allowed`, off by default
   (`agents.setYoloAllowed`, owners and admins; Settings → Washi → What leaves). Allowed, a chat's
   starter flips the composer's ⚡ YOLO chip: `agent_sessions.approvals` (`setSessionOptions`, null

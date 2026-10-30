@@ -130,6 +130,7 @@ export class AgentHost {
       listPeople,
       searchKey,
       canUseTool: (sessionId, name, input) => this.approvals.gateSdkTool(sessionId, name, input),
+      fetchGrant: (sessionId, url) => this.approvals.takeFetchGrant(sessionId, url),
     })
     this.aiSdkPort = createAiSdkPort({
       ws,

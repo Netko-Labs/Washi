@@ -66,6 +66,8 @@ export interface ToolGate {
   approve(sessionId: string, toolName: string, input: unknown): Promise<boolean>
   /** Reads never ask. */
   isRead(toolName: string): boolean
+  /** The off-list host a yes let this fetch reach, once; null when none did. */
+  takeFetchGrant?(sessionId: string, url: string): string | null
 }
 
 export type ToolVerdict =
