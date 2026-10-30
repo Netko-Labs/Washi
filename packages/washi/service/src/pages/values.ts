@@ -13,3 +13,6 @@ export const LIBRARY = new RegExp(`^(${PAGE_LIBRARIES.join('|')})(/[\\w-][\\w.-]
 
 export const NOT_LISTED_WORDS =
   "is not on this server's page packages — an admin can add it in Settings → Server"
+
+/** Page code runs in a browser-like sandbox: a package's entry is read in this order (D116). */
+export const BROWSER_CONDITIONS = ['browser', 'import', 'module', 'default']

@@ -1,9 +1,9 @@
-import { realpathSync } from 'node:fs'
-import { join, sep } from 'node:path'
+import { readFileSync, realpathSync } from 'node:fs'
+import { join, resolve, sep } from 'node:path'
 import type { PagePackageSet } from '@washi/domain'
 import { PAGE_IMPORT, PAGE_LIBRARIES } from '@washi/paper/registry'
 import { PACKAGE_NAME } from '../server/constants'
-import { LIBRARY, NOT_LISTED_WORDS } from './values'
+import { BROWSER_CONDITIONS, LIBRARY, NOT_LISTED_WORDS } from './values'
 
 const escaped = (name: string) => name.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')
 
@@ -47,11 +47,53 @@ export function realDir(set: PagePackageSet | null): string | null {
 /** Where a server package import lands — only ever inside that package's own installed folder. */
 export function insidePackage(path: string, set: PagePackageSet, root: string): string {
   const name = packageOf(path)
-  const resolved = Bun.resolveSync(path, root)
-  if (!resolved.startsWith(join(root, 'node_modules', name) + sep)) {
+  const folder = join(root, 'node_modules', name)
+  const resolved = browserEntry(path, name, folder) ?? Bun.resolveSync(path, root)
+  if (!resolved.startsWith(folder + sep)) {
     throw new Error(importRefusal(path, set))
   }
   return resolved
+}
+
+/** The first condition a sandbox can use, through nested condition maps and fallback arrays. */
+function pick(target: unknown): string | null {
+  if (typeof target === 'string') return target
+  if (Array.isArray(target)) return target.map(pick).find((found) => found !== null) ?? null
+  if (!target || typeof target !== 'object') return null
+  const conditions = target as Record<string, unknown>
+  for (const condition of BROWSER_CONDITIONS) {
+    const found = condition in conditions ? pick(conditions[condition]) : null
+    if (found) return found
+  }
+  return null
+}
+
+/**
+ * A package's entry as a browser bundler reads it — `Bun.resolveSync` reads it as the server,
+ * and a Node build (Buffer, node:crypto) does not run in the page's sandbox. Null: let Bun decide.
+ */
+function browserEntry(path: string, name: string, folder: string): string | null {
+  let manifest: { exports?: unknown; browser?: unknown; module?: unknown }
+  try {
+    manifest = JSON.parse(readFileSync(join(folder, 'package.json'), 'utf8'))
+  } catch {
+    return null
+  }
+  const subpath = path === name ? '.' : `./${path.slice(name.length + 1)}`
+  const { exports } = manifest
+  const isSubpathMap =
+    exports !== null &&
+    typeof exports === 'object' &&
+    !Array.isArray(exports) &&
+    Object.keys(exports).some((key) => key.startsWith('.'))
+  const target = isSubpathMap
+    ? pick((exports as Record<string, unknown>)[subpath])
+    : subpath === '.'
+      ? (pick(exports) ??
+        (typeof manifest.browser === 'string' ? manifest.browser : null) ??
+        (typeof manifest.module === 'string' ? manifest.module : null))
+      : null
+  return target ? resolve(folder, target) : null
 }
 
 /** What a bundle's cache key must carry: a version moving rebuilds every page that may import it. */

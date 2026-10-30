@@ -40,12 +40,26 @@ beforeAll(() => {
   })
   fakePackage('@acme/greet', { 'index.js': `export const greet = (name) => 'hi ' + name` })
   fakePackage('heavy', { 'index.js': `export const blob = '${'x'.repeat(800 * 1024)}'` })
+  // As nanoid ships: a Node build the sandbox cannot run, and a browser build it can.
+  fakePackage(
+    'twofold',
+    {
+      'index.js': `export const where = Buffer.from('node').toString()`,
+      'index.browser.js': `export const where = 'browser'`,
+    },
+    {
+      exports: {
+        '.': { browser: './index.browser.js', import: './index.js', default: './index.js' },
+      },
+    },
+  )
   set = {
     dir,
     packages: [
       { name: 'slugger', version: '1.2.3' },
       { name: '@acme/greet', version: '1.2.3' },
       { name: 'heavy', version: '1.2.3' },
+      { name: 'twofold', version: '1.2.3' },
     ],
   }
 })
@@ -98,6 +112,16 @@ describe('a page importing the server’s packages (D116)', () => {
       children: [{ name: 'Text', children: ['hi big-plan!'] }],
     })
     expect(pageCodeDiagnostics(PAGE, set)).toEqual([])
+  })
+
+  test('a package with a Node and a browser build bundles the browser one', async () => {
+    const source = `import { where } from 'twofold'\n<Sheet title="t"><Text>{where}</Text></Sheet>`
+    const compiled = await compilePage(source, pages, set)
+    if (!compiled.ok) throw new Error(compiled.error)
+    expect(await draw(compiled.js)).toEqual({
+      name: 'Sheet',
+      children: [{ name: 'Text', children: ['browser'] }],
+    })
   })
 
   test('a package off the list says where an admin adds it; without a server, as before', async () => {
