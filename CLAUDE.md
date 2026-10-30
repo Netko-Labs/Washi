@@ -218,7 +218,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
 - **A person picks a page's theme (D88).** `<Sheet theme>` is a registry id — the house eight and
   seven ported palettes (`theme-values/`, a light tone nudged in lightness where it missed the rules)
   — or `ws:<slug>`, a theme the workspace made: `workspace_themes` (workspace file), eight tokens a
-  mode, `themes.list/add/update/remove`, its maker or a steward changes it, a rename keeps the slug.
+  mode, `themes.list/add/update/remove`, its maker or a steward changes it, a rename keeps the slug,
+  a name is taken once (case-blind, `themeNameClash`).
   Written like the look (`updateMeta` → the source; ⋯ → Theme). Paper resolves a `ws:` key through
   `SheetLookHost.theme` (`useThemesStore.pairOf` in `SheetView`; a public link carries the tokens in
   its payload); a key nobody lends wears Washi. `themeChecks` is the one contrast gate: below `refuse`
