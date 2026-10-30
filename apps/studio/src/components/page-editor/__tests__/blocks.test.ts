@@ -89,8 +89,8 @@ describe('the / menu drops live data on the page', () => {
       .map((option) => option.label)
 
   test('a view of any table; progress only where a status says what shipped', () => {
-    expect(labels('', 'view')).toEqual(['issues', 'notes'])
-    expect(labels('', 'progress')).toEqual(['issues'])
+    expect(labels('', 'view')).toEqual(['Issues', 'Notes'])
+    expect(labels('', 'progress')).toEqual(['Issues'])
   })
 
   test('/database names the new table from what was typed, never a taken name', () => {

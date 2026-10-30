@@ -67,16 +67,16 @@ describe('the / menu in groups', () => {
 
   test('a table step lists tables and typing filters them', () => {
     const view = slashMatches('', { tables: TABLES, step: 'view' })
-    expect(labelsOf(view)).toEqual(['issues', 'team notes'])
-    expect(view.map((option) => option.hint)).toEqual(['Live', 'team_notes'])
-    expect(labelsOf(slashMatches('note', { tables: TABLES, step: 'view' }))).toEqual(['team notes'])
+    expect(labelsOf(view)).toEqual(['Issues', 'Team notes'])
+    expect(view.map((option) => option.hint)).toEqual(['issues', 'team_notes'])
+    expect(labelsOf(slashMatches('note', { tables: TABLES, step: 'view' }))).toEqual(['Team notes'])
     expect(labelsOf(slashMatches('team_', { tables: TABLES, step: 'view' }))).toEqual([
-      'team notes',
+      'Team notes',
     ])
     expect(slashMatches('', { tables: TABLES, step: 'automation' })[0]).toMatchObject({
       pick: { kind: 'automation', table: 'issues' },
     })
-    expect(labelsOf(slashMatches('', { tables: TABLES, step: 'progress' }))).toEqual(['issues'])
+    expect(labelsOf(slashMatches('', { tables: TABLES, step: 'progress' }))).toEqual(['Issues'])
   })
 
   test('a page step lists pages; include never offers the page into itself', () => {
