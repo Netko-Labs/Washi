@@ -17,6 +17,7 @@ export type {
   BlockInputProps,
   BlockListProps,
   BlockMenuProps,
+  BlockMenuState,
   BlockRowProps,
   ColumnGapProps,
   ColumnsRowProps,

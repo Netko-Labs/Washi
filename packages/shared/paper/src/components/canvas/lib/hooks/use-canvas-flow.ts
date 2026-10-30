@@ -2,7 +2,7 @@ import type { WsxElement } from '@washi/wsx'
 import { addEdge, type Connection, useEdgesState, useNodesState } from '@xyflow/react'
 import { useEffect } from 'react'
 import type { IdeaEdge, IdeaNode } from '../types'
-import { fromWsx, nextId } from '../utils'
+import { freeSpot, fromWsx, nextId } from '../utils'
 
 /** Flow state seeded from the markup, reseeded whenever the page's markup moves under it. */
 export function useCanvasFlow(canvas: WsxElement, commit: (n: IdeaNode[], e: IdeaEdge[]) => void) {
@@ -50,7 +50,7 @@ export function useCanvasFlow(canvas: WsxElement, commit: (n: IdeaNode[], e: Ide
       const added: IdeaNode = {
         id: nextId(nodes),
         type: 'idea',
-        position: { x, y },
+        position: freeSpot(nodes, x, y),
         data: { label: 'New idea', tone: null, page: null },
         selected: true,
       }

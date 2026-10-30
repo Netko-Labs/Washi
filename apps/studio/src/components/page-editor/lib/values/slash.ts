@@ -56,6 +56,7 @@ export const SLASH_GROUP_ORDER: SlashGroup[] = [
   'layout',
   'advanced',
   'code',
+  'pages',
 ]
 
 export const SLASH_GROUP_LABELS: Record<SlashGroup, string> = {
@@ -65,6 +66,7 @@ export const SLASH_GROUP_LABELS: Record<SlashGroup, string> = {
   layout: 'Layout',
   advanced: 'Advanced',
   code: 'Code',
+  pages: 'Pages',
 }
 
 /** How many pages a page step lists at once; typing narrows it. */

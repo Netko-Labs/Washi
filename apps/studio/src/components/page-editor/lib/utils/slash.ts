@@ -1,3 +1,4 @@
+import { tableLabel } from '@washi/paper'
 import type {
   DataOption,
   KindOption,
@@ -22,20 +23,22 @@ export function kindMatches(query: string): KindOption[] {
   return KIND_OPTIONS.filter((option) => option.label.toLowerCase().includes(needle))
 }
 
-const tableLabel = (table: TableRef) => table.name.replace(/_/g, ' ')
-
 function tableStep(step: SlashStep, needle: string, tables: TableRef[]): DataOption[] {
   const { group } = SLASH_STEPS[step]
   return tables
-    .filter((table) => tableLabel(table).toLowerCase().includes(needle))
+    .filter((table) => `${tableLabel(table.name)} ${table.name}`.toLowerCase().includes(needle))
     .flatMap((table): DataOption[] => {
-      const base = { type: 'data' as const, group, label: tableLabel(table) }
+      const base = {
+        type: 'data' as const,
+        group,
+        label: tableLabel(table.name),
+        hint: table.name,
+      }
       if (step === 'view') {
         return [
           {
             ...base,
             key: `view:${table.name}`,
-            hint: 'Live',
             pick: { kind: 'view', table: table.name },
           },
         ]
@@ -45,7 +48,6 @@ function tableStep(step: SlashStep, needle: string, tables: TableRef[]): DataOpt
           {
             ...base,
             key: `automation:${table.name}`,
-            hint: 'On the server',
             pick: { kind: 'automation', table: table.name },
           },
         ]
@@ -55,7 +57,6 @@ function tableStep(step: SlashStep, needle: string, tables: TableRef[]): DataOpt
         {
           ...base,
           key: `progress:${table.name}`,
-          hint: '30 days',
           pick: { kind: 'progress', table },
         },
       ]

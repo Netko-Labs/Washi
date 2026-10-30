@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import { hasErrors, parse, serialize, validate, type WsxElement } from '@washi/wsx'
 import { paperRegistry } from '../../../registry'
-import { fromWsx, nextId, toWsx } from '../lib'
+import { freeSpot, fromWsx, nextId, toWsx } from '../lib'
 
 const SOURCE = `<Sheet title="Ideas"><Canvas>
   <Node id="intake" x={0} y={0} tone="info">Intake</Node>
@@ -44,5 +44,17 @@ describe('a canvas is markup both ways', () => {
   test('a new node never takes an id already in use', () => {
     const { nodes } = fromWsx(canvasOf(SOURCE))
     expect(nextId(nodes)).toBe('idea-3')
+  })
+
+  test('a new idea steps off the ones already where it would land', () => {
+    const { nodes } = fromWsx(canvasOf(SOURCE))
+    expect(freeSpot(nodes, 100, 100)).toEqual({ x: 100, y: 100 })
+    expect(freeSpot(nodes, 0.4, -0.3)).toEqual({ x: 24.4, y: 23.7 })
+    const stacked = fromWsx(
+      canvasOf(
+        '<Sheet title="t"><Canvas><Node id="a" x={331} y={170}>A</Node><Node id="b" x={355} y={194}>B</Node></Canvas></Sheet>',
+      ),
+    ).nodes
+    expect(freeSpot(stacked, 331, 170)).toEqual({ x: 379, y: 218 })
   })
 })

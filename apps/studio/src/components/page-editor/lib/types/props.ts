@@ -1,5 +1,6 @@
 import type { SheetDetail } from '@washi/domain'
 import type { WsxElement, WsxValue } from '@washi/wsx'
+import type { RefObject } from 'react'
 import type {
   Block,
   ColumnsBlock,
@@ -97,6 +98,15 @@ export interface EditToggleProps {
 
 export interface BlockMenuProps {
   block: Block
+}
+
+export interface BlockMenuState {
+  isOpen: boolean
+  toggle: () => void
+  close: () => void
+  root: RefObject<HTMLDivElement | null>
+  trigger: RefObject<HTMLButtonElement | null>
+  menu: RefObject<HTMLDivElement | null>
 }
 
 export interface PageBodyProps {

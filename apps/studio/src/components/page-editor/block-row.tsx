@@ -32,7 +32,7 @@ export function BlockRow({ block, numberAt, rootProps, isNested }: BlockRowProps
     >
       {/* The whole gutter beside the block, full height: the pointer never leaves the row on its way. */}
       <div
-        className={`absolute inset-y-0 hidden items-start justify-end gap-0.5 font-sans group-focus-within/block:flex group-hover/block:flex ${
+        className={`absolute inset-y-0 hidden items-start justify-end gap-0.5 font-sans group-focus-within/block:flex group-hover/block:flex has-[[aria-expanded=true]]:flex ${
           isNested ? '-left-7 w-7 pr-1' : '-left-14 w-14 pr-1.5'
         }`}
       >

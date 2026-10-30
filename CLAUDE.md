@@ -591,7 +591,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   title (`VALUE_TONES` in paper's `lib`); there (`<Table>` also reads its table's spec once, `useDatabase`: choices and people draw as the
   database view's do, numbers in their `format`), and in a Board card's `badge`, a list cell is a pill per item
   (`listCell` keeps what `toRows` joined; `patchRow` carries it through an optimistic move), and an untoned `<Badge>` is a neutral pill. Dates read as dates wherever a cell is drawn (`whenLabel`:
-  a day, a moment, a `start/end` range), `$row` in visible text included; empty cells sort last.
+  a day, a moment, a `start/end` range; a year not the reader's spelled out, four digits), `$row`
+  in visible text included; empty cells sort last.
   `<Roadmap end>` runs a bar from `date` to a second column, as trackers keep start and due apart.
   A Board with no `groups` lays its columns out in the column's own order (status steps, select
   options; empty ones too, so a card can go there), then any value off that list; rows with none gather last under "No <property>" (drawn only while it holds one; a drop there empties the cell). A Board reads its table's spec once (`useTableSpec`): a column's head counts its cards and sums a

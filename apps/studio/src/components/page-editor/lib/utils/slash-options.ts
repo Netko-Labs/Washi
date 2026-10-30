@@ -141,7 +141,7 @@ export function blockOptions(needle: string, isNested: boolean): SlashOption[] {
   )
 }
 
-/** A page found by its title as it is typed: `/budget` or `/link budget`. */
+/** A page found by its title as it is typed: `/budget` or `/link budget`. Listed after every block. */
 export function pageLinks(needle: string, pages: PageRef[]): DataOption[] {
   const term = needle.replace(/^(link( to)?( page)?)\s*/, '')
   if (!term) return []
@@ -150,7 +150,7 @@ export function pageLinks(needle: string, pages: PageRef[]): DataOption[] {
     .slice(0, LINK_MATCHES)
     .map((page) => ({
       type: 'data',
-      group: 'basic',
+      group: 'pages',
       key: `link:${page.id}`,
       label: `Link to page · ${page.title || 'Untitled'}`,
       hint: 'Link',
