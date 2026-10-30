@@ -72,7 +72,7 @@ import { greet } from '@acme/greet'
 
 async function draw(js: string): Promise<unknown> {
   const vm = (await loadEngine()).newContext()
-  const prelude = `globalThis.h = (name, props, ...children) => ({ name, children: children.flat() })
+  const prelude = `globalThis.__h = (name, props, ...children) => ({ name, children: children.flat() })
 globalThis.Sheet = 'Sheet'; globalThis.Text = 'Text'; globalThis.__washi = {}`
   const result = vm.evalCode(`${prelude};\n${js}\nJSON.stringify(globalThis.__page.view())`)
   const value = result.error ? vm.dump(result.error) : JSON.parse(vm.dump(result.value))

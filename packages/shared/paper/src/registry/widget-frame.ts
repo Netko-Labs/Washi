@@ -19,7 +19,7 @@ import {
 } from 'react'
 import { createRoot } from 'react-dom/client'
 
-globalThis.h = createElement
+globalThis.__h = createElement
 globalThis.Fragment = Fragment
 
 const MIN_INTERVAL_MS = 1000
@@ -33,7 +33,7 @@ const ask = (type, body) =>
     send({ type, id: asked, ...body })
   })
 
-let live = { state: {}, page: null, props: {}, data: 0, pages: 0 }
+let live = { state: {}, page: null, props: null, data: 0, pages: 0 }
 const listeners = new Set()
 const update = (next) => {
   live = { ...live, ...next }
@@ -145,6 +145,7 @@ export const useFile = (key, options) => {
 }
 export { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState }
 
+// A stop lasts only until the page hands the widget new props: they may be what it lacked.
 class Boundary extends Component {
   constructor(props) {
     super(props)
@@ -153,6 +154,9 @@ class Boundary extends Component {
   static getDerivedStateFromError(error) {
     return { error }
   }
+  componentDidUpdate(previous) {
+    if (this.state.error && previous.given !== this.props.given) this.setState({ error: null })
+  }
   render() {
     const { error } = this.state
     if (!error) return this.props.children
@@ -160,12 +164,15 @@ class Boundary extends Component {
   }
 }
 
-const Drawn = ({ component }) => createElement(component, useLive().props)
+// Nothing draws before the page's first props: a component reading one would stop on undefined.
+const Drawn = ({ component }) => {
+  const { props } = useLive()
+  if (!props) return null
+  return createElement(Boundary, { given: props }, createElement(component, props))
+}
 
 export function mount(component) {
-  createRoot(document.getElementById('root')).render(
-    createElement(Boundary, null, createElement(Drawn, { component })),
-  )
+  createRoot(document.getElementById('root')).render(createElement(Drawn, { component }))
   const measure = () => send({ type: 'height', value: Math.ceil(document.body.getBoundingClientRect().height) })
   new ResizeObserver(measure).observe(document.body)
 }

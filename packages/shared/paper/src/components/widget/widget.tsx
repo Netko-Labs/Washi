@@ -39,6 +39,7 @@ function WidgetFrame({ title, height, component, args, ...rest }: WidgetFramePro
           ref={frame}
           title={name}
           sandbox="allow-scripts"
+          allow="clipboard-write"
           srcDoc={bundle.document}
           style={tall}
           onLoad={onLoad}

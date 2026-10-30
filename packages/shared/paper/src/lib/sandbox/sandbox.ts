@@ -1,6 +1,6 @@
 import type { QuickJSContext, QuickJSWASMModule } from 'quickjs-emscripten-core'
 import type { Sandbox, SandboxBridge, SandboxSetup } from '../types'
-import { CRYPTO_SHIM, MAX_RANDOM_BYTES, SANDBOX_STACK_BYTES } from './values'
+import { CRYPTO_SHIM, INTL_SHIM, MAX_RANDOM_BYTES, SANDBOX_STACK_BYTES } from './values'
 
 let engine: Promise<QuickJSWASMModule> | null = null
 
@@ -78,7 +78,7 @@ export async function openSandbox(js: string, setup: SandboxSetup): Promise<Sand
   }
 
   // `;` first: a bundle opening with `(` would otherwise call whatever the prelude ended on.
-  const opened = run(`${CRYPTO_SHIM};\n${setup.prelude};\n${js}`, null)
+  const opened = run(`${CRYPTO_SHIM};\n${INTL_SHIM};\n${setup.prelude};\n${js}`, null)
   if (!opened.ok) {
     vm.dispose()
     runtime.dispose()

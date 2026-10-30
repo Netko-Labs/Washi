@@ -3,8 +3,9 @@ import { builtinModules } from 'node:module'
 import { join, resolve, sep } from 'node:path'
 import type { PagePackageSet } from '@washi/domain'
 import { PAGE_IMPORT, PAGE_LIBRARIES } from '@washi/paper/registry'
+import { parse } from '@washi/wsx'
 import { PACKAGE_NAME } from '../server/constants'
-import { BROWSER_CONDITIONS, LIBRARY, NOT_LISTED_WORDS } from './values'
+import { BROWSER_CONDITIONS, LIBRARY, MISSING_PAGE_EXPORT, NOT_LISTED_WORDS } from './values'
 
 const escaped = (name: string) => name.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')
 
@@ -122,4 +123,21 @@ export function terminalRefusal(path: string, set: PagePackageSet | null): strin
   }
   const names = [...PAGE_LIBRARIES, ...(set?.packages.map((each) => each.name) ?? [])]
   return `cannot require "${path}" — a terminal requires Node's own fs, path, events, util and the like, ${names.join(', ')}, or a .json file it holds`
+}
+
+function titleOf(source: string | undefined, id: string): string {
+  try {
+    const title = source ? parse(source).props.title : null
+    return typeof title === 'string' && title ? title : `page:${id}`
+  } catch {
+    return `page:${id}`
+  }
+}
+
+/** A bundler's word for a `page:` import the page does not export, said with the page's title. */
+export function inWords(message: string, pages: Map<string, string>): string {
+  const missing = MISSING_PAGE_EXPORT.exec(message)
+  if (!missing) return message
+  const [, id = '', name = ''] = missing
+  return `${titleOf(pages.get(id), id)} has no export named ${name}`
 }

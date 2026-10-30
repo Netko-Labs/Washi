@@ -634,7 +634,7 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   — or `denied` with tsuru's reason), as every press that reaches out is.
 - **A widget is JSX, where an owner allows (D113, was D98).** `<Widget title height><Clock /></Widget>`
   draws one of the page's own components (D100) with real React in an iframe `sandbox="allow-scripts"`
-  — no `allow-same-origin`, so an opaque origin with no cookies, storage or parent — under a CSP with
+  — no `allow-same-origin`, so an opaque origin with no cookies, storage or parent; `allow="clipboard-write"` lets a press copy — under a CSP with
   no network (`default-src 'none'`; pictures only `data:`/`blob:`) unless hosts are listed (D118). Its child is exactly one element
   naming a prelude component (policy `component`); text — a pre-D113 HTML widget — is a warning, not
   a refusal, so its page still saves: it draws a note in words, its text kept. `pageModule` turns a Widget's child into a drawn node
@@ -749,7 +749,7 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   traces them into `.output` (`RUNTIME_FILE_DEPS`); `zod` alone bundles to ~490 KB.
   Paper runs it (`PageProgram`, from `WsxView` when `hasCode`): `PaperHost.compilePage` (the studio:
   `scripts.page`), then the shared sandbox (`lib/sandbox`: QuickJS, 32 MB, 100 ms a draw) with
-  `programPrelude` — the registry names, an `h` that calls a page's own components, and
+  `programPrelude` — the registry names, `__h` (the JSX factory: a page may name its own `h`) calling its components, and
   `globalThis.__washi`: `useRows` `useRow` `useTable` `useInsert` `useUpdate` `useDelete` · `useState`
   (local, by call order) `usePageState` (the page's `state`; an
   unset key's `initial` is written once the page has drawn, so a Select on it shows the same) `useStored` (the reader's, localStorage)

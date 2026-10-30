@@ -31,7 +31,7 @@ async function draw(source: string): Promise<unknown> {
   const vm = (await loadEngine()).newContext()
   const prelude = `
 for (const name of ['Sheet', 'Title', 'Section', 'Button', 'Text', 'Columns', 'Column']) globalThis[name] = name
-globalThis.h = (name, props, ...kids) => typeof name === 'function'
+globalThis.__h = (name, props, ...kids) => typeof name === 'function'
   ? name({ ...props, children: kids })
   : { name, props: props || {}, children: kids.flat() }
 globalThis.__washi = {

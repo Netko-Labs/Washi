@@ -31,7 +31,7 @@ const pages = (id: string) => (id === 'lib-1' ? LIB : null)
 async function run(js: string): Promise<unknown> {
   const vm = (await loadEngine()).newContext()
   const prelude = `
-globalThis.h = (name, props, ...children) => typeof name === 'function'
+globalThis.__h = (name, props, ...children) => typeof name === 'function'
   ? name({ ...props, children })
   : { name, props: props || {}, children: children.flat() }
 globalThis.Stat = 'Stat'; globalThis.Sheet = 'Sheet'
@@ -102,5 +102,42 @@ describe('an export that calls a hook', () => {
       `import { useRows } from 'washi'\nconst open = useRows({ table: 'tasks' })\n<Sheet title="t" />`,
     ]
     for (const source of lent) expect(pageCodeDiagnostics(source)).toEqual([])
+  })
+})
+
+describe('what a page names', () => {
+  test('a component reads a computed constant, and a parameter named h is just a name', async () => {
+    const compiled = await compilePage(
+      `import { useRows } from 'washi'
+const COLS = 'AB'.split('')
+function Head() { return <Stat label={COLS.join('')} value={COLS.length} /> }
+const rows = useRows({ table: 'tasks' })
+<Sheet title="t"><Head />{rows.map((h) => <Stat label="p" value={h.points} />)}</Sheet>`,
+      pages,
+    )
+    if (!compiled.ok) throw new Error(compiled.error)
+    expect(await run(compiled.js)).toEqual({
+      name: 'Sheet',
+      props: { title: 't' },
+      children: [
+        { name: 'Stat', props: { label: 'AB', value: 2 }, children: [] },
+        { name: 'Stat', props: { label: 'p', value: 2 }, children: [] },
+        { name: 'Stat', props: { label: 'p', value: 3 }, children: [] },
+      ],
+    })
+  })
+
+  test('an import another page does not export is said in words', async () => {
+    const missing = await compilePage(
+      `import { nope } from 'page:lib-1'\n<Sheet title={nope} />`,
+      pages,
+    )
+    expect(missing).toEqual({ ok: false, error: 'Lib has no export named nope' })
+  })
+
+  test('a page importing itself is refused at save', () => {
+    const source = `import { x } from 'page:me'\nexport const y = 1\n<Sheet title="t" />`
+    expect(pageCodeDiagnostics(source, null, 'me')[0]?.message).toContain('imports itself')
+    expect(pageCodeDiagnostics(source, null, 'other')).toEqual([])
   })
 })
