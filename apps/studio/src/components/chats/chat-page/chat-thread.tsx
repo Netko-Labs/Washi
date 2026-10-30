@@ -16,7 +16,7 @@ export function ChatThread({ workspaceId }: ChatThreadProps) {
         onScroll={stick.onScroll}
         className="h-full overflow-y-auto overflow-x-hidden overscroll-y-contain"
       >
-        <div className="mx-auto flex w-full max-w-[768px] flex-col gap-7 px-4 pt-6 pb-12 sm:px-6 md:pt-10">
+        <div className="mx-auto flex w-full max-w-[768px] flex-col gap-7 px-4 pt-6 pb-16 sm:px-6 md:pt-10">
           {blocks.map((block, index) =>
             block.kind === 'person' ? (
               <ChatPerson key={block.id} block={block} />
