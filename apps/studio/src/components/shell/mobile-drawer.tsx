@@ -1,14 +1,14 @@
 import { useRef } from 'react'
 import { useSwipe } from '@/components/shared/gestures'
 import { Sidebar } from '@/components/sidebar'
-import { DRAWER_SWIPE, type MobileDrawerProps, useShellStore } from './lib'
+import { DRAWER_SWIPE, type MobileDrawerProps, useDrawerOpen, useShellStore } from './lib'
 
 /**
- * Under `md`: the whole sidebar as a full-screen menu. ✕, a swipe back to the left or a pick
- * closes it. It is drawn once and only slides, so opening it is a transform, never a mount.
+ * Under `md`: the whole sidebar as a full-screen menu. ✕, Escape, a swipe back to the left or a
+ * pick closes it. It is drawn once and only slides, so opening it is a transform, never a mount.
  */
 export function MobileDrawer({ workspace }: MobileDrawerProps) {
-  const isOpen = useShellStore((state) => state.drawer)
+  const isOpen = useDrawerOpen()
   const panel = useRef<HTMLDivElement>(null)
   const close = () => useShellStore.getState().setDrawer(false)
   useSwipe(panel, {
