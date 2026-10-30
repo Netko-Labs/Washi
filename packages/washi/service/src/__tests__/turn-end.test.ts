@@ -179,3 +179,20 @@ describe('a turn cut off by a restart says so', () => {
     expect(statusOf(session.id)).toBe('error')
   })
 })
+
+describe('a new chat is named by its first ask', () => {
+  test('the rename tells the list, so the panel header stops saying Session N', async () => {
+    const host = hostWith(async () => ({ costUsd: null, billing: 'metered' }))
+    const changed: string[] = []
+    host.setEvents({
+      update: () => {},
+      approval: () => {},
+      openSheet: () => {},
+      sessionChanged: (id) => changed.push(id),
+    })
+    const session = createSession(ws, 'Session 17')
+    await host.prompt(session.id, 'Plan the offsite in Kyoto')
+    expect(listSessions(ws).find((each) => each.id === session.id)?.title).not.toBe('Session 17')
+    expect(changed).toContain(session.id)
+  })
+})
