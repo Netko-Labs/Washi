@@ -24,6 +24,7 @@ export function Terminal({ title, height, files, program, ...rest }: TerminalPro
           ref={frame}
           title={name}
           sandbox="allow-scripts"
+          allow="clipboard-write"
           srcDoc={bundle.document}
           style={tall}
           onLoad={onLoad}

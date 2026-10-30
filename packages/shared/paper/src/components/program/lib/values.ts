@@ -24,8 +24,9 @@ export const PROGRAM_BRIDGE = [
 ]
 
 /**
- * What every page that runs stands on, inside the sandbox: the registry's names as tags, `h` that
- * calls a page's own components and keeps handlers, and `globalThis.__washi` — what
+ * What every page that runs stands on, inside the sandbox: the registry's names as tags, `__h`
+ * (the JSX factory, named so no page's own `h` shadows it) that calls a page's own components and
+ * keeps handlers, and `globalThis.__washi` — what
  * `import … from 'washi'` reads. A page acts only from a press, so drawing can never write — the
  * host refuses one too (`programBridge`), whatever the page's code calls.
  */
@@ -41,7 +42,7 @@ for (const name of ${JSON.stringify(PROGRAM_BRIDGE)}) {
 }
 globalThis.Fragment = '__fragment'
 let __handlers = [], __slots = [], __slot = 0, __drawing = false
-globalThis.h = (name, props, ...children) => {
+globalThis.__h = (name, props, ...children) => {
   const kids = children.flat(Infinity).filter((child) => child != null && child !== false && child !== true)
   if (typeof name === 'function') return name({ ...(props || {}), children: kids })
   const out = {}

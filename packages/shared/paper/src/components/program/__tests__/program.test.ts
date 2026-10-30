@@ -15,7 +15,7 @@ const PAGE = parse('<Sheet title="Tasks" icon="🦊"><Title>Tasks</Title></Sheet
 /** A bundle as compilePage leaves it: `view` on `globalThis.__page`, the hooks off `__washi`. */
 const bundle = (body: string) =>
   `(() => { const { useRows, useState, usePageState, useNavigate, useMe, useFile, act } = globalThis.__washi
-function Kpi({ label, value }) { return h(Stat, { label, value }) }
+function Kpi({ label, value }) { return __h(Stat, { label, value }) }
 globalThis.__page = { view: () => { ${body} } } })()`
 
 const open = (body: string) =>
@@ -66,7 +66,7 @@ function harness(values: Record<string, string | number | boolean | null> = {}) 
 describe('a page that runs, in its sandbox (D100)', () => {
   test('every hook `washi` exports is there', async () => {
     const sandbox = await open(
-      'return h(Sheet, { title: "t" }, Object.keys(globalThis.__washi).join())',
+      'return __h(Sheet, { title: "t" }, Object.keys(globalThis.__washi).join())',
     )
     const drawn = harness().run(sandbox)
     expect(drawn.children[0].split(',').sort()).toEqual([...PAGE_HOOKS].sort())
@@ -76,7 +76,7 @@ describe('a page that runs, in its sandbox (D100)', () => {
   test('its own components unfold into primitives; rows are asked for, then drawn', async () => {
     const sandbox = await open(
       `const rows = useRows({ table: 'tasks' })
-       return h(Sheet, { title: 'x' }, h(Kpi, { label: 'Open', value: rows.length }))`,
+       return __h(Sheet, { title: 'x' }, __h(Kpi, { label: 'Open', value: rows.length }))`,
     )
     const page = harness()
     const first = checkDrawn(page.run(sandbox), PAGE)
@@ -97,7 +97,7 @@ describe('a page that runs, in its sandbox (D100)', () => {
   test('useFile is asked for, then read once: text, bytes, and a refusal in words (D119)', async () => {
     const sandbox = await open(
       `const text = useFile('file:a'); const bytes = useFile('file:b', { as: 'bytes' })
-       return h(Sheet, { title: 'x' }, h(Text, null, String(text), ' ', bytes ? bytes.join('.') : 'none'))`,
+       return __h(Sheet, { title: 'x' }, __h(Text, null, String(text), ' ', bytes ? bytes.join('.') : 'none'))`,
     )
     const page = harness()
     expect(checkDrawn(page.run(sandbox), PAGE)).toMatchObject({
@@ -109,7 +109,7 @@ describe('a page that runs, in its sandbox (D100)', () => {
     expect(checkDrawn(page.run(sandbox), PAGE)).toMatchObject({
       root: { children: [{ children: [{ value: 'héllo 1.2.255' }] }] },
     })
-    const refused = await open(`useFile('file:c'); return h(Sheet, { title: 'x' })`)
+    const refused = await open(`useFile('file:c'); return __h(Sheet, { title: 'x' })`)
     page.live.files.set('text:file:c', JSON.stringify({ error: 'file:c is 40 MB' }))
     expect(page.run(refused)).toContain('file:c is 40 MB')
     sandbox.dispose()
@@ -121,8 +121,8 @@ describe('a page that runs, in its sandbox (D100)', () => {
       `const [n, setN] = useState(0)
        const [, setTab] = usePageState('tab', 'week')
        const go = useNavigate()
-       return h(Sheet, { title: 'x' }, h(Text, null, 'n ', n),
-         h(Button, { onPress: () => { setN(n + 1); setTab('month'); act({ verb: 'table.insert', table: 't', data: {} }); go('p2') } }, 'Add'))`,
+       return __h(Sheet, { title: 'x' }, __h(Text, null, 'n ', n),
+         __h(Button, { onPress: () => { setN(n + 1); setTab('month'); act({ verb: 'table.insert', table: 't', data: {} }); go('p2') } }, 'Add'))`,
     )
     const page = harness()
     const before = checkDrawn(page.run(sandbox), PAGE)
@@ -150,7 +150,7 @@ describe('a page that runs, in its sandbox (D100)', () => {
   test('usePageState’s initial seeds an unset key once drawn — what a Select bound to it shows', async () => {
     const sandbox = await open(
       `const [tab] = usePageState('tab', 'week'); const [kind] = usePageState('kind', 'all')
-       return h(Sheet, { title: 'x' }, h(Text, null, tab, ' ', kind))`,
+       return __h(Sheet, { title: 'x' }, __h(Text, null, tab, ' ', kind))`,
     )
     const page = harness({ kind: 'mine' })
     expect(checkDrawn(page.run(sandbox), PAGE)).toMatchObject({
@@ -171,7 +171,7 @@ describe('a page that runs, in its sandbox (D100)', () => {
 
   test('the bridge is out of the page’s reach, and the host refuses a write outside a press', async () => {
     const sandbox = await open(
-      `return h(Sheet, { title: 'x' }, h(Text, null, [typeof __bridge_act, typeof __bridge_set, typeof __drawing].join()))`,
+      `return __h(Sheet, { title: 'x' }, __h(Text, null, [typeof __bridge_act, typeof __bridge_set, typeof __drawing].join()))`,
     )
     const page = harness()
     expect(checkDrawn(page.run(sandbox), PAGE)).toMatchObject({

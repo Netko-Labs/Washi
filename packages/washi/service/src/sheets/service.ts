@@ -39,9 +39,9 @@ export interface WsxCheck {
 
 /**
  * Parse + registry-validate WSX source. Warnings (the complexity budget) never block a save.
- * Without the workspace, page code imports only Washi's own libraries.
+ * Without the workspace, page code imports only Washi's own libraries; `self` is the page's id.
  */
-export function checkSource(source: string, ws?: Workspace): WsxCheck {
+export function checkSource(source: string, ws?: Workspace, self?: string): WsxCheck {
   try {
     const root = parse(source)
     const diagnostics = [
@@ -49,7 +49,7 @@ export function checkSource(source: string, ws?: Workspace): WsxCheck {
       ...scriptDiagnostics(root),
       ...terminalDiagnostics(root, pagePackagesOf(ws)),
       ...(hasCode(root)
-        ? [...pageCodeDiagnostics(source, pagePackagesOf(ws)), ...domDiagnostics(root)]
+        ? [...pageCodeDiagnostics(source, pagePackagesOf(ws), self), ...domDiagnostics(root)]
         : []),
     ]
     return { ok: !hasErrors(diagnostics), diagnostics, missing: extractMissing(root) }
@@ -71,8 +71,8 @@ export class SheetValidationError extends Error {
   }
 }
 
-function parseValidated(ws: Workspace, source: string) {
-  const check = checkSource(source, ws)
+function parseValidated(ws: Workspace, source: string, self?: string) {
+  const check = checkSource(source, ws, self)
   if (!check.ok) throw new SheetValidationError(check.diagnostics)
   return parse(source)
 }
@@ -115,7 +115,7 @@ function mergedSource(ws: Workspace, id: string, write: SheetWrite, baseVersion?
     throw new SheetConflictError(id)
   }
   if (merged === null) throw new Error(`sheet not found: ${id}`)
-  if (merged !== write.source && !checkSource(merged, ws).ok) throw new SheetConflictError(id)
+  if (merged !== write.source && !checkSource(merged, ws, id).ok) throw new SheetConflictError(id)
   return merged
 }
 
@@ -126,7 +126,7 @@ export function updateSheetFromSource(
   editedBy: SheetAuthor = null,
   baseVersion?: string,
 ): SheetDetail {
-  parseValidated(ws, write.source)
+  parseValidated(ws, write.source, id)
   const source = mergedSource(ws, id, write, baseVersion)
   const root = parse(source)
   if (editedBy === 'washi') guardWashiWrite(parse(requireSheet(ws, id).source), root)

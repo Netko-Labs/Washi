@@ -165,6 +165,42 @@ function frame() { return H }
       expect(module.indexOf(stays)).toBeGreaterThan(view)
     }
   })
+
+  test('a name a hook hands out by destructuring stays in view(), and so does what reads it', () => {
+    const module = pageModule(`import { usePageState, useRows } from 'washi'
+const [wCost, setCost] = usePageState('w_cost', 3)
+const { rows: [first = null, ...rest] } = { rows: useRows({ table: 't' }) }
+const { a, b: { c } } = { a: 1, b: { c: 2 } }
+const weights = { cost: wCost }
+const head = first
+const tail = rest.length
+const both = a + c
+<Sheet title="t"><Text>{weights.cost}</Text></Sheet>`)
+    const view = module.indexOf('export default function view() {')
+    for (const stays of ['const [wCost', 'const weights', 'const head', 'const tail']) {
+      expect(module.indexOf(stays)).toBeGreaterThan(view)
+    }
+    expect(module.indexOf('const { a, b')).toBeLessThan(view)
+    expect(module.indexOf('const both')).toBeLessThan(view)
+  })
+
+  test('a computed constant a component reads moves up with it; one reaching a hook never', () => {
+    const module = pageModule(`import { useNow, act as press } from 'washi'
+const COLS = 'ABCDEFGH'.split('')
+const ROWS = Array.from({ length: COLS.length }, (_, i) => i)
+const today = new Date()
+const ticks = useTicks()
+const pressed = press({ verb: 'x' })
+function useTicks() { return useNow() }
+function Board() { return <Text>{COLS.join('') + ROWS.length + ticks + pressed}</Text> }
+<Sheet title="t"><Board /><Text>{today}</Text></Sheet>`)
+    const view = module.indexOf('export default function view() {')
+    expect(module.indexOf('const COLS')).toBeLessThan(view)
+    expect(module.indexOf('const ROWS')).toBeLessThan(view)
+    for (const stays of ['const today', 'const ticks', 'const pressed']) {
+      expect(module.indexOf(stays)).toBeGreaterThan(view)
+    }
+  })
 })
 
 describe('text beside code', () => {

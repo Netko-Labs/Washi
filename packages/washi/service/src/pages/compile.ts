@@ -6,6 +6,7 @@ import {
   exactPattern,
   importRefusal,
   insidePackage,
+  inWords,
   isAllowedImport,
   isNodeRequire,
   NODE_MODULE,
@@ -188,12 +189,14 @@ export async function bundle(
       target: 'browser',
       minify: target.minify,
       define: { 'process.env.NODE_ENV': '"production"', ...target.define },
-      jsx: { runtime: 'classic', factory: 'h', fragment: 'Fragment' },
+      jsx: { runtime: 'classic', factory: '__h', fragment: 'Fragment' },
       plugins: [plugin(module, pages, target, packages)],
       throw: false,
     })
     const output = built.outputs[0]
-    if (!built.success || !output) return failure(built.logs[0]?.message ?? 'it did not compile')
+    if (!built.success || !output) {
+      return failure(inWords(built.logs[0]?.message ?? 'it did not compile', pages))
+    }
     return capped(remember(hash, { ok: true, js: await output.text() }), maxBytes)
   } catch (error) {
     return failure(error)

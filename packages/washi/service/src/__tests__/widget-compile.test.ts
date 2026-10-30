@@ -32,7 +32,7 @@ const errors = (source: string) =>
 async function draw(js: string): Promise<unknown> {
   const vm = (await loadEngine()).newContext()
   const prelude = `
-globalThis.h = (name, props, ...children) => typeof name === 'function'
+globalThis.__h = (name, props, ...children) => typeof name === 'function'
   ? name({ ...props, children })
   : { name, props: props || {}, children: children.flat() }
 globalThis.Stat = 'Stat'; globalThis.Sheet = 'Sheet'; globalThis.Widget = 'Widget'
