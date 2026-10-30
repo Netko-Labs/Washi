@@ -1,6 +1,13 @@
 import { useState } from 'react'
 import { InviteRow } from './invite-row'
-import { type PeopleSectionProps, usePeople } from './lib'
+import {
+  INVITE_ROLES,
+  type InviteRole,
+  type PeopleSectionProps,
+  ROLE_LEGEND,
+  usePeople,
+} from './lib'
+import { RolePill } from './role-pill'
 
 /**
  * No email server is assumed: an invitation is a link someone pastes into chat.
@@ -9,6 +16,7 @@ import { type PeopleSectionProps, usePeople } from './lib'
 export function PeopleSection({ workspaceId }: PeopleSectionProps) {
   const { members, invitations, error, invite, cancel } = usePeople(workspaceId)
   const [email, setEmail] = useState('')
+  const [role, setRole] = useState<InviteRole>('member')
 
   return (
     <section>
@@ -17,6 +25,7 @@ export function PeopleSection({ workspaceId }: PeopleSectionProps) {
         Invite someone by email, then send them the link. They sign in with that address and they're
         in.
       </p>
+      <p className="mt-1 text-[12.5px] text-muted-foreground leading-relaxed">{ROLE_LEGEND}</p>
 
       <ul className="mt-4 divide-y divide-border">
         {members.map((member) => (
@@ -30,7 +39,7 @@ export function PeopleSection({ workspaceId }: PeopleSectionProps) {
                 {member.email}
               </span>
             </span>
-            <span className="font-mono text-[11px] text-muted-foreground">{member.role}</span>
+            <RolePill role={member.role} />
           </li>
         ))}
         {invitations.map((invitation) => (
@@ -44,7 +53,7 @@ export function PeopleSection({ workspaceId }: PeopleSectionProps) {
           event.preventDefault()
           const address = email.trim()
           if (!address) return
-          void invite(address, 'member').then((id) => id && setEmail(''))
+          void invite(address, role).then((id) => id && setEmail(''))
         }}
       >
         <input
@@ -55,6 +64,18 @@ export function PeopleSection({ workspaceId }: PeopleSectionProps) {
           aria-label="Email to invite"
           className="h-11 min-w-0 flex-1 rounded-xl border border-border bg-card px-3 text-[14px] outline-none focus-visible:border-primary"
         />
+        <select
+          value={role}
+          aria-label="Role"
+          onChange={(event) => setRole(event.target.value as InviteRole)}
+          className="h-11 shrink-0 rounded-xl border border-border bg-card px-2 text-[13.5px]"
+        >
+          {INVITE_ROLES.map((choice) => (
+            <option key={choice.id} value={choice.id}>
+              {choice.label}
+            </option>
+          ))}
+        </select>
         <button
           type="submit"
           disabled={!email.trim()}

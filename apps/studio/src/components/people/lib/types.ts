@@ -12,6 +12,12 @@ export interface InvitationView {
   expiresAt: string
 }
 
+export type InviteRole = 'member' | 'admin'
+
+export interface RolePillProps {
+  role: string
+}
+
 export interface PeopleSectionProps {
   workspaceId: string
 }

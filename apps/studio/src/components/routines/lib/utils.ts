@@ -1,5 +1,11 @@
-import { parseCron } from '@washi/domain'
-import type { RoutineDraft, RoutineTemplate, ScheduleDraft, ScheduleKind } from './types'
+import { nextOccurrence, parseCron } from '@washi/domain'
+import type {
+  RoutineDraft,
+  RoutineTemplate,
+  RoutineWire,
+  ScheduleDraft,
+  ScheduleKind,
+} from './types'
 
 /** The zone this device lives in — what "07:00" means to the person typing it. */
 export function deviceTimeZone(): string {
@@ -72,6 +78,21 @@ export function wallLabel(key: string): string {
     timeZone: 'UTC',
   })
   return `${label}, ${time}`
+}
+
+/** A routine with no runs yet: paused, when it would run resumed; else when it runs next. */
+export function noRunsNote(
+  routine: Pick<RoutineWire, 'cron' | 'timeZone' | 'enabled'> | null,
+  now: Date,
+): string {
+  const next = routine ? nextOccurrence(routine.cron, routine.timeZone, now) : null
+  const when = next ? wallLabel(next) : null
+  if (routine && !routine.enabled) {
+    return when
+      ? `No runs yet. It is paused: resume it and it runs next on ${when}, or run it now.`
+      : 'No runs yet. It is paused: run it now, or resume it.'
+  }
+  return when ? `No runs yet. It runs next on ${when}, or run it now.` : 'No runs yet. Run it now.'
 }
 
 export function durationLabel(ms: number | null): string {

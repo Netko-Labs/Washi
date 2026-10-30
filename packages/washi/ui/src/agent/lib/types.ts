@@ -97,6 +97,8 @@ export interface OptionChipsProps {
 export interface InferenceView {
   active: 'local_cli' | 'api_key' | null
   provider: string | null
+  /** What a conversation with no pick of its own runs on; null when the key names none. */
+  defaultModel: string | null
   localModel: string | null
   plan: string | null
   /** The workspace's picks for the composer; null offers the recommended three. */

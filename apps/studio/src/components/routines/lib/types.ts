@@ -67,6 +67,7 @@ export interface SchedulePickerProps {
 
 export interface RoutineRunsProps {
   workspaceId: string
+  routine: RoutineWire | null
   runs: RoutineRun[]
 }
 

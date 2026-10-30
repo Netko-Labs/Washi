@@ -16,6 +16,7 @@ import { YoloChip, YoloNote } from '../yolo-chip'
 const view = (patch: Partial<InferenceView> = {}): InferenceView => ({
   active: 'api_key',
   provider: 'anthropic',
+  defaultModel: null,
   localModel: null,
   plan: null,
   enabledModels: null,

@@ -63,12 +63,13 @@ export function ModelCard({
       )}
       <SettingRow
         label="Default effort"
-        hint="Quick · Balanced · Deep — a conversation can change its own"
+        hint="Deeper thinks longer and costs more a turn; a conversation can change its own"
       >
         <Segmented
           value={effort}
           options={EFFORT_OPTIONS}
           onChange={(next) => void onEffort(next)}
+          describe
         />
       </SettingRow>
     </SettingsCard>

@@ -1,10 +1,10 @@
 import { Link } from '@tanstack/react-router'
 import { relativeTime } from '@washi/ui'
-import { DAY_MS, durationLabel, type RoutineRunsProps, startedAtMs } from './lib'
+import { DAY_MS, durationLabel, noRunsNote, type RoutineRunsProps, startedAtMs } from './lib'
 import { RunStatusBadge } from './run-status-badge'
 
 /** Every run newest first, each one its chat; three numbers on top. */
-export function RoutineRuns({ workspaceId, runs }: RoutineRunsProps) {
+export function RoutineRuns({ workspaceId, routine, runs }: RoutineRunsProps) {
   const now = Date.now()
   const within = (days: number) =>
     runs.filter((run) => now - startedAtMs(run.startedAt) < days * DAY_MS)
@@ -17,7 +17,7 @@ export function RoutineRuns({ workspaceId, runs }: RoutineRunsProps) {
   if (runs.length === 0) {
     return (
       <p className="rounded-2xl border border-border border-dashed px-5 py-10 text-center text-[13px] text-muted-foreground">
-        No runs yet. Run it now, or wait for its next minute.
+        {noRunsNote(routine, new Date(now))}
       </p>
     )
   }

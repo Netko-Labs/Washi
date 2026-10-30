@@ -106,7 +106,7 @@ export function RoutinePage({ workspaceId, routineId, template, tab }: RoutinePa
                 onRemove={isNew ? undefined : () => void page.remove()}
               />
             ) : (
-              <RoutineRuns workspaceId={workspaceId} runs={page.runs} />
+              <RoutineRuns workspaceId={workspaceId} routine={page.routine} runs={page.runs} />
             )}
           </>
         )}

@@ -164,6 +164,11 @@ describe('hosted: the workspace key and nothing else', () => {
       provider: 'openrouter',
       model: 'anthropic/claude-sonnet-5',
     })
+    expect((await source.status()).apiKey).toEqual({
+      provider: 'openrouter',
+      source: 'workspace',
+      model: 'anthropic/claude-sonnet-5',
+    })
   })
 
   test('no stored key is null, with no local CLI to fall back to and no way to pick one', async () => {

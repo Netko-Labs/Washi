@@ -50,7 +50,14 @@ export type {
   UsageCardProps,
   YoloSetting,
 } from './types'
-export { clampInt, clampMoney, refusalFor, settingsLabel, sinceLabel } from './utils'
+export {
+  clampInt,
+  clampMoney,
+  refusalFor,
+  sentToModel,
+  settingsLabel,
+  sinceLabel,
+} from './utils'
 export {
   ADMIN_TABS,
   APPROVAL_MODE_OPTIONS,

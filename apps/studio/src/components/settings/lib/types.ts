@@ -172,6 +172,8 @@ export interface ModelMenuProps {
 }
 
 export interface OutsideCardProps {
+  /** Whose model every turn goes to: the workspace's key, else the server's; null with neither. */
+  modelProvider: string | null
   approvalMode: ApprovalMode
   /** The server's admin approves everything that leaves, in every workspace (D118). */
   serverApproves: boolean

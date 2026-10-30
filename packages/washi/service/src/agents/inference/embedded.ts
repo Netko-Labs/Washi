@@ -71,7 +71,7 @@ export function createEmbeddedKeySource(
       active: credential?.kind ?? null,
       localCli: cli,
       localModel,
-      apiKey: key ? { provider: 'anthropic', source: 'environment' } : null,
+      apiKey: key ? { provider: 'anthropic', source: 'environment', model: null } : null,
       missing,
       credential,
     }

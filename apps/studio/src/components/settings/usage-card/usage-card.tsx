@@ -30,8 +30,8 @@ export function UsageCard({
           of={`of $${spend.capUsd} today`}
           left={
             spend.savedUsd > 0
-              ? `metered · saved ${usd(spend.savedUsd)} on a plan`
-              : 'metered dollars'
+              ? `spent on the key · a plan covered ${usd(spend.savedUsd)}`
+              : 'dollars spent on the model key'
           }
           right={`resets at midnight · ${settings.zone}`}
         />
@@ -68,7 +68,7 @@ export function UsageCard({
       <NumberRow
         key={`cap-${spend.capUsd}`}
         label="Daily stop"
-        hint="Metered dollars a day before Washi pauses"
+        hint="Dollars spent on the model key in a day before Washi pauses"
         value={spend.capUsd}
         prefix="$"
         onSave={onDailyCap}
@@ -76,7 +76,7 @@ export function UsageCard({
       <NumberRow
         key={`turns-${spend.turnCap}`}
         label="Turn cap"
-        hint="The backstop for models with no price"
+        hint="Turns a day before Washi pauses, plan or key — the stop for a model with no price"
         value={spend.turnCap}
         integer
         onSave={onTurnCap}

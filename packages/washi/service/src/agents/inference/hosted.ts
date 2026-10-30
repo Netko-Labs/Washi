@@ -32,7 +32,9 @@ export function createStoredKeySource(lookup: StoredKeyLookup): AgentKeySource {
         active: credential ? 'api_key' : null,
         localCli: null,
         localModel: null,
-        apiKey: credential ? { provider: credential.provider, source } : null,
+        apiKey: credential
+          ? { provider: credential.provider, source, model: credential.model ?? null }
+          : null,
         missing: credential ? null : MISSING.workspaceKeyAbsent,
       }
     },

@@ -522,7 +522,7 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   group's sections as tabs under them — Account (Profile — `auth.updateUser`; Preferences —
   the theme — Light · Dark · System, one `useTheme` store in `components/shared/theme`), Workspace (General — rename through
   `auth.organization.update`, owners and admins; People; Storage — D70; Emojis — D71), Washi
-  (Models · What leaves · Usage · Routines), Server (the app admin's). `?tab=` names the section;
+  (Models · What leaves · Usage), Server (the app admin's). `?tab=` names the section;
   none or an unknown one lands on Profile (the old `agent` on Models). **The team's models** are app meta `agent_enabled_models` (`EnabledModel[]`, id +
   the catalogue's name, per provider; none for the key's provider = the recommended three), set by owners (`agents.setEnabledModels`)
   and read by the composer's model chip through `agents.settings`. Menus and pickers in the studio

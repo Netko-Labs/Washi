@@ -43,8 +43,9 @@ export function RoutineSetup({
           className="w-full resize-y rounded-lg border border-border bg-background px-3 py-2.5 text-[13.5px] leading-relaxed outline-none focus-visible:border-primary"
         />
         <p className="mt-2 text-[12px] text-muted-foreground">
-          Each run is its own chat: reads pass, page edits land marked as Washi’s, and anything that
-          leaves the server still asks at the desk.
+          Each run is a Washi turn in its own chat, and counts toward the daily stop. Reads pass,
+          page and table edits land marked as Washi’s, and anything that leaves the server still
+          asks a person first.
         </p>
       </section>
 
