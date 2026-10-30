@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
+import { type Filter, matchesFilters, type TableSpec } from '@washi/ink'
 import {
   createSheet,
   defineTable,
@@ -155,5 +156,57 @@ describe('ink executor', () => {
 
     deleteRecords(ws, table.id, ids)
     expect(executeQuery(ws, table.id, spec, { table: 'tasks' }).rows).toHaveLength(2)
+  })
+
+  const titles = (table: { id: string }, where: Filter[], on: TableSpec = spec) =>
+    executeQuery(ws, table.id, on, { table: on.name, where }).rows.map((row) => row.title)
+
+  test('contains matches % and _ literally, in SQL as in memory', () => {
+    const table = seed()
+    insertRecord(ws, table.id, { title: '50% off' })
+    insertRecord(ws, table.id, { title: 'snake_case' })
+    insertRecord(ws, table.id, { title: 'C:\\path' })
+    for (const [needle, expected] of [
+      ['%', ['50% off']],
+      ['_', ['snake_case']],
+      ['\\', ['C:\\path']],
+      ['A', ['a', 'snake_case', 'C:\\path']],
+    ] as const) {
+      const where: Filter[] = [{ column: 'title', op: 'contains', value: needle }]
+      expect(titles(table, where)).toEqual([...expected])
+      const rows = executeQuery(ws, table.id, spec, { table: 'tasks' }).rows
+      const inMemory = rows.filter((row) => matchesFilters(row, where, spec))
+      expect(inMemory.map((row) => row.title)).toEqual([...expected])
+    }
+  })
+
+  test('ne keeps empty cells, eq/ne null ask for empty, in SQL as in memory', () => {
+    const tagged: TableSpec = {
+      name: 'tagged',
+      columns: [...spec.columns, { name: 'tags', type: 'multi_select', options: ['x', 'y'] }],
+    }
+    const table = defineTable(ws, tagged)
+    insertRecord(ws, table.id, { title: 'a', status: 'todo', tags: ['x'] })
+    insertRecord(ws, table.id, { title: 'b', status: 'shipped', tags: [] })
+    insertRecord(ws, table.id, { title: 'c' })
+    insertRecord(ws, table.id, { title: 'd', status: '' })
+    const cases: [Filter[], string[]][] = [
+      [[{ column: 'status', op: 'ne', value: 'shipped' }], ['a', 'c', 'd']],
+      [[{ column: 'status', op: 'eq', value: null }], ['c', 'd']],
+      [[{ column: 'status', op: 'eq', value: '' }], ['c', 'd']],
+      [[{ column: 'status', op: 'ne', value: null }], ['a', 'b']],
+      [[{ column: 'status', op: 'in', value: ['todo', null] }], ['a', 'c']],
+      [[{ column: 'points', op: 'gt', value: 0 }], []],
+      [[{ column: 'tags', op: 'eq', value: null }], ['b', 'c', 'd']],
+      [[{ column: 'tags', op: 'ne', value: null }], ['a']],
+      [[{ column: 'tags', op: 'ne', value: 'x' }], ['b', 'c', 'd']],
+    ]
+    const rows = executeQuery(ws, table.id, tagged, { table: 'tagged' }).rows
+    for (const [where, expected] of cases) {
+      expect(titles(table, where, tagged)).toEqual(expected)
+      const inMemory = rows.filter((row) => matchesFilters(row, where, tagged))
+      expect(inMemory.map((row) => row.title)).toEqual(expected)
+      expect(matchRecordIds(ws, table.id, tagged, where)).toHaveLength(expected.length)
+    }
   })
 })

@@ -15,6 +15,9 @@ export const RELATIVE = /^\.{0,2}\//
 
 export const isNodeRequire = (path: string) => NODE_MODULE.test(path) || RELATIVE.test(path)
 
+export const exactPattern = (paths: string[]): RegExp | null =>
+  paths.length ? new RegExp(`^(${paths.map(escaped).join('|')})$`) : null
+
 /** One of the server's packages or a subpath of it; as with a library, no segment climbs out. */
 export function packagePattern(set: PagePackageSet | null): RegExp | null {
   if (!set || set.packages.length === 0) return null
@@ -32,10 +35,13 @@ export function isAllowedImport(path: string, set: PagePackageSet | null): boole
 const packageOf = (path: string) =>
   path.startsWith('@') ? path.split('/').slice(0, 2).join('/') : (path.split('/')[0] ?? path)
 
-/** Why an import is refused, in words; on a server, a package it lacks says where to add it. */
+/**
+ * Why an import is refused, in words; on a server, a package it lacks says where to add it.
+ * Node's own `fs` or `child_process` is never a package to add, `node:` or not.
+ */
 export function importRefusal(path: string, set: PagePackageSet | null): string {
   const name = packageOf(path)
-  if (set && PACKAGE_NAME.test(name) && !isAllowedImport(name, set)) {
+  if (set && PACKAGE_NAME.test(name) && !NODE_MODULE.test(path) && !isAllowedImport(name, set)) {
     return `"${name}" ${NOT_LISTED_WORDS}`
   }
   const names = [...PAGE_LIBRARIES, ...(set?.packages.map((each) => each.name) ?? [])]

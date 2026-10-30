@@ -136,6 +136,16 @@ describe('a page importing the server’s packages (D116)', () => {
     )
   })
 
+  test('Node’s own modules are never a package to add, node: or not', async () => {
+    for (const path of ['child_process', 'fs/promises', 'node:fs']) {
+      const source = `import x from '${path}'\n<Sheet title="t" />`
+      const words = `cannot import "${path}" — a page imports from washi, washi/ui, date-fns`
+      expect(pageCodeDiagnostics(source, set)[0]?.message).toContain(words)
+      const compiled = await compilePage(source, pages, set)
+      expect(compiled.ok ? '' : compiled.error).toContain(words)
+    }
+  })
+
   test('removed, a page that imported it stops in words, never a crash', async () => {
     const gone = { dir, packages: set.packages.filter(({ name }) => name !== 'slugger') }
     expect(await compilePage(PAGE, pages, gone)).toEqual({

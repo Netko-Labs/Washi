@@ -22,16 +22,16 @@ import { computeRollups } from './ink-rollups'
 import { getTableByName } from './tables'
 import type { RollupFetch } from './types'
 
-const FILTER_SQL: Record<Filter['op'], string> = {
+const FILTER_SQL: Record<Exclude<Filter['op'], 'in' | 'ne'>, string> = {
   eq: '= ?',
-  ne: '!= ?',
   gt: '> ?',
   gte: '>= ?',
   lt: '< ?',
   lte: '<= ?',
-  contains: "LIKE '%' || ? || '%'",
-  in: 'IN', // expanded per-value below
+  contains: "LIKE '%' || ? || '%' ESCAPE '\\'",
 }
+
+const LIKE_SPECIAL = /[\\%_]/g
 
 const IDENTIFIER = /^[a-z][a-z0-9_]*$/
 
@@ -60,15 +60,54 @@ function arrayColumns(spec: TableSpec): Set<string> {
   )
 }
 
-/** On a list column, eq/contains/in ask "holds any of these", and ne asks "holds none". */
+/**
+ * On a list column, eq/contains/in ask "holds any of these", and ne asks "holds none";
+ * eq/ne `null` (or '') ask "holds nothing" / "holds something".
+ */
 function listClause(filter: Filter, params: Scalar[]): string {
   if (!['eq', 'ne', 'contains', 'in'].includes(filter.op)) {
     throw new Error(`"${filter.op}" does not apply to the list column "${filter.column}"`)
+  }
+  if ((filter.value === null || filter.value === '') && ['eq', 'ne'].includes(filter.op)) {
+    params.push(`$.${assertIdentifier(filter.column)}`)
+    const isEmpty = 'NOT EXISTS (SELECT 1 FROM json_each(data, ?))'
+    return filter.op === 'eq' ? isEmpty : `NOT ${isEmpty}`
   }
   const values = Array.isArray(filter.value) ? filter.value : [filter.value]
   params.push(`$.${assertIdentifier(filter.column)}`, ...values)
   const holds = `EXISTS (SELECT 1 FROM json_each(data, ?) WHERE value IN (${values.map(() => '?').join(', ')}))`
   return filter.op === 'ne' ? `NOT ${holds}` : holds
+}
+
+/**
+ * `matchesFilters` in SQL: eq/ne `null` or '' ask empty / not empty (either), ne keeps an empty
+ * cell (Notion's "is not"), an `in` holding null takes empties, contains matches literally.
+ * Each `at()` binds the column's path again, so params stay in SQL text order.
+ */
+function scalarClause(filter: Filter, params: Scalar[]): string {
+  const at = () => columnExpr(filter.column, params)
+  const value = Array.isArray(filter.value) ? String(filter.value) : filter.value
+  if (filter.op === 'in') {
+    const values = Array.isArray(filter.value) ? filter.value : [filter.value]
+    const present = values.filter((each) => each !== null)
+    const listed = `${at()} IN (${present.map(() => '?').join(', ')})`
+    params.push(...present)
+    return present.length === values.length ? listed : `(${listed} OR ${at()} IS NULL)`
+  }
+  if ((value === null || value === '') && (filter.op === 'eq' || filter.op === 'ne')) {
+    const isEmpty = `COALESCE(${at()}, '') = ''`
+    return filter.op === 'eq' ? isEmpty : `NOT ${isEmpty}`
+  }
+  if (filter.op === 'ne') {
+    const isNull = `${at()} IS NULL`
+    const differs = `${at()} != ?`
+    params.push(value)
+    return `(${isNull} OR ${differs})`
+  }
+  const clause = `${at()} ${FILTER_SQL[filter.op]}`
+  const literal = typeof value === 'string' ? value.replace(LIKE_SPECIAL, '\\$&') : value
+  params.push(filter.op === 'contains' ? literal : value)
+  return clause
 }
 
 function buildWhere(filters: Filter[], spec: TableSpec): { sql: string; params: Scalar[] } {
@@ -80,15 +119,7 @@ function buildWhere(filters: Filter[], spec: TableSpec): { sql: string; params: 
       clauses.push(listClause(filter, params))
       continue
     }
-    const expr = columnExpr(filter.column, params)
-    if (filter.op === 'in') {
-      const values = Array.isArray(filter.value) ? filter.value : [filter.value]
-      clauses.push(`${expr} IN (${values.map(() => '?').join(', ')})`)
-      params.push(...values)
-    } else {
-      clauses.push(`${expr} ${FILTER_SQL[filter.op]}`)
-      params.push(Array.isArray(filter.value) ? String(filter.value) : filter.value)
-    }
+    clauses.push(scalarClause(filter, params))
   }
   return { sql: clauses.length ? ` AND ${clauses.join(' AND ')}` : '', params }
 }

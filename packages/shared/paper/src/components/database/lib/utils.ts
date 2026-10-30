@@ -115,6 +115,7 @@ export function propertyProblem(draft: PropertyDraft, taken: string[]): string |
   if (taken.includes(columnKey(draft.label)))
     return `“${draft.label.trim()}” is already a property.`
   if (needsOptions(draft.type) && draft.options.length === 0) return 'Add at least one option.'
+  if (needsOptions(draft.type) && draft.options.length > 64) return 'Keep it to 64 options.'
   return null
 }
 

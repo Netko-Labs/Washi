@@ -30,6 +30,7 @@ export function PropertyOptions({ draft, edit }: PropertyOptionsProps) {
           aria-label="Add an option"
           placeholder={draft.options.length ? 'Another…' : 'Type an option, press Enter'}
           value={draft.typing}
+          maxLength={64}
           onChange={(event) => {
             const parts = event.currentTarget.value.split(',')
             const typing = parts.pop() ?? ''
