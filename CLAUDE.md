@@ -557,7 +557,9 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   `domDiagnostics` refuses one outside a Widget's component, what it reaches, or an export. Reads ask
   over `postMessage` and are answered as the reader (`useWidgetBridge`; `useStored` is the page's own
   localStorage); a write — state, store, act, navigate — lands only while the frame holds focus under
-  the person's transient activation (`isPressed`). Colours arrive on load; height reports itself.
+  the person's transient activation (`isPressed`). Colours arrive on load; height reports itself, and `height` is only the least a widget takes —
+  taller content grows the frame, never cut; ⤢ Full screen puts the widget's own box full screen
+  (the Fullscreen API, so the frame keeps running).
   App meta `widgets_enabled`, off by default: `embeds.widgets` / `embeds.setWidgets` (owners and
   admins), Settings → Workspace → Embeds → Widgets; off, on a shared link or a host without
   `compileWidget`, a widget is a note. `/widget` drops a JSX clock, its component above the page.

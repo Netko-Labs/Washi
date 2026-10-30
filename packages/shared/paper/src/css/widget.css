@@ -1,0 +1,48 @@
+/* A widget (D113): its own component in a sandboxed frame, as tall as what it draws. */
+.wsx-widget {
+  margin: 0;
+}
+.wsx-widget iframe {
+  display: block;
+  width: 100%;
+  height: var(--widget-h);
+  border: 0;
+  border-radius: var(--r-card);
+  background: transparent;
+}
+.wsx-widget figcaption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.82em;
+}
+.wsx-widget-full {
+  margin-left: auto;
+  border: 0;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.wsx-widget-full:hover {
+  background: var(--muted-bg);
+  color: var(--ink);
+}
+/* Full screen: the frame takes the whole screen, its own height no longer the limit. */
+.wsx-widget:fullscreen {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background: var(--bg);
+}
+.wsx-widget:fullscreen iframe {
+  flex: 1;
+  height: auto;
+}
+.wsx-widget:fullscreen .wsx-widget-full {
+  display: none;
+}

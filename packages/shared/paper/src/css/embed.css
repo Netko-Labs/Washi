@@ -269,18 +269,3 @@ a.wsx-file:hover {
 }
 
 /* A widget's frame: no chrome of its own, the height its document reports. */
-.wsx-widget {
-  margin: 0;
-}
-.wsx-widget iframe {
-  display: block;
-  width: 100%;
-  border: 0;
-  border-radius: var(--r-card);
-  background: transparent;
-}
-.wsx-widget figcaption {
-  margin-top: 6px;
-  color: var(--muted);
-  font-size: 0.82em;
-}
