@@ -50,7 +50,7 @@ describe('which key a hosted workspace runs on (D105)', () => {
       ),
     })
     const status = await runtime.resolve('w1').host.inference()
-    expect(status.apiKey).toEqual({ provider: 'anthropic', source: 'server' })
+    expect(status.apiKey).toEqual({ provider: 'anthropic', source: 'server', model: null })
     runtime.close()
     rmSync(dir, { recursive: true, force: true })
   })

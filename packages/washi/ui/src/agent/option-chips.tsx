@@ -2,7 +2,13 @@ import { IconCheck, IconChevronDown } from '@tabler/icons-react'
 import { useState } from 'react'
 import { api } from '../api'
 import { useAgentStore } from '../stores'
-import { EFFORTS, LOCAL_MODELS, type OptionChipsProps, offeredModels } from './lib'
+import {
+  EFFORTS,
+  LOCAL_MODELS,
+  type OptionChipsProps,
+  offeredModels,
+  workspaceDefaultLabel,
+} from './lib'
 import { YoloChip } from './yolo-chip'
 
 const CHIP =
@@ -88,7 +94,7 @@ export function OptionChips({ session, inference }: OptionChipsProps) {
                 onClick={() => pickModel(null)}
                 className={`${ROW} text-muted-foreground`}
               >
-                The workspace default
+                {workspaceDefaultLabel(inference)}
                 {!currentModel && <IconCheck className="ml-auto size-3.5" />}
               </button>
             )}

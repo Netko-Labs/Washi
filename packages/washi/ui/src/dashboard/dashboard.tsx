@@ -69,6 +69,12 @@ export function Dashboard() {
             </div>
             <div className="font-mono font-semibold text-[22px] tracking-[-0.02em]">
               {usd((onPlan ? today?.spend.savedUsd : today?.spend.costUsd) ?? 0)}
+              {!onPlan && today && (
+                <span className="font-normal text-[13px] text-muted-foreground tracking-normal">
+                  {' '}
+                  of ${today.spend.capUsd}
+                </span>
+              )}
             </div>
           </div>
         </div>

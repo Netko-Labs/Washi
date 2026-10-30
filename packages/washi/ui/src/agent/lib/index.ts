@@ -43,6 +43,7 @@ export {
   pagesMatching,
   receiptLine,
   usd,
+  workspaceDefaultLabel,
 } from './utils'
 export {
   ATTACH_PAGE_ROWS,

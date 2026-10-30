@@ -70,6 +70,17 @@ export function offeredModels(inference: InferenceView | null): ModelChoice[] {
   }))
 }
 
+/** "Workspace default (Sonnet 5.5)": the model a conversation runs when it picks none. */
+export function workspaceDefaultLabel(inference: InferenceView | null): string {
+  const id = inference?.defaultModel
+  if (!id) return 'Workspace default'
+  const known = [
+    ...offeredModels(inference),
+    ...(RECOMMENDED_MODELS[inference?.provider ?? 'anthropic'] ?? []),
+  ]
+  return `Workspace default (${known.find((model) => model.id === id)?.label ?? id})`
+}
+
 /** How tall the composer grows in `room` px before it scrolls; never under a few lines. */
 export function composerCap(room: number): number {
   return Math.max(COMPOSER_MIN_CAP_PX, Math.round(room * COMPOSER_SHARE))

@@ -12,6 +12,7 @@ export function useInference(): InferenceView | null {
         setView({
           active: status.active,
           provider: status.apiKey?.provider ?? null,
+          defaultModel: status.apiKey?.model ?? null,
           localModel: status.localModel,
           plan: status.localCli?.plan ?? null,
           enabledModels: settings.enabledModels,
