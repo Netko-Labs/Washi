@@ -22,3 +22,23 @@ export const WEEKDAY_NAMES = [
   'Friday',
   'Saturday',
 ]
+
+export const WEEKDAY_SHORT = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+
+export const MONTH_NAMES = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+]
+
+/** Past this many times, days or months, a schedule reads as its expression. */
+export const MAX_LISTED = 4
