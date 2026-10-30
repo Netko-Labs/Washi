@@ -1,7 +1,13 @@
 import type { AgentSession, ApprovalMode, SheetSummary, TranscriptEntry } from '@washi/domain'
 import { hostPlace } from '../../api'
-import type { InferenceView, ModelChoice, TurnDone } from './types'
-import { ATTACH_PAGE_ROWS, COMPOSER_MIN_CAP_PX, COMPOSER_SHARE, RECOMMENDED_MODELS } from './values'
+import type { FollowChange, InferenceView, ModelChoice, ScrollBox, TurnDone } from './types'
+import {
+  ATTACH_PAGE_ROWS,
+  COMPOSER_MIN_CAP_PX,
+  COMPOSER_SHARE,
+  NEAR_END_PX,
+  RECOMMENDED_MODELS,
+} from './values'
 
 function duration(ms: number): string {
   const tenths = Math.round(ms / 100)
@@ -100,4 +106,13 @@ export function pagesMatching(sheets: SheetSummary[], term: string): SheetSummar
   return sheets
     .filter((sheet) => !needle || sheet.title.toLowerCase().includes(needle))
     .slice(0, ATTACH_PAGE_ROWS)
+}
+
+export function isAtEnd(box: ScrollBox, slack = NEAR_END_PX): boolean {
+  return box.scrollHeight - box.scrollTop - box.clientHeight <= slack
+}
+
+/** The panel follows its end only for a reader already there, their own send, or another chat. */
+export function followsEnd({ isPinned, isOwnSend, isNewChat }: FollowChange): boolean {
+  return isPinned || isOwnSend || isNewChat
 }

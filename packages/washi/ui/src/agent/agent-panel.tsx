@@ -20,16 +20,22 @@ const FRAME = {
 
 /** The door's room: a popover, a dock beside the page, or the whole screen on a phone (D61). */
 export function AgentPanel({ placement = 'float', onExpand }: AgentPanelProps) {
-  const { title, transcript, mood, isEmpty, turn } = useAgentStore(
+  const { title, transcript, mood, isEmpty, turn, sessionId } = useAgentStore(
     useShallow((state) => ({
       title: state.sessions.find((session) => session.id === state.activeSessionId)?.title,
       transcript: state.transcript,
       mood: mascotStateFor(state.transcript, state.running, state.approvals, state.stalled),
       isEmpty: state.transcript.length === 0 && !state.running,
       turn: turnViewOf(state).state,
+      sessionId: state.activeSessionId,
     })),
   )
-  const { scrollRef } = usePanelFrame(transcript.length, turn)
+  const { scrollRef } = usePanelFrame({
+    length: transcript.length,
+    turn,
+    sessionId,
+    isOwnSend: transcript.at(-1)?.update.kind === 'user_message',
+  })
   const store = useAgentStore.getState
 
   return (

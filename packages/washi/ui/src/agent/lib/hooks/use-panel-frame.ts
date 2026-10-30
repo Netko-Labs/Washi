@@ -1,31 +1,35 @@
 import { useEffect, useRef } from 'react'
-import { type TurnState, useAgentStore } from '../../../stores'
-import type { PanelFrame } from '../types'
-import { NEAR_END_PX } from '../values'
+import { useAgentStore } from '../../../stores'
+import type { PanelFrame, PanelSignal } from '../types'
+import { followsEnd, isAtEnd } from '../utils'
 
 /**
  * What the panel needs besides the store: the subscriptions started, the transcript kept at its
  * tail — on a new entry, a turn's end (Stopped, Retry) and a box shrunk by a keyboard or the
- * composer, unless the reader scrolled up.
+ * composer — while the reader is there; a reader scrolled up stays put.
  */
-export function usePanelFrame(transcriptLength: number, turn: TurnState): PanelFrame {
+export function usePanelFrame({ length, turn, sessionId, isOwnSend }: PanelSignal): PanelFrame {
   const scrollRef = useRef<HTMLDivElement>(null)
   const isPinned = useRef(true)
+  const shownSession = useRef(sessionId)
 
   useEffect(() => {
     void useAgentStore.getState().init()
   }, [])
 
   useEffect(() => {
+    const isNewChat = sessionId !== shownSession.current
+    shownSession.current = sessionId
+    if (!followsEnd({ isPinned: isPinned.current, isOwnSend, isNewChat })) return
     isPinned.current = true
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight })
-  }, [transcriptLength, turn])
+  }, [length, turn, sessionId, isOwnSend])
 
   useEffect(() => {
     const box = scrollRef.current
     if (!box) return
     const onScroll = () => {
-      isPinned.current = box.scrollHeight - box.scrollTop - box.clientHeight <= NEAR_END_PX
+      isPinned.current = isAtEnd(box)
     }
     const observer = new ResizeObserver(() => {
       if (isPinned.current) box.scrollTop = box.scrollHeight
