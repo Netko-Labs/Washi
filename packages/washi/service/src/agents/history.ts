@@ -23,11 +23,11 @@ export function conversationHistory(entries: TranscriptEntry[]): PromptRequest['
 
 /** The turn before the latest ask ended because a person pressed Stop. */
 export function followsStop(entries: TranscriptEntry[]): boolean {
-  const ask = entries.findLastIndex(({ update }) => update.kind === 'user_message')
-  for (let index = ask - 1; index >= 0; index--) {
+  let asks = 0
+  for (let index = entries.length - 1; index >= 0; index--) {
     const update = entries[index]?.update
-    if (update?.kind === 'turn_done') return update.stopReason === 'cancelled'
-    if (update?.kind === 'user_message') return false
+    if (update?.kind === 'user_message' && ++asks > 1) return false
+    if (asks === 1 && update?.kind === 'turn_done') return update.stopReason === 'cancelled'
   }
   return false
 }
