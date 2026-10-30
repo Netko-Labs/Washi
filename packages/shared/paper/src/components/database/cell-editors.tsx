@@ -1,6 +1,6 @@
 import { formatNumber } from '../../lib'
 import { usePaperHost } from '../../provider'
-import { type ChoiceCellProps, hueAt, type ScalarCellProps } from './lib'
+import { type ChoiceCellProps, hueAt, type RelationCellProps, type ScalarCellProps } from './lib'
 
 /** Text, number and URL: typed in place, written when the cell is left. */
 export function TextCell({ column, value, commit }: ScalarCellProps) {
@@ -39,9 +39,10 @@ export function CheckCell({ column, value, commit }: ScalarCellProps) {
 }
 
 /** Multi-select and relation: chips to drop, a menu to add. */
-export function ListCell({ column, value, commit, choices }: ChoiceCellProps) {
+export function ListCell({ column, value, commit, choices, unknown }: ChoiceCellProps) {
   const items = Array.isArray(value) ? value : []
-  const label = (item: string) => choices.find((choice) => choice.value === item)?.label ?? item
+  const label = (item: string) =>
+    choices.find((choice) => choice.value === item)?.label ?? unknown ?? item
   const rest = choices.filter((choice) => !items.includes(choice.value))
   return (
     <span className="wsx-db-list">
@@ -81,6 +82,21 @@ export function ListCell({ column, value, commit, choices }: ChoiceCellProps) {
       )}
     </span>
   )
+}
+
+/** Related rows by their titles, never their ids; a target table gone reads as a quiet dash. */
+export function RelationCell({ choices, ...props }: RelationCellProps) {
+  if (choices === null) {
+    return (
+      <span
+        className="wsx-db-formula"
+        title="The table it points at is gone — it may be in the Trash"
+      >
+        <span className="wsx-db-placeholder">—</span>
+      </span>
+    )
+  }
+  return <ListCell {...props} choices={choices ?? []} unknown={choices ? '—' : '…'} />
 }
 
 /** A formula's or rollup's value, read-only: it is computed on read, never typed. */

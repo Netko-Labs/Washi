@@ -1,5 +1,12 @@
 import { describe, expect, test } from 'bun:test'
-import { boardColumns, headCount, naturalBefore, rankBetween, rankPatches } from '../lib/utils'
+import {
+  boardColumns,
+  groupLabel,
+  headCount,
+  naturalBefore,
+  rankBetween,
+  rankPatches,
+} from '../lib/utils'
 
 const rows = [
   { id: 'a', status: 'todo', rank: 1 },
@@ -99,6 +106,38 @@ describe('columns no page named', () => {
       'In review:a',
       'Done:b',
       'Archived:c',
+    ])
+  })
+})
+
+describe('rows with nothing to group by', () => {
+  const cards = [
+    { id: 'a', stage: 'Lead', rank: 1 },
+    { id: 'b', stage: null, rank: 1 },
+    { id: 'c', stage: '', rank: 2 },
+  ]
+
+  test('gather last in their own column, even beside the columns a page named', () => {
+    expect(names(boardColumns(cards, {}, 'stage', 'rank', ['Lead', 'Won']))).toEqual([
+      'Lead:a',
+      'Won:',
+      ':bc',
+    ])
+    expect(names(boardColumns(cards, {}, 'stage', 'rank', undefined, ['Lead']))).toEqual([
+      'Lead:a',
+      ':bc',
+    ])
+    expect(groupLabel('', 'deal_stage')).toBe('No deal stage')
+    expect(groupLabel('Lead', 'deal_stage')).toBe('Lead')
+  })
+
+  test('the column is drawn only while it holds a row', () => {
+    const grouped = cards.map((row) => ({ ...row, stage: 'Lead' }))
+    expect(names(boardColumns(grouped, {}, 'stage', 'rank', ['Lead']))).toEqual(['Lead:abc'])
+    const moving = { a: { group: '', rank: 3, against: null } }
+    expect(names(boardColumns(grouped, moving, 'stage', 'rank', ['Lead']))).toEqual([
+      'Lead:bc',
+      ':a',
     ])
   })
 })

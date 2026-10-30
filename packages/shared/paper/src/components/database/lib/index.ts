@@ -4,6 +4,7 @@ export { usePropertyDraft } from './hooks/use-property-draft'
 export { usePropertyPopover } from './hooks/use-property-popover'
 export { useRecords } from './hooks/use-records'
 export { useRelationChoices } from './hooks/use-relation-choices'
+export { useRelationTitles } from './hooks/use-relation-titles'
 export { useRowActions } from './hooks/use-row-actions'
 export type {
   AddProperty,
@@ -19,6 +20,7 @@ export type {
   DatabaseContext,
   DatabaseLoad,
   DatabaseProps,
+  DatabaseRowsProps,
   DatabaseView,
   DateInputsProps,
   GalleryCardProps,
@@ -32,6 +34,8 @@ export type {
   PropertyType,
   QueryRow,
   RecordsState,
+  RelationCellProps,
+  RelationTitles,
   ScalarCellProps,
   StatusGroup,
   TableSpec,
@@ -46,10 +50,12 @@ export {
   initialsOf,
   isRank,
   labelOf,
+  namedColumns,
   needsOptions,
   newRow,
   propertyColumn,
   propertyProblem,
+  relationChoices,
   statusGroupOf,
   tableLabel,
   titleColumn,

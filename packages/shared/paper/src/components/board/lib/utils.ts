@@ -2,6 +2,7 @@ import { patchRow } from '../../../lib/rows'
 import { toneOf } from '../../../lib/tone-of'
 import type { ActionRef, Row } from '../../../lib/types'
 import type { BoardColumn, Move, RankPatch } from './types'
+import { NO_GROUP } from './values'
 
 export function rankOf(row: Row, rank: string): number {
   return typeof row[rank] === 'number' ? (row[rank] as number) : 0
@@ -59,14 +60,27 @@ export function boardColumns(
   })
   // Unnamed groups follow the column's own order — status steps, select options — empty ones too,
   // so a card can be dropped where nothing is yet; a value off that list comes after.
-  const present = [...new Set(merged.map((row) => String(row[groupBy] ?? '—')))]
-  const names = groups ?? [...options, ...present.filter((name) => !options.includes(name))]
+  const present = [...new Set(merged.map((row) => groupKeyOf(row, groupBy)))].filter(Boolean)
+  const named = groups ?? [...options, ...present.filter((name) => !options.includes(name))]
+  const isUngrouped = merged.some((row) => groupKeyOf(row, groupBy) === NO_GROUP)
+  const names = isUngrouped && !named.includes(NO_GROUP) ? [...named, NO_GROUP] : named
   return names.map((name) => ({
     name,
     items: merged
-      .filter((row) => String(row[groupBy] ?? '—') === name)
+      .filter((row) => groupKeyOf(row, groupBy) === name)
       .sort((a, b) => rankOf(a, rank) - rankOf(b, rank)),
   }))
+}
+
+/** The column a row falls in; an empty value falls in Notion's "No status". */
+export function groupKeyOf(row: Row, groupBy: string): string {
+  const value = row[groupBy]
+  return value === null || value === undefined ? NO_GROUP : String(value)
+}
+
+/** What a column is called: its value, or "No stage" for the rows that have none. */
+export function groupLabel(name: string, groupBy: string): string {
+  return name === NO_GROUP ? `No ${groupBy.replace(/_/g, ' ')}` : name
 }
 
 /** The card the pointer sits above, by layout midpoints — transforms in flight don't count. */
@@ -105,6 +119,7 @@ export function naturalBefore(rows: Row[], column: Row[], id: string): string | 
 
 /** A column named for a meaning (done, blocked, in review) wears its tone; others take the ramp. */
 export function columnHue(name: string, index: number): string {
+  if (name === NO_GROUP) return 'var(--muted)'
   const tone = toneOf(name)
   if (tone === 'neutral') return 'var(--muted)'
   if (tone === 'accent') return 'var(--k-fill)'

@@ -1,4 +1,5 @@
 import { statusOptions } from '@washi/ink'
+import type { PaperHost } from '../../../provider'
 import type {
   Choice,
   ColumnSpec,
@@ -8,11 +9,16 @@ import type {
   StatusGroup,
   TableSpec,
 } from './types'
-import { DEFAULT_STATUS_GROUPS } from './values'
+import { DEFAULT_STATUS_GROUPS, RELATION_CHOICE_LIMIT } from './values'
 
 /** Notion's title property: the first text column names the row. */
 export function titleColumn(spec: TableSpec): ColumnSpec | undefined {
   return spec.columns.find((column) => column.type === 'text')
+}
+
+/** A view's `columns` in the order the page wrote them; a name the table lacks is skipped. */
+export function namedColumns(spec: TableSpec, names: string[]): ColumnSpec[] {
+  return names.flatMap((name) => spec.columns.find((column) => column.name === name) ?? [])
 }
 
 /** A page that names no views gets a table, and a board when something can group it. */
@@ -133,4 +139,23 @@ export function propertyColumn(
     ...(type === 'status' && { groups: DEFAULT_STATUS_GROUPS }),
     ...(format && { format }),
   } as ColumnSpec
+}
+
+/** The rows a relation can point at, by title; null when its table is gone or cannot be read. */
+export async function relationChoices(host: PaperHost, target: string): Promise<Choice[] | null> {
+  try {
+    const [spec, result] = await Promise.all([
+      host.describeTable(target),
+      host.runQuery({ table: target, limit: RELATION_CHOICE_LIMIT }),
+    ])
+    if (!spec) return null
+    const title = titleColumn(spec)?.name
+    return result.rows.map((row) => ({
+      value: String(row.id),
+      label:
+        title && typeof row[title] === 'string' && row[title] ? String(row[title]) : 'Untitled',
+    }))
+  } catch {
+    return null
+  }
 }

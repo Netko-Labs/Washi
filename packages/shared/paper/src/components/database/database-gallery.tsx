@@ -1,5 +1,13 @@
 import { GalleryCard } from './gallery-card'
-import { isRank, newRow, titleColumn, useRecords, useRowActions, type ViewProps } from './lib'
+import {
+  isRank,
+  namedColumns,
+  newRow,
+  titleColumn,
+  useRecords,
+  useRowActions,
+  type ViewProps,
+} from './lib'
 
 /** Notion's gallery: a card per row, its cover on top; a press opens the row as its page. */
 export function DatabaseGallery({ db, view, empty }: ViewProps) {
@@ -8,7 +16,7 @@ export function DatabaseGallery({ db, view, empty }: ViewProps) {
   const title = titleColumn(db.spec)
   const cover = db.spec.columns.find((column) => column.name === view.cover)
   const shown = view.columns
-    ? db.spec.columns.filter((column) => view.columns?.includes(column.name) && column !== title)
+    ? namedColumns(db.spec, view.columns).filter((column) => column !== title)
     : db.spec.columns
         .filter((column) => column !== title && column !== cover && !isRank(column))
         .slice(0, 3)

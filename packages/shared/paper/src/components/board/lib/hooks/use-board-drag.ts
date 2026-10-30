@@ -4,7 +4,7 @@ import type { Row } from '../../../../lib/types'
 import { usePaperHost } from '../../../../provider'
 import type { BindQuery } from '../../../../registry'
 import type { BoardDrag, BoardLayout, DragState, Move } from '../types'
-import { boardColumns, cardBelow, naturalBefore, rankPatches } from '../utils'
+import { boardColumns, cardBelow, groupKeyOf, naturalBefore, rankPatches } from '../utils'
 import { useSlide } from './use-slide'
 
 /**
@@ -72,8 +72,12 @@ export function useBoardDrag(bind: BindQuery, rows: Row[], layout: BoardLayout):
     const order = [...others.slice(0, at), dragged, ...others.slice(at)]
     // No rank column (rank=""): a drop moves the card between groups and keeps no order.
     const patches = rank ? rankPatches(order, id, rank) : [{ id, rank: 0 }]
-    const groupOf = (row: string) =>
-      row === id ? target.group : String(rows.find((entry) => entry.id === row)?.[groupBy] ?? '')
+    const groupOf = (row: string) => {
+      const entry = rows.find((each) => each.id === row)
+      return row === id || !entry ? target.group : groupKeyOf(entry, groupBy)
+    }
+    // "No status" is written as an empty cell, never an empty string.
+    const valueOf = (row: string) => groupOf(row) || null
 
     setMoves((current) => {
       const live = Object.entries(current).filter(
@@ -91,8 +95,8 @@ export function useBoardDrag(bind: BindQuery, rows: Row[], layout: BoardLayout):
         table: bind.table,
         row: patch.id,
         set: rank
-          ? { [groupBy]: groupOf(patch.id), [rank]: patch.rank }
-          : { [groupBy]: groupOf(patch.id) },
+          ? { [groupBy]: valueOf(patch.id), [rank]: patch.rank }
+          : { [groupBy]: valueOf(patch.id) },
       }),
     )
     const ids = patches.map((patch) => patch.id)

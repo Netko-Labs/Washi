@@ -550,7 +550,7 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   whole day) and minus the past, all in wall-clock strings — zones never enter. A press opens the
   `add` Form in a dialog with `date` seeded `start/end`; as it is sent the day is read again
   (`useSlotBooking`, the form's `check`), and a slot taken meanwhile is refused in words. Week paging is Agenda's (`useAgendaPeriod`). Agenda reads a row's times off its own range
-  when it has no `time` column.
+  when it has no `time` column, and draws a range on each day it spans (≤ 31, `AGENDA_SPAN_DAYS`).
 - **Days as a grid (D103).** `<Heatmap bind date value weeks label weekStart>` is GitHub's calendar:
   the last `weeks` (4–53, default 16) whole weeks to today, a column per week, each day leveled 1–4
   against the busiest day on screen — rows counted, or `value` summed; a moment or a range counts on
@@ -577,7 +577,7 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   a day, a moment, a `start/end` range), `$row` in visible text included; empty cells sort last.
   `<Roadmap end>` runs a bar from `date` to a second column, as trackers keep start and due apart.
   A Board with no `groups` lays its columns out in the column's own order (status steps, select
-  options; empty ones too, so a card can go there), then any value off that list. A Board reads its table's spec once (`useTableSpec`): a column's head counts its cards and sums a
+  options; empty ones too, so a card can go there), then any value off that list; rows with none gather last under "No <property>" (drawn only while it holds one; a drop there empties the cell). A Board reads its table's spec once (`useTableSpec`): a column's head counts its cards and sums a
   numeric `meta` in that column's `format`, and a card's person `avatar` (or kicker) is named, never an id. `<Stat format="percent">` reads a ratio as one, `<Stat currency="USD">` an
   amount as money in the reader's locale. Inside a Repeat, a Progress takes `value="$row.ratio"` (or
   `expr` over `$row`); a share nothing real gives — a failed `expr`, an empty cell — reads —, never
