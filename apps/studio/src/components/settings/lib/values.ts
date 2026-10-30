@@ -200,6 +200,7 @@ export const SETTINGS_TAB_KEYS = [
 export const THEME_OPTIONS = [
   { id: 'light', label: 'Light', desc: 'Paper' },
   { id: 'dark', label: 'Dark', desc: 'Ink' },
+  { id: 'system', label: 'System', desc: 'Follows this device' },
 ] as const
 
 /** Tabs only an app admin sees. */

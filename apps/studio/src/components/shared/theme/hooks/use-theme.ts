@@ -1,23 +1,29 @@
 import { useEffect } from 'react'
 import { create } from 'zustand'
-import { THEME_KEY } from '../constants'
+import { DARK_QUERY, THEME_KEY } from '../constants'
 import type { Theme, ThemeState } from '../types'
+import { isDarkFor, isTheme } from '../utils'
 
 function apply(theme: Theme) {
-  document.documentElement.classList.toggle('dark', theme === 'dark')
+  const isDark = isDarkFor(theme, matchMedia(DARK_QUERY).matches)
+  document.documentElement.classList.toggle('dark', isDark)
 }
 
-const useThemeStore = create<ThemeState>((set) => ({
+const useThemeStore = create<ThemeState>((set, get) => ({
   theme: 'light',
   isHydrated: false,
   hydrate: () => {
     let theme: Theme = 'light'
     try {
-      theme = localStorage.getItem(THEME_KEY) === 'dark' ? 'dark' : 'light'
+      const stored = localStorage.getItem(THEME_KEY)
+      if (isTheme(stored)) theme = stored
     } catch {
       // private mode: paper
     }
     apply(theme)
+    matchMedia(DARK_QUERY).addEventListener('change', () => {
+      if (get().theme === 'system') apply('system')
+    })
     set({ theme, isHydrated: true })
   },
   setTheme: (theme) => {
@@ -31,12 +37,11 @@ const useThemeStore = create<ThemeState>((set) => ({
   },
 }))
 
-/** Paper or ink, one choice shared by every control that shows it (user menu, Preferences). */
+/** Paper, ink or the device's own, one choice shared by every control that shows it. */
 export function useTheme() {
   const theme = useThemeStore((state) => state.theme)
   useEffect(() => {
     if (!useThemeStore.getState().isHydrated) useThemeStore.getState().hydrate()
   }, [])
-  const setTheme = useThemeStore.getState().setTheme
-  return { theme, setTheme, toggle: () => setTheme(theme === 'dark' ? 'light' : 'dark') }
+  return { theme, setTheme: useThemeStore.getState().setTheme }
 }

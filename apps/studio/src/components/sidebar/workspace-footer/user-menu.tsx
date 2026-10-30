@@ -1,16 +1,10 @@
-import {
-  IconBuildingCommunity,
-  IconLogout,
-  IconMoon,
-  IconSun,
-  IconUserCircle,
-} from '@tabler/icons-react'
+import { IconBuildingCommunity, IconLogout, IconUserCircle } from '@tabler/icons-react'
 import { Link } from '@tanstack/react-router'
 import { initials, useViewStore } from '@washi/ui'
 import { Floating } from '@/components/shared/floating'
-import { useTheme } from '@/components/shared/theme'
 import { signOut } from '@/integrations/auth'
 import { type UserMenuProps, useMenuState } from './lib'
+import { ThemeChoice } from './theme-choice'
 
 const ROW =
   'flex h-8 w-full items-center gap-2.5 rounded-lg px-2 text-left text-[13px] hover:bg-accent'
@@ -18,7 +12,6 @@ const ROW =
 /** The person is their avatar; theme, settings and sign out live under it. */
 export function UserMenu({ workspace, onNavigate, placement = 'up' }: UserMenuProps) {
   const identity = useViewStore((state) => state.identity)
-  const { theme, toggle } = useTheme()
   const menu = useMenuState()
 
   return (
@@ -47,10 +40,7 @@ export function UserMenu({ workspace, onNavigate, placement = 'up' }: UserMenuPr
             <div className="truncate font-semibold text-[13px]">{identity.name}</div>
             <div className="truncate text-[11px] text-muted-foreground">{identity.email}</div>
           </div>
-          <button type="button" role="menuitem" onClick={toggle} className={ROW}>
-            {theme === 'dark' ? <IconSun className="size-4" /> : <IconMoon className="size-4" />}
-            {theme === 'dark' ? 'Light theme' : 'Dark theme'}
-          </button>
+          <ThemeChoice />
           <Link
             to="/w/$workspaceId/settings"
             params={{ workspaceId: workspace.id }}
