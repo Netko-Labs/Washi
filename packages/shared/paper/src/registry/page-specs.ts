@@ -1,5 +1,6 @@
 import type { ComponentSpec } from '@washi/wsx'
 import { z } from 'zod'
+import { WIDGET_WORDS } from './page-modules'
 import { p } from './spec-kit'
 
 /** What a formula already means by these names; a workspace function may not take one. */
@@ -47,11 +48,10 @@ export const PAGE_SPECS: Record<string, ComponentSpec> = {
   ),
   Widget: p(
     { title: z.string().max(80).optional(), height: z.number().int().min(60).max(1600).optional() },
-    'text',
+    'component',
     {
-      hints: {
-        html: 'the HTML is the Widget’s children: a backtick string; it runs only where an owner allows widgets',
-      },
+      childWords: WIDGET_WORDS,
+      hints: { html: WIDGET_WORDS },
     },
   ),
   Formula: p(

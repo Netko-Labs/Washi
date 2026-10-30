@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import { paperRegistry } from '@washi/paper/registry'
 import { hasErrors, parse, serialize, validate } from '@washi/wsx'
-import { lockedBlock, newBlock, toBlocks, toSheet } from '../lib/convert'
+import { lockedBlock, newBlock, sourceOver, toBlocks, toSheet } from '../lib/convert'
 import {
   applyShortcut,
   blockFrame,
@@ -12,7 +12,9 @@ import {
   starterNode,
   titleOf,
   uploadNode,
+  withWidgetCode,
 } from '../lib/utils'
+import { checkSource } from '../source-editor/lib/utils'
 
 const SOURCE = `<Sheet title="Plan" feel="note">
   <Title>Plan</Title>
@@ -201,6 +203,20 @@ describe('the / menu drops live data on the page', () => {
       children: [gallery],
     }
     expect(validate(sheet, paperRegistry)).toEqual([])
+  })
+
+  test('/widget lands a JSX clock: the Widget in place, its component above the page', () => {
+    const option = slashMatches('widget', []).find(
+      (each) => each.type === 'data' && each.key === 'widget',
+    )
+    expect(option).toMatchObject({ label: 'Widget', hint: 'JSX' })
+    const saved = '<Sheet title="Ops">\n  <Title>Ops</Title>\n</Sheet>\n'
+    const blocks = [...toBlocks(parse(saved)), lockedBlock(dataNode({ kind: 'widget' }))]
+    const source = sourceOver(withWidgetCode(saved), blocks)
+    const root = parse(source)
+    expect(root.prelude?.components).toEqual(['Clock'])
+    expect(root.children.at(-1)).toMatchObject({ name: 'Widget', children: [{ name: 'Clock' }] })
+    expect(checkSource(source).filter((each) => each.severity === 'error')).toEqual([])
   })
 
   test('/code offers the page’s code, written in the source above the page', () => {

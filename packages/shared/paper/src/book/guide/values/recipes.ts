@@ -1,118 +1,4 @@
-import type { Recipe } from './types'
-
-/** Props whose zod shape says less than their name: what a reader should picture instead. */
-export const PROP_TYPES: Record<string, string> = {
-  bind: 'query { table, where, orderBy, limit, groupBy, params }',
-  history: 'history { table, column, range }',
-  action: 'action { verb, … }',
-  onAdd: 'action { verb, … }',
-  onOpen: 'action { verb, … }',
-  class: 'layout tokens',
-  views: 'list of { name, kind, groupBy?, date?, where?, columns? }',
-  defaults: 'column → value or { state }',
-  seed: 'column → value',
-}
-
-/** What each primitive is for, in the reader's words. */
-export const SUMMARIES: Record<string, string> = {
-  Sheet: 'The page itself: its title, look, theme, feel and declared state.',
-  Section: 'A labelled band that groups blocks under a small heading and a rule.',
-  Row: 'Lays blocks side by side, wrapping when the page is narrow.',
-  Stack: 'Lays blocks top to bottom with an even gap.',
-  Grid: 'A twelve-column field; children take span. One column under 400px.',
-  Divider: 'A quiet rule between parts of a page.',
-  Embed:
-    'Another site in a sandboxed frame — https only; YouTube, Spotify, Figma and the other built-ins play, any other host only if the workspace lists it.',
-  Gallery:
-    'Pictures in a grid of squares, 2–4 across; a press opens one large, the arrows walk the rest.',
-  Video: 'A video that plays in place — an upload (file:<id>) or an https address.',
-  Audio: 'A sound with the browser’s player, its title above.',
-  File: 'A document as a line: its kind, name and size; it opens or downloads.',
-  Bookmark: 'A link as a card — title, a line about it, its picture — read once when it was made.',
-  Steps:
-    'A numbered how-to: each Step’s number drawn big, a rail between them, the step’s blocks under its title.',
-  Compare:
-    'Options side by side, 2–4, each a card of what it holds; pick marks the recommended one. They stack under 560px.',
-  Option:
-    'One choice in a Compare: a title over its blocks — a List of pros and cons reads well; pick marks it.',
-  Faq: 'Questions people ask, one answer open at a time; keyboard and screen readers work as the browser’s own.',
-  Question: 'One question in a Faq: the title asks, its children answer.',
-  Countdown:
-    'Days left to a date on the reader’s clock — hours under two days with a time — then “Today”, then days ago.',
-  Widget:
-    'A page’s own HTML and JS in a frame with no origin and no network, reaching the page only through washi.rows / state / act — off until an owner allows widgets.',
-  Formula:
-    'A function the workspace’s formula columns may call by name — values in, a value out, nothing else reached.',
-  Automation:
-    'TypeScript the server runs when a row is added to (or changes in) a table: run(event) reads rows and acts on them. It draws a note, nothing else.',
-  Include: 'Another page drawn here and kept current — its blocks, not its cover; never nested.',
-  Backlinks: 'Every page that links here and the reader can open, live.',
-  Outline: 'The page’s own headings as contents; a press scrolls to one.',
-  PageLink: 'A link to one page as a block: its icon and title, opened on a press.',
-  Subpages:
-    'Every page under this one (or of), live, in the sidebar’s order: a list, cards, or a gallery of covers.',
-  Columns:
-    'Notion’s columns: Columns side by side, each its ratio’s share; they stack under 560px.',
-  Column: 'One column inside Columns; ratio 1–6 is its share of the width.',
-  Bento: 'A home of tiles packed densely, 3, 4 or 6 across; two across under 720px, one under 400.',
-  Tile: 'One cell of a Bento: square, wide, tall, big or a banner across the row.',
-  Title: 'A heading, level 1 to 3.',
-  Text: 'A paragraph; lead makes it the page’s intro.',
-  List: 'Bullets, numbers or checks around Items.',
-  Item: 'One entry in a List; done ticks a check list.',
-  Quote: 'A pulled quote in serif with a tone rule.',
-  Code: 'Preformatted text that wraps and scrolls.',
-  Pair: 'A term and its definition, for spec tables and facts.',
-  Note: 'A footnote, numbered in document order.',
-  Source: 'An attribution, numbered §1 §2… on its own.',
-  Money: 'An amount formatted in the reader’s locale; never hand-format money.',
-  Mark: 'Highlights a phrase inside Text.',
-  Kbd: 'A key cap inside Text.',
-  Ref: 'A link to another page by its id.',
-  Tag: 'A small label inside Text.',
-  Card: 'A box around related blocks, with an optional title.',
-  Callout: 'An aside that means something: info, success, warning, danger.',
-  Redact: 'Hides what it wraps from a page’s public link.',
-  Hero: 'A big opener: title, subtitle, alignment.',
-  Figure: 'An https image with a caption; its shape is held while it loads.',
-  Repeat: 'Draws its children once per row, with $row in scope.',
-  Table: 'Rows as a table; stacks into cards on a phone.',
-  Stat: 'One figure with a label, a hint and a trend; reads expr aggregates, as money with currency.',
-  Chart: 'Bars, lines, areas or a donut over rows, or a column over time.',
-  Timeline: 'A vertical run of Steps, each with its own marker.',
-  Step: 'One entry on a Timeline (marker, title, body), or one numbered step of Steps (title, body).',
-  Progress: 'A bar filled to a ratio, with its percentage.',
-  Badge: 'A pill in a tone; can read an expr.',
-  Avatar: 'Initials in a circle.',
-  Canvas: 'Ideas and the lines between them; hand edits write the page.',
-  Node: 'One idea on a Canvas; may link a page.',
-  Edge: 'A line between two Nodes.',
-  Roadmap: 'One bar per row on a shared calendar, Notion’s timeline.',
-  Schema: 'A table’s columns and types, as the page’s spec.',
-  Field: 'One cell, edited in place: text, number, select, date, check.',
-  Board: 'Cards in columns by a group; drag writes the group and the order.',
-  Database: 'A table with views as tabs (table · board · timeline), rows edited in place.',
-  Button: 'Runs one action on click.',
-  Compose: 'A text box that runs one action with what was typed, then clears.',
-  Form: 'One whole row typed and added; trigger puts it behind a button in a modal.',
-  Heatmap:
-    "GitHub's calendar of days: the last weeks to today as squares, each as dark as its rows (counted, or a value summed). For habits, workouts, a journal, anything done on days.",
-  Slots:
-    'Free times to book, Calendly-style: each allowed day cut into slots of `minutes` within `hours`, minus rows whose date overlaps and minus the past; a press opens a form with the slot filled in.',
-  Agenda: 'A calendar: a week or a month of rows on their dates; + on a day adds one there.',
-  Task: 'A checkbox bound to a row’s checkbox column.',
-  Switch: 'Writes true or false to a state key.',
-  Select: 'Writes one choice to a state key; views filtered by it follow.',
-  Slider: 'Writes a number to a state key.',
-  Show: 'Shows its children while an expression holds.',
-  Tabs: 'Tab labels over panels, one label per Tab; may write the open tab to state. A strip wider than the page scrolls sideways.',
-  Tab: 'One panel inside Tabs.',
-  Reveal: 'A disclosure: a label that opens what it holds.',
-  Drawer: 'A side panel that opens while a state key is set; with bind, one row.',
-  Chip: 'A dotted status pill.',
-  Mascot: 'Washi-chan, once per page, in a mood.',
-  Missing: 'Stands in for something the registry lacks, and files the request.',
-}
+import type { Recipe } from '../types'
 
 /** Primitives that only work together; each source validates and renders over the book's `tasks`. */
 export const RECIPES: Recipe[] = [
@@ -167,6 +53,31 @@ const add = useInsert('expenses')
   <Total rows={rows} />
   <List>{rows.map((row) => <Item key={row.id}>{row.name} · {row.amount}</Item>)}</List>
   <Button onPress={() => add({ name: 'Coffee', amount: 4 })}>Add a coffee</Button>
+</Sheet>`,
+  },
+  {
+    id: 'widget',
+    title: 'A drawing primitives can’t make',
+    why: 'When no primitive draws it — a dial, a canvas, a custom chart: a component in the page’s code, drawn by a Widget in its own frame. Its rows come through washi’s hooks; a press inside it writes.',
+    uses: ['Widget', 'Stat'],
+    source: `import { useRows } from 'washi'
+
+function Dial({ done, total }) {
+  const turn = total ? done / total : 0
+  return (
+    <svg viewBox="0 0 100 100" width="120" height="120">
+      <circle cx="50" cy="50" r="40" fill="none" strokeWidth="10" style={{ stroke: 'var(--border)' }} />
+      <circle cx="50" cy="50" r="40" fill="none" strokeWidth="10" pathLength="1" strokeDasharray={\`\${turn} 1\`} transform="rotate(-90 50 50)" style={{ stroke: 'var(--accent)' }} />
+    </svg>
+  )
+}
+
+const tasks = useRows({ table: 'tasks' })
+const done = tasks.filter((task) => task.status === 'done').length
+
+<Sheet title="Progress">
+  <Stat label="Done" value={done} />
+  <Widget title="How far" height={140}><Dial done={done} total={tasks.length} /></Widget>
 </Sheet>`,
   },
   {

@@ -20,8 +20,13 @@ export function PageProgram({ root, draw }: PageProgramProps) {
     [host, invoke],
   )
 
+  // One provider either way, so what the literal parts drew (a widget's frame) stays mounted.
   if (state.status === 'drawn')
     return <PaperProvider host={scoped}>{draw(state.root)}</PaperProvider>
   const literal = literalOnly(root)
-  return draw(state.status === 'stopped' ? withNotice(literal, state.reason) : literal)
+  return (
+    <PaperProvider host={scoped}>
+      {draw(state.status === 'stopped' ? withNotice(literal, state.reason) : literal)}
+    </PaperProvider>
+  )
 }

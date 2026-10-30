@@ -51,3 +51,4 @@ export type {
   WsxValue,
 } from './types'
 export { hasErrors, validate } from './validate'
+export { domDiagnostics } from './widget'

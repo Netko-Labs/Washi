@@ -1,2 +1,2 @@
 export { useWidget } from './hooks/use-widget'
-export { widgetDocument } from './utils'
+export { HTML_WORDS } from './values'

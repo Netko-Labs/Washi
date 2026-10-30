@@ -98,11 +98,11 @@ function uploadOptions(needle: string): Extract<SlashOption, { type: 'data' }>[]
     type: 'data',
     key: 'widget',
     label: 'Widget',
-    hint: 'HTML',
+    hint: 'JSX',
     pick: { kind: 'widget' },
   }
   const code = !needle || 'code script typescript program hooks'.includes(needle) ? [pageCode] : []
-  const html = !needle || 'widget html embed code'.includes(needle) ? [widget] : []
+  const drawn = !needle || 'widget jsx react canvas svg code'.includes(needle) ? [widget] : []
   const formula: Extract<SlashOption, { type: 'data' }> = {
     type: 'data',
     key: 'formula',
@@ -111,7 +111,7 @@ function uploadOptions(needle: string): Extract<SlashOption, { type: 'data' }>[]
     pick: { kind: 'formula' },
   }
   const fn = !needle || 'formula function fn'.includes(needle) ? [formula] : []
-  return [...uploads, ...pictures, ...code, ...html, ...fn]
+  return [...uploads, ...pictures, ...code, ...drawn, ...fn]
 }
 
 /** Tab sections sit on the page itself: never offered inside a column or a tab. */

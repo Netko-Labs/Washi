@@ -1,17 +1,8 @@
+import { readStored, storedKey, writeStored } from '../../../lib'
 import { stateValue } from '../../../lib/sandbox'
 import type { ActionRef, ProgramLive, ProgramNeeds, SandboxBridge } from '../../../lib/types'
 import type { PaperHost } from '../../../provider'
 import { PROGRAM_MIN_INTERVAL_MS } from './values'
-
-const storedKey = (page: string | undefined, key: string) => `washi:stored:${page ?? 'page'}:${key}`
-
-function stored(key: string): string | undefined {
-  try {
-    return localStorage.getItem(key) ?? undefined
-  } catch {
-    return undefined
-  }
-}
 
 /**
  * The host's side of every `__bridge_*` for one run: answers from what is already known, and notes
@@ -45,14 +36,10 @@ export function programBridge(
     set: pressed('a page state change', (key = '', json = 'null') =>
       live.set(key, stateValue(json)),
     ),
-    stored: (key) => stored(storedKey(host.pageId, key)),
-    store: pressed('a stored change', (key = '', json = 'null') => {
-      try {
-        localStorage.setItem(storedKey(host.pageId, key), json)
-      } catch {
-        // Storage full or off: the value lives until the page closes, like any page state.
-      }
-    }),
+    stored: (key) => readStored(storedKey(host.pageId, key)),
+    store: pressed('a stored change', (key = '', json = 'null') =>
+      writeStored(storedKey(host.pageId, key), json),
+    ),
     interval: (ms) => {
       const asked = Math.max(PROGRAM_MIN_INTERVAL_MS, Number(ms) || 0)
       needs.every = needs.every ? Math.min(needs.every, asked) : asked

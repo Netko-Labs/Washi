@@ -1,8 +1,8 @@
 import { sep } from 'node:path'
-import { PAGE_HOOKS, PAGE_IMPORT, paperRegistry } from '@washi/paper/registry'
+import { PAGE_HOOKS, PAGE_IMPORT, paperRegistry, WIDGET_HOOKS } from '@washi/paper/registry'
 import { pageModule } from '@washi/wsx'
 import { isAllowedImport } from './check'
-import type { CompiledPage, PageSource } from './types'
+import type { BundleTarget, CompiledPage, PageSource } from './types'
 import {
   IMPORT_WORDS,
   LIBRARY,
@@ -15,10 +15,15 @@ const NS = 'washi'
 const transpiler = new Bun.Transpiler({ loader: 'tsx' })
 const cache = new Map<string, CompiledPage>()
 
-const ENTRY = `import view, * as exports from 'washi:self'\nglobalThis.__page = { view, exports }`
-const HOOKS = PAGE_HOOKS.map(
-  (name) => `export const ${name} = (...args) => globalThis.__washi.${name}(...args)`,
-).join('\n')
+const REACT = /^react(-dom)?(\/[\w-]+)*$/
+const HOOKS = [
+  ...PAGE_HOOKS.map(
+    (name) => `export const ${name} = (...args) => globalThis.__washi.${name}(...args)`,
+  ),
+  ...WIDGET_HOOKS.map(
+    (name) => `export const ${name} = () => { throw new Error('${name} works inside a widget') }`,
+  ),
+].join('\n')
 const UI = Object.keys(paperRegistry.components)
   .map((name) => `export const ${name} = '${name}'`)
   .join('\n')
@@ -51,7 +56,7 @@ function importedPages(module: string, read: PageSource): Map<string, string> {
   return found
 }
 
-function plugin(module: string, pages: Map<string, string>): Bun.BunPlugin {
+function plugin(module: string, pages: Map<string, string>, target: BundleTarget): Bun.BunPlugin {
   return {
     name: 'washi-page',
     setup(build) {
@@ -59,13 +64,18 @@ function plugin(module: string, pages: Map<string, string>): Bun.BunPlugin {
       build.onResolve({ filter: /^washi(\/ui)?$/ }, ({ path }) => ({ path, namespace: NS }))
       build.onResolve({ filter: PAGE_IMPORT }, ({ path }) => ({ path, namespace: NS }))
       build.onResolve({ filter: LIBRARY }, ({ path }) => ({ path: insideLibrary(path) }))
+      build.onResolve({ filter: REACT }, ({ path, importer }) =>
+        target.react && importer === 'washi'
+          ? { path: Bun.resolveSync(path, import.meta.dir) }
+          : undefined,
+      )
       build.onResolve({ filter: /.*/, namespace: NS }, ({ path }) => {
         throw new Error(`cannot import "${path}" — ${IMPORT_WORDS}`)
       })
       build.onLoad({ filter: /.*/, namespace: NS }, ({ path }) => {
-        if (path === 'washi:entry') return { contents: ENTRY, loader: 'js' }
+        if (path === 'washi:entry') return { contents: target.entry, loader: 'js' }
         if (path === 'washi:self') return { contents: module, loader: 'tsx' }
-        if (path === 'washi') return { contents: HOOKS, loader: 'js' }
+        if (path === 'washi') return { contents: target.washi, loader: 'js' }
         if (path === 'washi/ui') return { contents: UI, loader: 'js' }
         const source = pages.get(PAGE_IMPORT.exec(path)?.[1] ?? '')
         return { contents: source ? pageModule(source) : '', loader: 'tsx' }
@@ -81,48 +91,69 @@ function remember(key: string, compiled: CompiledPage): CompiledPage {
   return compiled
 }
 
-const failure = (error: unknown): CompiledPage => {
+export const failure = (error: unknown): CompiledPage => {
   const message = error instanceof Error ? error.message : String(error)
   return { ok: false, error: message.split('\n')[0] ?? message }
 }
 
+/** The page as its sandbox runs it: `view` and its exports on `globalThis.__page`. */
+const PAGE_TARGET: BundleTarget = {
+  entry: `import view, * as exports from 'washi:self'\nglobalThis.__page = { view, exports }`,
+  washi: HOOKS,
+  react: false,
+  minify: { whitespace: true, syntax: true },
+}
+
 /**
- * A page bundled for the reader's sandbox (D100): its module, the libraries and pages it imports,
- * `washi`'s hooks as calls into the sandbox's own. Nothing in it reaches the network — every import
- * is resolved here, from the vetted list or a page the reader may read.
+ * A page's module bundled for where it runs: the libraries and pages it imports, `washi` as that
+ * place lends it. Nothing in it reaches the network — every import is resolved here, from the
+ * vetted list or a page the reader may read. Cached by everything that went in.
  */
-export async function compilePage(source: string, read: PageSource): Promise<CompiledPage> {
-  let module: string
+export async function bundle(
+  module: string,
+  read: PageSource,
+  target: BundleTarget,
+  key: string[],
+): Promise<CompiledPage> {
   let pages: Map<string, string>
   try {
-    module = pageModule(source)
     const refused = transpiler.scan(module).imports.find(({ path }) => !isAllowedImport(path))
     if (refused) return failure(`cannot import "${refused.path}" — ${IMPORT_WORDS}`)
     pages = importedPages(module, read)
   } catch (error) {
     return failure(error)
   }
-  const key = Bun.hash([source, ...pages.values()].join('\0')).toString(36)
-  const known = cache.get(key)
-  if (known) return remember(key, known)
+  const hash = Bun.hash([...key, ...pages.values()].join('\0')).toString(36)
+  const known = cache.get(hash)
+  if (known) return remember(hash, known)
 
   try {
     const built = await Bun.build({
       entrypoints: ['washi:entry'],
       format: 'iife',
       target: 'browser',
-      minify: { whitespace: true, syntax: true },
+      minify: target.minify,
+      define: { 'process.env.NODE_ENV': '"production"' },
       jsx: { runtime: 'classic', factory: 'h', fragment: 'Fragment' },
-      plugins: [plugin(module, pages)],
+      plugins: [plugin(module, pages, target)],
       throw: false,
     })
     const output = built.outputs[0]
     if (!built.success || !output) return failure(built.logs[0]?.message ?? 'it did not compile')
     const js = await output.text()
     if (js.length > PAGE_JS_MAX_BYTES) {
-      return failure(`the page bundles to ${Math.round(js.length / 1024)} KB — import less`)
+      return failure(`it bundles to ${Math.round(js.length / 1024)} KB — import less`)
     }
-    return remember(key, { ok: true, js })
+    return remember(hash, { ok: true, js })
+  } catch (error) {
+    return failure(error)
+  }
+}
+
+/** A page bundled for the reader's QuickJS sandbox (D100), `washi`'s hooks calls into its own. */
+export async function compilePage(source: string, read: PageSource): Promise<CompiledPage> {
+  try {
+    return await bundle(pageModule(source), read, PAGE_TARGET, ['page', source])
   } catch (error) {
     return failure(error)
   }

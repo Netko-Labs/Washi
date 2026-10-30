@@ -2,6 +2,7 @@ import { getSheet } from '@washi/repository'
 import {
   compilePage,
   compileScript,
+  compileWidget,
   PAGE_CODE_MAX_CHARS,
   readableSet,
   SCRIPT_MAX_CHARS,
@@ -28,6 +29,20 @@ export const scriptQueries = router({
     .query(({ ctx, input }) => {
       const readable = readableSet(ctx.ws, ctx.viewer)
       return compilePage(input.source, (id) =>
+        readable.has(id) ? (getSheet(ctx.ws, id)?.source ?? null) : null,
+      )
+    }),
+  /** One of a page's components bundled with React for a widget's frame (D113), imports as `page`. */
+  widget: workspaceProcedure
+    .input(
+      z.object({
+        source: z.string().max(PAGE_CODE_MAX_CHARS + 1),
+        component: z.string().regex(/^[A-Z][A-Za-z0-9_]{0,63}$/),
+      }),
+    )
+    .query(({ ctx, input }) => {
+      const readable = readableSet(ctx.ws, ctx.viewer)
+      return compileWidget(input.source, input.component, (id) =>
         readable.has(id) ? (getSheet(ctx.ws, id)?.source ?? null) : null,
       )
     }),

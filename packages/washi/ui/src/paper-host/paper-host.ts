@@ -102,6 +102,8 @@ export const paperHost: PaperHost = {
   // Not kept here: the server's cache also keys on the pages it imports, which may have moved.
   compilePage: (source) => api.scripts.page.query({ source }),
 
+  compileWidget: (source, component) => api.scripts.widget.query({ source, component }),
+
   describeMe: async () => {
     const { actor } = await api.workspaces.me.query()
     return actor ? { id: actor.id, name: actor.name } : null

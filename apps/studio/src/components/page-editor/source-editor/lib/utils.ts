@@ -2,12 +2,13 @@ import type { Diagnostic as LintDiagnostic } from '@codemirror/lint'
 import type { Text } from '@codemirror/state'
 import { EditorView } from '@codemirror/view'
 import { paperRegistry } from '@washi/paper/registry'
-import { type Diagnostic, parse, validate, WsxParseError } from '@washi/wsx'
+import { type Diagnostic, domDiagnostics, parse, validate, WsxParseError } from '@washi/wsx'
 
-/** The server's own check (`checkSource` in service): parse, then validate against the registry. */
+/** The server's own check (`checkSource` in service): parse, validate, and the DOM a widget's alone. */
 export function checkSource(source: string): Diagnostic[] {
   try {
-    return validate(parse(source), paperRegistry)
+    const root = parse(source)
+    return [...validate(root, paperRegistry), ...domDiagnostics(root)]
   } catch (error) {
     if (error instanceof WsxParseError) return error.diagnostics
     throw error

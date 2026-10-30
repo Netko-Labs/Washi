@@ -45,7 +45,8 @@ function sheet(input: SpecimenInput, inner: string): string {
     },
     children: innerNodes(inner),
   }
-  return serialize(root)
+  const code = SPECIMENS[input.name]?.code
+  return serialize(code ? { ...root, prelude: { source: code, components: [] } } : root)
 }
 
 /** The specimen's props with the knobs on top; an undefined knob falls back, a null one clears. */

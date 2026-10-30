@@ -6,7 +6,7 @@ import {
   STARTER_AUTOMATION,
   STARTER_FORMULA,
   STARTER_SOURCES,
-  STARTER_WIDGET,
+  STARTER_WIDGET_CODE,
 } from '../values'
 
 /** The live block a pick becomes, as WSX the page keeps whole. */
@@ -35,6 +35,11 @@ export function starterNode(block: StarterBlock, today = new Date()): WsxElement
   return node
 }
 
+/** The page with the `/widget` clock's component above it: a widget draws the page's own code. */
+export function withWidgetCode(source: string): string {
+  return `${STARTER_WIDGET_CODE}\n\n${source}`
+}
+
 export function dataNode(pick: DataPick): WsxElement {
   if (pick.kind === 'starter') return starterNode(pick.block)
   if (pick.kind === 'automation') {
@@ -46,7 +51,7 @@ export function dataNode(pick: DataPick): WsxElement {
     return element('Formula', { name: 'with_tax' }, [{ kind: 'text', value: STARTER_FORMULA }])
   }
   if (pick.kind === 'widget') {
-    return element('Widget', { title: 'A clock' }, [{ kind: 'text', value: STARTER_WIDGET }])
+    return element('Widget', { title: 'A clock' }, [element('Clock', {}, [])])
   }
   if (pick.kind === 'upload' || pick.kind === 'gallery') {
     throw new Error('an upload lands once its file is stored')

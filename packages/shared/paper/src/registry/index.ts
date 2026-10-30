@@ -8,7 +8,13 @@ export {
   pageIconSchema,
 } from './looks'
 export { mediaSrcSchema } from './media-specs'
-export { PAGE_HOOKS, PAGE_IMPORT, PAGE_LIBRARIES } from './page-modules'
+export {
+  PAGE_HOOKS,
+  PAGE_IMPORT,
+  PAGE_LIBRARIES,
+  WIDGET_HOOKS,
+  WIDGET_WORDS,
+} from './page-modules'
 export {
   exprTables,
   pageTables,
@@ -61,3 +67,4 @@ export {
   type ThemeTokens,
   type ThemeVerdict,
 } from './themes'
+export { WIDGET_FRAME } from './widget-frame'

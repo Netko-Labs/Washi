@@ -96,13 +96,17 @@ export const UPLOAD_OPTIONS = [
   { as: 'file', label: 'File', words: 'file document pdf attachment upload' },
 ] as const
 
-/** What `/widget` drops in: a clock in the page's own accent, reaching nothing. */
-export const STARTER_WIDGET = `<div id="clock" style="font: 600 40px system-ui; color: var(--accent)"></div>
-<script>
-  const tick = () => { clock.textContent = new Date().toLocaleTimeString() }
-  tick()
-  setInterval(tick, 1000)
-</script>`
+/** What `/widget` drops above the page: a clock in the page's own accent, reaching nothing. */
+export const STARTER_WIDGET_CODE = `import { useNow } from 'washi'
+
+function Clock() {
+  const now = new Date(useNow())
+  return (
+    <div style={{ font: '600 40px system-ui', color: 'var(--accent)' }}>
+      {now.toLocaleTimeString()}
+    </div>
+  )
+}`
 /** What `/automation` drops in over a table: a new row starts with a status. */
 export const STARTER_AUTOMATION = (table: string) => `function run(event) {
   // event: { table, kind, row, before } — rows({ table }) reads, act({ verb, … }) changes rows.

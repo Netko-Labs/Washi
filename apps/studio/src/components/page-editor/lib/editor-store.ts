@@ -1,5 +1,4 @@
-import { type UploadKind, uploadRefusal } from '@washi/domain'
-import { hostUploadFile, useSheetsStore } from '@washi/ui'
+import { useSheetsStore } from '@washi/ui'
 import type { WsxElement } from '@washi/wsx'
 import { create } from 'zustand'
 import { api } from '@/integrations/trpc'
@@ -9,48 +8,12 @@ import { flatten, isNestedBlock, locate, mapBlocks, tidy, writeList } from './sl
 import { tabActions } from './tab-actions'
 import { newTabs } from './tabs'
 import type { Block, BlockPlace, EditorState, FocusRequest, TextBlock } from './types'
-import { applyShortcut, bookmarkNode, dataNode, galleryNode, swapNode, uploadNode } from './utils'
+import { uploaded, uploadedGallery } from './upload-blocks'
+import { applyShortcut, bookmarkNode, dataNode, swapNode, withWidgetCode } from './utils'
 import { LIST_MARKERS, NEW_DATABASE, NEW_SUBPAGE_SOURCE } from './values'
 
 function isTyped(block: Block | undefined): block is TextBlock {
   return block !== undefined && 'text' in block && block.kind !== 'divider'
-}
-
-/** Stored in the workspace's files, checked first against the kind the menu offered. */
-async function uploaded(as: UploadKind, file: File | undefined) {
-  if (!file) throw new Error('no file was picked')
-  const refused = uploadRefusal(file.type, file.size, as)
-  if (refused) throw new Error(refused)
-  const send = hostUploadFile()
-  if (!send) throw new Error('this app stores no files')
-  const stored = await send(file)
-  return uploadNode(as, { id: stored.id, name: file.name, size: file.size })
-}
-
-/** Every picture stored before any lands; one refused refuses the gallery, in its words. */
-async function uploadedGallery(files: File[]) {
-  if (files.length === 0) throw new Error('no pictures were picked')
-  for (const file of files) {
-    const refused = uploadRefusal(file.type, file.size, 'image')
-    if (refused) throw new Error(`${file.name}: ${refused}`)
-  }
-  const send = hostUploadFile()
-  if (!send) throw new Error('this app stores no files')
-  // All or none: if one fails, the ones that did land are taken back so nothing is left unused.
-  const sent = await Promise.allSettled(files.map((file) => send(file)))
-  const landed = sent.flatMap((each, at) =>
-    each.status === 'fulfilled'
-      ? [{ id: each.value.id, name: files[at]?.name ?? '', size: files[at]?.size ?? 0 }]
-      : [],
-  )
-  const failed = sent.find((each) => each.status === 'rejected')
-  if (failed) {
-    await Promise.all(
-      landed.map((each) => api.files.remove.mutate({ id: each.id }).catch(() => {})),
-    )
-    throw failed.reason instanceof Error ? failed.reason : new Error('a picture did not upload')
-  }
-  return galleryNode(landed)
 }
 
 /** The page being typed into: every row reads its own block and calls these to change the page. */
@@ -264,6 +227,10 @@ export const useEditorStore = create<EditorState>((set, get) => {
         node = dataNode({ kind: 'link', sheet: made.id })
       }
       if (!node) return
+      // The clock's component is page code: the next save carries it above the page, and a page
+      // with code is edited as its source from then on.
+      const { savedSource } = get()
+      if (pick.kind === 'widget' && savedSource) set({ savedSource: withWidgetCode(savedSource) })
       const next = newBlock()
       const landed = [lockedBlock(node), next]
       // The `/` block may have gone while the table or page was made: what was made lands last.

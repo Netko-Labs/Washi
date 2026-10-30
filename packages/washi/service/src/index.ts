@@ -59,6 +59,7 @@ export type { StorageTest } from './files/types'
 export {
   type CompiledPage,
   compilePage,
+  compileWidget,
   PAGE_CODE_MAX_CHARS,
   type PageSource,
 } from './pages'
