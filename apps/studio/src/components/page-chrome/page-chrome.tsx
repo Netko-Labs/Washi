@@ -33,7 +33,7 @@ export function PageChrome({ pageId }: PageChromeProps) {
 
   return (
     <>
-      <div className="absolute top-2 right-0 flex items-center gap-3">
+      <div className="absolute top-2 right-0 flex items-center gap-3 max-md:static max-md:flex-wrap max-md:pt-2 max-md:empty:hidden">
         <PagePresence sheetId={sheet.id} />
         <WashiMark sheet={sheet} />
       </div>
