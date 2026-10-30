@@ -1,4 +1,5 @@
-import { matchesCron, parseCron } from './parse'
+import { DAY_MINUTES, NEXT_SEARCH_DAYS } from './constants'
+import { matchesCron, matchesDay, parseCron } from './parse'
 import { wallKey, wallMinus, wallMinute } from './wall'
 
 /**
@@ -17,14 +18,23 @@ export function latestOccurrence(cron: string, timeZone: string, now: Date): str
   return null
 }
 
-/** The next minute after `now` the schedule names, within a week; null past that. */
+/** The next minute after `now` the schedule names, read a day at a time; null if none ever comes. */
 export function nextOccurrence(cron: string, timeZone: string, now: Date): string | null {
   const fields = parseCron(cron)
   if (!fields) return null
   const here = wallMinute(now, timeZone)
-  for (let ahead = 1; ahead <= 7 * 24 * 60; ahead++) {
-    const at = wallMinus(here, -ahead)
-    if (matchesCron(fields, at)) return wallKey(at)
+  const midnight = { ...here, hour: 0, minute: 0 }
+  const hours = [...fields.hour].sort((a, b) => a - b)
+  const minutes = [...fields.minute].sort((a, b) => a - b)
+  for (let ahead = 0; ahead <= NEXT_SEARCH_DAYS; ahead++) {
+    const day = wallMinus(midnight, -ahead * DAY_MINUTES)
+    if (!matchesDay(fields, day)) continue
+    for (const hour of hours) {
+      for (const minute of minutes) {
+        const isLater = ahead > 0 || hour * 60 + minute > here.hour * 60 + here.minute
+        if (isLater) return wallKey({ ...day, hour, minute })
+      }
+    }
   }
   return null
 }

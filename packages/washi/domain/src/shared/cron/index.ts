@@ -1,5 +1,5 @@
 export { describeCron } from './describe'
-export { isCron, matchesCron, parseCron } from './parse'
+export { cronProblem, isCron, matchesCron, parseCron } from './parse'
 export { dailyCron, latestOccurrence, nextOccurrence } from './schedule'
 export type { CronFields, WallMinute } from './types'
 export { wallKey, wallMinute } from './wall'

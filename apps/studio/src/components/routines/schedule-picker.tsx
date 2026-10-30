@@ -1,4 +1,4 @@
-import { describeCron, nextOccurrence } from '@washi/domain'
+import { cronProblem, describeCron, nextOccurrence } from '@washi/domain'
 import {
   cronFromSchedule,
   SCHEDULE_KINDS,
@@ -13,6 +13,7 @@ const FIELD =
 /** A preset first, then only what that preset needs; the schedule read back in words. */
 export function SchedulePicker({ value, onChange }: SchedulePickerProps) {
   const cron = cronFromSchedule(value)
+  const problem = cronProblem(cron)
   const next = nextOccurrence(cron, value.timeZone, new Date())
   const set = (patch: Partial<typeof value>) => onChange({ ...value, ...patch })
 
@@ -111,10 +112,16 @@ export function SchedulePicker({ value, onChange }: SchedulePickerProps) {
         </div>
       )}
 
-      <p className="text-[12.5px] text-muted-foreground">
-        {describeCron(cron)} · {value.timeZone}
-        {next ? ` — next ${wallLabel(next)}` : ' — not in the next week'}
-      </p>
+      {problem ? (
+        <p role="alert" className="text-[12.5px] text-destructive">
+          {problem}
+        </p>
+      ) : (
+        <p className="text-[12.5px] text-muted-foreground">
+          {describeCron(cron)} · {value.timeZone}
+          {next ? ` — next ${wallLabel(next)}` : ' — that date never comes'}
+        </p>
+      )}
     </div>
   )
 }
