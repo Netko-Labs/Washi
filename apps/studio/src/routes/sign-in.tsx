@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { SignInPage } from '@/components/auth'
+import { sameOriginPath } from '@/integrations/auth'
 
 export const Route = createFileRoute('/sign-in')({
   ssr: false,
@@ -9,13 +10,7 @@ export const Route = createFileRoute('/sign-in')({
     search: Record<string, unknown>,
   ): Record<string, unknown> & { redirect?: string } => ({
     ...search,
-    // Same-origin paths only: a sign-in link must never bounce somewhere else.
-    redirect:
-      typeof search.redirect === 'string' &&
-      search.redirect.startsWith('/') &&
-      !search.redirect.startsWith('//')
-        ? search.redirect
-        : undefined,
+    redirect: sameOriginPath(search.redirect) ?? undefined,
   }),
   component: SignInPage,
 })
