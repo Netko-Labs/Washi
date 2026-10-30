@@ -9,6 +9,7 @@ import type {
   TextBlock,
   TextKind,
 } from './blocks'
+import type { SlashGroup } from './slash'
 import type { EditorState } from './store'
 
 export interface BlockListProps {
@@ -67,13 +68,14 @@ export interface KindOption {
 }
 
 /** A block `/` drops in with words to type over (D107). */
-export type StarterBlock = 'steps' | 'compare' | 'faq' | 'countdown'
+export type StarterBlock = 'steps' | 'compare' | 'faq' | 'countdown' | 'bento'
 
 export interface StarterOption {
   block: StarterBlock
   label: string
   hint: string
   words: string
+  group: SlashGroup
 }
 
 export interface BlockRowProps {

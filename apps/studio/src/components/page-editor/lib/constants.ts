@@ -1,3 +1,6 @@
+import type { SheetSummary } from '@washi/domain'
+import type { SlashNav, TableRef } from './types'
+
 /** Typing pauses this long before the page is saved. */
 export const SAVE_DELAY_MS = 700
 
@@ -19,3 +22,10 @@ export const MAX_TAB_LABEL = 60
 
 /** Picks that open a picker first: closed or refused, the `/` they came from has nothing to keep. */
 export const PICKER_KINDS: ReadonlySet<string> = new Set(['upload', 'gallery', 'unsplash'])
+
+/** The `/` menu as it opens: no step, the first row lit. */
+export const SLASH_START: SlashNav = { step: null, active: 0, query: '' }
+
+/** Stable empties, so a block with no `/` typed never re-renders on a table or page change. */
+export const NO_TABLES: TableRef[] = []
+export const NO_SHEETS: SheetSummary[] = []

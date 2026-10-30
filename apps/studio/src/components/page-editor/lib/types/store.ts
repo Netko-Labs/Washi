@@ -33,10 +33,12 @@ export interface EditorState {
   turnInto: (id: string, kind: TextKind) => void
   /** Enter: the text after the caret moves into a new block below. */
   splitAt: (id: string, caret: number) => void
-  /** Backspace at the start: un-style, or join the block above. */
+  /** Backspace at the start: un-style, or join the block above — never the page's title. */
   mergeBack: (id: string) => void
   insertAfter: (id: string) => void
   remove: (id: string) => void
+  /** A copy under new ids, right below. */
+  duplicate: (id: string) => void
   move: (id: string, step: -1 | 1) => void
   moveFocus: (id: string, step: -1 | 1) => void
   setSaveState: (saveState: SaveState) => void

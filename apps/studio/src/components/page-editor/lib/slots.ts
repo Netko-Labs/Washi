@@ -97,3 +97,19 @@ export function mapBlocks(blocks: Block[], change: (block: Block) => Block): Blo
     isContainer(block) ? mapSlots(block, (slot) => slot.blocks.map(change)) : change(block),
   )
 }
+
+/** The same block under new ids, down to each column's or tab's own blocks. */
+export function copyBlock(block: Block): Block {
+  const id = crypto.randomUUID()
+  if (block.kind === 'locked') return { ...block, id, node: structuredClone(block.node) }
+  if (!isContainer(block)) return { ...block, id, props: { ...block.props } }
+  const copied = mapSlots(block, (slot) => slot.blocks.map(copyBlock))
+  if (isColumns(copied)) {
+    return {
+      ...copied,
+      id,
+      columns: copied.columns.map((slot) => ({ ...slot, id: crypto.randomUUID() })),
+    }
+  }
+  return { ...copied, id, tabs: copied.tabs.map((slot) => ({ ...slot, id: crypto.randomUUID() })) }
+}

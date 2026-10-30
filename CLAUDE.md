@@ -273,7 +273,10 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   Title/Text/List/Item/Quote/Callout/Code/Divider become typed blocks; anything else (or text with
   inline marks) stays a locked block, kept byte-for-byte. `/` also drops live blocks in as locked
   blocks: a new database (`/database Name` defines the table), a linked view of any table
-  (`<Database>`), or a 30-day progress chart over a status's done group. Saves go through `sheets.update` — the
+  (`<Database>`), or a 30-day progress chart over a status's done group. The menu is grouped (Basic
+  blocks · Media · Database · Layout · Advanced · Code); a pick over one table or page (linked view,
+  progress, automation, link, include) is a second step listing them. The title (a first `h1`) has
+  no ⋮⋮ and takes nothing in on Backspace. Saves go through `sheets.update` — the
   same validation as the agent's. `serialize` writes text with `<{}>&`, runs of spaces or
   newlines as a string literal, so typed text always round-trips.
   A locked block draws its own `<Sheet>` frame under a `SheetLookProvider` with no `band` or `edit`, so

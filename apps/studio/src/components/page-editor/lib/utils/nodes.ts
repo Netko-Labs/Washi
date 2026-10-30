@@ -71,7 +71,12 @@ export function dataNode(pick: DataPick): WsxElement {
     throw new Error('an upload lands once its file is stored')
   }
   if (pick.kind === 'code') throw new Error('page code is written in the source, above the page')
-  if (pick.kind === 'tabs') throw new Error('tabs are edited in place, not kept whole')
+  if (pick.kind === 'tabs' || pick.kind === 'columns') {
+    throw new Error(`${pick.kind} are edited in place, not kept whole`)
+  }
+  if (pick.kind === 'include') return element('Include', { sheet: pick.sheet }, [])
+  if (pick.kind === 'outline') return element('Outline', {}, [])
+  if (pick.kind === 'backlinks') return element('Backlinks', {}, [])
   if (pick.kind === 'bookmark') return bookmarkNode(pick.href, null)
   if (pick.kind === 'embed') return element('Embed', { src: pick.src }, [])
   if (pick.kind === 'link') return element('PageLink', { sheet: pick.sheet }, [])

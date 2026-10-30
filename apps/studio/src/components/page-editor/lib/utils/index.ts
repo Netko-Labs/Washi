@@ -1,6 +1,7 @@
 export {
   applyShortcut,
   blockFrame,
+  isTitleBlock,
   numberedPositions,
   titleOf,
   withoutTrailingLines,

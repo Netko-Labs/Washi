@@ -62,8 +62,10 @@ describe('tabs in the editor', () => {
     const page = saved([made])
     expect(validate(page, paperRegistry)).toEqual([])
     expect(serialize(page)).toContain(`<Tabs labels={["Tab 1","Tab 2"]}>`)
-    expect(slashMatches('tabs', [])[0]?.label).toBe('Tabs')
-    expect(slashMatches('tabs', [], [], true).some((option) => option.label === 'Tabs')).toBe(false)
+    expect(slashMatches('tabs')[0]?.label).toBe('Tabs')
+    expect(slashMatches('tabs', { isNested: true }).some((option) => option.label === 'Tabs')).toBe(
+      false,
+    )
   })
 
   test('a tab is added, renamed and moved; labels follow the tabs', () => {
