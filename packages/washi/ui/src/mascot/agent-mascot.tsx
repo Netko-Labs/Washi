@@ -1,3 +1,4 @@
+import { useId } from 'react'
 import type {
   AgentMascotProps,
   AgentMascotState,
@@ -229,6 +230,8 @@ function stateContent(state: AgentMascotState): MascotStateContent {
 export function AgentMascot({ state, size = 22, className, crop = false }: AgentMascotProps) {
   const { wrap, inner, backdrop } = stateContent(state)
   const radius = crop ? 0 : Math.round(size * 0.3)
+  // One id per drawing: a twin in a hidden subtree (the closed drawer) would lend its clip.
+  const clipId = `am-${useId()}`
   return (
     <svg
       viewBox="0 0 1024 1024"
@@ -238,11 +241,11 @@ export function AgentMascot({ state, size = 22, className, crop = false }: Agent
       style={{ display: 'block', borderRadius: radius }}
       aria-hidden
     >
-      <clipPath id={`am-${state}`}>
+      <clipPath id={clipId}>
         <rect x="12" y="12" width="1000" height="1000" rx="220" />
       </clipPath>
       <g transform={crop ? 'translate(-256 -330) scale(1.5)' : undefined}>
-        <g clipPath={`url(#am-${state})`}>
+        <g clipPath={`url(#${clipId})`}>
           <rect x="12" y="12" width="1000" height="1000" fill={BG} />
           {backdrop}
           <g style={{ animation: wrap, transformBox: 'fill-box', transformOrigin: 'center' }}>
