@@ -99,7 +99,8 @@ export const SUMMARIES: Record<string, string> = {
     "GitHub's calendar of days: the last weeks to today as squares, each as dark as its rows (counted, or a value summed). For habits, workouts, a journal, anything done on days.",
   Slots:
     'Free times to book, Calendly-style: each allowed day cut into slots of `minutes` within `hours`, rows whose date overlaps struck through, the past left out; a press opens a form with the slot filled in, and the booking is said back.',
-  Agenda: 'A calendar: a week or a month of rows on their dates; + on a day adds one there.',
+  Agenda:
+    'A calendar: a week or a month of rows on their dates; + on a day adds one there, and an event’s ⋯ duplicates it, copies it to a day or repeats it through a date.',
   Task: 'A checkbox bound to a row’s checkbox column.',
   Switch: 'Writes true or false to a state key.',
   Select: 'Writes one choice to a state key; views filtered by it follow.',

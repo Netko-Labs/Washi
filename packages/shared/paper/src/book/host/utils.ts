@@ -1,6 +1,7 @@
 import {
   type Cell,
   changedSpec,
+  type Filter,
   type HistoryQuery,
   type InkQuery,
   matchesFilters,
@@ -145,6 +146,21 @@ export function seedTables(seeds: SeedTable[] = SEED_TABLES): Map<string, Memory
   )
 }
 
+/** D76's copy over memory, literal `set` and `each` only: an Agenda event's Duplicate or Repeat. */
+function copyRows(table: MemoryTable, where: Filter[], set: QueryRow, each: QueryRow[]): number {
+  const copies = table.rows
+    .filter((row) => matchesFilters(row, where, table.spec))
+    .flatMap(({ id: _id, ...row }) => each.map((entry) => ({ ...row, ...set, ...entry })))
+  for (const data of copies) {
+    const issues = validateRecord(table.spec, data)
+    if (issues.length > 0) {
+      throw new Error(issues.map((issue) => `${issue.path}: ${issue.message}`).join('; '))
+    }
+  }
+  for (const data of copies) table.rows.push({ id: `${table.spec.name}-${table.next++}`, ...data })
+  return copies.length
+}
+
 /** A PaperHost over memory: every verb lands, every bind refetches, nothing leaves the tab. */
 export function createBookHost(say: Say, seeds?: SeedTable[]): PaperHost {
   const tables = seedTables(seeds)
@@ -183,6 +199,18 @@ export function createBookHost(say: Say, seeds?: SeedTable[]): PaperHost {
             id: `${table.spec.name}-${table.next++}`,
             ...(action.data as QueryRow),
           })
+          break
+        }
+        case 'table.copy': {
+          const set = (action.set ?? {}) as Record<string, unknown>
+          if (
+            Object.values(set).some((v) => v !== null && typeof v === 'object' && !Array.isArray(v))
+          ) {
+            say('table.copy with an expr — would reach the host')
+            return
+          }
+          const each = (action.each as QueryRow[] | undefined) ?? [{}]
+          copyRows(need(action.table), action.where as Filter[], set as QueryRow, each)
           break
         }
         case 'table.update':

@@ -71,6 +71,7 @@ export const VERBS = {
     params: z.record(z.string(), scalar).optional(),
     where: z.array(copyFilter).min(1).max(16),
     set: z.record(z.string(), z.union([cell, z.object({ expr: z.string().min(1) })])).default({}),
+    each: z.array(z.record(z.string(), cell)).min(1).max(500).optional(),
     limit: z.number().int().positive().max(500).optional(),
   }),
   'table.delete': z.object({

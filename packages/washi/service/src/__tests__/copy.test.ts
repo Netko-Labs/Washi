@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import type { InkMutation, RecordData } from '@washi/ink'
 import { openWorkspace, type Workspace } from '@washi/repository'
+import { CapabilityDesk } from '../agents/desk'
 import { defineUserTable, runMutation, runQuery } from '../tables/service'
 
 let ws: Workspace
@@ -123,5 +124,54 @@ describe('copy (D76)', () => {
       'expected an ISO date',
     )
     expect(count()).toBe(5)
+  })
+
+  test('each makes one copy per entry, its cells over set, in one transaction', () => {
+    const rent = monthOf('2026-10').find((row) => row.name === 'Rent')
+    const result = runMutation(ws, {
+      kind: 'copy',
+      table: 'expenses',
+      where: [{ column: 'id', op: 'eq', value: String(rent?.id) }],
+      set: { paid: false, note: 'again' },
+      each: [{ date: '2026-10-02' }, { date: '2026-10-03', note: 'third' }],
+    })
+    expect(result.affected).toBe(2)
+    const copies = monthOf('2026-10').filter((row) => row.name === 'Rent' && row.id !== rent?.id)
+    expect(copies.map((row) => [row.date, row.amount, row.paid, row.note])).toEqual([
+      ['2026-10-02', 900, false, 'again'],
+      ['2026-10-03', 900, false, 'third'],
+    ])
+  })
+
+  test('each refuses a computed column, past the cap, or one bad entry, landing nothing', () => {
+    const one = [{ column: 'name', op: 'eq' as const, value: 'Rent' }]
+    const copy = (each: RecordData[], limit?: number) =>
+      runMutation(ws, { kind: 'copy', table: 'expenses', where: one, set: {}, each, limit })
+    expect(() => copy([{ month: '2026-11' }])).toThrow('computed from its formula')
+    expect(() => copy([{ date: '2026-10-02' }, { date: '2026-10-03' }], 1)).toThrow(
+      'more than 1 copies',
+    )
+    expect(() => copy([{ date: '2026-10-02' }, { date: 'soon' }])).toThrow('expected an ISO date')
+    expect(count()).toBe(5)
+  })
+
+  test("an Agenda's Repeat on days is one press through the desk, signed by the presser", async () => {
+    const rent = monthOf('2026-10').find((row) => row.name === 'Rent')
+    const desk = new CapabilityDesk(ws, () => null)
+    await desk.execute(
+      {
+        verb: 'table.copy',
+        table: 'expenses',
+        where: [{ column: 'id', op: 'eq', value: String(rent?.id) }],
+        set: {},
+        each: [{ date: '2026-10-02' }, { date: '2026-10-05' }],
+      },
+      { origin: 'sheet', actorId: 'member-1' },
+    )
+    expect(count()).toBe(7)
+    const authors = ws.sqlite
+      .query('SELECT author FROM record_changes ORDER BY rowid DESC LIMIT 2')
+      .all() as { author: string | null }[]
+    expect(authors.map((row) => row.author)).toEqual(['member-1', 'member-1'])
   })
 })

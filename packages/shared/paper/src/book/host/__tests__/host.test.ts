@@ -56,6 +56,33 @@ describe('book host', () => {
   })
 })
 
+test("an Agenda event's copies land as rows of their own, each entry over the row", async () => {
+  const host = createBookHost(() => {})
+  await host.runAction({
+    verb: 'table.copy',
+    table: 'tasks',
+    where: [{ column: 'id', op: 'eq', value: 'tasks-1' }],
+    set: {},
+    each: [{ due: '2026-11-04' }, { due: '2026-11-05' }],
+  })
+  const rows = (await host.runQuery({ table: 'tasks' })).rows
+  const copies = rows.filter((row) => row.title === rows[0]?.title)
+  expect(copies.map((row) => [row.id, row.due])).toEqual([
+    ['tasks-1', rows[0]?.due ?? null],
+    ['tasks-8', '2026-11-04'],
+    ['tasks-9', '2026-11-05'],
+  ])
+  await expect(
+    host.runAction({
+      verb: 'table.copy',
+      table: 'tasks',
+      where: [{ column: 'id', op: 'eq', value: 'tasks-1' }],
+      each: [{ due: '2026-11-06' }, { due: 'soon' }],
+    }),
+  ).rejects.toThrow()
+  expect((await host.runQuery({ table: 'tasks' })).rows).toHaveLength(9)
+})
+
 test('a deleted row id is never reused', async () => {
   const host = createBookHost(() => {})
   await host.runAction({ verb: 'table.delete', table: 'tasks', row: 'tasks-7' })
