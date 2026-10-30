@@ -8,8 +8,8 @@ import { LockedBlock } from './locked-block'
 import { ScriptBlock } from './script-block'
 import { TabsRow } from './tabs-row'
 
-/** Blocks whose code is typed in place: what a page draws, and what a row write runs. */
-const SCRIPTED = new Set(['Automation', 'Formula'])
+/** Blocks whose code is typed in place: what a row write runs, a formula, a Terminal's program. */
+const SCRIPTED = new Set(['Automation', 'Formula', 'Terminal'])
 
 const LINE: Record<string, string> = {
   before: '-top-px inset-x-0 h-[3px]',

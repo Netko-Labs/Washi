@@ -39,6 +39,8 @@ export const SUMMARIES: Record<string, string> = {
     'Days left to a date on the reader’s clock — hours under two days with a time — then “Today”, then days ago.',
   Widget:
     'One of the page’s own components drawn with React in a frame with no origin and no network — a canvas, an svg — reaching the page only through washi’s hooks; off until an owner allows widgets.',
+  Terminal:
+    'A Node-style program run from a press in a widget’s frame: console.log draws its screen, require("fs") reads the uploads it holds, timers tick — no network, no real disk; off until an owner allows widgets.',
   Formula:
     'A function the workspace’s formula columns may call by name — values in, a value out, nothing else reached.',
   Automation:

@@ -2,6 +2,8 @@ import { PAGE_LIBRARIES } from '@washi/paper/registry'
 
 /** A page's whole source when it runs code — a page, not a program. */
 export const PAGE_CODE_MAX_CHARS = 60_000
+/** A Terminal's program (D119): a script someone pastes, not a project. */
+export const TERMINAL_PROGRAM_MAX_CHARS = 60_000
 export const KB = 1024
 export const MB = 1024 * KB
 export const PAGE_CACHE_SIZE = 64

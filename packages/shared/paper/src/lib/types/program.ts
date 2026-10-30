@@ -34,6 +34,8 @@ export interface ProgramLive {
   members: string | null | undefined
   /** The reader JSON, the same way. */
   me: string | null | undefined
+  /** `as:key` → `{ value }` or `{ error }` JSON; null while it is read. */
+  files: Map<string, string | null>
   /** Why a press stopped the page; it stays stopped until its code changes. */
   halted: string | null
   values: Record<string, string | number | boolean | null>
@@ -46,6 +48,8 @@ export interface ProgramNeeds {
   tables: string[]
   members: boolean
   me: boolean
+  /** Uploads asked for, as `as:key`. */
+  files: string[]
   /** The first write the page tried while it drew, refused; the run stops on it. */
   refused: string | null
   /** The shortest clock the page set, in ms; 0 when none. */
@@ -112,6 +116,7 @@ export type WidgetAsk =
   | { type: 'members'; id: number }
   | { type: 'me'; id: number }
   | { type: 'stored'; id: number; key: string }
+  | { type: 'file'; id: number; key: string; as: string }
 
 /** What a frame may change, only from the person's own press inside it. */
 export type WidgetWrite =

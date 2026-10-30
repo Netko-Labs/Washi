@@ -1,5 +1,6 @@
 export { pageCodeDiagnostics } from './check'
 export { compilePage } from './compile'
+export { compileTerminal, terminalDiagnostics } from './terminal'
 export type { CompiledPage, PageSource } from './types'
-export { PAGE_CODE_MAX_CHARS } from './values'
+export { PAGE_CODE_MAX_CHARS, TERMINAL_PROGRAM_MAX_CHARS } from './values'
 export { compileWidget } from './widget'

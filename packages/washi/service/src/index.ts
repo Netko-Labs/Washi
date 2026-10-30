@@ -63,9 +63,11 @@ export type { StorageTest } from './files/types'
 export {
   type CompiledPage,
   compilePage,
+  compileTerminal,
   compileWidget,
   PAGE_CODE_MAX_CHARS,
   type PageSource,
+  TERMINAL_PROGRAM_MAX_CHARS,
 } from './pages'
 export {
   createReminderRule,

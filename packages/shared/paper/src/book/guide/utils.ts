@@ -139,6 +139,11 @@ export function pageLimits(): Limit[] {
         'A Widget draws one of the page’s own components with React in a frame with no origin and no network: div, svg, canvas and refs are its alone. It reads and writes only through washi’s hooks, writes from a press inside it, and runs only where an owner turned widgets on.',
     },
     {
+      title: 'Terminals',
+      detail:
+        'A Terminal runs Node-style JS in a widget’s frame, only from a press: its files are uploads read as the reader (up to 32 MB each unless the server says otherwise), held in memory with what it writes. Node’s fs, path, events, util, os, buffer, timers, url and assert are lent; no network, child process or real disk.',
+    },
+    {
       title: 'Actions',
       detail:
         'Actions are objects naming a verb: sheet.open, sheet.create, table.insert, table.update, table.reorder, table.copy, table.delete, state.set. Opening outside links from a page is refused; images are https only.',

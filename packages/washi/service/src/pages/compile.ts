@@ -6,8 +6,11 @@ import {
   importRefusal,
   insidePackage,
   isAllowedImport,
+  isNodeRequire,
+  NODE_MODULE,
   packageKey,
   packagePattern,
+  RELATIVE,
   realDir,
 } from './imports'
 import type { BundleTarget, CompiledPage, PageSource } from './types'
@@ -69,9 +72,19 @@ function plugin(
   // A server package's own React (a component kit's peer) is the frame's, never a second copy.
   const lendsReact = (importer: string) =>
     importer === 'washi' || Boolean(root && importer.startsWith(root + sep))
+  const refusal = target.refusal ?? importRefusal
   return {
     name: 'washi-page',
     setup(build) {
+      if (target.node) {
+        build.onResolve({ filter: NODE_MODULE }, ({ path }) => ({
+          path: `node:${path.replace(/^node:/, '')}`,
+          namespace: NS,
+        }))
+        build.onResolve({ filter: RELATIVE }, ({ path, importer }) =>
+          importer === 'washi:self' ? { path: `local:${path}`, namespace: NS } : undefined,
+        )
+      }
       build.onResolve({ filter: /^washi:(entry|self)$/ }, ({ path }) => ({ path, namespace: NS }))
       build.onResolve({ filter: /^washi(\/ui)?$/ }, ({ path }) => ({ path, namespace: NS }))
       build.onResolve({ filter: PAGE_IMPORT }, ({ path }) => ({ path, namespace: NS }))
@@ -87,11 +100,17 @@ function plugin(
           : undefined,
       )
       build.onResolve({ filter: /.*/, namespace: NS }, ({ path }) => {
-        throw new Error(importRefusal(path, packages))
+        throw new Error(refusal(path, packages))
       })
       build.onLoad({ filter: /.*/, namespace: NS }, ({ path }) => {
         if (path === 'washi:entry') return { contents: target.entry, loader: 'js' }
-        if (path === 'washi:self') return { contents: module, loader: 'tsx' }
+        if (path === 'washi:self') return { contents: module, loader: target.selfLoader ?? 'tsx' }
+        const shim = /^(node|local):(.+)$/.exec(path)
+        if (shim) {
+          const lend = shim[1] === 'node' ? 'builtin' : 'local'
+          const contents = `module.exports = globalThis.__terminal.${lend}(${JSON.stringify(shim[2])})`
+          return { contents, loader: 'js' }
+        }
         if (path === 'washi') return { contents: target.washi, loader: 'js' }
         if (path === 'washi/ui') return { contents: UI, loader: 'js' }
         const source = pages.get(PAGE_IMPORT.exec(path)?.[1] ?? '')
@@ -145,8 +164,10 @@ export async function bundle(
   try {
     const refused = transpiler
       .scan(module)
-      .imports.find(({ path }) => !isAllowedImport(path, packages))
-    if (refused) return failure(importRefusal(refused.path, packages))
+      .imports.find(
+        ({ path }) => !isAllowedImport(path, packages) && !(target.node && isNodeRequire(path)),
+      )
+    if (refused) return failure((target.refusal ?? importRefusal)(refused.path, packages))
     pages = importedPages(module, read)
   } catch (error) {
     return failure(error)
@@ -161,7 +182,7 @@ export async function bundle(
       format: 'iife',
       target: 'browser',
       minify: target.minify,
-      define: { 'process.env.NODE_ENV': '"production"' },
+      define: { 'process.env.NODE_ENV': '"production"', ...target.define },
       jsx: { runtime: 'classic', factory: 'h', fragment: 'Fragment' },
       plugins: [plugin(module, pages, target, packages)],
       throw: false,

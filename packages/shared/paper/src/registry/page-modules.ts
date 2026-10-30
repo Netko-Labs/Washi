@@ -16,6 +16,7 @@ export const PAGE_HOOKS = [
   'useMembers',
   'useMe',
   'useNavigate',
+  'useFile',
   'act',
 ] as const
 
@@ -36,3 +37,6 @@ export const WIDGET_HOOKS = [
 
 export const WIDGET_WORDS =
   "A widget is JSX now: define a component in the page's code and put it here, <Widget><Clock /></Widget>"
+
+/** A Terminal's file path: names of letters, digits, `_ - .` joined by `/`, none starting with a dot. */
+export const TERMINAL_PATH = /^[\w-][\w.-]*(\/[\w-][\w.-]*)*$/

@@ -29,6 +29,7 @@ export function useProgramSandbox(root: WsxElement) {
     title: '',
     rows: new Map(),
     tables: new Map(),
+    files: new Map(),
     members: undefined,
     me: undefined,
     halted: null,
@@ -80,6 +81,7 @@ export function useProgramSandbox(root: WsxElement) {
       box.sandbox = null
       box.rows.clear()
       box.tables.clear()
+      box.files.clear()
       box.members = undefined
       box.me = undefined
       box.halted = null

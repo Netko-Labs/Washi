@@ -13,6 +13,12 @@ import type { LockedBlock, ScriptCheck } from '../types'
 const entryOf = (node: WsxElement) =>
   node.name === 'Automation' ? 'run' : String(node.props.name ?? '')
 
+/** A Terminal's program is bundled as its frame runs it; a script only has to compile. */
+const checkOf = (node: WsxElement, source: string) =>
+  node.name === 'Terminal'
+    ? api.scripts.terminal.query({ program: source })
+    : api.scripts.compile.query({ source, entry: entryOf(node) })
+
 const textOf = (node: WsxElement) =>
   node.children.map((child) => (child.kind === 'text' ? child.value : '')).join('')
 
@@ -32,8 +38,7 @@ export function useScriptCode(block: LockedBlock) {
     const keep = (source: string) => {
       const ask = ++asked
       setCheck({ status: 'checking' })
-      api.scripts.compile
-        .query({ source, entry: entryOf(block.node) })
+      checkOf(block.node, source)
         .then((compiled) => {
           if (ask !== asked) return
           if (!compiled.ok) return setCheck({ status: 'refused', error: compiled.error })
@@ -54,7 +59,7 @@ export function useScriptCode(block: LockedBlock) {
       doc: textOf(block.node),
       extensions: [
         basicSetup,
-        javascript({ jsx: true, typescript: true }),
+        javascript({ jsx: true, typescript: block.node.name !== 'Terminal' }),
         sourceTheme(),
         EditorView.lineWrapping,
         EditorView.updateListener.of((update) => {

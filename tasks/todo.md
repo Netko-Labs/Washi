@@ -1120,3 +1120,24 @@ Acceptance: wsx/paper/service/editor tests pass; typecheck, Biome, `bun test`, s
 - [ ] later: a real-socket check of the reconnect path (tested against a stub feed only)
 
 Acceptance: service + store tests pass; typecheck, Biome and `bun test` green.
+
+
+# Terminal runs a Node program (2026-10-29) — D119
+
+- [x] `<Terminal title height files>{program}</Terminal>`: text child, `files` path → `file:<id>`
+      (plain paths, ≤ 16), indexed as worn uploads
+- [x] `scripts.terminal` / `compileTerminal`: CommonJS, sloppy, `require.main` the program; Node's
+      modules → the frame's shim, libraries + page packages by name, the rest refused in words, at
+      save too
+- [x] frame: Node shim (fs over the files, path, events, util, os, buffer, timers, url, assert,
+      process, console), a batched screen with ANSI colours and a fitted font; runs only from a press
+- [x] `useFile(key, { as })` for page code (QuickJS) and widgets (bridge); `fileReadMb` limit (32)
+- [x] editor: `/terminal`, Code · Preview, Attach a file (upload or `files.recent`); book specimen,
+      summary, recipe, `/learn` limits, Washi's instructions
+- [x] tests: Bad Apple's `index.js` verbatim over an SRT-shaped frames file, fs, clear, timers,
+      exit, refusals, allowlist, `files` validation, `useFile` both sides
+- [ ] later: a real-browser check of the frame (the vm harness fakes the DOM; fonts and fit unseen)
+- [ ] later: a Terminal on a shared link (widgets don't run there, so neither does it)
+
+Acceptance: service/paper tests pass; typecheck, Biome, `bun test`, studio build green.
+

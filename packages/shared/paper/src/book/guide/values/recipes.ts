@@ -81,6 +81,26 @@ const done = tasks.filter((task) => task.status === 'done').length
 </Sheet>`,
   },
   {
+    id: 'terminal',
+    title: 'A script, run as it is',
+    why: 'Someone’s Node program — an ASCII animation, a small tool — pasted unchanged into a Terminal: console.log draws its screen, the uploads it reads are attached as files, a press runs it.',
+    uses: ['Terminal', 'Text'],
+    source: `<Sheet title="Run a script">
+  <Text>Paste a Node program, attach the files it reads, press Run.</Text>
+  <Terminal title="Spinner" height={180}>{\`const spin = ['◐', '◓', '◑', '◒']
+let step = 0
+const timer = setInterval(() => {
+  console.clear()
+  console.log(spin[step % 4] + ' Working… ' + step + '/20')
+  step += 1
+  if (step > 20) {
+    clearInterval(timer)
+    console.log('Done.')
+  }
+}, 100)\`}</Terminal>
+</Sheet>`,
+  },
+  {
     id: 'hub',
     title: 'A hub for its pages',
     why: 'A main page for a part of life: its figures on top, every page under it as cards with their covers, one pinned link.',

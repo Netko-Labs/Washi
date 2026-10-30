@@ -81,6 +81,7 @@ export const LIMIT_ROWS: LimitRow[] = [
   { limit: 'pageDrawMs', label: 'Page code time per draw', unit: 'ms' },
   { limit: 'pageBundleKb', label: 'Page code bundle', unit: 'KB' },
   { limit: 'widgetBundleKb', label: 'Widget bundle', unit: 'KB' },
+  { limit: 'fileReadMb', label: 'Upload a page or terminal reads', unit: 'MB' },
   { limit: 'automationMemoryMb', label: 'Automation memory', unit: 'MB' },
   { limit: 'automationMs', label: 'Automation time per run', unit: 'ms' },
   { limit: 'formulaMs', label: 'Formula function time per call', unit: 'ms' },

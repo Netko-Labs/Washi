@@ -24,7 +24,7 @@ import {
   type WsxMissing,
   WsxParseError,
 } from '@washi/wsx'
-import { pageCodeDiagnostics } from '../pages'
+import { pageCodeDiagnostics, terminalDiagnostics } from '../pages'
 import { extractAutomations, extractFormulas, scriptDiagnostics } from '../scripts/compile'
 import { pagePackagesOf } from '../server'
 import { guardWashiWrite, syncShare } from './access'
@@ -47,6 +47,7 @@ export function checkSource(source: string, ws?: Workspace): WsxCheck {
     const diagnostics = [
       ...validate(root, paperRegistry),
       ...scriptDiagnostics(root),
+      ...terminalDiagnostics(root, pagePackagesOf(ws)),
       ...(hasCode(root)
         ? [...pageCodeDiagnostics(source, pagePackagesOf(ws)), ...domDiagnostics(root)]
         : []),

@@ -8,6 +8,7 @@ export { useBlockDrop } from './hooks/use-block-drop'
 export { useFocusRequest } from './hooks/use-focus-request'
 export { useLoadBlocks } from './hooks/use-load-blocks'
 export { useScriptCode } from './hooks/use-script-code'
+export { useTerminalFiles } from './hooks/use-terminal-files'
 export { isColumns, isNestedBlock, isTabs, shownTab } from './slots'
 export type {
   Block,
@@ -28,6 +29,7 @@ export type {
   TabLabelProps,
   TabMenuProps,
   TabsRowProps,
+  TerminalFilesProps,
   TextBlock,
   TextKind,
 } from './types'
@@ -36,6 +38,7 @@ export {
   kindMatches,
   numberedPositions,
   pickFiles,
+  sizeLabel,
   slashMatches,
   titleOf,
 } from './utils'

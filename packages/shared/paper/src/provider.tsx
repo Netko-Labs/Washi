@@ -28,6 +28,13 @@ export interface PaperHost {
   compilePage?(source: string): Promise<CompiledScript>
   /** One of the page's components bundled with React for a widget's frame; without it, none draw. */
   compileWidget?(source: string, component: string): Promise<CompiledScript>
+  /** A Terminal's program bundled for its frame (D119); without it, no terminal runs. */
+  compileTerminal?(program: string): Promise<CompiledScript>
+  /**
+   * An upload's bytes the reader may open, held to the server's cap (D119) — `useFile` and a
+   * Terminal's files. Rejects in words; without it, nothing is read.
+   */
+  readFile?(key: string): Promise<Uint8Array>
   /** Who is reading, for a page's `useMe()`; a host with no accounts leaves it out. */
   describeMe?(): Promise<{ id: string; name: string } | null>
   /** Whether an owner lets this workspace's pages run widgets; without it, none run. */

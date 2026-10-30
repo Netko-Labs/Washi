@@ -29,5 +29,7 @@ export interface FileStore {
   put(input: { name: string; mime: string; bytes: Uint8Array }): Promise<StoredFile>
   get(id: string): Promise<{ file: StoredFile; bytes: Uint8Array } | null>
   info(id: string): StoredFile | null
+  /** The newest uploads first, so a picker can offer one already stored. */
+  recent(limit: number): StoredFile[]
   remove(id: string): Promise<void>
 }

@@ -36,6 +36,7 @@ import { Select } from './components/select'
 import { Slots } from './components/slots'
 import { cell } from './components/states'
 import { Callout, Card, Figure, Hero } from './components/surface'
+import { Terminal } from './components/terminal'
 import {
   Code,
   Item,
@@ -206,6 +207,11 @@ function renderElement(node: WsxElement, ctx: Ctx): ReactNode {
         args: drawn ? resolveProps(drawn, ctx.row) : undefined,
       } as never)
     }
+    case 'Terminal':
+      return createElement(Terminal, {
+        ...p,
+        program: node.children.map((child) => (child.kind === 'text' ? child.value : '')).join(''),
+      } as never)
     case 'Include':
       return createElement(Include, {
         ...p,

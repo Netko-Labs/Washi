@@ -7,6 +7,7 @@ import {
   STARTER_AUTOMATION,
   STARTER_FORMULA,
   STARTER_SOURCES,
+  STARTER_TERMINAL,
   STARTER_WIDGET_CODE,
 } from '../values'
 
@@ -53,6 +54,9 @@ export function dataNode(pick: DataPick): WsxElement {
   }
   if (pick.kind === 'widget') {
     return element('Widget', { title: 'A clock' }, [element('Clock', {}, [])])
+  }
+  if (pick.kind === 'terminal') {
+    return element('Terminal', { title: 'Hello' }, [{ kind: 'text', value: STARTER_TERMINAL }])
   }
   if (pick.kind === 'unsplash') {
     if (!pick.photo) throw new Error('a photo lands once it is picked')

@@ -4,6 +4,7 @@ import { parse } from '@washi/wsx'
 import { api } from '../api'
 import { childrenOf } from '../page-tree'
 import { useLiveStore, useSheetsStore } from '../stores'
+import { readUpload } from './utils'
 
 let listed: { at: number; hosts: Promise<string[]> } | null = null
 
@@ -104,6 +105,10 @@ export const paperHost: PaperHost = {
   compilePage: (source) => api.scripts.page.query({ source }),
 
   compileWidget: (source, component) => api.scripts.widget.query({ source, component }),
+
+  compileTerminal: (program) => api.scripts.terminal.query({ program }),
+
+  readFile: (key) => readUpload(key),
 
   describeMe: async () => {
     const { actor } = await api.workspaces.me.query()

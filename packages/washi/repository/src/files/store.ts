@@ -1,5 +1,5 @@
 import { fileTable } from '@washi/domain/db'
-import { eq } from 'drizzle-orm'
+import { desc, eq } from 'drizzle-orm'
 import type { Workspace } from '../storage/client'
 import type { BlobStore, FileStore, StoredFile } from './types'
 
@@ -32,6 +32,14 @@ export function createFileStore(ws: Workspace, blobs: BlobStore): FileStore {
       return bytes ? { file, bytes } : null
     },
     info: rowOf,
+    recent: (limit) =>
+      ws.db
+        .select()
+        .from(fileTable)
+        .orderBy(desc(fileTable.hlcCreated))
+        .limit(limit)
+        .all()
+        .map(({ id, name, mime, size, hlcCreated }) => ({ id, name, mime, size, hlcCreated })),
     async remove(id) {
       await blobs.delete(id)
       ws.db.delete(fileTable).where(eq(fileTable.id, id)).run()

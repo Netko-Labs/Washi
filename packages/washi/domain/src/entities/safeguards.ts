@@ -23,6 +23,7 @@ export const codeLimitsSchema = z.object({
   automationMs: z.number().int().min(10).max(5000),
   formulaMs: z.number().int().min(1).max(1000),
   widgetBundleKb: z.number().int().min(64).max(8192),
+  fileReadMb: z.number().int().min(1).max(512),
   imageMb: z.number().int().min(1).max(512),
   videoMb: z.number().int().min(1).max(512),
   audioMb: z.number().int().min(1).max(512),
@@ -31,7 +32,7 @@ export const codeLimitsSchema = z.object({
 export type CodeLimits = z.infer<typeof codeLimitsSchema>
 export type CodeLimit = keyof CodeLimits
 
-/** Today's constants (D95, D97, D99, D100, D113): what a server nobody tuned runs on. */
+/** Today's constants (D95, D97, D99, D100, D113, D119): what a server nobody tuned runs on. */
 export const CODE_LIMITS: CodeLimits = {
   pageMemoryMb: 32,
   pageDrawMs: 100,
@@ -40,6 +41,7 @@ export const CODE_LIMITS: CodeLimits = {
   automationMs: 100,
   formulaMs: 20,
   widgetBundleKb: 768,
+  fileReadMb: 32,
   imageMb: 10,
   videoMb: 50,
   audioMb: 25,

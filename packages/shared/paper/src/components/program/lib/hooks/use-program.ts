@@ -1,5 +1,6 @@
 import type { WsxElement } from '@washi/wsx'
 import { useCallback, useEffect, useState } from 'react'
+import { base64Of, fileAsOf, readFileAs } from '../../../../lib'
 import type { ProgramNeeds, ProgramState } from '../../../../lib/types'
 import { usePaperHost } from '../../../../provider'
 import { programBridge } from '../bridge'
@@ -11,6 +12,7 @@ const noNeeds = (): ProgramNeeds => ({
   tables: [],
   members: false,
   me: false,
+  files: [],
   refused: null,
   every: 0,
   seeds: {},
@@ -64,6 +66,20 @@ export function useProgram(root: WsxElement) {
         .describeTable(name)
         .then((spec) => box.tables.set(name, JSON.stringify(spec)))
         .catch(() => box.tables.set(name, 'null'))
+        .finally(again)
+    }
+    for (const id of new Set(needs.files)) {
+      const [as = 'text', ...rest] = id.split(':')
+      box.files.set(id, null)
+      readFileAs(host, rest.join(':'), fileAsOf(as))
+        .then((value) => {
+          const shown = value instanceof Uint8Array ? base64Of(value) : value
+          box.files.set(id, JSON.stringify({ value: shown }))
+        })
+        .catch((cause: unknown) => {
+          const error = cause instanceof Error ? cause.message : String(cause)
+          box.files.set(id, JSON.stringify({ error }))
+        })
         .finally(again)
     }
     if (needs.members) {

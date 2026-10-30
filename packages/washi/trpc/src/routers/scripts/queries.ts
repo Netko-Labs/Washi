@@ -3,12 +3,14 @@ import {
   codeLimits,
   compilePage,
   compileScript,
+  compileTerminal,
   compileWidget,
   PAGE_CODE_MAX_CHARS,
   pagePackagesOf,
   reachableWidgetHosts,
   readableSet,
   SCRIPT_MAX_CHARS,
+  TERMINAL_PROGRAM_MAX_CHARS,
 } from '@washi/service'
 import { z } from 'zod'
 import { router, workspaceProcedure } from '../../init'
@@ -56,4 +58,13 @@ export const scriptQueries = router({
         { maxKb: codeLimits(ctx.ws).widgetBundleKb, network: reachableWidgetHosts(ctx.ws) },
       )
     }),
+  /** A Terminal's program bundled for its frame (D119): a widget's frame, the same reach. */
+  terminal: workspaceProcedure
+    .input(z.object({ program: z.string().max(TERMINAL_PROGRAM_MAX_CHARS + 1) }))
+    .query(({ ctx, input }) =>
+      compileTerminal(input.program, pagePackagesOf(ctx.ws), {
+        maxKb: codeLimits(ctx.ws).widgetBundleKb,
+        network: reachableWidgetHosts(ctx.ws),
+      }),
+    ),
 })

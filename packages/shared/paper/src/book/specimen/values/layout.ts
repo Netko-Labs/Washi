@@ -26,6 +26,11 @@ export const LAYOUT_SPECIMENS: Record<string, Specimen> = {
     props: { title: 'A clock', height: 90 },
     children: '<Clock />',
   },
+  Terminal: {
+    props: { title: 'Hello', height: 160 },
+    children:
+      "{`const os = require('os')\nconsole.log('Hello from a Washi terminal' + os.EOL)\nconsole.table([{ frame: 1 }, { frame: 2 }])`}",
+  },
   Formula: {
     props: { name: 'with_tax', title: 'Price with tax' },
     children:

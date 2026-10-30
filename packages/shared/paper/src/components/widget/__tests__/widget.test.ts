@@ -24,6 +24,10 @@ function harness(values: WidgetPage['values'] = {}) {
     listPages: (parent: string) => [{ id: `${parent}-child`, title: 'Child' }],
     openSheet: (id: string) => void calls.push(`open ${id}`),
     runAction: async (action: unknown) => void calls.push(`act ${JSON.stringify(action)}`),
+    readFile: async (key: string) => {
+      if (key !== 'file:a') throw new Error(`${key} is not an upload you can open`)
+      return new TextEncoder().encode('{"n":1}')
+    },
   } as unknown as PaperHost
   const page: WidgetPage = {
     host,
@@ -54,6 +58,19 @@ describe('a widget’s frame and its page (D113)', () => {
     ])
     expect(await answerAsk(ask({ type: 'me', id: 4 }), page)).toEqual({ id: 'u1', name: 'Juan' })
     expect(await answerAsk(ask({ type: 'members', id: 5 }), page)).toEqual([])
+  })
+
+  test('useFile reads an upload as the reader may, or says why not (D119)', async () => {
+    const { page } = harness()
+    const file = (key: string, as: string) => ask({ type: 'file', id: 9, key, as })
+    expect(await answerAsk(file('file:a', 'json'), page)).toEqual({ ok: true, value: { n: 1 } })
+    expect(await answerAsk(file('file:a', 'text'), page)).toEqual({ ok: true, value: '{"n":1}' })
+    const bytes = (await answerAsk(file('file:a', 'bytes'), page)) as { value: Uint8Array }
+    expect(bytes.value.length).toBe(7)
+    expect(await answerAsk(file('file:z', 'text'), page)).toEqual({
+      ok: false,
+      error: 'file:z is not an upload you can open',
+    })
   })
 
   test('a read that fails answers empty, never throws into the frame', async () => {
