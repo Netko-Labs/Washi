@@ -56,6 +56,16 @@ describe('page editor blocks', () => {
     expect(parse(serialize(sheet))).toEqual(sheet)
   })
 
+  test('a code block saves without the blank lines typed after it', () => {
+    const sheet = toSheet(parse('<Sheet title="t"></Sheet>'), [
+      newBlock('code', '  indented\nline two\n\n\n'),
+    ])
+    const [code] = sheet.children
+    expect(code?.kind === 'element' && code.children).toEqual([
+      { kind: 'text', value: '  indented\nline two' },
+    ])
+  })
+
   test('text in several runs stays locked rather than gaining or losing spaces', () => {
     const root = parse('<Sheet title="t"><Text>Tom {"&"} Jerry</Text></Sheet>')
     expect(toBlocks(root).map((block) => block.kind)).toEqual(['locked'])

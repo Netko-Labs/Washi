@@ -137,7 +137,7 @@ export function toBlocks(root: WsxElement): Block[] {
 
 function toNode(block: TextBlock): WsxElement | null {
   if (block.kind === 'divider') return element('Divider', block.props, [])
-  if (block.kind === 'code') return element('Code', block.props, text(block.text))
+  if (block.kind === 'code') return element('Code', block.props, text(block.text.trimEnd()))
   if (!block.text.trim()) return null
   const level = HEADING_LEVELS[block.kind]
   if (level)

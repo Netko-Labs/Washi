@@ -69,6 +69,10 @@ export function BlockInput({ block, numberAt }: BlockInputProps) {
       const [first] = slash === null ? [] : slashMatches(slash, store().tables, [], isNested)
       if (first) pick(first)
       else store().splitAt(block.id, field.selectionStart)
+    } else if (event.key === 'Enter' && !event.shiftKey && atEnd && field.value.endsWith('\n')) {
+      event.preventDefault()
+      store().setText(block.id, field.value.trimEnd())
+      store().insertAfter(block.id)
     } else if (event.key === 'Escape' && slash !== null) {
       store().setText(block.id, '')
     } else if (event.key === 'Backspace' && atStart) {
@@ -85,10 +89,17 @@ export function BlockInput({ block, numberAt }: BlockInputProps) {
 
   return (
     <div
+      data-tone={block.kind === 'callout' ? String(block.props.tone ?? 'info') : undefined}
       className={`relative flex items-baseline gap-2 ${
         block.kind === 'quote' ? 'border-l-[3px] border-current/30 pl-4' : ''
-      } ${block.kind === 'callout' ? 'rounded-xl bg-black/[0.04] px-4 py-3' : ''} ${
-        block.kind === 'code' ? 'rounded-xl bg-black/[0.05] px-4 py-3' : ''
+      } ${
+        block.kind === 'callout'
+          ? 'rounded-xl border border-[var(--t-line)] bg-[var(--t-tint)] px-4 py-3'
+          : ''
+      } ${
+        block.kind === 'code'
+          ? 'rounded-xl border border-[var(--border)] bg-[var(--muted-bg)] px-4 py-3'
+          : ''
       }`}
     >
       {block.kind === 'bullet' && <span className="select-none">•</span>}
@@ -116,7 +127,7 @@ export function BlockInput({ block, numberAt }: BlockInputProps) {
           block.kind === 'todo' && block.done ? 'line-through opacity-50' : ''
         }`}
       />
-      {slash !== null && <SlashMenu id={block.id} query={slash} onPick={pick} />}
+      {slash !== null && <SlashMenu id={block.id} query={slash} anchor={ref} onPick={pick} />}
     </div>
   )
 }
