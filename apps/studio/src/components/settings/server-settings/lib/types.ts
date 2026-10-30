@@ -8,7 +8,7 @@ export interface WorkspaceDefaultsState {
   turnCap?: number
 }
 
-/** The server's Exa key as its admins see it: only the last four. */
+/** The server's Exa or Unsplash key as its admins see it: only the last four. */
 export interface ServerSearchKeyState {
   last4: string
   updatedAt: string
@@ -29,6 +29,7 @@ export interface ServerSettingsState {
   signup: SignupMode
   key: KeyState | null
   searchKey: ServerSearchKeyState | null
+  unsplashKey: ServerSearchKeyState | null
   fetchHosts: string[]
   embedHosts: string[]
   widgets: boolean
@@ -37,6 +38,14 @@ export interface ServerSettingsState {
 }
 
 export type HostListKind = 'fetch' | 'embed'
+
+export interface LentKeyCopy {
+  title: string
+  desc: string
+  lent: string
+  none: string
+  blurb: string
+}
 
 export interface HostListCopy {
   title: string
@@ -55,8 +64,11 @@ export interface ServerKeyCardProps {
   onModel: (model: string | null) => Promise<unknown>
 }
 
-export interface ServerSearchKeyCardProps {
-  searchKey: ServerSearchKeyState | null
+export type LentKeyTarget = 'exa' | 'unsplash'
+
+export interface ServerLentKeyCardProps {
+  target: LentKeyTarget
+  connected: ServerSearchKeyState | null
   /** Null when it took; otherwise the server's refusal. */
   onSave: (key: string) => Promise<string | null>
   onRemove: () => Promise<unknown>

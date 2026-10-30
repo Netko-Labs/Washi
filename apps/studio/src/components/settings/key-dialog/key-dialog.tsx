@@ -1,6 +1,6 @@
 import { IconEye, IconEyeOff, IconX } from '@tabler/icons-react'
 import { Dialog } from '@/components/shared/dialog'
-import { type KeyDialogProps, PROVIDER_META, refusalFor, sinceLabel } from '../lib'
+import { KEY_NOTES, type KeyDialogProps, PROVIDER_META, refusalFor, sinceLabel } from '../lib'
 import { useKeyDialog } from './lib'
 
 /** A stable ref callback: React runs it on mount only, so focus is taken once. */
@@ -115,8 +115,8 @@ export function KeyDialog({
       ) : (
         <p className="text-[12.5px] text-muted-foreground">
           {connected && !replacing
-            ? `${target === 'exa' ? 'Remove stops searches on this key.' : 'Remove makes Washi fall asleep until another key is connected.'} Nothing already written changes.`
-            : `Keys come from ${meta.from}. ${target === 'exa' ? 'Every search still stops at the desk.' : 'The model is chosen in Settings, not here.'}`}
+            ? `${target === 'exa' || target === 'unsplash' ? KEY_NOTES[target].remove : 'Remove makes Washi fall asleep until another key is connected.'} Nothing already written changes.`
+            : `Keys come from ${meta.from}. ${target === 'exa' || target === 'unsplash' ? KEY_NOTES[target].connect : 'The model is chosen in Settings, not here.'}`}
         </p>
       )}
 

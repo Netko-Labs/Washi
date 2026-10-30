@@ -1,4 +1,4 @@
-// conventions: >300 lines — context, procedures and their refusals; split when next touched
+// conventions: >300 lines — context, procedures, their refusals and the control-plane contract; split when next touched
 import { initTRPC, TRPCError } from '@trpc/server'
 import type { Viewer } from '@washi/domain'
 import type { FileStore, Workspace } from '@washi/repository'
@@ -64,8 +64,8 @@ export interface AgentCredentialInput {
   model?: string | null
 }
 
-/** Services Washi reaches out to with a key of its own. Exa searches the web. */
-export const INTEGRATIONS = ['exa'] as const
+/** Services a workspace reaches out to with a key of its own. Exa searches the web; Unsplash finds photos. */
+export const INTEGRATIONS = ['exa', 'unsplash'] as const
 export type Integration = (typeof INTEGRATIONS)[number]
 
 export interface SecretStore {
@@ -129,6 +129,8 @@ export interface ServerRuntime {
   presence: PresenceBoard
   /** Hosted only: the server's page packages (D116), installed on its data volume. */
   pagePackages?: PagePackageStore
+  /** The workspace's own Unsplash key, else the server's (D117) — for a route to call with, never to return. */
+  unsplashKey?(workspaceId: string): Promise<string | null>
 }
 
 export interface Context {

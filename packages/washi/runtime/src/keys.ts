@@ -14,7 +14,7 @@ export function keyWithFallback(
   }
 }
 
-/** The same rule for web search: a workspace's own Exa key, else the server's, else none. */
+/** The same rule for a lone integration key — Exa's, Unsplash's: the workspace's, else the server's, else none. */
 export function searchKeyWithFallback(
   own: SearchKeyLookup,
   server: () => Promise<string | null>,

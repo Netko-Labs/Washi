@@ -80,6 +80,7 @@ export type {
   SheetLookHost,
   SheetLookProviderProps,
   SheetMarkProps,
+  UnsplashCredit,
 } from './look'
 export type {
   AudioProps,

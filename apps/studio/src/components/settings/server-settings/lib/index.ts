@@ -4,7 +4,7 @@ export type {
   PagePackageState,
   PagePackagesCardProps,
   ServerKeyCardProps,
-  ServerSearchKeyCardProps,
+  ServerLentKeyCardProps,
   ServerSearchKeyState,
   ServerSettingsState,
   ServerWidgetsCardProps,
@@ -15,7 +15,7 @@ export { packageState, sizeLabel } from './utils'
 export {
   HOST_LISTS,
   INSTALL_POLL_MS,
+  LENT_KEY_COPY,
   PAGE_PACKAGES_COPY,
-  SEARCH_KEY_COPY,
   WASHI_DEFAULTS,
 } from './values'

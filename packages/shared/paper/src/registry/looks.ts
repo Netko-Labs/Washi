@@ -30,16 +30,30 @@ export const COVER_PICTURES: { slug: string; label: string }[] = [
 ]
 
 export const FILE_KEY = /^file:[a-z0-9-]{1,48}$/
+/** A photo picked from Unsplash: the workspace keeps its hotlinks and credit by id (D117). */
+export const UNSPLASH_KEY = /^unsplash:[A-Za-z0-9_-]{1,64}$/
 
-/** `preset:sage` · `picture:fjord` · `file:<id>` — a key, never a URL (D60). */
+const UNSPLASH_UTM = { utm_source: 'washi', utm_medium: 'referral' }
+export const UNSPLASH_HOME = 'https://unsplash.com/'
+
+/** Unsplash's guidelines: a link back to it or a photographer carries the app's referral. */
+export function unsplashLink(href: string): string {
+  const url = new URL(href)
+  for (const [key, value] of Object.entries(UNSPLASH_UTM)) url.searchParams.set(key, value)
+  return url.href
+}
+
+export const unsplashCaption = (name: string) => `Photo by ${name} on Unsplash`
+
+/** `preset:sage` · `picture:fjord` · `file:<id>` · `unsplash:<id>` — a key, never a URL (D60). */
 export const coverKeySchema = z.string().refine(
   (key) => {
     const [kind, name] = [key.slice(0, key.indexOf(':')), key.slice(key.indexOf(':') + 1)]
     if (kind === 'preset') return name in COVER_PRESETS
     if (kind === 'picture') return COVER_PICTURES.some((picture) => picture.slug === name)
-    return FILE_KEY.test(key)
+    return FILE_KEY.test(key) || UNSPLASH_KEY.test(key)
   },
-  { message: 'a cover is preset:<name>, picture:<name> or file:<id>' },
+  { message: 'a cover is preset:<name>, picture:<name>, file:<id> or unsplash:<id>' },
 )
 
 /** An emoji, a registry icon name (checked where the names live), or an upload's `file:<id>`. */

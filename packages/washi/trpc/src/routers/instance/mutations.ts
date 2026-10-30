@@ -38,6 +38,14 @@ export const instanceMutations = router({
     await ctx.instance.removeSearchKey()
     return { removed: true }
   }),
+  /** Unsplash for every workspace without its own Access Key (D117); write-only the same way. */
+  setUnsplashKey: adminProcedure
+    .input(integrationKeySchema)
+    .mutation(({ ctx, input }) => ctx.instance.setUnsplashKey(ctx.adminId, input.key)),
+  removeUnsplashKey: adminProcedure.mutation(async ({ ctx }) => {
+    await ctx.instance.removeUnsplashKey()
+    return { removed: true }
+  }),
   /** Hosts every workspace may fetch without asking; tsuru's refusals still refuse. */
   setFetchHosts: adminProcedure
     .input(z.object({ hosts: hostListSchema }))

@@ -87,12 +87,23 @@ export async function bootRuntime(env: Env): Promise<BootedRuntime> {
         (workspaceId) => hosted.integrationKey(workspaceId, 'exa'),
         () => hosted.instance.searchKey(),
       ),
+      unsplashKey: searchKeyWithFallback(
+        (workspaceId) => hosted.integrationKey(workspaceId, 'unsplash'),
+        () => hosted.instance.unsplashKey(),
+      ),
       blobs,
       workspaceStorage: (workspaceId) => hosted.storage.config(workspaceId),
     }
   } else {
     const control = createEmbeddedControlPlane({ workspaceId: DEFAULT_WORKSPACE_ID })
-    options = { mode, control, dataDir, searchKey: async () => env.EXA_API_KEY ?? null, blobs }
+    options = {
+      mode,
+      control,
+      dataDir,
+      searchKey: async () => env.EXA_API_KEY ?? null,
+      unsplashKey: async () => env.UNSPLASH_ACCESS_KEY ?? null,
+      blobs,
+    }
   }
 
   return startRuntime(options, trustedOrigins)

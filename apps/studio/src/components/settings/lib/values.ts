@@ -16,6 +16,8 @@ import {
 import type {
   ApprovalMode,
   Effort,
+  IntegrationId,
+  KeyTarget,
   Option,
   ProviderMeta,
   RecommendedModel,
@@ -31,7 +33,7 @@ export const PROVIDERS = [
   { id: 'openrouter', label: 'OpenRouter', hint: 'sk-or-…' },
 ] as const
 
-export const PROVIDER_META: Record<'anthropic' | 'openrouter' | 'exa', ProviderMeta> = {
+export const PROVIDER_META: Record<KeyTarget, ProviderMeta> = {
   anthropic: {
     id: 'anthropic',
     label: 'Anthropic',
@@ -58,6 +60,27 @@ export const PROVIDER_META: Record<'anthropic' | 'openrouter' | 'exa', ProviderM
     hint: 'exa-…',
     from: 'exa.ai',
     blurb: 'searches still ask until allowed always',
+  },
+  unsplash: {
+    id: 'unsplash',
+    label: 'Photos · Unsplash',
+    mark: 'Un',
+    tint: 'bg-[#111111] text-white',
+    hint: 'Access Key, not the Secret key',
+    from: 'unsplash.com/developers',
+    blurb: 'covers and pictures, searched on a press',
+  },
+}
+
+/** What Remove does, and what a key is for, in the key dialog — per service outside. */
+export const KEY_NOTES: Record<IntegrationId, { remove: string; connect: string }> = {
+  exa: {
+    remove: 'Remove stops searches on this key.',
+    connect: 'Every search still stops at the desk.',
+  },
+  unsplash: {
+    remove: 'Remove stops photo searches on this key; covers already picked stay.',
+    connect: 'Each search and pick is a press, and the ledger keeps it.',
   },
 }
 
@@ -194,6 +217,9 @@ export const SIGNUP_OPTIONS: readonly Option<SignupMode>[] = [
     desc: 'Anyone who reaches this server can create an account and workspaces.',
   },
 ]
+
+export const ON_SERVER_UNSPLASH_KEY =
+  'On the server’s key: Unsplash photos come through this server’s Access Key until the workspace connects its own, which then wins.'
 
 export const ON_SERVER_SEARCH_KEY =
   'On the server’s key: web search runs on this server’s Exa key until the workspace connects its own, which then wins.'

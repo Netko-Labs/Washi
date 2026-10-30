@@ -21,6 +21,14 @@ export interface SheetFrameProps extends SheetLook {
 
 export type LookPart = 'icon' | 'cover'
 
+/** An Unsplash cover as the workspace keeps it: Unsplash's hotlink and whom to credit (D117). */
+export interface UnsplashCredit {
+  url: string
+  name: string
+  profileUrl: string
+  pageUrl: string
+}
+
 /** What a host lends a page's look: where pictures live, how to draw an icon, how to change one. */
 export interface SheetLookHost {
   /** The host's own band under the icon — who is here, the add buttons, a row's properties. */
@@ -28,6 +36,8 @@ export interface SheetLookHost {
   drawIcon?(name: string): ReactNode
   fileUrl?(id: string): string
   pictureUrl?(slug: string): string
+  /** A photo kept for `unsplash:<id>`; unknown ids draw no picture. */
+  unsplash?(id: string): UnsplashCredit | undefined
   /** A workspace theme's tokens by its `ws:<slug>` key; unknown keys wear Washi. */
   theme?(key: string): ThemePair | undefined
   /** A read-only host leaves it out and the look stays still. */

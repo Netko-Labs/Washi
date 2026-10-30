@@ -19,7 +19,12 @@ export function frameOf(root: WsxElement): SheetLook {
 export function coverStyle(cover: string, look: SheetLookHost): CSSProperties {
   const [kind, key] = [cover.slice(0, cover.indexOf(':')), cover.slice(cover.indexOf(':') + 1)]
   if (kind === 'preset') return { background: COVER_PRESETS[key]?.background }
-  const url = kind === 'picture' ? look.pictureUrl?.(key) : look.fileUrl?.(key)
+  const url =
+    kind === 'picture'
+      ? look.pictureUrl?.(key)
+      : kind === 'unsplash'
+        ? look.unsplash?.(key)?.url
+        : look.fileUrl?.(key)
   return url ? { backgroundImage: `url(${url})` } : {}
 }
 

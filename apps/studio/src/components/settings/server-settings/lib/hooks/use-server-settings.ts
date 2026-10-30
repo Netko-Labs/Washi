@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { api } from '@/integrations/trpc'
 import type { ModelOption } from '@/lib/types'
 import type { ProviderId, SignupMode } from '../../../lib'
-import type { ServerSettingsState, WorkspaceDefaultsState } from '../types'
+import type { LentKeyTarget, ServerSettingsState, WorkspaceDefaultsState } from '../types'
 import { INSTALL_POLL_MS } from '../values'
 
 const messageOf = (cause: unknown, fallback: string) =>
@@ -84,19 +84,25 @@ export function useServerSettings() {
         await api.instance.setKeyModel.mutate({ model })
         await refresh()
       }),
-    saveSearchKey: async (key: string): Promise<string | null> => {
+    saveLentKey: async (target: LentKeyTarget, key: string): Promise<string | null> => {
       try {
-        await api.instance.setSearchKey.mutate({ key })
+        if (target === 'exa') await api.instance.setSearchKey.mutate({ key })
+        else await api.instance.setUnsplashKey.mutate({ key })
         await refresh()
         return null
       } catch (cause) {
         return messageOf(cause, 'The key did not save.')
       }
     },
-    removeSearchKey: () =>
+    removeLentKey: (target: LentKeyTarget) =>
       attempt(async () => {
-        await api.instance.removeSearchKey.mutate()
-        patch({ searchKey: null })
+        if (target === 'exa') {
+          await api.instance.removeSearchKey.mutate()
+          patch({ searchKey: null })
+        } else {
+          await api.instance.removeUnsplashKey.mutate()
+          patch({ unsplashKey: null })
+        }
       }),
     setHosts: async (kind: 'fetch' | 'embed', hosts: string[]): Promise<string | null> => {
       try {

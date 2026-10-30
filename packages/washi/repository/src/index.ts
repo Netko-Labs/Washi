@@ -164,6 +164,11 @@ export {
 } from './storage/tables'
 export type { AutomationEntry, SheetIndexInput } from './storage/types'
 export {
+  getUnsplashPhoto,
+  keepUnsplashPhoto,
+  listUnsplashPhotos,
+} from './storage/unsplash-photos'
+export {
   createWorkspaceTheme,
   deleteWorkspaceTheme,
   getWorkspaceTheme,

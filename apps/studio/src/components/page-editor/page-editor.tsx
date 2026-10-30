@@ -1,4 +1,5 @@
 import { frameOf, SheetFrame } from '@washi/paper'
+import { UnsplashPick } from '@/components/shared/unsplash'
 import { BlockList } from './block-list'
 import { type PageEditorProps, useAutosave, useEditorStore, useLoadBlocks } from './lib'
 
@@ -20,6 +21,7 @@ export function PageEditor({ sheet, root }: PageEditorProps) {
         }}
         className="block h-24 w-full cursor-text"
       />
+      <UnsplashPick />
     </SheetFrame>
   )
 }

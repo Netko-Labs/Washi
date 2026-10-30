@@ -2,7 +2,12 @@ import { type ServerPolicy, serverPolicySchema, workspaceDefaultsSchema } from '
 import { eq } from 'drizzle-orm'
 import { instanceSetting, user } from '../db'
 import type { ControlDB } from './client'
-import { SERVER_SEAL_ID, SERVER_SEARCH_SEAL_ID, SETTING_KEYS } from './constants'
+import {
+  SERVER_SEAL_ID,
+  SERVER_SEARCH_SEAL_ID,
+  SERVER_UNSPLASH_SEAL_ID,
+  SETTING_KEYS,
+} from './constants'
 import { open, seal } from './crypto'
 import type {
   SealedSearchKey,
@@ -59,10 +64,40 @@ export function createServerSettings({
     return stored ? (stored as SealedServerKey) : null
   }
 
-  const sealedSearchKey = async (): Promise<SealedSearchKey | null> => {
-    const stored = json((await rows.get(SETTING_KEYS.searchKey)) ?? undefined)
-    return stored ? (stored as SealedSearchKey) : null
+  // A lone integration key — Exa's, Unsplash's — sealed under its own id, shown by its last four.
+  const loneKey = (settingKey: string, sealId: string) => {
+    const sealed = async (): Promise<SealedSearchKey | null> => {
+      const stored = json((await rows.get(settingKey)) ?? undefined)
+      return stored ? (stored as SealedSearchKey) : null
+    }
+    return {
+      async secret() {
+        const row = await sealed()
+        return row ? open(masterKey, sealId, row) : null
+      },
+      async info() {
+        const row = await sealed()
+        if (!row) return null
+        return {
+          last4: row.last4,
+          updatedAt: new Date(row.updatedAt),
+          updatedBy: row.updatedBy ? await nameOf(row.updatedBy) : null,
+        }
+      },
+      async set(actorId: string, key: string) {
+        const row: SealedSearchKey = {
+          ...(await seal(masterKey, sealId, key)),
+          updatedBy: actorId,
+          updatedAt: new Date().toISOString(),
+        }
+        await rows.put(settingKey, JSON.stringify(row))
+        return { last4: row.last4 }
+      },
+      drop: () => rows.drop(settingKey),
+    }
   }
+  const search = loneKey(SETTING_KEYS.searchKey, SERVER_SEARCH_SEAL_ID)
+  const unsplash = loneKey(SETTING_KEYS.unsplashKey, SERVER_UNSPLASH_SEAL_ID)
 
   return {
     async load() {
@@ -117,30 +152,15 @@ export function createServerSettings({
     },
     removeKey: () => rows.drop(SETTING_KEYS.agentKey),
 
-    async searchKey() {
-      const row = await sealedSearchKey()
-      return row ? open(masterKey, SERVER_SEARCH_SEAL_ID, row) : null
-    },
-    async searchKeyInfo() {
-      const row = await sealedSearchKey()
-      if (!row) return null
-      return {
-        last4: row.last4,
-        updatedAt: new Date(row.updatedAt),
-        updatedBy: row.updatedBy ? await nameOf(row.updatedBy) : null,
-      }
-    },
-    async setSearchKey(actorId, key) {
-      const sealed = await seal(masterKey, SERVER_SEARCH_SEAL_ID, key)
-      const row: SealedSearchKey = {
-        ...sealed,
-        updatedBy: actorId,
-        updatedAt: new Date().toISOString(),
-      }
-      await rows.put(SETTING_KEYS.searchKey, JSON.stringify(row))
-      return { last4: sealed.last4 }
-    },
-    removeSearchKey: () => rows.drop(SETTING_KEYS.searchKey),
+    searchKey: search.secret,
+    searchKeyInfo: search.info,
+    setSearchKey: search.set,
+    removeSearchKey: search.drop,
+
+    unsplashKey: unsplash.secret,
+    unsplashKeyInfo: unsplash.info,
+    setUnsplashKey: unsplash.set,
+    removeUnsplashKey: unsplash.drop,
   }
 }
 

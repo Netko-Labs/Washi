@@ -83,6 +83,11 @@ describe('tool calls read like a person asked', () => {
     const preview = describeTool('link_preview', { href: 'https://github.com/oven-sh/bun' }, titles)
     expect(`${preview.action} ${preview.subject}`).toBe('Read a bookmark from github.com')
     expect(preview.outbound).toBe(true)
+    const photos = describeTool('unsplash_search', { query: 'fjord' }, titles)
+    expect(`${photos.action} ${photos.subject}`).toBe('Search Unsplash for “fjord”')
+    const picked = describeTool('unsplash_use', { id: 'Dwu85P9SOIk' }, titles)
+    expect(`${picked.action} ${picked.subject}`).toBe('Picked a photo from Unsplash')
+    expect(picked.outbound).toBe(true)
   })
 
   test('a page draft carries its source for the preview', () => {

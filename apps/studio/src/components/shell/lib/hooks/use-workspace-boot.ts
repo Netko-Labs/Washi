@@ -3,6 +3,7 @@ import {
   useLiveStore,
   useSheetsStore,
   useThemesStore,
+  useUnsplashStore,
   useViewStore,
 } from '@washi/ui'
 import { useEffect } from 'react'
@@ -28,6 +29,7 @@ export function useWorkspaceBoot(workspaceId: string) {
   useEffect(() => {
     void useSheetsStore.getState().refresh()
     void useThemesStore.getState().refresh()
+    void useUnsplashStore.getState().refresh()
     void useAgentStore.getState().init()
     useLiveStore.getState().connect()
     // Only the subscriptions need closing; resetting state is the loader's job, and doing it

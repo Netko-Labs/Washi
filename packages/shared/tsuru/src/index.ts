@@ -14,3 +14,14 @@ export {
   type PolicyVerdict,
 } from './policy'
 export { type LinkPreview, linkPreview, readPreview } from './preview'
+export {
+  UNSPLASH_API,
+  UNSPLASH_ID,
+  type UnsplashCall,
+  type UnsplashPhoto,
+  type UnsplashSearch,
+  type UnsplashSearchInput,
+  unsplashDownload,
+  unsplashPhoto,
+  unsplashSearch,
+} from './unsplash'

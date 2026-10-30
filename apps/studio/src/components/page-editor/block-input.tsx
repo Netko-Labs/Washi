@@ -2,6 +2,7 @@ import { acceptFor } from '@washi/domain'
 import { useNoticeStore } from '@washi/ui'
 import type { KeyboardEvent } from 'react'
 import { useRef } from 'react'
+import { useUnsplashPickStore } from '@/components/shared/unsplash'
 import {
   type BlockInputProps,
   FIELD_CLASS,
@@ -36,7 +37,12 @@ export function BlockInput({ block, numberAt }: BlockInputProps) {
             ? pickFiles(acceptFor('image'), true).then((files) =>
                 files.length > 0 ? { ...chosen, files } : null,
               )
-            : Promise.resolve(chosen)
+            : chosen.kind === 'unsplash' && ref.current
+              ? useUnsplashPickStore
+                  .getState()
+                  .ask(ref.current)
+                  .then((photo) => (photo ? { ...chosen, photo } : null))
+              : Promise.resolve(chosen)
       // The `/` text stays put, so a refused name (taken since the menu loaded) can be retyped.
       ready
         .then((landing) => landing && store().insertData(block.id, landing))

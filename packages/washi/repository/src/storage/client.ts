@@ -11,6 +11,7 @@ import { ensureChatSearch } from './chat-search'
 import { ensureCustomEmojis } from './custom-emojis'
 import { ensureReminders } from './reminders'
 import { ensureRoutineRuns } from './routine-runs-ddl'
+import { ensureUnsplashPhotos } from './unsplash-photos'
 import { ensureWorkspaceThemes } from './workspace-themes'
 
 export type DrizzleDB = BunSQLiteDatabase<typeof schema>
@@ -353,6 +354,7 @@ function createTables(sqlite: Database) {
   ensureCustomEmojis(sqlite)
   ensureWorkspaceThemes(sqlite)
   ensureReminders(sqlite)
+  ensureUnsplashPhotos(sqlite)
 
   // window_state used to live here. A server has no windows — it moved to the
   // desktop client's own store.

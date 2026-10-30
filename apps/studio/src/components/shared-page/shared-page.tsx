@@ -11,8 +11,11 @@ import { shareLook } from './share-look'
 export function SharedPage({ workspaceId, token }: SharedPageProps) {
   const state = useSharedPage(workspaceId, token)
   const host = useMemo(() => shareHost(workspaceId, token), [workspaceId, token])
-  const theme = state.status === 'ready' ? state.page.theme : null
-  const look = useMemo(() => shareLook(workspaceId, token, theme), [workspaceId, token, theme])
+  const page = state.status === 'ready' ? state.page : null
+  const look = useMemo(
+    () => shareLook(workspaceId, token, page?.theme ?? null, page?.unsplash ?? null),
+    [workspaceId, token, page],
+  )
 
   if (state.status === 'loading') return <main className="min-h-dvh bg-background" />
   if (state.status === 'gone') {

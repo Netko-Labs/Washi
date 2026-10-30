@@ -1,4 +1,4 @@
-import type { HostListCopy, HostListKind } from './types'
+import type { HostListCopy, HostListKind, LentKeyCopy, LentKeyTarget } from './types'
 
 /** Washi's own starting values, shown until the server sets its own (service constants). */
 export const WASHI_DEFAULTS = { approvalMode: 'ask', dailyCapUsd: 25, turnCap: 200 } as const
@@ -18,13 +18,22 @@ export const HOST_LISTS: Record<HostListKind, HostListCopy> = {
   },
 }
 
-export const SEARCH_KEY_COPY = {
-  title: 'Web search',
-  desc: 'Workspaces without an Exa key of their own search the web on this one. A workspace’s own key always wins.',
-  lent: 'Lent to every workspace',
-  none: 'None',
-  blurb: 'One Exa key for every workspace on this server, encrypted on it',
-} as const
+export const LENT_KEY_COPY: Record<LentKeyTarget, LentKeyCopy> = {
+  exa: {
+    title: 'Web search',
+    desc: 'Workspaces without an Exa key of their own search the web on this one. A workspace’s own key always wins.',
+    lent: 'Lent to every workspace',
+    none: 'None',
+    blurb: 'One Exa key for every workspace on this server, encrypted on it',
+  },
+  unsplash: {
+    title: 'Unsplash photos',
+    desc: 'Workspaces without an Unsplash Access Key of their own pick covers and pictures on this one. A workspace’s own key always wins.',
+    lent: 'Lent to every workspace',
+    none: 'None',
+    blurb: 'One Unsplash Access Key for every workspace on this server, encrypted on it',
+  },
+}
 
 export const PAGE_PACKAGES_COPY = {
   title: 'Page packages',

@@ -92,6 +92,7 @@ export function createRuntime(options: RuntimeOptions): Runtime {
     presence,
     defaultWorkspaceId: options.defaultWorkspaceId ?? DEFAULT_WORKSPACE_ID,
     pagePackages: options.pagePackages,
+    unsplashKey: (workspaceId) => options.unsplashKey?.(workspaceId) ?? Promise.resolve(null),
 
     resolve(workspaceId) {
       const existing = hosts.get(workspaceId)

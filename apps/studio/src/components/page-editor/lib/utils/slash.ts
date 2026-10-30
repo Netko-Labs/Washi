@@ -94,6 +94,14 @@ function uploadOptions(needle: string): Extract<SlashOption, { type: 'data' }>[]
     pick: { kind: 'code' },
   }
   const pictures = !needle || 'gallery photos pictures album'.includes(needle) ? [gallery] : []
+  const unsplash: Extract<SlashOption, { type: 'data' }> = {
+    type: 'data',
+    key: 'unsplash',
+    label: 'Unsplash photo',
+    hint: 'search',
+    pick: { kind: 'unsplash' },
+  }
+  const stock = !needle || 'unsplash image photo picture stock'.includes(needle) ? [unsplash] : []
   const widget: Extract<SlashOption, { type: 'data' }> = {
     type: 'data',
     key: 'widget',
@@ -111,7 +119,7 @@ function uploadOptions(needle: string): Extract<SlashOption, { type: 'data' }>[]
     pick: { kind: 'formula' },
   }
   const fn = !needle || 'formula function fn'.includes(needle) ? [formula] : []
-  return [...uploads, ...pictures, ...code, ...drawn, ...fn]
+  return [...uploads, ...pictures, ...stock, ...code, ...drawn, ...fn]
 }
 
 /** Tab sections sit on the page itself: never offered inside a column or a tab. */

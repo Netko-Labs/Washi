@@ -1,6 +1,7 @@
 export const COVER_TABS = [
   { id: 'presets', label: 'Presets' },
   { id: 'pictures', label: 'Pictures' },
+  { id: 'unsplash', label: 'Unsplash' },
   { id: 'upload', label: 'Upload' },
 ] as const
 

@@ -39,6 +39,7 @@ function store() {
   let policy = serverPolicySchema.parse({})
   let key: { last4: string; provider: string; model: string | null } | null = null
   let searchKey: string | null = null
+  let unsplashKey: string | null = null
   const instance: InstanceStore = {
     isAdmin: async (id) => id === 'first',
     signup: async () => signup,
@@ -84,6 +85,17 @@ function store() {
     },
     removeSearchKey: async () => {
       searchKey = null
+    },
+    unsplashKeyInfo: async () =>
+      unsplashKey
+        ? { last4: unsplashKey.slice(-4), updatedAt: new Date(0), updatedBy: 'First' }
+        : null,
+    setUnsplashKey: async (_actor, secret) => {
+      unsplashKey = secret
+      return { last4: secret.slice(-4) }
+    },
+    removeUnsplashKey: async () => {
+      unsplashKey = null
     },
   }
   return instance

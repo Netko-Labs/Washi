@@ -1,17 +1,21 @@
 import {
   APPROVAL_MODE_OPTIONS,
   ON_SERVER_SEARCH_KEY,
+  ON_SERVER_UNSPLASH_KEY,
   type OutsideCardProps,
   PROVIDER_META,
   YOLO_OPTIONS,
 } from '../lib'
 import { ProviderRow, Segmented, SettingRow, SettingsCard } from '../shared/card'
 
+const NOTE = 'border-border border-t px-5 py-4 text-[13px] text-muted-foreground'
+
 /** Reads pass and page edits land either way. This card is about the outside. */
 export function OutsideCard({
   approvalMode,
   searchKey,
-  serverSearchKey,
+  unsplashKey,
+  lent,
   onApprovalMode,
   yoloAllowed,
   onYoloAllowed,
@@ -43,16 +47,19 @@ export function OutsideCard({
           onChange={(choice) => void onYoloAllowed(choice === 'on')}
         />
       </SettingRow>
-      {!searchKey && serverSearchKey && (
-        <p className="border-border border-t px-5 py-4 text-[13px] text-muted-foreground">
-          {ON_SERVER_SEARCH_KEY}
-        </p>
-      )}
+      {!searchKey && lent.exa && <p className={NOTE}>{ON_SERVER_SEARCH_KEY}</p>}
       <ProviderRow
         meta={PROVIDER_META.exa}
         connected={searchKey}
-        onConnect={onConnect}
-        onRemove={() => void onRemove()}
+        onConnect={() => onConnect('exa')}
+        onRemove={() => void onRemove('exa')}
+      />
+      {!unsplashKey && lent.unsplash && <p className={NOTE}>{ON_SERVER_UNSPLASH_KEY}</p>}
+      <ProviderRow
+        meta={PROVIDER_META.unsplash}
+        connected={unsplashKey}
+        onConnect={() => onConnect('unsplash')}
+        onRemove={() => void onRemove('unsplash')}
       />
     </SettingsCard>
   )

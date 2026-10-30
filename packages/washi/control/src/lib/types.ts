@@ -68,7 +68,9 @@ export type ServerSettings = Omit<InstanceStore, 'isAdmin' | 'signup' | 'setSign
   agentKey(): Promise<AgentCredentialOut | null>
   /** Decrypted, for the web search tool only — never for a route. */
   searchKey(): Promise<string | null>
+  /** Decrypted, for the Unsplash search alone — never sent to a client. */
+  unsplashKey(): Promise<string | null>
 }
 
 export type HostedInstanceStore = InstanceStore &
-  Pick<ServerSettings, 'load' | 'agentKey' | 'searchKey'>
+  Pick<ServerSettings, 'load' | 'agentKey' | 'searchKey' | 'unsplashKey'>

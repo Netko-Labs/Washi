@@ -4,7 +4,9 @@ import type { ReactNode } from 'react'
 import type { ModelOption } from '@/lib/types'
 
 export type ProviderId = 'anthropic' | 'openrouter'
-export type KeyTarget = ProviderId | 'exa'
+export type KeyTarget = ProviderId | IntegrationId
+/** A workspace's own key to a service outside: Exa searches the web, Unsplash finds photos. */
+export type IntegrationId = 'exa' | 'unsplash'
 export type Effort = 'quick' | 'balanced' | 'deep'
 export type ResumeBy = 'anyone' | 'owners'
 export type ApprovalMode = 'ask' | 'auto'
@@ -166,13 +168,14 @@ export interface ModelMenuProps {
 export interface OutsideCardProps {
   approvalMode: ApprovalMode
   searchKey: SearchKeyState | null
-  /** The server lends its Exa key to a workspace without one. */
-  serverSearchKey: boolean
+  unsplashKey: SearchKeyState | null
+  /** Whether the server lends its key to a workspace without one, per integration. */
+  lent: Record<IntegrationId, boolean>
   onApprovalMode: (mode: ApprovalMode) => Promise<unknown>
   yoloAllowed: boolean
   onYoloAllowed: (allowed: boolean) => Promise<unknown>
-  onConnect: () => void
-  onRemove: () => Promise<unknown>
+  onConnect: (target: IntegrationId) => void
+  onRemove: (target: IntegrationId) => Promise<unknown>
 }
 
 export interface UsageCardProps {

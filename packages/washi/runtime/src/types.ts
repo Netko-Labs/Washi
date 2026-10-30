@@ -20,6 +20,8 @@ export interface RuntimeOptions {
   pagePackages?: PagePackageInstaller
   /** The Exa key a workspace searches the web with. Hosted stores one; embedded reads the env. */
   searchKey?: SearchKeyLookup
+  /** The Unsplash Access Key a workspace picks photos with: its own, else the server's (D117). */
+  unsplashKey?: SearchKeyLookup
   /** Where a workspace's files go. Absent: a folder beside its .db (D60). */
   blobs?: BlobStoreFactory
   /** Hosted only: a workspace's own bucket, which takes its new uploads in front of `blobs`. */

@@ -13,7 +13,13 @@ export function AgentTab({ part }: AgentTabProps) {
   const { key, searchKey, spend, settings: standing } = settings
 
   const connectedFor = (target: KeyTarget) =>
-    target === 'exa' ? searchKey : key?.provider === target ? key : null
+    target === 'exa'
+      ? searchKey
+      : target === 'unsplash'
+        ? settings.unsplashKey
+        : key?.provider === target
+          ? key
+          : null
 
   return (
     <div className="grid gap-9">
@@ -47,12 +53,13 @@ export function AgentTab({ part }: AgentTabProps) {
         <OutsideCard
           approvalMode={settings.approvalMode}
           searchKey={searchKey}
-          serverSearchKey={settings.serverSearchKey}
+          unsplashKey={settings.unsplashKey}
+          lent={{ exa: settings.serverSearchKey, unsplash: settings.serverUnsplashKey }}
           onApprovalMode={settings.setApprovalMode}
           yoloAllowed={standing?.yoloAllowed ?? false}
           onYoloAllowed={settings.setYoloAllowed}
-          onConnect={() => setDialog('exa')}
-          onRemove={settings.removeSearchKey}
+          onConnect={setDialog}
+          onRemove={settings.removeIntegrationKey}
         />
       )}
 
@@ -75,7 +82,11 @@ export function AgentTab({ part }: AgentTabProps) {
           target={dialog}
           connected={connectedFor(dialog)}
           onSave={(secret) => settings.connect(dialog, secret)}
-          onRemove={dialog === 'exa' ? settings.removeSearchKey : settings.removeKey}
+          onRemove={
+            dialog === 'exa' || dialog === 'unsplash'
+              ? () => settings.removeIntegrationKey(dialog)
+              : settings.removeKey
+          }
           onClose={() => setDialog(null)}
         />
       )}

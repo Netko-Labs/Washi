@@ -1,7 +1,7 @@
 import type { SheetSummary } from '@washi/domain'
 import type { LookPart } from '@washi/paper'
 
-export type CoverTab = 'presets' | 'pictures' | 'upload'
+export type CoverTab = 'presets' | 'pictures' | 'unsplash' | 'upload'
 export type IconTab = 'emoji' | 'upload'
 
 export interface UploadState {
