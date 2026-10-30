@@ -87,3 +87,13 @@ export interface PageSplit {
 
 /** An AST node's own text in the source it was parsed from. */
 export type Slice = (node: t.Node) => string
+
+/** What a top-level statement does as the module loads: nothing, a computation, or a change. */
+export type Acting = 'none' | 'computes' | 'changes'
+
+/** A top-level `const` that may move beside the page's functions. */
+export interface HoistCandidate {
+  names: string[]
+  reads: Set<string>
+  acts: Acting
+}
