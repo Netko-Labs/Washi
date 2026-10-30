@@ -6,6 +6,7 @@ import {
   RootDocument,
   type RouterContext,
 } from '@/components/core/root'
+import { THEME_SCRIPT } from '@/components/shared/theme'
 import appCss from '@/styles.css?url'
 
 export const Route = createRootRouteWithContext<RouterContext>()({
@@ -22,6 +23,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' },
       { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
     ],
+    scripts: [{ children: THEME_SCRIPT }],
   }),
   shellComponent: RootDocument,
   notFoundComponent: NotFound,

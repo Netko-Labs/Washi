@@ -7,7 +7,8 @@ export function RootDocument({ children }: RootDocumentProps) {
   const { queryClient } = useRouter().options.context
   return (
     <Provider queryClient={queryClient}>
-      <html lang="en">
+      {/* The head's theme script may set `dark` before React sees this element. */}
+      <html lang="en" suppressHydrationWarning>
         <head>
           <HeadContent />
         </head>
