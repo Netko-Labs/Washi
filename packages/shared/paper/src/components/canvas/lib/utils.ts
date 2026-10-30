@@ -1,5 +1,6 @@
 import type { WsxElement, WsxNode, WsxValue } from '@washi/wsx'
 import type { Tone } from '../../../lib/types'
+import { IDEA_STEP } from './constants'
 import type { IdeaEdge, IdeaNode } from './types'
 
 const TONES: Tone[] = ['neutral', 'accent', 'info', 'success', 'warning', 'danger']
@@ -82,4 +83,20 @@ export function nextId(nodes: IdeaNode[]): string {
   let n = nodes.length + 1
   while (taken.has(`idea-${n}`)) n++
   return `idea-${n}`
+}
+
+/** `(x, y)`, stepped diagonally while an idea already sits there, so repeated adds stay visible. */
+export function freeSpot(nodes: IdeaNode[], x: number, y: number): { x: number; y: number } {
+  const isTaken = (at: { x: number; y: number }) =>
+    nodes.some(
+      (node) =>
+        Math.abs(node.position.x - at.x) < IDEA_STEP / 2 &&
+        Math.abs(node.position.y - at.y) < IDEA_STEP / 2,
+    )
+  const at = { x, y }
+  while (isTaken(at)) {
+    at.x += IDEA_STEP
+    at.y += IDEA_STEP
+  }
+  return at
 }
