@@ -1,4 +1,4 @@
-import type { SettingsTab } from './types'
+import type { ProviderId, SettingsTab } from './types'
 import { PROVIDER_META, SETTINGS_GROUPS } from './values'
 
 const MINUTE = 60_000
@@ -43,4 +43,13 @@ export function clampMoney(value: string): number | null {
 export function settingsLabel(tab: SettingsTab): string {
   const sections = SETTINGS_GROUPS.flatMap((group) => group.sections)
   return sections.find((section) => section.key === tab)?.label ?? 'Settings'
+}
+
+/** The plain fact under every approval: each turn sends the ask and what Washi reads to a model. */
+export function sentToModel(provider: string | null): string {
+  const label = PROVIDER_META[provider as ProviderId]?.label
+  const to = label
+    ? `${label}, the model provider of the key Washi runs on`
+    : 'the model provider of the key Washi runs on'
+  return `On every turn, what you ask and the pages Washi reads are sent to ${to}.`
 }

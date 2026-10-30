@@ -51,6 +51,7 @@ export function AgentTab({ part }: AgentTabProps) {
 
       {part === 'outside' && (
         <OutsideCard
+          modelProvider={key?.provider ?? settings.serverKey?.provider ?? null}
           approvalMode={settings.approvalMode}
           serverApproves={settings.serverApproves}
           searchKey={searchKey}

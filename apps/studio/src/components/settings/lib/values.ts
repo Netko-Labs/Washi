@@ -76,11 +76,11 @@ export const PROVIDER_META: Record<KeyTarget, ProviderMeta> = {
 export const KEY_NOTES: Record<IntegrationId, { remove: string; connect: string }> = {
   exa: {
     remove: 'Remove stops searches on this key.',
-    connect: 'Every search still stops at the desk.',
+    connect: 'Every search still waits for a person to approve it.',
   },
   unsplash: {
     remove: 'Remove stops photo searches on this key; covers already picked stay.',
-    connect: 'Each search and pick is a press, and the ledger keeps it.',
+    connect: 'Each search and pick is a person’s press, and each is logged.',
   },
 }
 
@@ -224,7 +224,7 @@ export const ON_SERVER_UNSPLASH_KEY =
 
 /** Said instead of the approvals choice while the server's admin approves for everyone (D118). */
 export const SERVER_APPROVES =
-  'The server approves everything: fetches, searches and actions never stop at the desk, whatever this workspace or a chat says. Its admin can change that.'
+  'The server approves everything: fetches, searches and actions never wait for a person, whatever this workspace or a chat says. Its admin can change that.'
 
 export const ON_SERVER_SEARCH_KEY =
   'On the server’s key: web search runs on this server’s Exa key until the workspace connects its own, which then wins.'
@@ -238,7 +238,7 @@ export const APPROVAL_MODE_OPTIONS: readonly Option<ApprovalMode>[] = [
   {
     id: 'auto',
     label: 'Auto',
-    desc: 'A standing yes from this workspace. Each call is still written to the ledger.',
+    desc: 'Washi fetches, searches and runs actions without asking. Each call is still logged.',
   },
 ]
 
@@ -247,7 +247,7 @@ export const YOLO_OPTIONS: readonly Option<YoloSetting>[] = [
   {
     id: 'on',
     label: 'On',
-    desc: 'Whoever starts a conversation may switch on YOLO in it. Each call is still ledgered.',
+    desc: 'Whoever starts a conversation may switch on YOLO in it. Each call is still logged.',
   },
 ]
 
