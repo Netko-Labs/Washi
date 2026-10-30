@@ -1,3 +1,4 @@
+import { MAX_TEXT_CELL } from './constants'
 import type { Cell, ColumnSpec, ColumnType, RecordData, TableSpec } from './types'
 
 export interface InkIssue {
@@ -56,6 +57,9 @@ function checkValue(column: ColumnSpec, value: Cell): string | null {
       break
   }
   if (typeof value !== 'string') return 'expected a string'
+  if (value.length > MAX_TEXT_CELL) {
+    return `text up to ${MAX_TEXT_CELL.toLocaleString('en')} characters`
+  }
   switch (column.type) {
     case 'date':
       return checkDate(value)

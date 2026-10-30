@@ -1,5 +1,5 @@
 export { shareOf } from './columns'
-export { MAX_TAB_LABEL, MAX_TABS, SAVE_DELAY_MS, SIDE_DROP } from './constants'
+export { MAX_TAB_LABEL, MAX_TABS, PICKER_KINDS, SAVE_DELAY_MS, SIDE_DROP } from './constants'
 export { newBlock, toBlocks, toSheet } from './convert'
 export { useEditorStore } from './editor-store'
 export { useAutoSize } from './hooks/use-auto-size'

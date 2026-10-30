@@ -188,7 +188,9 @@ export {
 export { processSingleton } from './shared/process'
 export {
   acceptFor,
+  type ByteRange,
   byteRange,
+  contentDisposition,
   isInlineType,
   largestUpload,
   UPLOAD_CAPS,
@@ -198,5 +200,6 @@ export {
   type UploadRule,
   uploadCaps,
   uploadKindOf,
+  uploadName,
   uploadRefusal,
 } from './shared/uploads'

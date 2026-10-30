@@ -1,5 +1,12 @@
 import { describe, expect, test } from 'bun:test'
-import { byteRange, isInlineType, uploadKindOf, uploadRefusal } from '../index'
+import {
+  byteRange,
+  contentDisposition,
+  isInlineType,
+  uploadKindOf,
+  uploadName,
+  uploadRefusal,
+} from '../index'
 
 const MB = 1024 * 1024
 
@@ -33,7 +40,41 @@ describe('what a workspace takes as an upload', () => {
     expect(byteRange('bytes=900-', 1000)).toEqual({ start: 900, end: 999 })
     expect(byteRange('bytes=-100', 1000)).toEqual({ start: 900, end: 999 })
     expect(byteRange('bytes=0-5000', 1000)).toEqual({ start: 0, end: 999 })
-    expect(byteRange('bytes=2000-', 1000)).toBeNull()
+    expect(byteRange('bytes=9-2', 1000)).toBeNull()
+    expect(byteRange('bytes=1-2, 4-5', 1000)).toBeNull()
     expect(byteRange(null, 1000)).toBeNull()
+  })
+
+  test('a range wholly past the end is unsatisfiable, never the whole file', () => {
+    expect(byteRange('bytes=999999999-', 25_000)).toBe('unsatisfiable')
+    expect(byteRange('bytes=1000-2000', 1000)).toBe('unsatisfiable')
+    expect(byteRange('bytes=-0', 1000)).toBe('unsatisfiable')
+  })
+
+  test('an empty file is refused in words, before it uploads', () => {
+    expect(uploadRefusal('image/png', 0)).toBe('that file is empty')
+    expect(uploadRefusal('image/svg+xml', 0)).toBe('that kind of file is not taken')
+  })
+})
+
+describe('the name an upload keeps', () => {
+  test('a browser’s escapes decoded once; no path, no control characters', () => {
+    expect(uploadName('a%22b<c>.png')).toBe('a"b<c>.png')
+    expect(uploadName('a\\"b.png')).toBe('a"b.png')
+    expect(uploadName('../../x.png')).toBe('x.png')
+    expect(uploadName('C:\\Users\\me\\x.png')).toBe('x.png')
+    expect(uploadName('line%0D%0Abreak\u0007.png')).toBe('linebreak.png')
+    expect(uploadName('100%25 done.pdf')).toBe('100%25 done.pdf')
+    expect(uploadName(undefined)).toBe('file')
+    expect(uploadName('../..')).toBe('file')
+  })
+
+  test('served as RFC 5987 with a plain ASCII fallback beside it', () => {
+    expect(contentDisposition('a"b<c>.png', true)).toBe(
+      `inline; filename="a_b<c>.png"; filename*=UTF-8''a%22b%3Cc%3E.png`,
+    )
+    expect(contentDisposition("Café (v2)'s.pdf", false)).toBe(
+      `attachment; filename="Caf_ (v2)'s.pdf"; filename*=UTF-8''Caf%C3%A9%20%28v2%29%27s.pdf`,
+    )
   })
 })

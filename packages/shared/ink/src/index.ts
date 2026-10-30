@@ -1,4 +1,4 @@
-export { COPY_ROW_CAP } from './constants'
+export { COPY_ROW_CAP, MAX_TEXT_CELL } from './constants'
 export { matchesFilters } from './match'
 export {
   type Aggregate,

@@ -9,3 +9,6 @@ export interface UploadRule {
 
 /** Bytes each kind may take. */
 export type UploadCaps = Record<UploadKind, number>
+
+/** Inclusive offsets, or a range wholly past the end of the file. */
+export type ByteRange = { start: number; end: number } | 'unsatisfiable'

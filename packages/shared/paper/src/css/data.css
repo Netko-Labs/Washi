@@ -54,6 +54,17 @@
 .wsx-table td[data-bool="false"] {
   color: var(--muted);
 }
+/* One long value never widens the table: it wraps within its own width and is cut past four lines. */
+.wsx-cell-text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  max-width: 60ch;
+  min-width: 0;
+  overflow: hidden;
+  overflow-wrap: break-word;
+}
 .wsx-pills {
   display: inline-flex;
   flex-wrap: wrap;
