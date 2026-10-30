@@ -34,6 +34,7 @@ describe('comments', () => {
     expect(countUnreadMentions(ws, kenji.id)).toBe(1)
     expect(countUnreadMentions(ws, ana.id)).toBe(0)
     expect(listMentions(ws, kenji.id)[0]).toMatchObject({ sheetTitle: 'Plan', authorName: 'Ana' })
+    expect(listComments(ws, sheet.id)[0]?.mentions).toEqual([kenji, ana])
 
     markMentionsRead(ws, kenji.id, { sheetId: sheet.id })
     expect(countUnreadMentions(ws, kenji.id)).toBe(0)

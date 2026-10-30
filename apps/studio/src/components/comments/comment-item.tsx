@@ -1,5 +1,5 @@
 import { initials, relativeTime } from '@washi/ui'
-import { bodySegments, type CommentItemProps, useCommentsStore } from './lib'
+import { bodySegments, type CommentItemProps, mentionedIn, useCommentsStore } from './lib'
 
 export function CommentItem({ comment, isMine }: CommentItemProps) {
   return (
@@ -24,11 +24,11 @@ export function CommentItem({ comment, isMine }: CommentItemProps) {
           )}
         </div>
         <p className="whitespace-pre-wrap break-words text-[13px] leading-relaxed">
-          {bodySegments(comment.body, comment.mentions).map((segment, index) =>
+          {bodySegments(comment.body, mentionedIn(comment)).map((segment, index) =>
             segment.isMention ? (
               <span
                 key={`${index}-${segment.text}`}
-                className="rounded bg-primary/12 px-0.5 font-medium text-primary"
+                className="rounded-full bg-primary/12 px-1.5 py-px font-medium text-primary"
               >
                 {segment.text}
               </span>

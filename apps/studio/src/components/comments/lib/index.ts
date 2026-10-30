@@ -11,4 +11,11 @@ export type {
   Composer,
   MentionPickerProps,
 } from './types'
-export { bodySegments, keptMentions, mentionMatches, mentionQuery, threadsOf } from './utils'
+export {
+  bodySegments,
+  keptMentions,
+  mentionedIn,
+  mentionMatches,
+  mentionQuery,
+  threadsOf,
+} from './utils'

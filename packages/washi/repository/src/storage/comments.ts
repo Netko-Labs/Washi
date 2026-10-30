@@ -13,8 +13,13 @@ export function listComments(ws: Workspace, sheetId: string): Comment[] {
     .all()
 }
 
-/** The comment and an unread Inbox row for everyone it mentions. The caller vets the mentions. */
-export function createComment(ws: Workspace, write: CommentWrite, author: CommentAuthor): Comment {
+/** The comment and an unread Inbox row for each person in `notify`; the caller picks them. */
+export function createComment(
+  ws: Workspace,
+  write: CommentWrite,
+  author: CommentAuthor,
+  notify: string[],
+): Comment {
   const id = newId()
   const row = {
     id,
@@ -29,10 +34,10 @@ export function createComment(ws: Workspace, write: CommentWrite, author: Commen
   }
   ws.sqlite.transaction(() => {
     ws.db.insert(commentTable).values(row).run()
-    const notify = ws.sqlite.query(
+    const inbox = ws.sqlite.query(
       'INSERT OR IGNORE INTO mention_inbox (user_id, comment_id, sheet_id) VALUES (?, ?, ?)',
     )
-    for (const mention of write.mentions) notify.run(mention.id, id, write.sheetId)
+    for (const userId of notify) inbox.run(userId, id, write.sheetId)
     appendOp(ws, 'comment', id, { kind: 'create', ...row })
   })()
   return row

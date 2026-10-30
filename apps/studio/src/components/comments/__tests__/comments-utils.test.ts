@@ -1,6 +1,13 @@
 import { describe, expect, test } from 'bun:test'
 import type { Comment } from '@washi/domain'
-import { bodySegments, keptMentions, mentionMatches, mentionQuery, threadsOf } from '../lib/utils'
+import {
+  bodySegments,
+  keptMentions,
+  mentionedIn,
+  mentionMatches,
+  mentionQuery,
+  threadsOf,
+} from '../lib/utils'
 
 const comment = (id: string, threadId: string): Comment => ({
   id,
@@ -34,6 +41,12 @@ describe('comments', () => {
       '@Ana Pérez',
       '@Ana',
     ])
+  })
+
+  test('an author naming themself is drawn as a mention too', () => {
+    const own = { ...comment('c', 'c'), body: 'note to @Ana' }
+    const marked = bodySegments(own.body, mentionedIn(own)).filter((segment) => segment.isMention)
+    expect(marked.map((segment) => segment.text)).toEqual(['@Ana'])
   })
 
   test('the @query is read from just before the caret', () => {

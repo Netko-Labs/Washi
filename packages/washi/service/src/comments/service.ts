@@ -15,7 +15,10 @@ export class CommentError extends Error {
   }
 }
 
-/** A reply stays on its thread's page; nobody is notified of their own mention, or twice. */
+/**
+ * A reply stays on its thread's page. Every mention is kept, so the body draws it; nobody is
+ * notified of their own, or twice.
+ */
 export function postComment(ws: Workspace, write: CommentWrite, author: CommentAuthor): Comment {
   requireSheet(ws, write.sheetId)
   if (write.threadId) {
@@ -24,13 +27,14 @@ export function postComment(ws: Workspace, write: CommentWrite, author: CommentA
       throw new CommentError('that thread is not on this page')
     }
   }
-  const seen = new Set([author.id])
+  const seen = new Set<string>()
   const mentions = write.mentions.filter((mention) => {
     if (seen.has(mention.id)) return false
     seen.add(mention.id)
     return true
   })
-  return createComment(ws, { ...write, mentions }, author)
+  const notify = mentions.map((mention) => mention.id).filter((id) => id !== author.id)
+  return createComment(ws, { ...write, mentions }, author, notify)
 }
 
 export function resolveThread(ws: Workspace, threadId: string, resolved: boolean): void {

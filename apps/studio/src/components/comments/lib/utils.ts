@@ -28,6 +28,11 @@ export function bodySegments(body: string, mentions: MentionRef[]): BodySegment[
     .map((text) => ({ text, isMention: names.includes(text) }))
 }
 
+/** Who a comment's body may name: its mentions, and its author — older comments dropped a self-mention. */
+export function mentionedIn(comment: Comment): MentionRef[] {
+  return [...comment.mentions, { id: comment.authorId, name: comment.authorName }]
+}
+
 /** The `@query` being typed right before the caret, or null when the caret is not in one. */
 export function mentionQuery(text: string, caret: number): string | null {
   const match = /(?:^|\s)@([^\s@]{0,40})$/.exec(text.slice(0, caret))
