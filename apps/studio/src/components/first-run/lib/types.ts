@@ -6,6 +6,11 @@ export interface FirstRunGateProps {
   children: ReactNode
 }
 
+export interface AsleepNoteProps {
+  workspace: WorkspaceSummary
+  onSkip: () => void
+}
+
 export interface FirstRunProps {
   workspace: WorkspaceSummary
   onDone: () => void
