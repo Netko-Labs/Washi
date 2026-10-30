@@ -1,3 +1,4 @@
+export { AppError } from './app-error'
 export type { RouterContext } from './lib'
 export { APP_DESCRIPTION, APP_NAME } from './lib'
 export { NotFound } from './not-found'

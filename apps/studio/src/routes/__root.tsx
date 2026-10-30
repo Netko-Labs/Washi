@@ -2,6 +2,7 @@ import { createRootRouteWithContext } from '@tanstack/react-router'
 import {
   APP_DESCRIPTION,
   APP_NAME,
+  AppError,
   NotFound,
   RootDocument,
   type RouterContext,
@@ -30,5 +31,6 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     scripts: [{ children: THEME_SCRIPT }],
   }),
   shellComponent: RootDocument,
+  errorComponent: AppError,
   notFoundComponent: NotFound,
 })

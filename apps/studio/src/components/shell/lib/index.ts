@@ -1,6 +1,7 @@
 export { DOCK_KEY_PREFIX, DRAWER_EDGE, DRAWER_SWIPE, FOLD_KEY_PREFIX, MAIN_ID } from './constants'
 export { enterWorkspace } from './enter-workspace'
 export { useDock } from './hooks/use-dock'
+export { useDrawerOpen } from './hooks/use-drawer-open'
 export { useFold } from './hooks/use-fold'
 export { useMainOnNavigate } from './hooks/use-main-on-navigate'
 export { useRouteTab } from './hooks/use-route-tab'

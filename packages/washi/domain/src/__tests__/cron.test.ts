@@ -26,8 +26,41 @@ describe('cron', () => {
     expect(describeCron('0 10 * * 0,6')).toBe('Weekends at 10:00')
     expect(describeCron('0 17 * * 5')).toBe('Every Friday at 17:00')
     expect(describeCron('15 * * * *')).toBe('Every hour at :15')
-    expect(describeCron('0 * * * 1')).toBe('0 * * * 1')
-    expect(describeCron('0 9 1 * *')).toBe('0 9 1 * *')
+    expect(describeCron('0 * * * 1')).toBe('Every hour at :00 on Mondays')
+    expect(describeCron('0 9 * * 0-6')).toBe('Every day at 09:00')
+  })
+
+  test('says dates, weekday lists and repeats in words', () => {
+    expect(describeCron('0 3 1 1 *')).toBe('At 03:00 on 1 January')
+    expect(describeCron('30 9 15 * *')).toBe('At 09:30 on day 15 of every month')
+    expect(describeCron('0 9 1,15 * *')).toBe('At 09:00 on days 1 and 15 of every month')
+    expect(describeCron('0 9 1 1,4,7,10 *')).toBe(
+      'At 09:00 on day 1 of January, April, July and October',
+    )
+    expect(describeCron('0 9 * 12 *')).toBe('Every day in December at 09:00')
+    expect(describeCron('0 8 * * 1,3,5')).toBe('At 08:00 on Mon, Wed and Fri')
+    expect(describeCron('0 8 * * 0,1')).toBe('At 08:00 on Mon and Sun')
+    expect(describeCron('0 8 * * 2-4')).toBe('At 08:00 on Tue, Wed and Thu')
+    expect(describeCron('0 9,17 * * *')).toBe('Every day at 09:00 and 17:00')
+    expect(describeCron('*/15 * * * *')).toBe('Every 15 minutes')
+    expect(describeCron('*/15 * * * 1-5')).toBe('Every 15 minutes on weekdays')
+    expect(describeCron('* * * * *')).toBe('Every minute')
+    expect(describeCron('0 */6 * * *')).toBe('Every 6 hours at :00')
+    expect(describeCron('30 */2 * * 6')).toBe('Every 2 hours at :30 on Saturdays')
+  })
+
+  test('keeps the expression where words would mislead', () => {
+    for (const raw of [
+      '*/7 * * * *',
+      '*/15 9-17 * * *',
+      '0 9-17 * * *',
+      '0 9 1 * 1',
+      '0 9 * 1 1',
+      '0 9 */2 * *',
+      '0 9 1,2,3,4,5 * *',
+    ]) {
+      expect(describeCron(raw)).toBe(raw)
+    }
   })
 
   test('occurrences are wall-clock minutes in the zone, today only for the latest', () => {

@@ -30,4 +30,26 @@ describe('numbers read in the sandbox as in the browser', () => {
       expect(String(new Function(`return ${code}`)())).toBe(expected)
     sandbox.dispose()
   })
+
+  test('a locale is the host’s own, and a bad one throws as Intl does', async () => {
+    const sandbox = await open()
+    const read = (code: string) => sandbox.call(`String(${code})`, null)
+    const cases = [
+      "(1234567.5).toLocaleString('de-DE')",
+      "new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(1234.5)",
+      "(0.256).toLocaleString(['fr-FR'], { style: 'percent' })",
+      "new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY' }).format(5000)",
+      "Intl.NumberFormat('de-DE').resolvedOptions().locale",
+    ]
+    for (const code of cases) {
+      expect(read(code)).toEqual({ ok: true, value: String(new Function(`return ${code}`)()) })
+    }
+    expect(read("(1234567.5).toLocaleString('de-DE')")).toEqual({ ok: true, value: '1.234.567,5' })
+    const bad = read("(1).toLocaleString('en', { style: 'currency' })")
+    expect(bad.ok).toBe(false)
+    expect(
+      read("(() => { try { Intl.NumberFormat('x-bad-') } catch (e) { return e.name } })()"),
+    ).toEqual({ ok: true, value: 'RangeError' })
+    sandbox.dispose()
+  })
 })

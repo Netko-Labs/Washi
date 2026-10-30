@@ -1,5 +1,5 @@
 import { useShallow } from 'zustand/react/shallow'
-import { mascotStateFor, useAgentStore } from '../stores'
+import { mascotStateFor, turnViewOf, useAgentStore } from '../stores'
 import { AgentComposer } from './agent-composer'
 import { ApprovalBar } from './approval-bar'
 import { EmptyChat } from './empty-chat'
@@ -20,15 +20,22 @@ const FRAME = {
 
 /** The door's room: a popover, a dock beside the page, or the whole screen on a phone (D61). */
 export function AgentPanel({ placement = 'float', onExpand }: AgentPanelProps) {
-  const { title, transcript, mood, isEmpty } = useAgentStore(
+  const { title, transcript, mood, isEmpty, turn, sessionId } = useAgentStore(
     useShallow((state) => ({
       title: state.sessions.find((session) => session.id === state.activeSessionId)?.title,
       transcript: state.transcript,
       mood: mascotStateFor(state.transcript, state.running, state.approvals, state.stalled),
       isEmpty: state.transcript.length === 0 && !state.running,
+      turn: turnViewOf(state).state,
+      sessionId: state.activeSessionId,
     })),
   )
-  const { scrollRef } = usePanelFrame(transcript.length)
+  const { scrollRef } = usePanelFrame({
+    length: transcript.length,
+    turn,
+    sessionId,
+    isOwnLast: transcript.at(-1)?.update.kind === 'user_message',
+  })
   const store = useAgentStore.getState
 
   return (
@@ -45,12 +52,14 @@ export function AgentPanel({ placement = 'float', onExpand }: AgentPanelProps) {
       />
 
       <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto overscroll-y-none">
-        {isEmpty ? (
-          <EmptyChat onStarter={(text) => void store().sendPrompt(text)} />
-        ) : (
-          <TranscriptView transcript={transcript} />
-        )}
-        <TurnStatus variant="panel" />
+        <div>
+          {isEmpty ? (
+            <EmptyChat onStarter={(text) => void store().sendPrompt(text)} />
+          ) : (
+            <TranscriptView transcript={transcript} />
+          )}
+          <TurnStatus variant="panel" />
+        </div>
       </div>
 
       <ApprovalBar />

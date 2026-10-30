@@ -10,6 +10,7 @@ import type {
 } from '@washi/domain'
 import type { RefObject } from 'react'
 import type { AgentMascotState } from '../../mascot'
+import type { TurnState } from '../../stores'
 
 export type TurnDone = Extract<AgentUpdate, { kind: 'turn_done' }>
 
@@ -139,6 +140,30 @@ export interface ComposerState {
 
 export interface PanelFrame {
   scrollRef: RefObject<HTMLDivElement | null>
+}
+
+/** What moved in the panel's chat: the follow reads it against where the reader is. */
+export interface PanelSignal {
+  length: number
+  turn: TurnState
+  sessionId: string | null
+  /** The last entry is the person's own ask. */
+  isOwnLast: boolean
+}
+
+export interface FollowChange {
+  isPinned: boolean
+  isNewChat: boolean
+  isOwnLast: boolean
+  length: number
+  /** The transcript's length when the follow last looked. */
+  shownLength: number
+}
+
+export interface ScrollBox {
+  scrollHeight: number
+  scrollTop: number
+  clientHeight: number
 }
 
 export interface TurnStatusProps {

@@ -5,6 +5,7 @@ export function SidebarButton() {
   return (
     <button
       type="button"
+      data-drawer-opener
       onClick={() => useShellStore.getState().setDrawer(true)}
       aria-label="Open the menu"
       title="Menu"

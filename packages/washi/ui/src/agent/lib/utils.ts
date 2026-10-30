@@ -1,7 +1,13 @@
 import type { AgentSession, ApprovalMode, SheetSummary, TranscriptEntry } from '@washi/domain'
 import { hostPlace } from '../../api'
-import type { InferenceView, ModelChoice, TurnDone } from './types'
-import { ATTACH_PAGE_ROWS, COMPOSER_MIN_CAP_PX, COMPOSER_SHARE, RECOMMENDED_MODELS } from './values'
+import type { FollowChange, InferenceView, ModelChoice, ScrollBox, TurnDone } from './types'
+import {
+  ATTACH_PAGE_ROWS,
+  COMPOSER_MIN_CAP_PX,
+  COMPOSER_SHARE,
+  NEAR_END_PX,
+  RECOMMENDED_MODELS,
+} from './values'
 
 function duration(ms: number): string {
   const tenths = Math.round(ms / 100)
@@ -100,4 +106,17 @@ export function pagesMatching(sheets: SheetSummary[], term: string): SheetSummar
   return sheets
     .filter((sheet) => !needle || sheet.title.toLowerCase().includes(needle))
     .slice(0, ATTACH_PAGE_ROWS)
+}
+
+export function isAtEnd(box: ScrollBox, slack = NEAR_END_PX): boolean {
+  return box.scrollHeight - box.scrollTop - box.clientHeight <= slack
+}
+
+/**
+ * The panel follows its end for a reader already there, another chat, or the person's send — once,
+ * as it lands: while Washi works on it, a reader who scrolled up stays put.
+ */
+export function followsEnd(change: FollowChange): boolean {
+  const isFreshSend = change.isOwnLast && change.length > change.shownLength
+  return change.isPinned || change.isNewChat || isFreshSend
 }

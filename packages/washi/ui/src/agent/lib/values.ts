@@ -36,3 +36,6 @@ export const COMPOSER_SHARE = 0.4
 export const COMPOSER_MIN_CAP_PX = 96
 
 export const ATTACH_PAGE_ROWS = 8
+
+/** How close to the end of the transcript still counts as reading the end, in px. */
+export const NEAR_END_PX = 48

@@ -22,7 +22,8 @@ export function useChatThread() {
   const blocks = useMemo(() => chatBlocks(transcript), [transcript])
   const asks = approvals.filter((request) => request.sessionId === activeSessionId)
   const stick = useStickToBottom(
-    `${transcript.length}:${asks.length}:${running}:${turn}`,
+    `${asks.length}:${running}:${turn}`,
+    transcript.length,
     transcript.at(-1)?.update.kind === 'user_message',
   )
   return { blocks, asks, turn, endId, stick }

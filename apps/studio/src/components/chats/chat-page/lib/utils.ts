@@ -185,6 +185,11 @@ export function isNearBottom(box: ScrollBox, slack = NEAR_BOTTOM_PX): boolean {
   return box.scrollHeight - box.scrollTop - box.clientHeight <= slack
 }
 
+/** The person's send just landed: the transcript grew and ends on their ask. Once, not after. */
+export function isFreshSend(isOwnLast: boolean, length: number, shownLength: number): boolean {
+  return isOwnLast && length > shownLength
+}
+
 /** Pages a finished `sheet_delete` in this run moved to the trash — each gets its Restore. */
 export function trashedPages(steps: ToolStep[]): string[] {
   return steps.flatMap((step) => {

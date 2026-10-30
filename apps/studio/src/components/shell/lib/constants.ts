@@ -6,3 +6,5 @@ export const DOCK_KEY_PREFIX = 'washi:dock:'
 export const DRAWER_EDGE = 12
 export const DRAWER_SWIPE = 72
 export const MAIN_ID = 'main'
+/** The ☰ that opens the drawer; focus goes back to it when Escape closes the drawer. */
+export const DRAWER_OPENER = '[data-drawer-opener]'
