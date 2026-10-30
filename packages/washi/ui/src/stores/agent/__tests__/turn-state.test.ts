@@ -26,6 +26,7 @@ const session = (status: AgentSession['status'] = 'idle') =>
     costUsd: 0,
     model: null,
     effort: null,
+    approvals: null,
     createdBy: 'rin',
     anchor: null,
     createdAt: '',
