@@ -2,6 +2,7 @@ import type { SheetDetail } from '@washi/domain'
 import { serialize, type WsxElement, type WsxNode } from '@washi/wsx'
 import { api } from '../../api'
 import { useSheetsStore } from '../../stores'
+import type { ShownSheet } from './types'
 
 function swap(node: WsxNode, from: WsxElement, to: WsxElement): WsxNode {
   if (node === from) return to
@@ -43,5 +44,22 @@ export function pageWriter(sheet: SheetDetail, loaded: WsxElement) {
         await useSheetsStore.getState().refresh()
       })
     return saving
+  }
+}
+
+/**
+ * The page on screen at the stamp it was loaded at, so the list catching up to it reloads
+ * nothing. Every load that starts forgets it: a load cut short leaves nothing to match.
+ */
+export function shownSheet(): ShownSheet {
+  let drawn: SheetDetail | null = null
+  return {
+    isDrawn: (id, version) => drawn?.id === id && drawn.hlcUpdated === version,
+    loading: () => {
+      drawn = null
+    },
+    drawn: (sheet) => {
+      drawn = sheet
+    },
   }
 }
