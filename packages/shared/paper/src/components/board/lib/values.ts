@@ -6,3 +6,6 @@ export const FORMER_MEMBER = 'Former member'
 
 /** A person cell when the host cannot say who is on the team: no name, and no claim they left. */
 export const UNNAMED = 'Someone'
+
+/** The column of rows with no value to group by; drawn only while it holds some. */
+export const NO_GROUP = ''
