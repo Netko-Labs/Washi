@@ -58,7 +58,7 @@ export function SlashMenu({ anchor, menu }: SlashMenuProps) {
           >
             <span className="truncate">{option.label}</span>
             <span
-              className={`shrink-0 text-[11px] text-muted-foreground ${option.type === 'text' ? 'font-mono pointer-coarse:hidden' : ''}`}
+              className={`max-w-[50%] shrink-0 truncate text-[11px] text-muted-foreground ${option.type === 'text' ? 'font-mono pointer-coarse:hidden' : ''}`}
             >
               {option.hint}
             </span>

@@ -24,10 +24,14 @@ export function kindMatches(query: string): KindOption[] {
 
 const tableLabel = (table: TableRef) => table.name.replace(/_/g, ' ')
 
+/** Names read alike once spaced, so the raw name is the hint wherever it differs. */
+const tableHint = (table: TableRef, hint: string) =>
+  table.name === tableLabel(table) ? hint : table.name
+
 function tableStep(step: SlashStep, needle: string, tables: TableRef[]): DataOption[] {
   const { group } = SLASH_STEPS[step]
   return tables
-    .filter((table) => tableLabel(table).toLowerCase().includes(needle))
+    .filter((table) => `${tableLabel(table)} ${table.name}`.toLowerCase().includes(needle))
     .flatMap((table): DataOption[] => {
       const base = { type: 'data' as const, group, label: tableLabel(table) }
       if (step === 'view') {
@@ -35,7 +39,7 @@ function tableStep(step: SlashStep, needle: string, tables: TableRef[]): DataOpt
           {
             ...base,
             key: `view:${table.name}`,
-            hint: 'Live',
+            hint: tableHint(table, 'Live'),
             pick: { kind: 'view', table: table.name },
           },
         ]
@@ -45,7 +49,7 @@ function tableStep(step: SlashStep, needle: string, tables: TableRef[]): DataOpt
           {
             ...base,
             key: `automation:${table.name}`,
-            hint: 'On the server',
+            hint: tableHint(table, 'On the server'),
             pick: { kind: 'automation', table: table.name },
           },
         ]
@@ -55,7 +59,7 @@ function tableStep(step: SlashStep, needle: string, tables: TableRef[]): DataOpt
         {
           ...base,
           key: `progress:${table.name}`,
-          hint: '30 days',
+          hint: tableHint(table, '30 days'),
           pick: { kind: 'progress', table },
         },
       ]

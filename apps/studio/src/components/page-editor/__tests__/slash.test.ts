@@ -22,7 +22,7 @@ const labelsOf = (options: SlashOption[]) => options.map((option) => option.labe
 describe('the / menu in groups', () => {
   test('an empty query lists every group in order, each row once', () => {
     const options = slashMatches('', { tables: TABLES, pages: PAGES })
-    expect(groupsOf(options)).toEqual(SLASH_GROUP_ORDER)
+    expect(groupsOf(options)).toEqual(SLASH_GROUP_ORDER.filter((group) => group !== 'pages'))
     const keys = options.map((option) => (option.type === 'text' ? option.kind : option.key))
     expect(new Set(keys).size).toBe(keys.length)
   })
@@ -45,6 +45,19 @@ describe('the / menu in groups', () => {
     expect(slashMatches('zzz')).toEqual([])
   })
 
+  test('a page found by its title comes after every block', () => {
+    const pages = [
+      { id: 'o', title: 'Outline notes' },
+      { id: 'b', title: 'Backlinks audit' },
+      { id: 'l', title: 'Linked accounts' },
+    ]
+    expect(slashMatches('outline', { pages })[0]).toMatchObject({ key: 'outline' })
+    expect(slashMatches('backlinks', { pages })[0]).toMatchObject({ key: 'backlinks' })
+    const linked = slashMatches('linked', { pages })
+    expect(linked[0]).toMatchObject({ type: 'step', step: 'view' })
+    expect(linked.at(-1)).toMatchObject({ group: 'pages', pick: { kind: 'link', sheet: 'l' } })
+  })
+
   test('hints read plainly', () => {
     const hint = (key: string) =>
       slashMatches('').find((option) => option.type !== 'text' && option.key === key)?.hint
@@ -55,7 +68,11 @@ describe('the / menu in groups', () => {
   test('a table step lists tables and typing filters them', () => {
     const view = slashMatches('', { tables: TABLES, step: 'view' })
     expect(labelsOf(view)).toEqual(['issues', 'team notes'])
+    expect(view.map((option) => option.hint)).toEqual(['Live', 'team_notes'])
     expect(labelsOf(slashMatches('note', { tables: TABLES, step: 'view' }))).toEqual(['team notes'])
+    expect(labelsOf(slashMatches('team_', { tables: TABLES, step: 'view' }))).toEqual([
+      'team notes',
+    ])
     expect(slashMatches('', { tables: TABLES, step: 'automation' })[0]).toMatchObject({
       pick: { kind: 'automation', table: 'issues' },
     })

@@ -56,7 +56,7 @@ export interface PageRef {
 }
 
 /** The `/` menu's headings, in the order they are drawn. */
-export type SlashGroup = 'basic' | 'media' | 'database' | 'layout' | 'advanced' | 'code'
+export type SlashGroup = 'basic' | 'media' | 'database' | 'layout' | 'advanced' | 'code' | 'pages'
 
 /** A second step of the menu: a list of tables or pages to drop the block over. */
 export type SlashStep = 'view' | 'progress' | 'automation' | 'link' | 'include'
