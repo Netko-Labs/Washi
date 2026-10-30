@@ -30,6 +30,8 @@ export interface PromptRequest {
   /** Opaque to Washi: the Claude SDK's own session id, when a port keeps one. */
   resumeToken?: string | null
   signal?: AbortSignal
+  /** Called on every message the model streams, partial or whole: the host's watchdog listens. */
+  onActivity?: () => void
 }
 
 export type HandoverResult = { ok: true; page: string } | { ok: false; reason: string }

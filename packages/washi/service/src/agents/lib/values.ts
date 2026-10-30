@@ -153,3 +153,6 @@ export const HANDOVER_DESCRIPTION =
 
 export const DB_MUTATE_DESCRIPTION =
   "Insert, update, delete or copy records: { kind, table, data?, where? }. copy makes every row where matches a new row, set over it: { kind: 'copy', table, where, set, params?, limit? } — a set value is a cell or { expr } over the source row in the page grammar (date: { expr: 'add_months(date, 1)' }); params fill { param } filter values and read as $name in an expr. Never sets a formula or rollup. At most 500 rows (limit lowers it), all or nothing."
+
+export const TURN_STALLED = 'Washi stopped hearing back — the turn was ended'
+export const TURN_INTERRUPTED = 'The server restarted while Washi was working — the turn was ended'

@@ -164,3 +164,14 @@ export interface AgentSettingsReport {
   approvalMode: ApprovalMode
   yoloAllowed: boolean
 }
+
+export interface TurnLimits {
+  quietMs: number
+  graceMs: number
+}
+
+/** One running turn. `ended` once its `turn_done` landed: whatever the port says later is dropped. */
+export interface RunningTurn {
+  abort: AbortController
+  ended: boolean
+}

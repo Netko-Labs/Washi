@@ -143,6 +143,7 @@ export function createClaudeSdkPort(deps: ClaudeSdkPortDeps): AgentPort {
 
         try {
           for await (const message of stream) {
+            request.onActivity?.()
             if (message.type === 'system' && message.subtype === 'init') {
               resumeToken = message.session_id
               model = message.model

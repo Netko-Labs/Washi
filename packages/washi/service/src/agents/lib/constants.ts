@@ -87,3 +87,8 @@ export const IMAGE_TYPES: ReadonlySet<string> = new Set(['image/jpeg', 'image/pn
 export const MAX_INLINE_FILE_BYTES = 200 * 1024
 /** A conversation's default title: the first words of its first ask. */
 export const TITLE_WORDS = 6
+
+/** A turn whose port says nothing this long is ended (D114); a question waiting on a person pauses it. */
+export const TURN_QUIET_MS = 5 * 60_000
+/** After Stop or the watchdog aborts, how long a port gets to return before the turn is closed for it. */
+export const TURN_GRACE_MS = 15_000

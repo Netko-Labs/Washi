@@ -110,6 +110,13 @@ export class ApprovalDesk implements ToolGate {
     return this.pending.size > 0
   }
 
+  /** A turn waiting on a person is not a quiet one (D114). */
+  isWaitingIn(sessionId: string): boolean {
+    for (const entry of this.pending.values())
+      if (entry.request.sessionId === sessionId) return true
+    return false
+  }
+
   /** Live questions only: a client that opens late still sees what Washi is waiting on. */
   list(): ApprovalRequest[] {
     return [...this.pending.values()].map((entry) => entry.request)

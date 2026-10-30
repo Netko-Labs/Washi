@@ -47,11 +47,23 @@ import type {
   InferenceStatus,
   LocalModel,
   ResumeBy,
+  RunningTurn,
   SearchKeyLookup,
   SessionOptions,
   TodayReport,
+  TurnLimits,
 } from './lib'
-import { IMAGE_TYPES, MAX_INLINE_FILE_BYTES, SDK_EFFORT, titleFrom } from './lib'
+import {
+  IMAGE_TYPES,
+  MAX_INLINE_FILE_BYTES,
+  SDK_EFFORT,
+  TURN_GRACE_MS,
+  TURN_INTERRUPTED,
+  TURN_QUIET_MS,
+  TURN_STALLED,
+  titleFrom,
+  wordsOf,
+} from './lib'
 import { proposedDiff } from './normalize'
 import {
   type AgentPort,
@@ -63,6 +75,7 @@ import {
 import { AgentPreferences } from './preferences'
 import { RoutineBook } from './routines'
 import { recentTurns } from './today'
+import { TurnAbandonedError, TurnWatchdog } from './watchdog'
 
 export class AgentHost {
   private events: AgentHostEvents | null = null
@@ -70,7 +83,8 @@ export class AgentHost {
   private search: SearchKeyLookup | null = null
   private files: FileStore | null = null
   /** One per running turn, keyed by session — Stop aborts exactly that turn. */
-  private readonly turns = new Map<string, AbortController>()
+  private readonly turns = new Map<string, RunningTurn>()
+  private limits: TurnLimits = { quietMs: TURN_QUIET_MS, graceMs: TURN_GRACE_MS }
 
   private readonly ws: Workspace
   private readonly keys: AgentKeySource
@@ -98,7 +112,9 @@ export class AgentHost {
       canStart: () => this.budget.refusal() === null,
     })
     expirePendingApprovals(ws)
-    failInterruptedSessions(ws)
+    for (const sessionId of failInterruptedSessions(ws)) {
+      appendTurn(ws, sessionId, { kind: 'turn_done', stopReason: 'error', error: TURN_INTERRUPTED })
+    }
 
     const runHankoAction = (action: unknown) => this.desk.execute(action)
     const openSheet = (id: string) => this.events?.openSheet(id)
@@ -209,7 +225,7 @@ export class AgentHost {
   cancel(sessionId: string): boolean {
     const turn = this.turns.get(sessionId)
     if (!turn) return false
-    turn.abort()
+    turn.abort.abort()
     this.approvals.dropSession(sessionId)
     return true
   }
@@ -354,91 +370,119 @@ export class AgentHost {
   /**
    * One user turn: persist, run it on whichever port the credential picks, close
    * it with a receipt. The turn is registered before anything awaits, so Stop
-   * works from the first moment — including while the local CLI is probed.
+   * works from the first moment — including while the local CLI is probed. Every
+   * turn ends in exactly one `turn_done`, even one whose port never returns (D114).
    */
   async prompt(sessionId: string, text: string, ask: AskOptions = {}): Promise<void> {
     if (this.turns.has(sessionId)) {
       throw new Error('A turn is already running in this conversation. Stop it first.')
     }
-    const abort = new AbortController()
+    const turn: RunningTurn = { abort: new AbortController(), ended: false }
+    const watchdog = new TurnWatchdog(turn.abort, this.limits, () =>
+      this.approvals.isWaitingIn(sessionId),
+    )
     const started = Date.now()
-    this.turns.set(sessionId, abort)
+    this.turns.set(sessionId, turn)
 
     try {
-      const attachments = ask.attachments ?? []
-      const session = getSession(this.ws, sessionId)
-      // A conversation is named by its first ask until Washi names it better.
-      if (
-        session &&
-        /^Session \d+$/.test(session.title) &&
-        getTranscript(this.ws, sessionId).length === 0
-      ) {
-        updateSession(this.ws, sessionId, { title: titleFrom(text) })
-      }
-      this.record(sessionId, {
-        kind: 'user_message',
-        text,
-        ...(attachments.length > 0 && { attachments }),
-      })
-      const { prompt, images } = await this.compose(text, attachments)
-      const refusal = this.budget.refusal()
-      if (refusal) {
-        this.fail(sessionId, refusal)
-        return
-      }
-
-      const credential = await this.keys.resolve()
-      if (abort.signal.aborted) {
-        this.record(sessionId, { kind: 'turn_done', stopReason: 'cancelled', durationMs: 0 })
-        return
-      }
-      if (!credential) {
-        const status = await this.keys.status()
-        this.fail(sessionId, status.missing ?? 'Nothing can run this turn yet.')
-        return
-      }
-
-      // Two ports, one vocabulary (§05). Anthropic keeps the native Claude Agent
-      // SDK path, which resumes sessions itself; anything else goes through the
-      // AI SDK, where Washi owns the history.
-      const native = credential.provider === 'anthropic'
-      const port = native ? this.claudePort : this.aiSdkPort
-      updateSession(this.ws, sessionId, { status: 'running' })
-      const result = await port.prompt(
-        {
-          sessionId,
-          text: prompt,
-          credential,
-          model: { provider: credential.provider, model: session?.model ?? credential.model },
-          effort: SDK_EFFORT[session?.effort ?? this.prefs.effort()],
-          images,
-          viewer: ask.viewer,
-          setTitle: (title) => {
-            updateSession(this.ws, sessionId, { title })
-            this.events?.sessionChanged?.(sessionId)
-          },
-          handover: (sheetId, note) =>
-            this.handover(sessionId, ask.viewer ?? NOBODY, sheetId, note),
-          history: native ? [] : conversationHistory(getTranscript(this.ws, sessionId)),
-          resumeToken: native ? getSdkSessionId(this.ws, sessionId) : null,
-          signal: abort.signal,
-        },
-        (update) => this.emit(sessionId, update),
-      )
-      this.close(sessionId, credential, result, Date.now() - started)
+      await watchdog.guard(this.run(sessionId, text, ask, turn, watchdog, started))
     } catch (error) {
-      this.record(sessionId, {
-        kind: 'turn_done',
-        stopReason: 'error',
-        error: String(error),
-        durationMs: Date.now() - started,
-      })
-      updateSession(this.ws, sessionId, { status: 'error' })
+      if (turn.ended) return
+      const durationMs = Date.now() - started
+      if (error instanceof TurnAbandonedError && !watchdog.stalled) {
+        this.stop(sessionId, turn, durationMs)
+      } else {
+        const words = watchdog.stalled ? TURN_STALLED : wordsOf(error)
+        this.record(
+          sessionId,
+          { kind: 'turn_done', stopReason: 'error', error: words, durationMs },
+          turn,
+        )
+        updateSession(this.ws, sessionId, { status: 'error' })
+      }
     } finally {
+      turn.ended = true
       this.turns.delete(sessionId)
       // A turn that ended — however — has nobody left to hear its questions.
       this.approvals.dropSession(sessionId)
     }
+  }
+
+  private async run(
+    sessionId: string,
+    text: string,
+    ask: AskOptions,
+    turn: RunningTurn,
+    watchdog: TurnWatchdog,
+    started: number,
+  ): Promise<void> {
+    const attachments = ask.attachments ?? []
+    const session = getSession(this.ws, sessionId)
+    // A conversation is named by its first ask until Washi names it better.
+    if (
+      session &&
+      /^Session \d+$/.test(session.title) &&
+      getTranscript(this.ws, sessionId).length === 0
+    ) {
+      updateSession(this.ws, sessionId, { title: titleFrom(text) })
+    }
+    this.record(sessionId, {
+      kind: 'user_message',
+      text,
+      ...(attachments.length > 0 && { attachments }),
+    })
+    // From the ask on: a process that dies before the port starts still leaves a receipt at boot.
+    updateSession(this.ws, sessionId, { status: 'running' })
+    const { prompt, images } = await this.compose(text, attachments)
+    const refusal = this.budget.refusal()
+    if (refusal) {
+      this.fail(sessionId, refusal, turn)
+      return
+    }
+
+    const credential = await this.keys.resolve()
+    if (turn.abort.signal.aborted) {
+      if (watchdog.stalled) this.fail(sessionId, TURN_STALLED, turn)
+      else this.stop(sessionId, turn, 0)
+      return
+    }
+    if (!credential) {
+      const status = await this.keys.status()
+      this.fail(sessionId, status.missing ?? 'Nothing can run this turn yet.', turn)
+      return
+    }
+
+    // Two ports, one vocabulary (§05). Anthropic keeps the native Claude Agent
+    // SDK path, which resumes sessions itself; anything else goes through the
+    // AI SDK, where Washi owns the history.
+    const native = credential.provider === 'anthropic'
+    const port = native ? this.claudePort : this.aiSdkPort
+    const result = await port.prompt(
+      {
+        sessionId,
+        text: prompt,
+        credential,
+        model: { provider: credential.provider, model: session?.model ?? credential.model },
+        effort: SDK_EFFORT[session?.effort ?? this.prefs.effort()],
+        images,
+        viewer: ask.viewer,
+        setTitle: (title) => {
+          updateSession(this.ws, sessionId, { title })
+          this.events?.sessionChanged?.(sessionId)
+        },
+        handover: (sheetId, note) => this.handover(sessionId, ask.viewer ?? NOBODY, sheetId, note),
+        history: native ? [] : conversationHistory(getTranscript(this.ws, sessionId)),
+        resumeToken: native ? getSdkSessionId(this.ws, sessionId) : null,
+        signal: turn.abort.signal,
+        onActivity: watchdog.heard,
+      },
+      (update) => {
+        watchdog.heard()
+        this.emit(sessionId, update, turn)
+      },
+    )
+    const ended = watchdog.stalled ? { ...result, cancelled: false, error: TURN_STALLED } : result
+    this.close(sessionId, credential, ended, Date.now() - started, turn)
   }
 
   /** Pages ride by id — Washi reads them; text files ride inline; pictures ride as image blocks. */
@@ -472,22 +516,32 @@ export class AgentHost {
     return { prompt: lines.length > 0 ? `${lines.join('\n')}\n\n${text}` : text, images }
   }
 
+  /** A turn given up on still charges what it spent when it finally returns; nothing else lands. */
   private close(
     sessionId: string,
     credential: AgentCredential,
     result: TurnResult,
     durationMs: number,
+    turn: RunningTurn,
   ) {
+    if (turn.ended) {
+      this.budget.charge(result.costUsd, result.billing)
+      return
+    }
     const stopReason = result.cancelled ? 'cancelled' : result.error ? 'error' : 'end_turn'
-    this.record(sessionId, {
-      kind: 'turn_done',
-      stopReason,
-      ...(result.error ? { error: result.error } : {}),
-      ...(result.costUsd != null ? { costUsd: result.costUsd } : {}),
-      billing: result.billing,
-      model: result.model ?? credential.model,
-      durationMs,
-    })
+    this.record(
+      sessionId,
+      {
+        kind: 'turn_done',
+        stopReason,
+        ...(result.error ? { error: result.error } : {}),
+        ...(result.costUsd != null ? { costUsd: result.costUsd } : {}),
+        billing: result.billing,
+        model: result.model ?? credential.model,
+        durationMs,
+      },
+      turn,
+    )
     updateSession(this.ws, sessionId, {
       status: stopReason === 'error' ? 'error' : 'idle',
       ...(result.resumeToken ? { sdkSessionId: result.resumeToken } : {}),
@@ -498,19 +552,29 @@ export class AgentHost {
     this.budget.charge(result.costUsd, result.billing)
   }
 
-  private fail(sessionId: string, error: string) {
-    this.record(sessionId, { kind: 'turn_done', stopReason: 'error', error })
+  private stop(sessionId: string, turn: RunningTurn, durationMs: number) {
+    if (turn.ended) return
+    this.record(sessionId, { kind: 'turn_done', stopReason: 'cancelled', durationMs }, turn)
+    updateSession(this.ws, sessionId, { status: 'idle' })
+  }
+
+  private fail(sessionId: string, error: string, turn: RunningTurn) {
+    if (turn.ended) return
+    this.record(sessionId, { kind: 'turn_done', stopReason: 'error', error }, turn)
     updateSession(this.ws, sessionId, { status: 'error' })
   }
 
   /** sheet_replace proposals also render as diffs in the transcript (spec §6). */
-  private emit(sessionId: string, update: AgentUpdate) {
-    this.record(sessionId, update)
+  private emit(sessionId: string, update: AgentUpdate, turn: RunningTurn) {
+    this.record(sessionId, update, turn)
     const diff = proposedDiff(update, (id) => getSheet(this.ws, id))
-    if (diff) this.record(sessionId, diff)
+    if (diff) this.record(sessionId, diff, turn)
   }
 
-  private record(sessionId: string, update: AgentUpdate) {
+  /** A turn's own updates stop at its `turn_done`: one receipt, nothing after it. */
+  private record(sessionId: string, update: AgentUpdate, turn?: RunningTurn) {
+    if (turn?.ended) return
+    if (turn && update.kind === 'turn_done') turn.ended = true
     const entry = appendTurn(this.ws, sessionId, update)
     this.events?.update(sessionId, entry)
   }

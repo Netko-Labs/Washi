@@ -22,6 +22,8 @@ export {
   SDK_EFFORT,
   TODAY_TURN_LIMIT,
   TODAY_WINDOW_MS,
+  TURN_GRACE_MS,
+  TURN_QUIET_MS,
   YOLO_ALLOWED_KEY,
 } from './constants'
 export { agentEnv, sessionConfigDir } from './env'
@@ -43,16 +45,20 @@ export type {
   LocalCliStatus,
   LocalModel,
   ResumeBy,
+  RunningTurn,
   SdkEffort,
   SearchKeyLookup,
   SessionOptions,
   TodayReport,
+  TurnLimits,
   TurnSummary,
 } from './types'
-export { titleFrom } from './utils'
+export { titleFrom, wordsOf } from './utils'
 export {
   DB_MUTATE_DESCRIPTION,
   HANDOVER_DESCRIPTION,
   SEARCH_NOT_SET,
   SYSTEM_INSTRUCTIONS,
+  TURN_INTERRUPTED,
+  TURN_STALLED,
 } from './values'
