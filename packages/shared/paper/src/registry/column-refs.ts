@@ -14,6 +14,14 @@ function mentions(value: unknown, test: (text: string) => boolean): boolean {
   return false
 }
 
+/** A bind's own `table` names the table, never a column. */
+function scanned(key: string, value: unknown): unknown {
+  if (!TABLE_KEYS.includes(key)) return value
+  if (typeof value === 'string') return null
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return value
+  return Object.fromEntries(Object.entries(value).filter(([field]) => field !== 'table'))
+}
+
 function rowRefsIn(node: WsxNode, rowRef: RegExp): boolean {
   if (node.kind === 'text') return rowRef.test(node.value)
   if (node.kind !== 'element') return false
@@ -35,10 +43,8 @@ export function namesColumn(root: WsxElement, table: string, column: string): bo
   walk(root, (node) => {
     if (found || !TABLE_KEYS.some((key) => tableOf(node.props[key]) === table)) return
     found =
-      Object.entries(node.props).some(
-        ([key, value]) =>
-          !(TABLE_KEYS.includes(key) && typeof value === 'string') && mentions(value, named),
-      ) || node.children.some((child) => rowRefsIn(child, rowRef))
+      Object.entries(node.props).some(([key, value]) => mentions(scanned(key, value), named)) ||
+      node.children.some((child) => rowRefsIn(child, rowRef))
   })
   return found
 }

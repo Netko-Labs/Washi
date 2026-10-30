@@ -37,4 +37,10 @@ describe('namesColumn', () => {
     expect(namesColumn(root, 'tasks', 'tasks')).toBe(false)
     expect(namesColumn(root, 'missing', 'kind')).toBe(false)
   })
+
+  test("an object bind's own table is not a column of the same name", () => {
+    const root = page(`<Board bind={{ table: 'tasks', where: [] }} groupBy="kind" />`)
+    expect(namesColumn(root, 'tasks', 'tasks')).toBe(false)
+    expect(namesColumn(root, 'tasks', 'kind')).toBe(true)
+  })
 })
