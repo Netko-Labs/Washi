@@ -24,11 +24,11 @@ function formatUtc(date: Date, locale: string | undefined, options: Intl.DateTim
 }
 
 function momentLabel(value: string, thisYear: number, locale?: string): string {
-  const day = {
+  const day: Intl.DateTimeFormatOptions = {
     month: 'short',
     day: 'numeric',
     ...(Number(value.slice(0, 4)) !== thisYear && { year: 'numeric' }),
-  } as const
+  }
   if (!MOMENT.test(value)) return formatUtc(new Date(`${value}T00:00:00Z`), locale, day)
   return formatUtc(new Date(`${value.slice(0, 16)}:00Z`), locale, {
     ...day,
