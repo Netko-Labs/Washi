@@ -3,6 +3,8 @@ import type { PagePlacement } from '../../page-tree'
 
 export interface SheetsState {
   sheets: SheetSummary[]
+  /** False until the list has answered once for this workspace: an empty list is not yet an answer. */
+  isLoaded: boolean
   activeId: string | null
   searchTerm: string
   searchHits: SearchHit[]

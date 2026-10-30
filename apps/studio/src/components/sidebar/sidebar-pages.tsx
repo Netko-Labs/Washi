@@ -9,10 +9,10 @@ import { SidebarTree } from './sidebar-tree'
 
 /** Recents, Favorites, the page tree, Routines, then Databases and the Trash. */
 export function SidebarPages({ workspaceId, onNavigate }: SidebarSectionProps) {
-  const sheets = useSheetsStore((state) => state.sheets)
+  const sheets = useSheetsStore((state) => (state.isLoaded ? state.sheets : null))
   const favoriteIds = useFavoritesStore((state) => state.ids)
   const activeTab = useViewStore((state) => state.activeTab)
-  const favorites = sheets.filter((sheet) => favoriteIds.includes(sheet.id))
+  const favorites = (sheets ?? []).filter((sheet) => favoriteIds.includes(sheet.id))
   const newPage = () => {
     void useSheetsStore.getState().createSheet()
     onNavigate()
@@ -46,7 +46,7 @@ export function SidebarPages({ workspaceId, onNavigate }: SidebarSectionProps) {
           <IconPlus className="size-3.5" />
         </button>
       </div>
-      {sheets.length === 0 && (
+      {sheets?.length === 0 && (
         <p className="px-2 py-1 text-[14px] text-muted-foreground leading-relaxed md:text-[12.5px]">
           No pages yet. Start one, or ask Washi to.
         </p>

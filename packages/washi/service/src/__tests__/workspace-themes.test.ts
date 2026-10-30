@@ -25,10 +25,23 @@ describe('a workspace makes its own page themes', () => {
   test('the slug is plain, free, and kept through a rename', () => {
     expect(themeSlug('Kōbai Night!')).toBe('kobai-night')
     const first = addWorkspaceTheme(ws, write('Our Nord'), 'ana')
-    const second = addWorkspaceTheme(ws, write('Our nord'), 'ana')
+    const second = addWorkspaceTheme(ws, write('Our Nord!'), 'ana')
     expect([first.slug, second.slug]).toEqual(['our-nord', 'our-nord-2'])
     const renamed = editWorkspaceTheme(ws, first.id, write('Fjord'), maker)
     expect(renamed).toMatchObject({ name: 'Fjord', slug: 'our-nord' })
+  })
+
+  test('a name already taken, in any case, is refused in words; keeping its own name is not', () => {
+    const first = addWorkspaceTheme(ws, write('zz-night'), 'ana')
+    expect(() => addWorkspaceTheme(ws, write(' ZZ-Night '), 'ben')).toThrow(
+      'This workspace already has a theme named “zz-night” — pick another name',
+    )
+    const second = addWorkspaceTheme(ws, write('Dusk'), 'ana')
+    expect(() => editWorkspaceTheme(ws, second.id, write('ZZ-NIGHT'), maker)).toThrow(
+      WorkspaceThemeError,
+    )
+    expect(editWorkspaceTheme(ws, first.id, write('ZZ-Night'), maker).name).toBe('ZZ-Night')
+    expect(listWorkspaceThemes(ws)).toHaveLength(2)
   })
 
   test('ink nobody can read is refused, in words', () => {

@@ -15,6 +15,7 @@ let generation = 0
 
 export const useSheetsStore = create<SheetsState>((set, get) => ({
   sheets: [],
+  isLoaded: false,
   activeId: null,
   searchTerm: '',
   searchHits: [],
@@ -29,6 +30,7 @@ export const useSheetsStore = create<SheetsState>((set, get) => ({
     if (issued !== generation) return
     set((state) => ({
       sheets,
+      isLoaded: true,
       activeId: state.activeId ?? sheets[0]?.id ?? null,
     }))
   },
@@ -128,6 +130,7 @@ export const useSheetsStore = create<SheetsState>((set, get) => ({
     generation += 1
     set({
       sheets: [],
+      isLoaded: false,
       activeId: null,
       searchTerm: '',
       searchHits: [],

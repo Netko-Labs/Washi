@@ -47,7 +47,11 @@ export function EmojiAddCard({ add }: EmojiAddCardProps) {
         >
           {draft.busy ? 'Adding…' : 'Add'}
         </button>
-        {draft.error && <p className="w-full text-[12.5px] text-destructive">{draft.error}</p>}
+        {draft.error ? (
+          <p className="w-full text-[12.5px] text-destructive">{draft.error}</p>
+        ) : (
+          draft.note && <p className="w-full text-[12.5px] text-muted-foreground">{draft.note}</p>
+        )}
       </form>
     </SettingsCard>
   )

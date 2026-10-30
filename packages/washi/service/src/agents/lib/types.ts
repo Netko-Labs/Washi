@@ -120,7 +120,7 @@ export interface SessionOptions {
 
 export interface AgentHostEvents {
   update: (sessionId: string, entry: TranscriptEntry) => void
-  /** Washi renamed the conversation; the list should refetch. */
+  /** The conversation was renamed or moved; the list should refetch. */
   sessionChanged?: (sessionId: string) => void
   approval: (request: ApprovalRequest) => void
   /** Only a client showing that chat moves; a handover also moves the chat there (D110). */

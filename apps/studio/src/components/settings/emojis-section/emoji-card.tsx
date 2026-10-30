@@ -1,28 +1,22 @@
-import { IconTrash } from '@tabler/icons-react'
 import { hostFileUrl } from '@washi/ui'
+import { ConfirmRemove } from '@/components/shared/confirm-remove'
 import type { EmojiCardProps } from './lib'
 
+/** One emoji a row, as Slack lists them: the picture, its whole `:name:`, who added it. */
 export function EmojiCard({ emoji, addedBy, isRemovable, onRemove }: EmojiCardProps) {
   const url = hostFileUrl()?.(emoji.fileId)
 
   return (
-    <li className="group flex items-center gap-2.5 rounded-xl border border-border bg-background px-2.5 py-2">
+    <li className="flex items-center gap-3 border-border border-t px-4 py-2.5 first:border-t-0">
       <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-muted">
         {url && <img src={url} alt="" loading="lazy" className="size-7 object-contain" />}
       </span>
-      <span className="min-w-0 flex-1">
-        <span className="block truncate font-mono text-[12.5px]">:{emoji.name}:</span>
-        <span className="block truncate text-[11.5px] text-muted-foreground">by {addedBy}</span>
+      <code className="min-w-0 flex-1 break-all font-mono text-[13px]">:{emoji.name}:</code>
+      <span className="max-w-[40%] shrink-0 truncate text-[12.5px] text-muted-foreground">
+        by {addedBy}
       </span>
       {isRemovable && (
-        <button
-          type="button"
-          onClick={() => onRemove(emoji.id)}
-          aria-label={`Remove :${emoji.name}:`}
-          className="grid size-7 shrink-0 place-items-center rounded-lg text-muted-foreground opacity-0 hover:bg-accent hover:text-destructive focus-visible:opacity-100 group-hover:opacity-100 max-md:opacity-100"
-        >
-          <IconTrash className="size-4" />
-        </button>
+        <ConfirmRemove label={`Remove :${emoji.name}:`} onConfirm={() => onRemove(emoji.id)} />
       )}
     </li>
   )

@@ -1,9 +1,10 @@
-import type { WorkspaceTheme, WorkspaceThemeWrite } from '@washi/domain'
-import { themeChecks } from '@washi/paper/registry'
+import { themeNameClash, type WorkspaceTheme, type WorkspaceThemeWrite } from '@washi/domain'
+import { themeChecks, themeRefusal } from '@washi/paper/registry'
 import {
   createWorkspaceTheme,
   deleteWorkspaceTheme,
   getWorkspaceTheme,
+  listWorkspaceThemes,
   updateWorkspaceTheme,
   type Workspace,
   workspaceThemeBySlug,
@@ -36,13 +37,13 @@ function freeSlug(ws: Workspace, name: string): string {
 }
 
 function requireReadable(write: WorkspaceThemeWrite): void {
-  const [refused] = themeChecks(write).filter((check) => check.verdict === 'refuse')
-  if (refused) {
-    const { rule, ratio, mode } = refused
-    throw new WorkspaceThemeError(
-      `${rule.label} is ${ratio.toFixed(1)}:1 in ${mode} — it needs ${rule.refuse}:1 to be read`,
-    )
-  }
+  const refusal = themeRefusal(themeChecks(write))
+  if (refusal) throw new WorkspaceThemeError(refusal)
+}
+
+function requireFreeName(ws: Workspace, name: string, exceptId: string | null = null): void {
+  const clash = themeNameClash(listWorkspaceThemes(ws), name, exceptId)
+  if (clash) throw new WorkspaceThemeError(clash)
 }
 
 export function addWorkspaceTheme(
@@ -51,6 +52,7 @@ export function addWorkspaceTheme(
   createdBy: string,
 ): WorkspaceTheme {
   requireReadable(write)
+  requireFreeName(ws, write.name)
   return createWorkspaceTheme(ws, { ...write, slug: freeSlug(ws, write.name) }, createdBy)
 }
 
@@ -72,6 +74,7 @@ export function editWorkspaceTheme(
 ): WorkspaceTheme {
   requireMine(ws, id, by)
   requireReadable(write)
+  requireFreeName(ws, write.name, id)
   const updated = updateWorkspaceTheme(ws, id, write)
   if (!updated) throw new WorkspaceThemeError('no such theme')
   return updated

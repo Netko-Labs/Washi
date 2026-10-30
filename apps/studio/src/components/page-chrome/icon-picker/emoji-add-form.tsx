@@ -41,7 +41,11 @@ export function EmojiAddForm({ add, onDone }: EmojiAddFormProps) {
           {draft.busy ? 'Adding…' : 'Add'}
         </button>
       </div>
-      {draft.error && <span className="text-[12px] text-destructive">{draft.error}</span>}
+      {draft.error ? (
+        <span className="text-[12px] text-destructive">{draft.error}</span>
+      ) : (
+        draft.note && <span className="text-[12px] text-muted-foreground">{draft.note}</span>
+      )}
     </form>
   )
 }

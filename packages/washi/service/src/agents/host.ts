@@ -429,6 +429,7 @@ export class AgentHost {
       getTranscript(this.ws, sessionId).length === 0
     ) {
       updateSession(this.ws, sessionId, { title: titleFrom(text) })
+      this.events?.sessionChanged?.(sessionId)
     }
     this.record(sessionId, {
       kind: 'user_message',

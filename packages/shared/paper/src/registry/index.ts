@@ -60,7 +60,13 @@ export {
   WORKSPACE_THEME_KEY,
 } from './surface'
 export { TERMINAL_FRAME } from './terminal'
-export { contrastRatio, isThemeRefused, THEME_RULES, themeChecks } from './theme-check'
+export {
+  contrastRatio,
+  isThemeRefused,
+  THEME_RULES,
+  themeChecks,
+  themeRefusal,
+} from './theme-check'
 export { toHex } from './theme-color'
 export { fillDraft, readTheme, THEME_TOKENS, ThemeImportError, themeFile } from './theme-import'
 export {

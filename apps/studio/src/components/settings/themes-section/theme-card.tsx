@@ -1,5 +1,5 @@
-import { IconDownload, IconPencil, IconTrash } from '@tabler/icons-react'
-import { useState } from 'react'
+import { IconDownload, IconPencil } from '@tabler/icons-react'
+import { ConfirmRemove } from '@/components/shared/confirm-remove'
 import { ThemeSwatch } from '@/components/shared/theme-swatch'
 import { downloadTheme, type ThemeCardProps } from './lib'
 
@@ -7,7 +7,6 @@ const ACTION = 'grid size-8 place-items-center rounded-lg text-muted-foreground 
 
 /** Remove asks once in the row: pages wearing the theme go back to Washi. */
 export function ThemeCard({ theme, madeBy, isChangeable, onEdit, onRemove }: ThemeCardProps) {
-  const [isAsking, setAsking] = useState(false)
   return (
     <li className="flex items-center gap-3 border-border border-t px-4 py-2.5 first:border-t-0">
       <ThemeSwatch pair={theme} className="h-8 w-11 text-[12px]" />
@@ -37,27 +36,11 @@ export function ThemeCard({ theme, madeBy, isChangeable, onEdit, onRemove }: The
           >
             <IconPencil className="size-4" />
           </button>
-          {isAsking ? (
-            <button
-              type="button"
-              onClick={onRemove}
-              onBlur={() => setAsking(false)}
-              ref={(node) => node?.focus()}
-              className="h-8 rounded-lg px-2.5 font-medium text-[12.5px] text-destructive hover:bg-accent"
-            >
-              Remove?
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setAsking(true)}
-              aria-label={`Remove ${theme.name}`}
-              title="Remove — pages wearing it go back to Washi"
-              className={`${ACTION} hover:text-destructive`}
-            >
-              <IconTrash className="size-4" />
-            </button>
-          )}
+          <ConfirmRemove
+            label={`Remove ${theme.name}`}
+            title="Remove — pages wearing it go back to Washi"
+            onConfirm={onRemove}
+          />
         </>
       )}
     </li>

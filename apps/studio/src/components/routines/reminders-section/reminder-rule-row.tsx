@@ -1,4 +1,5 @@
-import { IconBell, IconTrash } from '@tabler/icons-react'
+import { IconBell } from '@tabler/icons-react'
+import { ConfirmRemove } from '@/components/shared/confirm-remove'
 import { ToggleSwitch } from '../toggle-switch'
 import { type ReminderRuleRowProps, ruleSummary } from './lib'
 
@@ -19,14 +20,7 @@ export function ReminderRuleRow({ reminder, onToggle, onRemove }: ReminderRuleRo
           {ruleSummary(reminder)}
         </span>
       </span>
-      <button
-        type="button"
-        onClick={onRemove}
-        aria-label={`Delete ${reminder.title}`}
-        className="grid size-8 shrink-0 place-items-center rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-      >
-        <IconTrash className="size-4" />
-      </button>
+      <ConfirmRemove label={`Delete ${reminder.title}`} onConfirm={onRemove} />
       <ToggleSwitch
         isOn={reminder.enabled}
         label={`${reminder.enabled ? 'Pause' : 'Resume'} ${reminder.title}`}

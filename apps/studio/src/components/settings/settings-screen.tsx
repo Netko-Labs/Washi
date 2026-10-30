@@ -26,7 +26,7 @@ export function SettingsScreen({ workspaceId, tab, onTab }: SettingsScreenProps)
 
   return (
     <section className="min-h-0 flex-1 overflow-y-auto overscroll-y-none">
-      <div className="mx-auto max-w-[720px] px-5 pt-9 pb-16 md:px-10 md:pt-11">
+      <div className="fab-room mx-auto max-w-[720px] px-5 pt-9 md:px-10 md:pt-11">
         <h1 className="mb-5 font-semibold text-[26px] tracking-[-0.02em]">Settings</h1>
         <SettingsTabs groups={groups} current={shown} onTab={onTab} />
         <div>

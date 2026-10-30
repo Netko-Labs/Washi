@@ -28,7 +28,7 @@ export function CommentsList({ sheetId }: CommentsPanelProps) {
           <CommentThreadCard key={thread.root.id} thread={thread} myId={session?.user.id ?? null} />
         ))}
       </div>
-      <div className="shrink-0 border-border border-t p-3">
+      <div className="fab-room shrink-0 border-border border-t p-3">
         {error && <p className="pb-2 text-[12px] text-destructive">{error}</p>}
         <CommentComposer sheetId={sheetId} placeholder="Add a comment…" />
       </div>
