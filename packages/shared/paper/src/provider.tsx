@@ -1,4 +1,4 @@
-import type { HistoryQuery, InkQuery, QueryResult, TableSpec } from '@washi/ink'
+import type { ColumnChange, HistoryQuery, InkQuery, QueryResult, TableSpec } from '@washi/ink'
 import type { WsxElement } from '@washi/wsx'
 import { createContext, type ReactNode, useContext } from 'react'
 import type { ActionRef, CompiledScript, PageCard } from './lib/types'
@@ -63,6 +63,11 @@ export interface PaperHost {
   toggleTask(recordId: string, done: boolean, field?: string): Promise<void>
   /** Column specs, so a select Field offers the column's options — never the page's. */
   describeTable(name: string): Promise<TableSpec | null>
+  /**
+   * Renames or deletes a property, or edits its options, from a column's menu; rejects in words.
+   * A host that cannot change a table (a shared link) leaves it out: the menu only sorts, hides.
+   */
+  changeColumn?(change: ColumnChange): Promise<void>
   /** BCP-47; dates and money format from the vault locale at render, never in a page. */
   locale?: string
 }

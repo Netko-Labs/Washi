@@ -202,6 +202,38 @@ export const mutationSchema = z.discriminatedUnion('kind', [
 ])
 export type InkMutation = z.infer<typeof mutationSchema>
 
+const optionName = z.string().trim().min(1).max(64)
+
+/**
+ * One change to a property from its column menu: a rename (the values move with it), a removal
+ * (the values go), or one option renamed (`from` + `to`), added (`to`) or removed (`from`).
+ */
+export const columnChangeSchema = z.discriminatedUnion('kind', [
+  z.object({
+    kind: z.literal('rename'),
+    table: identifier('table'),
+    column: identifier('column'),
+    to: identifier('column'),
+  }),
+  z.object({ kind: z.literal('remove'), table: identifier('table'), column: identifier('column') }),
+  z
+    .object({
+      kind: z.literal('option'),
+      table: identifier('table'),
+      column: identifier('column'),
+      from: optionName.optional(),
+      to: optionName.optional(),
+      /** Where a new status option goes; to-do when unnamed. */
+      group: z.enum(['todo', 'doing', 'done']).optional(),
+    })
+    .refine((change) => change.from !== undefined || change.to !== undefined, 'name an option'),
+])
+export type ColumnChange = z.infer<typeof columnChangeSchema>
+export type OptionChange = Extract<ColumnChange, { kind: 'option' }>
+
+/** A column change's new spec, or why it cannot be made, in words. */
+export type ChangedSpec = { ok: true; spec: TableSpec } | { ok: false; error: string }
+
 export type QueryRow = Record<string, Cell>
 
 export interface QueryResult {

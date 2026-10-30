@@ -1,0 +1,186 @@
+/* A column's menu — the header press, its popover, and the reader's own sort and hide chips. */
+
+.wsx-db-table th:not(.wsx-db-plus-cell) {
+  padding: 0;
+}
+.wsx-db-table .wsx-db-th {
+  display: flex;
+  width: 100%;
+  padding: 12px 16px 10px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--ease);
+}
+.wsx-db-table .wsx-db-th:hover,
+.wsx-db-table .wsx-db-th[aria-expanded="true"] {
+  background: var(--muted-bg);
+  color: var(--ink);
+}
+.wsx-db-table .wsx-db-th:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.wsx-db-sorted {
+  color: var(--tone-accent-text);
+}
+
+.wsx-db-menu {
+  display: flex;
+  flex-direction: column;
+}
+.wsx-db-menu > [role="menu"] {
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+  border-top: 1px solid var(--border);
+}
+.wsx-db-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: var(--r-cell);
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.wsx-db-menu-item:hover,
+.wsx-db-menu-item:focus-visible {
+  outline: none;
+  background: var(--muted-bg);
+}
+.wsx-db-menu-item > span {
+  width: 14px;
+  color: var(--muted);
+  text-align: center;
+}
+.wsx-db-menu-item[data-danger],
+.wsx-db-menu-item[data-danger] > span {
+  color: var(--tone-danger-text);
+}
+
+.wsx-db-menu-back {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 500;
+}
+.wsx-db-confirm {
+  margin: 12px 14px 8px;
+}
+.wsx-db-ghost {
+  flex: none;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: var(--r-chip);
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+.wsx-db-ghost:hover {
+  background: var(--muted-bg);
+}
+.wsx-db-button[data-danger] {
+  background: var(--tone-danger-text);
+}
+
+.wsx-db-option-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 4px 8px 8px;
+  border: 0;
+}
+.wsx-db-option-group + .wsx-db-option-group {
+  border-top: 1px solid var(--border);
+}
+.wsx-db-option-group > legend {
+  float: left;
+  width: 100%;
+  padding: 6px 6px 2px;
+}
+.wsx-db-option {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.wsx-db-option input,
+.wsx-db-option-add {
+  flex: 1;
+  min-width: 0;
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid transparent;
+  border-radius: var(--r-chip);
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  outline: none;
+}
+.wsx-db-option input:hover,
+.wsx-db-option-add:hover {
+  background: var(--muted-bg);
+}
+.wsx-db-option input:focus,
+.wsx-db-option-add:focus {
+  border-color: var(--accent);
+  background: var(--bg);
+}
+.wsx-db-option button {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: var(--r-chip);
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  cursor: pointer;
+}
+.wsx-db-option button:hover {
+  background: var(--muted-bg);
+  color: var(--tone-danger-text);
+}
+
+.wsx-db-chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.wsx-db-view-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  padding: 0 8px 0 10px;
+  border: 0;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--accent) 12%, transparent);
+  color: var(--tone-accent-text);
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+.wsx-db-view-chip > span {
+  opacity: 0.7;
+}
+.wsx-db-view-chip:hover > span {
+  opacity: 1;
+}

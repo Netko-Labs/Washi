@@ -1,4 +1,4 @@
-import type { NumberFormatChoice, PropertyType } from './types'
+import type { ColumnSpec, NumberFormatChoice, PropertyType, StatusGroup } from './types'
 
 export const PROPERTY_TYPES: PropertyType[] = [
   { type: 'text', label: 'Text', hint: 'Words, a name, a note' },
@@ -37,3 +37,20 @@ export const DEFAULT_STATUS_GROUPS = {
 
 /** The rows a relation's menu offers and its chips are named from. */
 export const RELATION_CHOICE_LIMIT = 500
+
+/** The types whose values are picked off a list of options. */
+export const CHOICE_TYPES: ReadonlySet<ColumnSpec['type']> = new Set([
+  'select',
+  'multi_select',
+  'status',
+])
+
+/** A status's groups as Notion names them in its options. */
+export const STATUS_GROUP_LABELS: { group: StatusGroup; label: string }[] = [
+  { group: 'todo', label: 'To-do' },
+  { group: 'doing', label: 'In progress' },
+  { group: 'done', label: 'Complete' },
+]
+
+/** Rows counted before an option goes; past this the warning says "at least". */
+export const OPTION_USE_LIMIT = 1000

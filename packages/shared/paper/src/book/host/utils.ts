@@ -1,10 +1,12 @@
 import {
   type Cell,
+  changedSpec,
   type HistoryQuery,
   type InkQuery,
   matchesFilters,
   type QueryResult,
   type QueryRow,
+  rowPatch,
   type Scalar,
   type TableSpec,
   validateRecord,
@@ -237,6 +239,19 @@ export function createBookHost(say: Say, seeds?: SeedTable[]): PaperHost {
       notify()
     },
     describeTable: async (name) => tables.get(name)?.spec ?? null,
+    changeColumn: async (change) => {
+      const table = need(change.table)
+      const next = changedSpec(table.spec, change)
+      if (!next.ok) throw new Error(next.error)
+      const column = table.spec.columns.find((each) => each.name === change.column)
+      for (const row of table.rows) {
+        const moved = column && rowPatch(column, change, row)
+        if (moved) Object.assign(row, moved)
+      }
+      table.spec = next.spec
+      say(`${change.kind} ${change.column} landed in memory`)
+      notify()
+    },
     locale: typeof navigator === 'undefined' ? 'en-US' : navigator.language,
   }
   return host

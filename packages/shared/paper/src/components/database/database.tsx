@@ -77,7 +77,7 @@ export function Database({ table, views, empty, ...rest }: DatabaseProps) {
           empty={empty}
         />
       ) : (
-        <DatabaseTable db={db} view={view} empty={empty} />
+        <DatabaseTable key={view.name} db={db} view={view} empty={empty} />
       )}
     </section>
   )

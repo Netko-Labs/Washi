@@ -576,7 +576,11 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
 - **Database views read like Notion's (D84).** A table's head shows each property's type
   (`PropertyIcon`) and name in sentence case; select/status/person cells draw a pill, a step dot or a
   face over an invisible native select; dates read "Nov 4, 2026" and numbers group until pressed
-  (`DateCell`/`NumberCell` swap to the editor on a press); the foot counts rows. A Board with no
+  (`DateCell`/`NumberCell` swap to the editor on a press); the foot counts rows. A head is a menu
+  (`ColumnMenu`): Rename, Edit options and Delete go through `PaperHost.changeColumn` →
+  `tables.changeColumn` (`changedSpec` + `rowPatch` in ink: values follow through `updateRecords`; a
+  formula, rollup or reminder that reads it refuses; the title stays); Sort and Hide are the reader's,
+  never saved (a × chip clears them). A Board with no
   `onAdd` gets + New per column when the host has `newRow`: the row is made in that group, titled
   Untitled, and opened in the peek. A word that means something (high, blocked, in review, done…) wears
   its tone everywhere it shows — pill, badge, a board column's dot, a plain `<Table>` cell past the

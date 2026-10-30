@@ -1,15 +1,26 @@
-import { statusOptions } from '@washi/ink'
+import { type Cell, statusOptions } from '@washi/ink'
+import type { KeyboardEvent } from 'react'
 import type { PaperHost } from '../../../provider'
 import type {
   Choice,
   ColumnSpec,
   DatabaseView,
+  OptionGroup,
+  OptionRemoval,
   Person,
   PropertyDraft,
+  QueryRow,
+  SortDirection,
   StatusGroup,
   TableSpec,
 } from './types'
-import { DEFAULT_STATUS_GROUPS, RELATION_CHOICE_LIMIT } from './values'
+import {
+  CHOICE_TYPES,
+  DEFAULT_STATUS_GROUPS,
+  OPTION_USE_LIMIT,
+  RELATION_CHOICE_LIMIT,
+  STATUS_GROUP_LABELS,
+} from './values'
 
 /** Notion's title property: the first text column names the row. */
 export function titleColumn(spec: TableSpec): ColumnSpec | undefined {
@@ -167,4 +178,81 @@ export async function relationChoices(host: PaperHost, target: string): Promise<
   } catch {
     return null
   }
+}
+
+/** What a cell sorts by: a choice by its place in the column, a person by name; null is empty. */
+function sortKey(column: ColumnSpec, cell: Cell | undefined, people: Person[]) {
+  if (cell === undefined || cell === null || cell === '') return null
+  const first = Array.isArray(cell) ? cell[0] : cell
+  if (first === undefined) return null
+  if (column.type === 'relation' && Array.isArray(cell)) return cell.length
+  if (CHOICE_TYPES.has(column.type)) {
+    const at = choicesFor(column, people).findIndex((choice) => choice.value === first)
+    return at < 0 ? Number.MAX_SAFE_INTEGER : at
+  }
+  if (column.type === 'person') return people.find((each) => each.id === first)?.name ?? first
+  if (typeof first === 'boolean') return first ? 1 : 0
+  return first
+}
+
+/** A reader's sort over the rows loaded; empty cells stay last either way, ties keep their order. */
+export function sortRows(
+  rows: QueryRow[],
+  column: ColumnSpec,
+  direction: SortDirection,
+  people: Person[],
+): QueryRow[] {
+  const sign = direction === 'asc' ? 1 : -1
+  return rows
+    .map((row, at) => ({ row, at, key: sortKey(column, row[column.name], people) }))
+    .sort((a, b) => {
+      if (a.key === null || b.key === null) {
+        return a.key === b.key ? a.at - b.at : a.key === null ? 1 : -1
+      }
+      const order =
+        typeof a.key === 'number' && typeof b.key === 'number'
+          ? a.key - b.key
+          : String(a.key).localeCompare(String(b.key), undefined, { numeric: true })
+      return sign * order || a.at - b.at
+    })
+    .map(({ row }) => row)
+}
+
+/** A choice column's options as its menu lists them: a status by its three groups. */
+export function optionGroups(column: ColumnSpec): OptionGroup[] {
+  if (column.type !== 'status' || !column.groups) {
+    return [{ label: null, options: column.options ?? [] }]
+  }
+  const groups = column.groups
+  return STATUS_GROUP_LABELS.map(({ group, label }) => ({ group, label, options: groups[group] }))
+}
+
+/** The warning before an option in use goes: how many rows hold it, and what becomes of them. */
+export function optionRemovalWords({ option, count }: OptionRemoval): string {
+  if (count === null) return `Rows that hold “${option}” will be left empty.`
+  const many = count >= OPTION_USE_LIMIT ? `At least ${count} rows hold` : `${count} rows hold`
+  const holders = count === 1 ? '1 row holds' : many
+  return `${holders} “${option}” — removing it leaves ${count === 1 ? 'it' : 'them'} empty.`
+}
+
+/** ↑ ↓ walk a menu's fields and items as a native menu does; Home and End jump, outside a field. */
+export function walkMenu(event: KeyboardEvent<HTMLElement>): void {
+  const typing = event.target instanceof HTMLInputElement
+  const jump = !typing && (event.key === 'Home' || event.key === 'End')
+  if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp' && !jump) return
+  const items = [
+    ...event.currentTarget.querySelectorAll<HTMLElement>('input, [role="menuitem"]'),
+  ].filter((item) => !item.hasAttribute('disabled'))
+  if (items.length === 0) return
+  event.preventDefault()
+  const at = items.indexOf(document.activeElement as HTMLElement)
+  const next =
+    event.key === 'Home'
+      ? 0
+      : event.key === 'End'
+        ? items.length - 1
+        : event.key === 'ArrowDown'
+          ? (at + 1) % items.length
+          : (at <= 0 ? items.length : at) - 1
+  items[next]?.focus()
 }
