@@ -1,4 +1,4 @@
-import { type Cell, statusOptions } from '@washi/ink'
+import { type Cell, CHOICE_COLUMN_TYPES, statusOptions } from '@washi/ink'
 import type { KeyboardEvent } from 'react'
 import type { PaperHost } from '../../../provider'
 import type {
@@ -16,7 +16,6 @@ import type {
   ViewSort,
 } from './types'
 import {
-  CHOICE_TYPES,
   DEFAULT_STATUS_GROUPS,
   OPTION_USE_LIMIT,
   RELATION_CHOICE_LIMIT,
@@ -187,7 +186,7 @@ function sortKey(column: ColumnSpec, cell: Cell | undefined, people: Person[]) {
   const first = Array.isArray(cell) ? cell[0] : cell
   if (first === undefined) return null
   if (column.type === 'relation' && Array.isArray(cell)) return cell.length
-  if (CHOICE_TYPES.has(column.type)) {
+  if (CHOICE_COLUMN_TYPES.has(column.type)) {
     const at = choicesFor(column, people).findIndex((choice) => choice.value === first)
     return at < 0 ? Number.MAX_SAFE_INTEGER : at
   }

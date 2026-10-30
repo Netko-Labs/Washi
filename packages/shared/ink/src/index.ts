@@ -1,5 +1,5 @@
 export { changedSpec, rowPatch, titleColumnOf } from './columns'
-export { COPY_ROW_CAP, MAX_TEXT_CELL } from './constants'
+export { CHOICE_COLUMN_TYPES, COPY_ROW_CAP, MAX_TEXT_CELL } from './constants'
 export { matchesFilters } from './match'
 export {
   type Aggregate,

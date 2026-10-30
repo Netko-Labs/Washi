@@ -1,6 +1,7 @@
 import { type ColumnChange, changedSpec, rowPatch, type TableSpec } from '@washi/ink'
 import {
   executeQuery,
+  formulaFunctions,
   getTableByName,
   listReminders,
   listTables,
@@ -8,6 +9,7 @@ import {
   type Workspace,
 } from '@washi/repository'
 import { InkError } from './errors'
+import { checkFormulas } from './rules'
 import { defineUserTable } from './service'
 import type { ColumnChangeResult } from './types'
 
@@ -37,12 +39,27 @@ function readersOf(ws: Workspace, table: string, column: string): string[] {
   return [...rollups, ...reminders]
 }
 
-/** The formula the spec check refused over, in a person's words; names are snake_case words. */
-function formulaReading(spec: TableSpec, name: string): string | undefined {
-  const word = new RegExp(`\\b${name}\\b`)
-  return spec.columns.find(
-    (each) => each.type === 'formula' && each.name !== name && word.test(each.expr ?? ''),
-  )?.name
+/**
+ * The formula check over the changed spec, run before anything is written. A refusal over the
+ * column that went (`total: unknown identifier \`qty\``) is said in a person's words; any other
+ * refusal stays as the check said it.
+ */
+function checkFormulasAfter(ws: Workspace, spec: TableSpec, name: string): void {
+  try {
+    checkFormulas(
+      spec,
+      formulaFunctions(ws).map((formula) => formula.name),
+    )
+  } catch (cause) {
+    const message = cause instanceof InkError ? cause.message : ''
+    const formula = spec.columns.find(
+      (each) => each.type === 'formula' && message.startsWith(`${each.name}: `),
+    )
+    if (formula && message.includes(`\`${name}\``)) {
+      throw new InkError(`The formula “${formula.name}” reads “${name}” — change it first.`)
+    }
+    throw cause
+  }
 }
 
 /**
@@ -74,22 +91,16 @@ export function changeColumn(
     throw new InkError(`too many rows to change in one step (${ALL_ROWS} or more); nothing changed`)
   }
 
-  try {
-    return ws.sqlite.transaction(() => {
-      defineUserTable(ws, next.spec)
-      let moved = 0
-      for (const row of rows) {
-        const patch = rowPatch(column, change, row)
-        if (!patch) continue
-        moved += updateRecords(ws, table.id, [String(row.id)], patch, author)
-      }
-      return { moved }
-    })()
-  } catch (cause) {
-    const formula = change.kind === 'option' ? undefined : formulaReading(table.spec, column.name)
-    if (cause instanceof InkError && formula) {
-      throw new InkError(`The formula “${formula}” reads “${column.name}” — change it first.`)
+  if (change.kind !== 'option') checkFormulasAfter(ws, next.spec, column.name)
+
+  return ws.sqlite.transaction(() => {
+    defineUserTable(ws, next.spec)
+    let moved = 0
+    for (const row of rows) {
+      const patch = rowPatch(column, change, row)
+      if (!patch) continue
+      moved += updateRecords(ws, table.id, [String(row.id)], patch, author)
     }
-    throw cause
-  }
+    return { moved }
+  })()
 }

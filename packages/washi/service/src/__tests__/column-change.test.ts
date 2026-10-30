@@ -41,6 +41,27 @@ describe('a column menu’s changes', () => {
     expect(atlas()?.qty).toBe(2)
   })
 
+  test('any other refusal keeps its own words, even beside a formula that names the column', () => {
+    defineUserTable(ws, { name: 'lines', columns: [{ name: 'order_qty', type: 'number' }] })
+    defineUserTable(ws, {
+      name: 'orders',
+      columns: [
+        { name: 'name', type: 'text' },
+        { name: 'qty', type: 'number' },
+        { name: 'label', type: 'formula', expr: "when(true, 'qty', '')" },
+        {
+          name: 'pieces',
+          type: 'rollup',
+          rollup: { table: 'lines', via: 'order_qty', on: 'qty', fn: 'count' },
+        },
+      ],
+    })
+    expect(() =>
+      changeColumn(ws, { kind: 'rename', table: 'orders', column: 'qty', to: 'quantity' }),
+    ).toThrow('pieces: "qty" is not a stored column to match on')
+    expect(atlas()?.qty).toBe(2)
+  })
+
   test('a rename carries the values, and history says who moved them', () => {
     dropFormula()
     const change = { kind: 'rename', table: 'orders', column: 'qty', to: 'count' } as const

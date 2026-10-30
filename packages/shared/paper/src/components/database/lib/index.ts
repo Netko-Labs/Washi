@@ -84,7 +84,6 @@ export {
   walkMenu,
 } from './utils'
 export {
-  CHOICE_TYPES,
   DEFAULT_STATUS_GROUPS,
   NUMBER_FORMATS,
   PROPERTY_PANEL_WIDTH,

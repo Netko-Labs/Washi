@@ -1,10 +1,10 @@
+import { CHOICE_COLUMN_TYPES } from '@washi/ink'
 import { useState } from 'react'
 import { usePaperHost } from '../../provider'
 import { ColumnDelete } from './column-delete'
 import { ColumnOptions } from './column-options'
 import { ColumnRename } from './column-rename'
 import {
-  CHOICE_TYPES,
   type ColumnMenuPage,
   type ColumnMenuProps,
   type SortDirection,
@@ -49,7 +49,7 @@ export function ColumnMenu({ db, column, isTitle, local, onDone }: ColumnMenuPro
         <p className="wsx-db-panel-head">{label}</p>
       )}
       <div role="menu" aria-label={`${label} property`}>
-        {editable && CHOICE_TYPES.has(column.type) && (
+        {editable && CHOICE_COLUMN_TYPES.has(column.type) && (
           <button
             type="button"
             role="menuitem"
