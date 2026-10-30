@@ -71,6 +71,11 @@ export const useEditorStore = create<EditorState>((set, get) => {
 
     setText: (id, text) =>
       replace(id, (block) => applyShortcut({ ...block, text }) ?? { ...block, text }),
+    dropSlash: (id, typed) => {
+      const place = locate(get().blocks, id)
+      const block = place?.list[place.at]
+      if (isTyped(block) && block.text === typed) replace(id, () => ({ ...block, text: '' }))
+    },
     setDone: (id, done) => replace(id, (block) => ({ ...block, done })),
     turnInto: (id, kind) => {
       replace(id, (block) => turnInto(block, kind))

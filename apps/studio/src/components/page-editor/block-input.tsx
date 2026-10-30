@@ -10,6 +10,7 @@ import {
   isNestedBlock,
   KIND_LOOKS,
   KIND_PLACEHOLDERS,
+  PICKER_KINDS,
   pickFiles,
   type SlashOption,
   slashMatches,
@@ -44,14 +45,18 @@ export function BlockInput({ block, numberAt }: BlockInputProps) {
                   .ask(ref.current)
                   .then((photo) => (photo ? { ...chosen, photo } : null))
               : Promise.resolve(chosen)
-      // The `/` text stays put, so a refused name (taken since the menu loaded) can be retyped.
+      // A refused name (taken since the menu loaded) keeps its `/` text to retype; a picker's goes.
+      const isPicker = PICKER_KINDS.has(chosen.kind)
+      const typed = block.text
+      const letGo = () => isPicker && store().dropSlash(block.id, typed)
       ready
-        .then((landing) => landing && store().insertData(block.id, landing))
-        .catch((cause: unknown) =>
+        .then((landing) => (landing ? store().insertData(block.id, landing) : letGo()))
+        .catch((cause: unknown) => {
+          letGo()
           useNoticeStore
             .getState()
-            .say(`That did not land — ${cause instanceof Error ? cause.message : String(cause)}`),
-        )
+            .say(`That did not land — ${cause instanceof Error ? cause.message : String(cause)}`)
+        })
       return
     }
     store().turnInto(block.id, option.kind)

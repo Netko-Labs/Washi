@@ -27,6 +27,8 @@ export interface EditorState {
   /** Someone else's edit, merged: new blocks in, the rows still under the caret keep their ids. */
   absorb: (blocks: Block[], version: string | null, source: string) => void
   setText: (id: string, text: string) => void
+  /** Empties a block still reading `typed`: a picker closed or refused leaves no `/image` behind. */
+  dropSlash: (id: string, typed: string) => void
   setDone: (id: string, done: boolean) => void
   turnInto: (id: string, kind: TextKind) => void
   /** Enter: the text after the caret moves into a new block below. */
