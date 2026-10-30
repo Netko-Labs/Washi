@@ -1,8 +1,12 @@
 /** Where a page's `useStored` keeps a key: the reader's own browser, per page. */
 export const storedKey = (page: string | undefined, key: string) =>
-  `washi:stored:${page ?? 'page'}:${key}`
+  page ? `washi:stored:${page}:${key}` : `memory:${key}`
+
+// A page with no id (the book's stage) has nothing to keep a value under: it lasts the visit.
+const unkept = new Map<string, string>()
 
 export function readStored(key: string): string | undefined {
+  if (key.startsWith('memory:')) return unkept.get(key)
   try {
     return localStorage.getItem(key) ?? undefined
   } catch {
@@ -11,6 +15,10 @@ export function readStored(key: string): string | undefined {
 }
 
 export function writeStored(key: string, json: string) {
+  if (key.startsWith('memory:')) {
+    unkept.set(key, json)
+    return
+  }
   try {
     localStorage.setItem(key, json)
   } catch {

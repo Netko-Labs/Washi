@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { PAGE_HOOKS, WIDGET_FRAME, WIDGET_HOOKS, WIDGET_WORDS } from '@washi/paper/registry'
+import { PAGE_HOOKS, WIDGET_FRAME, WIDGET_HOOKS } from '@washi/paper/registry'
 import { compilePage, compileWidget } from '../pages'
 import { loadEngine } from '../scripts/engine'
 import { checkSource } from '../sheets/service'
@@ -96,11 +96,9 @@ describe('a widget is JSX (D113)', () => {
 })
 
 describe('saving a page with a widget', () => {
-  test('a component child is taken; text, as HTML was, is refused in words', () => {
+  test('a component child is taken; an old widget’s HTML still saves, to draw its note', () => {
     expect(errors(PAGE)).toEqual([])
-    expect(errors('<Sheet title="t"><Widget>{`<div id="x"></div>`}</Widget></Sheet>')).toEqual([
-      WIDGET_WORDS,
-    ])
+    expect(errors('<Sheet title="t"><Widget>{`<div id="x"></div>`}</Widget></Sheet>')).toEqual([])
   })
 
   test('DOM elements outside a widget’s component are refused', () => {

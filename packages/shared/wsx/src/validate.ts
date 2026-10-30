@@ -62,9 +62,12 @@ function checkChildren(node: WsxElement, spec: ComponentSpec, path: string, walk
   if (spec.children === 'component') {
     const [only, ...rest] = node.children
     const isComponent = only?.kind === 'element' && walk.components.has(only.name)
-    if (!isComponent || rest.length > 0) {
-      error(out, path, spec.childWords ?? `<${node.name}> takes one of the page's own components`)
-    }
+    const words = spec.childWords ?? `<${node.name}> takes one of the page's own components`
+    // Text from before components (an old widget's HTML) draws a note; refusing it would lock the page.
+    const isOldText =
+      node.children.length > 0 && node.children.every((child) => child.kind === 'text')
+    if (isOldText) out.push({ severity: 'warning', message: words, path })
+    else if (!isComponent || rest.length > 0) error(out, path, words)
   }
   if (spec.children === 'none' && node.children.length > 0) {
     error(out, path, `<${node.name}> does not take children`)

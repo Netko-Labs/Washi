@@ -547,8 +547,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   draws one of the page's own components (D100) with real React in an iframe `sandbox="allow-scripts"`
   — no `allow-same-origin`, so an opaque origin with no cookies, storage or parent — under a CSP with
   no network (`default-src 'none'`; pictures only `data:`/`blob:`). Its child is exactly one element
-  naming a prelude component (policy `component`); text — a pre-D113 HTML widget — is refused at save
-  in words and draws a note, its text kept. `pageModule` turns a Widget's child into a drawn node
+  naming a prelude component (policy `component`); text — a pre-D113 HTML widget — is a warning, not
+  a refusal, so its page still saves: it draws a note in words, its text kept. `pageModule` turns a Widget's child into a drawn node
   (`widgetsAsNodes`), so the page's sandbox never calls it: its props are evaluated there and handed
   to the frame. `scripts.widget` (`compileWidget`) bundles the component through `compilePage`'s
   pipeline — same allowlist, `page:` reads, cap, cache — with React (traced into `.output`,

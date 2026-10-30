@@ -29,9 +29,8 @@ const errors = (source: string) =>
     .map((each) => each.message)
 
 describe('a widget is JSX (D113)', () => {
-  test('one of the page’s own components is its child; text or a primitive is refused', () => {
+  test('one of the page’s own components is its child; a primitive is refused', () => {
     expect(errors(`${CLOCK}\n<Sheet title="t"><Widget><Clock /></Widget></Sheet>`)).toEqual([])
-    expect(errors('<Sheet title="t"><Widget>{`<div></div>`}</Widget></Sheet>')).toEqual([WORDS])
     expect(errors(`${CLOCK}\n<Sheet title="t"><Widget><Text>hi</Text></Widget></Sheet>`)).toEqual([
       WORDS,
     ])
@@ -39,6 +38,14 @@ describe('a widget is JSX (D113)', () => {
     expect(
       errors(`${CLOCK}\n<Sheet title="t"><Widget><Clock /><Clock /></Widget></Sheet>`),
     ).toEqual([WORDS])
+  })
+
+  test('an old widget’s HTML is a warning, so its page still saves', () => {
+    const said = validate(
+      parse('<Sheet title="t"><Widget>{`<div></div>`}</Widget></Sheet>'),
+      registry,
+    )
+    expect(said.map((each) => [each.severity, each.message])).toEqual([['warning', WORDS]])
   })
 
   test('the page never calls a widget’s component: it draws as a node, props evaluated', () => {
