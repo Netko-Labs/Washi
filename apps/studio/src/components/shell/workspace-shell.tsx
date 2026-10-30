@@ -1,7 +1,7 @@
 import { CommandPalette, MascotDefs, Notice } from '@washi/ui'
 import { RowPeek } from '@/components/row-peek'
 import { useIsNarrow } from '@/components/shared/viewport'
-import { useTabNavigation, useWorkspaceBoot, type WorkspaceShellProps } from './lib'
+import { PALETTE_LINKS, useTabNavigation, useWorkspaceBoot, type WorkspaceShellProps } from './lib'
 import { NarrowShell } from './narrow-shell'
 import { SkipLink } from './skip-link'
 import { WideShell } from './wide-shell'
@@ -18,7 +18,7 @@ export function WorkspaceShell({ workspace, children }: WorkspaceShellProps) {
       <MascotDefs />
       <Shell workspace={workspace}>{children}</Shell>
       <RowPeek workspaceId={workspace.id} />
-      <CommandPalette />
+      <CommandPalette links={PALETTE_LINKS} />
       <Notice />
     </div>
   )

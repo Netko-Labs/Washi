@@ -17,3 +17,4 @@ export type {
   WorkspaceShellProps,
 } from './types'
 export { focusMain, pathFor, readDock, readFold, writeDock, writeFold } from './utils'
+export { PALETTE_LINKS } from './values'

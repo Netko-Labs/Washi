@@ -1,4 +1,5 @@
 import type { PropRow, Recipe } from '@washi/paper/book'
+import type { RefObject } from 'react'
 
 export interface LearnGroup {
   id: string
@@ -8,8 +9,14 @@ export interface LearnGroup {
 
 export interface LearnNavProps {
   groups: LearnGroup[]
+  recipes: Recipe[]
   query: string
   onQuery: (query: string) => void
+}
+
+export interface LearnNavListProps extends LearnNavProps {
+  active: string | null
+  onPick: () => void
 }
 
 export interface LearnSheetProps {
@@ -26,8 +33,17 @@ export interface LearnPropsProps {
   rows: PropRow[]
 }
 
-export interface LearnRecipeProps {
-  recipe: Recipe
+export interface LearnRecipesProps {
+  recipes: Recipe[]
+  query: string
+}
+
+export interface ContentsState {
+  isOpen: boolean
+  open: () => void
+  close: () => void
+  toggle: () => void
+  root: RefObject<HTMLElement | null>
 }
 
 export interface Copied {

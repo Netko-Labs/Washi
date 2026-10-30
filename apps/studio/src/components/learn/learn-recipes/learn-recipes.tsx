@@ -1,16 +1,19 @@
-import { RECIPES } from '@washi/paper/book'
 import { LearnSheet } from '../learn-sheet'
-import { anchorOf } from '../lib'
+import { ANCHOR_OFFSET, anchorOf, type LearnRecipesProps, recipeAnchorOf } from '../lib'
 
 /** Primitives that only make sense together, each a whole page you can copy. */
-export function LearnRecipes() {
+export function LearnRecipes({ recipes, query }: LearnRecipesProps) {
+  if (recipes.length === 0) {
+    return <p className="text-[14px] text-muted-foreground">No recipe matches “{query.trim()}”.</p>
+  }
+
   return (
     <div className="space-y-10">
-      {RECIPES.map((recipe) => (
+      {recipes.map((recipe) => (
         <article
           key={recipe.id}
-          id={`r-${recipe.id}`}
-          className="learn-recipe scroll-mt-6 space-y-3"
+          id={recipeAnchorOf(recipe.id)}
+          className={`learn-recipe ${ANCHOR_OFFSET} space-y-3`}
         >
           <header>
             <h3 className="font-semibold text-[16px]">{recipe.title}</h3>

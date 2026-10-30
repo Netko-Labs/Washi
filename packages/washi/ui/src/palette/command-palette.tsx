@@ -1,8 +1,8 @@
-import { IconSearch, IconSparkles } from '@tabler/icons-react'
+import { IconArrowUpRight, IconSearch, IconSparkles } from '@tabler/icons-react'
 import { Command } from 'cmdk'
 import { SheetIcon } from '../sheet-icon'
 import { useAgentStore, useNoticeStore, useSheetsStore, useViewStore } from '../stores'
-import { usePalette } from './lib'
+import { type CommandPaletteProps, usePalette } from './lib'
 
 /** Free text is a question: a turn starts on screen, in a fresh chat if one is running. */
 function askWashi(text: string) {
@@ -18,7 +18,7 @@ function askWashi(text: string) {
 }
 
 /** ⌘K palette per Washi.dc.html: scrim, 560px panel at 14vh, ask Washi, a blank page, pages. */
-export function CommandPalette() {
+export function CommandPalette({ links = [] }: CommandPaletteProps) {
   const { sheets, paletteOpen, closePalette, createSheet, searchTerm, searchHits, search } =
     useSheetsStore()
   const ref = usePalette(paletteOpen)
@@ -145,6 +145,27 @@ export function CommandPalette() {
                       {hit.snippet}
                     </span>
                   </span>
+                </Command.Item>
+              ))}
+            </Command.Group>
+          )}
+          {links.length > 0 && (
+            <Command.Group
+              heading="Help"
+              className="[&_[cmdk-group-heading]]:px-2.5 [&_[cmdk-group-heading]]:pt-2 [&_[cmdk-group-heading]]:pb-1 [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:text-[11px] [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-[0.06em]"
+            >
+              {links.map((link) => (
+                <Command.Item
+                  key={link.href}
+                  value={`${link.label} ${link.keywords ?? ''} help`}
+                  onSelect={() => {
+                    window.open(link.href, '_blank', 'noopener')
+                    closePalette()
+                  }}
+                  className="flex h-9 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-[13px] data-[selected=true]:bg-accent"
+                >
+                  <IconArrowUpRight className="size-4 text-muted-foreground" />
+                  <span className="truncate">{link.label}</span>
                 </Command.Item>
               ))}
             </Command.Group>
