@@ -1,6 +1,7 @@
 import { IconDots } from '@tabler/icons-react'
 import { useRef, useState } from 'react'
 import { SharePanel } from '@/components/share'
+import { BottomSheet } from '@/components/shared/bottom-sheet'
 import { useDismiss } from '@/components/shared/dismiss'
 import type { PageMenuMode, PageMenuProps } from './lib'
 import { MoveToPanel } from './move-to-panel'
@@ -8,12 +9,23 @@ import { PageMenuList } from './page-menu-list'
 import { RenameForm } from './rename-form'
 import { ThemePanel } from './theme-panel'
 
-/** The ⋯ beside Copy link: what a person does to a page as a whole. */
+/** The ⋯ beside Copy link: what a person does to a page as a whole; a phone's rises as a sheet. */
 export function PageMenu({ sheet, compact }: PageMenuProps) {
   const [mode, setMode] = useState<PageMenuMode | null>(null)
   const root = useRef<HTMLDivElement>(null)
   useDismiss(root, mode !== null, () => setMode(null))
   const close = () => setMode(null)
+  const panel = (
+    <>
+      {mode === 'menu' && (
+        <PageMenuList sheet={sheet} onMode={setMode} onDone={close} compact={compact} />
+      )}
+      {mode === 'share' && <SharePanel sheet={sheet} onClose={close} />}
+      {mode === 'rename' && <RenameForm sheet={sheet} onDone={close} />}
+      {mode === 'move' && <MoveToPanel sheet={sheet} onDone={close} />}
+      {mode === 'theme' && <ThemePanel sheet={sheet} onDone={close} />}
+    </>
+  )
 
   return (
     <div ref={root} className="relative">
@@ -29,7 +41,12 @@ export function PageMenu({ sheet, compact }: PageMenuProps) {
       >
         <IconDots className="size-4" />
       </button>
-      {mode && (
+      {mode && compact && (
+        <BottomSheet label="Page options" onClose={close}>
+          {panel}
+        </BottomSheet>
+      )}
+      {mode && !compact && (
         <div
           role="dialog"
           aria-label="Page options"
@@ -37,13 +54,7 @@ export function PageMenu({ sheet, compact }: PageMenuProps) {
             mode === 'share' ? 'w-[340px] p-1.5' : 'w-[260px]'
           }`}
         >
-          {mode === 'menu' && (
-            <PageMenuList sheet={sheet} onMode={setMode} onDone={close} compact={compact} />
-          )}
-          {mode === 'share' && <SharePanel sheet={sheet} onClose={close} />}
-          {mode === 'rename' && <RenameForm sheet={sheet} onDone={close} />}
-          {mode === 'move' && <MoveToPanel sheet={sheet} onDone={close} />}
-          {mode === 'theme' && <ThemePanel sheet={sheet} onDone={close} />}
+          {panel}
         </div>
       )}
     </div>

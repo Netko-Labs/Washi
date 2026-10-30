@@ -7,10 +7,8 @@ import {
 } from '@tabler/icons-react'
 import { useFavoritesStore } from '@washi/ui'
 import { useCommentsStore } from '@/components/comments'
+import { SHEET_ROW as ITEM } from '@/components/shared/bottom-sheet'
 import type { PageMenuQuickProps } from './lib'
-
-const ITEM =
-  'flex h-10 w-full items-center gap-2.5 rounded-lg px-2 text-left text-[14px] hover:bg-accent'
 
 /** What a wide header shows beside ⋯, folded into it on a phone. */
 export function PageMenuQuick({ sheet, onMode, onDone }: PageMenuQuickProps) {

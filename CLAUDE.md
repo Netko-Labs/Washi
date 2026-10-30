@@ -100,7 +100,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   has ‹ back, and ☰ or a swipe in from the left edge opens the whole sidebar as a full-screen menu
   (`MobileDrawer`, D80–D82; drawn once and slid, never mounted on open; ✕, a swipe back left or a
   pick closes it). The header keeps Edit and ⋯ (`NarrowHeaderActions`; comments, share, copy link and
-  the star fold into ⋯ as `PageMenuQuick`); Washi is the mascot FAB under the thumb, no bottom bar. Gestures are `useSwipe` (`components/shared/gestures`): touch
+  the star fold into ⋯ as `PageMenuQuick`; that ⋯ and a drawer row's ⋯ — add inside, trash — rise
+  as a `BottomSheet`); Washi is the mascot FAB under the thumb, no bottom bar. Gestures are `useSwipe` (`components/shared/gestures`): touch
   events, axis-locked, far-or-fast commits; a phone's peek is a sheet its bar pulls down. `useIsNarrow` picks the shell; the workspace routes never SSR.
   The browser tab says where you are (D112): `<place> · <context>` (`Roadmap · Netko`, a peek
   `<row> · <page>`, `Settings · People`), set by each view through `useDocumentTitle`
