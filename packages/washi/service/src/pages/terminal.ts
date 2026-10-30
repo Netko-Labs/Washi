@@ -2,7 +2,7 @@ import { CODE_LIMITS, type PagePackageSet } from '@washi/domain'
 import { TERMINAL_FRAME } from '@washi/paper/registry'
 import type { Diagnostic, WsxElement, WsxNode } from '@washi/wsx'
 import { bundle, failure } from './compile'
-import { isAllowedImport, isNodeRequire, terminalRefusal } from './imports'
+import { isAllowedImport, isNodeRequire, RELATIVE, terminalRefusal } from './imports'
 import type { BundleTarget, CompiledPage, WidgetReach } from './types'
 import { KB, TERMINAL_PROGRAM_MAX_CHARS } from './values'
 
@@ -78,10 +78,11 @@ export async function compileTerminal(
   const problem = terminalProblem(program, packages)
   if (problem) return failure(problem)
   const key = ['terminal', program]
+  const local = [...new Set(requiredBy(program).filter((path) => RELATIVE.test(path)))]
   const compiled = await bundle(
     program,
     () => null,
-    TERMINAL_TARGET,
+    { ...TERMINAL_TARGET, local },
     key,
     packages,
     reach.maxKb * KB,

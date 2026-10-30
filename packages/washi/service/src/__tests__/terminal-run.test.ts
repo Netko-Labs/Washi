@@ -113,4 +113,21 @@ console.table([{ a: 1 }, { a: 2 }])`)
     expect(run.screen()).toContain('hi there\nhi { n: 1n }\n┌')
     expect(run.screen()).not.toContain('again')
   })
+
+  test('the page libraries load through require, and through import', async () => {
+    for (const [program, printed] of [
+      ["const { z } = require('zod')\nconsole.log(z.string().parse('ok'))", 'ok\n'],
+      ["console.log(JSON.stringify(require('lodash-es').chunk([1, 2, 3], 2)))", '[[1,2],[3]]\n'],
+      [
+        "const { format } = require('date-fns')\nconsole.log(format(new Date(0), 'yyyy'))",
+        '1970\n',
+      ],
+    ] as const) {
+      expect((await runTerminal(program)).screen()).toBe(printed)
+    }
+    const imported = await runTerminal(
+      "import _, { chunk } from 'lodash-es'\nconsole.log(_.chunk === chunk)",
+    )
+    expect(imported.screen()).toBe('true\n')
+  })
 })

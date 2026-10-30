@@ -3,6 +3,7 @@ import { CODE_LIMITS, type CodeLimits, type PagePackageSet } from '@washi/domain
 import { PAGE_HOOKS, PAGE_IMPORT, paperRegistry, WIDGET_HOOKS } from '@washi/paper/registry'
 import { pageModule } from '@washi/wsx'
 import {
+  exactPattern,
   importRefusal,
   insidePackage,
   isAllowedImport,
@@ -10,7 +11,6 @@ import {
   NODE_MODULE,
   packageKey,
   packagePattern,
-  RELATIVE,
   realDir,
 } from './imports'
 import type { BundleTarget, CompiledPage, PageSource } from './types'
@@ -81,9 +81,14 @@ function plugin(
           path: `node:${path.replace(/^node:/, '')}`,
           namespace: NS,
         }))
-        build.onResolve({ filter: RELATIVE }, ({ path, importer }) =>
-          importer === 'washi:self' ? { path: `local:${path}`, namespace: NS } : undefined,
-        )
+        // Only the program's own paths: a hook that merely sees a library's `./x.js`, even answering
+        // nothing, makes Bun 1.4 emit bindings it never declares (`util2 is not defined`).
+        const local = exactPattern(target.local ?? [])
+        if (local) {
+          build.onResolve({ filter: local }, ({ path, importer }) =>
+            importer === 'washi:self' ? { path: `local:${path}`, namespace: NS } : undefined,
+          )
+        }
       }
       build.onResolve({ filter: /^washi:(entry|self)$/ }, ({ path }) => ({ path, namespace: NS }))
       build.onResolve({ filter: /^washi(\/ui)?$/ }, ({ path }) => ({ path, namespace: NS }))

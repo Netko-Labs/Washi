@@ -15,6 +15,9 @@ export const RELATIVE = /^\.{0,2}\//
 
 export const isNodeRequire = (path: string) => NODE_MODULE.test(path) || RELATIVE.test(path)
 
+export const exactPattern = (paths: string[]): RegExp | null =>
+  paths.length ? new RegExp(`^(${paths.map(escaped).join('|')})$`) : null
+
 /** One of the server's packages or a subpath of it; as with a library, no segment climbs out. */
 export function packagePattern(set: PagePackageSet | null): RegExp | null {
   if (!set || set.packages.length === 0) return null
