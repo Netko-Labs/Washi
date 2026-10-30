@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
+import { sheetMetaPatchSchema } from '@washi/domain'
 import { createSheet, getAppMeta, getSheet, openWorkspace, type Workspace } from '@washi/repository'
 import { liftLooksIntoSource, updateSheetMetaAndLook } from '../sheets/look'
 import { createSheetFromSource, undoWashiWrite, updateSheetFromSource } from '../sheets/service'
@@ -35,6 +36,17 @@ describe('the look lives in the page (D64)', () => {
     expect(removed.source).not.toContain('cover=')
     expect(removed.cover).toBeNull()
     expect(removed.icon).toBe('book')
+  })
+
+  test('an Unsplash cover is its id in the page, through the meta patch too (D117)', () => {
+    const sheet = createSheetFromSource(ws, { title: 'Matcha', source: source() })
+    const patch = sheetMetaPatchSchema.parse({ cover: 'unsplash:Dwu85P9SOIk' })
+    const picked = updateSheetMetaAndLook(ws, sheet.id, patch)
+    expect(picked.source).toContain('cover="unsplash:Dwu85P9SOIk"')
+    expect(picked.cover).toBe('unsplash:Dwu85P9SOIk')
+    expect(sheetMetaPatchSchema.safeParse({ cover: 'https://images.unsplash.com/x' }).success).toBe(
+      false,
+    )
   })
 
   test('a picked theme is a prop of the page; an id the registry lacks is refused', () => {

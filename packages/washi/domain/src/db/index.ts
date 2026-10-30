@@ -20,6 +20,7 @@ export {
   sheetRevisionTable,
   sheetShareTable,
   sheetTable,
+  unsplashPhotoTable,
   userTableTable,
   workspaceThemeTable,
 } from './schema'

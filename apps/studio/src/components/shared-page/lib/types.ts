@@ -1,3 +1,4 @@
+import type { UnsplashCredit } from '@washi/paper'
 import type { ThemePair } from '@washi/paper/registry'
 import type { WsxElement } from '@washi/wsx'
 
@@ -11,6 +12,8 @@ export interface SharedPayload {
   source: string
   /** The workspace theme the page wears, if any; built-in themes need nothing. */
   theme: ThemePair | null
+  /** An Unsplash cover's hotlink and credit (D117); the reader cannot ask for it. */
+  unsplash: (UnsplashCredit & { id: string }) | null
 }
 
 export type SharedState =

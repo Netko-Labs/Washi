@@ -1,5 +1,7 @@
+// conventions: >300 lines — the editor's block and store types; split into types/ when next touched
 import type { SheetDetail, UploadKind } from '@washi/domain'
 import type { WsxElement, WsxValue } from '@washi/wsx'
+import type { KeptPhoto } from '@/components/shared/unsplash'
 
 export type TextKind =
   | 'text'
@@ -195,6 +197,7 @@ export type DataPick =
   /** `file` arrives once the person picked one; the menu offers the kind. */
   | { kind: 'upload'; as: UploadKind; file?: File }
   | { kind: 'gallery'; files?: File[] }
+  | { kind: 'unsplash'; photo?: KeptPhoto }
   | { kind: 'code' }
   | { kind: 'widget' }
   | { kind: 'formula' }

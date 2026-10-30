@@ -10,6 +10,7 @@ export const instanceQueries = router({
     signup: await ctx.instance.signup(),
     key: await ctx.instance.keyInfo(),
     searchKey: await ctx.instance.searchKeyInfo(),
+    unsplashKey: await ctx.instance.unsplashKeyInfo(),
     ...ctx.instance.policy(),
     pagePackages: ctx.runtime.pagePackages?.list() ?? [],
   })),

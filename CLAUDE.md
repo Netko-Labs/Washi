@@ -189,7 +189,22 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   beside them) or `file:<id>` (an upload); presets and pictures live in `@washi/paper/registry`.
   An icon is a registry name, an emoji or `file:<id>` (`SheetIcon` draws an upload through the
   host's `fileUrl`, else a page glyph).
-- **A workspace keeps its own emoji (D71).** `custom_emojis` (workspace file; `ensureCustomEmojis`):
+- **A cover or a picture may come from Unsplash (D117).** A cover key `unsplash:<id>`; the hotlinks
+  (regular/full), the photographer and both pages are kept in `unsplash_photos` (workspace file;
+  `ensureUnsplashPhotos`) when it is picked, so a cover reads that table (`SheetLookHost.unsplash`,
+  `useUnsplashStore`; a shared link carries the photo in its payload) and never asks Unsplash per
+  view. The Access Key is the workspace's (`organization_integration` `unsplash`, Settings → Washi →
+  What leaves) else the server's (sealed under `:server:unsplash`, Settings → Server; runtime
+  `unsplashKey`, the D105 rule); embedded reads `UNSPLASH_ACCESS_KEY`. tsuru's `unsplashSearch` /
+  `unsplashPhoto` / `unsplashDownload` reach only `api.unsplash.com`, the key in `Authorization:
+  Client-ID`, results trimmed and any photo not on `images.unsplash.com` dropped — wired in trpc
+  (`unsplash.status · photos · search · use`), never in service (C3). `use` reads the photo again
+  by id (a client never names a URL), keeps it and pings its `download_location`, as Unsplash's
+  guidelines ask; each search and pick is a ledger row (`unsplash_search`, `unsplash_use`). The
+  cover picker has an Unsplash tab; `/unsplash` lands a `<Figure>` on the hotlink captioned "Photo
+  by <name> on Unsplash"; a cover credits the photographer and Unsplash with `utm_source=washi`
+  links (`unsplashLink`). No key → the tab says where one goes. The studio's CSP sets no `img-src`.
+- **A workspace keeps its own emoji (D71). `custom_emojis` (workspace file; `ensureCustomEmojis`):
   a bare lowercase shortcode unique per workspace over an upload; `emojis.list/add/remove`, its
   adder or a steward removes. Picking one sets the icon to `file:<fileId>`. `trashedUploads` never
   frees an emoji's file; removing the emoji frees it only if nothing wears it (`isUploadWorn`).

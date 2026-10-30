@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test'
 import { hasErrors, parse, validate } from '@washi/wsx'
-import { paperRegistry } from '../index'
+import { paperRegistry, unsplashCaption, unsplashLink } from '../index'
 
 const passes = (props: string) =>
   !hasErrors(validate(parse(`<Sheet title="p" ${props}><Text>x</Text></Sheet>`), paperRegistry))
@@ -21,5 +21,20 @@ describe('a page wears its own look (D64)', () => {
     expect(passes('cover="preset:neon"')).toBe(false)
     expect(passes('cover="picture:beach"')).toBe(false)
     expect(passes('cover="https://example.com/a.jpg"')).toBe(false)
+  })
+
+  test('an Unsplash cover is its photo id, never its address (D117)', () => {
+    expect(passes('cover="unsplash:Dwu85P9SOIk"')).toBe(true)
+    expect(passes('cover="unsplash:"')).toBe(false)
+    expect(passes('cover="unsplash:../photos/x"')).toBe(false)
+    expect(passes('cover="unsplash:https://images.unsplash.com/x"')).toBe(false)
+  })
+
+  test('an Unsplash credit names the photographer and links back with the referral', () => {
+    expect(unsplashCaption('Ansel Adams')).toBe('Photo by Ansel Adams on Unsplash')
+    const link = new URL(unsplashLink('https://unsplash.com/@ansel?utm_source=other'))
+    expect(link.origin + link.pathname).toBe('https://unsplash.com/@ansel')
+    expect(link.searchParams.get('utm_source')).toBe('washi')
+    expect(link.searchParams.get('utm_medium')).toBe('referral')
   })
 })

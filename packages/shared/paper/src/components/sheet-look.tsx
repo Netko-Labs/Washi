@@ -1,7 +1,7 @@
 import { coverStyle } from '../lib'
 import type { SheetCoverProps, SheetMarkProps } from '../lib/types'
 import { useSheetLook } from '../look'
-import { COVER_PICTURES } from '../registry/looks'
+import { COVER_PICTURES, UNSPLASH_HOME, unsplashLink } from '../registry/looks'
 
 /** The page's cover, full bleed above its column. A picture names itself; Washi shipped it. */
 export function SheetCover({ cover }: SheetCoverProps) {
@@ -10,11 +10,26 @@ export function SheetCover({ cover }: SheetCoverProps) {
   const picture = cover.startsWith('picture:')
     ? COVER_PICTURES.find((entry) => entry.slug === cover.slice('picture:'.length))
     : undefined
+  const photo = cover.startsWith('unsplash:')
+    ? look.unsplash?.(cover.slice('unsplash:'.length))
+    : undefined
 
   return (
     <div className="wsx-cover" style={coverStyle(cover, look)}>
       {picture && look.pictureUrl && (
         <span className="wsx-cover-caption">{picture.label} · one of Washi's pictures</span>
+      )}
+      {photo && (
+        <span className="wsx-cover-caption">
+          Photo by{' '}
+          <a href={unsplashLink(photo.profileUrl)} target="_blank" rel="noreferrer">
+            {photo.name}
+          </a>{' '}
+          on{' '}
+          <a href={unsplashLink(UNSPLASH_HOME)} target="_blank" rel="noreferrer">
+            Unsplash
+          </a>
+        </span>
       )}
       {edit && (
         <button

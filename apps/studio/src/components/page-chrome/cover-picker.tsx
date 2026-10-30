@@ -1,5 +1,6 @@
 import { COVER_PICTURES, COVER_PRESETS } from '@washi/paper/registry'
 import { useState } from 'react'
+import { UnsplashPanel } from '@/components/shared/unsplash'
 import {
   COVER_TABS,
   type CoverTab,
@@ -15,12 +16,16 @@ const TILE =
   'relative flex h-14 items-end overflow-hidden rounded-lg p-1.5 text-left ring-offset-2 ring-offset-popover'
 const LABEL = 'rounded bg-black/35 px-1 font-medium text-[10.5px] text-white'
 
-/** Presets · Pictures · Upload. Whatever is picked, the page stores a key (D60). */
+/** Presets · Pictures · Unsplash · Upload. Whatever is picked, the page stores a key (D60). */
 export function CoverPicker({ anchor, current, onPick, onClose }: PickerProps) {
   const root = usePickerRoot(onClose)
   const at = useAnchored(anchor)
   const [tab, setTab] = useState<CoverTab>(() =>
-    current?.startsWith('picture:') ? 'pictures' : 'presets',
+    current?.startsWith('picture:')
+      ? 'pictures'
+      : current?.startsWith('unsplash:')
+        ? 'unsplash'
+        : 'presets',
   )
 
   const ring = (on: boolean) => (on ? 'ring-2 ring-primary' : 'hover:ring-2 hover:ring-border')
@@ -84,6 +89,8 @@ export function CoverPicker({ anchor, current, onPick, onClose }: PickerProps) {
           ))}
         </div>
       )}
+
+      {tab === 'unsplash' && <UnsplashPanel onPicked={(photo) => onPick(`unsplash:${photo.id}`)} />}
 
       {tab === 'upload' && (
         <UploadDrop hint="JPG · PNG · WebP · GIF · up to 10 MB" onPick={onPick} />

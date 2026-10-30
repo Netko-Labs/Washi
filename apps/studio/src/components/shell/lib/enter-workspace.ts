@@ -4,6 +4,7 @@ import {
   useFavoritesStore,
   useSheetsStore,
   useThemesStore,
+  useUnsplashStore,
   useViewStore,
 } from '@washi/ui'
 import { useCommentsStore } from '@/components/comments'
@@ -20,6 +21,7 @@ export function enterWorkspace(workspace: WorkspaceSummary): void {
   useAgentStore.getState().bind(workspace.id)
   useSheetsStore.getState().reset()
   useThemesStore.getState().reset()
+  useUnsplashStore.getState().reset()
   useFavoritesStore.getState().bind(workspace.id)
   useCommentsStore.getState().reset()
   useMentionsStore.getState().reset()

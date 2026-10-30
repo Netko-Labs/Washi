@@ -12,11 +12,14 @@ export const MIN_SECRET_LENGTH = 32
 export const SERVER_SEAL_ID = ':server'
 /** The server's Exa key, under its own id so the two keys never share a derivation. */
 export const SERVER_SEARCH_SEAL_ID = ':server:exa'
+/** The server's Unsplash Access Key, its own derivation too (D117). */
+export const SERVER_UNSPLASH_SEAL_ID = ':server:unsplash'
 
 /** `instance_setting` keys (D105); `signup` predates them. */
 export const SETTING_KEYS = {
   agentKey: 'agent_key',
   searchKey: 'search_key',
+  unsplashKey: 'unsplash_key',
   fetchHosts: 'fetch_hosts',
   embedHosts: 'embed_hosts',
   widgets: 'widgets',

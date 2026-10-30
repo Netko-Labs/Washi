@@ -64,6 +64,25 @@ describe('the server’s own search key', () => {
   })
 })
 
+describe('the server’s own Unsplash key (D117)', () => {
+  test('is sealed under its own id, beside the search key and never over it', async () => {
+    const { rows, store } = memoryRows()
+    const settings = settingsOver(store)
+    await settings.setSearchKey('u1', 'exa-server-not-real-7c3e')
+    expect(await settings.setUnsplashKey('u1', 'unsplash-access-not-real-9f2a')).toEqual({
+      last4: '9f2a',
+    })
+    expect(rows.get(SETTING_KEYS.unsplashKey)).not.toContain('unsplash-access')
+    expect(await settings.unsplashKeyInfo()).toMatchObject({ last4: '9f2a', updatedBy: 'First' })
+    expect(await settings.unsplashKey()).toBe('unsplash-access-not-real-9f2a')
+    expect(await settings.searchKey()).toBe('exa-server-not-real-7c3e')
+
+    await settings.removeUnsplashKey()
+    expect(await settings.unsplashKey()).toBeNull()
+    expect(await settings.searchKey()).toBe('exa-server-not-real-7c3e')
+  })
+})
+
 describe('the server policy (D105)', () => {
   test('reads from memory once loaded, and every write updates it', async () => {
     const { store } = memoryRows({ [SETTING_KEYS.fetchHosts]: '["api.example.com"]' })

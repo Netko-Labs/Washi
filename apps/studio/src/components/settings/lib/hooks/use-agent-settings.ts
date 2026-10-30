@@ -6,8 +6,10 @@ import type {
   AgentSettingsState,
   ApprovalMode,
   Effort,
+  IntegrationId,
   KeyInput,
   KeyState,
+  LentKeyState,
   ResumeBy,
   SearchKeyState,
   ServerKeyUse,
@@ -23,6 +25,7 @@ export function useAgentSettings() {
   const [serverKey, setServerKey] = useState<ServerKeyUse | null>(null)
   const [searchKey, setSearchKey] = useState<SearchKeyState | null>(null)
   const [serverSearchKey, setServerSearchKey] = useState(false)
+  const [unsplash, setUnsplash] = useState<LentKeyState>({ key: null, lent: false })
   const [approvalMode, setApprovalModeState] = useState<ApprovalMode>('ask')
   const [spend, setSpend] = useState<SpendState | null>(null)
   const [settings, setSettings] = useState<AgentSettingsState | null>(null)
@@ -33,22 +36,24 @@ export function useAgentSettings() {
 
   const refresh = useCallback(async () => {
     try {
-      const [stored, lent, exa, lentExa, approvals, today, standing, catalogue] = await Promise.all(
-        [
+      const [stored, lent, exa, lentExa, own, lentOwn, approvals, today, standing, catalogue] =
+        await Promise.all([
           api.workspaces.agentKey.query(),
           api.workspaces.serverKey.query(),
           api.workspaces.integrationKey.query({ integration: 'exa' }),
           api.workspaces.serverSearchKey.query(),
+          api.workspaces.integrationKey.query({ integration: 'unsplash' }),
+          api.workspaces.serverUnsplashKey.query(),
           api.agents.approvalMode.query(),
           api.agents.spend.query(),
           api.agents.settings.query(),
           api.models.list.query(),
-        ],
-      )
+        ])
       setKey(stored as KeyState | null)
       setServerKey(lent)
       setSearchKey(exa as SearchKeyState | null)
       setServerSearchKey(lentExa)
+      setUnsplash({ key: own as SearchKeyState | null, lent: lentOwn })
       setApprovalModeState(approvals.mode)
       setSpend(today as SpendState)
       setSettings(standing as AgentSettingsState)
@@ -89,10 +94,10 @@ export function useAgentSettings() {
     })
 
   /** For the dialog: the refusal comes back to it; the screen's own error stays as it was. */
-  const connect = async (target: 'anthropic' | 'openrouter' | 'exa', secret: string) => {
+  const connect = async (target: 'anthropic' | 'openrouter' | IntegrationId, secret: string) => {
     try {
-      if (target === 'exa') {
-        await api.workspaces.setIntegrationKey.mutate({ integration: 'exa', key: secret })
+      if (target === 'exa' || target === 'unsplash') {
+        await api.workspaces.setIntegrationKey.mutate({ integration: target, key: secret })
       } else {
         // Replacing a provider's key keeps its model; a new provider starts from its default.
         await api.workspaces.setAgentKey.mutate({
@@ -120,15 +125,9 @@ export function useAgentSettings() {
       setKey((current) => (current ? { ...current, model } : current))
     })
 
-  const saveSearchKey = (secret: string) =>
+  const removeIntegrationKey = (integration: IntegrationId) =>
     attempt(async () => {
-      await api.workspaces.setIntegrationKey.mutate({ integration: 'exa', key: secret })
-      await refresh()
-    })
-
-  const removeSearchKey = () =>
-    attempt(async () => {
-      await api.workspaces.removeIntegrationKey.mutate({ integration: 'exa' })
+      await api.workspaces.removeIntegrationKey.mutate({ integration })
       await refresh()
     })
 
@@ -186,6 +185,8 @@ export function useAgentSettings() {
     serverKey,
     searchKey,
     serverSearchKey,
+    unsplashKey: unsplash.key,
+    serverUnsplashKey: unsplash.lent,
     approvalMode,
     spend,
     settings,
@@ -197,8 +198,7 @@ export function useAgentSettings() {
     connect,
     removeKey,
     setModel,
-    saveSearchKey,
-    removeSearchKey,
+    removeIntegrationKey,
     setApprovalMode,
     setYoloAllowed,
     resume,

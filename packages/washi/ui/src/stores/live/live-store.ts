@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { api } from '../../api'
 import { useSheetsStore } from '../sheets/sheets-store'
 import { useThemesStore } from '../themes/themes-store'
+import { useUnsplashStore } from '../unsplash/unsplash-store'
 import type { LiveState } from './types'
 
 let subscription: { unsubscribe: () => void } | null = null
@@ -25,6 +26,7 @@ export const useLiveStore = create<LiveState>(() => ({
         pageTimer = setTimeout(() => {
           void useSheetsStore.getState().refresh()
           void useThemesStore.getState().refresh()
+          void useUnsplashStore.getState().refresh()
         }, PAGE_REFRESH_MS)
       },
     })

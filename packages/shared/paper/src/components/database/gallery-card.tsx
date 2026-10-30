@@ -1,6 +1,6 @@
 import { coverStyle } from '../../lib'
 import { useSheetLook } from '../../look'
-import { FILE_KEY } from '../../registry/looks'
+import { FILE_KEY, UNSPLASH_KEY } from '../../registry/looks'
 import { CardValue } from './card-value'
 import type { GalleryCardProps } from './lib'
 
@@ -11,7 +11,9 @@ export function GalleryCard({ db, row, title, cover, shown, onOpen }: GalleryCar
   const look = useSheetLook()
   const picture = cover ? row[cover.name] : undefined
   const isUrl = typeof picture === 'string' && picture.startsWith('https://')
-  const isKey = typeof picture === 'string' && (COVER_KEY.test(picture) || FILE_KEY.test(picture))
+  const isKey =
+    typeof picture === 'string' &&
+    [COVER_KEY, FILE_KEY, UNSPLASH_KEY].some((key) => key.test(picture))
   const name = title ? row[title.name] : undefined
 
   return (

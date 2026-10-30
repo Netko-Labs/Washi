@@ -9,6 +9,7 @@ import {
 import {
   getSheet,
   getTableByName,
+  getUnsplashPhoto,
   liveShareFor,
   shareByToken,
   type Workspace,
@@ -68,7 +69,23 @@ export function sharedPage(ws: Workspace, token: string) {
     hlcUpdated: sheet.hlcUpdated,
     source: serialize(redactForShare({ ...root, props })),
     theme: wornTheme(ws, props.theme),
+    unsplash: wornPhoto(ws, sheet.cover),
   }
+}
+
+/** An Unsplash cover's hotlink and credit travel with the link too (D117). */
+function wornPhoto(ws: Workspace, cover: string | null) {
+  if (!cover?.startsWith('unsplash:')) return null
+  const photo = getUnsplashPhoto(ws, cover.slice('unsplash:'.length))
+  return (
+    photo && {
+      id: photo.id,
+      url: photo.regularUrl,
+      name: photo.photographer,
+      profileUrl: photo.profileUrl,
+      pageUrl: photo.pageUrl,
+    }
+  )
 }
 
 /** A workspace theme travels with the link; the reader has no session to fetch it with. */

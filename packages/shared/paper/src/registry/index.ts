@@ -6,6 +6,10 @@ export {
   coverKeySchema,
   FILE_KEY,
   pageIconSchema,
+  UNSPLASH_HOME,
+  UNSPLASH_KEY,
+  unsplashCaption,
+  unsplashLink,
 } from './looks'
 export { mediaSrcSchema } from './media-specs'
 export {

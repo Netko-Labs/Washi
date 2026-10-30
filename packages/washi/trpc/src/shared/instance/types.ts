@@ -48,6 +48,10 @@ export interface InstanceStore {
   setSearchKey(actorId: string, key: string): Promise<{ last4: string }>
   /** Workspaces without an Exa key of their own lose web search. */
   removeSearchKey(): Promise<void>
+  /** D117: the Unsplash Access Key a workspace without its own picks photos with. */
+  unsplashKeyInfo(): Promise<ServerSearchKeyInfo | null>
+  setUnsplashKey(actorId: string, key: string): Promise<{ last4: string }>
+  removeUnsplashKey(): Promise<void>
 }
 
 /** A page package's row in Settings → Server: its install as it stands, in words when it failed. */

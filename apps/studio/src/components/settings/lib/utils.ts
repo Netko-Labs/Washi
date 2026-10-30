@@ -18,7 +18,10 @@ export function sinceLabel(iso: string, now = Date.now()): string {
 export function refusalFor(target: keyof typeof PROVIDER_META, raw: string): string {
   const meta = PROVIDER_META[target]
   if (/401|unauthori|invalid|refused/i.test(raw)) {
-    return `${meta.label.split(' · ').pop()} refused this key. Check it was copied whole — keys start with ${meta.hint.replace('…', '')}. Nothing was saved.`
+    const shape = meta.hint.endsWith('…')
+      ? `keys start with ${meta.hint.replace('…', '')}`
+      : `it is the ${meta.hint}`
+    return `${meta.label.split(' · ').pop()} refused this key. Check it was copied whole — ${shape}. Nothing was saved.`
   }
   if (/412|key store|no key/i.test(raw)) {
     return 'This deployment has no key store, so there is nothing to set here.'

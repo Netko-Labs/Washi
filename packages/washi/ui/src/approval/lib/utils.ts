@@ -12,6 +12,7 @@ import {
   IconLink,
   IconMessageForward,
   IconPencil,
+  IconPhoto,
   IconSearch,
   IconTable,
   IconTablePlus,
@@ -186,6 +187,22 @@ export function describeTool(
         action: 'Read a bookmark from',
         subject: hostOf(text(args.href)),
         details: text(args.href) ? [String(args.href)] : [],
+        outbound: true,
+      })
+    case 'unsplash_search':
+      return base({
+        icon: IconPhoto,
+        action: 'Search Unsplash for',
+        subject: text(args.query) ? `“${String(args.query)}”` : null,
+        details: [],
+        outbound: true,
+      })
+    case 'unsplash_use':
+      return base({
+        icon: IconPhoto,
+        action: 'Picked a photo from',
+        subject: 'Unsplash',
+        details: text(args.id) ? [`unsplash.com/photos/${String(args.id)}`] : [],
         outbound: true,
       })
     case 'web_search':

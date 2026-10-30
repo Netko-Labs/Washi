@@ -20,6 +20,7 @@ import { systemRouter } from './routers/system'
 import { tablesRouter } from './routers/tables'
 import { themesRouter } from './routers/themes'
 import { tokensRouter } from './routers/tokens'
+import { unsplashRouter } from './routers/unsplash'
 import { workspacesRouter } from './routers/workspaces'
 
 /**
@@ -37,6 +38,7 @@ export const appRouter = router({
   embeds: embedsRouter,
   emojis: emojisRouter,
   links: linksRouter,
+  unsplash: unsplashRouter,
   scripts: scriptsRouter,
   themes: themesRouter,
   tables: tablesRouter,

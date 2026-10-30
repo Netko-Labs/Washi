@@ -147,6 +147,11 @@ export {
   workspaceThemeSchema,
   workspaceThemeWriteSchema,
 } from './entities/themes'
+export {
+  type UnsplashPhotoRow,
+  unsplashPhotoIdSchema,
+  unsplashPhotoSchema,
+} from './entities/unsplash'
 export { compareHlc, createHlcClock, type HlcClock } from './hlc'
 export { positionBetween } from './position'
 export {

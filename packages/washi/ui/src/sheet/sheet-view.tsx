@@ -1,12 +1,13 @@
 import { PaperProvider, SheetLookProvider, WsxView } from '@washi/paper'
 import { SheetIcon } from '../sheet-icon'
-import { useThemesStore } from '../stores'
+import { useThemesStore, useUnsplashStore } from '../stores'
 import { type SheetViewProps, usePageSheet } from './lib'
 import { SheetEmpty, SheetFailed, SheetLoading, SheetMissing } from './sheet-states'
 
 export function SheetView({ sheetId, chrome, look, footer, body: Body }: SheetViewProps) {
   const { summary, state, host } = usePageSheet(sheetId)
   const themes = useThemesStore((store) => store.themes)
+  const photos = useUnsplashStore((store) => store.photos)
 
   if (state.status === 'idle') return <SheetEmpty />
   if (state.status === 'loading') return <SheetLoading />
@@ -27,6 +28,7 @@ export function SheetView({ sheetId, chrome, look, footer, body: Body }: SheetVi
           band: chrome,
           drawIcon: (name) => <SheetIcon name={name} />,
           theme: themes.length > 0 ? useThemesStore.getState().pairOf : undefined,
+          unsplash: photos.length > 0 ? useUnsplashStore.getState().creditOf : undefined,
         }}
       >
         <PaperProvider host={host}>

@@ -3,7 +3,7 @@ import {
   HostListCard,
   PagePackagesCard,
   ServerKeyCard,
-  ServerSearchKeyCard,
+  ServerLentKeyCard,
   ServerWidgetsCard,
   useServerSettings,
   WorkspaceDefaultsCard,
@@ -41,10 +41,17 @@ export function ServerTab() {
             onRemove={server.removeKey}
             onModel={server.setKeyModel}
           />
-          <ServerSearchKeyCard
-            searchKey={settings.searchKey}
-            onSave={server.saveSearchKey}
-            onRemove={server.removeSearchKey}
+          <ServerLentKeyCard
+            target="exa"
+            connected={settings.searchKey}
+            onSave={(key) => server.saveLentKey('exa', key)}
+            onRemove={() => server.removeLentKey('exa')}
+          />
+          <ServerLentKeyCard
+            target="unsplash"
+            connected={settings.unsplashKey}
+            onSave={(key) => server.saveLentKey('unsplash', key)}
+            onRemove={() => server.removeLentKey('unsplash')}
           />
           <WorkspaceDefaultsCard defaults={settings.defaults} onSave={server.setDefaults} />
           <HostListCard

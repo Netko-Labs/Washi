@@ -73,10 +73,10 @@ export interface SheetShare {
 export const sheetMetaPatchSchema = z.object({
   title: z.string().min(1).max(200).optional(),
   icon: sheetIconSchema.nullable().optional(),
-  // `preset:sage` · `picture:kiso-valley` · `file:<id>` — a key, never a URL (D60).
+  // `preset:sage` · `picture:kiso-valley` · `file:<id>` · `unsplash:<id>` — a key, never a URL (D60).
   cover: z
     .string()
-    .regex(/^(preset|picture|file):[a-z0-9-]{1,48}$/)
+    .regex(/^((preset|picture|file):[a-z0-9-]{1,48}|unsplash:[A-Za-z0-9_-]{1,64})$/)
     .nullable()
     .optional(),
   // A registry theme id, or `ws:<slug>` for one the workspace made; the registry has the last word.

@@ -243,6 +243,18 @@ export const customEmojiTable = sqliteTable('custom_emojis', {
   hlcCreated: text('hlc_created').notNull(),
 })
 
+/** An Unsplash photo a page picked: hotlinks and credit, so drawing a cover never asks Unsplash. */
+export const unsplashPhotoTable = sqliteTable('unsplash_photos', {
+  id: text('id').primaryKey(),
+  regularUrl: text('regular_url').notNull(),
+  fullUrl: text('full_url').notNull(),
+  photographer: text('photographer').notNull(),
+  profileUrl: text('profile_url').notNull(),
+  pageUrl: text('page_url').notNull(),
+  pickedBy: text('picked_by'),
+  hlcPicked: text('hlc_picked').notNull(),
+})
+
 /** A page theme the workspace made: eight tokens per mode, stored as JSON. */
 export const workspaceThemeTable = sqliteTable('workspace_themes', {
   id: text('id').primaryKey(),

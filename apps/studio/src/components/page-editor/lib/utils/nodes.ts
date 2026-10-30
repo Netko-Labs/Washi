@@ -1,3 +1,4 @@
+import { unsplashCaption } from '@washi/paper/registry'
 import { parse, type WsxElement, type WsxNode, type WsxValue } from '@washi/wsx'
 import { element } from '../convert'
 import type { BookmarkPreview, DataPick, StarterBlock } from '../types'
@@ -52,6 +53,15 @@ export function dataNode(pick: DataPick): WsxElement {
   }
   if (pick.kind === 'widget') {
     return element('Widget', { title: 'A clock' }, [element('Clock', {}, [])])
+  }
+  if (pick.kind === 'unsplash') {
+    if (!pick.photo) throw new Error('a photo lands once it is picked')
+    const caption = unsplashCaption(pick.photo.photographer)
+    return element(
+      'Figure',
+      { src: pick.photo.regularUrl, alt: pick.photo.alt ?? caption, caption },
+      [],
+    )
   }
   if (pick.kind === 'upload' || pick.kind === 'gallery') {
     throw new Error('an upload lands once its file is stored')

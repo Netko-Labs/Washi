@@ -24,6 +24,10 @@ export const workspaceQueries = router({
   serverSearchKey: workspaceProcedure.query(
     async ({ ctx }) => (await ctx.runtime.control.instance?.searchKeyInfo()) != null,
   ),
+  /** The same yes or no for Unsplash (D117). */
+  serverUnsplashKey: workspaceProcedure.query(
+    async ({ ctx }) => (await ctx.runtime.control.instance?.unsplashKeyInfo()) != null,
+  ),
   integrationKey: workspaceProcedure
     .input(z.object({ integration: z.enum(INTEGRATIONS) }))
     .query(
