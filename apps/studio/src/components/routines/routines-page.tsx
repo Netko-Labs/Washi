@@ -64,7 +64,7 @@ export function RoutinesPage({ workspaceId }: RoutinesPageProps) {
               to="/w/$workspaceId/routines/new"
               params={{ workspaceId }}
               search={{ template: template.key }}
-              className="rounded-xl border border-border border-dashed px-4 py-3 hover:border-solid hover:bg-card"
+              className="rounded-xl border border-border border-dashed px-4 py-3 hover:border-solid hover:bg-card dark:border-muted-foreground/50"
             >
               <span className="block font-medium text-[13.5px]">{template.title}</span>
               <span className="block text-[12.5px] text-muted-foreground">{template.blurb}</span>

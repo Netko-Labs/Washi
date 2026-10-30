@@ -11,7 +11,7 @@ export function ConfirmTextButton({ idle, armed, onConfirm }: ConfirmTextButtonP
       className={`h-7 shrink-0 rounded-lg px-2.5 font-medium text-[12px] ${
         isArmed
           ? 'bg-destructive text-white'
-          : 'border border-border text-muted-foreground hover:border-destructive hover:text-destructive'
+          : 'border border-destructive/40 text-destructive hover:border-destructive hover:bg-destructive/10'
       }`}
     >
       {isArmed ? armed : idle}
