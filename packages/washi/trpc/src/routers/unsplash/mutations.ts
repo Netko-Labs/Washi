@@ -65,11 +65,9 @@ export const unsplashMutations = router({
     .mutation(async ({ ctx, input }) => {
       const accessKey = await accessKeyOf(ctx)
       const call = { subject: 'unsplash_use', input }
-      const photo = await ledgered(ctx.ws, ctx.actor?.id ?? null, call, async () => {
-        const read = await unsplashPhoto(input.id, { accessKey })
-        await unsplashDownload(read.downloadLocation, { accessKey })
-        return read
-      })
+      const photo = await ledgered(ctx.ws, ctx.actor?.id ?? null, call, () =>
+        unsplashPhoto(input.id, { accessKey }),
+      )
       const kept = keepUnsplashPhoto(
         ctx.ws,
         {
@@ -82,6 +80,8 @@ export const unsplashMutations = router({
         },
         ctx.actor?.id ?? null,
       )
+      // A count Unsplash misses (a 429, an outage) is its statistic, never the person's photo.
+      void unsplashDownload(photo.downloadLocation, { accessKey }).catch(() => undefined)
       return { ...kept, alt: photo.alt }
     }),
 })

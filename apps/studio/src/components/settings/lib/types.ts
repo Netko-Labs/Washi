@@ -47,6 +47,12 @@ export interface SearchKeyState {
   updatedAt: string
 }
 
+/** A workspace's own key for a lent integration, and whether the server lends one. */
+export interface LentKeyState {
+  key: SearchKeyState | null
+  lent: boolean
+}
+
 export interface SpendState {
   day: string
   costUsd: number

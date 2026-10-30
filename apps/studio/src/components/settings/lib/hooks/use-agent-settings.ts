@@ -9,6 +9,7 @@ import type {
   IntegrationId,
   KeyInput,
   KeyState,
+  LentKeyState,
   ResumeBy,
   SearchKeyState,
   ServerKeyUse,
@@ -24,10 +25,7 @@ export function useAgentSettings() {
   const [serverKey, setServerKey] = useState<ServerKeyUse | null>(null)
   const [searchKey, setSearchKey] = useState<SearchKeyState | null>(null)
   const [serverSearchKey, setServerSearchKey] = useState(false)
-  const [unsplash, setUnsplash] = useState<{ key: SearchKeyState | null; lent: boolean }>({
-    key: null,
-    lent: false,
-  })
+  const [unsplash, setUnsplash] = useState<LentKeyState>({ key: null, lent: false })
   const [approvalMode, setApprovalModeState] = useState<ApprovalMode>('ask')
   const [spend, setSpend] = useState<SpendState | null>(null)
   const [settings, setSettings] = useState<AgentSettingsState | null>(null)
