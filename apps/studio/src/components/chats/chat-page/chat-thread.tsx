@@ -1,12 +1,12 @@
 import { IconArrowDown } from '@tabler/icons-react'
-import { AgentMascot, ApprovalCard, useAgentStore } from '@washi/ui'
+import { ApprovalCard, TurnStatus, useAgentStore } from '@washi/ui'
 import { ChatPerson } from './chat-person'
 import { ChatTurn } from './chat-turn'
 import { type ChatThreadProps, useChatThread } from './lib'
 
 /** The conversation in one reading column; it follows the end unless the reader scrolled away. */
 export function ChatThread({ workspaceId }: ChatThreadProps) {
-  const { blocks, asks, running, stick } = useChatThread()
+  const { blocks, asks, turn, failureId, stick } = useChatThread()
   const last = blocks.at(-1)
 
   return (
@@ -25,16 +25,12 @@ export function ChatThread({ workspaceId }: ChatThreadProps) {
                 key={block.id}
                 block={block}
                 workspaceId={workspaceId}
-                isLive={running && index === blocks.length - 1}
+                isLive={turn === 'working' && index === blocks.length - 1}
+                failureId={failureId}
               />
             ),
           )}
-          {running && last?.kind !== 'washi' && (
-            <div className="flex items-center gap-3 text-[14px] text-muted-foreground sm:gap-4">
-              <AgentMascot state="thinking" size={26} />
-              <span className="animate-pulse">Washi is working…</span>
-            </div>
-          )}
+          <TurnStatus variant="page" mark={last?.kind !== 'washi'} />
           {asks.map((request) => (
             <div key={request.id} className="sm:pl-[42px]" data-approval-inline>
               <ApprovalCard

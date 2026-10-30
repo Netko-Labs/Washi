@@ -2,9 +2,11 @@ import { create } from 'zustand'
 import { api } from '../../api'
 import { useViewStore } from '../view/view-store'
 import { rememberChat, rememberedChat } from './chat-memory'
+import { RETRY_WAIT_MS } from './constants'
 import { subscribeAgent } from './subscriptions'
+import { untilIdle, watchStall } from './turn-watch'
 import type { AgentState, ChatScope } from './types'
-import { isTurnLive, pickChat, scopeOfSession, scopeOfTab } from './utils'
+import { isTurnLive, lastAsk, pickChat, scopeOfSession, scopeOfTab } from './utils'
 
 let subscriptions: { unsubscribe: () => void }[] | null = null
 /** Bumped by reset: a load issued for the last workspace must not land in this one. */
@@ -15,12 +17,13 @@ let creating: Promise<string | null> | null = null
 
 const tabOf = (scope: ChatScope) => (scope ? (`note:${scope}` as const) : 'view:dashboard')
 
-export const useAgentStore = create<AgentState>((set, get) => ({
+export const useAgentStore = create<AgentState>((set, get, store) => ({
   sessions: [],
   activeSessionId: null,
   transcript: [],
   approvals: [],
   running: false,
+  stalled: false,
   draft: false,
   startDraft: () =>
     set({ draft: true, activeSessionId: null, transcript: [], running: false, moved: null }),
@@ -45,7 +48,10 @@ export const useAgentStore = create<AgentState>((set, get) => ({
   },
 
   initialize: async () => {
-    subscriptions ??= subscribeAgent({ getState: get, setState: set })
+    subscriptions ??= [
+      ...subscribeAgent({ getState: get, setState: set }),
+      { unsubscribe: watchStall(store) },
+    ]
     const issued = generation
     const [sessions, pending] = await Promise.all([
       api.agents.listSessions.query(),
@@ -177,9 +183,37 @@ export const useAgentStore = create<AgentState>((set, get) => ({
     }
   },
 
+  /** Nothing to stop there means its receipt was missed: read it instead. */
   stopTurn: async () => {
     const sessionId = get().activeSessionId
-    if (sessionId) await api.agents.cancel.mutate({ sessionId })
+    if (!sessionId) return
+    const { cancelled } = await api.agents.cancel.mutate({ sessionId })
+    if (!cancelled) await get().refreshActive()
+  },
+
+  retryTurn: async () => {
+    const ask = lastAsk(get().transcript)
+    if (!ask) return
+    if (get().running) {
+      await get().stopTurn()
+      await untilIdle(store, RETRY_WAIT_MS)
+    }
+    await get().sendPrompt(ask.text, ask.attachments)
+  },
+
+  /** `agents.status` vouches for a turn the transcript says still runs: no turn anywhere, none here. */
+  refreshActive: async () => {
+    const id = get().activeSessionId
+    if (!id) return
+    const [transcript, sessions, activity] = await Promise.all([
+      api.agents.transcript.query({ sessionId: id }),
+      api.agents.listSessions.query(),
+      api.agents.status.query(),
+    ])
+    if (get().activeSessionId !== id) return
+    const isBusy = activity.state === 'working' || activity.state === 'needs_you'
+    const session = sessions.find((each) => each.id === id)
+    set({ sessions, transcript, running: isBusy && isTurnLive(transcript, session) })
   },
 
   resolveApproval: async (id, decision) => {
@@ -199,6 +233,7 @@ export const useAgentStore = create<AgentState>((set, get) => ({
       transcript: [],
       approvals: [],
       running: false,
+      stalled: false,
       draft: false,
       scope: null,
       moved: null,

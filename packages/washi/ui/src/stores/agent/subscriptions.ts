@@ -27,7 +27,19 @@ function settleActive({ getState, setState }: Store, id: string, scope: ChatScop
 /** Every live feed the agent store hears, and the route it follows (D110). */
 export function subscribeAgent(store: Store): { unsubscribe: () => void }[] {
   const { getState: get, setState: set } = store
+  let starts = 0
   const agentUpdates = api.agents.onAgentUpdate.subscribe(undefined, {
+    // A start after the first is a reconnect: whatever ended meanwhile is read, not waited for.
+    onStarted: () => {
+      if (starts++ === 0) return
+      void get()
+        .refreshActive()
+        .catch(() => {})
+      void api.agents.pendingApprovals
+        .query()
+        .then((approvals) => set({ approvals }))
+        .catch(() => {})
+    },
     onData: ({ data: { sessionId, entry } }) => {
       if (sessionId !== get().activeSessionId) return
       set((state) => ({

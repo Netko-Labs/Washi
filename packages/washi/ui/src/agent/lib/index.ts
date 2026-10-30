@@ -1,9 +1,11 @@
 export { useAutosize } from './hooks/use-autosize'
 export { useComposer } from './hooks/use-composer'
 export { useComposerSession } from './hooks/use-composer-session'
+export { useElapsed } from './hooks/use-elapsed'
 export { useFabShortcut } from './hooks/use-fab-shortcut'
 export { useInference } from './hooks/use-inference'
 export { usePanelFrame } from './hooks/use-panel-frame'
+export { useTurnView } from './hooks/use-turn-view'
 export type {
   AgentPanelProps,
   AttachMenuProps,
@@ -25,11 +27,13 @@ export type {
   ScopeChipProps,
   ToolPillProps,
   TranscriptViewProps,
+  TurnStatusProps,
   YoloProps,
 } from './types'
 export {
   approvalsOf,
   composerCap,
+  elapsedLabel,
   isYoloOffered,
   mergeMessageChunks,
   nextApprovals,

@@ -442,6 +442,19 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   its first ask, then by Washi through `set_conversation_title` (a tool both ports expose,
   asked for in the instructions); `agents.renameSession` and `deleteSession` (refused while a
   turn runs) are the person's. `onSessionChanged` tells the list to refetch.
+- **A turn always ends, and says how (D114).** Every turn lands exactly one `turn_done`
+  (`RunningTurn.ended`: nothing the port says after it is recorded). `TurnWatchdog` aborts a turn
+  whose port streams nothing for 5 min (`TURN_QUIET_MS`; a question waiting on a person pauses
+  it) and closes it as `error` in words (`TURN_STALLED`); after any abort, Stop's too, a port gets
+  15s (`TURN_GRACE_MS`) before the host closes the turn without it — a late result still charges
+  the budget. A chat is `running` from its ask, so a process that dies mid-turn leaves a receipt
+  at boot (`TURN_INTERRUPTED`). The client reads one state per chat (`turnViewOf`: idle · working
+  · stalled · failed): `TurnStatus` (panel and the D111 page) shows Working… with its clock, the
+  last failure with Retry (`retryTurn` re-sends the ask, Stop first over a stuck turn), and after
+  90s of silence (`STALL_MS`, `watchStall`) "Washi hasn't said anything for a while" with Stop and
+  Retry — the mascot flags it. A stall, a Stop with nothing to stop and every socket reconnect
+  (`onStarted` after the first) re-read the chat (`refreshActive`), so a receipt the bus dropped
+  still lands.
 - **Settings is grouped by whose it is (D69):** one column, the groups as sliding pills and each
   group's sections as tabs under them — Account (Profile — `auth.updateUser`; Preferences —
   the theme, one `useTheme` store in `components/shared/theme`), Workspace (General — rename through
