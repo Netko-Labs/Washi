@@ -1,5 +1,7 @@
 import { parse } from '@washi/wsx'
 import { useEffect, useState } from 'react'
+import { APP_NAME } from '@/components/core/root'
+import { useDocumentTitle } from '@/components/shared/document-title'
 import type { SharedPayload, SharedState } from '../types'
 import { fetchShared } from '../utils'
 
@@ -17,5 +19,6 @@ export function useSharedPage(workspaceId: string, token: string): SharedState {
       live = false
     }
   }, [workspaceId, token])
+  useDocumentTitle(state.status === 'ready' ? [state.page.title, APP_NAME] : [])
   return state
 }
