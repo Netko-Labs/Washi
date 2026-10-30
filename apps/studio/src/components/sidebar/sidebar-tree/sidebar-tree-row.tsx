@@ -8,6 +8,7 @@ import {
 } from '@washi/ui'
 import { pathFor } from '@/components/shell'
 import { openInPlace } from '../lib'
+import { RowMenu } from '../row-menu'
 import { INDENT_PX, type SidebarTreeRowProps, useRowDrag, useTreeStore } from './lib'
 
 const DROP_LINE = 'pointer-events-none absolute right-1 h-0.5 rounded-full bg-primary'
@@ -24,6 +25,11 @@ export function SidebarTreeRow({
   const isRunning = useAgentStore((state) => state.running)
   const { drop, isDragging, handlers } = useRowDrag(sheet)
   const indent = 4 + depth * INDENT_PX
+  const addInside = () => {
+    useTreeStore.getState().expand([sheet.id])
+    void useSheetsStore.getState().createSheet(sheet.id)
+    onNavigate()
+  }
 
   return (
     <div
@@ -42,25 +48,27 @@ export function SidebarTreeRow({
       {drop === 'before' && <span className={`${DROP_LINE} -top-px`} style={{ left: indent }} />}
       {drop === 'after' && <span className={`${DROP_LINE} -bottom-px`} style={{ left: indent }} />}
       <span
-        className="relative grid size-5 shrink-0 place-items-center"
+        className="relative grid size-5 shrink-0 place-items-center max-md:flex max-md:h-full max-md:w-auto max-md:items-center"
         style={{ marginLeft: indent }}
       >
-        <SheetIcon
-          name={sheet.icon}
-          className={`size-[18px] md:size-[15px] ${hasChildren ? 'max-md:invisible group-focus-within:invisible group-hover:invisible' : ''}`}
-        />
-        {hasChildren && (
+        {hasChildren ? (
           <button
             type="button"
             aria-label={isExpanded ? `Collapse ${sheet.title}` : `Expand ${sheet.title}`}
             onClick={() => useTreeStore.getState().toggle(sheet.id)}
-            className="absolute inset-0 hidden place-items-center rounded text-muted-foreground hover:bg-border group-focus-within:grid group-hover:grid max-md:grid"
+            className="absolute inset-0 hidden place-items-center rounded text-muted-foreground hover:bg-border max-md:static max-md:grid max-md:h-full max-md:w-7 md:group-focus-within:grid md:group-hover:grid"
           >
             <IconChevronRight
               className={`size-3.5 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
             />
           </button>
+        ) : (
+          <span aria-hidden className="hidden w-7 max-md:block" />
         )}
+        <SheetIcon
+          name={sheet.icon}
+          className={`size-[18px] md:size-[15px] ${hasChildren ? 'md:group-focus-within:invisible md:group-hover:invisible' : ''}`}
+        />
       </span>
       <a
         href={pathFor(workspaceId, `note:${sheet.id}`)}
@@ -88,16 +96,12 @@ export function SidebarTreeRow({
           />
         )}
       </a>
-      <span className="mr-1 hidden shrink-0 items-center group-focus-within:flex group-hover:flex">
+      <span className="mr-1 hidden shrink-0 items-center md:group-focus-within:flex md:group-hover:flex">
         <button
           type="button"
           aria-label={`Add a page inside ${sheet.title}`}
           title="Add a page inside"
-          onClick={() => {
-            useTreeStore.getState().expand([sheet.id])
-            void useSheetsStore.getState().createSheet(sheet.id)
-            onNavigate()
-          }}
+          onClick={addInside}
           className="grid size-6 place-items-center rounded text-muted-foreground hover:text-foreground"
         >
           <IconPlus className="size-3.5" />
@@ -107,6 +111,7 @@ export function SidebarTreeRow({
           onConfirm={() => void useSheetsStore.getState().deleteSheet(sheet.id)}
         />
       </span>
+      <RowMenu sheet={sheet} onAddInside={addInside} />
     </div>
   )
 }

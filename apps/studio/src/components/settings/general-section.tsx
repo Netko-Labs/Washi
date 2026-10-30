@@ -31,7 +31,7 @@ export function GeneralSection({ workspaceId }: GeneralSectionProps) {
         }
       />
       <SettingRow label="Workspace ID" hint="What an app admin or a support thread asks for.">
-        <code className="max-w-[200px] truncate font-mono text-[12px] text-muted-foreground">
+        <code className="max-w-[200px] truncate font-mono max-[480px]:max-w-none text-[12px] text-muted-foreground">
           {workspaceId}
         </code>
         <button

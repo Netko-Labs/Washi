@@ -32,7 +32,7 @@ export function EmptyChat({ onStarter }: EmptyChatProps) {
           {starter}
         </button>
       ))}
-      <div className="text-[11px] text-muted-foreground">
+      <div className="text-[11px] text-muted-foreground pointer-coarse:hidden">
         Toggle anytime with{' '}
         <span className="inline-flex h-[18px] items-center rounded-[5px] border border-border bg-muted px-[5px] font-mono text-[10.5px]">
           ⌘J

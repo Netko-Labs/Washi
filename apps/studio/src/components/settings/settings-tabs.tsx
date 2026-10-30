@@ -1,13 +1,15 @@
 import { useRef } from 'react'
+import { edgeFade, useScrollEdges } from '@/components/shared/scroll-edges'
 import { type SettingsTabsProps, useSlidingPill } from './lib'
 
 const EASE = 'duration-[260ms] ease-[cubic-bezier(0.2,0.8,0.2,1)] motion-reduce:transition-none'
 
-/** Whose settings, as pills; that group's sections, as tabs under them. */
+/** Whose settings, as pills; that group's sections, as tabs under them, faded where more hide. */
 export function SettingsTabs({ groups, current, onTab }: SettingsTabsProps) {
   const pills = useRef<HTMLDivElement>(null)
   const group = groups.find((each) => each.sections.some((section) => section.key === current))
   const pill = useSlidingPill(pills, group?.label ?? '')
+  const { strip, edges } = useScrollEdges<HTMLDivElement>(current)
 
   return (
     <div className="mb-7">
@@ -44,11 +46,15 @@ export function SettingsTabs({ groups, current, onTab }: SettingsTabsProps) {
       </div>
 
       {group && group.sections.length > 1 && (
-        <div className="mt-4 flex gap-1 overflow-x-auto border-border border-b">
+        <div
+          ref={strip}
+          className={`mt-4 flex gap-1 overflow-x-auto border-border border-b ${edgeFade(edges)}`}
+        >
           {group.sections.map(({ key, label, icon: Icon }) => (
             <button
               key={key}
               type="button"
+              data-key={key}
               onClick={() => onTab(key)}
               aria-current={key === current ? 'page' : undefined}
               className={`-mb-px flex h-9 shrink-0 items-center gap-[7px] border-b-2 px-3 font-medium text-[13px] transition-colors ${

@@ -11,19 +11,24 @@ const ICON_BUTTON =
 const ROW =
   'flex h-11 w-full items-center gap-2.5 rounded-lg px-2 text-left text-[13px] hover:bg-accent disabled:opacity-50 md:h-8'
 
-/** The chat's name, renamed in place, and ⋯ for Rename and Delete. A new chat has neither yet. */
+/**
+ * The chat's name, renamed in place, and ⋯ for Rename and Delete. A new chat has neither yet.
+ * A phone's header already goes back, so there the bar keeps only the name and ⋯.
+ */
 export function ChatBar({ workspaceId, chatId }: ChatBarProps) {
   const bar = useChatBar(workspaceId, chatId)
   const { session } = bar
 
   return (
-    <div className="flex h-12 shrink-0 items-center gap-1 px-1 sm:px-3">
+    <div
+      className={`flex h-12 shrink-0 items-center gap-1 px-1 sm:px-3 ${session ? '' : 'max-md:hidden'}`}
+    >
       <Link
         to="/w/$workspaceId/chats"
         params={{ workspaceId }}
         aria-label="All chats"
         title="All chats"
-        className={ICON_BUTTON}
+        className={`${ICON_BUTTON} max-md:hidden`}
       >
         <IconChevronLeft className="size-[18px]" />
       </Link>

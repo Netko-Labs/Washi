@@ -12,7 +12,7 @@ export function WorkspaceShell({ workspace, children }: WorkspaceShellProps) {
   const Shell = useIsNarrow() ? NarrowShell : WideShell
 
   return (
-    <div className="flex h-dvh overflow-hidden bg-background font-sans text-[14px] text-foreground">
+    <div className="flex h-dvh overflow-hidden pt-[env(safe-area-inset-top)] bg-background font-sans text-[14px] text-foreground">
       <MascotDefs />
       <Shell workspace={workspace}>{children}</Shell>
       <RowPeek workspaceId={workspace.id} />

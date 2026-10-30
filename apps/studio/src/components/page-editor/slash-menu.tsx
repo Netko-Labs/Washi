@@ -40,7 +40,9 @@ export function SlashMenu({ id, query, anchor, onPick }: SlashMenuProps) {
           } ${option.type === 'data' && options[index - 1]?.type === 'text' ? 'mt-1 border-border border-t' : ''}`}
         >
           <span className="truncate">{option.label}</span>
-          <span className="shrink-0 font-mono text-[11px] text-muted-foreground">
+          <span
+            className={`shrink-0 font-mono text-[11px] text-muted-foreground ${option.type === 'text' ? 'pointer-coarse:hidden' : ''}`}
+          >
             {option.hint}
           </span>
         </button>
