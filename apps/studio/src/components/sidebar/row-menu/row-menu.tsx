@@ -5,7 +5,7 @@ import { BottomSheet, SHEET_ROW } from '@/components/shared/bottom-sheet'
 import type { RowMenuProps } from '../lib'
 
 /** A phone's ⋯ on a sidebar row: what a wide sidebar shows on hover, which a touch never does. */
-export function RowMenu({ sheet, onAddInside }: RowMenuProps) {
+export function RowMenu({ sheet, onAddInside, tabIndex }: RowMenuProps) {
   const [isOpen, setOpen] = useState(false)
   const close = () => setOpen(false)
 
@@ -13,6 +13,7 @@ export function RowMenu({ sheet, onAddInside }: RowMenuProps) {
     <>
       <button
         type="button"
+        tabIndex={tabIndex}
         aria-label={`Options for ${sheet.title}`}
         aria-haspopup="dialog"
         aria-expanded={isOpen}

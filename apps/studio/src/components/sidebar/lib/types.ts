@@ -55,4 +55,5 @@ export interface SidebarPageRowProps extends SidebarSectionProps {
 export interface RowMenuProps {
   sheet: SheetSummary
   onAddInside?: () => void
+  tabIndex?: number
 }

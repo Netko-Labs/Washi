@@ -20,6 +20,7 @@ export function SidebarTreeRow({
   isExpanded,
   workspaceId,
   onNavigate,
+  tabStop,
 }: SidebarTreeRowProps) {
   const isActive = useViewStore((state) => state.activeTab === `note:${sheet.id}`)
   const isRunning = useAgentStore((state) => state.running)
@@ -35,10 +36,13 @@ export function SidebarTreeRow({
     <div
       {...handlers}
       role="treeitem"
-      tabIndex={-1}
+      data-tree-id={sheet.id}
+      tabIndex={tabStop === sheet.id ? 0 : -1}
+      aria-label={sheet.title}
       aria-level={depth + 1}
       aria-expanded={hasChildren ? isExpanded : undefined}
       aria-selected={isActive}
+      onFocus={() => useTreeStore.getState().setCurrent(sheet.id)}
       className={`group relative flex h-12 items-center rounded-lg md:h-[29px] ${
         isActive ? 'bg-accent font-medium' : 'text-muted-foreground hover:bg-accent'
       } ${drop === 'inside' ? 'bg-primary/10 ring-1 ring-primary/40' : ''} ${
@@ -54,6 +58,7 @@ export function SidebarTreeRow({
         {hasChildren ? (
           <button
             type="button"
+            tabIndex={-1}
             aria-label={isExpanded ? `Collapse ${sheet.title}` : `Expand ${sheet.title}`}
             onClick={() => useTreeStore.getState().toggle(sheet.id)}
             className="absolute inset-0 hidden place-items-center rounded text-muted-foreground hover:bg-border max-md:static max-md:grid max-md:h-full max-md:w-7 md:group-focus-within:grid md:group-hover:grid"
@@ -73,7 +78,7 @@ export function SidebarTreeRow({
       <a
         href={pathFor(workspaceId, `note:${sheet.id}`)}
         draggable={false}
-        aria-label={`Open ${sheet.title}`}
+        tabIndex={-1}
         onClick={(event) =>
           openInPlace(event, () => {
             useViewStore.getState().openTab(`note:${sheet.id}`)
@@ -99,6 +104,7 @@ export function SidebarTreeRow({
       <span className="mr-1 hidden shrink-0 items-center md:group-focus-within:flex md:group-hover:flex">
         <button
           type="button"
+          tabIndex={-1}
           aria-label={`Add a page inside ${sheet.title}`}
           title="Add a page inside"
           onClick={addInside}
@@ -107,11 +113,12 @@ export function SidebarTreeRow({
           <IconPlus className="size-3.5" />
         </button>
         <ConfirmDeleteButton
+          tabIndex={-1}
           label={`Delete ${sheet.title}`}
           onConfirm={() => void useSheetsStore.getState().deleteSheet(sheet.id)}
         />
       </span>
-      <RowMenu sheet={sheet} onAddInside={addInside} />
+      <RowMenu sheet={sheet} onAddInside={addInside} tabIndex={-1} />
     </div>
   )
 }

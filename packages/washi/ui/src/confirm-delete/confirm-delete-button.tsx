@@ -7,6 +7,7 @@ export function ConfirmDeleteButton({
   label,
   onConfirm,
   className = '',
+  tabIndex,
 }: ConfirmDeleteButtonProps) {
   const [armed, setArmed] = useState(false)
 
@@ -19,16 +20,18 @@ export function ConfirmDeleteButton({
   return armed ? (
     <button
       type="button"
+      tabIndex={tabIndex}
       aria-label={`Confirm: ${label}`}
       onClick={onConfirm}
       onMouseLeave={() => setArmed(false)}
-      className={`h-5 shrink-0 rounded bg-destructive px-1.5 font-medium text-[11px] text-white ${className}`}
+      className={`h-5 shrink-0 rounded bg-destructive px-1.5 font-medium text-[11px] text-destructive-foreground ${className}`}
     >
       Delete?
     </button>
   ) : (
     <button
       type="button"
+      tabIndex={tabIndex}
       aria-label={label}
       onClick={() => setArmed(true)}
       className={`grid size-6 shrink-0 place-items-center rounded text-muted-foreground hover:text-destructive ${className}`}

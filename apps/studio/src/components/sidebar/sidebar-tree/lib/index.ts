@@ -1,5 +1,5 @@
 export { INDENT_PX } from './constants'
-export { useRevealActive } from './hooks/use-reveal-active'
 export { useRowDrag } from './hooks/use-row-drag'
+export { useTreeNav } from './hooks/use-tree-nav'
 export { useTreeStore } from './tree-store'
 export type { SidebarTreeNodeProps, SidebarTreeProps, SidebarTreeRowProps } from './types'
