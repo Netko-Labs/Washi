@@ -1,4 +1,4 @@
-export { AGENDA_HUES, AGENDA_MONTH_LIMIT, AGENDA_ROW_LIMIT } from './constants'
+export { AGENDA_HUES, AGENDA_MONTH_LIMIT, AGENDA_ROW_LIMIT, AGENDA_SPAN_DAYS } from './constants'
 export { useAgendaPeriod } from './hooks/use-agenda-period'
 export type {
   AgendaColumns,
@@ -13,6 +13,7 @@ export type {
 export {
   badgeOf,
   dayKeyOf,
+  eventDays,
   eventTime,
   eventTitle,
   hueOf,

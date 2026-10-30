@@ -1,5 +1,7 @@
 import { describe, expect, test } from 'bun:test'
 import {
+  AGENDA_SPAN_DAYS,
+  eventDays,
   eventTime,
   eventTitle,
   isoDay,
@@ -52,6 +54,16 @@ describe('agenda week', () => {
       'date',
     )
     expect(days.get('2026-10-28')?.map((row) => row.id)).toEqual(['a', 'b'])
+  })
+
+  test('a range falls on every day it spans, to its end day', () => {
+    const days = rowsByDay([{ id: 'trip', date: '2026-10-30/2026-11-02' }], 'date')
+    expect([...days.keys()]).toEqual(['2026-10-30', '2026-10-31', '2026-11-01', '2026-11-02'])
+    expect(eventDays('2026-10-29T10:00/2026-10-29T10:15')).toEqual(['2026-10-29'])
+    expect(eventDays('2026-10-29T22:00/2026-10-30T00:00')).toEqual(['2026-10-29'])
+    expect(eventDays('2026-10-29T22:00/2026-10-30T01:00')).toEqual(['2026-10-29', '2026-10-30'])
+    expect(eventDays('2026-11-02/2026-10-30')).toEqual(['2026-11-02'])
+    expect(eventDays('2026-01-01/2026-12-31')).toHaveLength(AGENDA_SPAN_DAYS)
   })
 
   test('an event reads its time span and its name', () => {

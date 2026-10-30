@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useBind } from '../../../../lib'
 import { useSheetState } from '../../../../state'
+import { AGENDA_SPAN_DAYS } from '../constants'
 import type { AgendaPeriod, AgendaPeriodOptions } from '../types'
 import {
   addDays,
@@ -37,8 +38,9 @@ export function useAgendaPeriod({
     view === 'month'
       ? monthSpan(month, weekStart, today, locale)
       : weekSpan(weekStartOf(now, weekStart, offset), today, locale)
+  const from = addDays(span.start, -AGENDA_SPAN_DAYS)
   const to = addDays(span.start, span.days.length)
-  const state = useBind(rangeQuery(bind, date, isoDay(span.start), isoDay(to)))
+  const state = useBind(rangeQuery(bind, date, isoDay(from), isoDay(to)))
 
   const moveTo = (target: Date) => {
     if (stateKey) sheet.set(stateKey, monthKey(target))

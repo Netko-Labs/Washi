@@ -1,9 +1,10 @@
 import type { BindQuery } from '../../../registry'
-import { AGENDA_HUES, AGENDA_ROW_LIMIT } from './constants'
+import { AGENDA_HUES, AGENDA_ROW_LIMIT, AGENDA_SPAN_DAYS } from './constants'
 import type { AgendaColumns, AgendaDayInfo, AgendaSpan, Row, WeekStart } from './types'
 
 const DAY_KEY = /^(\d{4}-\d{2}-\d{2})/
 const MONTH_KEY = /^(\d{4})-(\d{2})(?:-\d{2})?$/
+const MIDNIGHT = /T00:00(?::00)?$/
 
 /** A calendar day on the reader's own clock — never UTC's, or a late evening lands tomorrow. */
 export function isoDay(date: Date): string {
@@ -113,11 +114,28 @@ export function dayKeyOf(cell: unknown): string | null {
   return typeof cell === 'string' ? (DAY_KEY.exec(cell)?.[1] ?? null) : null
 }
 
+/** The days a `start/end` cell covers, its end day included unless it ends at midnight. */
+export function eventDays(cell: unknown): string[] {
+  const first = dayKeyOf(cell)
+  if (!first) return []
+  const end = String(cell).split('/')[1]
+  const last = dayKeyOf(end)
+  if (!last || last <= first) return [first]
+  const [year, month, day] = first.split('-').map(Number)
+  const start = new Date(year ?? 0, (month ?? 1) - 1, day ?? 1)
+  const days = [first]
+  while (days.length < AGENDA_SPAN_DAYS) {
+    const key = isoDay(addDays(start, days.length))
+    if (key > last || (key === last && MIDNIGHT.test(end ?? ''))) break
+    days.push(key)
+  }
+  return days
+}
+
 export function rowsByDay(rows: Row[], date: string): Map<string, Row[]> {
   const days = new Map<string, Row[]>()
   for (const row of rows) {
-    const key = dayKeyOf(row[date])
-    if (key) days.set(key, [...(days.get(key) ?? []), row])
+    for (const key of eventDays(row[date])) days.set(key, [...(days.get(key) ?? []), row])
   }
   return days
 }
