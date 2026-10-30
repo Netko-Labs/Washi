@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test'
+import type { TodayTurn } from '../../today'
 import type { InboxRow } from '../lib'
-import { dayLabel, groupByDay, matchesFilter, whenLabel } from '../lib'
+import { dayLabel, groupByDay, matchesFilter, turnRow, whenLabel } from '../lib'
 
 const HOUR = 3_600_000
 const DAY = 24 * HOUR
@@ -50,5 +51,36 @@ describe('inbox list', () => {
     expect(matchesFilter(mention, 'needs')).toBe(false)
     expect(matchesFilter(mention, 'mentions')).toBe(true)
     expect(matchesFilter(mention, 'washi')).toBe(false)
+  })
+})
+
+describe('a turn in the inbox says what Washi did', () => {
+  const turn = (outcome: TodayTurn['outcome'], receipt: TodayTurn['receipt']): TodayTurn => ({
+    sessionId: 's1',
+    sessionTitle: 'Trip planning',
+    prompt: 'plan **Kyoto** with `dates`',
+    tools: [],
+    outcome,
+    receipt,
+    at: now,
+  })
+  const done = { kind: 'turn_done', stopReason: 'end_turn' } as const
+
+  test('the page it wrote, else the line it said — never the ask', () => {
+    const made = turnRow(turn({ kind: 'page', touch: 'made', id: 'p1', title: 'Kyoto' }, done))
+    expect(made).toMatchObject({ verb: 'made', where: 'Kyoto', detail: null })
+    const changed = turnRow(
+      turn({ kind: 'page', touch: 'changed', id: 'p1', title: 'Kyoto' }, done),
+    )
+    expect(changed.verb).toBe('updated')
+    const reply = turnRow(turn({ kind: 'reply', text: 'Three days fit.' }, done))
+    expect(reply).toMatchObject({ verb: 'replied “Three days fit.”', where: null })
+  })
+
+  test('nothing to show reads how it ended, in its chat', () => {
+    const stopped = turnRow(turn(null, { kind: 'turn_done', stopReason: 'cancelled' }))
+    expect(stopped).toMatchObject({ verb: 'was stopped in', where: 'Trip planning' })
+    const failed = turnRow(turn(null, { kind: 'turn_done', stopReason: 'error', error: 'no key' }))
+    expect(failed).toMatchObject({ where: 'Trip planning', detail: 'no key' })
   })
 })

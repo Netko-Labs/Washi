@@ -1,4 +1,7 @@
 import type { ApprovalDecision, ApprovalRequest } from '@washi/domain'
+import type { TodayTurn } from '../../today'
+
+export type StopReason = TodayTurn['receipt']['stopReason']
 
 export type InboxKind = 'mention' | 'washi' | 'reminder'
 export type InboxFilter = 'all' | 'needs' | 'mentions' | 'washi'

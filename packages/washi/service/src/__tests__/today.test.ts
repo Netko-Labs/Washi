@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import { appendTurn, createSession, openWorkspace, type Workspace } from '@washi/repository'
+import { plainLine } from '../agents/lib'
 import { hlcMs, recentTurns } from '../agents/today'
 
 let ws: Workspace
@@ -35,6 +36,47 @@ describe('today retells each turn: the ask, what it touched, the receipt', () =>
     expect(turns[1]?.tools).toEqual(['sheet_check', 'sheet_create'])
     expect(turns[1]?.receipt).toMatchObject({ billing: 'plan', costUsd: 0.03 })
     expect(turns[0]?.tools).toEqual([])
+  })
+
+  test('a turn comes to the last page it wrote, else the first line it said, plain', () => {
+    const session = createSession(ws, 'Trip')
+    appendTurn(ws, session.id, { kind: 'user_message', text: 'plan **Kyoto**' })
+    appendTurn(ws, session.id, { kind: 'message_chunk', text: 'On it.' })
+    appendTurn(ws, session.id, {
+      kind: 'tool_call',
+      toolCallId: 'c1',
+      title: 'sheet_create',
+      toolKind: 'edit',
+      status: 'pending',
+      input: { title: 'Kyoto' },
+    })
+    appendTurn(ws, session.id, {
+      kind: 'tool_call_update',
+      toolCallId: 'c1',
+      status: 'completed',
+      output: '{"id":"p1","title":"Kyoto"}',
+    })
+    appendTurn(ws, session.id, { kind: 'turn_done', stopReason: 'end_turn' })
+    appendTurn(ws, session.id, { kind: 'user_message', text: 'what is `due`?' })
+    appendTurn(ws, session.id, { kind: 'message_chunk', text: '## **Due** is the `date`' })
+    appendTurn(ws, session.id, { kind: 'message_chunk', text: ' a task ends.\n\nMore.' })
+    appendTurn(ws, session.id, { kind: 'turn_done', stopReason: 'end_turn' })
+    appendTurn(ws, session.id, { kind: 'user_message', text: 'stop' })
+    appendTurn(ws, session.id, { kind: 'turn_done', stopReason: 'cancelled' })
+
+    const [stopped, reply, made] = recentTurns(ws)
+    expect(made?.outcome).toEqual({ kind: 'page', touch: 'made', id: 'p1', title: 'Kyoto' })
+    expect(reply?.outcome).toEqual({ kind: 'reply', text: 'Due is the date a task ends.' })
+    expect(stopped?.outcome).toBeNull()
+  })
+
+  test('a reply reads as one plain line, cut to fit', () => {
+    expect(plainLine('- [Roadmap](washi://p1) has *three* __open__ items', 140)).toBe(
+      'Roadmap has three open items',
+    )
+    expect(plainLine('\n\n> quoted', 140)).toBe('quoted')
+    expect(plainLine('a long line of words', 10)).toBe('a long li…')
+    expect(plainLine('  \n ', 140)).toBeNull()
   })
 
   test('outside the window is not today', () => {

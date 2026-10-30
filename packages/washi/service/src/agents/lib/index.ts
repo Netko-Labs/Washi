@@ -52,9 +52,10 @@ export type {
   SessionOptions,
   TodayReport,
   TurnLimits,
+  TurnOutcome,
   TurnSummary,
 } from './types'
-export { titleFrom, wordsOf } from './utils'
+export { plainLine, titleFrom, wordsOf } from './utils'
 export {
   AFTER_STOP,
   DB_MUTATE_DESCRIPTION,

@@ -10,5 +10,5 @@ export type {
   InboxRowProps,
   NeedRowProps,
 } from './types'
-export { dayLabel, groupByDay, matchesFilter, whenLabel } from './utils'
+export { dayLabel, groupByDay, matchesFilter, turnRow, whenLabel } from './utils'
 export { EMPTY_LABELS, FILTER_LABELS } from './values'

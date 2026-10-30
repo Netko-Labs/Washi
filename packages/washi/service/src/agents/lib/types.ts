@@ -129,6 +129,11 @@ export interface AgentHostEvents {
 
 export type EventsRef = () => AgentHostEvents | null
 
+/** What a turn came to: the last page it made or changed, else the first line it said. */
+export type TurnOutcome =
+  | { kind: 'page'; touch: 'made' | 'changed'; id: string; title: string }
+  | { kind: 'reply'; text: string }
+
 export interface TurnSummary {
   sessionId: string
   sessionTitle: string
@@ -136,6 +141,7 @@ export interface TurnSummary {
   prompt: string
   /** Distinct tools the turn touched, in order. */
   tools: string[]
+  outcome: TurnOutcome | null
   receipt: Extract<AgentUpdate, { kind: 'turn_done' }>
   /** Wall-clock ms of the receipt. */
   at: number

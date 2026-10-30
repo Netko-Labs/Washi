@@ -1,5 +1,7 @@
+import type { TodayTurn } from '../../today'
 import { DAY_MS } from './constants'
 import type { DayGroup, InboxFilter, InboxRow } from './types'
+import { TURN_LEFT } from './values'
 
 const MINUTE = 60_000
 const HOUR = 60 * MINUTE
@@ -46,6 +48,25 @@ export function groupByDay(rows: InboxRow[], now: number): DayGroup[] {
     else groups.push({ label, rows: [row] })
   }
   return groups
+}
+
+/** What Washi did, in one line: the page it wrote, else what it said, else where it was left. */
+export function turnRow(turn: TodayTurn): InboxRow {
+  const { outcome, receipt } = turn
+  const said =
+    outcome?.kind === 'page'
+      ? { verb: outcome.touch === 'made' ? 'made' : 'updated', where: outcome.title }
+      : outcome?.kind === 'reply'
+        ? { verb: `replied “${outcome.text}”`, where: null }
+        : { verb: TURN_LEFT[receipt.stopReason], where: turn.sessionTitle }
+  return {
+    id: `${turn.sessionId}-${turn.at}`,
+    kind: 'washi',
+    at: turn.at,
+    who: null,
+    ...said,
+    detail: receipt.stopReason === 'error' ? (receipt.error ?? 'failed') : null,
+  }
 }
 
 export function matchesFilter(row: InboxRow, filter: InboxFilter): boolean {
