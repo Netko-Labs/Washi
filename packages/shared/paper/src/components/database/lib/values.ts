@@ -34,3 +34,6 @@ export const DEFAULT_STATUS_GROUPS = {
   doing: ['In progress'],
   done: ['Done'],
 }
+
+/** The rows a relation's menu offers and its chips are named from. */
+export const RELATION_CHOICE_LIMIT = 500

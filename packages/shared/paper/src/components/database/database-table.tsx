@@ -1,7 +1,8 @@
 import { AddProperty } from './add-property'
-import { DatabaseCell } from './database-cell'
+import { DatabaseRows } from './database-rows'
 import {
   isRank,
+  namedColumns,
   newRow,
   tableLabel,
   titleColumn,
@@ -20,9 +21,9 @@ export function DatabaseTable({ db, view, empty }: ViewProps) {
 
   const title = titleColumn(db.spec)
   const shown = view.columns
-    ? db.spec.columns.filter((column) => view.columns?.includes(column.name))
+    ? namedColumns(db.spec, view.columns)
     : db.spec.columns.filter((column) => !isRank(column))
-  const columns = title ? [title, ...shown.filter((column) => column !== title)] : shown
+  const columns = title && !shown.includes(title) ? [title, ...shown] : shown
 
   return (
     <div className="wsx-db-grid">
@@ -48,41 +49,14 @@ export function DatabaseTable({ db, view, empty }: ViewProps) {
             </th>
           </tr>
         </thead>
-        <tbody>
-          {records.rows.map((row) => {
-            const id = String(row.id)
-            return (
-              <tr key={id}>
-                {columns.map((column) => (
-                  <td
-                    key={column.name}
-                    data-title={column === title || undefined}
-                    data-label={tableLabel(column.name)}
-                  >
-                    <DatabaseCell
-                      db={db}
-                      column={column}
-                      value={row[column.name]}
-                      commit={(value) => void commit(id, column.name, value)}
-                    />
-                    {column === title && actions.canOpen && (
-                      <button
-                        type="button"
-                        className="wsx-db-open"
-                        aria-label="Open"
-                        title="Open beside the page"
-                        onClick={() => actions.open(id)}
-                      >
-                        <span aria-hidden>↗</span> Open
-                      </button>
-                    )}
-                  </td>
-                ))}
-                <td />
-              </tr>
-            )
-          })}
-        </tbody>
+        <DatabaseRows
+          db={db}
+          columns={columns}
+          title={title}
+          rows={records.rows}
+          commit={commit}
+          onOpen={actions.canOpen ? actions.open : undefined}
+        />
       </table>
       {records.status === 'loading' && (
         <div className="wsx-empty" data-state="loading" aria-busy>

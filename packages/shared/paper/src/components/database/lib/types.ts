@@ -47,12 +47,33 @@ export interface CellProps {
   column: ColumnSpec
   value: Cell | undefined
   commit: (value: Cell) => void
+  /** Read once for a whole view; a cell without them reads its own target. */
+  titles?: RelationTitles
 }
 
-export type ScalarCellProps = Omit<CellProps, 'db'>
+export type ScalarCellProps = Omit<CellProps, 'db' | 'titles'>
 
 export interface ChoiceCellProps extends ScalarCellProps {
   choices: Choice[]
+  /** What an item reads as when no choice names it; the item itself if unset. */
+  unknown?: string
+}
+
+/** Null when the table it points at cannot be read; undefined while it loads. */
+export interface RelationCellProps extends ScalarCellProps {
+  choices: Choice[] | null | undefined
+}
+
+/** Each relation target's rows by title, null for one that cannot be read; absent while loading. */
+export type RelationTitles = Record<string, Choice[] | null>
+
+export interface DatabaseRowsProps {
+  db: DatabaseContext
+  columns: ColumnSpec[]
+  title: ColumnSpec | undefined
+  rows: QueryRow[]
+  commit: Commit
+  onOpen?: (id: string) => void
 }
 
 export type StatusGroup = 'todo' | 'doing' | 'done'
