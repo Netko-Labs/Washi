@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
+import type { ChatAnchor } from '@washi/domain'
 import {
   createSession,
   getSession,
@@ -8,12 +9,14 @@ import {
 } from '@washi/repository'
 import { ChatMoveError, movedFrom } from '../agents/handover'
 import { AgentHost } from '../agents/host'
+import type { AgentKeySource } from '../agents/lib'
+import type { AgentPort } from '../agents/ports'
 import { SheetNotFoundError } from '../sheets/access'
 import { createSheetFromSource } from '../sheets/service'
 
 let ws: Workspace
 let host: AgentHost
-let opened: { id: string; sessionId?: string }[]
+let opened: { id: string; sessionId: string; handover?: boolean }[]
 beforeEach(() => {
   ws = openWorkspace({ id: 'test', path: ':memory:' })
   host = new AgentHost(ws)
@@ -21,11 +24,24 @@ beforeEach(() => {
   host.setEvents({
     update: () => {},
     approval: () => {},
-    openSheet: (id, sessionId) => opened.push({ id, sessionId }),
+    openSheet: (id, sessionId, handover) => opened.push({ id, sessionId, handover }),
   })
 })
 afterEach(() => ws.close())
 
+const KEY: AgentKeySource = {
+  resolve: async () => ({ kind: 'api_key', apiKey: 'k', provider: 'anthropic', model: 'm' }),
+  status: async () => ({
+    preference: 'auto',
+    active: 'api_key',
+    localCli: null,
+    localModel: null,
+    apiKey: null,
+    missing: null,
+  }),
+}
+
+const ASK = 'Move this page to the trash'
 const RIN = { id: 'rin', isOwner: false }
 const KENJI = { id: 'kenji', isOwner: false }
 
@@ -89,7 +105,7 @@ describe('a conversation lives in a place, and can move (D110)', () => {
       ok: true,
       page: 'Kyoto',
     })
-    expect(opened).toEqual([{ id: kyoto.id, sessionId: chat.id }])
+    expect(opened).toEqual([{ id: kyoto.id, sessionId: chat.id, handover: true }])
     expect(getTranscript(ws, chat.id).at(-1)?.update).toMatchObject({
       kind: 'handoff',
       by: 'washi',
@@ -111,5 +127,40 @@ describe('a conversation lives in a place, and can move (D110)', () => {
 
     host.moveSession(newer.id, plan.id, RIN)
     expect(movedFrom(ws, plan.id, RIN)).toMatchObject({ sessionId: older.id, sheetId: kyoto.id })
+  })
+})
+
+describe('the model is told the page its chat is on', () => {
+  const asked = async (anchor: ChatAnchor | null, viewer = RIN) => {
+    const said: string[] = []
+    const port: AgentPort = {
+      id: 'anthropic',
+      prompt: async (request) => {
+        said.push(request.text)
+        return { costUsd: 0, billing: 'metered' }
+      },
+    }
+    Object.assign(host, { claudePort: port, keys: KEY })
+    const chat = createSession(ws, 'Here', { createdBy: viewer.id, anchor })
+    await host.prompt(chat.id, ASK, { viewer })
+    return said[0]
+  }
+
+  test('its title and id lead the ask, and a subtree says so', async () => {
+    const plan = page('Plan')
+    expect(await asked({ sheetId: plan.id, scope: 'page' })).toBe(
+      `This conversation is on the page "Plan" (id ${plan.id}): "this page" means it.\n\n${ASK}`,
+    )
+    expect(await asked({ sheetId: plan.id, scope: 'subtree' })).toContain(
+      `(id ${plan.id}) and the pages under it`,
+    )
+  })
+
+  test('Home, a page gone, or one the asker cannot read is left unsaid', async () => {
+    const secret = page('Secret', ' visibility="private" access={["kenji"]}')
+    expect(await asked(null)).toBe(ASK)
+    expect(await asked({ sheetId: 'gone', scope: 'page' })).toBe(ASK)
+    expect(await asked({ sheetId: secret.id, scope: 'page' })).toBe(ASK)
+    expect(await asked({ sheetId: secret.id, scope: 'page' }, KENJI)).toContain('"Secret"')
   })
 })

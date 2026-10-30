@@ -102,6 +102,8 @@ export interface AgentActivity extends AgentSpendReport {
 export interface Caller {
   origin: CapabilityOrigin
   actorId?: string | null
+  /** The turn an agent call runs in: a page it opens is shown only to that chat. */
+  sessionId?: string
 }
 
 export interface AskOptions {
@@ -121,8 +123,8 @@ export interface AgentHostEvents {
   /** Washi renamed the conversation; the list should refetch. */
   sessionChanged?: (sessionId: string) => void
   approval: (request: ApprovalRequest) => void
-  /** With a chat, only that chat's person is sent there (a handover, D110). */
-  openSheet: (id: string, sessionId?: string) => void
+  /** Only a client showing that chat moves; a handover also moves the chat there (D110). */
+  openSheet: (id: string, sessionId: string, handover?: boolean) => void
 }
 
 export type EventsRef = () => AgentHostEvents | null

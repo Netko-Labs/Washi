@@ -9,6 +9,7 @@ export type {
   ChatComposerProps,
   ChatDockProps,
   ChatEmptyProps,
+  ChatMissingProps,
   ChatPageCardProps,
   ChatPersonProps,
   ChatReceiptsProps,

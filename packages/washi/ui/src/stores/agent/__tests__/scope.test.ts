@@ -32,6 +32,14 @@ const SESSIONS = [
 const MOVE: ChatMove = { sessionId: 'plan-new', sheetId: 'plan', title: 'plan-new', at: '' }
 
 const feed = { subscribe: () => ({ unsubscribe: () => {} }) }
+type OpenRequest = { id: string; sessionId: string; handover?: boolean }
+let requestOpen: (request: OpenRequest) => void = () => {}
+const openFeed = {
+  subscribe: (_input: unknown, handlers: { onData: (event: { data: OpenRequest }) => void }) => {
+    requestOpen = (data) => handlers.onData({ data })
+    return { unsubscribe: () => {} }
+  },
+}
 // A creation the test lets land when it chooses; prompts are recorded by the chat they went to.
 let landCreation: (session: AgentSession) => void = () => {}
 const prompted: string[] = []
@@ -39,7 +47,7 @@ const client = {
   agents: {
     onAgentUpdate: feed,
     onApprovalRequested: feed,
-    onOpenSheetRequested: feed,
+    onOpenSheetRequested: openFeed,
     onSessionChanged: feed,
     listSessions: { query: async () => SESSIONS },
     pendingApprovals: { query: async () => [] },
@@ -153,5 +161,34 @@ describe('a chat made while the person moves (D110)', () => {
     expect(agent().activeSessionId).toBe('plan-new')
     expect(prompted.at(-1)).toBe('kyoto-new')
     expect([...memory.values()]).toContain('kyoto-new')
+  })
+})
+
+describe('a page Washi opens moves only the chat it came from (D110)', () => {
+  test('another chat’s page, a teammate’s or a routine’s, moves nothing here', async () => {
+    await open('note:plan')
+    requestOpen({ id: 'theirs', sessionId: 'someone-else' })
+    requestOpen({ id: 'theirs', sessionId: 'home-routine', handover: true })
+    expect(useViewStore.getState().activeTab).toBe('note:plan')
+    expect(agent().activeSessionId).toBe('plan-new')
+  })
+
+  test('a page the chat on screen made opens with that chat still on screen', async () => {
+    await open('note:plan')
+    requestOpen({ id: 'made', sessionId: 'plan-new' })
+    await settle()
+    expect(useViewStore.getState().activeTab).toBe('note:made')
+    expect(agent().activeSessionId).toBe('plan-new')
+    expect(agent().sessions.find((each) => each.id === 'plan-new')?.anchor?.sheetId).toBe('plan')
+  })
+
+  test('a handover takes the chat on screen with it, panel open', async () => {
+    await open('note:plan')
+    requestOpen({ id: 'kyoto', sessionId: 'plan-new', handover: true })
+    await settle()
+    expect(useViewStore.getState().activeTab).toBe('note:kyoto')
+    expect(agent().activeSessionId).toBe('plan-new')
+    expect(agent().scope).toBe('kyoto')
+    expect(agent().panelOpen).toBe(true)
   })
 })

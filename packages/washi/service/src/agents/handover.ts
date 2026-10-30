@@ -1,4 +1,4 @@
-import type { ChatMove, Handoff, Viewer } from '@washi/domain'
+import type { ChatAnchor, ChatMove, Handoff, Viewer } from '@washi/domain'
 import {
   getSession,
   getSheet,
@@ -52,4 +52,17 @@ export function moveChat(
 /** What a page's empty panel says about the chat that left it, if one did and is still away. */
 export function movedFrom(ws: Workspace, sheetId: string, viewer: Viewer): ChatMove | null {
   return viewer.id === null ? null : latestMoveFrom(ws, sheetId, viewer.id)
+}
+
+/** Told to the model each turn, so "this page" is the chat's own; unsaid unless the asker reads it. */
+export function chatPlaceLine(
+  ws: Workspace,
+  anchor: ChatAnchor | null,
+  viewer: Viewer,
+): string | null {
+  if (!anchor) return null
+  const sheet = getSheet(ws, anchor.sheetId)
+  if (!sheet || !readableSet(ws, viewer).has(sheet.id)) return null
+  const reach = anchor.scope === 'subtree' ? ' and the pages under it' : ''
+  return `This conversation is on the page "${sheet.title}" (id ${sheet.id})${reach}: "this page" means it.`
 }

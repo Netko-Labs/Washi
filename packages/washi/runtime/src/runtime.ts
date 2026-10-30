@@ -74,8 +74,13 @@ export function createRuntime(options: RuntimeOptions): Runtime {
         events.emit('agentUpdate', { workspaceId, sessionId, entry })
       },
       approval: (request) => events.emit('approvalRequested', { ...request, workspaceId }),
-      openSheet: (id, sessionId) =>
-        events.emit('openSheetRequested', { workspaceId, id, ...(sessionId && { sessionId }) }),
+      openSheet: (id, sessionId, handover) =>
+        events.emit('openSheetRequested', {
+          workspaceId,
+          id,
+          sessionId,
+          ...(handover && { handover }),
+        }),
       sessionChanged: (sessionId) => events.emit('sessionChanged', { workspaceId, sessionId }),
     })
     host.setPeople(() => options.control.listMembers(workspaceId))

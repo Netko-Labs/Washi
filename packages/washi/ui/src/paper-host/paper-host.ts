@@ -58,7 +58,11 @@ export const paperHost: PaperHost = {
       )
       return
     }
-    await api.capabilities.runAction.mutate({ action })
+    const { opened } = await api.capabilities.runAction.mutate({ action })
+    if (opened)
+      void import('../stores').then(({ useViewStore }) =>
+        useViewStore.getState().openTab(`note:${opened}`),
+      )
   },
 
   // A page this reader cannot open answers NOT_FOUND (D65): the link keeps its own words.

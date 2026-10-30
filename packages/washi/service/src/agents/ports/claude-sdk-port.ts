@@ -23,8 +23,8 @@ export interface ClaudeSdkPortDeps {
   catalogue: ModelCatalogue
   /** Read as each turn starts, so a change on the server reaches the next one. */
   instructions: () => string
-  runHankoAction: (input: unknown) => Promise<void>
-  openSheet?: (id: string) => void
+  runHankoAction: (input: unknown, sessionId: string) => Promise<void>
+  openSheet?: (id: string, sessionId: string) => void
   listPeople?: () => Promise<Member[]>
   searchKey?: SearchKeyLookup
   canUseTool: (
@@ -115,8 +115,8 @@ export function createClaudeSdkPort(deps: ClaudeSdkPortDeps): AgentPort {
             pathToClaudeCodeExecutable: local ? credential.executable : undefined,
             mcpServers: {
               washi: createWashiTools(deps.ws, {
-                runHankoAction: deps.runHankoAction,
-                openSheet: deps.openSheet,
+                runHankoAction: (action) => deps.runHankoAction(action, request.sessionId),
+                openSheet: (id) => deps.openSheet?.(id, request.sessionId),
                 listPeople: deps.listPeople,
                 searchKey: deps.searchKey,
                 setTitle: request.setTitle,

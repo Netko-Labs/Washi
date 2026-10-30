@@ -13,8 +13,8 @@ import type { AgentPort, PromptRequest, ToolGate, TurnResult } from './types'
 export interface AiSdkPortDeps {
   ws: Workspace
   gate: ToolGate
-  runHankoAction: (input: unknown) => Promise<void>
-  openSheet?: (id: string) => void
+  runHankoAction: (input: unknown, sessionId: string) => Promise<void>
+  openSheet?: (id: string, sessionId: string) => void
   listPeople?: () => Promise<Member[]>
   searchKey?: SearchKeyLookup
   /** Read as each turn starts, so a change on the server reaches the next one. */
@@ -53,8 +53,8 @@ export function createAiSdkPort({
       }
       const tools = createAiTools({
         ws,
-        runHankoAction,
-        openSheet,
+        runHankoAction: (action) => runHankoAction(action, request.sessionId),
+        openSheet: (id) => openSheet?.(id, request.sessionId),
         listPeople,
         searchKey,
         setTitle: request.setTitle,

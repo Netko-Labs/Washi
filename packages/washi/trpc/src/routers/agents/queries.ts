@@ -1,4 +1,11 @@
-import { getTranscript, isSessionVisible, listSessions, searchChats } from '@washi/repository'
+import { TRPCError } from '@trpc/server'
+import {
+  getSession,
+  getTranscript,
+  isSessionVisible,
+  listSessions,
+  searchChats,
+} from '@washi/repository'
 import { movedFrom, serverApprovesAll } from '@washi/service'
 import { z } from 'zod'
 import { pageProcedure, router, workspaceProcedure } from '../../init'
@@ -47,7 +54,10 @@ export const agentQueries = router({
   movedFrom: pageProcedure
     .input(z.object({ sheetId: z.string() }))
     .query(({ ctx, input }) => movedFrom(ctx.ws, input.sheetId, ctx.viewer)),
-  transcript: chatProcedure
-    .input(z.object({ sessionId: z.string() }))
-    .query(({ ctx, input }) => getTranscript(ctx.ws, input.sessionId)),
+  transcript: chatProcedure.input(z.object({ sessionId: z.string() })).query(({ ctx, input }) => {
+    if (!getSession(ctx.ws, input.sessionId)) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'no such chat' })
+    }
+    return getTranscript(ctx.ws, input.sessionId)
+  }),
 })
