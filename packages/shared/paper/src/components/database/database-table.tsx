@@ -54,7 +54,11 @@ export function DatabaseTable({ db, view, empty }: ViewProps) {
             return (
               <tr key={id}>
                 {columns.map((column) => (
-                  <td key={column.name} data-title={column === title || undefined}>
+                  <td
+                    key={column.name}
+                    data-title={column === title || undefined}
+                    data-label={tableLabel(column.name)}
+                  >
                     <DatabaseCell
                       db={db}
                       column={column}
