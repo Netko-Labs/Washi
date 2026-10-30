@@ -41,6 +41,7 @@ export {
   sizeLabel,
   slashMatches,
   titleOf,
+  withoutTrailingLines,
 } from './utils'
 export {
   FIELD_CLASS,

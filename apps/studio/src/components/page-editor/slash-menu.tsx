@@ -1,8 +1,9 @@
 import { useSheetsStore } from '@washi/ui'
+import { Floating } from '@/components/shared/floating'
 import { isNestedBlock, type SlashMenuProps, slashMatches, useEditorStore } from './lib'
 
 /** Typed `/` in an empty block: pick what the block becomes. Enter takes the first match. */
-export function SlashMenu({ id, query, onPick }: SlashMenuProps) {
+export function SlashMenu({ id, query, anchor, onPick }: SlashMenuProps) {
   const tables = useEditorStore((state) => state.tables)
   const sheets = useSheetsStore((state) => state.sheets)
   const isNested = useEditorStore((state) => isNestedBlock(state.blocks, id))
@@ -14,10 +15,12 @@ export function SlashMenu({ id, query, onPick }: SlashMenuProps) {
   )
 
   return (
-    <div
+    <Floating
+      anchor={anchor}
+      offset={4}
       role="listbox"
       aria-label="Turn this block into"
-      className="absolute top-full left-0 z-30 mt-1 max-h-[320px] w-[280px] overflow-y-auto rounded-xl border border-border bg-popover p-1 font-sans text-popover-foreground shadow-[0_16px_48px_rgb(0_0_0/0.18)]"
+      className="max-h-[min(320px,calc(100dvh-16px))] w-[280px] overflow-y-auto rounded-xl border border-border bg-popover p-1 font-sans text-popover-foreground shadow-[0_16px_48px_rgb(0_0_0/0.18)]"
     >
       {options.length === 0 && (
         <p className="px-2 py-1.5 text-[12.5px] text-muted-foreground">No block by that name.</p>
@@ -42,6 +45,6 @@ export function SlashMenu({ id, query, onPick }: SlashMenuProps) {
           </span>
         </button>
       ))}
-    </div>
+    </Floating>
   )
 }

@@ -22,8 +22,8 @@ export function HeaderCrumbs({ starInActions }: HeaderCrumbsProps) {
   return (
     <>
       <nav aria-label="Breadcrumb" className="flex min-w-0 items-center gap-1.5 text-[13px]">
-        <span className="hidden shrink-0 items-center gap-1.5 @xl:flex">
-          <span className="text-muted-foreground">{workspaceName}</span>
+        <span className="hidden min-w-0 shrink-[100] items-center gap-1.5 overflow-hidden @xl:flex">
+          <span className="truncate text-muted-foreground">{workspaceName}</span>
           {SLASH}
         </span>
         {shown.length < ancestors.length && (
@@ -33,7 +33,10 @@ export function HeaderCrumbs({ starInActions }: HeaderCrumbsProps) {
           </>
         )}
         {shown.map((sheet) => (
-          <span key={sheet.id} className="flex min-w-0 items-center gap-1.5">
+          <span
+            key={sheet.id}
+            className="flex min-w-0 shrink-[10] items-center gap-1.5 overflow-hidden"
+          >
             <button
               type="button"
               onClick={() => useViewStore.getState().openTab(`note:${sheet.id}`)}
@@ -46,7 +49,7 @@ export function HeaderCrumbs({ starInActions }: HeaderCrumbsProps) {
         ))}
         <span className="truncate font-medium">{leaf}</span>
         {view === 'note' && active && (
-          <span className="hidden shrink-0 text-muted-foreground @3xl:inline">
+          <span className="hidden shrink-[1000] truncate text-muted-foreground @3xl:inline">
             · edited {relativeTime(active.hlcUpdated)}
           </span>
         )}

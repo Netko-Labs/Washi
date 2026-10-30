@@ -38,7 +38,7 @@ export function RowPeek({ workspaceId }: RowPeekProps) {
           key={peek.sheetId}
           sheetId={peek.sheetId}
           chrome={
-            <div className="pt-5">
+            <div className="pt-5 max-md:pt-8">
               <RowProperties sheetId={peek.sheetId} />
             </div>
           }

@@ -63,8 +63,12 @@ body {
  * takes pinch-zoom from everyone. Unlayered, so it beats Tailwind's text-[…] utilities.
  */
 @media (max-width: 767px) {
-  /* Room under a page's last block for Washi's button, which sits over the corner on a phone. */
-  [data-sheet-id] {
+  /*
+   * Room under a page's last block for Washi's button, which sits over the corner on a phone —
+   * inside the page, so its paper fills the pane however short it is.
+   */
+  [data-sheet-id] > .wsx,
+  [data-sheet-id]:not(:has(> .wsx)) {
     padding-bottom: calc(88px + env(safe-area-inset-bottom));
   }
   input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),

@@ -1,4 +1,5 @@
 import type { UploadKind } from '@washi/domain'
+import type { RefObject } from 'react'
 import type { KeptPhoto } from '@/components/shared/unsplash'
 import type { KindOption, StarterBlock } from './props'
 
@@ -57,5 +58,6 @@ export type SlashOption =
 export interface SlashMenuProps {
   id: string
   query: string
+  anchor: RefObject<HTMLElement | null>
   onPick: (option: SlashOption) => void
 }
