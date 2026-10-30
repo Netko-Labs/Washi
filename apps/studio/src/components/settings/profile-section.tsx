@@ -33,7 +33,9 @@ export function ProfileSection() {
         label="Email"
         hint="Where invitations and sign-in go. Ask an app admin to change it."
       >
-        <span className="text-[13px] text-muted-foreground">{identity.email}</span>
+        <span className="min-w-0 break-all text-[13px] text-muted-foreground">
+          {identity.email}
+        </span>
       </SettingRow>
     </SettingsCard>
   )
