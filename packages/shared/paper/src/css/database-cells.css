@@ -55,6 +55,12 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.wsx-db-table .wsx-db-formula {
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 /* Figures line up right in a table's column; a row's own property list reads them left. */
 .wsx-db-table :is(.wsx-db-reading, .wsx-db-input, .wsx-db-formula)[data-num] {
   margin-left: auto;

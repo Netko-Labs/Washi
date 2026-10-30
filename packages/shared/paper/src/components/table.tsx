@@ -92,5 +92,5 @@ function TableValue({ row, name, isTitle, db, locale }: TableValueProps) {
   // A word that means something wears its tone here too (D84); a title never.
   const tone = !isTitle && typeof value === 'string' ? toneOf(value) : undefined
   if (tone) return <span {...styled({ size: 'sm', tone }, 'wsx-badge')}>{value}</span>
-  return cell(value, locale)
+  return <span className="wsx-cell-text">{cell(value, locale)}</span>
 }

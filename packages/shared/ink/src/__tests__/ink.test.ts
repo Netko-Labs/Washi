@@ -1,6 +1,12 @@
 import { describe, expect, test } from 'bun:test'
 import { z } from 'zod'
-import { mutationSchema, querySchema, tableSpecSchema, validateRecord } from '../index'
+import {
+  MAX_TEXT_CELL,
+  mutationSchema,
+  querySchema,
+  tableSpecSchema,
+  validateRecord,
+} from '../index'
 
 const tasks = tableSpecSchema.parse({
   name: 'tasks',
@@ -33,6 +39,13 @@ describe('record validation', () => {
   test('rejects wrong types, unknown columns, bad select values', () => {
     const issues = validateRecord(tasks, { title: 7, ghost: 'x', status: 'later', due: 'nope' })
     expect(issues.map((issue) => issue.path).sort()).toEqual(['due', 'ghost', 'status', 'title'])
+  })
+
+  test('a text cell holds ten thousand characters, refused past that in words', () => {
+    expect(validateRecord(tasks, { title: 'x'.repeat(MAX_TEXT_CELL) })).toEqual([])
+    expect(validateRecord(tasks, { title: 'x'.repeat(60_000) })).toEqual([
+      { path: 'title', message: 'text up to 10,000 characters' },
+    ])
   })
 })
 
