@@ -625,8 +625,10 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   `onPress`/`onClick`/`key` through and the prelude's components by; a `<Sheet>`'s own props stay
   literal. Text beside a hole keeps the space JSX keeps (`Hello {name}`), and `serialize` writes an
   element of text and holes on one line so it survives. `hasCode` says a page runs; `checkSource`
-  checks its code at save (below); the editor opens a page with code in source mode. `pageModule` makes a page an ES module: imports, functions
-  and `export`s on top, every other statement and the markup in `export default function view()`.
+  checks its code at save (below); the editor opens a page with code in source mode. `pageModule` makes a page an ES module: imports, functions,
+  `export`s and plain `const`s on top (`moduleConstants`: nothing in them runs at load, none reads a
+  name `view()` holds — so a helper reads `const H = 20` beside it), every other statement and the
+  markup in `export default function view()`.
   `compilePage` (service `pages/`, `scripts.page`) bundles it with `Bun.build` — `washi` (the hooks,
   `PAGE_HOOKS`, as calls into `globalThis.__washi`), `washi/ui` (registry names), `PAGE_LIBRARIES`
   (`date-fns`, `lodash-es`, `zod`, resolved off disk) and `page:<id>` (a page the reader can read,

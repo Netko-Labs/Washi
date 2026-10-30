@@ -1,4 +1,5 @@
 import type * as t from '@babel/types'
+import { moduleConstants } from './hoist'
 import { splitPage } from './split'
 import { widgetsAsNodes } from './widget'
 
@@ -46,17 +47,20 @@ export function hoistedHookCalls(source: string): string[] {
 }
 
 /**
- * A page as an ES module: its imports, functions and exports at the top; every other statement and
- * the markup become `export default function view()`, run on each draw — so a hook written at the
- * page's top level is called where hooks are. A Widget's component is left to its frame.
+ * A page as an ES module: its imports, functions, exports and plain constants at the top (so a
+ * helper reads the constants beside it); every other statement and the markup become
+ * `export default function view()`, run on each draw — so a hook written at the page's top level is
+ * called where hooks are. A Widget's component is left to its frame.
  */
 export function pageModule(source: string): string {
   const { code, markup } = splitPage(source)
+  const statements = code?.statements ?? []
+  const constants = moduleConstants(statements)
   const top: string[] = []
   const body: string[] = []
-  for (const statement of code?.statements ?? []) {
+  for (const statement of statements) {
     const text = code?.text.slice(statement.start ?? 0, statement.end ?? 0) ?? ''
-    ;(HOISTED.has(statement.type) ? top : body).push(text)
+    ;(HOISTED.has(statement.type) || constants.has(statement) ? top : body).push(text)
   }
   return widgetsAsNodes(
     [...top, 'export default function view() {', ...body, `return (\n${markup}\n)`, '}'].join('\n'),
