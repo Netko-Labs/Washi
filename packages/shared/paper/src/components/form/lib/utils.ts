@@ -1,17 +1,27 @@
 import { ARRAY_COLUMN_TYPES, type TableSpec } from '@washi/ink'
 import { isRank } from '../../database'
-import type { Cell, ColumnSpec, FormDefault, FormEntries, FormPlan, SheetStateValue } from './types'
+import type {
+  Cell,
+  ColumnSpec,
+  FieldAria,
+  FormDefault,
+  FormEntries,
+  FormPlan,
+  SheetStateValue,
+} from './types'
 
 const isComputed = (column: ColumnSpec) => column.type === 'formula' || column.type === 'rollup'
 
 /**
  * Named fields in their order, or every stored column but a board's rank. Defaults for columns
- * not shown are written too. Unknown and computed names are refused in ink's own words.
+ * not shown are written too. Unknown and computed names are refused in ink's own words, and so is
+ * a required name the form does not show.
  */
 export function formPlan(
   spec: TableSpec,
   fields?: string[],
   defaults?: Record<string, FormDefault>,
+  required: string[] = [],
 ): FormPlan {
   const columns = new Map(spec.columns.map((column) => [column.name, column]))
   const refused: string[] = []
@@ -34,7 +44,30 @@ export function formPlan(
   const hidden = Object.keys(defaults ?? {})
     .filter((name) => !shown.some((column) => column.name === name))
     .flatMap(writable)
-  return { fields: shown, written: [...shown, ...hidden], refused }
+  const needed = required.flatMap((name) => {
+    const column = shown.find((each) => each.name === name)
+    if (!column) refused.push(`“${name}” is required but is not one of the form’s fields`)
+    return column ? [column] : []
+  })
+  return { fields: shown, written: [...shown, ...hidden], required: needed, refused }
+}
+
+/** Required fields holding nothing, in the form's order; a required checkbox must be ticked. */
+export function missingOf(required: ColumnSpec[], values: Record<string, Cell>): string[] {
+  return required
+    .filter((column) => {
+      const cell = cellOf(column, values[column.name])
+      return cell === undefined || cell === false
+    })
+    .map((column) => column.name)
+}
+
+/** What an input tells assistive tech: required, and why it was turned back. */
+export function fieldAria(id: string, required?: boolean, error?: string): FieldAria {
+  return {
+    ...(required && { 'aria-required': true }),
+    ...(error && { 'aria-invalid': true, 'aria-describedby': `${id}-error` }),
+  }
 }
 
 /** A `{ state }` default reads the page; unset, empty or null state leaves the column alone. */

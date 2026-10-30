@@ -1,12 +1,13 @@
-import { FORM_INPUT_TYPES, type FormInputProps } from './lib'
+import { FORM_INPUT_TYPES, type FormInputProps, fieldAria } from './lib'
 
 /** Text, number, date and URL: one line, so Enter adds the row. */
-export function FormText({ id, column, value, onChange }: FormInputProps) {
+export function FormText({ id, column, value, onChange, required, error }: FormInputProps) {
   const shown = typeof value === 'string' || typeof value === 'number' ? String(value) : ''
   const numeric = column.type === 'number'
   return (
     <input
       id={id}
+      {...fieldAria(id, required, error)}
       className="wsx-field-input"
       type={FORM_INPUT_TYPES[column.type] ?? 'text'}
       step={numeric ? 'any' : undefined}

@@ -15,6 +15,8 @@ export interface FormProps extends BlockProps {
   defaults?: Record<string, FormDefault>
   submit?: string
   reset?: boolean
+  /** Fields that must hold something before the row is sent; a required checkbox, ticked. */
+  required?: string[]
   /** A button with this label opens the form in a modal instead of laying it on the page. */
   trigger?: string
   /** The modal's heading; the trigger's words when left out. */
@@ -39,6 +41,8 @@ export interface FormDialogProps extends FormInlineProps {
   title: string
   seed?: Record<string, Cell>
   check?: () => Promise<string | null>
+  /** Told once the row has landed, just before the dialog closes. */
+  onAdded?: () => void
 }
 
 export interface FormUnavailableProps {
@@ -50,6 +54,7 @@ export interface FormUnavailableProps {
 export interface FormPlan {
   fields: ColumnSpec[]
   written: ColumnSpec[]
+  required: ColumnSpec[]
   refused: string[]
 }
 
@@ -60,11 +65,13 @@ export type FormStatus =
   | { kind: 'idle' }
   | { kind: 'busy' }
   | { kind: 'added' }
+  | { kind: 'missing'; columns: string[] }
   | { kind: 'refused'; reason: string }
 
 export interface FormDraftOptions {
   table: string
   written: ColumnSpec[]
+  required: ColumnSpec[]
   defaults?: Record<string, FormDefault>
   seed?: Record<string, Cell>
   reset: boolean
@@ -76,8 +83,8 @@ export interface FormDraft {
   values: Record<string, Cell>
   set: (column: string, value: Cell) => void
   status: FormStatus
-  canSubmit: boolean
-  submit: () => Promise<void>
+  /** Resolves to the first required field left empty, if any — the one to focus. */
+  submit: () => Promise<string | null>
 }
 
 export interface FormFieldProps {
@@ -86,10 +93,24 @@ export interface FormFieldProps {
   value: Cell | undefined
   people: Person[]
   onChange: (value: Cell) => void
+  required?: boolean
+  error?: string
 }
 
 export type FormInputProps = Omit<FormFieldProps, 'people'>
 
 export interface FormChoiceProps extends FormInputProps {
   choices: Choice[]
+}
+
+export interface LandedNote {
+  note: string | null
+  show: (words: string) => void
+  clear: () => void
+}
+
+export interface FieldAria {
+  'aria-required'?: true
+  'aria-invalid'?: true
+  'aria-describedby'?: string
 }

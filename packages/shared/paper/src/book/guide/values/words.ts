@@ -94,11 +94,11 @@ export const SUMMARIES: Record<string, string> = {
   Database: 'A table with views as tabs (table · board · timeline), rows edited in place.',
   Button: 'Runs one action on click.',
   Compose: 'A text box that runs one action with what was typed, then clears.',
-  Form: 'One whole row typed and added; trigger puts it behind a button in a modal.',
+  Form: 'One whole row typed and added; required names the fields it will not send without. trigger puts it behind a button in a modal.',
   Heatmap:
     "GitHub's calendar of days: the last weeks to today as squares, each as dark as its rows (counted, or a value summed). For habits, workouts, a journal, anything done on days.",
   Slots:
-    'Free times to book, Calendly-style: each allowed day cut into slots of `minutes` within `hours`, minus rows whose date overlaps and minus the past; a press opens a form with the slot filled in.',
+    'Free times to book, Calendly-style: each allowed day cut into slots of `minutes` within `hours`, rows whose date overlaps struck through, the past left out; a press opens a form with the slot filled in, and the booking is said back.',
   Agenda: 'A calendar: a week or a month of rows on their dates; + on a day adds one there.',
   Task: 'A checkbox bound to a row’s checkbox column.',
   Switch: 'Writes true or false to a state key.',

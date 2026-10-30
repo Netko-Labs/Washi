@@ -6,11 +6,16 @@ import type { FormFieldProps, FormInputProps } from './lib'
 
 /** A labelled input, typed the way its column stores values. */
 export function FormField({ people, ...input }: FormFieldProps) {
-  const { id, column } = input
+  const { id, column, required, error } = input
   return (
-    <div className="wsx-field" data-kind={column.type}>
+    <div className="wsx-field" data-kind={column.type} data-required={required || undefined}>
       <label className="wsx-field-label" htmlFor={id}>
         {tableLabel(column.name)}
+        {required && (
+          <span className="wsx-field-required" aria-hidden>
+            *
+          </span>
+        )}
       </label>
       {column.type === 'boolean' ? (
         <FormCheck {...input} />
@@ -22,6 +27,11 @@ export function FormField({ people, ...input }: FormFieldProps) {
         <FormRelation {...input} />
       ) : (
         <FormText {...input} />
+      )}
+      {error && (
+        <span id={`${id}-error`} className="wsx-field-error">
+          {error}
+        </span>
       )}
     </div>
   )

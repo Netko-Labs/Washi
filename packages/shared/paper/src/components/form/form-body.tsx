@@ -2,7 +2,7 @@ import { useId } from 'react'
 import { styled } from '../../lib'
 import { tableLabel } from '../database'
 import { FormField } from './form-field'
-import { type FormBodyProps, formPlan, useFormDraft } from './lib'
+import { type FormBodyProps, formPlan, REQUIRED_HINT, useFormDraft } from './lib'
 
 export function FormBody({
   db,
@@ -10,6 +10,7 @@ export function FormBody({
   defaults,
   submit,
   reset = true,
+  required,
   seed,
   check,
   onAdded,
@@ -17,10 +18,11 @@ export function FormBody({
   ...rest
 }: FormBodyProps) {
   // A seeded column is written even when it is not shown: the day a calendar's + stood on.
-  const plan = formPlan(db.spec, fields, { ...defaults, ...seed })
+  const plan = formPlan(db.spec, fields, { ...defaults, ...seed }, required)
   const draft = useFormDraft({
     table: db.table,
     written: plan.written,
+    required: plan.required,
     defaults,
     seed,
     reset,
@@ -43,9 +45,10 @@ export function FormBody({
       {...styled(rest, 'wsx-form')}
       aria-label={`Add to ${tableLabel(db.table)}`}
       noValidate
-      onSubmit={(event) => {
+      onSubmit={async (event) => {
         event.preventDefault()
-        void draft.submit()
+        const missing = await draft.submit()
+        if (missing) document.getElementById(`${id}-${missing}`)?.focus()
       }}
     >
       {plan.fields.map((column) => (
@@ -56,6 +59,12 @@ export function FormBody({
           value={draft.values[column.name]}
           people={db.people}
           onChange={(value) => draft.set(column.name, value)}
+          required={plan.required.includes(column)}
+          error={
+            status.kind === 'missing' && status.columns.includes(column.name)
+              ? REQUIRED_HINT
+              : undefined
+          }
         />
       ))}
       <div className="wsx-form-actions">
@@ -64,7 +73,7 @@ export function FormBody({
           className="wsx-button"
           data-tone="accent"
           data-size="sm"
-          disabled={!draft.canSubmit}
+          disabled={status.kind === 'busy'}
           aria-busy={status.kind === 'busy' || undefined}
         >
           {submit ?? 'Add'}
