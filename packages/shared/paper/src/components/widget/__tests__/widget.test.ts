@@ -10,6 +10,7 @@ import {
   isAsk,
   isPressed,
   isWrite,
+  tokensOf,
   widgetCsp,
   widgetDocument,
 } from '../lib/utils'
@@ -168,5 +169,20 @@ describe('a widget is as tall as what it draws', () => {
     expect(frameHeight(320, 565)).toBe(565)
     expect(frameHeight(320, 120)).toBe(320)
     expect(frameHeight(undefined, 200)).toBe(200)
+  })
+
+  test('a frame wears the page’s mode, never the system’s', () => {
+    const inside = (isDark: boolean) =>
+      ({ closest: (selector: string) => (selector === '.dark' && isDark ? {} : null) }) as Element
+    const style = { getPropertyValue: (token: string) => (token === '--ink' ? ' #eee ' : '') }
+    const computed = globalThis.getComputedStyle
+    globalThis.getComputedStyle = (() => style) as unknown as typeof getComputedStyle
+    try {
+      expect(tokensOf(inside(true))).toContain('--ink: #eee;')
+      expect(tokensOf(inside(true))).toEndWith('color-scheme: dark;')
+      expect(tokensOf(inside(false))).toEndWith('color-scheme: light;')
+    } finally {
+      globalThis.getComputedStyle = computed
+    }
   })
 })

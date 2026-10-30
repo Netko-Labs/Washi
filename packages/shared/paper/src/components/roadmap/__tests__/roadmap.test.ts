@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { calendarOf, moved, placed, rowSpan, shift, spanOf, ticksOf, toIso } from '../lib'
+import { calendarOf, drawnOf, moved, placed, rowSpan, shift, spanOf, ticksOf, toIso } from '../lib'
 
 const day = (iso: string) => spanOf(iso)?.start ?? Number.NaN
 
@@ -37,6 +37,45 @@ describe('roadmap dates', () => {
     expect(ticks.map((tick) => new Date(tick.day * 86_400_000).getUTCDay())).toEqual([1, 1, 1])
     // None in the last stretch, where a label would run off the edge.
     expect(Math.max(...ticks.map((tick) => tick.day))).toBeLessThan(day('2026-10-01') + 28 * 0.88)
+  })
+})
+
+describe('a far-off date', () => {
+  const now = day('2026-10-10')
+  const near = ['2026-09-01', '2026-10-01/2026-11-20', '2026-12-05'].map((iso) => spanOf(iso))
+  const spans = [...near, spanOf('0001-01-01'), spanOf('9999-12-31')].flatMap((s) => (s ? [s] : []))
+
+  test('holds the calendar to three years around the bulk of the rows', () => {
+    const calendar = calendarOf(spans, now)
+    expect(calendar.days).toBe(3 * 365 + 1)
+    expect(calendar.first).toBeLessThanOrEqual(day('2026-09-01'))
+    expect(calendar.first + calendar.days).toBeGreaterThan(day('2026-12-05'))
+  })
+
+  test('draws a few ticks, never one per day', () => {
+    const calendar = calendarOf(spans, now)
+    const ticks = ticksOf(calendar)
+    expect(ticks.length).toBeLessThanOrEqual(12)
+    expect(ticks.every((tick) => toIso(tick.day).slice(8) === '01')).toBe(true)
+    const early = ticksOf({ first: day('0001-01-01'), days: 400 }).map((t) => toIso(t.day))
+    expect(early.slice(0, 2)).toEqual(['0001-01-01', '0001-02-01'])
+  })
+
+  test('is cut at the edge it runs past', () => {
+    const calendar = calendarOf(spans, now)
+    const last = calendar.first + calendar.days - 1
+    const past = spanOf('9999-12-31')
+    const across = spanOf('0001-01-01/9999-12-31')
+    if (!past || !across) throw new Error('unparsed')
+    expect(drawnOf(past, calendar)).toEqual({ start: last, end: last, cut: 'end' })
+    expect(drawnOf(across, calendar)).toEqual({ start: calendar.first, end: last, cut: 'both' })
+    expect(drawnOf({ start: now, end: now }, calendar).cut).toBeUndefined()
+  })
+
+  test('only far-off rows: the calendar sits on them', () => {
+    const late = ['9999-11-01', '9999-12-31'].flatMap((iso) => spanOf(iso) ?? [])
+    const calendar = calendarOf(late, now)
+    expect(calendar.first + calendar.days - 1).toBe(day('9999-12-31') + 3)
   })
 })
 

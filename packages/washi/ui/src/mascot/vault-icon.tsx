@@ -1,3 +1,4 @@
+import { useId } from 'react'
 import type { VaultIconProps, VaultTopic } from './lib/types'
 import { OPEN_SMILE, SPARKLE_EYES, VAULT_TOPICS } from './lib/vault-topics'
 
@@ -16,7 +17,7 @@ export function VaultIcon({ topic, size = 40, className }: VaultIconProps) {
     ),
   }
   const ear = def.ear ?? '#AEBB9A'
-  const clipId = `vault-${topic.replace(/[^a-z0-9]/gi, '')}`
+  const clipId = `vault-${useId()}`
 
   return (
     <svg

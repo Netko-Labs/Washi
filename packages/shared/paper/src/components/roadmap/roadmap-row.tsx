@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { percent, type RoadmapRowProps, useBarDrag } from './lib'
+import { drawnOf, percent, type RoadmapRowProps, useBarDrag } from './lib'
 
 /** One row: its name, and its bar on the track. Drag a bar to reschedule; click an empty track to date it. */
 export function RoadmapRow({ span, calendar, title, onMove, onPlace, onOpen }: RoadmapRowProps) {
@@ -7,6 +7,7 @@ export function RoadmapRow({ span, calendar, title, onMove, onPlace, onOpen }: R
   const dayWidth = () => (track.current?.clientWidth ?? 0) / calendar.days
   const drag = useBarDrag(dayWidth, span?.start ?? null, onMove)
   const single = span !== null && span.end === span.start
+  const drawn = span ? drawnOf(span, calendar) : null
 
   return (
     <div className="wsx-roadmap-row">
@@ -14,15 +15,18 @@ export function RoadmapRow({ span, calendar, title, onMove, onPlace, onOpen }: R
         {title}
       </button>
       <div ref={track} className="wsx-roadmap-track">
-        {span ? (
+        {drawn ? (
           <div
             className="wsx-roadmap-bar"
             data-dragging={drag.shift !== 0 || undefined}
             data-single={single || undefined}
+            data-cut={drawn.cut}
             title={single ? `${title} — drag to reschedule` : 'Drag to reschedule'}
             style={{
-              left: percent(span.start + drag.shift, calendar),
-              width: single ? undefined : `${((span.end - span.start + 1) / calendar.days) * 100}%`,
+              left: percent(drawn.start + drag.shift, calendar),
+              width: single
+                ? undefined
+                : `${((drawn.end - drawn.start + 1) / calendar.days) * 100}%`,
             }}
             onPointerDown={drag.onPointerDown}
           >

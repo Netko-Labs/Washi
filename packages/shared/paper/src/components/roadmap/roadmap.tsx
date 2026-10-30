@@ -4,6 +4,7 @@ import { usePaperHost } from '../../provider'
 import { Bound } from '../states'
 import {
   calendarOf,
+  isOnCalendar,
   moved,
   percent,
   placed,
@@ -47,7 +48,9 @@ export function Roadmap({ bind, date, end, title = 'title', empty, ...rest }: Ro
                     {tick.label}
                   </span>
                 ))}
-                <i className="wsx-roadmap-today" style={{ left: percent(today(), calendar) }} />
+                {isOnCalendar(today(), calendar) && (
+                  <i className="wsx-roadmap-today" style={{ left: percent(today(), calendar) }} />
+                )}
               </div>
             </div>
             {rows.map((row, index) => {

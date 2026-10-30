@@ -9,6 +9,11 @@
   border: 0;
   border-radius: var(--r-card);
   background: transparent;
+  color-scheme: light;
+}
+/* Matches the scheme the frame is sent (`tokensOf`): a mismatch paints an opaque backdrop. */
+.dark .wsx-widget iframe {
+  color-scheme: dark;
 }
 .wsx-widget figcaption {
   display: flex;

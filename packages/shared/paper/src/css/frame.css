@@ -12,6 +12,8 @@
   user-select: text;
   /* Whatever overflows stays in its block: a page never scrolls sideways on a phone. */
   overflow-x: clip;
+  /* A long word breaks rather than runs under that clip; `break-word` keeps min-content as is. */
+  overflow-wrap: break-word;
 }
 /* Paper sizes its own boxes: a host without a CSS reset (no Tailwind preflight) draws it the same. */
 .wsx,
@@ -301,6 +303,7 @@ button.wsx-sheet-mark:hover {
   font-size: 12.5px;
   line-height: 1.55;
   white-space: pre-wrap;
+  overflow-wrap: normal;
   overflow-x: auto;
   color: var(--ink);
 }

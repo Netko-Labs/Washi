@@ -12,11 +12,20 @@ import { CSP_HOST, EMPTY_ANSWERS, TOKENS, WIDGET_ONERROR, WIDGET_STYLE } from '.
 const ASKS = new Set(['rows', 'table', 'pages', 'members', 'me', 'stored', 'file'])
 const WRITES = new Set(['set', 'store', 'act', 'navigate'])
 
+/**
+ * The page's colours, and its mode as `color-scheme`: a frame whose scheme differs from its host's
+ * gets an opaque backdrop, so it follows the page, never the system.
+ */
 export function tokensOf(element: Element | null): string {
   if (!element) return ''
   const style = getComputedStyle(element)
-  return TOKENS.map((token) => `${token}: ${style.getPropertyValue(token).trim()};`).join(' ')
+  const tokens = TOKENS.map((token) => `${token}: ${style.getPropertyValue(token).trim()};`)
+  return [...tokens, `color-scheme: ${schemeOf(element)};`].join(' ')
 }
+
+/** Paper's own mode switch: dark tokens under `.dark`, light everywhere else. */
+export const schemeOf = (element: Element): 'light' | 'dark' =>
+  element.closest('.dark') ? 'dark' : 'light'
 
 /** `scheme://host` for a host, and for `*.domain` the domain itself too. */
 function sources(scheme: string, hosts: readonly string[]): string[] {
