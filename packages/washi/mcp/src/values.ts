@@ -20,7 +20,8 @@ db_mutate inserts, updates or deletes them; db_row_activity says who changed a r
 Pages: search or sheet_list, then sheet_get for the WSX source and its version; run sheet_check
 before sheet_create or sheet_replace, and pass the version back as baseVersion so a teammate's
 typing is merged, not overwritten. sheet_delete moves a page and its sub-pages to the Trash, only
-when your person asks; they restore it from there. comment_add speaks on a page, or on a row by its
+when your person asks; they restore it from there; db_trash_table does the same for a table they
+name. comment_add speaks on a page, or on a row by its
 recordId.
 
 Working a backlog kept in Washi: find the issues table (db_list_tables), query the open rows,

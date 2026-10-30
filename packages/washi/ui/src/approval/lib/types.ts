@@ -32,3 +32,13 @@ export interface RestorePageProps {
   /** The page Washi moved to the trash. */
   id: string
 }
+
+export interface RestoreTableProps {
+  /** The table Washi moved to the trash. */
+  id: string
+}
+
+export interface RestoreButtonProps {
+  state: RestoreState
+  onRestore: () => void
+}

@@ -31,3 +31,11 @@ export interface CopyResult {
 
 /** One `set` entry, checked: a literal cell, or an expr parsed once for every row. */
 export type CopyOverride = { column: string; value: Cell } | { column: string; ast: ExprAst }
+
+/** A table an agent moved to the trash (D121), and the pages the asker reads that now draw it missing. */
+export interface TrashedByAgent {
+  id: string
+  name: string
+  rows: number
+  shownOn: string[]
+}

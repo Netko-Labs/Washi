@@ -4,6 +4,7 @@ export const PAST_TENSE: Record<string, string> = {
   Copy: 'Copied',
   Create: 'Made',
   Link: 'Linked',
+  Moving: 'Moved',
   Remove: 'Removed',
   Run: 'Ran',
   Search: 'Searched',

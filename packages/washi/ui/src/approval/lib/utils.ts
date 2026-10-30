@@ -144,6 +144,13 @@ export function describeTool(
         action: title ? `Moved “${title}” to the trash` : 'Moved a page to the trash',
       })
     }
+    case 'db_trash_table': {
+      const table = text(args.table)
+      return base({
+        icon: IconTrash,
+        action: table ? `Moving “${table}” to the trash` : 'Moving a table to the trash',
+      })
+    }
     case 'db_define':
     case 'db_mutate':
       return describeTable(name, args)
@@ -252,6 +259,16 @@ export function describeTool(
       })
     default:
       return base({ icon: IconTool, action: name.replaceAll('_', ' ') })
+  }
+}
+
+/** The table a finished `db_trash_table` moved, by the id its answer carries — its Restore. */
+export function trashedTableId(name: string, output: string | null | undefined): string | null {
+  if (name !== 'db_trash_table' || !output) return null
+  try {
+    return text(record(JSON.parse(output)).id)
+  } catch {
+    return null
   }
 }
 

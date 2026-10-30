@@ -71,6 +71,7 @@ describe('Washi over MCP (D101)', () => {
       expect.arrayContaining([
         'db_query',
         'db_mutate',
+        'db_trash_table',
         'sheet_get',
         'sheet_replace',
         'comment_add',

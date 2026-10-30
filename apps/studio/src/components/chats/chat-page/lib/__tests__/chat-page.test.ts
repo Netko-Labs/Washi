@@ -10,6 +10,7 @@ import {
   shortTitle,
   startersFor,
   trashedPages,
+  trashedTables,
 } from '../utils'
 import { GENERIC_STARTERS } from '../values'
 
@@ -204,5 +205,24 @@ describe('trashed pages', () => {
         { ...step('completed', 'd'), name: 'sheet_get' },
       ]),
     ).toEqual(['a'])
+  })
+})
+
+describe('trashed tables', () => {
+  test('a finished table trash offers Restore by the id it answered (D121)', () => {
+    const step = (status: 'completed' | 'failed', id: string, output: string | null) => ({
+      id,
+      name: 'db_trash_table',
+      input: { table: 'issues' },
+      status,
+      output,
+    })
+    expect(
+      trashedTables([
+        step('completed', 'a', '{"id":"tb1","name":"issues","rows":2,"shownOn":[]}'),
+        step('failed', 'b', 'unknown table "issues"'),
+        step('completed', 'c', null),
+      ]),
+    ).toEqual(['tb1'])
   })
 })

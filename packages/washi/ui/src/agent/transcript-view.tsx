@@ -1,6 +1,6 @@
 import { IconAlertTriangle } from '@tabler/icons-react'
 import type { AgentUpdate } from '@washi/domain'
-import { pastTense, RestorePage, useDescribeTool } from '../approval'
+import { pastTense, RestorePage, RestoreTable, trashedTableId, useDescribeTool } from '../approval'
 import { BUBBLE_PROSE, Markdown } from '../markdown'
 import { Mascot } from '../mascot'
 import { HandoffDivider } from './handoff-divider'
@@ -48,6 +48,7 @@ function ToolPill({ update, followups }: ToolPillProps) {
   const { icon: Icon, action, subject } = describe(update.title, update.input, output)
   const trashed = update.title === 'sheet_delete' && status === 'completed'
   const trashedId = (update.input as { id?: unknown } | undefined)?.id
+  const trashedTable = status === 'completed' ? trashedTableId(update.title, output) : null
 
   return (
     <div className="my-1" data-tool-card>
@@ -71,6 +72,7 @@ function ToolPill({ update, followups }: ToolPillProps) {
         )}
       </details>
       {trashed && typeof trashedId === 'string' && <RestorePage id={trashedId} />}
+      {trashedTable && <RestoreTable id={trashedTable} />}
       {diff && <DiffView diff={diff} />}
     </div>
   )

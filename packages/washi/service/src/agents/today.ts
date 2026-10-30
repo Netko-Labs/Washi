@@ -20,7 +20,7 @@ const field = (input: unknown, key: string): string | null => {
   return typeof value === 'string' && value.trim() ? value : null
 }
 
-/** `sheet_create` answers with the sheet it made, as JSON. */
+/** `sheet_create` and `db_trash_table` answer with what they touched, as JSON. */
 const createdId = (output: string | undefined): string | null =>
   output?.match(/"id"\s*:\s*"([^"]+)"/)?.[1] ?? null
 
@@ -36,6 +36,17 @@ function pageOf(
   if (!id) return null
   const title = getSheet(ws, id)?.title ?? field(call.input, 'title') ?? 'Untitled'
   return { kind: 'page', touch: made ? 'made' : 'changed', id, title }
+}
+
+/** The table a finished `db_trash_table` moved to the trash (D121). */
+function trashedTableOf(
+  call: Extract<AgentUpdate, { kind: 'tool_call' }>,
+  result: Extract<AgentUpdate, { kind: 'tool_call_update' }>,
+): TurnOutcome | null {
+  if (result.status !== 'completed' || call.title !== 'db_trash_table') return null
+  const id = createdId(result.output)
+  const name = field(call.input, 'table')
+  return id && name ? { kind: 'table', touch: 'trashed', id, name } : null
 }
 
 /**
@@ -76,7 +87,7 @@ export function recentTurns(
         if (!tools.includes(update.title)) tools.push(update.title)
       } else if (update.kind === 'tool_call_update') {
         const call = calls.get(update.toolCallId)
-        page = (call && pageOf(ws, call, update)) || page
+        page = (call && (pageOf(ws, call, update) ?? trashedTableOf(call, update))) || page
       } else if (update.kind === 'turn_done' && hlcMs(entry.createdAt) >= since) {
         const reply = plainLine(said, PROMPT_PREVIEW_CHARS)
         turns.push({
