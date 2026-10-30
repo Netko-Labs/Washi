@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { CustomEmojiView, EmojiDraftState } from '../types'
-import { toShortcode } from '../utils'
+import { shortcodeNote, toShortcode } from '../utils'
 
 const EMPTY: EmojiDraftState = { name: '', file: null, busy: false, error: null }
 
@@ -40,5 +40,12 @@ export function useEmojiDraft(
     }
   }
 
-  return { ...draft, isReady: Boolean(draft.file && draft.name), setFile, setName, submit }
+  return {
+    ...draft,
+    isReady: Boolean(draft.file && draft.name),
+    note: draft.busy ? null : shortcodeNote(draft.name),
+    setFile,
+    setName,
+    submit,
+  }
 }

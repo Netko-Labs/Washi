@@ -5,6 +5,7 @@ import {
   emojiName,
   matchesQuery,
   searchEmoji,
+  shortcodeNote,
   toShortcode,
   withRecent,
 } from '../utils'
@@ -43,6 +44,15 @@ describe('shortcodes and recents', () => {
   test('a file name or a typed name becomes what the server accepts', () => {
     expect(toShortcode('Party Fox.PNG')).toBe('party-fox')
     expect(toShortcode('  ok_hand+1 ')).toBe('ok_hand+1')
+  })
+
+  test('a name the server would change says so as it is typed', () => {
+    expect(shortcodeNote('zznight日本語 ZZ!')).toBe(
+      'Lowercase letters, digits, - _ and + only — this becomes :zznight-zz:',
+    )
+    expect(shortcodeNote(':party-fox:')).toBeNull()
+    expect(shortcodeNote('日本語')).toContain('none of what you typed is kept')
+    expect(shortcodeNote('')).toBeNull()
   })
 
   test('the newest pick leads, once, and the row stays short', () => {

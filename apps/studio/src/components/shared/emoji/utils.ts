@@ -1,4 +1,9 @@
-import { RECENT_EMOJI_KEY_PREFIX, RECENT_EMOJI_LIMIT, SHORTCODE_MAX } from './constants'
+import {
+  RECENT_EMOJI_KEY_PREFIX,
+  RECENT_EMOJI_LIMIT,
+  SHORTCODE_MAX,
+  SHORTCODE_RULE,
+} from './constants'
 import type { CustomEmojiView, EmojiCategory, EmojiEntry } from './types'
 import { EMOJI_SOURCES } from './values'
 
@@ -82,6 +87,17 @@ export function toShortcode(text: string): string {
     .replace(/\s+/g, '-')
     .replace(/[^a-z0-9_+-]/g, '')
     .slice(0, SHORTCODE_MAX)
+}
+
+/** What a typed name will be saved as, said only when that is not what was typed. */
+export function shortcodeNote(typed: string): string | null {
+  const bare = typed.trim().replace(/^:+|:+$/g, '')
+  if (!bare) return null
+  const name = toShortcode(bare)
+  if (name === bare) return null
+  return name
+    ? `${SHORTCODE_RULE} — this becomes :${name}:`
+    : `${SHORTCODE_RULE} — none of what you typed is kept.`
 }
 
 export function readRecentEmoji(personId: string): string[] {
