@@ -7,6 +7,7 @@ import {
 } from '@washi/ui'
 import { pathFor } from '@/components/shell'
 import { openInPlace, type SidebarPageRowProps } from './lib'
+import { RowMenu } from './row-menu'
 
 export function SidebarPageRow({ sheet, workspaceId, onNavigate }: SidebarPageRowProps) {
   const running = useAgentStore((state) => state.running)
@@ -38,12 +39,13 @@ export function SidebarPageRow({ sheet, workspaceId, onNavigate }: SidebarPageRo
           />
         )}
       </a>
-      <span className="mr-1 hidden shrink-0 group-focus-within:block group-hover:block">
+      <span className="mr-1 hidden shrink-0 md:group-focus-within:block md:group-hover:block">
         <ConfirmDeleteButton
           label={`Delete ${sheet.title}`}
           onConfirm={() => void useSheetsStore.getState().deleteSheet(sheet.id)}
         />
       </span>
+      <RowMenu sheet={sheet} />
     </div>
   )
 }

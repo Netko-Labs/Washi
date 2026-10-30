@@ -51,3 +51,8 @@ export interface SidebarSectionProps {
 export interface SidebarPageRowProps extends SidebarSectionProps {
   sheet: SheetSummary
 }
+
+export interface RowMenuProps {
+  sheet: SheetSummary
+  onAddInside?: () => void
+}

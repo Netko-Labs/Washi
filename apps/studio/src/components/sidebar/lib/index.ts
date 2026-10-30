@@ -8,6 +8,7 @@ export type {
   PlaceId,
   RecentEntry,
   RecentSheet,
+  RowMenuProps,
   SidebarPageRowProps,
   SidebarProps,
   SidebarSectionProps,
