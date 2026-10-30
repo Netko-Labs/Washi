@@ -1,3 +1,4 @@
+import { useDialogFocus } from '@washi/ui'
 import { useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { useDismiss } from '@/components/shared/dismiss'
@@ -11,6 +12,7 @@ import type { BottomSheetProps } from './types'
 export function BottomSheet({ label, onClose, children }: BottomSheetProps) {
   const card = useRef<HTMLDivElement>(null)
   useDismiss(card, true, onClose)
+  useDialogFocus(card, true, { trap: true })
 
   return createPortal(
     <>

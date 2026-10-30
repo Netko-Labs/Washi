@@ -51,8 +51,9 @@ export function ThemePanel({ sheet, onDone }: PageMenuPanelProps) {
       {HOUSE.map((id) => row(id, THEMES[id]))}
       <p className={label}>Ported</p>
       {PORTED.map((id) => row(id, THEMES[id]))}
-      <div className="my-1 h-px bg-border" />
+      <hr className="my-1 border-border" />
       <Link
+        role="menuitem"
         to="/w/$workspaceId/settings"
         from="/w/$workspaceId"
         search={{ tab: 'themes' }}

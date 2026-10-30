@@ -20,18 +20,19 @@ const ROW =
 export function PageMenuList({ sheet, onMode, onDone, compact }: PageMenuListProps) {
   const store = useSheetsStore.getState
   const item = compact ? SHEET_ROW : ROW
+  const role = compact ? undefined : 'menuitem'
 
-  return (
-    <div className="p-1">
+  const items = (
+    <>
       {compact && <PageMenuQuick sheet={sheet} onMode={onMode} onDone={onDone} />}
-      <button type="button" onClick={() => onMode('rename')} className={item}>
+      <button type="button" role={role} onClick={() => onMode('rename')} className={item}>
         <IconCursorText className="size-4 text-muted-foreground" />
         Rename
       </button>
       {!compact && (
         <button
           type="button"
-          role="switch"
+          role="menuitemcheckbox"
           aria-checked={sheet.fullWidth}
           onClick={() => void store().updateMeta(sheet.id, { fullWidth: !sheet.fullWidth })}
           className={item}
@@ -51,12 +52,13 @@ export function PageMenuList({ sheet, onMode, onDone, compact }: PageMenuListPro
           </span>
         </button>
       )}
-      <button type="button" onClick={() => onMode('theme')} className={item}>
+      <button type="button" role={role} onClick={() => onMode('theme')} className={item}>
         <IconPalette className="size-4 text-muted-foreground" />
         Theme
       </button>
       <button
         type="button"
+        role={role}
         onClick={() => {
           void store().duplicateSheet(sheet.id)
           onDone()
@@ -66,12 +68,13 @@ export function PageMenuList({ sheet, onMode, onDone, compact }: PageMenuListPro
         <IconCopy className="size-4 text-muted-foreground" />
         Duplicate
       </button>
-      <button type="button" onClick={() => onMode('move')} className={item}>
+      <button type="button" role={role} onClick={() => onMode('move')} className={item}>
         <IconCornerDownRight className="size-4 text-muted-foreground" />
         Move to…
       </button>
       <button
         type="button"
+        role={role}
         onClick={() => {
           useEditorStore.getState().startEditing(sheet.id, false, 'source')
           onDone()
@@ -81,9 +84,10 @@ export function PageMenuList({ sheet, onMode, onDone, compact }: PageMenuListPro
         <IconCode className="size-4 text-muted-foreground" />
         Edit source
       </button>
-      <div className="my-1 h-px bg-border" />
+      <hr className="my-1 border-border" />
       <button
         type="button"
+        role={role}
         onClick={() => {
           void store().deleteSheet(sheet.id)
           onDone()
@@ -93,6 +97,14 @@ export function PageMenuList({ sheet, onMode, onDone, compact }: PageMenuListPro
         <IconTrash className="size-4" />
         Move to Trash
       </button>
+    </>
+  )
+
+  return compact ? (
+    <div className="p-1">{items}</div>
+  ) : (
+    <div role="menu" aria-label="Page options" className="p-1">
+      {items}
     </div>
   )
 }

@@ -1,9 +1,7 @@
 import { IconDots } from '@tabler/icons-react'
-import { useRef, useState } from 'react'
 import { SharePanel } from '@/components/share'
 import { BottomSheet } from '@/components/shared/bottom-sheet'
-import { useDismiss } from '@/components/shared/dismiss'
-import type { PageMenuMode, PageMenuProps } from './lib'
+import { type PageMenuProps, usePageMenu } from './lib'
 import { MoveToPanel } from './move-to-panel'
 import { PageMenuList } from './page-menu-list'
 import { RenameForm } from './rename-form'
@@ -11,10 +9,7 @@ import { ThemePanel } from './theme-panel'
 
 /** The ⋯ beside Copy link: what a person does to a page as a whole; a phone's rises as a sheet. */
 export function PageMenu({ sheet, compact }: PageMenuProps) {
-  const [mode, setMode] = useState<PageMenuMode | null>(null)
-  const root = useRef<HTMLDivElement>(null)
-  useDismiss(root, mode !== null, () => setMode(null))
-  const close = () => setMode(null)
+  const { mode, setMode, toggle, close, root, trigger, popover } = usePageMenu(compact)
   const panel = (
     <>
       {mode === 'menu' && (
@@ -26,15 +21,19 @@ export function PageMenu({ sheet, compact }: PageMenuProps) {
       {mode === 'theme' && <ThemePanel sheet={sheet} onDone={close} />}
     </>
   )
+  const box = `absolute top-full right-0 z-40 mt-1 max-w-[calc(100vw-24px)] rounded-xl border border-border bg-popover text-popover-foreground shadow-[0_16px_48px_rgb(0_0_0/0.18)] ${
+    mode === 'share' ? 'w-[340px] p-1.5' : 'w-[260px]'
+  }`
 
   return (
     <div ref={root} className="relative">
       <button
+        ref={trigger}
         type="button"
         aria-label="Page options"
-        aria-haspopup="dialog"
+        aria-haspopup="menu"
         aria-expanded={mode !== null}
-        onClick={() => setMode(mode ? null : 'menu')}
+        onClick={toggle}
         className={`grid size-8 place-items-center rounded-lg text-muted-foreground hover:bg-accent ${
           mode ? 'bg-accent' : ''
         }`}
@@ -46,14 +45,13 @@ export function PageMenu({ sheet, compact }: PageMenuProps) {
           {panel}
         </BottomSheet>
       )}
-      {mode && !compact && (
-        <div
-          role="dialog"
-          aria-label="Page options"
-          className={`absolute top-full right-0 z-40 mt-1 max-w-[calc(100vw-24px)] rounded-xl border border-border bg-popover text-popover-foreground shadow-[0_16px_48px_rgb(0_0_0/0.18)] ${
-            mode === 'share' ? 'w-[340px] p-1.5' : 'w-[260px]'
-          }`}
-        >
+      {mode === 'menu' && !compact && (
+        <div ref={popover} className={box}>
+          {panel}
+        </div>
+      )}
+      {mode && mode !== 'menu' && !compact && (
+        <div ref={popover} role="dialog" aria-label="Page options" className={box}>
           {panel}
         </div>
       )}
