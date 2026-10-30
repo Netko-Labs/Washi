@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { wrapIndex } from '../utils'
+import { menuStep, wrapIndex } from '../utils'
 
 describe('Tab stays inside a modal', () => {
   test('at an edge it goes around', () => {
@@ -21,5 +21,28 @@ describe('Tab stays inside a modal', () => {
 
   test('nothing to land on is the box’s to hold', () => {
     expect(wrapIndex(0, -1, false)).toBeNull()
+  })
+})
+
+describe('arrows walk a menu', () => {
+  test('down and up go around at the ends', () => {
+    expect(menuStep(3, 0, 'ArrowDown')).toBe(1)
+    expect(menuStep(3, 2, 'ArrowDown')).toBe(0)
+    expect(menuStep(3, 0, 'ArrowUp')).toBe(2)
+  })
+
+  test('Home and End land on the ends', () => {
+    expect(menuStep(3, 1, 'Home')).toBe(0)
+    expect(menuStep(3, 1, 'End')).toBe(2)
+  })
+
+  test('from outside the items, down is the first and up the last', () => {
+    expect(menuStep(3, -1, 'ArrowDown')).toBe(0)
+    expect(menuStep(3, -1, 'ArrowUp')).toBe(2)
+  })
+
+  test('other keys and an empty menu are left alone', () => {
+    expect(menuStep(3, 1, 'Enter')).toBeNull()
+    expect(menuStep(0, -1, 'ArrowDown')).toBeNull()
   })
 })

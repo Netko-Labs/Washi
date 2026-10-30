@@ -70,7 +70,7 @@ export function RowPeekMenu({ sheetId, workspaceId, onDeleted }: RowPeekMenuProp
                 <button
                   type="button"
                   onClick={() => void remove()}
-                  className="h-[30px] rounded-lg bg-destructive px-3 font-medium text-[12.5px] text-white"
+                  className="h-[30px] rounded-lg bg-destructive px-3 font-medium text-[12.5px] text-destructive-foreground"
                 >
                   Delete
                 </button>

@@ -55,7 +55,7 @@
   --popover: #fffdf8;
   --popover-foreground: #221f1a;
   --muted: #e9e4d9;
-  --muted-foreground: #6f685d;
+  --muted-foreground: #6a6359;
   --accent: #e6e0d4;
   --accent-foreground: #221f1a;
   --secondary: #e9e4d9;
@@ -64,7 +64,8 @@
   --input: #cbc3b4;
   --primary: #c25f2c;
   --primary-foreground: #fbf9f4;
-  --destructive: #b5543c;
+  --destructive: #9e4c37;
+  --destructive-foreground: #ffffff;
   --ring: var(--primary);
   --brand-indigo: #3d5a73;
   --brand-matcha: #94a06b;
@@ -91,7 +92,8 @@
   --input: #262626;
   --primary: #e8e6e1;
   --primary-foreground: #111111;
-  --destructive: #e7000b;
+  --destructive: #ee4a52;
+  --destructive-foreground: #111111;
 }
 
 @theme inline {
@@ -110,6 +112,7 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);

@@ -7,6 +7,8 @@ export interface TreeState {
   over: { id: string; drop: PageDrop } | null
   /** Why the last move did not stick, shown under the tree until the next drag. */
   notice: string | null
+  current: string | null
+  setCurrent: (id: string) => void
   toggle: (id: string) => void
   expand: (ids: string[]) => void
   startDrag: (id: string) => void
@@ -21,15 +23,29 @@ export interface SidebarTreeProps {
   onNavigate: () => void
 }
 
-export interface SidebarTreeNodeProps extends SidebarTreeProps {
+export interface TreeBranchProps extends SidebarTreeProps {
+  tabStop: string | null
+}
+
+export interface SidebarTreeNodeProps extends TreeBranchProps {
   sheet: SheetSummary
   depth: number
   groups: Map<string | null, SheetSummary[]>
 }
 
-export interface SidebarTreeRowProps extends SidebarTreeProps {
+export interface SidebarTreeRowProps extends TreeBranchProps {
   sheet: SheetSummary
   depth: number
   hasChildren: boolean
   isExpanded: boolean
 }
+
+/** A row as drawn, in order: what the arrow keys walk. */
+export interface TreeRow {
+  id: string
+  parentId: string | null
+  hasChildren: boolean
+  isExpanded: boolean
+}
+
+export type TreeMove = { kind: 'focus'; id: string } | { kind: 'toggle'; id: string }

@@ -3,4 +3,5 @@ export interface ConfirmDeleteButtonProps {
   label: string
   onConfirm: () => void
   className?: string
+  tabIndex?: number
 }

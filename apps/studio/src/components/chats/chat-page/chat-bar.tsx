@@ -92,7 +92,7 @@ export function ChatBar({ workspaceId, chatId }: ChatBarProps) {
                     <button
                       type="button"
                       onClick={bar.remove}
-                      className="h-11 flex-1 rounded-lg bg-destructive px-2 text-[13px] text-white md:h-8"
+                      className="h-11 flex-1 rounded-lg bg-destructive px-2 text-[13px] text-destructive-foreground md:h-8"
                     >
                       Delete
                     </button>

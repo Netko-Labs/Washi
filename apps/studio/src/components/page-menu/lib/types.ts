@@ -1,6 +1,17 @@
 import type { SheetSummary } from '@washi/domain'
+import type { RefObject } from 'react'
 
 export type PageMenuMode = 'menu' | 'rename' | 'move' | 'share' | 'theme'
+
+export interface PageMenuState {
+  mode: PageMenuMode | null
+  setMode: (mode: PageMenuMode) => void
+  toggle: () => void
+  close: () => void
+  root: RefObject<HTMLDivElement | null>
+  trigger: RefObject<HTMLButtonElement | null>
+  popover: RefObject<HTMLDivElement | null>
+}
 
 export interface PageMenuProps {
   sheet: SheetSummary

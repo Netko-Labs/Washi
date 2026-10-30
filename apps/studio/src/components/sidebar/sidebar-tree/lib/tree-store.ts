@@ -7,6 +7,10 @@ export const useTreeStore = create<TreeState>((set, get) => ({
   draggingId: null,
   over: null,
   notice: null,
+  current: null,
+  setCurrent: (id) => {
+    if (get().current !== id) set({ current: id })
+  },
   toggle: (id) =>
     set(({ expanded }) => ({
       expanded: expanded.includes(id) ? expanded.filter((each) => each !== id) : [...expanded, id],

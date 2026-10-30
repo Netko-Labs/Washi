@@ -2,7 +2,7 @@ import { Header } from '@washi/ui'
 import { Sidebar, SidebarToggle } from '@/components/sidebar'
 import { AgentLayer } from './agent-layer'
 import { HeaderActions } from './header-actions'
-import { useDock, useFold, useShellStore, type WorkspaceShellProps } from './lib'
+import { MAIN_ID, useDock, useFold, useShellStore, type WorkspaceShellProps } from './lib'
 
 /** From `md` up: the sidebar beside the page, folding to nothing; the left edge peeks it back. */
 export function WideShell({ workspace, children }: WorkspaceShellProps) {
@@ -26,7 +26,7 @@ export function WideShell({ workspace, children }: WorkspaceShellProps) {
           onPointerEnter={() => shell().setPeeking(true)}
         />
       )}
-      <main className="flex min-w-0 flex-1 flex-col">
+      <main id={MAIN_ID} tabIndex={-1} className="flex min-w-0 flex-1 flex-col outline-none">
         <Header
           leading={
             folded && (

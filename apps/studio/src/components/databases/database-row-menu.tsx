@@ -49,7 +49,7 @@ export function DatabaseRowMenu({ name, onOpen, onTrash }: DatabaseRowMenuProps)
                 <button
                   type="button"
                   onClick={() => void trash()}
-                  className="h-[30px] rounded-lg bg-destructive px-3 font-medium text-[12.5px] text-white"
+                  className="h-[30px] rounded-lg bg-destructive px-3 font-medium text-[12.5px] text-destructive-foreground"
                 >
                   Move to trash
                 </button>

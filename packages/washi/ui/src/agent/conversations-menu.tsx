@@ -109,7 +109,7 @@ export function ConversationsMenu({ onClose }: ConversationsMenuProps) {
                   setRow(RESTING)
                   void store().deleteSession(session.id)
                 }}
-                className="h-6 rounded-md bg-destructive px-2 text-[11.5px] text-white"
+                className="h-6 rounded-md bg-destructive px-2 text-[11.5px] text-destructive-foreground"
               >
                 Delete
               </button>
