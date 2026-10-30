@@ -6,6 +6,7 @@ export {
   exaSearch,
 } from './exa'
 export { guardedFetch, TsuruError } from './fetch'
+export { ANY_HOST, hostEntry, hostMatches } from './hosts'
 export {
   checkUrl,
   type FetchPolicy,

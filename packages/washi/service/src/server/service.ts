@@ -1,4 +1,6 @@
 import {
+  ANY_HOST,
+  type CodeLimits,
   type PagePackageSet,
   processSingleton,
   type ServerPolicy,
@@ -7,11 +9,11 @@ import {
 } from '@washi/domain'
 import { PAGE_LIBRARIES } from '@washi/paper/registry'
 import { setAppMeta, type Workspace } from '@washi/repository'
-import { isPrivateAddress } from '@washi/tsuru'
+import { hostEntry, isPrivateAddress } from '@washi/tsuru'
 import { APPROVAL_MODE_KEY, DAILY_CAP_USD_KEY, DAILY_TURN_CAP_KEY } from '../agents/lib'
 import {
   BUILT_IN_IMPORTS,
-  FETCH_HOST,
+  HOST_WORDS,
   PACKAGE_NAME,
   PACKAGE_NAME_MAX,
   PACKAGE_SPEC,
@@ -63,6 +65,21 @@ export function pagePackageSpec(raw: string): { name: string; spec: string } {
   return { name, spec }
 }
 
+/** What code may spend here (D118): the server's numbers, else today's constants. */
+export function codeLimits(ws: Workspace): CodeLimits {
+  return serverPolicy(ws).limits
+}
+
+/** The server's admin said yes to everything that leaves, in every workspace (D118). */
+export function serverApprovesAll(ws: Workspace): boolean {
+  return serverPolicy(ws).safeguards.approveAll
+}
+
+/** Whether tsuru may reach private, loopback and metadata addresses here (D118). */
+export function privateNetworkAllowed(ws: Workspace): boolean {
+  return serverPolicy(ws).safeguards.privateNetwork
+}
+
 /** Written into a new workspace's own file once; from then on its owners change them there. */
 export function applyWorkspaceDefaults(ws: Workspace, defaults: WorkspaceDefaults): void {
   if (defaults.approvalMode) setAppMeta(ws, APPROVAL_MODE_KEY, defaults.approvalMode)
@@ -72,22 +89,27 @@ export function applyWorkspaceDefaults(ws: Workspace, defaults: WorkspaceDefault
   if (defaults.turnCap !== undefined) setAppMeta(ws, DAILY_TURN_CAP_KEY, String(defaults.turnCap))
 }
 
-/** Pasted addresses become bare host names; an address or a private name is refused in words. */
-export function fetchHostList(raw: string[]): string[] {
+/**
+ * Pasted entries as a list keeps them: hosts, `*.domain` or `*`, sorted and once each; anything
+ * else is refused in words.
+ */
+export function hostList(raw: string[], refuse: (entry: string) => Error): string[] {
   const hosts: string[] = []
   for (const entry of raw) {
-    const host = entry
-      .trim()
-      .toLowerCase()
-      .replace(/^https?:\/\//, '')
-      .replace(/[/:?#].*$/, '')
-    if (!FETCH_HOST.test(host)) {
-      throw new FetchHostError(`“${entry}” is not a host — try api.example.com or *.example.com`)
-    }
-    if (isPrivateAddress(host.replace(/^\*\./, ''))) {
-      throw new FetchHostError(`“${entry}” is a private name — Washi never reaches those`)
-    }
+    const host = hostEntry(entry)
+    if (!host) throw refuse(`“${entry}” is not a host — ${HOST_WORDS}`)
     if (!hosts.includes(host)) hosts.push(host)
   }
   return hosts.sort()
+}
+
+/** A fetch list also refuses a private name: one reaches those only by asking (D118). */
+export function fetchHostList(raw: string[]): string[] {
+  const refuse = (message: string) => new FetchHostError(message)
+  const hosts = hostList(raw, refuse)
+  const named = hosts.find(
+    (host) => host !== ANY_HOST && isPrivateAddress(host.replace(/^\*\./, '')),
+  )
+  if (named) throw refuse(`“${named}” is a private name — Washi reaches those only by asking`)
+  return hosts
 }

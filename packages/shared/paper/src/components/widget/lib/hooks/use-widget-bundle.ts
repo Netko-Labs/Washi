@@ -29,7 +29,7 @@ export function useWidgetBundle(component: string, isOn: boolean): WidgetBundle 
         if (!alive) return
         setBundle(
           compiled.ok
-            ? { status: 'ready', document: widgetDocument(compiled.js) }
+            ? { status: 'ready', document: widgetDocument(compiled.js, compiled.network) }
             : { status: 'failed', reason: compiled.error },
         )
       })

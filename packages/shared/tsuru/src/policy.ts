@@ -1,8 +1,11 @@
 import { z } from 'zod'
+import { ANY_HOST, hostMatches } from './hosts'
 
 export const fetchPolicySchema = z.object({
-  /** Hostnames (exact or `*.suffix`) the workspace has approved. */
+  /** Hosts approved: exact, `*.domain` (it and every host under it) or `*` for every public one. */
   allowedHosts: z.array(z.string().min(1)).default([]),
+  /** The server's admin lifted the private-range guard (D118); never on by default. */
+  allowPrivate: z.boolean().default(false),
   maxResponseBytes: z.number().int().positive().default(1_048_576),
   timeoutMs: z.number().int().positive().max(60_000).default(15_000),
 })
@@ -33,15 +36,9 @@ export function isPrivateAddress(host: string): boolean {
   return false
 }
 
-function hostAllowed(host: string, allowed: string[]): boolean {
-  return allowed.some((entry) =>
-    entry.startsWith('*.') ? host.endsWith(entry.slice(1)) : host === entry,
-  )
-}
-
 /**
- * Gate a URL against the policy. https-only, never loopback/private ranges —
- * the mirin RPC WebSocket and MCP loopback servers live there (spec §5).
+ * Gate a URL against the policy. https-only, never loopback/private ranges unless the server's
+ * admin said so — the mirin RPC WebSocket and MCP loopback servers live there (spec §5).
  */
 export function checkUrl(rawUrl: string, policy: FetchPolicy): PolicyVerdict {
   let url: URL
@@ -53,10 +50,15 @@ export function checkUrl(rawUrl: string, policy: FetchPolicy): PolicyVerdict {
   if (url.protocol !== 'https:') return { ok: false, reason: 'https only' }
   if (url.username || url.password) return { ok: false, reason: 'credentials in URL' }
   if (url.port && url.port !== '443') return { ok: false, reason: 'non-standard port' }
-  if (isPrivateAddress(url.hostname)) {
+  const isPrivate = isPrivateAddress(url.hostname)
+  if (isPrivate && !policy.allowPrivate) {
     return { ok: false, reason: 'private and loopback addresses are blocked' }
   }
-  if (!hostAllowed(url.hostname, policy.allowedHosts)) {
+  // `*` means every public site; a private one still asks unless it is listed by name.
+  const listed = isPrivate
+    ? policy.allowedHosts.filter((entry) => entry !== ANY_HOST)
+    : policy.allowedHosts
+  if (!hostMatches(url.hostname, listed)) {
     return {
       ok: false,
       reason: `host "${url.hostname}" is not on the allowlist`,

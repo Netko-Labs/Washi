@@ -1,4 +1,11 @@
-import type { PagePackage, ServerPolicy, WorkspaceDefaults } from '@washi/domain'
+import type {
+  CodeLimits,
+  PagePackage,
+  Safeguard,
+  SafeguardChange,
+  ServerPolicy,
+  WorkspaceDefaults,
+} from '@washi/domain'
 import type { AgentCredentialInput } from '../../init'
 import type { SIGNUP_MODES } from './values'
 
@@ -26,6 +33,14 @@ export interface ServerKeyUse {
   model: string | null
 }
 
+/** The last time a safeguard (or the limits) changed, its admin by name. */
+export interface SafeguardChangeInfo {
+  which: SafeguardChange['which']
+  on: boolean
+  by: string | null
+  at: Date
+}
+
 /** The server's own settings, held by its app admins (its first account). Absent in embedded mode. */
 export interface InstanceStore {
   isAdmin(actorId: string): Promise<boolean>
@@ -33,12 +48,20 @@ export interface InstanceStore {
   setSignup(mode: SignupMode): Promise<void>
   /** Read from memory: every workspace check asks it, so it never waits on Postgres. */
   policy(): ServerPolicy
-  setFetchHosts(hosts: string[]): Promise<void>
-  setEmbedHosts(hosts: string[]): Promise<void>
+  /** A list that gains or loses `*` is logged like a safeguard (D118). */
+  setFetchHosts(actorId: string, hosts: string[]): Promise<void>
+  setEmbedHosts(actorId: string, hosts: string[]): Promise<void>
+  /** Hosts a widget's frame may reach; empty is no network at all. */
+  setWidgetHosts(actorId: string, hosts: string[]): Promise<void>
   setWidgets(enabled: boolean): Promise<void>
   setDefaults(defaults: WorkspaceDefaults): Promise<void>
   /** The admin's list as the installer keeps it (D116); only the runtime's installer writes it. */
   setPagePackages(packages: PagePackage[]): Promise<void>
+  /** Every flip is logged: which, to what, by whom, when (D118). */
+  setSafeguard(actorId: string, which: Safeguard, on: boolean): Promise<void>
+  setLimits(actorId: string, limits: CodeLimits): Promise<void>
+  /** The newest change per safeguard. */
+  safeguardLog(): Promise<SafeguardChangeInfo[]>
   keyInfo(): Promise<ServerKeyInfo | null>
   setKey(actorId: string, credential: AgentCredentialInput): Promise<{ last4: string }>
   setKeyModel(actorId: string, model: string | null): Promise<void>

@@ -56,8 +56,8 @@ export function useProgramSandbox(root: WsxElement) {
         const sandbox = await openSandbox(compiled.js, {
           prelude: programPrelude(NAMES),
           names: PROGRAM_BRIDGE,
-          deadlineMs: PROGRAM_DEADLINE_MS,
-          memoryBytes: PROGRAM_MEMORY_BYTES,
+          deadlineMs: compiled.sandbox?.deadlineMs ?? PROGRAM_DEADLINE_MS,
+          memoryBytes: compiled.sandbox?.memoryBytes ?? PROGRAM_MEMORY_BYTES,
         })
         if (!alive) return sandbox.dispose()
         box.sandbox = sandbox

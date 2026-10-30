@@ -22,10 +22,17 @@ export const SETTING_KEYS = {
   unsplashKey: 'unsplash_key',
   fetchHosts: 'fetch_hosts',
   embedHosts: 'embed_hosts',
+  widgetHosts: 'widget_hosts',
   widgets: 'widgets',
   defaults: 'workspace_defaults',
   pagePackages: 'page_packages',
+  safeguards: 'safeguards',
+  limits: 'code_limits',
+  safeguardLog: 'safeguard_history',
 } as const
+
+/** How many safeguard changes the server remembers, newest last. */
+export const SAFEGUARD_LOG_KEPT = 100
 
 /** A fresh server lets its first account in; after that, only invited emails. */
 export const DEFAULT_SIGNUP = 'invite'

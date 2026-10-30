@@ -1,4 +1,4 @@
-import type { SheetDetail } from '@washi/domain'
+import { ANY_HOST, type SheetDetail } from '@washi/domain'
 import type { HistoryQuery, InkQuery, QueryResult, TableSpec } from '@washi/ink'
 import {
   pageTables,
@@ -16,6 +16,7 @@ import {
   workspaceThemeBySlug,
 } from '@washi/repository'
 import { extractFiles, parse, parseExpr, serialize, type WsxElement } from '@washi/wsx'
+import { playableEmbedHosts } from '../embeds/service'
 import { runHistory } from '../tables/history'
 import { runQuery } from '../tables/service'
 import { readableSet } from './access'
@@ -70,6 +71,8 @@ export function sharedPage(ws: Workspace, token: string) {
     source: serialize(redactForShare({ ...root, props })),
     theme: wornTheme(ws, props.theme),
     unsplash: wornPhoto(ws, sheet.cover),
+    // Only whether `*` is listed: a link plays any https embed then, and the list never leaves (D118).
+    embedsAnySite: playableEmbedHosts(ws).includes(ANY_HOST),
   }
 }
 

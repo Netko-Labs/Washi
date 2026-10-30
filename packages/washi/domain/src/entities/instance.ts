@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { CODE_LIMITS, codeLimitsSchema, SAFEGUARDS_ON, safeguardsSchema } from './safeguards'
 
 /** What a new workspace starts with (D105); an unset field keeps Washi's own default. */
 export const workspaceDefaultsSchema = z.object({
@@ -8,7 +9,7 @@ export const workspaceDefaultsSchema = z.object({
 })
 export type WorkspaceDefaults = z.infer<typeof workspaceDefaultsSchema>
 
-/** A host list as an admin types it: addresses, bare names, or `*.suffix` for fetches. */
+/** A host list as an admin types it: addresses, bare names, `*.domain` or a bare `*` (D118). */
 export const hostListSchema = z.array(z.string().trim().min(1).max(260)).max(128)
 
 /** An npm package page code may import (D116): as the admin asked for it, and what it became. */
@@ -25,9 +26,12 @@ export type PagePackage = z.infer<typeof pagePackageSchema>
 export const serverPolicySchema = z.object({
   fetchHosts: z.array(z.string()).default([]),
   embedHosts: z.array(z.string()).default([]),
+  widgetHosts: z.array(z.string()).default([]),
   widgets: z.boolean().default(true),
   defaults: workspaceDefaultsSchema.default({}),
   pagePackages: z.array(pagePackageSchema).default([]),
+  safeguards: safeguardsSchema.default(SAFEGUARDS_ON),
+  limits: codeLimitsSchema.default(CODE_LIMITS),
 })
 export type ServerPolicy = z.infer<typeof serverPolicySchema>
 

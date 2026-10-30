@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { SettingsCard } from '../shared/card'
 import { useIsSteward } from '../shared/stewardship'
 import { useEmbedHosts } from './lib'
+import { WidgetHostsCard } from './widget-hosts-card'
 
 /** What a page may put in a frame: the built-ins always, these sites once an owner lists them. */
 export function EmbedsSection() {
@@ -99,7 +100,7 @@ export function EmbedsSection() {
       </SettingsCard>
       <SettingsCard
         title="Widgets"
-        desc="A widget is a page’s own HTML and JavaScript, run in a frame with no network and no reach but the page’s. Off, a widget shows as a note."
+        desc="A widget is a page’s own code, run in a frame with no reach but the page’s and the sites listed under Widget network. Off, a widget shows as a note."
         tag={
           !server.widgets
             ? { tone: 'off', label: 'Off · by the server' }
@@ -127,6 +128,7 @@ export function EmbedsSection() {
           )}
         </div>
       </SettingsCard>
+      <WidgetHostsCard />
     </div>
   )
 }

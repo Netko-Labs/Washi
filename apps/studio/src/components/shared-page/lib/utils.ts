@@ -19,7 +19,7 @@ export async function fetchShared(workspaceId: string, token: string) {
 }
 
 /** A host that can only read what the link allows; every write and every other page refuses. */
-export function shareHost(workspaceId: string, token: string): PaperHost {
+export function shareHost(workspaceId: string, token: string, embedsAnySite = false): PaperHost {
   const refuse = async () => {
     throw new Error('This is a read-only copy of the page.')
   }
@@ -34,6 +34,7 @@ export function shareHost(workspaceId: string, token: string): PaperHost {
     toggleTask: refuse,
     resolveSheet: async () => null,
     openSheet: () => undefined,
+    embedAllowed: async () => embedsAnySite,
     locale: typeof navigator === 'undefined' ? 'en-US' : navigator.language,
   }
 }

@@ -1,4 +1,5 @@
 import type { PaperHost } from '@washi/paper'
+import { hostMatches } from '@washi/tsuru/hosts'
 import { parse } from '@washi/wsx'
 import { api } from '../api'
 import { childrenOf } from '../page-tree'
@@ -111,7 +112,7 @@ export const paperHost: PaperHost = {
 
   widgetsAllowed: () => widgetsOn(),
 
-  embedAllowed: async (host) => (await listedEmbedHosts()).includes(host),
+  embedAllowed: async (host) => hostMatches(host, await listedEmbedHosts()),
 
   newPage: (parentId) => useSheetsStore.getState().createSheet(parentId),
 

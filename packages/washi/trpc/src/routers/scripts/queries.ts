@@ -1,10 +1,12 @@
 import { getSheet } from '@washi/repository'
 import {
+  codeLimits,
   compilePage,
   compileScript,
   compileWidget,
   PAGE_CODE_MAX_CHARS,
   pagePackagesOf,
+  reachableWidgetHosts,
   readableSet,
   SCRIPT_MAX_CHARS,
 } from '@washi/service'
@@ -33,9 +35,10 @@ export const scriptQueries = router({
         input.source,
         (id) => (readable.has(id) ? (getSheet(ctx.ws, id)?.source ?? null) : null),
         pagePackagesOf(ctx.ws),
+        codeLimits(ctx.ws),
       )
     }),
-  /** One of a page's components bundled with React for a widget's frame (D113), imports as `page`. */
+  /** One of a page's components bundled for a widget's frame (D113), with the hosts it may reach. */
   widget: workspaceProcedure
     .input(
       z.object({
@@ -50,6 +53,7 @@ export const scriptQueries = router({
         input.component,
         (id) => (readable.has(id) ? (getSheet(ctx.ws, id)?.source ?? null) : null),
         pagePackagesOf(ctx.ws),
+        { maxKb: codeLimits(ctx.ws).widgetBundleKb, network: reachableWidgetHosts(ctx.ws) },
       )
     }),
 })

@@ -1,9 +1,16 @@
+import type { CodeLimits, Safeguard } from '@washi/domain'
 import { useCallback, useEffect, useState } from 'react'
 import { api } from '@/integrations/trpc'
 import type { ModelOption } from '@/lib/types'
 import type { ProviderId, SignupMode } from '../../../lib'
 import type { LentKeyTarget, ServerSettingsState, WorkspaceDefaultsState } from '../types'
 import { INSTALL_POLL_MS } from '../values'
+
+const LISTS = {
+  fetch: { field: 'fetchHosts', save: api.instance.setFetchHosts },
+  embed: { field: 'embedHosts', save: api.instance.setEmbedHosts },
+  widget: { field: 'widgetHosts', save: api.instance.setWidgetHosts },
+} as const
 
 const messageOf = (cause: unknown, fallback: string) =>
   cause instanceof Error ? cause.message : fallback
@@ -104,16 +111,27 @@ export function useServerSettings() {
           patch({ unsplashKey: null })
         }
       }),
-    setHosts: async (kind: 'fetch' | 'embed', hosts: string[]): Promise<string | null> => {
+    setHosts: async (kind: keyof typeof LISTS, hosts: string[]): Promise<string | null> => {
       try {
-        if (kind === 'fetch')
-          patch({ fetchHosts: await api.instance.setFetchHosts.mutate({ hosts }) })
-        else patch({ embedHosts: await api.instance.setEmbedHosts.mutate({ hosts }) })
+        const list = LISTS[kind]
+        patch({ [list.field]: await list.save.mutate({ hosts }) })
+        // A list gaining or losing * is on the trail.
+        await refresh()
         return null
       } catch (cause) {
         return messageOf(cause, 'The list did not save.')
       }
     },
+    setSafeguard: (which: Safeguard, on: boolean) =>
+      attempt(async () => {
+        await api.instance.setSafeguard.mutate({ which, on })
+        await refresh()
+      }),
+    setLimits: (limits: CodeLimits) =>
+      attempt(async () => {
+        await api.instance.setLimits.mutate(limits)
+        await refresh()
+      }),
     setWidgets: (enabled: boolean) =>
       attempt(async () => {
         patch({ widgets: await api.instance.setWidgets.mutate({ enabled }) })

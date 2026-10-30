@@ -52,6 +52,7 @@ export function AgentTab({ part }: AgentTabProps) {
       {part === 'outside' && (
         <OutsideCard
           approvalMode={settings.approvalMode}
+          serverApproves={settings.serverApproves}
           searchKey={searchKey}
           unsplashKey={settings.unsplashKey}
           lent={{ exa: settings.serverSearchKey, unsplash: settings.serverUnsplashKey }}

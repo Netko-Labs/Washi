@@ -4,7 +4,7 @@ import { getAppMeta, type Workspace } from '@washi/repository'
 import { fetchPolicySchema, guardedFetch } from '@washi/tsuru'
 import { z } from 'zod'
 import { pageCapabilities, tableCapabilities } from '../capabilities'
-import { serverPolicy } from '../server'
+import { privateNetworkAllowed, serverPolicy } from '../server'
 import { NOBODY } from '../sheets/access'
 import { HANDOVER_DESCRIPTION, type SearchKeyLookup } from './lib'
 import type { HandoverResult } from './ports/types'
@@ -18,10 +18,16 @@ export function ownFetchHosts(ws: Workspace): string[] {
   return stored ? (JSON.parse(stored) as string[]) : []
 }
 
-/** The workspace's hosts and the server's (D105); what tsuru refuses outright stays refused. */
+/**
+ * The workspace's hosts and the server's (D105), `*` among them meaning every public site; what
+ * tsuru refuses outright stays refused, private ranges too unless the server lifted that (D118).
+ */
 export function currentFetchPolicy(ws: Workspace) {
   const hosts = new Set([...ownFetchHosts(ws), ...serverPolicy(ws).fetchHosts])
-  return fetchPolicySchema.parse({ allowedHosts: [...hosts] })
+  return fetchPolicySchema.parse({
+    allowedHosts: [...hosts],
+    allowPrivate: privateNetworkAllowed(ws),
+  })
 }
 
 function text(value: unknown) {

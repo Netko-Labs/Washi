@@ -2,8 +2,8 @@ import { PAGE_LIBRARIES } from '@washi/paper/registry'
 
 /** A page's whole source when it runs code — a page, not a program. */
 export const PAGE_CODE_MAX_CHARS = 60_000
-/** What a page may ship to the reader's sandbox, its libraries bundled in. */
-export const PAGE_JS_MAX_BYTES = 768 * 1024
+export const KB = 1024
+export const MB = 1024 * KB
 export const PAGE_CACHE_SIZE = 64
 /** How deep `page:` imports may chain before a loop is assumed. */
 export const PAGE_IMPORT_DEPTH = 8

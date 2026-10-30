@@ -27,6 +27,7 @@ export function useAgentSettings() {
   const [serverSearchKey, setServerSearchKey] = useState(false)
   const [unsplash, setUnsplash] = useState<LentKeyState>({ key: null, lent: false })
   const [approvalMode, setApprovalModeState] = useState<ApprovalMode>('ask')
+  const [serverApproves, setServerApproves] = useState(false)
   const [spend, setSpend] = useState<SpendState | null>(null)
   const [settings, setSettings] = useState<AgentSettingsState | null>(null)
   const [models, setModels] = useState<ModelOption[]>([])
@@ -55,6 +56,7 @@ export function useAgentSettings() {
       setServerSearchKey(lentExa)
       setUnsplash({ key: own as SearchKeyState | null, lent: lentOwn })
       setApprovalModeState(approvals.mode)
+      setServerApproves(approvals.server)
       setSpend(today as SpendState)
       setSettings(standing as AgentSettingsState)
       setModels(catalogue.models as ModelOption[])
@@ -188,6 +190,7 @@ export function useAgentSettings() {
     unsplashKey: unsplash.key,
     serverUnsplashKey: unsplash.lent,
     approvalMode,
+    serverApproves,
     spend,
     settings,
     models,

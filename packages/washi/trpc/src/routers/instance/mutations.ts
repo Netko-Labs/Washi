@@ -1,8 +1,10 @@
 import {
   agentCredentialSchema,
   agentModelSchema,
+  codeLimitsSchema,
   hostListSchema,
   integrationKeySchema,
+  safeguardSchema,
   workspaceDefaultsSchema,
 } from '@washi/domain'
 import { embedHostList, fetchHostList, PagePackageError, pagePackageSpec } from '@washi/service'
@@ -46,21 +48,40 @@ export const instanceMutations = router({
     await ctx.instance.removeUnsplashKey()
     return { removed: true }
   }),
-  /** Hosts every workspace may fetch without asking; tsuru's refusals still refuse. */
+  /** Hosts every workspace may fetch without asking, `*` for every public one; tsuru's refusals still refuse. */
   setFetchHosts: adminProcedure
     .input(z.object({ hosts: hostListSchema }))
     .mutation(async ({ ctx, input }) => {
       const hosts = fetchHostList(input.hosts)
-      await ctx.instance.setFetchHosts(hosts)
+      await ctx.instance.setFetchHosts(ctx.adminId, hosts)
       return hosts
     }),
   setEmbedHosts: adminProcedure
     .input(z.object({ hosts: hostListSchema }))
     .mutation(async ({ ctx, input }) => {
       const hosts = embedHostList(input.hosts)
-      await ctx.instance.setEmbedHosts(hosts)
+      await ctx.instance.setEmbedHosts(ctx.adminId, hosts)
       return hosts
     }),
+  /** Hosts every widget's frame may reach (D118); empty keeps them off the network. */
+  setWidgetHosts: adminProcedure
+    .input(z.object({ hosts: hostListSchema }))
+    .mutation(async ({ ctx, input }) => {
+      const hosts = embedHostList(input.hosts)
+      await ctx.instance.setWidgetHosts(ctx.adminId, hosts)
+      return hosts
+    }),
+  /** Lifts or restores one safeguard for every workspace; each flip is logged (D118). */
+  setSafeguard: adminProcedure
+    .input(z.object({ which: safeguardSchema, on: z.boolean() }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.instance.setSafeguard(ctx.adminId, input.which, input.on)
+      return ctx.instance.policy().safeguards
+    }),
+  setLimits: adminProcedure.input(codeLimitsSchema).mutation(async ({ ctx, input }) => {
+    await ctx.instance.setLimits(ctx.adminId, input)
+    return ctx.instance.policy().limits
+  }),
   /** Off is off for every workspace; on, each workspace still decides for itself. */
   setWidgets: adminProcedure
     .input(z.object({ enabled: z.boolean() }))

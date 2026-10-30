@@ -1,4 +1,4 @@
-import type { ApprovalDecision, ApprovalRequest } from '@washi/domain'
+import { ANY_HOST, type ApprovalDecision, type ApprovalRequest } from '@washi/domain'
 import {
   clearSessionApprovals,
   createApproval,
@@ -10,6 +10,7 @@ import {
   type Workspace,
 } from '@washi/repository'
 import { checkUrl, EXA_SEARCH_URL, type PolicyVerdict } from '@washi/tsuru'
+import { serverApprovesAll } from '../server'
 import type { CapabilityDesk } from './desk'
 import {
   APPROVAL_MODE_KEY,
@@ -20,6 +21,7 @@ import {
   type EventsRef,
   READ_TOOLS,
   ROUTINE_APPROVAL_TIMEOUT_MS,
+  SERVER_APPROVED,
   YOLO_ALLOWED_KEY,
 } from './lib'
 import { shortToolName } from './normalize'
@@ -142,6 +144,16 @@ export class ApprovalDesk implements ToolGate {
     const verdict = this.policyVerdict(toolName, input)
     if (verdict?.ok) return true
     if (verdict && !verdict.needsApproval) return false
+    if (serverApprovesAll(this.ws)) {
+      recordCapability(this.ws, {
+        origin: 'agent',
+        subject: toolName,
+        input,
+        decision: 'auto',
+        detail: SERVER_APPROVED,
+      })
+      return true
+    }
     const standing = this.standingYes(sessionId)
     if (standing) {
       recordCapability(this.ws, {
@@ -189,10 +201,16 @@ export class ApprovalDesk implements ToolGate {
     return { actorId: own === 'auto' ? (session?.createdBy ?? null) : null }
   }
 
-  /** What leaves the server, judged by the fetch policy: a listed host passes, an unknown one asks. */
+  /**
+   * What leaves the server, judged by the fetch policy: a host listed by name passes, any other asks.
+   * `*` lets tsuru reach every public site, never past the desk (D118).
+   */
   private policyVerdict(toolName: string, input: unknown): PolicyVerdict | null {
     const url = outboundUrl(toolName, input)
-    return url ? checkUrl(url, currentFetchPolicy(this.ws)) : null
+    if (!url) return null
+    const policy = currentFetchPolicy(this.ws)
+    const named = policy.allowedHosts.filter((host) => host !== ANY_HOST)
+    return checkUrl(url, { ...policy, allowedHosts: named })
   }
 
   private remember(sessionId: string, toolName: string, input: unknown) {

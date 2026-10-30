@@ -221,6 +221,10 @@ export const SIGNUP_OPTIONS: readonly Option<SignupMode>[] = [
 export const ON_SERVER_UNSPLASH_KEY =
   'On the server’s key: Unsplash photos come through this server’s Access Key until the workspace connects its own, which then wins.'
 
+/** Said instead of the approvals choice while the server's admin approves for everyone (D118). */
+export const SERVER_APPROVES =
+  'The server approves everything: fetches, searches and actions never stop at the desk, whatever this workspace or a chat says. Its admin can change that.'
+
 export const ON_SERVER_SEARCH_KEY =
   'On the server’s key: web search runs on this server’s Exa key until the workspace connects its own, which then wins.'
 

@@ -1,6 +1,8 @@
+export { CodeLimitsCard } from './code-limits-card'
 export { HostListCard } from './host-list-card'
 export { useServerSettings } from './lib'
 export { PagePackagesCard } from './page-packages-card'
+export { SafeguardsCard } from './safeguards-card'
 export { ServerKeyCard } from './server-key-card'
 export { ServerLentKeyCard } from './server-lent-key-card'
 export { ServerWidgetsCard } from './server-widgets-card'

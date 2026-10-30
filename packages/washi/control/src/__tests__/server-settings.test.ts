@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'bun:test'
+import { CODE_LIMITS, SAFEGUARDS_ON } from '@washi/domain'
 import { SETTING_KEYS } from '../lib/constants'
 import { createServerSettings } from '../lib/server-settings'
 import type { SettingRows } from '../lib/types'
@@ -92,9 +93,12 @@ describe('the server policy (D105)', () => {
     expect(settings.policy()).toEqual({
       fetchHosts: ['api.example.com'],
       embedHosts: [],
+      widgetHosts: [],
       widgets: true,
       defaults: {},
       pagePackages: [],
+      safeguards: SAFEGUARDS_ON,
+      limits: CODE_LIMITS,
     })
     await settings.setWidgets(false)
     await settings.setDefaults({ turnCap: 40 })
@@ -143,5 +147,79 @@ describe('the server policy (D105)', () => {
     const fallen = settingsOver(garbled.store)
     await fallen.load()
     expect(fallen.policy()).toMatchObject({ pagePackages: [], widgets: true })
+  })
+})
+
+describe('the safeguards (D118)', () => {
+  test('a fresh server holds every one, at today’s limits', async () => {
+    const settings = settingsOver(memoryRows().store)
+    await settings.load()
+    expect(settings.policy()).toMatchObject({ safeguards: SAFEGUARDS_ON, limits: CODE_LIMITS })
+  })
+
+  test('each switch reads alone; anything but a literal true keeps the guard', async () => {
+    const { store } = memoryRows({
+      [SETTING_KEYS.safeguards]: '{"privateNetwork":"yes","approveAll":true,"other":true}',
+    })
+    const settings = settingsOver(store)
+    await settings.load()
+    expect(settings.policy().safeguards).toEqual({ privateNetwork: false, approveAll: true })
+  })
+
+  test('a row that is not json keeps every guard', async () => {
+    const { store } = memoryRows({
+      [SETTING_KEYS.safeguards]: 'garbled',
+      [SETTING_KEYS.limits]: 'garbled',
+    })
+    const settings = settingsOver(store)
+    await settings.load()
+    expect(settings.policy()).toMatchObject({ safeguards: SAFEGUARDS_ON, limits: CODE_LIMITS })
+  })
+
+  test('a limit out of range falls back to today’s alone', async () => {
+    const { store } = memoryRows({
+      [SETTING_KEYS.limits]: '{"pageDrawMs":99999,"formulaMs":50,"imageMb":"big"}',
+    })
+    const settings = settingsOver(store)
+    await settings.load()
+    expect(settings.policy().limits).toEqual({ ...CODE_LIMITS, formulaMs: 50 })
+  })
+
+  test('every flip is logged; the newest per switch reads back by name', async () => {
+    const { rows, store } = memoryRows()
+    const settings = settingsOver(store)
+    await settings.load()
+    await settings.setSafeguard('u1', 'privateNetwork', true)
+    await settings.setSafeguard('u1', 'privateNetwork', false)
+    await settings.setSafeguard('u1', 'approveAll', true)
+    await settings.setLimits('u1', { ...CODE_LIMITS, pageDrawMs: 300 })
+    expect(settings.policy().safeguards).toEqual({ privateNetwork: false, approveAll: true })
+    expect(settings.policy().limits.pageDrawMs).toBe(300)
+
+    const log = JSON.parse(rows.get(SETTING_KEYS.safeguardLog) ?? '[]')
+    expect(log).toHaveLength(4)
+    expect(log[0]).toMatchObject({ which: 'privateNetwork', on: true, by: 'u1' })
+    const latest = await settings.safeguardLog()
+    expect(latest).toMatchObject([
+      { which: 'privateNetwork', on: false, by: 'First' },
+      { which: 'approveAll', on: true, by: 'First' },
+      { which: 'limits', on: true, by: 'First' },
+    ])
+  })
+
+  test('a host list gaining or losing * is logged; other edits are not', async () => {
+    const { rows, store } = memoryRows()
+    const settings = settingsOver(store)
+    await settings.load()
+    await settings.setEmbedHosts('u1', ['tally.so'])
+    expect(rows.get(SETTING_KEYS.safeguardLog)).toBeUndefined()
+    await settings.setWidgetHosts('u1', ['*'])
+    await settings.setFetchHosts('u1', ['*', 'api.example.com'])
+    await settings.setFetchHosts('u1', ['api.example.com'])
+    expect(settings.policy()).toMatchObject({ widgetHosts: ['*'], fetchHosts: ['api.example.com'] })
+    expect(await settings.safeguardLog()).toMatchObject([
+      { which: 'widgetHosts', on: true },
+      { which: 'fetchHosts', on: false },
+    ])
   })
 })

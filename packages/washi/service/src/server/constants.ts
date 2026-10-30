@@ -1,5 +1,5 @@
-/** A host name, or `*.suffix` for every host under it — never an address. */
-export const FETCH_HOST = /^(\*\.)?(?=.{1,253}$)([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/
+/** How a host list entry may be written, said once for every list (D118). */
+export const HOST_WORDS = 'try api.example.com, *.example.com, or * for every site'
 
 /** npm's rules for a new package name: lowercase, URL-safe, an optional scope (D116). */
 export const PACKAGE_NAME = /^(@[a-z0-9~-][a-z0-9._~-]*\/)?[a-z0-9~-][a-z0-9._~-]*$/

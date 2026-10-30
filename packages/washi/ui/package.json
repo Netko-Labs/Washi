@@ -23,6 +23,7 @@
     "@washi/domain": "workspace:*",
     "@washi/paper": "workspace:*",
     "@washi/trpc": "workspace:*",
+    "@washi/tsuru": "workspace:*",
     "@washi/wsx": "workspace:*",
     "cmdk": "^1.1.1",
     "react-markdown": "^10",

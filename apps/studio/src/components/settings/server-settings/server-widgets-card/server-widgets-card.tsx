@@ -6,7 +6,7 @@ export function ServerWidgetsCard({ widgets, onChange }: ServerWidgetsCardProps)
   return (
     <SettingsCard
       title="Widgets"
-      desc="A widget runs a page’s own HTML in a frame with no network. Off here, no workspace can turn them on."
+      desc="A widget runs a page’s own code in a frame that reaches only the sites listed under Widget network. Off here, no workspace can turn them on."
       tag={
         widgets ? { tone: 'ok', label: 'Each workspace decides' } : { tone: 'off', label: 'Off' }
       }
