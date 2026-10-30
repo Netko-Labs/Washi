@@ -11,6 +11,7 @@ import {
   updateSheetAccess,
   updateSheetFromSource,
   updateSheetMetaAndLook,
+  updateSheetSuggest,
 } from '@washi/service'
 import { z } from 'zod'
 import { pageProcedure, router, workspaceProcedure } from '../../init'
@@ -73,6 +74,10 @@ export const sheetMutations = router({
       }),
     )
     .mutation(({ ctx, input }) => updateSheetAccess(ctx.ws, input.id, input, ctx.viewer.id)),
+  /** Whether the page's link takes suggested rows (D120): a person's switch, never Washi's. */
+  setSuggest: pageProcedure
+    .input(z.object({ id: z.string(), suggest: z.boolean() }))
+    .mutation(({ ctx, input }) => updateSheetSuggest(ctx.ws, input.id, input.suggest)),
   /** Empties what this person can see; private pages of others stay in the Trash. */
   emptyTrash: workspaceProcedure.mutation(async ({ ctx }) => {
     if (!ctx.viewer.isOwner) {

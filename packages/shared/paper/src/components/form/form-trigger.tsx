@@ -1,13 +1,17 @@
 import { useState } from 'react'
-import { styled } from '../../lib'
+import { addModeOf, styled } from '../../lib'
+import { usePaperHost } from '../../provider'
 import { tableLabel } from '../database'
 import { FormDialog } from './form-dialog'
-import { type FormProps, useLandedNote } from './lib'
+import { type FormProps, SENT_NOTE, useLandedNote } from './lib'
 
 /** `<Form trigger>`: one button on the page, the form in a modal; it says so once a row lands. */
 export function FormTrigger({ trigger, title, table, ...rest }: FormProps) {
+  const host = usePaperHost()
   const [open, setOpen] = useState(false)
   const landed = useLandedNote()
+  const mode = addModeOf(host)
+  if (!mode) return null
   const label = trigger ?? `Add to ${tableLabel(table)}`
   const { variant, tone, size, emphasis, span, class: className, ...form } = rest
   return (
@@ -37,7 +41,7 @@ export function FormTrigger({ trigger, title, table, ...rest }: FormProps) {
       <FormDialog
         open={open}
         onClose={() => setOpen(false)}
-        onAdded={() => landed.show('Added')}
+        onAdded={() => landed.show(mode === 'suggest' ? SENT_NOTE : 'Added')}
         title={title ?? label}
         table={table}
         {...form}

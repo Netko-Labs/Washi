@@ -170,6 +170,8 @@ export const paperHost: PaperHost = {
     await api.tables.changeColumn.mutate({ change })
   },
 
+  requested: (table, date, from, to) => api.suggestions.requested.query({ table, date, from, to }),
+
   columnPages: async (table, column) => {
     const pages = await api.tables.columnPages.query({ table, column })
     return pages.map((page) => page.title || 'Untitled')

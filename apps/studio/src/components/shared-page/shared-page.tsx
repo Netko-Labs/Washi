@@ -6,13 +6,17 @@ import { shareLook } from './share-look'
 
 /**
  * A page through its read-only link (D65): no session, no sidebar, no Washi. What arrives was
- * redacted on the server; this only draws it.
+ * redacted on the server; this only draws it. Its adds are suggestions, if it takes them (D120).
  */
 export function SharedPage({ workspaceId, token }: SharedPageProps) {
   const state = useSharedPage(workspaceId, token)
   const page = state.status === 'ready' ? state.page : null
-  const anySite = page?.embedsAnySite ?? false
-  const host = useMemo(() => shareHost(workspaceId, token, anySite), [workspaceId, token, anySite])
+  const embedsAnySite = page?.embedsAnySite ?? false
+  const suggest = page?.suggest ?? false
+  const host = useMemo(
+    () => shareHost(workspaceId, token, { embedsAnySite, suggest }),
+    [workspaceId, token, embedsAnySite, suggest],
+  )
   const look = useMemo(
     () => shareLook(workspaceId, token, page?.theme ?? null, page?.unsplash ?? null),
     [workspaceId, token, page],
@@ -40,7 +44,7 @@ export function SharedPage({ workspaceId, token }: SharedPageProps) {
           <AgentMascot state="idle" size={20} />
           Shared from Washi
         </span>
-        <span>Read-only</span>
+        <span>{state.page.suggest ? 'Takes suggestions' : 'Read-only'}</span>
       </header>
       <SheetLookProvider value={look}>
         <PaperProvider host={host}>

@@ -1,3 +1,4 @@
+export { addModeOf } from './add-mode'
 export { resolveQuery } from './bind'
 export { DAY, dayLabel, whenLabel } from './days'
 export { base64Of, fileAsOf, readFileAs, readTerminalFiles } from './files'
@@ -27,6 +28,7 @@ export { reachOf, styled } from './styled'
 export { toneOf } from './tone-of'
 export type {
   ActionRef,
+  AddMode,
   BindState,
   BlockProps,
   CellKind,
@@ -48,6 +50,7 @@ export type {
   StyledProps,
   Tone,
   Variant,
+  Visitor,
   Width,
 } from './types'
 export { VALUE_TONES } from './values'

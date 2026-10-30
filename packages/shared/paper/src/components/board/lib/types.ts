@@ -1,5 +1,5 @@
 import type { DragEvent, RefObject } from 'react'
-import type { ActionRef, BlockProps, Row } from '../../../lib/types'
+import type { ActionRef, AddMode, BlockProps, Row } from '../../../lib/types'
 import type { BindQuery } from '../../../registry'
 
 export interface BoardProps extends BlockProps {
@@ -58,9 +58,30 @@ export interface CardActions {
   /** A select or status column's options in their own order; none until the spec is read. */
   optionsOf: (column: string) => string[]
   add: (action: ActionRef, group: string) => void
-  /** Notion's + New in a column: the row is made already in it and opened where the reader is. */
+  /**
+   * Notion's + New in a column: the row is made already in it and opened where the reader is;
+   * through a link that takes suggestions, its title is asked and sent to be approved (D120).
+   */
   creatable: boolean
-  create: (table: string, data: Record<string, string>) => void
+  create: (draft: BoardDraft) => void
+  /** How an add lands here: a read-only link draws none, one that suggests asks first (D120). */
+  mode: AddMode
+  suggest: BoardSuggest
+}
+
+/** A suggested card: its column, and the title field asked for. */
+export interface BoardDraft {
+  group: string
+  groupBy: string
+  title: string
+}
+
+export interface BoardSuggest {
+  draft: BoardDraft | null
+  open: (draft: BoardDraft) => void
+  close: () => void
+  note: string | null
+  landed: () => void
 }
 
 export interface BoardCardProps {

@@ -7,7 +7,15 @@ export interface ShareSettings {
   visibility: Audience
   access: string[]
   token: string | null
+  /** The link takes suggested rows (D120). */
+  suggest: boolean
   hidden: { blocks: number; columns: Record<string, string[]> }
+}
+
+export interface ShareSuggestProps {
+  value: boolean
+  busy: boolean
+  onChange: (suggest: boolean) => void
 }
 
 export interface ShareButtonProps {

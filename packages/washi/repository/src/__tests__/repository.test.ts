@@ -25,7 +25,7 @@ beforeEach(() => {
 })
 afterEach(() => ws.close())
 
-const write = (source: string, title = 'Test sheet') => ({ title, source })
+const write = (source: string, title = 'Test sheet') => ({ title, source, suggest: false })
 const index = (body: string, refs: string[] = []) => ({ body, refs })
 
 describe('loro store', () => {

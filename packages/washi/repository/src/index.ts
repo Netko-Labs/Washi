@@ -146,6 +146,16 @@ export {
   today,
 } from './storage/spend'
 export {
+  countPendingOnSheet,
+  countSuggestionsSince,
+  decideSuggestion,
+  getSuggestion,
+  insertSuggestion,
+  listPendingSuggestions,
+  markSuggestionsRead,
+  pendingSuggestionsFor,
+} from './storage/suggestions'
+export {
   isTableNameTrashed,
   listTrashedTables,
   purgeTable,
@@ -162,7 +172,12 @@ export {
   restoreRecords,
   updateRecords,
 } from './storage/tables'
-export type { AutomationEntry, SheetIndexInput } from './storage/types'
+export type {
+  AutomationEntry,
+  SheetIndexInput,
+  SuggestionRecord,
+  SuggestionWrite,
+} from './storage/types'
 export {
   getUnsplashPhoto,
   keepUnsplashPhoto,

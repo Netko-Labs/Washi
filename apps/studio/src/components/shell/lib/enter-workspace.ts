@@ -11,6 +11,7 @@ import {
 import { useCommentsStore } from '@/components/comments'
 import { useMentionsStore } from '@/components/mentions'
 import { useRemindersStore } from '@/components/reminders'
+import { useSuggestionsStore } from '@/components/suggestions'
 import { setActiveWorkspace } from '@/integrations/trpc'
 import type { WorkspaceSummary } from '@/lib/types'
 
@@ -28,6 +29,7 @@ export function enterWorkspace(workspace: WorkspaceSummary): void {
   useCommentsStore.getState().reset()
   useMentionsStore.getState().reset()
   useRemindersStore.getState().reset()
+  useSuggestionsStore.getState().reset()
   const view = useViewStore.getState()
   view.closeAll()
   view.setWorkspaceName(workspace.name)

@@ -4,6 +4,7 @@ import {
   groupLabel,
   headCount,
   naturalBefore,
+  newCard,
   rankBetween,
   rankPatches,
 } from '../lib/utils'
@@ -139,5 +140,15 @@ describe('rows with nothing to group by', () => {
       'Lead:bc',
       ':a',
     ])
+  })
+})
+
+describe('a column’s + New', () => {
+  test('lands in its column, titled Untitled; the no-group column leaves the group empty', () => {
+    expect(newCard({ group: 'todo', groupBy: 'status', title: 'name' })).toEqual({
+      status: 'todo',
+      name: 'Untitled',
+    })
+    expect(newCard({ group: '', groupBy: 'status', title: 'name' })).toEqual({ name: 'Untitled' })
   })
 })

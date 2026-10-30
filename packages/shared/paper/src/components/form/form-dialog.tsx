@@ -18,7 +18,7 @@ export function FormDialog({
   seed,
   ...rest
 }: FormDialogProps) {
-  const db = useDatabase(table)
+  const db = useDatabase(table, 'write')
   const dialog = useRef<HTMLDialogElement>(null)
   const isReady = db !== null && typeof db === 'object'
 

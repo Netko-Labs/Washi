@@ -1,8 +1,13 @@
 import { patchRow } from '../../../lib/rows'
 import { toneOf } from '../../../lib/tone-of'
 import type { ActionRef, Row } from '../../../lib/types'
-import type { BoardColumn, Move, RankPatch } from './types'
+import type { BoardColumn, BoardDraft, Move, RankPatch } from './types'
 import { NO_GROUP } from './values'
+
+/** A + New card: in its column, titled Untitled until someone names it. */
+export function newCard({ group, groupBy, title }: BoardDraft): Record<string, string> {
+  return { ...(group && { [groupBy]: group }), [title]: 'Untitled' }
+}
 
 export function rankOf(row: Row, rank: string): number {
   return typeof row[rank] === 'number' ? (row[rank] as number) : 0

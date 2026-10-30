@@ -10,7 +10,7 @@ const LABEL =
 
 /** One list, one width, newest first, grouped by day; Needs you pinned on top, answered inline (D59). */
 export function Inbox({ rows }: InboxProps) {
-  const { approvals, groups, filter, setFilter, now, unread, mentions, hasMentions } =
+  const { approvals, groups, filter, setFilter, now, unread, mentions, waiting, hasMentions } =
     useInbox(rows)
   const count = approvals.length + unread
   const chips: InboxFilter[] = hasMentions
@@ -35,9 +35,7 @@ export function Inbox({ rows }: InboxProps) {
               key={chip}
               filter={chip}
               active={filter}
-              count={
-                chip === 'needs' ? approvals.length : chip === 'mentions' ? mentions : undefined
-              }
+              count={chip === 'needs' ? waiting : chip === 'mentions' ? mentions : undefined}
               onPick={setFilter}
             />
           ))}
@@ -60,7 +58,7 @@ export function Inbox({ rows }: InboxProps) {
             </div>
           </>
         )}
-        {showNeeds && approvals.length === 0 && (
+        {showNeeds && waiting === 0 && (
           <div className="mt-4 flex items-center gap-3 px-3 py-2.5 text-[13px]">
             <span className="grid size-7 place-items-center">
               <AgentMascot state="done" size={22} />

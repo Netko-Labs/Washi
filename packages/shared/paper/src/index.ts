@@ -75,6 +75,7 @@ export type {
   SheetLook,
   SheetLookHost,
   UnsplashCredit,
+  Visitor,
 } from './lib/types'
 export { SheetLookProvider, useSheetLook } from './look'
 export { type PaperHost, PaperProvider, usePaperHost } from './provider'

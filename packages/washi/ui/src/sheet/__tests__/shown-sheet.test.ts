@@ -15,6 +15,7 @@ const sheet = (id: string, hlcUpdated: string): SheetDetail => ({
   undoable: false,
   rowOf: null,
   visibility: 'shared',
+  suggest: false,
   access: [],
   hlcUpdated,
   source: '<Sheet />',

@@ -7,10 +7,12 @@ export {
   EVERY_DAY,
   WORKDAYS,
 } from './constants'
+export { useAgendaAdd } from './hooks/use-agenda-add'
 export { useAgendaPeriod } from './hooks/use-agenda-period'
 export { useEventCopy } from './hooks/use-event-copy'
 export { useEventMenu } from './hooks/use-event-menu'
 export type {
+  AgendaAdd,
   AgendaColumns,
   AgendaCopyPageProps,
   AgendaDayInfo,
@@ -45,6 +47,7 @@ export {
   monthSpan,
   rangeQuery,
   repeatWords,
+  requestedByDay,
   rowsByDay,
   shiftCell,
   shiftDay,

@@ -47,6 +47,8 @@ export interface AgendaPeriod {
   days: AgendaDayInfo[]
   label: string
   state: BindState
+  /** Pending times visitors asked for (D120): held, and drawn as Requested. */
+  requested: string[]
   isCurrent: boolean
   shift: (steps: number) => void
   reset: () => void
@@ -74,12 +76,26 @@ export interface AgendaDayProps {
   rows: Row[]
   columns: AgendaColumns
   empty: string
+  /** Pending requests on this day, as start times; empty for a whole day. */
+  requested?: string[]
   /** Events shown before the rest fold under "+N more". */
   limit?: number
   onAdd?: () => void
   onOpen?: (id: string) => void
   /** The event's ⋯: Duplicate, Copy to…, Repeat on days…; without it (a read-only host) none. */
   onMenu?: (row: Row) => void
+}
+
+/** The day a + was pressed on, and what is said once its row is sent. */
+export interface AgendaAdd {
+  /** A day's + or an event's ⋯, whichever is open. */
+  pick: AgendaPick
+  adding: string | null
+  open: (day: string) => void
+  openEvent: (row: Row) => void
+  close: () => void
+  note: string | null
+  landed: () => void
 }
 
 export interface AgendaEventProps {

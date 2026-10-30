@@ -138,4 +138,5 @@ export type {
   Variant,
   Width,
 } from './style'
+export type { AddMode, Visitor } from './suggest'
 export type { FileAs, FrameLook, TerminalProps, TerminalState } from './terminal'

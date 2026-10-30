@@ -156,6 +156,13 @@
   gap: 6px;
   padding: 0 8px 10px;
 }
+.wsx-agenda-requested {
+  padding: 4px 8px;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
 .wsx-agenda-free {
   padding: 2px 2px;
   font-size: 12px;

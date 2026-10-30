@@ -1,7 +1,7 @@
-import type { ColumnChange, HistoryQuery, InkQuery, QueryResult, TableSpec } from '@washi/ink'
+import type { Cell, ColumnChange, HistoryQuery, InkQuery, QueryResult, TableSpec } from '@washi/ink'
 import type { WsxElement } from '@washi/wsx'
 import { createContext, type ReactNode, useContext } from 'react'
-import type { ActionRef, CompiledScript, PageCard } from './lib/types'
+import type { ActionRef, CompiledScript, PageCard, Visitor } from './lib/types'
 
 /**
  * The capability surface a rendered sheet may touch. The host app wires these
@@ -70,6 +70,17 @@ export interface PaperHost {
   changeColumn?(change: ColumnChange): Promise<void>
   /** Titles of the pages whose views name a column — what its rename or delete leaves behind. */
   columnPages?(table: string, column: string): Promise<string[]>
+  /** A host that writes nothing (a link): no add is drawn unless it takes suggestions. */
+  isReadOnly?: boolean
+  /**
+   * A link that takes suggestions (D120): a Form, a calendar's + or a board's + New sends its row
+   * here instead of `runAction`, to wait for a member. Rejects in words.
+   */
+  suggestRow?(table: string, cells: Record<string, Cell>, visitor: Visitor): Promise<void>
+  /** The columns a suggestion may write — a redacted one by type, never a value. */
+  describeWritable?(table: string): Promise<TableSpec | null>
+  /** Pending times on `date` in `[from, to)`, drawn as Requested; never who asked. */
+  requested?(table: string, date: string, from: string, to: string): Promise<string[]>
   /** BCP-47; dates and money format from the vault locale at render, never in a page. */
   locale?: string
 }

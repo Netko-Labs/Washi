@@ -1,4 +1,4 @@
-import { styled } from '../../lib'
+import { addModeOf, styled } from '../../lib'
 import { usePaperHost } from '../../provider'
 import { useAgendaPeriod } from '../agenda'
 import { FormDialog } from '../form'
@@ -20,6 +20,8 @@ import {
  * A week of free times to book, Calendly's way (D102): the hours of each allowed day cut into
  * slots, the booked struck through, the past left out; a week already spent opens on the next.
  * A press asks `add` in a modal, the slot filled in, checked again as it is booked and said back.
+ * Through a link that takes suggestions a press requests the slot, and a requested one is held;
+ * a read-only link books nothing (D120).
  */
 export function Slots({
   bind,
@@ -43,9 +45,16 @@ export function Slots({
     locale: host.locale,
     startOffset: openingWeek(now, weekStart, days, hours, minutes),
   })
-  const booking = useSlotBooking(bind, date, minutes)
+  const mode = addModeOf(host)
+  const booking = useSlotBooking(bind, date, minutes, mode === 'suggest')
   const { picked } = booking
   const busy = busyOf(period.state.rows, date, minutes)
+  const held = busyOf(
+    period.requested.map((cell) => ({ [date]: cell })),
+    date,
+    minutes,
+  )
+  const verb = mode === 'suggest' ? 'Request' : addLabel
   const open = period.days.filter((day) => days.includes(weekdayOf(day.key)))
   const pickedDay = picked && period.days.find((day) => picked.start.startsWith(day.key))
 
@@ -78,7 +87,9 @@ export function Slots({
         <div className="wsx-slots-days" aria-busy={period.state.status === 'loading' || undefined}>
           {open.map((day) => {
             const slots =
-              period.state.status === 'ready' ? slotsOn(day.key, hours, minutes, busy, now) : []
+              period.state.status === 'ready'
+                ? slotsOn(day.key, hours, minutes, busy, now, held)
+                : []
             return (
               <section
                 key={day.key}
@@ -96,11 +107,25 @@ export function Slots({
                         type="button"
                         className="wsx-slot"
                         data-booked={slot.isBooked || undefined}
-                        aria-label={slot.isBooked ? `${slot.label}, booked` : undefined}
-                        disabled={!add || slot.isBooked}
+                        data-requested={slot.isRequested || undefined}
+                        aria-label={
+                          slot.isBooked
+                            ? `${slot.label}, booked`
+                            : slot.isRequested
+                              ? `${slot.label}, requested`
+                              : undefined
+                        }
+                        disabled={!add || !mode || slot.isBooked || slot.isRequested}
                         onClick={() => booking.pick(slot)}
                       >
-                        {slot.label}
+                        {slot.isRequested ? (
+                          <>
+                            <span className="wsx-slot-time">{slot.label}</span>
+                            <span className="wsx-slot-note">Requested</span>
+                          </>
+                        ) : (
+                          slot.label
+                        )}
                       </button>
                     ))}
                   </div>
@@ -114,11 +139,12 @@ export function Slots({
           })}
         </div>
       )}
-      {add && (
+      {add && mode && (
         <FormDialog
           open={picked !== null}
           onClose={booking.close}
-          title={`${addLabel}${pickedDay ? ` · ${pickedDay.long}` : ''}${picked ? ` · ${picked.label}` : ''}`}
+          isBooking
+          title={`${verb}${pickedDay ? ` · ${pickedDay.long}` : ''}${picked ? ` · ${picked.label}` : ''}`}
           table={bind.table}
           fields={add}
           submit={addLabel}

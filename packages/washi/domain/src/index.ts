@@ -125,6 +125,7 @@ export {
   type SheetShare,
   type SheetSummary,
   type SheetWrite,
+  type StoredSheetUpdate,
   type StoredSheetWrite,
   sheetDetailSchema,
   sheetIconSchema,
@@ -140,6 +141,20 @@ export {
   type StorageInfo,
   storageConfigSchema,
 } from './entities/storage'
+export {
+  type RequestedAsk,
+  requestedAskSchema,
+  type Suggestion,
+  type SuggestionAsk,
+  type SuggestionInbox,
+  type SuggestionKind,
+  type SuggestionStatus,
+  suggestionAskSchema,
+  suggestionInboxSchema,
+  suggestionKindSchema,
+  suggestionSchema,
+  suggestionStatusSchema,
+} from './entities/suggestions'
 export {
   type LinkColumnInput,
   linkColumnInputSchema,

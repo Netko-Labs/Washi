@@ -25,6 +25,8 @@ export interface Slot {
 /** A slot as a day draws it: a booked one stays on screen, struck through. */
 export interface DaySlot extends Slot {
   isBooked: boolean
+  /** A visitor asked for it and nobody has decided yet (D120). */
+  isRequested: boolean
 }
 
 export type WeekStart = NonNullable<SlotsProps['weekStart']>

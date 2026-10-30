@@ -112,6 +112,7 @@ export {
   liftLooksIntoSource,
   updateSheetAccess,
   updateSheetMetaAndLook,
+  updateSheetSuggest,
 } from './sheets/look'
 export { reindexPages } from './sheets/reindex'
 export { liftScriptsIntoCode } from './sheets/scripts-to-code'
@@ -144,6 +145,20 @@ export {
   SheetMoveError,
   trashSheetAs,
 } from './sheets/tree'
+export {
+  approveSuggestion,
+  declineSuggestion,
+  markSuggestionsSeen,
+  requestedSpans,
+  SuggestionError,
+  SuggestionRefusedError,
+  sharedRequested,
+  sharedWritable,
+  suggestionInbox,
+  suggestRow,
+  unreadSuggestions,
+  writableColumns,
+} from './suggestions'
 export { rowActivity } from './tables/activity'
 export {
   purgeUserTable,

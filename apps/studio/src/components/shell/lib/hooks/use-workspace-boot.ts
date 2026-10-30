@@ -9,6 +9,7 @@ import {
 import { useEffect } from 'react'
 import { useMentionsPoll } from '@/components/mentions'
 import { useRemindersPoll } from '@/components/reminders'
+import { useSuggestionsPoll } from '@/components/suggestions'
 import { useSession } from '@/integrations/auth'
 
 /**
@@ -19,6 +20,7 @@ export function useWorkspaceBoot(workspaceId: string) {
   const { data: session } = useSession()
   useMentionsPoll(workspaceId)
   useRemindersPoll(workspaceId)
+  useSuggestionsPoll(workspaceId)
   const name = session?.user.name
   const email = session?.user.email
 

@@ -80,6 +80,15 @@ describe('page editor blocks', () => {
   })
 })
 
+describe('typing keeps who reads the page and what its link takes (D65, D120)', () => {
+  test('sourceOver keeps the Sheet’s visibility and suggest props', () => {
+    const saved =
+      '<Sheet title="Book" visibility="public" suggest={true}>\n  <Text>Hi</Text>\n</Sheet>\n'
+    const root = parse(sourceOver(saved, toBlocks(parse(saved))))
+    expect(root.props).toMatchObject({ visibility: 'public', suggest: true })
+  })
+})
+
 describe('the / menu drops live data on the page', () => {
   const issues = { name: 'issues', done: { column: 'state', values: ['Done'] } }
   const notes = { name: 'notes', done: null }

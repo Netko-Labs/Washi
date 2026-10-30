@@ -21,6 +21,17 @@ export function useInbox(extra: InboxRow[] | undefined) {
   )
   const unread = rows.filter((row) => row.unread).length
   const mentions = (extra ?? []).filter((row) => row.kind === 'mention').length
+  const waiting = approvals.length + (extra ?? []).filter((row) => row.actions?.length).length
 
-  return { approvals, groups, filter, setFilter, now, unread, mentions, hasMentions: !!extra }
+  return {
+    approvals,
+    groups,
+    filter,
+    setFilter,
+    now,
+    unread,
+    mentions,
+    waiting,
+    hasMentions: !!extra,
+  }
 }

@@ -5,6 +5,7 @@ import {
   type SheetDetail,
   type SheetMetaPatch,
   type SheetSummary,
+  type StoredSheetUpdate,
   type StoredSheetWrite,
 } from '@washi/domain'
 import { sheetLinkTable, sheetTable } from '@washi/domain/db'
@@ -30,6 +31,7 @@ const SUMMARY = {
   rowOf: sheetTable.rowId,
   visibility: sheetTable.visibility,
   access: sheetTable.access,
+  suggest: sheetTable.suggest,
   // Drizzle renders a lone column unqualified here, and `id` would bind to the revision's.
   undoable:
     sql<boolean>`exists (select 1 from sheet_revisions r where r.sheet_id = sheets.id)`.mapWith(
@@ -78,6 +80,7 @@ export function createSheet(
       cover: write.cover ?? null,
       visibility: write.visibility ?? 'shared',
       access: write.access ?? [],
+      suggest: write.suggest ?? false,
       tags: write.tags ?? [],
       source: write.source,
       loroSnapshot: Buffer.from(createSnapshot(write.source)),
@@ -95,7 +98,7 @@ export function createSheet(
 export function updateSheet(
   ws: Workspace,
   id: string,
-  write: StoredSheetWrite,
+  write: StoredSheetUpdate,
   index: SheetIndexInput,
   editedBy: SheetAuthor = null,
 ): SheetDetail | null {
@@ -118,6 +121,7 @@ export function updateSheet(
         cover: write.cover ?? null,
         visibility: write.visibility ?? 'shared',
         access: write.access ?? [],
+        suggest: write.suggest,
         tags: write.tags ?? existing.tags,
         source: write.source,
         loroSnapshot: Buffer.from(updateSnapshot(existing.loroSnapshot, write.source)),

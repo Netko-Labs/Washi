@@ -140,6 +140,16 @@ export function rowsByDay(rows: Row[], date: string): Map<string, Row[]> {
   return days
 }
 
+/** Pending times per day, as their start time (`10:00`), or empty for a whole day. */
+export function requestedByDay(cells: string[]): Map<string, string[]> {
+  const days = new Map<string, string[]>()
+  for (const cell of cells) {
+    const time = /T(\d{2}:\d{2})/.exec(cell)?.[1] ?? ''
+    for (const key of eventDays(cell)) days.set(key, [...(days.get(key) ?? []), time])
+  }
+  return days
+}
+
 function text(value: unknown): string | null {
   if (value === null || value === undefined || value === '') return null
   return String(value)

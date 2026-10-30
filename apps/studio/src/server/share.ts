@@ -1,5 +1,6 @@
+import { requestedAskSchema } from '@washi/domain'
 import { historyQuerySchema, querySchema } from '@washi/ink'
-import { ShareGoneError, ShareRefusedError } from '@washi/service'
+import { ShareGoneError, ShareRefusedError, SuggestionRefusedError } from '@washi/service'
 import { z } from 'zod'
 import { washiRuntime } from '@/server/runtime'
 
@@ -8,6 +9,8 @@ export const shareAskSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('rows'), query: querySchema }),
   z.object({ kind: z.literal('history'), query: historyQuerySchema }),
   z.object({ kind: z.literal('table'), name: z.string().min(1).max(64) }),
+  z.object({ kind: z.literal('writable'), name: z.string().min(1).max(64) }),
+  z.object({ kind: z.literal('requested'), ask: requestedAskSchema }),
 ])
 
 /**
@@ -27,6 +30,9 @@ export function shareFailure(cause: unknown): Response {
     return Response.json({ error: cause.message }, { status: 404 })
   if (cause instanceof ShareRefusedError) {
     return Response.json({ error: cause.message }, { status: 403 })
+  }
+  if (cause instanceof SuggestionRefusedError) {
+    return Response.json({ error: cause.message }, { status: cause.isLimit ? 429 : 422 })
   }
   throw cause
 }

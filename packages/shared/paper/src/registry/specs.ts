@@ -108,6 +108,7 @@ const frame: Record<string, ComponentSpec> = {
         state: sheetStateSchema.optional(),
         visibility: z.enum(['private', 'shared', 'public']).optional(),
         access: z.array(memberId).max(64).optional(),
+        suggest: z.boolean().optional(),
         wsx: z.literal('1').optional(),
       })
       .strict(),

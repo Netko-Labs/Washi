@@ -1,5 +1,6 @@
 import { type CSSProperties, Fragment } from 'react'
 import { columnOf, styled, useBind } from '../../lib'
+import { FormDialog } from '../form'
 import { Bound } from '../states'
 import { BoardCard } from './board-card'
 import {
@@ -11,7 +12,10 @@ import {
   useCardActions,
 } from './lib'
 
-/** Grouped, draggable records: drop a card and the others slide to make room. */
+/**
+ * Grouped, draggable records: drop a card and the others slide to make room. A read-only link
+ * adds nothing; one that takes suggestions asks a + New's title and sends it for approval (D120).
+ */
 export function Board({
   bind,
   groupBy,
@@ -45,79 +49,95 @@ export function Board({
     <Bound state={state} empty={empty}>
       {(rows) => {
         const titleKey = title ?? columnOf(rows, 'string', ['title', 'name']) ?? 'name'
+        const { suggest } = actions
         return (
-          <div ref={drag.boardRef} {...styled(rest, 'wsx-board')}>
-            {drag.columns.map(({ name, items }, index) => {
-              const resting = items.filter((row) => row.id !== drag.dragging)
-              const label = groupLabel(name, groupBy)
-              return (
-                <section
-                  key={name}
-                  aria-label={label}
-                  className="wsx-board-col"
-                  data-hot={drag.target?.group === name || undefined}
-                  style={{ '--col': columnHue(name, index) } as CSSProperties}
-                  onDragOver={(event) => drag.over(name, event)}
-                  onDrop={drag.drop}
-                >
-                  <div className="wsx-board-head">
-                    <span className="wsx-board-head-name">
-                      <i />
-                      <span className="wsx-board-head-label">{label}</span>
-                    </span>
-                    <span className="wsx-board-head-count">
-                      {headCount(items, meta, (total) => actions.shown(total, meta))}
-                    </span>
-                  </div>
-                  {items.map((row) => (
-                    <Fragment key={String(row.id)}>
-                      {slot(name, String(row.id))}
-                      <BoardCard
-                        row={row}
-                        titleKey={titleKey}
-                        kicker={kicker}
-                        badge={badge}
-                        meta={meta}
-                        avatar={avatar}
-                        dragging={drag.dragging === row.id}
-                        actions={actions}
-                        onDragStart={(event) => drag.start(String(row.id), event)}
-                        onDragEnd={drag.end}
-                      />
-                    </Fragment>
-                  ))}
-                  {slot(name, null)}
-                  {resting.length === 0 && drag.target?.group !== name && (
-                    <div className="wsx-board-drop">Drop here</div>
-                  )}
-                  {onAdd ? (
-                    <button
-                      type="button"
-                      className="wsx-board-add"
-                      onClick={() => actions.add(onAdd, name)}
-                    >
-                      + Add card
-                    </button>
-                  ) : (
-                    actions.creatable && (
-                      <button
-                        type="button"
-                        className="wsx-board-add"
-                        onClick={() =>
-                          actions.create(bind.table, {
-                            ...(name && { [groupBy]: name }),
-                            [titleKey]: 'Untitled',
-                          })
-                        }
-                      >
-                        + New
-                      </button>
-                    )
-                  )}
-                </section>
-              )
-            })}
-          </div>
+          <>
+            {suggest.note && (
+              <p className="wsx-slots-booked" role="status">
+                {suggest.note}
+              </p>
+            )}
+            <div ref={drag.boardRef} {...styled(rest, 'wsx-board')}>
+              {drag.columns.map(({ name, items }, index) => {
+                const resting = items.filter((row) => row.id !== drag.dragging)
+                const label = groupLabel(name, groupBy)
+                return (
+                  <section
+                    key={name}
+                    aria-label={label}
+                    className="wsx-board-col"
+                    data-hot={drag.target?.group === name || undefined}
+                    style={{ '--col': columnHue(name, index) } as CSSProperties}
+                    onDragOver={(event) => drag.over(name, event)}
+                    onDrop={drag.drop}
+                  >
+                    <div className="wsx-board-head">
+                      <span className="wsx-board-head-name">
+                        <i />
+                        <span className="wsx-board-head-label">{label}</span>
+                      </span>
+                      <span className="wsx-board-head-count">
+                        {headCount(items, meta, (total) => actions.shown(total, meta))}
+                      </span>
+                    </div>
+                    {items.map((row) => (
+                      <Fragment key={String(row.id)}>
+                        {slot(name, String(row.id))}
+                        <BoardCard
+                          row={row}
+                          titleKey={titleKey}
+                          kicker={kicker}
+                          badge={badge}
+                          meta={meta}
+                          avatar={avatar}
+                          dragging={drag.dragging === row.id}
+                          actions={actions}
+                          onDragStart={(event) => drag.start(String(row.id), event)}
+                          onDragEnd={drag.end}
+                        />
+                      </Fragment>
+                    ))}
+                    {slot(name, null)}
+                    {resting.length === 0 && drag.target?.group !== name && (
+                      <div className="wsx-board-drop">Drop here</div>
+                    )}
+                    {onAdd
+                      ? actions.mode === 'write' && (
+                          <button
+                            type="button"
+                            className="wsx-board-add"
+                            onClick={() => actions.add(onAdd, name)}
+                          >
+                            + Add card
+                          </button>
+                        )
+                      : actions.creatable && (
+                          <button
+                            type="button"
+                            className="wsx-board-add"
+                            onClick={() =>
+                              actions.create({ group: name, groupBy, title: titleKey })
+                            }
+                          >
+                            + New
+                          </button>
+                        )}
+                  </section>
+                )
+              })}
+            </div>
+            {actions.mode === 'suggest' && (
+              <FormDialog
+                open={suggest.draft !== null}
+                onClose={suggest.close}
+                onAdded={suggest.landed}
+                title={`Suggest${suggest.draft?.group ? ` · ${groupLabel(suggest.draft.group, groupBy)}` : ''}`}
+                table={bind.table}
+                fields={[suggest.draft?.title ?? titleKey]}
+                seed={suggest.draft?.group ? { [groupBy]: suggest.draft.group } : undefined}
+              />
+            )}
+          </>
         )
       }}
     </Bound>

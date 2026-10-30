@@ -2,7 +2,10 @@ import { useId } from 'react'
 import { styled } from '../../lib'
 import { tableLabel } from '../database'
 import { FormField } from './form-field'
-import { type FormBodyProps, formPlan, REQUIRED_HINT, useFormDraft } from './lib'
+import { FormVisitor } from './form-visitor'
+import { type FormBodyProps, formPlan, REQUIRED_HINT, SENT_NOTE, useFormDraft } from './lib'
+
+const VISITOR = 'visitor:'
 
 export function FormBody({
   db,
@@ -15,6 +18,7 @@ export function FormBody({
   check,
   onAdded,
   onCancel,
+  isBooking,
   ...rest
 }: FormBodyProps) {
   // A seeded column is written even when it is not shown: the day a calendar's + stood on.
@@ -40,6 +44,9 @@ export function FormBody({
   }
 
   const { status } = draft
+  const isSuggesting = draft.mode === 'suggest'
+  const label = isSuggesting ? (isBooking ? 'Request' : 'Suggest') : (submit ?? 'Add')
+  const missing = status.kind === 'missing' ? status.columns : []
   return (
     <form
       {...styled(rest, 'wsx-form')}
@@ -67,6 +74,16 @@ export function FormBody({
           }
         />
       ))}
+      {isSuggesting && (
+        <FormVisitor
+          id={id}
+          visitor={draft.visitor}
+          onChange={draft.setVisitor}
+          missing={missing.flatMap((key) =>
+            key.startsWith(VISITOR) ? [key.slice(VISITOR.length)] : [],
+          )}
+        />
+      )}
       <div className="wsx-form-actions">
         <button
           type="submit"
@@ -76,7 +93,7 @@ export function FormBody({
           disabled={status.kind === 'busy'}
           aria-busy={status.kind === 'busy' || undefined}
         >
-          {submit ?? 'Add'}
+          {label}
         </button>
         {onCancel && (
           <button type="button" className="wsx-button" data-variant="plain" onClick={onCancel}>
@@ -84,7 +101,7 @@ export function FormBody({
           </button>
         )}
         <span className="wsx-form-status" role="status" aria-live="polite">
-          {status.kind === 'added' && 'Added'}
+          {status.kind === 'added' && (isSuggesting ? SENT_NOTE : 'Added')}
         </span>
       </div>
       {status.kind === 'refused' && (

@@ -24,6 +24,7 @@ export {
   monthOf,
   monthSpan,
   rangeQuery,
+  requestedByDay,
   rowsByDay,
   spanDays,
   weekLabel,
