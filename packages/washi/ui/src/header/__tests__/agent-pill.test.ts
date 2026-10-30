@@ -10,9 +10,9 @@ const washiWrote = (msAgo: number) => ({
 
 describe('pillStateFor', () => {
   test('a page nobody is working on shows nothing, however long ago Washi wrote it', () => {
-    expect(pillStateFor({ mood: 'idle', isBusy: false, sheet: washiWrote(3_600_000), now: NOW })).toBe(
-      null,
-    )
+    expect(
+      pillStateFor({ mood: 'idle', isBusy: false, sheet: washiWrote(3_600_000), now: NOW }),
+    ).toBe(null)
     expect(
       pillStateFor({
         mood: 'done',

@@ -5,11 +5,9 @@ import { isDarkFor, isTheme } from '../utils'
 function paintsDark(stored: string | null, prefersDark: boolean): boolean {
   const classes = new Set<string>()
   const run = new Function('localStorage', 'matchMedia', 'document', THEME_SCRIPT)
-  run(
-    { getItem: () => stored },
-    () => ({ matches: prefersDark }),
-    { documentElement: { classList: { add: (name: string) => classes.add(name) } } },
-  )
+  run({ getItem: () => stored }, () => ({ matches: prefersDark }), {
+    documentElement: { classList: { add: (name: string) => classes.add(name) } },
+  })
   return classes.has('dark')
 }
 
