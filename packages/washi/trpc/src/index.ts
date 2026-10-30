@@ -16,6 +16,7 @@ import { routinesRouter } from './routers/routines'
 import { scriptsRouter } from './routers/scripts'
 import { sheetsRouter } from './routers/sheets'
 import { storageRouter } from './routers/storage'
+import { suggestionsRouter } from './routers/suggestions'
 import { systemRouter } from './routers/system'
 import { tablesRouter } from './routers/tables'
 import { themesRouter } from './routers/themes'
@@ -49,6 +50,7 @@ export const appRouter = router({
   models: modelsRouter,
   routines: routinesRouter,
   reminders: remindersRouter,
+  suggestions: suggestionsRouter,
   dev: devRouter,
   live: liveRouter,
 })

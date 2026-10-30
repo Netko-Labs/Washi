@@ -3,7 +3,7 @@ import type { TodayTurn } from '../../today'
 
 export type StopReason = TodayTurn['receipt']['stopReason']
 
-export type InboxKind = 'mention' | 'washi' | 'reminder'
+export type InboxKind = 'mention' | 'washi' | 'reminder' | 'suggestion'
 export type InboxFilter = 'all' | 'needs' | 'mentions' | 'washi'
 
 /** One line in the list: `who verb where`, a second line, a time. The host shapes mentions this way. */
@@ -20,6 +20,18 @@ export interface InboxRow {
   mono?: boolean
   unread?: boolean
   onOpen?: () => void
+  /** Presses under the row — a suggestion's Approve and Decline (D120); each rejects in words. */
+  actions?: InboxRowAction[]
+}
+
+export interface InboxRowAction {
+  label: string
+  isPrimary?: boolean
+  run: () => Promise<void>
+}
+
+export interface InboxRowActionsProps {
+  actions: InboxRowAction[]
 }
 
 export interface DayGroup {

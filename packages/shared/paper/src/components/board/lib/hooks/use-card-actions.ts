@@ -1,18 +1,27 @@
 import { statusOptions } from '@washi/ink'
 import { useData } from '../../../../data'
-import { formatNumber, resolveRowDeep, useRunAction, useTableSpec } from '../../../../lib'
+import {
+  addModeOf,
+  formatNumber,
+  resolveRowDeep,
+  useRunAction,
+  useTableSpec,
+} from '../../../../lib'
 import type { ActionRef, Row } from '../../../../lib/types'
 import { usePaperHost } from '../../../../provider'
 import { cell } from '../../../states'
 import type { CardActions } from '../types'
 import { substitute } from '../utils'
 import { FORMER_MEMBER, UNNAMED } from '../values'
+import { useBoardSuggest } from './use-board-suggest'
 
 export function useCardActions(onOpen: ActionRef | undefined, table: string): CardActions {
   const host = usePaperHost()
   const run = useRunAction()
   const { refresh } = useData()
   const look = useTableSpec(table)
+  const suggest = useBoardSuggest()
+  const mode = addModeOf(host)
   const columnOf = (name?: string) => look.spec?.columns.find((each) => each.name === name)
   return {
     locale: host.locale,
@@ -38,7 +47,9 @@ export function useCardActions(onOpen: ActionRef | undefined, table: string): Ca
       return spec.type === 'status' ? statusOptions(spec) : (spec.options ?? [])
     },
     add: (action, group) => void run(substitute(action, group)),
-    creatable: Boolean(host.newRow),
+    creatable: Boolean(host.newRow) || mode === 'suggest',
+    mode,
+    suggest,
     // The host tells the reader why a row was not added; the board only refetches.
     create: (table, data) =>
       void host

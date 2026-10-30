@@ -24,11 +24,11 @@ export function useShare(sheetId: string) {
     void load()
   }, [load])
 
-  const apply = async (visibility: Audience, access: string[]) => {
+  const write = async (change: () => Promise<unknown>) => {
     setBusy(true)
     setError(null)
     try {
-      await api.sheets.setAccess.mutate({ id: sheetId, visibility, access })
+      await change()
       await Promise.all([load(), useSheetsStore.getState().refresh()])
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : String(cause))
@@ -37,5 +37,10 @@ export function useShare(sheetId: string) {
     }
   }
 
-  return { settings, busy, error, apply }
+  const apply = (visibility: Audience, access: string[]) =>
+    write(() => api.sheets.setAccess.mutate({ id: sheetId, visibility, access }))
+  const setSuggest = (suggest: boolean) =>
+    write(() => api.sheets.setSuggest.mutate({ id: sheetId, suggest }))
+
+  return { settings, busy, error, apply, setSuggest }
 }

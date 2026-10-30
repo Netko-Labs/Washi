@@ -71,6 +71,6 @@ export function turnRow(turn: TodayTurn): InboxRow {
 
 export function matchesFilter(row: InboxRow, filter: InboxFilter): boolean {
   if (filter === 'all') return true
-  if (filter === 'needs') return false
+  if (filter === 'needs') return Boolean(row.actions?.length)
   return filter === 'mentions' ? row.kind === 'mention' : row.kind === 'washi'
 }

@@ -44,13 +44,15 @@ export function DatabaseGallery({ db, view, empty }: ViewProps) {
       {records.status === 'ready' && records.rows.length === 0 && empty && (
         <p className="wsx-empty">{empty}</p>
       )}
-      <button
-        type="button"
-        className="wsx-db-card wsx-db-card-new"
-        onClick={() => void actions.addRow(newRow(db.spec))}
-      >
-        + New
-      </button>
+      {actions.canAdd && (
+        <button
+          type="button"
+          className="wsx-db-card wsx-db-card-new"
+          onClick={() => void actions.addRow(newRow(db.spec))}
+        >
+          + New
+        </button>
+      )}
     </div>
   )
 }

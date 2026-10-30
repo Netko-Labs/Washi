@@ -1,10 +1,10 @@
 import type { Cell, ColumnSpec } from '@washi/ink'
-import type { BlockProps } from '../../../lib/types'
+import type { AddMode, BlockProps, Visitor } from '../../../lib/types'
 import type { StateRef } from '../../../registry'
 import type { SheetStateValue } from '../../../state'
 import type { Choice, DatabaseContext, Person } from '../../database'
 
-export type { Cell, Choice, ColumnSpec, DatabaseContext, Person, SheetStateValue }
+export type { AddMode, Cell, Choice, ColumnSpec, DatabaseContext, Person, SheetStateValue, Visitor }
 
 /** A literal for the new row, or page state read when it is sent — the picked month. */
 export type FormDefault = Cell | StateRef
@@ -33,6 +33,8 @@ export interface FormBodyProps extends Omit<FormInlineProps, 'table'> {
   check?: () => Promise<string | null>
   onAdded?: () => void
   onCancel?: () => void
+  /** A calendar's add: suggested through a link, it is a request for that time. */
+  isBooking?: boolean
 }
 
 export interface FormDialogProps extends FormInlineProps {
@@ -43,6 +45,7 @@ export interface FormDialogProps extends FormInlineProps {
   check?: () => Promise<string | null>
   /** Told once the row has landed, just before the dialog closes. */
   onAdded?: () => void
+  isBooking?: boolean
 }
 
 export interface FormUnavailableProps {
@@ -82,6 +85,10 @@ export interface FormDraftOptions {
 export interface FormDraft {
   values: Record<string, Cell>
   set: (column: string, value: Cell) => void
+  /** `suggest` on a link that takes suggestions: the visitor says who they are. */
+  mode: AddMode
+  visitor: Visitor
+  setVisitor: (field: keyof Visitor, value: string) => void
   status: FormStatus
   /** Resolves to the first required field left empty, if any — the one to focus. */
   submit: () => Promise<string | null>
@@ -101,6 +108,14 @@ export type FormInputProps = Omit<FormFieldProps, 'people'>
 
 export interface FormChoiceProps extends FormInputProps {
   choices: Choice[]
+}
+
+export interface FormVisitorProps {
+  id: string
+  visitor: Visitor
+  onChange: (field: keyof Visitor, value: string) => void
+  /** Which of `name` and `email` were turned back. */
+  missing: string[]
 }
 
 export interface LandedNote {

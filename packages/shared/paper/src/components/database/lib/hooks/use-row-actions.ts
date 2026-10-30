@@ -18,6 +18,8 @@ export function useRowActions(table: string) {
 
   return {
     canOpen: Boolean(host.openRow),
+    /** A link adds no rows here; a view is not one of the adds a link may suggest (D120). */
+    canAdd: !host.isReadOnly,
     open: (id: string) => host.openRow?.(id),
     addRow: async (data: Record<string, string>) => {
       if (!host.newRow) return run({ verb: 'table.insert', table, data })

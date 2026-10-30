@@ -235,7 +235,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   `sheets.visibility/access` like the look: `shared` (default) = the workspace, `private` = the
   member ids in `access` + owners (a page is as closed as its most closed ancestor), `public` =
   plus a read-only link (`sheet_shares`; one live token per page, opened and closed by
-  `syncShare` on every write). Every read goes through `readableSet(ws, viewer)` — tRPC's
+  `syncShare` on every write) — it draws no add at all (`isReadOnly`) unless it takes
+  suggestions (D120). Every read goes through `readableSet(ws, viewer)` — tRPC's
   `pageProcedure` checks any `id`/`sheetId`/`parentId` and answers NOT_FOUND; `ctx.viewer` is
   the actor + whether they own the workspace. Washi reads as the asker (`AskOptions.viewer` →
   `pagesFor`); routines are `NOBODY`. Washi's writes may not change visibility/access nor lower
@@ -244,6 +245,22 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   `sharedQuery`: only the page's own tables, no filter/sort/group on a redacted column).
   Tables themselves are not page-scoped: members read every table. `forgetUnenforcedVisibility`
   dropped pre-D65 visibility props once per workspace (app meta `visibility_enforced`).
+- **A link may take suggestions (D120).** `<Sheet suggest>`, cached in `sheets.suggest`, set only
+  by a person (Share → "Visitors can suggest rows", `sheets.setSuggest`; `guardWashiWrite` refuses
+  Washi turning it on), live only while public. Its Forms, Agenda's +, Slots and a Board's + New
+  (no `onAdd`) then ask "Your name" and "Your email" (plus a hidden trap) and send through the link
+  host's `suggestRow` → `POST /api/share/<ws>/<token>/suggest`, the address HMAC'd with
+  `WASHI_SECRET_KEY` there (C3). `suggestRow` writes only the columns those elements name or seed
+  (`writableColumns` off the page's own source); a redacted one is writable by type
+  (`describeWritable` → `sharedWritable`), never read back. Cells pass `checkData`; refusals are
+  words: 5 per address per 10 min, 30 a day, 200 pending a page. Nothing lands: a row in
+  `suggestions` (workspace file, `ensureSuggestions`; `pending · approved · declined`). A pending
+  time holds its slot: `requested` (link ask and `suggestions.requested`) answers bare date cells,
+  drawn Requested in Agenda and Slots for visitors and members alike; Slots' check and the server
+  refuse a booked or requested time. Members who read the page see it in the Inbox (`suggestions.*`,
+  `useSuggestionRows`, polled 30s): Approve is `runMutation` insert signed by that member (P1),
+  re-checking the table and the time; Decline keeps nothing. Washi has no way to decide one (A2).
+  The visitor hears nothing back yet: "Sent — the page's owner will confirm it."
 - **Files.** Uploads live in the workspace's files store: a row in the workspace's `files`
   table and the bytes beside the `.db` (`<dataDir>/<workspace>.files/`) or, with
   `WASHI_FILES_S3_*` set, in a bucket under a per-workspace prefix through Bun's own S3 client.

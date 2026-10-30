@@ -29,5 +29,6 @@ export function accessOf(root: WsxElement): SheetAccess {
     access: Array.isArray(access)
       ? access.filter((id): id is string => typeof id === 'string')
       : [],
+    suggest: root.props.suggest === true,
   }
 }

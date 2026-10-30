@@ -39,13 +39,17 @@ export function busyOf(rows: Row[], date: string, minutes: number): Busy[] {
   })
 }
 
-/** A day's slots: its hours cut into `minutes`, none before `now`, those under `busy` booked. */
+/**
+ * A day's slots: its hours cut into `minutes`, none before `now`, those under `busy` booked and
+ * those under `held` — times visitors asked for, still pending — requested.
+ */
 export function slotsOn(
   dayKey: string,
   hours: string,
   minutes: number,
   busy: Busy[],
   now: number,
+  held: Busy[] = [],
 ): DaySlot[] {
   const [open = '09:00', close = '17:00'] = hours.split('-')
   const first = minutesOf(`${dayKey}T${open}`)
@@ -57,7 +61,8 @@ export function slotsOn(
     if (from < now) continue
     const start = momentOf(from)
     const isBooked = busy.some((taken) => taken.from < to && from < taken.to)
-    slots.push({ start, end: momentOf(to), label: start.slice(11), isBooked })
+    const isRequested = !isBooked && held.some((taken) => taken.from < to && from < taken.to)
+    slots.push({ start, end: momentOf(to), label: start.slice(11), isBooked, isRequested })
   }
   return slots
 }

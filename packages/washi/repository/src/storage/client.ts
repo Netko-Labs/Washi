@@ -11,6 +11,7 @@ import { ensureChatSearch } from './chat-search'
 import { ensureCustomEmojis } from './custom-emojis'
 import { ensureReminders } from './reminders'
 import { ensureRoutineRuns } from './routine-runs-ddl'
+import { ensureSuggestions } from './suggestions'
 import { ensureUnsplashPhotos } from './unsplash-photos'
 import { ensureWorkspaceThemes } from './workspace-themes'
 
@@ -93,6 +94,7 @@ function createTables(sqlite: Database) {
   ensureColumn(sqlite, 'sheets', 'row_id', 'TEXT')
   ensureColumn(sqlite, 'sheets', 'visibility', "TEXT NOT NULL DEFAULT 'shared'")
   ensureColumn(sqlite, 'sheets', 'access', "TEXT NOT NULL DEFAULT '[]'")
+  ensureColumn(sqlite, 'sheets', 'suggest', 'INTEGER NOT NULL DEFAULT 0')
   sqlite.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_sheets_row ON sheets(row_id)')
   sqlite.exec('CREATE INDEX IF NOT EXISTS idx_sheets_parent ON sheets(parent_id, position)')
   backfillPositions(sqlite)
@@ -354,6 +356,7 @@ function createTables(sqlite: Database) {
   ensureCustomEmojis(sqlite)
   ensureWorkspaceThemes(sqlite)
   ensureReminders(sqlite)
+  ensureSuggestions(sqlite)
   ensureUnsplashPhotos(sqlite)
 
   // window_state used to live here. A server has no windows — it moved to the

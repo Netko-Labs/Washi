@@ -51,13 +51,15 @@ export function DatabaseTable({ db, view, empty }: ViewProps) {
           </p>
         )}
         <div className="wsx-db-foot">
-          <button
-            type="button"
-            className="wsx-db-new"
-            onClick={() => void actions.addRow(newRow(db.spec))}
-          >
-            + New
-          </button>
+          {actions.canAdd && (
+            <button
+              type="button"
+              className="wsx-db-new"
+              onClick={() => void actions.addRow(newRow(db.spec))}
+            >
+              + New
+            </button>
+          )}
           {records.status === 'ready' && records.rows.length > 0 && (
             <span className="wsx-db-count">
               {records.rows.length} {records.rows.length === 1 ? 'row' : 'rows'}

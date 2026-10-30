@@ -45,6 +45,8 @@ export {
   type StateRef,
   sheetStateSchema,
 } from './specs'
+export { bookingsOf, spanOf, spansOverlap, suggestTargets } from './suggest'
+export type { Span, SuggestTarget } from './suggest-types'
 export {
   CLASS_ALLOWLIST,
   classProblems,

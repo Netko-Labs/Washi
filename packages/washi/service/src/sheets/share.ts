@@ -45,7 +45,7 @@ interface Shared {
 }
 
 /** The page behind a live token, only while it is public and no ancestor is private. */
-function sharedSheet(ws: Workspace, token: string): Shared {
+export function sharedSheet(ws: Workspace, token: string): Shared {
   const share = shareByToken(ws, token)
   const sheet = share ? getSheet(ws, share.sheetId) : null
   if (sheet?.visibility !== 'public' || !readableSet(ws, WORLD).has(sheet.id)) {
@@ -60,7 +60,7 @@ function sharedSheet(ws: Workspace, token: string): Shared {
  */
 export function sharedPage(ws: Workspace, token: string) {
   const { sheet, root } = sharedSheet(ws, token)
-  const { access: _access, visibility: _visibility, ...props } = root.props
+  const { access: _access, visibility: _visibility, suggest, ...props } = root.props
   return {
     id: sheet.id,
     title: sheet.title,
@@ -73,6 +73,7 @@ export function sharedPage(ws: Workspace, token: string) {
     unsplash: wornPhoto(ws, sheet.cover),
     // Only whether `*` is listed: a link plays any https embed then, and the list never leaves (D118).
     embedsAnySite: playableEmbedHosts(ws).includes(ANY_HOST),
+    suggest: suggest === true,
   }
 }
 
@@ -111,7 +112,7 @@ function namesIn(node: unknown, into: Set<string>): Set<string> {
  * a column it redacts there; and every formula that reads any of those — directly or through
  * another formula — or `cop = usd * fx_rate` would hand a hidden `usd` straight to the link.
  */
-function hiddenIn(ws: Workspace, root: WsxElement, table: string): Set<string> {
+export function hiddenIn(ws: Workspace, root: WsxElement, table: string): Set<string> {
   const readable = pageTables(root)
   if (!readable.has(table)) {
     throw new ShareRefusedError(`this page does not read "${table}"`)
@@ -142,7 +143,7 @@ function hiddenIn(ws: Workspace, root: WsxElement, table: string): Set<string> {
 }
 
 /** Filtering, sorting or grouping on a hidden column would leak it through counts; refuse. */
-function refuseReading(hidden: Set<string>, columns: (string | undefined)[]) {
+export function refuseReading(hidden: Set<string>, columns: (string | undefined)[]) {
   const named = columns.find((column) => column && hidden.has(column))
   if (named) throw new ShareRefusedError(`"${named}" is redacted on this page`)
 }
@@ -205,6 +206,7 @@ export function shareSettings(ws: Workspace, id: string) {
     visibility: sheet?.visibility ?? 'shared',
     access: sheet?.access ?? [],
     token: liveShareFor(ws, id)?.token ?? null,
+    suggest: sheet?.suggest ?? false,
     hidden: sheet ? redactionSummary(parse(sheet.source)) : { blocks: 0, columns: {} },
   }
 }

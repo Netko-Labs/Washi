@@ -15,6 +15,8 @@ export const sheetSummarySchema = z.object({
   rowOf: z.string().nullable(),
   visibility: z.enum(['private', 'shared', 'public']),
   access: z.array(z.string()),
+  /** Its link takes suggested rows, while it is public (D120). */
+  suggest: z.boolean(),
   hlcUpdated: z.string(),
 })
 export type SheetSummary = z.infer<typeof sheetSummarySchema>
@@ -51,6 +53,7 @@ export type SheetLookPatch = Partial<Record<'icon' | 'cover' | 'theme', string |
 export interface SheetAccess {
   visibility: SheetSummary['visibility']
   access: string[]
+  suggest?: boolean
 }
 export type StoredSheetWrite = SheetWrite & Partial<SheetLook> & Partial<SheetAccess>
 

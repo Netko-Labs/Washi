@@ -1,5 +1,6 @@
 import { ARRAY_COLUMN_TYPES, type TableSpec } from '@washi/ink'
 import { isRank } from '../../database'
+import { EMAIL_SHAPE } from './constants'
 import type {
   Cell,
   ColumnSpec,
@@ -8,6 +9,7 @@ import type {
   FormEntries,
   FormPlan,
   SheetStateValue,
+  Visitor,
 } from './types'
 
 const isComputed = (column: ColumnSpec) => column.type === 'formula' || column.type === 'rollup'
@@ -122,6 +124,14 @@ export function hasEntries(entries: FormEntries): boolean {
         ? value.trim() !== ''
         : value !== null && value !== false,
   )
+}
+
+/** The visitor's name and a plausible email, or which of them to fill in again. */
+export function visitorGaps(visitor: Visitor): string[] {
+  return [
+    ...(visitor.name.trim() ? [] : ['name']),
+    ...(EMAIL_SHAPE.test(visitor.email.trim()) ? [] : ['email']),
+  ]
 }
 
 export function reasonOf(cause: unknown): string {

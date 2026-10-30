@@ -14,6 +14,7 @@ import {
   weekSpan,
   weekStartOf,
 } from '../utils'
+import { useRequested } from './use-requested'
 
 /**
  * Which week or month is shown, and its rows. The reader's own unless `stateKey` names page
@@ -42,6 +43,7 @@ export function useAgendaPeriod({
   const from = addDays(span.start, -AGENDA_SPAN_DAYS)
   const to = addDays(span.start, span.days.length)
   const state = useBind(rangeQuery(bind, date, isoDay(from), isoDay(to)))
+  const requested = useRequested(bind.table, date, isoDay(from), isoDay(to))
 
   const moveTo = (target: Date) => {
     if (stateKey) sheet.set(stateKey, monthKey(target))
@@ -53,6 +55,7 @@ export function useAgendaPeriod({
     days: span.days,
     label: span.label,
     state,
+    requested,
     isCurrent,
     shift: (steps) =>
       view === 'month' && stateKey

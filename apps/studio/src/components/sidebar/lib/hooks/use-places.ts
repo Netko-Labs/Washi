@@ -3,6 +3,7 @@ import type { MouseEvent } from 'react'
 import { useMentionsStore } from '@/components/mentions'
 import { useRemindersStore } from '@/components/reminders'
 import { pathFor } from '@/components/shell'
+import { useSuggestionsStore } from '@/components/suggestions'
 import type { PlaceId } from '../types'
 import { openInPlace } from '../utils'
 
@@ -19,7 +20,8 @@ export function usePlaces(workspaceId: string, onNavigate: () => void) {
   const inboxCount =
     useAgentStore((state) => state.approvals.length) +
     useMentionsStore((state) => state.unread) +
-    useRemindersStore((state) => state.unread)
+    useRemindersStore((state) => state.unread) +
+    useSuggestionsStore((state) => state.unread)
 
   const active: PlaceId | null =
     !activeTab || activeTab === 'view:dashboard'

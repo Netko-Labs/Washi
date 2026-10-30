@@ -18,6 +18,7 @@ import {
   SheetNotFoundError,
   SheetUndoError,
   SheetValidationError,
+  SuggestionError,
   WorkspaceThemeError,
 } from '@washi/service'
 import type { EventBus } from './shared/events'
@@ -172,6 +173,7 @@ const CHANGES: Record<string, ('page' | 'data')[]> = {
   tables: ['data', 'page'],
   capabilities: ['data', 'page'],
   themes: ['page'],
+  suggestions: ['data'],
 }
 
 /**
@@ -195,7 +197,8 @@ export const workspaceProcedure = t.procedure
         result.error.cause instanceof CustomEmojiError ||
         result.error.cause instanceof EmbedHostError ||
         result.error.cause instanceof WorkspaceThemeError ||
-        result.error.cause instanceof ReminderError)
+        result.error.cause instanceof ReminderError ||
+        result.error.cause instanceof SuggestionError)
     ) {
       throw new TRPCError({
         code: 'BAD_REQUEST',

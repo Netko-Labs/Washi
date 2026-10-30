@@ -4,6 +4,7 @@ import { type SharePanelProps, shareUrl, useShare } from './lib'
 import { ShareAudience } from './share-audience'
 import { ShareLink } from './share-link'
 import { SharePeople } from './share-people'
+import { ShareSuggest } from './share-suggest'
 
 const workspaceRoute = getRouteApi('/w/$workspaceId')
 const LABEL =
@@ -53,6 +54,11 @@ export function SharePanel({ sheet }: SharePanelProps) {
           <div className="px-2 pb-1">
             <ShareLink url={shareUrl(workspace.id, settings.token)} hidden={settings.hidden} />
           </div>
+          <ShareSuggest
+            value={settings.suggest}
+            busy={share.busy}
+            onChange={(suggest) => void share.setSuggest(suggest)}
+          />
         </>
       )}
       {share.error && <p className="px-2 pb-1 text-[12px] text-destructive">{share.error}</p>}

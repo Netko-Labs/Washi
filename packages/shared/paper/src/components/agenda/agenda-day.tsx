@@ -5,6 +5,7 @@ import type { AgendaDayProps } from './lib'
 export function AgendaDay({
   day,
   rows,
+  requested = [],
   columns,
   empty,
   limit,
@@ -30,7 +31,7 @@ export function AgendaDay({
       aria-label={day.long}
       data-today={day.isToday || undefined}
       data-outside={day.isOutside || undefined}
-      data-empty={rows.length === 0 || undefined}
+      data-empty={rows.length + requested.length === 0 || undefined}
     >
       <header className="wsx-agenda-day-head">
         <span className="wsx-agenda-weekday">{day.weekday}</span>
@@ -48,7 +49,14 @@ export function AgendaDay({
         )}
       </header>
       <div className="wsx-agenda-events">
-        {rows.length > 0 ? shown.map(event) : <span className="wsx-agenda-free">{empty}</span>}
+        {requested.map((time, index) => (
+          <span key={`${time}-${String(index)}`} className="wsx-agenda-requested">
+            Requested{time && ` · ${time}`}
+          </span>
+        ))}
+        {rows.length > 0
+          ? shown.map(event)
+          : requested.length === 0 && <span className="wsx-agenda-free">{empty}</span>}
         {folded.length > 0 && (
           <details className="wsx-agenda-more">
             <summary>+{folded.length} more</summary>

@@ -1,2 +1,2 @@
 export { Inbox } from './inbox'
-export type { InboxRow } from './lib'
+export type { InboxRow, InboxRowAction } from './lib'

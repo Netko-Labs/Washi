@@ -39,7 +39,24 @@ describe('free times to book (D102)', () => {
       end: '2026-10-29T11:30',
       label: '11:00',
       isBooked: false,
+      isRequested: false,
     })
+  })
+
+  test('a time a visitor asked for is held as requested, never over a booked one (D120)', () => {
+    const busy = busyOf([{ when: '2026-10-29T10:00/2026-10-29T10:30' }], 'when', 30)
+    const held = busyOf(
+      [{ when: '2026-10-29T10:00/2026-10-29T10:30' }, { when: '2026-10-29T11:00' }],
+      'when',
+      30,
+    )
+    const slots = slotsOn('2026-10-29', '10:00-12:00', 30, busy, 0, held)
+    expect(slots.map((slot) => [slot.label, slot.isBooked, slot.isRequested])).toEqual([
+      ['10:00', true, false],
+      ['10:30', false, false],
+      ['11:00', false, true],
+      ['11:30', false, false],
+    ])
   })
 
   test('a bare day takes the whole day; a slot never runs past closing', () => {

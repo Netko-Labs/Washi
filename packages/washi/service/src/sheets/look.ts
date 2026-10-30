@@ -118,3 +118,12 @@ export function updateSheetAccess(
   if (by && next.visibility === 'public') openShare(ws, id, by)
   return updated
 }
+
+/** A person lets a public page's link take suggested rows (D120); off, the prop goes. */
+export function updateSheetSuggest(ws: Workspace, id: string, suggest: boolean): SheetDetail {
+  const sheet = requireSheet(ws, id)
+  const root = parse(sheet.source)
+  const { suggest: _suggest, ...props } = root.props
+  const source = serialize({ ...root, props: suggest ? { ...props, suggest: true } : props })
+  return updateSheetFromSource(ws, id, { title: sheet.title, tags: sheet.tags, source })
+}

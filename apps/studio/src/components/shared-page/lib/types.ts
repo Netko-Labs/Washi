@@ -16,6 +16,13 @@ export interface SharedPayload {
   unsplash: (UnsplashCredit & { id: string }) | null
   /** The workspace or server lists `*` for embeds: any https one plays (D118). */
   embedsAnySite: boolean
+  /** Its adds become suggestions a member approves (D120). */
+  suggest: boolean
+}
+
+export interface ShareHostOptions {
+  embedsAnySite: boolean
+  suggest: boolean
 }
 
 export type SharedState =

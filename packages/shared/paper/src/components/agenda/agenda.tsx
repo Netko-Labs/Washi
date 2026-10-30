@@ -1,21 +1,22 @@
-import { useState } from 'react'
-import { styled } from '../../lib'
+import { addModeOf, styled } from '../../lib'
 import { usePaperHost } from '../../provider'
 import { FormDialog } from '../form'
 import { AgendaDay } from './agenda-day'
 import { AgendaEventMenu } from './agenda-event-menu'
 import {
   AGENDA_MONTH_LIMIT,
-  type AgendaPick,
   type AgendaProps,
+  requestedByDay,
   rowsByDay,
+  useAgendaAdd,
   useAgendaPeriod,
 } from './lib'
 
 /**
  * A week or a month of rows on their dates, the way a calendar shows it: today marked, ‹ › to
  * move, each row opening where the reader is. With `add`, a day's + opens a modal Form on that day.
- * A host that adds rows gives each event a ⋯: Duplicate, Copy to…, Repeat on days….
+ * A host that adds rows gives each event a ⋯: Duplicate, Copy to…, Repeat on days…. A read-only
+ * link draws neither, and times visitors asked for show as Requested (D120).
  */
 export function Agenda({
   bind,
@@ -34,9 +35,11 @@ export function Agenda({
 }: AgendaProps) {
   const host = usePaperHost()
   const period = useAgendaPeriod({ bind, date, weekStart, view, stateKey, locale: host.locale })
-  const [pick, setPick] = useState<AgendaPick>(null)
-  const adding = pick?.kind === 'add' ? pick.day : null
+  const mode = addModeOf(host)
+  const adds = useAgendaAdd(mode === 'suggest')
+  const { adding } = adds
   const byDay = rowsByDay(period.state.rows, date)
+  const asked = requestedByDay(period.requested)
   const columns = { date, title, time, end, badge }
   const addingOn = period.days.find((day) => day.key === adding)
   const unit = view === 'month' ? 'month' : 'week'
@@ -57,6 +60,11 @@ export function Agenda({
           </button>
         </div>
       </div>
+      {adds.note && (
+        <p className="wsx-slots-booked" role="status">
+          {adds.note}
+        </p>
+      )}
       {period.state.status === 'error' ? (
         <div className="wsx-empty" data-state="error" role="alert">
           This {unit} could not load — {period.state.error}
@@ -74,35 +82,38 @@ export function Agenda({
               key={day.key}
               day={day}
               rows={byDay.get(day.key) ?? []}
+              requested={asked.get(day.key)}
               columns={columns}
               empty={empty}
               limit={view === 'month' ? AGENDA_MONTH_LIMIT : undefined}
-              onAdd={add ? () => setPick({ kind: 'add', day: day.key }) : undefined}
+              onAdd={add && mode ? () => adds.open(day.key) : undefined}
               onOpen={host.openRow}
-              onMenu={host.newRow ? (row) => setPick({ kind: 'event', row }) : undefined}
+              onMenu={mode === 'write' && host.newRow ? adds.openEvent : undefined}
             />
           ))}
         </div>
       )}
-      {add && (
+      {add && mode && (
         <FormDialog
           open={adding !== null}
-          onClose={() => setPick(null)}
-          title={`${addLabel ?? 'Add'}${addingOn ? ` · ${addingOn.long}` : ''}`}
+          onClose={adds.close}
+          onAdded={adds.landed}
+          isBooking
+          title={`${mode === 'suggest' ? 'Request' : (addLabel ?? 'Add')}${addingOn ? ` · ${addingOn.long}` : ''}`}
           table={bind.table}
           fields={add}
           submit={addLabel}
           seed={adding ? { [date]: adding } : undefined}
         />
       )}
-      {pick?.kind === 'event' && (
+      {adds.pick?.kind === 'event' && (
         <AgendaEventMenu
-          row={pick.row}
+          row={adds.pick.row}
           table={bind.table}
           columns={columns}
           weekStart={weekStart}
           locale={host.locale}
-          onClose={() => setPick(null)}
+          onClose={adds.close}
         />
       )}
     </div>

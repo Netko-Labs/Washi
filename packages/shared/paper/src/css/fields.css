@@ -211,6 +211,13 @@ select.wsx-field-input {
   font-weight: 600;
   color: var(--tone-success-text);
 }
+.wsx-form-trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
 .wsx-form-list {
   min-height: calc(38px * var(--sz));
   padding: 5px 6px;

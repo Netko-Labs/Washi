@@ -1,3 +1,3 @@
 export { Form } from './form'
 export { FormDialog } from './form-dialog'
-export { useLandedNote } from './lib'
+export { SENT_NOTE, useLandedNote } from './lib'

@@ -1,24 +1,32 @@
-import { IconBell } from '@tabler/icons-react'
+import { IconBell, IconInbox } from '@tabler/icons-react'
 import { AgentMascot } from '../mascot'
 import { initials } from '../stores'
+import { InboxRowActions } from './inbox-row-actions'
 import { type InboxRowProps, whenLabel } from './lib'
 
 const ROW =
   'relative flex w-full items-start gap-3 rounded-xl px-3 py-2.5 text-left hover:bg-accent'
 
-/** Avatar or mascot · who verb where · the second line · the time. Unread keeps the dot. */
+/**
+ * Avatar or mascot · who verb where · the second line · the time. Unread keeps the dot; a row's
+ * own presses (a suggestion's Approve, Decline) sit under it, outside the row's own button.
+ */
 export function InboxRow({ row, now }: InboxRowProps) {
   const body = (
     <>
       {row.unread && (
         <span className="absolute top-[18px] left-0 size-1.5 rounded-full bg-primary" />
       )}
-      {row.kind === 'reminder' ? (
+      {row.kind === 'reminder' || row.kind === 'suggestion' ? (
         <span
           className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full bg-accent text-muted-foreground"
           aria-hidden
         >
-          <IconBell className="size-4" />
+          {row.kind === 'reminder' ? (
+            <IconBell className="size-4" />
+          ) : (
+            <IconInbox className="size-4" />
+          )}
         </span>
       ) : row.who ? (
         <span
@@ -53,10 +61,18 @@ export function InboxRow({ row, now }: InboxRowProps) {
     </>
   )
 
-  if (!row.onOpen) return <div className={ROW}>{body}</div>
-  return (
+  const main = row.onOpen ? (
     <button type="button" onClick={row.onOpen} className={ROW}>
       {body}
     </button>
+  ) : (
+    <div className={ROW}>{body}</div>
+  )
+  if (!row.actions?.length) return main
+  return (
+    <div>
+      {main}
+      <InboxRowActions actions={row.actions} />
+    </div>
   )
 }

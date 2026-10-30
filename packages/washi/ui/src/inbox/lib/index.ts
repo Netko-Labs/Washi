@@ -7,6 +7,8 @@ export type {
   InboxKind,
   InboxProps,
   InboxRow,
+  InboxRowAction,
+  InboxRowActionsProps,
   InboxRowProps,
   NeedRowProps,
 } from './types'

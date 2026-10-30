@@ -1,4 +1,4 @@
-import type { Reminder, ReminderHit, RoutineRun } from '@washi/domain'
+import type { Reminder, ReminderHit, RoutineRun, Suggestion } from '@washi/domain'
 import type { Filter, QueryRow, TableSpec } from '@washi/ink'
 
 /** A routine run joined to its chat, as `listRoutineRuns` reads it. */
@@ -55,4 +55,17 @@ export interface AutomationEntry {
   event: 'insert' | 'update'
   title: string | null
   source: string
+}
+
+/** A suggestion as kept, before anyone reads it. */
+export type SuggestionRecord = Omit<Suggestion, 'isRead' | 'sheetTitle'>
+
+export type SuggestionWrite = Omit<SuggestionRecord, 'id' | 'status' | 'hlcCreated'> & {
+  ipHash: string
+}
+
+export interface SuggestionDecision {
+  status: 'approved' | 'declined'
+  by: string
+  recordId: string | null
 }

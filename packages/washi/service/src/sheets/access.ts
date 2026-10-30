@@ -68,7 +68,7 @@ export function requireReadable(ws: Workspace, id: string, viewer: Viewer): void
  * `visibility` or `access`, nor hide less on a page that is on a public link.
  */
 export function guardWashiWrite(before: WsxElement | null, after: WsxElement): void {
-  const was = before ? accessOf(before) : { visibility: 'shared', access: [] }
+  const was: SheetAccess = before ? accessOf(before) : { visibility: 'shared', access: [] }
   const now = accessOf(after)
   if (was.visibility !== now.visibility || was.access.join() !== now.access.join()) {
     throw new SheetAccessError(
@@ -78,6 +78,11 @@ export function guardWashiWrite(before: WsxElement | null, after: WsxElement): v
   if (before && was.visibility === 'public' && redactionWeight(after) < redactionWeight(before)) {
     throw new SheetAccessError(
       'This page is on a public link: keep every <Redact> and redact column it has.',
+    )
+  }
+  if (now.suggest && !was.suggest) {
+    throw new SheetAccessError(
+      "Only a person lets a page's link take suggestions. Leave the Sheet's suggest prop off.",
     )
   }
 }

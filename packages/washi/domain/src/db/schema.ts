@@ -21,6 +21,8 @@ export const sheetTable = sqliteTable('sheets', {
     .notNull()
     .default('shared'),
   access: text('access', { mode: 'json' }).$type<string[]>().notNull().default([]),
+  /** Cache of `<Sheet suggest>` (D120): its link takes rows to approve. */
+  suggest: integer('suggest', { mode: 'boolean' }).notNull().default(false),
   /** Derived cache of the Loro doc's text — queries and FTS read this. */
   source: text('source').notNull(),
   loroSnapshot: blob('loro_snapshot', { mode: 'buffer' }).notNull(),

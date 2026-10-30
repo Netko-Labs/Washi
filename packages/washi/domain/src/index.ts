@@ -141,6 +141,20 @@ export {
   storageConfigSchema,
 } from './entities/storage'
 export {
+  type RequestedAsk,
+  requestedAskSchema,
+  type Suggestion,
+  type SuggestionAsk,
+  type SuggestionInbox,
+  type SuggestionKind,
+  type SuggestionStatus,
+  suggestionAskSchema,
+  suggestionInboxSchema,
+  suggestionKindSchema,
+  suggestionSchema,
+  suggestionStatusSchema,
+} from './entities/suggestions'
+export {
   type LinkColumnInput,
   linkColumnInputSchema,
   ROW_ACTIVITY_MAX,
