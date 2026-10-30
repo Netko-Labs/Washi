@@ -1,6 +1,6 @@
 import type { AgentSession, ApprovalRequest, TranscriptEntry } from '@washi/domain'
 import type { TabKey } from '../view/types'
-import type { AgentState, ChatScope, LastAsk, TurnFailure, TurnView } from './types'
+import type { AgentState, ChatScope, LastAsk, TurnFailure, TurnState, TurnView } from './types'
 import { TURN_CUT_OFF, TURN_FAILED } from './values'
 
 /** Header/panel mascot state from the transcript tail (design: agent status lives in chrome). */
@@ -117,16 +117,9 @@ export function turnViewOf(
   const ask = askEntry(transcript)
   const failure = running ? null : failureOf(transcript, session)
   const stop = running || failure ? null : stoppedReceipt(transcript)
+  const ended: TurnState = failure ? 'failed' : stop ? 'stopped' : 'idle'
   return {
-    state: running
-      ? stalled
-        ? 'stalled'
-        : 'working'
-      : failure
-        ? 'failed'
-        : stop
-          ? 'stopped'
-          : 'idle',
+    state: running ? (stalled ? 'stalled' : 'working') : ended,
     failureText: failure?.text ?? null,
     endId: failure?.entryId ?? stop,
     startedAt: running && ask ? msOf(ask.createdAt) : null,
