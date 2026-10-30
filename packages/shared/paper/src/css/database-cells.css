@@ -48,6 +48,15 @@
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
+/* A number never widens its column past this; the rest is cut, the whole value one press away. */
+.wsx-db-reading[data-num],
+.wsx-db-formula[data-num] {
+  max-width: 240px;
+  margin-left: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .wsx-db-reading:hover {
   background: var(--muted-bg);
 }
