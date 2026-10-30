@@ -18,7 +18,8 @@ export function useEventCopy(table: string, id: string, onCopied: () => void): E
     copy: async (entries) => {
       setStatus({ kind: 'busy' })
       try {
-        const spec = await host.describeTable(table).catch(() => null)
+        const spec = await host.describeTable(table)
+        if (!spec) throw new Error(`“${table}” can’t be read just now — try the copy again`)
         await host.runAction(copyAction(table, id, entries, spec))
         setStatus({ kind: 'idle' })
         onCopied()
