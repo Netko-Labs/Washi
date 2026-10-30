@@ -140,6 +140,31 @@ const open = useOpen()
     expect(module.indexOf('const open = useOpen()')).toBeGreaterThan(view)
     expect(module.trimEnd().endsWith('</Sheet>\n)\n}')).toBe(true)
   })
+
+  test('a plain constant sits beside the helper that reads it; one that acts or reads view() stays', () => {
+    const module = pageModule(`import { useNow } from 'washi'
+const H = 20
+const ROWS = Array.from({ length: H })
+const fill = (y) => y < H
+const now = useNow()
+const t = now / 1000
+const late = () => now > 0
+let count = 0
+function frame() { return H }
+<Sheet title="t"><Text>{frame(t)}</Text></Sheet>`)
+    const view = module.indexOf('export default function view() {')
+    expect(module.indexOf('const H = 20')).toBeLessThan(view)
+    expect(module.indexOf('const fill = (y) => y < H')).toBeLessThan(view)
+    for (const stays of [
+      'const ROWS',
+      'const now = useNow()',
+      'const t = now',
+      'const late',
+      'let count',
+    ]) {
+      expect(module.indexOf(stays)).toBeGreaterThan(view)
+    }
+  })
 })
 
 describe('text beside code', () => {
