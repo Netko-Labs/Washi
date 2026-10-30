@@ -13,6 +13,10 @@ export function SidebarPages({ workspaceId, onNavigate }: SidebarSectionProps) {
   const favoriteIds = useFavoritesStore((state) => state.ids)
   const activeTab = useViewStore((state) => state.activeTab)
   const favorites = sheets.filter((sheet) => favoriteIds.includes(sheet.id))
+  const newPage = () => {
+    void useSheetsStore.getState().createSheet()
+    onNavigate()
+  }
 
   return (
     <div className="min-h-0 flex-1 space-y-px overflow-y-auto px-3 pb-2 md:px-2">
@@ -30,21 +34,25 @@ export function SidebarPages({ workspaceId, onNavigate }: SidebarSectionProps) {
           ))}
         </>
       )}
-      <div className={LABEL}>Pages</div>
+      <div className={`${LABEL} flex items-center`}>
+        Pages
+        <button
+          type="button"
+          aria-label="New page"
+          title="New page"
+          onClick={newPage}
+          className="-my-1 ml-auto grid size-6 place-items-center rounded text-muted-foreground hover:bg-accent hover:text-foreground md:size-5"
+        >
+          <IconPlus className="size-3.5" />
+        </button>
+      </div>
       {sheets.length === 0 && (
         <p className="px-2 py-1 text-[14px] text-muted-foreground leading-relaxed md:text-[12.5px]">
           No pages yet. Start one, or ask Washi to.
         </p>
       )}
       <SidebarTree workspaceId={workspaceId} onNavigate={onNavigate} />
-      <button
-        type="button"
-        onClick={() => {
-          void useSheetsStore.getState().createSheet()
-          onNavigate()
-        }}
-        className={ROW}
-      >
+      <button type="button" onClick={newPage} className={ROW}>
         <IconPlus className="size-3.5 opacity-70" />
         New page
       </button>

@@ -17,7 +17,7 @@ function askWashi(text: string) {
     )
 }
 
-/** ⌘K palette per Washi.dc.html: scrim, 560px panel at 14vh, ask Washi, pages, a blank page. */
+/** ⌘K palette per Washi.dc.html: scrim, 560px panel at 14vh, ask Washi, a blank page, pages. */
 export function CommandPalette() {
   const { sheets, paletteOpen, closePalette, createSheet, searchTerm, searchHits, search } =
     useSheetsStore()
@@ -88,6 +88,22 @@ export function CommandPalette() {
             </Command.Item>
           )}
           <Command.Group
+            heading="Create"
+            className="[&_[cmdk-group-heading]]:px-2.5 [&_[cmdk-group-heading]]:pt-2 [&_[cmdk-group-heading]]:pb-1 [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:text-[11px] [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-[0.06em]"
+          >
+            <Command.Item
+              value="new blank page create"
+              onSelect={() => {
+                void createSheet()
+                closePalette()
+              }}
+              className="flex h-9 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-[13px] data-[selected=true]:bg-accent"
+            >
+              <IconSparkles className="size-4 text-muted-foreground" />
+              New blank page
+            </Command.Item>
+          </Command.Group>
+          <Command.Group
             heading="Pages"
             className="[&_[cmdk-group-heading]]:px-2.5 [&_[cmdk-group-heading]]:pt-2 [&_[cmdk-group-heading]]:pb-1 [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:text-[11px] [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-[0.06em]"
           >
@@ -133,22 +149,6 @@ export function CommandPalette() {
               ))}
             </Command.Group>
           )}
-          <Command.Group
-            heading="Create"
-            className="[&_[cmdk-group-heading]]:px-2.5 [&_[cmdk-group-heading]]:pt-2 [&_[cmdk-group-heading]]:pb-1 [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:text-[11px] [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-[0.06em]"
-          >
-            <Command.Item
-              value="new blank page create"
-              onSelect={() => {
-                void createSheet()
-                closePalette()
-              }}
-              className="flex h-9 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-[13px] data-[selected=true]:bg-accent"
-            >
-              <IconSparkles className="size-4 text-muted-foreground" />
-              New blank page
-            </Command.Item>
-          </Command.Group>
         </Command.List>
       </Command>
     </div>
