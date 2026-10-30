@@ -1,14 +1,18 @@
 import {
   byteRange,
+  contentDisposition,
   isInlineType,
   largestUpload,
   type UploadCaps,
   uploadCaps,
+  uploadKindOf,
   uploadRefusal,
 } from '@washi/domain'
 import { codeLimits } from '@washi/service'
 import type { ResolvedWorkspace } from '@washi/trpc'
+import { FILE_CSP } from '@/server/constants'
 import { createRequestContext, washiRuntime } from '@/server/runtime'
+import type { FileRefusal } from '@/server/types'
 
 /** Multipart framing on top of the file itself. */
 const BODY_SLACK = 16 * 1024
@@ -42,8 +46,11 @@ export function lengthMissing(request: Request): boolean {
 }
 
 /** A picture, a video, a sound or a document within its kind's limit; anything else in words. */
-export function fileLimits(file: File, caps: UploadCaps): string | null {
-  return uploadRefusal(file.type, file.size, undefined, caps)
+export function fileLimits(file: File, caps: UploadCaps): FileRefusal | null {
+  const error = uploadRefusal(file.type, file.size, undefined, caps)
+  if (!error) return null
+  const status = !uploadKindOf(file.type) ? 415 : file.size === 0 ? 400 : 413
+  return { error, status }
 }
 
 /**
@@ -56,16 +63,21 @@ export function fileResponse(
   caching: Record<string, string> = { 'cache-control': 'private, max-age=31536000, immutable' },
 ): Response {
   const length = found.bytes.byteLength
-  const disposition = isInlineType(found.file.mime) ? 'inline' : 'attachment'
   const headers: Record<string, string> = {
     'content-type': found.file.mime,
-    'content-disposition': `${disposition}; filename*=UTF-8''${encodeURIComponent(found.file.name)}`,
+    'content-disposition': contentDisposition(found.file.name, isInlineType(found.file.mime)),
     'x-content-type-options': 'nosniff',
-    'content-security-policy': 'sandbox',
+    'content-security-policy': FILE_CSP,
     'accept-ranges': 'bytes',
     ...caching,
   }
   const range = byteRange(request.headers.get('range'), length)
+  if (range === 'unsatisfiable') {
+    return new Response(null, {
+      status: 416,
+      headers: { ...headers, 'content-range': `bytes */${length}` },
+    })
+  }
   if (!range) {
     return new Response(found.bytes.slice(), {
       headers: { ...headers, 'content-length': String(length) },

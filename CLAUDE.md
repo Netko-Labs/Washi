@@ -244,10 +244,11 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   `POST /api/files` (multipart) and `GET /api/files/<id>` are studio routes gated like a workspace
   procedure (`src/server/files.ts`); `files.remove` is tRPC. What a workspace takes is `UPLOAD_RULES`
   in domain (D95): pictures 10 MB, videos 50 MB, audio and documents 25 MB (the server's admin may
-  change these, D118) — never HTML or SVG;
+  change these, D118) — never HTML or SVG (415), never empty (400);
   `uploadRefusal` says why in words, on the server and before a picker uploads (covers, icons and
   emojis ask for a picture). Served bytes are `nosniff`, `Content-Security-Policy: sandbox`, inline
   only for media and PDFs (else a download), and honour `Range` (`byteRange` → 206) so a video seeks.
+  The CSP is a route rule of its own (`FILE_ROUTES`): Nitro's `headers` rule overwrites a handler's.
   `<Video>` `<Audio>` `<File src name bytes>` and `<Figure>` take an https address or `file:<id>`
   (`mediaUrl` through the host's `fileUrl`); `/image` `/video` `/audio` `/file` open the picker in the
   press that chose them and land the block once stored. Every `file:` key a page holds is indexed in

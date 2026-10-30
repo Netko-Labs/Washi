@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { uploadName } from '@washi/domain'
 import {
   bodyTooLarge,
   capsOf,
@@ -29,9 +30,9 @@ export const Route = createFileRoute('/api/files/$')({
         const file = form?.get('file')
         if (!(file instanceof File)) return Response.json({ error: 'no file' }, { status: 400 })
         const refusal = fileLimits(file, caps)
-        if (refusal) return Response.json({ error: refusal }, { status: 413 })
+        if (refusal) return Response.json({ error: refusal.error }, { status: refusal.status })
         const stored = await resolved.files.put({
-          name: file.name,
+          name: uploadName(file.name),
           mime: file.type,
           bytes: new Uint8Array(await file.arrayBuffer()),
         })

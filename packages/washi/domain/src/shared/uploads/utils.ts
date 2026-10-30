@@ -1,5 +1,5 @@
 import type { CodeLimits } from '../../entities/safeguards'
-import type { UploadCaps, UploadKind } from './types'
+import type { ByteRange, UploadCaps, UploadKind } from './types'
 import { MB, UPLOAD_CAPS, UPLOAD_RULES } from './values'
 
 /** Which kind a type is, or null for one no workspace takes. */
@@ -39,8 +39,37 @@ export function uploadRefusal(
   if (!kind || (only && kind !== only)) {
     return only ? `${UPLOAD_RULES[only].noun} only` : 'that kind of file is not taken'
   }
+  if (size === 0) return 'that file is empty'
   const cap = caps[kind]
   return size > cap ? `${UPLOAD_RULES[kind].noun} up to ${Math.round(cap / MB)} MB` : null
+}
+
+/**
+ * The name an upload keeps: its last path segment, no control characters. Browsers send `"`, CR
+ * and LF in a multipart filename as `%22 %0D %0A`; Bun hands them on undecoded, and an empty part
+ * no name at all.
+ */
+export function uploadName(sent: string | undefined): string {
+  const decoded = (sent ?? '')
+    .replace(/%22/gi, '"')
+    .replace(/%0[ad]/gi, '')
+    .replace(/\\"/g, '"')
+  const last = decoded.split(/[/\\]/).pop() ?? ''
+  const name = [...last]
+    .filter((char) => char.charCodeAt(0) >= 0x20 && char.charCodeAt(0) !== 0x7f)
+    .join('')
+    .trim()
+  return name === '' || name === '.' || name === '..' ? 'file' : name
+}
+
+/** `Content-Disposition` for a stored name: RFC 5987 for the real one, plain ASCII beside it. */
+export function contentDisposition(name: string, isInline: boolean): string {
+  const fallback = name.replace(/[^\x20-\x7e]|["\\]/g, '_')
+  const encoded = encodeURIComponent(name).replace(
+    /['()*]/g,
+    (char) => `%${char.charCodeAt(0).toString(16).toUpperCase()}`,
+  )
+  return `${isInline ? 'inline' : 'attachment'}; filename="${fallback}"; filename*=UTF-8''${encoded}`
 }
 
 /** What a browser shows inline; anything else downloads, so nothing from an upload renders as a page. */
@@ -52,14 +81,15 @@ export const isInlineType = (mime: string): boolean => {
 /** The `accept` a file picker offers for a kind. */
 export const acceptFor = (kind: UploadKind): string => UPLOAD_RULES[kind].mimes.join(',')
 
-/** `bytes=a-b` against a length: the slice a player asked for, or null to send the whole file. */
-export function byteRange(
-  header: string | null,
-  length: number,
-): { start: number; end: number } | null {
+/**
+ * `bytes=a-b` against a length: the slice a player asked for, `unsatisfiable` for one wholly past
+ * the end (a 416), or null to send the whole file.
+ */
+export function byteRange(header: string | null, length: number): ByteRange | null {
   const match = header?.match(/^bytes=(\d*)-(\d*)$/)
   if (!match || (!match[1] && !match[2])) return null
+  if (match[1] && match[2] && Number(match[1]) > Number(match[2])) return null
   const start = match[1] ? Number(match[1]) : Math.max(0, length - Number(match[2]))
   const end = match[1] && match[2] ? Math.min(Number(match[2]), length - 1) : length - 1
-  return start <= end && start < length ? { start, end } : null
+  return start <= end ? { start, end } : 'unsatisfiable'
 }
