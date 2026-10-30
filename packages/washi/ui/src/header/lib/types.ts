@@ -1,4 +1,14 @@
+import type { SheetSummary } from '@washi/domain'
 import type { ReactNode } from 'react'
+import type { AgentMascotState } from '../../mascot'
+
+export interface PillInput {
+  mood: AgentMascotState
+  /** A turn runs or a question waits in the chat on screen, which follows this page. */
+  isBusy: boolean
+  sheet: Pick<SheetSummary, 'editedBy' | 'hlcUpdated'> | undefined
+  now: number
+}
 
 export interface HeaderProps {
   /** Before the breadcrumb — the web's drawer button. */

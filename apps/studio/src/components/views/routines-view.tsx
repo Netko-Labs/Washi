@@ -6,6 +6,6 @@ const workspaceRoute = getRouteApi('/w/$workspaceId')
 
 export function RoutinesView() {
   const { workspace } = workspaceRoute.useLoaderData()
-  useScreen('view:routines', ['Routines', workspace.name])
+  useScreen('view:routines', ['Routines'])
   return <RoutinesPage workspaceId={workspace.id} />
 }

@@ -6,6 +6,6 @@ const workspaceRoute = getRouteApi('/w/$workspaceId')
 
 export function ChatsView() {
   const { workspace } = workspaceRoute.useLoaderData()
-  useScreen('view:chats', ['Chats', workspace.name])
+  useScreen('view:chats', ['Chats'])
   return <ChatsPage workspaceId={workspace.id} />
 }

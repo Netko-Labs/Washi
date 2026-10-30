@@ -102,10 +102,11 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   pick closes it). The header keeps Edit and ⋯ (`NarrowHeaderActions`; comments, share, copy link and
   the star fold into ⋯ as `PageMenuQuick`); Washi is the mascot FAB under the thumb, no bottom bar. Gestures are `useSwipe` (`components/shared/gestures`): touch
   events, axis-locked, far-or-fast commits; a phone's peek is a sheet its bar pulls down. `useIsNarrow` picks the shell; the workspace routes never SSR.
-  The browser tab says where you are (D112): `<place> · <context>` (`Roadmap · Netko`, a peek
-  `<row> · <page>`, `Settings · People`), set by each view through `useDocumentTitle`
-  (`components/shared/document-title`) from data it already holds — a part still loading is left
-  out, an empty title reads Untitled; routes outside a workspace set theirs in `head`.
+  The browser tab says where you are (D112): `<place> · <context>`, the workspace last
+  (`Roadmap · Netko`, a peek `<row> · <page> · Netko`, `Settings · People · Netko`), set by each
+  view through `useWorkspaceTitle` (`components/shared/document-title`) from data it already holds
+  — a part still loading is left out, an empty title reads Untitled; a shared link is
+  `<page> · Washi`; routes outside a workspace set theirs in `head`.
 - `apps/desktop` — mirin shell: window, menu, icon, Develop menu. `src/bun/` (main) boots the
   embedded runtime and serves `appRouter` via `createMirinBridge`; the renderer's `api` is a tRPC
   client over `mirinLink`. No port, no token.
@@ -508,11 +509,10 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   still lands.
 - **Settings is grouped by whose it is (D69):** one column, the groups as sliding pills and each
   group's sections as tabs under them — Account (Profile — `auth.updateUser`; Preferences —
-  the theme, one `useTheme` store in `components/shared/theme`), Workspace (General — rename through
+  the theme — Light · Dark · System, one `useTheme` store in `components/shared/theme`), Workspace (General — rename through
   `auth.organization.update`, owners and admins; People; Storage — D70; Emojis — D71), Washi
   (Models · What leaves · Usage · Routines), Server (the app admin's). `?tab=` names the section;
-  an unknown one (the old `agent`)
-  lands on Models. **The team's models** are app meta `agent_enabled_models` (`EnabledModel[]`, id +
+  none or an unknown one lands on Profile (the old `agent` on Models). **The team's models** are app meta `agent_enabled_models` (`EnabledModel[]`, id +
   the catalogue's name, per provider; none for the key's provider = the recommended three), set by owners (`agents.setEnabledModels`)
   and read by the composer's model chip through `agents.settings`. Menus and pickers in the studio
   are `Floating` (`components/shared/floating`): portalled to the body, so no `overflow-hidden`

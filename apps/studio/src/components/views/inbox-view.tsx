@@ -7,7 +7,7 @@ const workspaceRoute = getRouteApi('/w/$workspaceId')
 
 export function InboxView() {
   const { workspace } = workspaceRoute.useLoaderData()
-  useScreen('view:inbox', ['Inbox', workspace.name])
+  useScreen('view:inbox', ['Inbox'])
   const rows = useInboxRows()
   return (
     <FirstRunGate workspace={workspace}>

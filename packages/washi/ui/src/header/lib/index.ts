@@ -1,4 +1,5 @@
-export { MAX_CRUMBS } from './constants'
-export { useAgentMood } from './hooks/use-agent-mood'
-export type { HeaderCrumbsProps, HeaderProps } from './types'
+export { MAX_CRUMBS, WASHI_LINGER_MS } from './constants'
+export { useAgentPill } from './hooks/use-agent-pill'
+export type { HeaderCrumbsProps, HeaderProps, PillInput } from './types'
+export { lingerUntil, pillStateFor } from './utils'
 export { STATE_LABELS, VIEW_LABELS } from './values'

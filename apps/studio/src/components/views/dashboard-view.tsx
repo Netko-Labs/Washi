@@ -7,7 +7,7 @@ const workspaceRoute = getRouteApi('/w/$workspaceId')
 
 export function DashboardView() {
   const { workspace } = workspaceRoute.useLoaderData()
-  useScreen('view:dashboard', ['Home', workspace.name])
+  useScreen('view:dashboard', ['Home'])
   return (
     <FirstRunGate workspace={workspace}>
       <Dashboard />
