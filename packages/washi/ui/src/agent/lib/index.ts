@@ -1,3 +1,4 @@
+export { useAttachMenu } from './hooks/use-attach-menu'
 export { useAutosize } from './hooks/use-autosize'
 export { useComposer } from './hooks/use-composer'
 export { useComposerSession } from './hooks/use-composer-session'
@@ -21,6 +22,7 @@ export type {
   ModelChoice,
   MovePickerProps,
   OptionChipsProps,
+  PageSearch,
   PanelFrame,
   PanelHeaderProps,
   PanelPlacement,
@@ -38,10 +40,12 @@ export {
   mergeMessageChunks,
   nextApprovals,
   offeredModels,
+  pagesMatching,
   receiptLine,
   usd,
 } from './utils'
 export {
+  ATTACH_PAGE_ROWS,
   COMPOSER_MIN_CAP_PX,
   COMPOSER_SHARE,
   EFFORTS,

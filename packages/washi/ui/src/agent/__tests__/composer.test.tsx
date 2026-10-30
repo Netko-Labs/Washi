@@ -1,13 +1,15 @@
 import { describe, expect, test } from 'bun:test'
-import type { AgentSession } from '@washi/domain'
+import type { AgentSession, SheetSummary } from '@washi/domain'
 import { renderToStaticMarkup } from 'react-dom/server'
 import {
+  ATTACH_PAGE_ROWS,
   approvalsOf,
   COMPOSER_MIN_CAP_PX,
   composerCap,
   type InferenceView,
   isYoloOffered,
   nextApprovals,
+  pagesMatching,
 } from '../lib'
 import { YoloChip, YoloNote } from '../yolo-chip'
 
@@ -76,5 +78,19 @@ describe('the YOLO chip (D115)', () => {
     expect(nextApprovals(chat(null), view())).toBe('auto')
     expect(nextApprovals(chat('auto'), view())).toBeNull()
     expect(nextApprovals(chat(null), view({ approvalMode: 'auto' }))).toBe('ask')
+  })
+})
+
+describe('the attach picker', () => {
+  const page = (title: string) => ({ id: title, title }) as SheetSummary
+
+  test('offers pages whose title holds the words, a screenful at most', () => {
+    const sheets = [page('Roadmap'), page('Road trip'), page('Wiki')]
+    expect(pagesMatching(sheets, ' road ').map((sheet) => sheet.id)).toEqual([
+      'Roadmap',
+      'Road trip',
+    ])
+    const many = Array.from({ length: 20 }, (_, index) => page(`Page ${index}`))
+    expect(pagesMatching(many, '')).toHaveLength(ATTACH_PAGE_ROWS)
   })
 })

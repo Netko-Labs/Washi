@@ -1,7 +1,7 @@
-import type { AgentSession, ApprovalMode, TranscriptEntry } from '@washi/domain'
+import type { AgentSession, ApprovalMode, SheetSummary, TranscriptEntry } from '@washi/domain'
 import { hostPlace } from '../../api'
 import type { InferenceView, ModelChoice, TurnDone } from './types'
-import { COMPOSER_MIN_CAP_PX, COMPOSER_SHARE, RECOMMENDED_MODELS } from './values'
+import { ATTACH_PAGE_ROWS, COMPOSER_MIN_CAP_PX, COMPOSER_SHARE, RECOMMENDED_MODELS } from './values'
 
 function duration(ms: number): string {
   const tenths = Math.round(ms / 100)
@@ -92,4 +92,12 @@ export function nextApprovals(
 ): ApprovalMode | null {
   const next = approvalsOf(session, inference) === 'auto' ? 'ask' : 'auto'
   return next === inference.approvalMode ? null : next
+}
+
+/** The pages a picker offers for its words, in the tree's order, a screenful at most. */
+export function pagesMatching(sheets: SheetSummary[], term: string): SheetSummary[] {
+  const needle = term.trim().toLowerCase()
+  return sheets
+    .filter((sheet) => !needle || sheet.title.toLowerCase().includes(needle))
+    .slice(0, ATTACH_PAGE_ROWS)
 }
