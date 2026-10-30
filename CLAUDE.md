@@ -155,7 +155,9 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
 - **Live.** Every mutation under `sheets.*`, `tables.*` or `capabilities.*` emits
   `workspaceChanged`, and so does each finished Washi write (`runtime/agent-watch.ts`). Clients
   hold one `live.onChange` subscription (`useLiveStore`): pages refetch the list, data refetches
-  through `PaperHost.onDataChange`. An open editor takes a remote change in only while it has
+  through `PaperHost.onDataChange`. The host shares equal reads — tables, members, queries,
+  compiled pages (`@washi/ui` `reads`: one in flight, then 10s) — forgotten on each change before
+  its listeners run, on the host's own writes and on a workspace switch. An open editor takes a remote change in only while it has
   nothing unsaved (`absorb`, ids kept per row); otherwise its next save merges. Presence is a
   15s heartbeat (`live.here`) in the runtime's memory, never a record; Washi appears on a page
   for 20s after each rewrite of it.
