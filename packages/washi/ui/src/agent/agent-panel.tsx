@@ -34,7 +34,7 @@ export function AgentPanel({ placement = 'float', onExpand }: AgentPanelProps) {
     length: transcript.length,
     turn,
     sessionId,
-    isOwnSend: transcript.at(-1)?.update.kind === 'user_message',
+    isOwnLast: transcript.at(-1)?.update.kind === 'user_message',
   })
   const store = useAgentStore.getState
 

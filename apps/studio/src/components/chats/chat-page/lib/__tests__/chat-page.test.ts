@@ -4,6 +4,7 @@ import {
   chatBlocks,
   createdId,
   greetingFor,
+  isFreshSend,
   isNearBottom,
   receiptSummary,
   shortTitle,
@@ -177,6 +178,12 @@ describe('stick to bottom', () => {
   test('near the end counts as at the end', () => {
     expect(isNearBottom({ scrollTop: 560, scrollHeight: 1000, clientHeight: 400 })).toBe(true)
     expect(isNearBottom({ scrollTop: 300, scrollHeight: 1000, clientHeight: 400 })).toBe(false)
+  })
+
+  test('the person’s send pins once, as it lands — not on each turn change after', () => {
+    expect(isFreshSend(true, 5, 4)).toBe(true)
+    expect(isFreshSend(true, 5, 5)).toBe(false)
+    expect(isFreshSend(false, 6, 5)).toBe(false)
   })
 })
 

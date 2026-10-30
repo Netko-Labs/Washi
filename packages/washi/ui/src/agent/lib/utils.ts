@@ -112,7 +112,11 @@ export function isAtEnd(box: ScrollBox, slack = NEAR_END_PX): boolean {
   return box.scrollHeight - box.scrollTop - box.clientHeight <= slack
 }
 
-/** The panel follows its end only for a reader already there, their own send, or another chat. */
-export function followsEnd({ isPinned, isOwnSend, isNewChat }: FollowChange): boolean {
-  return isPinned || isOwnSend || isNewChat
+/**
+ * The panel follows its end for a reader already there, another chat, or the person's send — once,
+ * as it lands: while Washi works on it, a reader who scrolled up stays put.
+ */
+export function followsEnd(change: FollowChange): boolean {
+  const isFreshSend = change.isOwnLast && change.length > change.shownLength
+  return change.isPinned || change.isNewChat || isFreshSend
 }

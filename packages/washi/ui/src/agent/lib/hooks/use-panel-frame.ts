@@ -8,10 +8,11 @@ import { followsEnd, isAtEnd } from '../utils'
  * tail — on a new entry, a turn's end (Stopped, Retry) and a box shrunk by a keyboard or the
  * composer — while the reader is there; a reader scrolled up stays put.
  */
-export function usePanelFrame({ length, turn, sessionId, isOwnSend }: PanelSignal): PanelFrame {
+export function usePanelFrame({ length, turn, sessionId, isOwnLast }: PanelSignal): PanelFrame {
   const scrollRef = useRef<HTMLDivElement>(null)
   const isPinned = useRef(true)
   const shownSession = useRef(sessionId)
+  const shownLength = useRef(0)
 
   useEffect(() => {
     void useAgentStore.getState().init()
@@ -19,11 +20,19 @@ export function usePanelFrame({ length, turn, sessionId, isOwnSend }: PanelSigna
 
   useEffect(() => {
     const isNewChat = sessionId !== shownSession.current
+    const change = {
+      isPinned: isPinned.current,
+      isNewChat,
+      isOwnLast,
+      length,
+      shownLength: shownLength.current,
+    }
     shownSession.current = sessionId
-    if (!followsEnd({ isPinned: isPinned.current, isOwnSend, isNewChat })) return
+    shownLength.current = length
+    if (!followsEnd(change)) return
     isPinned.current = true
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight })
-  }, [length, turn, sessionId, isOwnSend])
+  }, [length, turn, sessionId, isOwnLast])
 
   useEffect(() => {
     const box = scrollRef.current

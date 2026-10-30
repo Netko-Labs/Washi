@@ -1,15 +1,28 @@
 import { describe, expect, test } from 'bun:test'
-import { followsEnd, isAtEnd } from '../lib'
+import { type FollowChange, followsEnd, isAtEnd } from '../lib'
+
+const scrolledUp: FollowChange = {
+  isPinned: false,
+  isNewChat: false,
+  isOwnLast: false,
+  length: 4,
+  shownLength: 4,
+}
 
 describe('the panel follows its end only for a reader there', () => {
   test('a reader scrolled up stays put when a turn ends or Washi writes', () => {
-    expect(followsEnd({ isPinned: false, isOwnSend: false, isNewChat: false })).toBe(false)
+    expect(followsEnd(scrolledUp)).toBe(false)
+    expect(followsEnd({ ...scrolledUp, length: 5 })).toBe(false)
   })
 
-  test('a reader at the end, their own send, or another chat follows', () => {
-    expect(followsEnd({ isPinned: true, isOwnSend: false, isNewChat: false })).toBe(true)
-    expect(followsEnd({ isPinned: false, isOwnSend: true, isNewChat: false })).toBe(true)
-    expect(followsEnd({ isPinned: false, isOwnSend: false, isNewChat: true })).toBe(true)
+  test('the person’s send follows once, as it lands — not on each turn change after', () => {
+    expect(followsEnd({ ...scrolledUp, isOwnLast: true, length: 5, shownLength: 4 })).toBe(true)
+    expect(followsEnd({ ...scrolledUp, isOwnLast: true, length: 5, shownLength: 5 })).toBe(false)
+  })
+
+  test('a reader at the end, or another chat, follows', () => {
+    expect(followsEnd({ ...scrolledUp, isPinned: true })).toBe(true)
+    expect(followsEnd({ ...scrolledUp, isNewChat: true })).toBe(true)
   })
 
   test('the end has a little slack', () => {

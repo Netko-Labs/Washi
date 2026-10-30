@@ -147,14 +147,17 @@ export interface PanelSignal {
   length: number
   turn: TurnState
   sessionId: string | null
-  /** The last entry is the person's own ask: their send always follows. */
-  isOwnSend: boolean
+  /** The last entry is the person's own ask. */
+  isOwnLast: boolean
 }
 
 export interface FollowChange {
   isPinned: boolean
-  isOwnSend: boolean
   isNewChat: boolean
+  isOwnLast: boolean
+  length: number
+  /** The transcript's length when the follow last looked. */
+  shownLength: number
 }
 
 export interface ScrollBox {
