@@ -85,7 +85,7 @@ export function DangerButton({ children }: DangerButtonProps) {
   return (
     <button
       type="button"
-      className="h-8 flex-none rounded-[10px] bg-destructive px-3 font-medium text-[13px] text-white hover:opacity-90"
+      className="h-8 flex-none rounded-[10px] bg-destructive px-3 font-medium text-[13px] text-destructive-foreground hover:opacity-90"
     >
       {children}
     </button>

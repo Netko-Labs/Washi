@@ -10,7 +10,7 @@ export function ConfirmTextButton({ idle, armed, onConfirm }: ConfirmTextButtonP
       onMouseLeave={disarm}
       className={`h-7 shrink-0 rounded-lg px-2.5 font-medium text-[12px] ${
         isArmed
-          ? 'bg-destructive text-white'
+          ? 'bg-destructive text-destructive-foreground'
           : 'border border-destructive/40 text-destructive hover:border-destructive hover:bg-destructive/10'
       }`}
     >

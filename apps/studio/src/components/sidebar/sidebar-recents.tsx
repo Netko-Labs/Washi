@@ -25,7 +25,7 @@ export function SidebarRecents({ workspaceId, onNavigate }: SidebarSectionProps)
           >
             <SheetIcon name={sheet.icon} className="size-[18px] shrink-0 md:size-[14px]" />
             <span className="w-full min-w-0 flex-1 truncate">{sheet.title}</span>
-            <span className="font-mono text-[10.5px] opacity-80">{age}</span>
+            <span className="font-mono text-[10.5px]">{age}</span>
           </a>
         ))}
       </div>

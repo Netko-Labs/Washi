@@ -61,7 +61,7 @@ export const useViewStore = create<ViewState>((set, get) => ({
   setTabs: (tabs) => set({ tabs: [...new Set(tabs)] }),
 
   // The host says who is here: the desktop from its profile, the web from the session.
-  identity: { name: '', email: '', color: '#c25f2c' },
+  identity: { name: '', email: '', color: '#b1582a' },
   setIdentity: (patch) => set((state) => ({ identity: { ...state.identity, ...patch } })),
   workspaceName: 'Workspace',
   setWorkspaceName: (workspaceName) => set({ workspaceName }),

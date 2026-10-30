@@ -40,7 +40,7 @@ export function StorageRemove({ onRemove }: StorageRemoveProps) {
             <button
               type="button"
               onClick={() => void confirm()}
-              className="h-[30px] rounded-lg bg-destructive px-3 font-medium text-[12.5px] text-white"
+              className="h-[30px] rounded-lg bg-destructive px-3 font-medium text-[12.5px] text-destructive-foreground"
             >
               Go back to the server
             </button>
