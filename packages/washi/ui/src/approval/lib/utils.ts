@@ -258,6 +258,6 @@ export function describeTool(
 /** A finished call's words: "Create a page" → "Made a page". */
 export function pastTense(action: string): string {
   const [verb = '', ...rest] = action.split(' ')
-  const past = PAST_TENSE[verb]
+  const past = Object.hasOwn(PAST_TENSE, verb) ? PAST_TENSE[verb] : undefined
   return past ? [past, ...rest].join(' ') : action
 }
