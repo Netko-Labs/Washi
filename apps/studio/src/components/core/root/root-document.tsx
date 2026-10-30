@@ -1,10 +1,12 @@
 import { HeadContent, Scripts, useRouter } from '@tanstack/react-router'
+import { useReloadOnStaleBuild } from '@/components/shared/stale-build'
 import { Provider } from '@/integrations/tanstack-query'
 import type { RootDocumentProps } from './lib'
 
 export function RootDocument({ children }: RootDocumentProps) {
   // The router's QueryClient; on the server that is one per request.
   const { queryClient } = useRouter().options.context
+  useReloadOnStaleBuild()
   return (
     <Provider queryClient={queryClient}>
       {/* The head's theme script may set `dark` before React sees this element. */}
