@@ -15,7 +15,7 @@ function greeting(hour = new Date().getHours()): string {
 }
 
 export function Dashboard() {
-  const { sheets } = useSheetsStore()
+  const { sheets, isLoaded } = useSheetsStore()
   const { openTab, identity } = useViewStore()
   const { today, decide } = useToday()
   const turns = today?.turns ?? []
@@ -102,7 +102,7 @@ export function Dashboard() {
               Recent pages
             </div>
             <div className="flex flex-col gap-2">
-              {recent.length === 0 && (
+              {isLoaded && recent.length === 0 && (
                 <p className="text-[13px] text-muted-foreground">No pages yet.</p>
               )}
               {recent.map((sheet) => (
