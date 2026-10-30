@@ -27,7 +27,7 @@ export const BASICS = [
   },
   {
     title: 'State makes a page interactive',
-    body: 'Select, Switch, Slider and Tabs write keys the Sheet declares; expressions and filters read them. That is a page’s whole behaviour — nothing in it runs code.',
+    body: 'Select, Switch, Slider and Tabs write keys the Sheet declares; expressions and filters read them. The markup stays data. A page may also run its own code, above the markup — in the reader’s sandbox, with no network, writing only from a press.',
   },
 ]
 

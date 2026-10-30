@@ -1,38 +1,40 @@
 import { IconSearch, IconSparkles } from '@tabler/icons-react'
 import { Command } from 'cmdk'
-import { useEffect } from 'react'
 import { SheetIcon } from '../sheet-icon'
-import { useAgentStore, useSheetsStore, useViewStore } from '../stores'
+import { useAgentStore, useNoticeStore, useSheetsStore, useViewStore } from '../stores'
+import { usePalette } from './lib'
 
-/** ⌘K palette per Washi.dc.html: scrim, 560px panel at 14vh, pages + agent actions. */
+/** Free text is a question: a turn starts on screen, in a fresh chat if one is running. */
+function askWashi(text: string) {
+  const agent = useAgentStore.getState()
+  if (agent.running) agent.startDraft()
+  if (!agent.panelOpen) agent.togglePanel()
+  useSheetsStore.getState().closePalette()
+  void agent
+    .sendPrompt(text)
+    .catch((cause: unknown) =>
+      useNoticeStore.getState().say(cause instanceof Error ? cause.message : String(cause)),
+    )
+}
+
+/** ⌘K palette per Washi.dc.html: scrim, 560px panel at 14vh, ask Washi, pages, a blank page. */
 export function CommandPalette() {
-  const {
-    sheets,
-    paletteOpen,
-    openPalette,
-    closePalette,
-    createSheet,
-    searchTerm,
-    searchHits,
-    search,
-  } = useSheetsStore()
-
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'k' && (event.metaKey || event.ctrlKey)) {
-        event.preventDefault()
-        openPalette()
-      }
-      if (event.key === 'Escape') closePalette()
-    }
-    document.addEventListener('keydown', onKeyDown)
-    return () => document.removeEventListener('keydown', onKeyDown)
-  }, [openPalette, closePalette])
+  const { sheets, paletteOpen, closePalette, createSheet, searchTerm, searchHits, search } =
+    useSheetsStore()
+  const ref = usePalette(paletteOpen)
+  const question = searchTerm.trim()
 
   if (!paletteOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50">
+    <div
+      ref={ref}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Ask Washi or search"
+      tabIndex={-1}
+      className="fixed inset-0 z-50 outline-none"
+    >
       <button
         type="button"
         aria-label="Close command palette"
@@ -51,7 +53,12 @@ export function CommandPalette() {
             autoFocus
             value={searchTerm}
             onValueChange={(value) => void search(value)}
-            placeholder="Search pages, blocks and agents…"
+            onKeyDown={(event) => {
+              if (event.key !== 'Enter' || !(event.metaKey || event.ctrlKey) || !question) return
+              event.preventDefault()
+              askWashi(question)
+            }}
+            placeholder="Ask Washi or search pages…"
             className="h-11 flex-1 bg-transparent text-[13.5px] outline-none placeholder:text-muted-foreground"
           />
           <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
@@ -60,8 +67,26 @@ export function CommandPalette() {
         </div>
         <Command.List className="max-h-[320px] overflow-y-auto p-1.5">
           <Command.Empty className="px-3 py-6 text-center text-[13px] text-muted-foreground">
-            No matches for that.
+            No pages match that.
           </Command.Empty>
+          {question && (
+            <Command.Item
+              forceMount
+              value="ask washi"
+              onSelect={() => askWashi(question)}
+              className="flex h-9 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-[13px] data-[selected=true]:bg-accent"
+            >
+              <span className="grid size-[18px] shrink-0 place-items-center rounded-full bg-agent font-semibold text-[9px] text-white">
+                AI
+              </span>
+              <span className="min-w-0 truncate">
+                Ask Washi: <span className="font-medium">{question}</span>
+              </span>
+              <kbd className="ml-auto shrink-0 rounded border border-border bg-muted px-1 font-mono text-[10px] text-muted-foreground">
+                ⌘⏎
+              </kbd>
+            </Command.Item>
+          )}
           <Command.Group
             heading="Pages"
             className="[&_[cmdk-group-heading]]:px-2.5 [&_[cmdk-group-heading]]:pt-2 [&_[cmdk-group-heading]]:pb-1 [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:text-[11px] [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-[0.06em]"
@@ -109,28 +134,11 @@ export function CommandPalette() {
             </Command.Group>
           )}
           <Command.Group
-            heading="Agents"
+            heading="Create"
             className="[&_[cmdk-group-heading]]:px-2.5 [&_[cmdk-group-heading]]:pt-2 [&_[cmdk-group-heading]]:pb-1 [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:text-[11px] [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-[0.06em]"
           >
             <Command.Item
-              value="new page create"
-              onSelect={() => {
-                void createSheet()
-                closePalette()
-                if (!useAgentStore.getState().panelOpen) useAgentStore.getState().togglePanel()
-              }}
-              className="flex h-9 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-[13px] data-[selected=true]:bg-accent"
-            >
-              <span className="grid size-[18px] place-items-center rounded-full bg-agent font-semibold text-[9px] text-white">
-                AI
-              </span>
-              Ask Washi to draft a page
-              <kbd className="ml-auto rounded border border-border bg-muted px-1 font-mono text-[10px] text-muted-foreground">
-                ⌘⏎
-              </kbd>
-            </Command.Item>
-            <Command.Item
-              value="blank new sheet"
+              value="new blank page create"
               onSelect={() => {
                 void createSheet()
                 closePalette()
