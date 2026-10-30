@@ -1,6 +1,7 @@
 import type { ComponentSpec } from '@washi/wsx'
 import { z } from 'zod'
-import { WIDGET_WORDS } from './page-modules'
+import { FILE_KEY } from './looks'
+import { TERMINAL_PATH, WIDGET_WORDS } from './page-modules'
 import { p } from './spec-kit'
 
 /** What a formula already means by these names; a workspace function may not take one. */
@@ -21,6 +22,18 @@ const BUILT_IN_CALLS = [
 export const SUBPAGE_LAYOUTS = ['list', 'cards', 'gallery'] as const
 
 const pageId = z.string().min(1).max(80).describe('page id')
+
+/** A Terminal's own files: a path its program reads (`frames.txt`, `data/a.csv`) → an upload. */
+export const terminalFilesSchema = z
+  .record(
+    z.string(),
+    z.string().regex(FILE_KEY, 'a file is file:<id>, an upload of this workspace'),
+  )
+  .refine(
+    (files) => Object.keys(files).every((path) => path.length <= 120 && TERMINAL_PATH.test(path)),
+    'a path is plain names joined by /, never .. or a leading dot',
+  )
+  .refine((files) => Object.keys(files).length <= 16, 'a terminal holds at most 16 files')
 
 /** A hub page's way out — one page linked, every child of a page — and what another site shows. */
 export const PAGE_SPECS: Record<string, ComponentSpec> = {
@@ -52,6 +65,20 @@ export const PAGE_SPECS: Record<string, ComponentSpec> = {
     {
       childWords: WIDGET_WORDS,
       hints: { html: WIDGET_WORDS },
+    },
+  ),
+  Terminal: p(
+    {
+      title: z.string().max(80).optional(),
+      height: z.number().int().min(120).max(1600).optional(),
+      files: terminalFilesSchema.optional(),
+    },
+    'text',
+    {
+      hints: {
+        code: 'the program is the Terminal’s children: a backtick string of Node-style JS',
+        files: 'files maps a path to an upload: files={{ "frames.txt": "file:<id>" }}',
+      },
     },
   ),
   Formula: p(

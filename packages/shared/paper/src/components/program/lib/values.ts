@@ -20,6 +20,7 @@ export const PROGRAM_BRIDGE = [
   'me',
   'navigate',
   'act',
+  'file',
 ]
 
 /**
@@ -68,6 +69,35 @@ const __keyed = (get, put, what) => (key, initial) => {
   }
   return [value, set]
 }
+const __files = new Map()
+const __bytes = (text) => {
+  const ABC = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+  const clean = text.replace(/=+$/, '')
+  const out = new Uint8Array(Math.floor((clean.length * 3) / 4))
+  let bits = 0, value = 0, at = 0
+  for (let i = 0; i < clean.length; i++) {
+    value = ((value << 6) | ABC.indexOf(clean[i])) & 0xffffff
+    bits += 6
+    if (bits >= 8) {
+      bits -= 8
+      out[at++] = (value >> bits) & 255
+    }
+  }
+  return out
+}
+// An upload is read once per sandbox and kept: what a file holds never changes under its id.
+const __useFile = (key, options) => {
+  const as = (options && options.as) || 'text'
+  const id = as + ':' + String(key)
+  if (__files.has(id)) return __files.get(id)
+  const raw = B.file(String(key), as)
+  if (raw === undefined) return null
+  const answer = JSON.parse(raw)
+  if (answer.error) throw new Error(answer.error)
+  const value = as === 'bytes' ? __bytes(answer.value) : answer.value
+  __files.set(id, value)
+  return value
+}
 const __pageState = __keyed((key) => B.state(key), (key, json) => B.set(key, json), 'a page state change')
 globalThis.__washi = {
   useRows: (query) => __read(B.rows(JSON.stringify(query)), []),
@@ -100,6 +130,7 @@ globalThis.__washi = {
   usePages: (of) => __read(B.pages(of == null ? '' : String(of)), []),
   useMembers: () => __read(B.members(), []),
   useMe: () => __read(B.me(), null),
+  useFile: __useFile,
   useNavigate: () => (id) => {
     __pressOnly('navigate')
     B.navigate(String(id))

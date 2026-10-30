@@ -16,9 +16,11 @@ export {
   PAGE_HOOKS,
   PAGE_IMPORT,
   PAGE_LIBRARIES,
+  TERMINAL_PATH,
   WIDGET_HOOKS,
   WIDGET_WORDS,
 } from './page-modules'
+export { terminalFilesSchema } from './page-specs'
 export {
   exprTables,
   pageTables,
@@ -57,6 +59,7 @@ export {
   WIDTHS,
   WORKSPACE_THEME_KEY,
 } from './surface'
+export { TERMINAL_FRAME } from './terminal'
 export { contrastRatio, isThemeRefused, THEME_RULES, themeChecks } from './theme-check'
 export { toHex } from './theme-color'
 export { fillDraft, readTheme, THEME_TOKENS, ThemeImportError, themeFile } from './theme-import'

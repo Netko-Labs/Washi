@@ -57,6 +57,7 @@ export function programBridge(
       if (live.me === undefined) needs.me = true
       return live.me ?? undefined
     },
+    file: (key = '', as = 'text') => cached(live.files, `${as}:${key}`, needs.files),
     navigate: pressed('navigate', (id = '') => host.openSheet(id)),
     act: pressed(
       'act',

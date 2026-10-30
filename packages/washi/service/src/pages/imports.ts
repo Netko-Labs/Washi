@@ -1,4 +1,5 @@
 import { readFileSync, realpathSync } from 'node:fs'
+import { builtinModules } from 'node:module'
 import { join, resolve, sep } from 'node:path'
 import type { PagePackageSet } from '@washi/domain'
 import { PAGE_IMPORT, PAGE_LIBRARIES } from '@washi/paper/registry'
@@ -6,6 +7,13 @@ import { PACKAGE_NAME } from '../server/constants'
 import { BROWSER_CONDITIONS, LIBRARY, NOT_LISTED_WORDS } from './values'
 
 const escaped = (name: string) => name.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')
+
+/** One of Node's own modules, `node:` or not: a Terminal's frame lends it, or says it can't (D119). */
+export const NODE_MODULE = new RegExp(`^(node:)?(${builtinModules.map(escaped).join('|')})$`)
+/** A path inside the program's own folder: `./data.json`. */
+export const RELATIVE = /^\.{0,2}\//
+
+export const isNodeRequire = (path: string) => NODE_MODULE.test(path) || RELATIVE.test(path)
 
 /** One of the server's packages or a subpath of it; as with a library, no segment climbs out. */
 export function packagePattern(set: PagePackageSet | null): RegExp | null {
@@ -99,3 +107,13 @@ function browserEntry(path: string, name: string, folder: string): string | null
 /** What a bundle's cache key must carry: a version moving rebuilds every page that may import it. */
 export const packageKey = (set: PagePackageSet | null) =>
   set?.packages.map(({ name, version }) => `${name}@${version}`).join(',') ?? ''
+
+/** Why a Terminal's program may not require something, in words (D119). */
+export function terminalRefusal(path: string, set: PagePackageSet | null): string {
+  const name = packageOf(path)
+  if (set && PACKAGE_NAME.test(name) && !isAllowedImport(name, set)) {
+    return `"${name}" ${NOT_LISTED_WORDS}`
+  }
+  const names = [...PAGE_LIBRARIES, ...(set?.packages.map((each) => each.name) ?? [])]
+  return `cannot require "${path}" — a terminal requires Node's own fs, path, events, util and the like, ${names.join(', ')}, or a .json file it holds`
+}

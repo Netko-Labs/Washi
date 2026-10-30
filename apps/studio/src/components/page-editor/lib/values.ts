@@ -116,6 +116,16 @@ export const STARTER_AUTOMATION = (table: string) => `function run(event) {
 }`
 
 /** What `/formula` drops in: a function any table's formula may call as with_tax(price). */
+/** `/terminal`'s first program: Node-style, so a pasted script runs as it would there. */
+export const STARTER_TERMINAL = `const os = require('os')
+
+console.log('Hello from a Washi terminal' + os.EOL)
+let left = 3
+const timer = setInterval(() => {
+  console.log(left > 0 ? left + '…' : 'Lift off!')
+  if (left-- === 0) clearInterval(timer)
+}, 500)`
+
 export const STARTER_FORMULA = `function with_tax(amount: number, rate = 0.19) {
   return Math.round(amount * (1 + rate) * 100) / 100
 }`

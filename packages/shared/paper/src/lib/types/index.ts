@@ -138,3 +138,4 @@ export type {
   Variant,
   Width,
 } from './style'
+export type { FileAs, FrameLook, TerminalProps, TerminalState } from './terminal'

@@ -14,7 +14,7 @@ const PAGE = parse('<Sheet title="Tasks" icon="🦊"><Title>Tasks</Title></Sheet
 
 /** A bundle as compilePage leaves it: `view` on `globalThis.__page`, the hooks off `__washi`. */
 const bundle = (body: string) =>
-  `(() => { const { useRows, useState, usePageState, useNavigate, useMe, act } = globalThis.__washi
+  `(() => { const { useRows, useState, usePageState, useNavigate, useMe, useFile, act } = globalThis.__washi
 function Kpi({ label, value }) { return h(Stat, { label, value }) }
 globalThis.__page = { view: () => { ${body} } } })()`
 
@@ -38,6 +38,7 @@ function harness(values: Record<string, string | number | boolean | null> = {}) 
     title: 'Tasks',
     rows: new Map(),
     tables: new Map(),
+    files: new Map(),
     members: undefined,
     me: undefined,
     halted: null,
@@ -49,6 +50,7 @@ function harness(values: Record<string, string | number | boolean | null> = {}) 
     tables: [],
     members: false,
     me: false,
+    files: [],
     refused: null,
     every: 0,
     seeds: {},
@@ -90,6 +92,28 @@ describe('a page that runs, in its sandbox (D100)', () => {
       root: { children: [{ name: 'Stat', props: { value: 2 } }] },
     })
     sandbox.dispose()
+  })
+
+  test('useFile is asked for, then read once: text, bytes, and a refusal in words (D119)', async () => {
+    const sandbox = await open(
+      `const text = useFile('file:a'); const bytes = useFile('file:b', { as: 'bytes' })
+       return h(Sheet, { title: 'x' }, h(Text, null, String(text), ' ', bytes ? bytes.join('.') : 'none'))`,
+    )
+    const page = harness()
+    expect(checkDrawn(page.run(sandbox), PAGE)).toMatchObject({
+      root: { children: [{ children: [{ value: 'null none' }] }] },
+    })
+    expect(page.needs.files).toEqual(['text:file:a', 'bytes:file:b'])
+    page.live.files.set('text:file:a', JSON.stringify({ value: 'héllo' }))
+    page.live.files.set('bytes:file:b', JSON.stringify({ value: btoa('\x01\x02\xff') }))
+    expect(checkDrawn(page.run(sandbox), PAGE)).toMatchObject({
+      root: { children: [{ children: [{ value: 'héllo 1.2.255' }] }] },
+    })
+    const refused = await open(`useFile('file:c'); return h(Sheet, { title: 'x' })`)
+    page.live.files.set('text:file:c', JSON.stringify({ error: 'file:c is 40 MB' }))
+    expect(page.run(refused)).toContain('file:c is 40 MB')
+    sandbox.dispose()
+    refused.dispose()
   })
 
   test('a press runs its handler: local state, page state, a verb, a page opened', async () => {

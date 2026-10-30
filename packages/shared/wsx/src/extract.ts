@@ -38,12 +38,15 @@ export function extractRefs(root: WsxElement): string[] {
 
 const FILE_KEY = /^file:[a-z0-9-]{1,48}$/
 
-/** Every upload the page uses, by key — a cover, an icon, a file, a video, a picture in a gallery. */
+/** Every upload the page uses, by key — a cover, an icon, a file, a gallery's, a terminal's. */
 export function extractFiles(root: WsxElement): string[] {
   const files = new Set<string>()
   walk(root, (node) => {
     if (node.kind !== 'element') return
-    for (const value of Object.values(node.props)) {
+    // A Terminal's `files` maps its paths to uploads: each counts as a prop does.
+    const { files: mapped } = node.props
+    const named = mapped && typeof mapped === 'object' && !Array.isArray(mapped) ? mapped : {}
+    for (const value of [...Object.values(node.props), ...Object.values(named)]) {
       if (typeof value === 'string' && FILE_KEY.test(value)) files.add(value)
     }
   })

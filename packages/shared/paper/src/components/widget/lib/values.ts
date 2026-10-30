@@ -42,4 +42,5 @@ export const EMPTY_ANSWERS: Record<string, unknown> = {
   table: null,
   me: null,
   stored: undefined,
+  file: null,
 }

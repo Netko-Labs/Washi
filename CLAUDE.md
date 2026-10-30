@@ -380,7 +380,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   refusals still refuse; Settings → Washi says so instead of the Approvals and YOLO choices.
   **Code limits** (`codeLimitsSchema`, floors and ceilings): page memory · ms per draw · bundle KB
   (`compilePage` hands the sandbox budget to the reader as `sandbox`), widget bundle KB, automation
-  MB · ms, formula ms per call, upload MB per kind (`uploadCaps`; `files.caps` for pickers); service
+  MB · ms, formula ms per call, upload MB per kind (`uploadCaps`; `files.caps` for pickers), file
+  read MB (`fileReadMb`, what `useFile` and a Terminal read, D119; `files.readCap`); service
   reads them only through `codeLimits(ws)`. Each flip — a switch, the limits, a list gaining or
   losing `*` — appends `{ which, on, by, at }` to `instance_setting` `safeguard_history` (last 100);
   each card says "Last changed by … on …".
@@ -646,6 +647,25 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   App meta `widgets_enabled`, off by default: `embeds.widgets` / `embeds.setWidgets` (owners and
   admins), Settings → Workspace → Embeds → Widgets; off, on a shared link or a host without
   `compileWidget`, a widget is a note. `/widget` drops a JSX clock, its component above the page.
+- **A Terminal runs a Node program (D119).** `<Terminal title height files>{program}</Terminal>` keeps
+  Node-style JS as its text, as an Automation keeps its own, and runs it in a widget's frame — the
+  same sandbox, CSP, network hosts and owner's switch (D113, D118); off, a note in words.
+  `scripts.terminal` (`compileTerminal`) bundles it through `compilePage`'s pipeline as CommonJS, sloppy
+  as Node runs it, the program its own `require.main`: Node's modules resolve to the frame's shim
+  (`registry/terminal`: fs · path · events · util · os · buffer · timers · url · assert; any other
+  is "not available in a Washi terminal" at `require`), the vetted libraries and the server's page
+  packages by name, `./x.json` off its files; anything else is refused in words, at save too
+  (`terminalDiagnostics`). `files` maps a plain path to `file:<id>` (≤ 16, indexed in `sheet_files`
+  like any upload a page wears). ▶ Run is the page's button, never the frame's: the press reads the
+  files as the reader (`PaperHost.readFile` → the files route's own gate, ≤ `fileReadMb`, 32 MB) and
+  hands them in with `run`, so `readFileSync` is sync; writes stay in memory for that run. ■ Stop
+  drops every timer, ⟲ Restart draws a fresh frame. The screen paints once per animation frame
+  (`console.clear`, ANSI colours, 2000 lines kept), its font fitted to the widest line and grown
+  when the program draws frames. Under W1 it is a widget's code: no parent, no network but listed
+  hosts, no process, no real disk — at worst a program doing what its own frame could. `useFile(key,
+  { as })` reads an upload the same way for page code (QuickJS: asked, then drawn again) and widgets
+  (over the bridge); a refusal throws its words. `/terminal` drops a starter; in the editor Code ·
+  Preview edits the program and Attach a file adds an upload, new or one of `files.recent`.
 - **A page may hold an automation (D97).** `<Automation table on="insert|update" title>` keeps TSX
   defining `function run(event)` (`{ table, kind, row, before }`). Each write lands it in the index
   (`sheet_automations`, read off the page by `extractAutomations`; a trashed page's sleep). Every row

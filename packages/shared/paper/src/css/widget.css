@@ -46,3 +46,29 @@
 .wsx-widget:fullscreen .wsx-widget-full {
   display: none;
 }
+
+/* A terminal (D119): the widget's frame, its run controls beside the full-screen button. */
+.wsx-terminal-status {
+  font-variant-numeric: tabular-nums;
+}
+.wsx-terminal-controls {
+  display: flex;
+  gap: 2px;
+  margin-left: auto;
+}
+.wsx-terminal-controls .wsx-widget-full {
+  margin-left: 0;
+}
+.wsx-terminal-button {
+  border: 0;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.wsx-terminal-button:hover {
+  background: var(--muted-bg);
+  color: var(--ink);
+}

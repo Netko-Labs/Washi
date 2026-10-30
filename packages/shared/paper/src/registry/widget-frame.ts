@@ -138,6 +138,11 @@ export const usePages = (of) => useAnswer('pages', { of: of == null ? '' : Strin
 export const useMembers = () => useAnswer('members', {}, [], null)
 export const useMe = () => useAnswer('me', {}, null, null)
 export const useNavigate = () => (id) => write('navigate', { type: 'navigate', id: String(id) })
+export const useFile = (key, options) => {
+  const answer = useAnswer('file', { key: String(key), as: options?.as ?? 'text' }, null, null)
+  if (answer && answer.ok === false) throw new Error(answer.error)
+  return answer ? answer.value : null
+}
 export { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState }
 
 class Boundary extends Component {

@@ -73,7 +73,8 @@ clock, a small tool — the page itself may run code, MDX-style: imports and cod
 From 'washi' import only: useRows(inkQuery) useRow(table, id) useTable(name) useInsert(table)
 useUpdate(table) useDelete(table) · useState(initial) (local) usePageState(key, initial) (the page's
 state, shared with Selects; initial seeds it) useStored(key, initial) (the reader's own) useInterval(ms ≥ 1000) useNow()
-· usePage() usePages(of?) useMembers() useMe() useNavigate() · act(action). Other imports: washi/ui,
+· usePage() usePages(of?) useMembers() useMe() useNavigate() · useFile('file:<id>', { as: 'text' | 'json' |
+'bytes' }) (an upload the reader may open; null until it is read) · act(action). Other imports: washi/ui,
 date-fns, lodash-es, zod (prefer zod/mini) and page:<id> — another page's exports, so a page may
 export function useBudget() for others. Writes (act, insert/update/delete, a setter, navigate) run
 only from an onPress; one called while the page draws stops it. The <Sheet>'s own props stay literal;
@@ -89,6 +90,12 @@ page's code, then <Widget title="Done"><Dial done={done} /></Widget>. DOM elemen
 and useRef/useEffect from washi belong to a widget's component alone; it gets the props the page hands
 it and the same washi hooks, writes only from a press inside it, and has no network. It runs only if
 an owner allowed widgets — prefer plain page code with registry primitives.
+When someone hands over a Node script to run as it is — an ASCII animation, a small CLI — a <Terminal
+title height files={{ "frames.txt": "file:<id>" }}> keeps it as its text (a JSON string when it holds
+backslashes). It runs in a widget's frame from a press: console.log/clear draw its screen, timers tick,
+require('fs') reads the uploads files maps (and writes in memory); Node's fs, path, events, util, os,
+buffer, timers, url and assert, the page libraries and the server's page packages — no network, process
+or real disk. Keep the program unchanged; attach what it reads.
 For a rule that should happen whenever rows change — fill a default, log a change, keep two tables in
 step — write <Automation table="tasks" on="insert|update" title="…"> with a backtick string defining
 function run(event) (event: { table, kind, row, before }); rows(query) reads, act({ verb: 'table.insert'

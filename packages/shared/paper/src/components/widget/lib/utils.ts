@@ -1,6 +1,7 @@
-import { readStored, storedKey, writeStored } from '../../../lib'
+import { fileAsOf, readFileAs, readStored, storedKey, writeStored } from '../../../lib'
 import type {
   ActionRef,
+  FrameLook,
   WidgetAsk,
   WidgetMessage,
   WidgetPage,
@@ -8,7 +9,7 @@ import type {
 } from '../../../lib/types'
 import { CSP_HOST, EMPTY_ANSWERS, TOKENS, WIDGET_ONERROR, WIDGET_STYLE } from './values'
 
-const ASKS = new Set(['rows', 'table', 'pages', 'members', 'me', 'stored'])
+const ASKS = new Set(['rows', 'table', 'pages', 'members', 'me', 'stored', 'file'])
 const WRITES = new Set(['set', 'store', 'act', 'navigate'])
 
 export function tokensOf(element: Element | null): string {
@@ -50,13 +51,17 @@ export function widgetCsp(network: readonly string[] = []): string {
   ].join('; ')
 }
 
-/** The frame's whole document: the CSP first, then the widget's bundle; colours arrive on load. */
-export function widgetDocument(js: string, network: readonly string[] = []): string {
+/** The frame's whole document: the CSP first, then the bundle; a widget's colours arrive on load. */
+export function widgetDocument(
+  js: string,
+  network: readonly string[] = [],
+  { style = WIDGET_STYLE, onerror = WIDGET_ONERROR }: FrameLook = {},
+): string {
   const script = js.replace(/<\/(script)/gi, '<\\/$1')
   return `<!doctype html><html><head><meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="${widgetCsp(network)}">
-<style>${WIDGET_STYLE}</style>
-<script>${WIDGET_ONERROR}</script>
+<style>${style}</style>
+<script>${onerror}</script>
 </head><body><div id="root"></div><script>${script}</script></body></html>`
 }
 
@@ -82,10 +87,20 @@ export async function answerAsk(ask: WidgetAsk, { host }: WidgetPage): Promise<u
     }
     if (ask.type === 'members') return (await host.describePeople?.()) ?? []
     if (ask.type === 'me') return (await host.describeMe?.()) ?? null
+    if (ask.type === 'file') return await answerFile(host, String(ask.key), ask.as)
     const raw = readStored(storedKey(host.pageId, String(ask.key)))
     return raw === undefined ? undefined : JSON.parse(raw)
   } catch {
     return EMPTY_ANSWERS[ask.type]
+  }
+}
+
+/** An upload as the reader may open it, or why not — the frame's `useFile` throws the words. */
+async function answerFile(host: WidgetPage['host'], key: string, as: unknown) {
+  try {
+    return { ok: true, value: await readFileAs(host, key, fileAsOf(as)) }
+  } catch (cause) {
+    return { ok: false, error: cause instanceof Error ? cause.message : String(cause) }
   }
 }
 
