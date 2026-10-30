@@ -99,6 +99,19 @@
   border-color: transparent;
   color: transparent;
 }
+/* Dates past the calendar's edge: the bar stops square there, as if it ran on. */
+.wsx-roadmap-bar[data-cut="start"],
+.wsx-roadmap-bar[data-cut="both"] {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-left-style: dashed;
+}
+.wsx-roadmap-bar[data-cut="end"],
+.wsx-roadmap-bar[data-cut="both"] {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-right-style: dashed;
+}
 .wsx-roadmap-bar[data-dragging] {
   cursor: grabbing;
   box-shadow: 0 6px 18px rgb(0 0 0 / 0.14);

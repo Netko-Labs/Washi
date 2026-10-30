@@ -17,6 +17,11 @@ export interface Span {
   end: number
 }
 
+export interface DrawnSpan extends Span {
+  /** The side cut at the calendar's edge, when the dates run past it. */
+  cut?: 'start' | 'end' | 'both'
+}
+
 export interface Calendar {
   first: number
   days: number

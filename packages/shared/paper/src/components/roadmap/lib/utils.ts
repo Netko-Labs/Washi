@@ -1,7 +1,8 @@
-import type { Calendar, Span, Tick } from './types'
+import type { Calendar, DrawnSpan, Span, Tick } from './types'
 
 const DAY_MS = 86_400_000
 const MIN_DAYS = 28
+const MAX_DAYS = 3 * 365 + 1
 const PAD_DAYS = 3
 
 const toDay = (iso: string) => Math.floor(Date.parse(iso.slice(0, 10)) / DAY_MS)
@@ -55,12 +56,32 @@ export function placed(
     : { [date]: toIso(day) }
 }
 
-/** The days on screen: every bar, a little air either side, and never less than four weeks. */
+/**
+ * The days on screen: every bar, a little air either side, never less than four weeks and never
+ * more than three years — past that, the three years around the middle of the starts and today.
+ */
 export function calendarOf(spans: Span[], now = today()): Calendar {
   const first = Math.min(now, ...spans.map((span) => span.start)) - PAD_DAYS
   const last = Math.max(now, ...spans.map((span) => span.end)) + PAD_DAYS
-  return { first, days: Math.max(MIN_DAYS, last - first + 1) }
+  if (last - first < MAX_DAYS) return { first, days: Math.max(MIN_DAYS, last - first + 1) }
+  const starts = [now, ...spans.map((span) => span.start)].sort((a, b) => a - b)
+  const middle = starts[Math.floor(starts.length / 2)] ?? now
+  const from = Math.max(first, middle - Math.floor(MAX_DAYS / 2))
+  return { first: Math.min(from, last - MAX_DAYS + 1), days: MAX_DAYS }
 }
+
+/** A span held inside the calendar, and the side it was cut on when it runs past an edge. */
+export function drawnOf(span: Span, calendar: Calendar): DrawnSpan {
+  const last = calendar.first + calendar.days - 1
+  const clamp = (day: number) => Math.min(Math.max(day, calendar.first), last)
+  const before = span.start < calendar.first
+  const after = span.end > last
+  const cut = before && after ? 'both' : before ? 'start' : after ? 'end' : undefined
+  return { start: clamp(span.start), end: clamp(span.end), cut }
+}
+
+export const isOnCalendar = (day: number, calendar: Calendar) =>
+  day >= calendar.first && day < calendar.first + calendar.days
 
 export function shift(span: Span, days: number): string {
   const start = toIso(span.start + days)
@@ -71,17 +92,41 @@ const LABEL = { month: 'short', day: 'numeric', timeZone: 'UTC' } as const
 /** The last days of a track: a tick there would run its label off the edge. */
 const TICK_TAIL = 0.12
 
-/** Mondays for a short calendar, the 1st of each month for a long one; none in the last stretch. */
+/**
+ * Mondays for a short calendar, the 1st of each month for a long one, of each quarter past a year
+ * and a half; none in the last stretch.
+ */
 export function ticksOf(calendar: Calendar): Tick[] {
-  const monthly = calendar.days > 120
-  const ticks: Tick[] = []
   const stop = calendar.first + calendar.days * (1 - TICK_TAIL)
-  for (let day = calendar.first; day < stop; day++) {
-    const date = new Date(day * DAY_MS)
-    const marks = monthly ? date.getUTCDate() === 1 : date.getUTCDay() === 1
-    if (marks) ticks.push({ day, label: date.toLocaleDateString(undefined, LABEL) })
+  const days =
+    calendar.days > 120
+      ? monthStarts(calendar.first, stop, calendar.days > 540 ? 3 : 1)
+      : mondays(calendar.first, stop)
+  return days.map((day) => ({
+    day,
+    label: new Date(day * DAY_MS).toLocaleDateString(undefined, LABEL),
+  }))
+}
+
+function mondays(first: number, stop: number): number[] {
+  const days: number[] = []
+  const weekday = new Date(first * DAY_MS).getUTCDay()
+  for (let day = first + ((8 - weekday) % 7); day < stop; day += 7) days.push(day)
+  return days
+}
+
+/** `setUTCFullYear`, not `Date.UTC`: that one reads the years 0–99 as 1900–1999. */
+function monthStarts(first: number, stop: number, step: number): number[] {
+  const days: number[] = []
+  const date = new Date(first * DAY_MS)
+  const year = date.getUTCFullYear()
+  const next = date.getUTCMonth() + (date.getUTCDate() === 1 ? 0 : 1)
+  for (let month = Math.ceil(next / step) * step; ; month += step) {
+    date.setUTCFullYear(year, month, 1)
+    const day = Math.round(date.getTime() / DAY_MS)
+    if (day >= stop) return days
+    days.push(day)
   }
-  return ticks
 }
 
 export const percent = (day: number, calendar: Calendar) =>
