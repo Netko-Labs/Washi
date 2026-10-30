@@ -88,6 +88,7 @@ export {
   type InstanceStore,
   type PagePackageRow,
   type PagePackageStore,
+  type SafeguardChangeInfo,
   type ServerKeyInfo,
   type ServerKeyUse,
   type ServerSearchKeyInfo,

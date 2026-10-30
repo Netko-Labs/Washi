@@ -1,5 +1,5 @@
 import { getTranscript, isSessionVisible, listSessions, searchChats } from '@washi/repository'
-import { movedFrom } from '@washi/service'
+import { movedFrom, serverApprovesAll } from '@washi/service'
 import { z } from 'zod'
 import { pageProcedure, router, workspaceProcedure } from '../../init'
 import { chatProcedure } from '../../shared/chats'
@@ -17,8 +17,11 @@ export const agentQueries = router({
   spend: workspaceProcedure.query(({ ctx }) => ctx.host.spend()),
   /** The stop's settings and the workspace's standing choices: who resumes, the default effort. */
   settings: workspaceProcedure.query(({ ctx }) => ctx.host.settings()),
-  /** Ask (the default) or auto: whether what leaves the server waits for a person. */
-  approvalMode: workspaceProcedure.query(({ ctx }) => ({ mode: ctx.host.approvalMode() })),
+  /** Ask (the default) or auto; `server` is the admin's yes for every workspace, which wins (D118). */
+  approvalMode: workspaceProcedure.query(({ ctx }) => ({
+    mode: ctx.host.approvalMode(),
+    server: serverApprovesAll(ctx.ws),
+  })),
   /** Idle, working, waiting on a person, or paused — plus today's numbers. Cheap; poll it. */
   status: workspaceProcedure.query(({ ctx }) => ctx.host.activity()),
   /** What the next turn will run on. Embedded probes the local Claude CLI, so not free. */

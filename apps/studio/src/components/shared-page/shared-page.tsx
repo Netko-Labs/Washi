@@ -10,8 +10,9 @@ import { shareLook } from './share-look'
  */
 export function SharedPage({ workspaceId, token }: SharedPageProps) {
   const state = useSharedPage(workspaceId, token)
-  const host = useMemo(() => shareHost(workspaceId, token), [workspaceId, token])
   const page = state.status === 'ready' ? state.page : null
+  const anySite = page?.embedsAnySite ?? false
+  const host = useMemo(() => shareHost(workspaceId, token, anySite), [workspaceId, token, anySite])
   const look = useMemo(
     () => shareLook(workspaceId, token, page?.theme ?? null, page?.unsplash ?? null),
     [workspaceId, token, page],

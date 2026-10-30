@@ -8,17 +8,17 @@ import {
   tableNameOf,
   type Workspace,
 } from '@washi/repository'
+import { codeLimits } from '../server'
 import { deleteRecord, runMutation, runQuery, updateRecord } from '../tables/service'
 import { compileScript } from './compile'
 import { loadEngine } from './engine'
 import type { AutomationEvent, AutomationRun, CompiledScript } from './types'
 import {
   AUTOMATION_AUTHOR,
-  AUTOMATION_DEADLINE_MS,
   AUTOMATION_MAX_ACTIONS,
-  AUTOMATION_MEMORY_BYTES,
   AUTOMATION_PRELUDE,
   COMPILED_KEPT,
+  MB,
 } from './values'
 
 const compiled = new Map<string, CompiledScript>()
@@ -47,9 +47,10 @@ export async function runAutomation(
 ): Promise<AutomationRun> {
   const script = compileOnce(source)
   if (!script.ok) return { ok: false, error: script.error }
+  const { automationMs, automationMemoryMb } = codeLimits(ws)
   const quickjs = await loadEngine()
   const runtime = quickjs.newRuntime()
-  runtime.setMemoryLimit(AUTOMATION_MEMORY_BYTES)
+  runtime.setMemoryLimit(automationMemoryMb * MB)
   const vm = runtime.newContext()
   try {
     const rows = vm.newFunction('__bridge_rows', (query) => {
@@ -58,7 +59,7 @@ export async function runAutomation(
     })
     vm.setProp(vm.global, '__bridge_rows', rows)
     rows.dispose()
-    const deadline = Date.now() + AUTOMATION_DEADLINE_MS
+    const deadline = Date.now() + automationMs
     runtime.setInterruptHandler(() => Date.now() > deadline)
     const code = `${AUTOMATION_PRELUDE}\n${script.js}\n__run(${JSON.stringify(JSON.stringify(event))})`
     const result = vm.evalCode(code)
@@ -68,7 +69,7 @@ export async function runAutomation(
       const message = typeof failure === 'string' ? failure : (failure.message ?? 'it threw')
       return {
         ok: false,
-        error: message === 'interrupted' ? `ran past ${AUTOMATION_DEADLINE_MS} ms` : message,
+        error: message === 'interrupted' ? `ran past ${automationMs} ms` : message,
       }
     }
     const actions = JSON.parse(vm.getString(result.value)) as Record<string, unknown>[]

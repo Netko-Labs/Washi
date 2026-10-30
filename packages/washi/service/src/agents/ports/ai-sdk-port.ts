@@ -60,6 +60,7 @@ export function createAiSdkPort({
         setTitle: request.setTitle,
         handover: request.handover,
         viewer: request.viewer,
+        fetchGrant: (url) => gate.takeFetchGrant?.(request.sessionId, url) ?? null,
       })
       const model =
         request.model.model ?? (await defaultModelFor(catalogue, request.model.provider))

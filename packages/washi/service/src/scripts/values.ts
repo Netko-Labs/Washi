@@ -8,13 +8,12 @@ export const ENTRY_WORDS: Record<string, string> = {
   run: 'an automation needs a function run(event) that says what to do',
 }
 
-/** An automation's run, and how much it may ask for: past these it is stopped, nothing applied. */
-export const AUTOMATION_DEADLINE_MS = 100
-export const AUTOMATION_MEMORY_BYTES = 16 * 1024 * 1024
+export const MB = 1024 * 1024
+
+/** How much an automation may ask for; its time and memory are the server's (`codeLimits`, D118). */
 export const AUTOMATION_MAX_ACTIONS = 50
-/** A formula function's whole budget per call — it runs once per row, so it must be quick. */
-export const FORMULA_DEADLINE_MS = 20
-export const FORMULA_MEMORY_BYTES = 16 * 1024 * 1024
+/** A formula's memory; its time per call — once per row, so it must be quick — is the server's. */
+export const FORMULA_MEMORY_BYTES = 16 * MB
 
 /** How many compiled automations the server keeps at once. */
 export const COMPILED_KEPT = 64

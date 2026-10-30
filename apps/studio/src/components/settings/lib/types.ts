@@ -173,6 +173,8 @@ export interface ModelMenuProps {
 
 export interface OutsideCardProps {
   approvalMode: ApprovalMode
+  /** The server's admin approves everything that leaves, in every workspace (D118). */
+  serverApproves: boolean
   searchKey: SearchKeyState | null
   unsplashKey: SearchKeyState | null
   /** Whether the server lends its key to a workspace without one, per integration. */

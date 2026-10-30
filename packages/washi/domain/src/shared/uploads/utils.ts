@@ -1,5 +1,6 @@
-import type { UploadKind } from './types'
-import { UPLOAD_RULES } from './values'
+import type { CodeLimits } from '../../entities/safeguards'
+import type { UploadCaps, UploadKind } from './types'
+import { MB, UPLOAD_CAPS, UPLOAD_RULES } from './values'
 
 /** Which kind a type is, or null for one no workspace takes. */
 export function uploadKindOf(mime: string): UploadKind | null {
@@ -13,16 +14,33 @@ export function uploadKindOf(mime: string): UploadKind | null {
   return null
 }
 
-/** Why an upload is refused, in words; null when it may land. `only` narrows to one kind. */
-export function uploadRefusal(mime: string, size: number, only?: UploadKind): string | null {
+/** The caps a server's limits set (D118). */
+export const uploadCaps = (limits: CodeLimits): UploadCaps => ({
+  image: limits.imageMb * MB,
+  video: limits.videoMb * MB,
+  audio: limits.audioMb * MB,
+  file: limits.fileMb * MB,
+})
+
+/** The largest upload of any kind: the body cap, read before the form is. */
+export const largestUpload = (caps: UploadCaps): number => Math.max(...Object.values(caps))
+
+/**
+ * Why an upload is refused, in words; null when it may land. `only` narrows to one kind; `caps` are
+ * the server's, today's when it set none.
+ */
+export function uploadRefusal(
+  mime: string,
+  size: number,
+  only?: UploadKind,
+  caps: UploadCaps = UPLOAD_CAPS,
+): string | null {
   const kind = uploadKindOf(mime)
   if (!kind || (only && kind !== only)) {
-    return only
-      ? `${UPLOAD_RULES[only].limit.split(' up to')[0]} only`
-      : 'that kind of file is not taken'
+    return only ? `${UPLOAD_RULES[only].noun} only` : 'that kind of file is not taken'
   }
-  const rule = UPLOAD_RULES[kind]
-  return size > rule.maxBytes ? rule.limit : null
+  const cap = caps[kind]
+  return size > cap ? `${UPLOAD_RULES[kind].noun} up to ${Math.round(cap / MB)} MB` : null
 }
 
 /** What a browser shows inline; anything else downloads, so nothing from an upload renders as a page. */

@@ -49,8 +49,11 @@ export {
   embedHostList,
   embedHosts,
   playableEmbedHosts,
+  reachableWidgetHosts,
   setEmbedHosts,
+  setWidgetHosts,
   setWidgetsEnabled,
+  widgetHosts,
   widgetsByServer,
   widgetsEnabled,
 } from './embeds/service'
@@ -81,12 +84,15 @@ export { installFormulaFunctions } from './scripts/formulas'
 export type { AutomationEvent, CompiledScript, ScriptEntry } from './scripts/types'
 export {
   applyWorkspaceDefaults,
+  codeLimits,
   FetchHostError,
   fetchHostList,
   lendServerPolicy,
   PagePackageError,
   pagePackageSpec,
   pagePackagesOf,
+  privateNetworkAllowed,
+  serverApprovesAll,
   serverPolicy,
 } from './server'
 export {

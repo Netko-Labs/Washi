@@ -1,8 +1,12 @@
 export { useServerSettings } from './hooks/use-server-settings'
 export type {
+  CodeLimitsCardProps,
   HostListCardProps,
+  HostListKind,
   PagePackageState,
   PagePackagesCardProps,
+  SafeguardChangeState,
+  SafeguardsCardProps,
   ServerKeyCardProps,
   ServerLentKeyCardProps,
   ServerSearchKeyState,
@@ -11,11 +15,13 @@ export type {
   WorkspaceDefaultsCardProps,
   WorkspaceDefaultsState,
 } from './types'
-export { packageState, sizeLabel } from './utils'
+export { changedLine, packageState, sizeLabel } from './utils'
 export {
   HOST_LISTS,
   INSTALL_POLL_MS,
   LENT_KEY_COPY,
+  LIMIT_ROWS,
   PAGE_PACKAGES_COPY,
+  SAFEGUARD_COPY,
   WASHI_DEFAULTS,
 } from './values'

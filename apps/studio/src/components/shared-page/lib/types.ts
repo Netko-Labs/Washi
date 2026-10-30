@@ -14,6 +14,8 @@ export interface SharedPayload {
   theme: ThemePair | null
   /** An Unsplash cover's hotlink and credit (D117); the reader cannot ask for it. */
   unsplash: (UnsplashCredit & { id: string }) | null
+  /** The workspace or server lists `*` for embeds: any https one plays (D118). */
+  embedsAnySite: boolean
 }
 
 export type SharedState =

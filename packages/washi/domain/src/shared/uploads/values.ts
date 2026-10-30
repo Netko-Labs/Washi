@@ -1,6 +1,6 @@
-import type { UploadKind, UploadRule } from './types'
+import type { UploadCaps, UploadKind, UploadRule } from './types'
 
-const MB = 1024 * 1024
+export const MB = 1024 * 1024
 
 /**
  * What a workspace takes as an upload. Never HTML or SVG: a file served from the studio's own
@@ -10,12 +10,12 @@ export const UPLOAD_RULES: Record<UploadKind, UploadRule> = {
   image: {
     mimes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif'],
     maxBytes: 10 * MB,
-    limit: 'pictures up to 10 MB',
+    noun: 'pictures',
   },
   video: {
     mimes: ['video/mp4', 'video/webm', 'video/quicktime'],
     maxBytes: 50 * MB,
-    limit: 'videos up to 50 MB',
+    noun: 'videos',
   },
   audio: {
     mimes: [
@@ -30,7 +30,7 @@ export const UPLOAD_RULES: Record<UploadKind, UploadRule> = {
       'audio/flac',
     ],
     maxBytes: 25 * MB,
-    limit: 'audio up to 25 MB',
+    noun: 'audio',
   },
   file: {
     mimes: [
@@ -45,11 +45,14 @@ export const UPLOAD_RULES: Record<UploadKind, UploadRule> = {
       'application/vnd.openxmlformats-officedocument.presentationml.presentation',
     ],
     maxBytes: 25 * MB,
-    limit: 'files up to 25 MB',
+    noun: 'files',
   },
 }
 
-/** The largest upload of any kind: the body cap, read before the form is. */
-export const UPLOAD_MAX_BYTES = Math.max(
-  ...Object.values(UPLOAD_RULES).map((rule) => rule.maxBytes),
-)
+/** Today's caps per kind, the server's own when its admin set none (D118). */
+export const UPLOAD_CAPS: UploadCaps = {
+  image: UPLOAD_RULES.image.maxBytes,
+  video: UPLOAD_RULES.video.maxBytes,
+  audio: UPLOAD_RULES.audio.maxBytes,
+  file: UPLOAD_RULES.file.maxBytes,
+}

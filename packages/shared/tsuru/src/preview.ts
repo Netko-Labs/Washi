@@ -64,13 +64,19 @@ export function readPreview(href: string, html: string): LinkPreview {
 
 /**
  * A person asked for this link's card: their press is the consent for this one host, so the
- * policy allows exactly it — still https only, no private ranges, redirects re-checked.
+ * policy allows exactly it — still https only, no private ranges (unless the server lifted that
+ * guard), redirects re-checked.
  */
-export async function linkPreview(href: string): Promise<LinkPreview> {
+export async function linkPreview(href: string, allowPrivate = false): Promise<LinkPreview> {
   const host = new URL(href).hostname
   const html = await guardedFetch(
     href,
-    fetchPolicySchema.parse({ allowedHosts: [host], maxResponseBytes: 524_288, timeoutMs: 8000 }),
+    fetchPolicySchema.parse({
+      allowedHosts: [host],
+      allowPrivate,
+      maxResponseBytes: 524_288,
+      timeoutMs: 8000,
+    }),
   )
   return readPreview(href, html)
 }

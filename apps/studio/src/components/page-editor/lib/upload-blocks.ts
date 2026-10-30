@@ -6,7 +6,8 @@ import { galleryNode, uploadNode } from './utils'
 /** Stored in the workspace's files, checked first against the kind the menu offered. */
 export async function uploaded(as: UploadKind, file: File | undefined) {
   if (!file) throw new Error('no file was picked')
-  const refused = uploadRefusal(file.type, file.size, as)
+  const caps = await api.files.caps.query().catch(() => undefined)
+  const refused = uploadRefusal(file.type, file.size, as, caps)
   if (refused) throw new Error(refused)
   const send = hostUploadFile()
   if (!send) throw new Error('this app stores no files')
@@ -17,8 +18,9 @@ export async function uploaded(as: UploadKind, file: File | undefined) {
 /** Every picture stored before any lands; one refused refuses the gallery, in its words. */
 export async function uploadedGallery(files: File[]) {
   if (files.length === 0) throw new Error('no pictures were picked')
+  const caps = await api.files.caps.query().catch(() => undefined)
   for (const file of files) {
-    const refused = uploadRefusal(file.type, file.size, 'image')
+    const refused = uploadRefusal(file.type, file.size, 'image', caps)
     if (refused) throw new Error(`${file.name}: ${refused}`)
   }
   const send = hostUploadFile()

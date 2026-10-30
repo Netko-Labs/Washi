@@ -1,8 +1,8 @@
-import { embedHost } from '@washi/paper/registry'
 import { getAppMeta, setAppMeta, type Workspace } from '@washi/repository'
-import { serverPolicy } from '../server'
+import { hostList, serverPolicy } from '../server'
 
 const EMBED_HOSTS = 'embed_hosts'
+const WIDGET_HOSTS = 'widget_hosts'
 
 export class EmbedHostError extends Error {
   constructor(message: string) {
@@ -17,15 +17,9 @@ export function embedHosts(ws: Workspace): string[] {
   return stored ? (JSON.parse(stored) as string[]) : []
 }
 
-/** Pasted addresses become bare, sorted host names; one that is no host is refused in words. */
+/** Pasted entries become hosts, `*.domain` or `*`; anything else is refused in words (D118). */
 export function embedHostList(raw: string[]): string[] {
-  const hosts: string[] = []
-  for (const entry of raw) {
-    const host = embedHost(entry)
-    if (!host) throw new EmbedHostError(`“${entry}” is not a site address — try docs.example.com`)
-    if (!hosts.includes(host)) hosts.push(host)
-  }
-  return hosts.sort()
+  return hostList(raw, (message) => new EmbedHostError(message))
 }
 
 export function setEmbedHosts(ws: Workspace, raw: string[]): string[] {
@@ -33,9 +27,25 @@ export function setEmbedHosts(ws: Workspace, raw: string[]): string[] {
   return embedHosts(ws)
 }
 
-/** What plays here: this workspace's sites and the server's (D105). */
+/** What plays here: this workspace's sites and the server's (D105), `*` for every https one. */
 export function playableEmbedHosts(ws: Workspace): string[] {
   return [...new Set([...embedHosts(ws), ...serverPolicy(ws).embedHosts])].sort()
+}
+
+/** Sites this workspace's widgets may reach, past the server's. */
+export function widgetHosts(ws: Workspace): string[] {
+  const stored = getAppMeta(ws, WIDGET_HOSTS)
+  return stored ? (JSON.parse(stored) as string[]) : []
+}
+
+export function setWidgetHosts(ws: Workspace, raw: string[]): string[] {
+  setAppMeta(ws, WIDGET_HOSTS, JSON.stringify(embedHostList(raw)))
+  return widgetHosts(ws)
+}
+
+/** What a widget's frame here may reach (D118); empty, as by default, is no network at all. */
+export function reachableWidgetHosts(ws: Workspace): string[] {
+  return [...new Set([...widgetHosts(ws), ...serverPolicy(ws).widgetHosts])].sort()
 }
 
 const WIDGETS = 'widgets_enabled'

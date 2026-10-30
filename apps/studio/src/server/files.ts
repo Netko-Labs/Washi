@@ -1,4 +1,13 @@
-import { byteRange, isInlineType, UPLOAD_MAX_BYTES, uploadRefusal } from '@washi/domain'
+import {
+  byteRange,
+  isInlineType,
+  largestUpload,
+  type UploadCaps,
+  uploadCaps,
+  uploadRefusal,
+} from '@washi/domain'
+import { codeLimits } from '@washi/service'
+import type { ResolvedWorkspace } from '@washi/trpc'
 import { createRequestContext, washiRuntime } from '@/server/runtime'
 
 /** Multipart framing on top of the file itself. */
@@ -17,10 +26,14 @@ export async function workspaceFor(request: Request) {
   return runtime.resolve(workspaceId)
 }
 
+/** What this workspace's uploads may weigh: the server's caps (D118). */
+export const capsOf = (resolved: ResolvedWorkspace): UploadCaps =>
+  uploadCaps(codeLimits(resolved.workspace))
+
 /** Refuses an oversized body from its declared length, before any of it is read. */
-export function bodyTooLarge(request: Request): boolean {
+export function bodyTooLarge(request: Request, caps: UploadCaps): boolean {
   const declared = Number(request.headers.get('content-length'))
-  return Number.isFinite(declared) && declared > UPLOAD_MAX_BYTES + BODY_SLACK
+  return Number.isFinite(declared) && declared > largestUpload(caps) + BODY_SLACK
 }
 
 /** No declared length means no limit could apply before reading; a browser's upload always has one. */
@@ -29,8 +42,8 @@ export function lengthMissing(request: Request): boolean {
 }
 
 /** A picture, a video, a sound or a document within its kind's limit; anything else in words. */
-export function fileLimits(file: File): string | null {
-  return uploadRefusal(file.type, file.size)
+export function fileLimits(file: File, caps: UploadCaps): string | null {
+  return uploadRefusal(file.type, file.size, undefined, caps)
 }
 
 /**

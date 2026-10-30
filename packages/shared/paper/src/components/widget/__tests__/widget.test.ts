@@ -10,6 +10,7 @@ import {
   isAsk,
   isPressed,
   isWrite,
+  widgetCsp,
   widgetDocument,
 } from '../lib/utils'
 
@@ -90,6 +91,40 @@ describe('a widget’s frame and its page (D113)', () => {
     expect(doc).toContain("default-src 'none'")
     expect(doc).toContain('const a = "<\\/script><b>"')
     expect(doc.match(/<\/script>/g)?.length).toBe(2)
+  })
+
+  test('no hosts listed: no network at all (the default)', () => {
+    const csp = widgetCsp()
+    expect(csp).toContain("default-src 'none'")
+    expect(csp).not.toContain('connect-src')
+    expect(csp).toContain('img-src data: blob:;')
+    expect(csp).not.toContain('https')
+  })
+
+  test('a listed host is reachable over https and wss, a *.domain with its subdomains', () => {
+    expect(widgetCsp(['api.example.com', '*.cdn.dev'])).toBe(
+      [
+        "default-src 'none'",
+        "script-src 'unsafe-inline'",
+        "style-src 'unsafe-inline'",
+        'img-src data: blob: https://api.example.com https://cdn.dev https://*.cdn.dev',
+        'font-src data: https://api.example.com https://cdn.dev https://*.cdn.dev',
+        'media-src data: blob: https://api.example.com https://cdn.dev https://*.cdn.dev',
+        'connect-src https://api.example.com https://cdn.dev https://*.cdn.dev wss://api.example.com wss://cdn.dev wss://*.cdn.dev',
+        "form-action 'none'",
+        "base-uri 'none'",
+      ].join('; '),
+    )
+  })
+
+  test('* is every https and wss site; a malformed entry never reaches the policy', () => {
+    const any = widgetCsp(['*'])
+    expect(any).toContain('connect-src https: wss:')
+    expect(any).toContain('img-src data: blob: https:;')
+    const spliced = widgetCsp(["evil.dev; script-src 'unsafe-eval'", 'ok.dev'])
+    expect(spliced).not.toContain('evil.dev')
+    expect(spliced).toContain('connect-src https://ok.dev wss://ok.dev')
+    expect(widgetDocument('x', ['ok.dev'])).toContain('connect-src https://ok.dev')
   })
 
   test('before the page runs, and once it draws, the Widget still names its component', () => {

@@ -6,7 +6,7 @@ import type {
   WidgetPage,
   WidgetWrite,
 } from '../../../lib/types'
-import { EMPTY_ANSWERS, TOKENS, WIDGET_CSP, WIDGET_ONERROR, WIDGET_STYLE } from './values'
+import { CSP_HOST, EMPTY_ANSWERS, TOKENS, WIDGET_ONERROR, WIDGET_STYLE } from './values'
 
 const ASKS = new Set(['rows', 'table', 'pages', 'members', 'me', 'stored'])
 const WRITES = new Set(['set', 'store', 'act', 'navigate'])
@@ -17,11 +17,44 @@ export function tokensOf(element: Element | null): string {
   return TOKENS.map((token) => `${token}: ${style.getPropertyValue(token).trim()};`).join(' ')
 }
 
+/** `scheme://host` for a host, and for `*.domain` the domain itself too. */
+function sources(scheme: string, hosts: readonly string[]): string[] {
+  return hosts.flatMap((host) =>
+    host.startsWith('*.')
+      ? [`${scheme}://${host.slice(2)}`, `${scheme}://${host}`]
+      : [`${scheme}://${host}`],
+  )
+}
+
+/**
+ * Scripts and styles inline only; nothing submits or navigates. With no hosts (the default) no
+ * network at all — not even pictures, which could carry data out in their address. Listed hosts
+ * (D118) may be reached over https and wss; `*` is every one.
+ */
+export function widgetCsp(network: readonly string[] = []): string {
+  const isAny = network.includes('*')
+  const hosts = network.filter((host) => CSP_HOST.test(host))
+  const https = isAny ? ['https:'] : sources('https', hosts)
+  const wss = isAny ? ['wss:'] : sources('wss', hosts)
+  const reach = [...https, ...wss]
+  return [
+    "default-src 'none'",
+    "script-src 'unsafe-inline'",
+    "style-src 'unsafe-inline'",
+    ['img-src data: blob:', ...https].join(' '),
+    ['font-src data:', ...https].join(' '),
+    ['media-src data: blob:', ...https].join(' '),
+    ...(reach.length > 0 ? [['connect-src', ...reach].join(' ')] : []),
+    "form-action 'none'",
+    "base-uri 'none'",
+  ].join('; ')
+}
+
 /** The frame's whole document: the CSP first, then the widget's bundle; colours arrive on load. */
-export function widgetDocument(js: string): string {
+export function widgetDocument(js: string, network: readonly string[] = []): string {
   const script = js.replace(/<\/(script)/gi, '<\\/$1')
   return `<!doctype html><html><head><meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="${WIDGET_CSP}">
+<meta http-equiv="Content-Security-Policy" content="${widgetCsp(network)}">
 <style>${WIDGET_STYLE}</style>
 <script>${WIDGET_ONERROR}</script>
 </head><body><div id="root"></div><script>${script}</script></body></html>`

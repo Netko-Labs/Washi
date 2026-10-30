@@ -4,7 +4,18 @@ import type { PaperHost } from '../../provider'
 import type { BlockProps } from './style'
 
 /** Code compiled for a sandbox: its JS, or why not, in words. */
-export type CompiledScript = { ok: true; js: string } | { ok: false; error: string }
+/**
+ * A bundle, or why not. A page's carries its sandbox's budget and a widget's the hosts its frame
+ * may reach — the server's say (D118); absent, today's constants and no network.
+ */
+export type CompiledScript =
+  | {
+      ok: true
+      js: string
+      sandbox?: { deadlineMs: number; memoryBytes: number }
+      network?: string[]
+    }
+  | { ok: false; error: string }
 
 export type ProgramState =
   | { status: 'starting' }

@@ -53,6 +53,9 @@ export interface SealedServerKey extends SealedSecret {
 /** The server's Exa key: one secret, no provider or model beside it. */
 export type SealedSearchKey = SealedSecret & Pick<SealedServerKey, 'updatedBy' | 'updatedAt'>
 
+/** The server's host lists, each its own `instance_setting` row. */
+export type HostList = 'fetchHosts' | 'embedHosts' | 'widgetHosts'
+
 export interface ServerSettingsDeps {
   rows: SettingRows
   masterKey: string

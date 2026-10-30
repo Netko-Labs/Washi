@@ -1,7 +1,9 @@
 import { SIGNUP_OPTIONS } from './lib'
 import {
+  CodeLimitsCard,
   HostListCard,
   PagePackagesCard,
+  SafeguardsCard,
   ServerKeyCard,
   ServerLentKeyCard,
   ServerWidgetsCard,
@@ -15,6 +17,7 @@ export function ServerTab() {
   const server = useServerSettings()
   const { settings, error } = server
   const chosen = SIGNUP_OPTIONS.find((option) => option.id === settings?.signup)
+  const changeOf = (which: string) => settings?.safeguardLog.find((each) => each.which === which)
 
   return (
     <div className="grid gap-9">
@@ -57,11 +60,13 @@ export function ServerTab() {
           <HostListCard
             kind="fetch"
             hosts={settings.fetchHosts}
+            lastChange={changeOf('fetchHosts')}
             onSave={(hosts) => server.setHosts('fetch', hosts)}
           />
           <HostListCard
             kind="embed"
             hosts={settings.embedHosts}
+            lastChange={changeOf('embedHosts')}
             onSave={(hosts) => server.setHosts('embed', hosts)}
           />
           <ServerWidgetsCard widgets={settings.widgets} onChange={server.setWidgets} />
@@ -69,6 +74,22 @@ export function ServerTab() {
             packages={settings.pagePackages}
             onAdd={server.addPagePackage}
             onRemove={server.removePagePackage}
+          />
+          <HostListCard
+            kind="widget"
+            hosts={settings.widgetHosts}
+            lastChange={changeOf('widgetHosts')}
+            onSave={(hosts) => server.setHosts('widget', hosts)}
+          />
+          <SafeguardsCard
+            safeguards={settings.safeguards}
+            log={settings.safeguardLog}
+            onChange={server.setSafeguard}
+          />
+          <CodeLimitsCard
+            limits={settings.limits}
+            lastChange={changeOf('limits')}
+            onSave={server.setLimits}
           />
         </>
       )}

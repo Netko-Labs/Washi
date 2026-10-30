@@ -1,5 +1,5 @@
 import { sep } from 'node:path'
-import type { PagePackageSet } from '@washi/domain'
+import { CODE_LIMITS, type CodeLimits, type PagePackageSet } from '@washi/domain'
 import { PAGE_HOOKS, PAGE_IMPORT, paperRegistry, WIDGET_HOOKS } from '@washi/paper/registry'
 import { pageModule } from '@washi/wsx'
 import {
@@ -11,7 +11,7 @@ import {
   realDir,
 } from './imports'
 import type { BundleTarget, CompiledPage, PageSource } from './types'
-import { LIBRARY, PAGE_CACHE_SIZE, PAGE_IMPORT_DEPTH, PAGE_JS_MAX_BYTES } from './values'
+import { KB, LIBRARY, MB, PAGE_CACHE_SIZE, PAGE_IMPORT_DEPTH } from './values'
 
 const NS = 'washi'
 const transpiler = new Bun.Transpiler({ loader: 'tsx' })
@@ -101,6 +101,12 @@ function plugin(
   }
 }
 
+/** The cap is checked on every answer, cached or not: an admin may have lowered it since. */
+function capped(compiled: CompiledPage, maxBytes: number): CompiledPage {
+  if (!compiled.ok || compiled.js.length <= maxBytes) return compiled
+  return failure(`it bundles to ${Math.round(compiled.js.length / KB)} KB — import less`)
+}
+
 function remember(key: string, compiled: CompiledPage): CompiledPage {
   cache.delete(key)
   cache.set(key, compiled)
@@ -125,7 +131,7 @@ const PAGE_TARGET: BundleTarget = {
  * A page's module bundled for where it runs: the libraries and pages it imports, `washi` as that
  * place lends it. Nothing in it reaches the network — every import is resolved here, from the
  * vetted list, the server's installed page packages or a page the reader may read. Cached by
- * everything that went in.
+ * everything that went in; `maxBytes` is the server's cap (D118).
  */
 export async function bundle(
   module: string,
@@ -133,6 +139,7 @@ export async function bundle(
   target: BundleTarget,
   key: string[],
   packages: PagePackageSet | null,
+  maxBytes: number,
 ): Promise<CompiledPage> {
   let pages: Map<string, string>
   try {
@@ -146,7 +153,7 @@ export async function bundle(
   }
   const hash = Bun.hash([...key, packageKey(packages), ...pages.values()].join('\0')).toString(36)
   const known = cache.get(hash)
-  if (known) return remember(hash, known)
+  if (known) return capped(remember(hash, known), maxBytes)
 
   try {
     const built = await Bun.build({
@@ -161,24 +168,34 @@ export async function bundle(
     })
     const output = built.outputs[0]
     if (!built.success || !output) return failure(built.logs[0]?.message ?? 'it did not compile')
-    const js = await output.text()
-    if (js.length > PAGE_JS_MAX_BYTES) {
-      return failure(`it bundles to ${Math.round(js.length / 1024)} KB — import less`)
-    }
-    return remember(hash, { ok: true, js })
+    return capped(remember(hash, { ok: true, js: await output.text() }), maxBytes)
   } catch (error) {
     return failure(error)
   }
 }
 
-/** A page bundled for the reader's QuickJS sandbox (D100), `washi`'s hooks calls into its own. */
+/**
+ * A page bundled for the reader's QuickJS sandbox (D100), `washi`'s hooks calls into its own; the
+ * sandbox's budget rides along, so the reader's browser squeezes it as the server says (D118).
+ */
 export async function compilePage(
   source: string,
   read: PageSource,
   packages: PagePackageSet | null = null,
+  limits: CodeLimits = CODE_LIMITS,
 ): Promise<CompiledPage> {
   try {
-    return await bundle(pageModule(source), read, PAGE_TARGET, ['page', source], packages)
+    const compiled = await bundle(
+      pageModule(source),
+      read,
+      PAGE_TARGET,
+      ['page', source],
+      packages,
+      limits.pageBundleKb * KB,
+    )
+    if (!compiled.ok) return compiled
+    const sandbox = { deadlineMs: limits.pageDrawMs, memoryBytes: limits.pageMemoryMb * MB }
+    return { ...compiled, sandbox }
   } catch (error) {
     return failure(error)
   }

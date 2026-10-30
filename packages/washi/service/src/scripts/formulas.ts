@@ -4,9 +4,10 @@ import {
   setFormulaRunner,
   type Workspace,
 } from '@washi/repository'
+import { codeLimits } from '../server'
 import { compileScript } from './compile'
 import { engineNow } from './engine'
-import { FORMULA_DEADLINE_MS, FORMULA_MEMORY_BYTES } from './values'
+import { FORMULA_MEMORY_BYTES } from './values'
 
 type Cell = string | number | boolean | null
 
@@ -22,6 +23,7 @@ function openCaller(ws: Workspace): FormulaCaller | null {
   const quickjs = engineNow()
   const functions = formulaFunctions(ws)
   if (!quickjs || functions.length === 0) return null
+  const { formulaMs } = codeLimits(ws)
   const runtime = quickjs.newRuntime()
   runtime.setMemoryLimit(FORMULA_MEMORY_BYTES)
   const vm = runtime.newContext()
@@ -29,7 +31,7 @@ function openCaller(ws: Workspace): FormulaCaller | null {
   for (const formula of functions) {
     const compiled = compileScript(formula.source, formula.name)
     if (!compiled.ok) continue
-    const deadline = Date.now() + FORMULA_DEADLINE_MS
+    const deadline = Date.now() + formulaMs
     runtime.setInterruptHandler(() => Date.now() > deadline)
     const result = vm.evalCode(compiled.js)
     if (result.error) {
@@ -42,7 +44,7 @@ function openCaller(ws: Workspace): FormulaCaller | null {
   return {
     call: (name, args) => {
       if (!defined.has(name)) throw new Error(`no function named ${name}`)
-      const deadline = Date.now() + FORMULA_DEADLINE_MS
+      const deadline = Date.now() + formulaMs
       runtime.setInterruptHandler(() => Date.now() > deadline)
       const result = vm.evalCode(`JSON.stringify(${name}(...${JSON.stringify(args)}) ?? null)`)
       if (result.error) {

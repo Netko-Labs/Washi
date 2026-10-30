@@ -60,6 +60,8 @@ export const PROMPT_PREVIEW_CHARS = 140
 
 /** A routine runs unattended: its questions wait for the morning, not five minutes. */
 export const ROUTINE_APPROVAL_TIMEOUT_MS = 12 * 60 * 60_000
+/** The ledger's reason for a call the server's admin approved for every workspace (D118). */
+export const SERVER_APPROVED = 'server'
 
 /**
  * Whether what leaves the server waits for a person. `ask` is the law (A2);

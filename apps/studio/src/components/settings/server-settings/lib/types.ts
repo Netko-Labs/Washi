@@ -1,3 +1,4 @@
+import type { CodeLimit, CodeLimits, Safeguard, SafeguardSubject, Safeguards } from '@washi/domain'
 import type { ModelOption } from '@/lib/types'
 import type { ApprovalMode, KeyState, ProviderId, SignupMode } from '../../lib'
 
@@ -32,12 +33,24 @@ export interface ServerSettingsState {
   unsplashKey: ServerSearchKeyState | null
   fetchHosts: string[]
   embedHosts: string[]
+  widgetHosts: string[]
   widgets: boolean
   defaults: WorkspaceDefaultsState
   pagePackages: PagePackageState[]
+  safeguards: Safeguards
+  limits: CodeLimits
+  safeguardLog: SafeguardChangeState[]
 }
 
-export type HostListKind = 'fetch' | 'embed'
+/** The newest change to one safeguard, as the trail tells it. */
+export interface SafeguardChangeState {
+  which: SafeguardSubject
+  on: boolean
+  by: string | null
+  at: string
+}
+
+export type HostListKind = 'fetch' | 'embed' | 'widget' | 'workspaceWidget'
 
 export interface LentKeyCopy {
   title: string
@@ -52,6 +65,20 @@ export interface HostListCopy {
   desc: string
   placeholder: string
   empty: string
+  /** What `*` in this list lets happen, said plainly beside its shortcut. */
+  anyWarning: string
+}
+
+export interface SafeguardCopy {
+  label: string
+  /** What lifting it lets happen. */
+  warning: string
+}
+
+export interface LimitRow {
+  limit: CodeLimit
+  label: string
+  unit: string
 }
 
 export interface ServerKeyCardProps {
@@ -79,6 +106,22 @@ export interface HostListCardProps {
   hosts: string[]
   /** Null when it took; otherwise the refusal, in words. */
   onSave: (hosts: string[]) => Promise<string | null>
+  /** Off, the list is only read: a member's view of a steward's list. */
+  isEditable?: boolean
+  /** When `*` last came or went. */
+  lastChange?: SafeguardChangeState
+}
+
+export interface SafeguardsCardProps {
+  safeguards: Safeguards
+  log: SafeguardChangeState[]
+  onChange: (which: Safeguard, on: boolean) => Promise<unknown>
+}
+
+export interface CodeLimitsCardProps {
+  limits: CodeLimits
+  lastChange?: SafeguardChangeState
+  onSave: (limits: CodeLimits) => Promise<unknown>
 }
 
 export interface ServerWidgetsCardProps {

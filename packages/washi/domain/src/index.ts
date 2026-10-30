@@ -97,6 +97,23 @@ export {
   reminderUpdateSchema,
 } from './entities/reminders'
 export {
+  ANY_HOST,
+  CODE_LIMITS,
+  type CodeLimit,
+  type CodeLimits,
+  codeLimitsSchema,
+  readCodeLimits,
+  readSafeguards,
+  SAFEGUARDS,
+  SAFEGUARDS_ON,
+  type Safeguard,
+  type SafeguardChange,
+  type SafeguardSubject,
+  type Safeguards,
+  safeguardSchema,
+  safeguardsSchema,
+} from './entities/safeguards'
+export {
   type AccessRow,
   type SearchHit,
   type SheetAccess,
@@ -172,10 +189,13 @@ export {
   acceptFor,
   byteRange,
   isInlineType,
-  UPLOAD_MAX_BYTES,
+  largestUpload,
+  UPLOAD_CAPS,
   UPLOAD_RULES,
+  type UploadCaps,
   type UploadKind,
   type UploadRule,
+  uploadCaps,
   uploadKindOf,
   uploadRefusal,
 } from './shared/uploads'

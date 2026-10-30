@@ -40,6 +40,7 @@ function store() {
   let key: { last4: string; provider: string; model: string | null } | null = null
   let searchKey: string | null = null
   let unsplashKey: string | null = null
+  let log: Awaited<ReturnType<InstanceStore['safeguardLog']>> = []
   const instance: InstanceStore = {
     isAdmin: async (id) => id === 'first',
     signup: async () => signup,
@@ -47,12 +48,23 @@ function store() {
       signup = mode
     },
     policy: () => policy,
-    setFetchHosts: async (fetchHosts) => {
+    setFetchHosts: async (_actor, fetchHosts) => {
       policy = { ...policy, fetchHosts }
     },
-    setEmbedHosts: async (embedHosts) => {
+    setEmbedHosts: async (_actor, embedHosts) => {
       policy = { ...policy, embedHosts }
     },
+    setWidgetHosts: async (_actor, widgetHosts) => {
+      policy = { ...policy, widgetHosts }
+    },
+    setSafeguard: async (actor, which, on) => {
+      policy = { ...policy, safeguards: { ...policy.safeguards, [which]: on } }
+      log = [{ which, on, by: actor, at: new Date(0) }]
+    },
+    setLimits: async (_actor, limits) => {
+      policy = { ...policy, limits }
+    },
+    safeguardLog: async () => log,
     setWidgets: async (widgets) => {
       policy = { ...policy, widgets }
     },
@@ -200,7 +212,63 @@ describe('the server’s own settings', () => {
       /private/,
     )
     await expect(admin.instance.setEmbedHosts({ hosts: ['not a site'] })).rejects.toThrow(
-      /not a site address/,
+      /not a host/,
     )
+    for (const bad of ['*example.com', 'a.*.com', '**']) {
+      await expect(admin.instance.setWidgetHosts({ hosts: [bad] })).rejects.toThrow(/not a host/)
+    }
+  })
+})
+
+describe('the server’s safeguards (D118)', () => {
+  test('every list takes * and *.domain', async () => {
+    const admin = callerFor(runtimeWith(store()), 'first')
+    expect(await admin.instance.setFetchHosts({ hosts: ['*', '*.Example.com'] })).toEqual([
+      '*',
+      '*.example.com',
+    ])
+    expect(await admin.instance.setEmbedHosts({ hosts: ['*'] })).toEqual(['*'])
+    expect(await admin.instance.setWidgetHosts({ hosts: ['wss://live.example.com'] })).toEqual([
+      'live.example.com',
+    ])
+    expect(await admin.instance.settings()).toMatchObject({ widgetHosts: ['live.example.com'] })
+  })
+
+  test('off by default; the admin lifts one, and the trail names who', async () => {
+    const admin = callerFor(runtimeWith(store()), 'first')
+    expect(await admin.instance.settings()).toMatchObject({
+      safeguards: { privateNetwork: false, approveAll: false },
+      limits: { pageDrawMs: 100, pageBundleKb: 768, formulaMs: 20 },
+      safeguardLog: [],
+    })
+    expect(await admin.instance.setSafeguard({ which: 'approveAll', on: true })).toEqual({
+      privateNetwork: false,
+      approveAll: true,
+    })
+    expect((await admin.instance.settings()).safeguardLog).toMatchObject([
+      { which: 'approveAll', on: true, by: 'first' },
+    ])
+  })
+
+  test('limits past their ceiling are refused', async () => {
+    const admin = callerFor(runtimeWith(store()), 'first')
+    const { limits } = await admin.instance.settings()
+    await expect(admin.instance.setLimits({ ...limits, pageMemoryMb: 4096 })).rejects.toThrow()
+    expect(await admin.instance.setLimits({ ...limits, pageDrawMs: 250 })).toMatchObject({
+      pageDrawMs: 250,
+    })
+  })
+
+  test('a member can neither lift a safeguard, tune the limits, nor list widget hosts', async () => {
+    const runtime = runtimeWith(store())
+    const member = callerFor(runtime, 'second')
+    const { limits } = await callerFor(runtime, 'first').instance.settings()
+    const refused = [
+      () => member.instance.setSafeguard({ which: 'privateNetwork', on: true }),
+      () => member.instance.setSafeguard({ which: 'approveAll', on: true }),
+      () => member.instance.setLimits(limits),
+      () => member.instance.setWidgetHosts({ hosts: ['*'] }),
+    ]
+    for (const call of refused) await expect(call()).rejects.toThrow(/app admin/)
   })
 })

@@ -1,8 +1,19 @@
-import { type ServerPolicy, serverPolicySchema, workspaceDefaultsSchema } from '@washi/domain'
+import {
+  ANY_HOST,
+  CODE_LIMITS,
+  type CodeLimit,
+  readCodeLimits,
+  readSafeguards,
+  type SafeguardChange,
+  type ServerPolicy,
+  serverPolicySchema,
+  workspaceDefaultsSchema,
+} from '@washi/domain'
 import { eq } from 'drizzle-orm'
 import { instanceSetting, user } from '../db'
 import type { ControlDB } from './client'
 import {
+  SAFEGUARD_LOG_KEPT,
   SERVER_SEAL_ID,
   SERVER_SEARCH_SEAL_ID,
   SERVER_UNSPLASH_SEAL_ID,
@@ -10,6 +21,7 @@ import {
 } from './constants'
 import { open, seal } from './crypto'
 import type {
+  HostList,
   SealedSearchKey,
   SealedServerKey,
   ServerSettings,
@@ -28,7 +40,7 @@ function json(value: string | undefined): unknown {
 
 /**
  * Each row parses on its own: one that no longer reads falls back alone, never taking the others
- * with it. Widgets fail closed — a switch that can't be read is off, not on.
+ * with it. Widgets and safeguards fail closed — a switch that can't be read keeps the guard.
  */
 function policyOf(values: Map<string, string>): ServerPolicy {
   const field = serverPolicySchema.shape
@@ -36,13 +48,21 @@ function policyOf(values: Map<string, string>): ServerPolicy {
   return {
     fetchHosts: field.fetchHosts.safeParse(json(values.get(SETTING_KEYS.fetchHosts))).data ?? [],
     embedHosts: field.embedHosts.safeParse(json(values.get(SETTING_KEYS.embedHosts))).data ?? [],
+    widgetHosts: field.widgetHosts.safeParse(json(values.get(SETTING_KEYS.widgetHosts))).data ?? [],
     widgets: widgets === undefined ? true : widgets === '1',
     defaults:
       workspaceDefaultsSchema.safeParse(json(values.get(SETTING_KEYS.defaults))).data ??
       workspaceDefaultsSchema.parse({}),
     pagePackages:
       field.pagePackages.safeParse(json(values.get(SETTING_KEYS.pagePackages))).data ?? [],
+    safeguards: readSafeguards(json(values.get(SETTING_KEYS.safeguards))),
+    limits: readCodeLimits(json(values.get(SETTING_KEYS.limits))),
   }
+}
+
+function changesOf(value: string | undefined): SafeguardChange[] {
+  const stored = json(value)
+  return Array.isArray(stored) ? (stored as SafeguardChange[]) : []
 }
 
 export function createServerSettings({
@@ -57,6 +77,22 @@ export function createServerSettings({
     await rows.put(key, value)
     values.set(key, value)
     policy = policyOf(values)
+  }
+
+  const logChange = (change: Omit<SafeguardChange, 'at'>) => {
+    const log = [
+      ...changesOf(values.get(SETTING_KEYS.safeguardLog)),
+      { ...change, at: new Date().toISOString() },
+    ]
+    return write(SETTING_KEYS.safeguardLog, JSON.stringify(log.slice(-SAFEGUARD_LOG_KEPT)))
+  }
+
+  /** A list that gains or loses `*` lifts or restores a guard, so the trail notes it. */
+  const writeHosts = async (actorId: string, list: HostList, hosts: string[]) => {
+    const wasAny = policy[list].includes(ANY_HOST)
+    await write(SETTING_KEYS[list], JSON.stringify(hosts))
+    const isAny = hosts.includes(ANY_HOST)
+    if (isAny !== wasAny) await logChange({ which: list, on: isAny, by: actorId })
   }
 
   const sealedKey = async (): Promise<SealedServerKey | null> => {
@@ -106,11 +142,38 @@ export function createServerSettings({
       policy = policyOf(values)
     },
     policy: () => policy,
-    setFetchHosts: (hosts) => write(SETTING_KEYS.fetchHosts, JSON.stringify(hosts)),
-    setEmbedHosts: (hosts) => write(SETTING_KEYS.embedHosts, JSON.stringify(hosts)),
+    setFetchHosts: (actorId, hosts) => writeHosts(actorId, 'fetchHosts', hosts),
+    setEmbedHosts: (actorId, hosts) => writeHosts(actorId, 'embedHosts', hosts),
+    setWidgetHosts: (actorId, hosts) => writeHosts(actorId, 'widgetHosts', hosts),
     setWidgets: (enabled) => write(SETTING_KEYS.widgets, enabled ? '1' : '0'),
     setDefaults: (defaults) => write(SETTING_KEYS.defaults, JSON.stringify(defaults)),
     setPagePackages: (packages) => write(SETTING_KEYS.pagePackages, JSON.stringify(packages)),
+
+    async setSafeguard(actorId, which, on) {
+      await write(SETTING_KEYS.safeguards, JSON.stringify({ ...policy.safeguards, [which]: on }))
+      await logChange({ which, on, by: actorId })
+    },
+    async setLimits(actorId, limits) {
+      await write(SETTING_KEYS.limits, JSON.stringify(limits))
+      const tuned = (Object.keys(CODE_LIMITS) as CodeLimit[]).some(
+        (key) => policy.limits[key] !== CODE_LIMITS[key],
+      )
+      await logChange({ which: 'limits', on: tuned, by: actorId })
+    },
+    async safeguardLog() {
+      const latest = new Map<SafeguardChange['which'], SafeguardChange>()
+      for (const change of changesOf(values.get(SETTING_KEYS.safeguardLog))) {
+        latest.set(change.which, change)
+      }
+      return Promise.all(
+        [...latest.values()].map(async (change) => ({
+          which: change.which,
+          on: change.on,
+          by: await nameOf(change.by),
+          at: new Date(change.at),
+        })),
+      )
+    },
 
     async agentKey() {
       const row = await sealedKey()

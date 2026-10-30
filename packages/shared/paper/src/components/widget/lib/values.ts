@@ -17,20 +17,8 @@ export const TOKENS = [
   '--muted-bg',
 ]
 
-/**
- * No network at all — not even pictures, which could carry data out in their address. Scripts and
- * styles inline only; nothing loads, submits or navigates.
- */
-export const WIDGET_CSP = [
-  "default-src 'none'",
-  "script-src 'unsafe-inline'",
-  "style-src 'unsafe-inline'",
-  'img-src data: blob:',
-  'font-src data:',
-  'media-src data: blob:',
-  "form-action 'none'",
-  "base-uri 'none'",
-].join('; ')
+/** A host as a CSP source may name it; anything else from the list is dropped, never spliced in. */
+export const CSP_HOST = /^(\*\.)?([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/
 
 export const WIDGET_STYLE = `:root { color-scheme: light dark; }
 body { margin: 0; font: 14px/1.5 system-ui, sans-serif; color: var(--ink); background: transparent; }

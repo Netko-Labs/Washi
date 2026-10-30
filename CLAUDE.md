@@ -39,6 +39,9 @@ is the primitives reference and these rules stand — a PR that breaks one does 
 - **P2** Writes merge (Loro, `baseVersion`); a merge that breaks WSX is `SheetConflictError`.
 - **P3** Nothing on screen is invented; empty states are the honest default.
 
+W1, A2 and tsuru's private-range guard hold by default; a server's admin may lift parts of them for
+every workspace on it (D118 lists which). Embedded has no instance store, so nothing is lifted there.
+
 Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the studio architecture
 (template-based web, desktop over mirin IPC) is the current block.
 
@@ -238,7 +241,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   `WASHI_FILES_S3_*` set, in a bucket under a per-workspace prefix through Bun's own S3 client.
   `POST /api/files` (multipart) and `GET /api/files/<id>` are studio routes gated like a workspace
   procedure (`src/server/files.ts`); `files.remove` is tRPC. What a workspace takes is `UPLOAD_RULES`
-  in domain (D95): pictures 10 MB, videos 50 MB, audio and documents 25 MB — never HTML or SVG;
+  in domain (D95): pictures 10 MB, videos 50 MB, audio and documents 25 MB (the server's admin may
+  change these, D118) — never HTML or SVG;
   `uploadRefusal` says why in words, on the server and before a picker uploads (covers, icons and
   emojis ask for a picture). Served bytes are `nosniff`, `Content-Security-Policy: sandbox`, inline
   only for media and PDFs (else a download), and honour `Range` (`byteRange` → 206) so a video seeks.
@@ -354,10 +358,32 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   never an agent tool (A1) nor service (C3): service is lent only what is ready
   (`lendServerPolicy`'s third argument → `pagePackagesOf(ws)`), and `compilePage`, `compileWidget`
   and `checkSource(source, ws)` resolve those from the cache like `PAGE_LIBRARIES` — inside the
-  package's folder, the same 768 KB cap, versions in the cache key. A package off the list is
+  package's folder, the same bundle cap (D118), versions in the cache key. A package off the list is
   "not on this server's page packages — an admin can add it in Settings → Server"; removed, its
   pages stop in those words. Washi's instructions list them each turn (`instructionsFor`).
   Embedded installs none.
+- **A server's admin may lift safeguards (D118).** Settings → Server, each off by default, in the
+  lent policy (`safeguards`, `limits`), parsed fail-closed (`readSafeguards`: only a literal `true`
+  lifts; `readCodeLimits`: one out of range falls back alone). **Every site** is `*` in a host list
+  — server fetch · embed · widget hosts, a workspace's embed and widget hosts — beside a host or
+  `*.domain` (that domain and its subdomains, on a dot; `hostEntry`/`hostMatches` in tsuru, anything
+  else refused in words). Fetch `*` passes tsuru for any public https host but never the desk
+  (`policyVerdict` judges named hosts only), and never a private one. Embed `*` plays any https
+  site, a shared link too (`embedsAnySite`, a boolean — the list never leaves). **Widget network**:
+  the server's + the workspace's hosts (`reachableWidgetHosts`, owners and admins) ride
+  `scripts.widget` as `network` into the frame's CSP (`widgetCsp`: https for img/font/media,
+  https + wss for connect; `*` = `https: wss:`); empty is `default-src 'none'` as before, and the
+  frame never gets `allow-same-origin`. **Private network** (`allowPrivate`): tsuru's fetches and
+  link previews may reach private, loopback, link-local and metadata addresses — still asking.
+  **Approval desk**: `approveAll` — what leaves never stops, in any workspace, ledgered `auto` with
+  detail `server`, and the fetch it passes reaches its host (a grant, see Approvals); tsuru's
+  refusals still refuse; Settings → Washi says so instead of the Approvals and YOLO choices.
+  **Code limits** (`codeLimitsSchema`, floors and ceilings): page memory · ms per draw · bundle KB
+  (`compilePage` hands the sandbox budget to the reader as `sandbox`), widget bundle KB, automation
+  MB · ms, formula ms per call, upload MB per kind (`uploadCaps`; `files.caps` for pickers); service
+  reads them only through `codeLimits(ws)`. Each flip — a switch, the limits, a list gaining or
+  losing `*` — appends `{ which, on, by, at }` to `instance_setting` `safeguard_history` (last 100);
+  each card says "Last changed by … on …".
 - **A chat is its starter's (D67).** `agent_sessions.created_by`; null is the workspace's (a
   routine's runs, every chat before D67). `chatProcedure` answers NOT_FOUND for any `sessionId`
   that is someone else's, and the agent subscriptions, `pendingApprovals` and `today` drop their
@@ -435,7 +461,11 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   (tsuru), so a search allowed always is `api.exa.ai` on that list. A workspace may set
   approvals to `auto` (`agents.setApprovalMode`, Settings → Agent on both hosts): a standing yes
   for what leaves, each call ledgered as `auto`; policy refusals still refuse. Owner or admin
-  only (`ownerProcedure`), as is setting an integration key.
+  only (`ownerProcedure`), as is setting an integration key. Any yes to an off-list fetch — Allow
+  once, `auto`, YOLO, the server's desk switch — is a one-shot grant for that host
+  (`takeFetchGrant`): `fetch_url` in both ports takes it through `ToolContext.fetchGrant` and
+  fetches with that one host added (`agentFetch`); https, private ranges and redirects are still
+  tsuru's to refuse, and a turn's end drops its unused grants (`dropSession`).
 - **A conversation may approve everything (D115).** App meta `yolo_allowed`, off by default
   (`agents.setYoloAllowed`, owners and admins; Settings → Washi → What leaves). Allowed, a chat's
   starter flips the composer's ⚡ YOLO chip: `agent_sessions.approvals` (`setSessionOptions`, null
@@ -599,7 +629,7 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
 - **A widget is JSX, where an owner allows (D113, was D98).** `<Widget title height><Clock /></Widget>`
   draws one of the page's own components (D100) with real React in an iframe `sandbox="allow-scripts"`
   — no `allow-same-origin`, so an opaque origin with no cookies, storage or parent — under a CSP with
-  no network (`default-src 'none'`; pictures only `data:`/`blob:`). Its child is exactly one element
+  no network (`default-src 'none'`; pictures only `data:`/`blob:`) unless hosts are listed (D118). Its child is exactly one element
   naming a prelude component (policy `component`); text — a pre-D113 HTML widget — is a warning, not
   a refusal, so its page still saves: it draws a note in words, its text kept. `pageModule` turns a Widget's child into a drawn node
   (`widgetsAsNodes`), so the page's sandbox never calls it: its props are evaluated there and handed
@@ -668,8 +698,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   any other host plays only if the workspace lists it — app meta `embed_hosts`, `embeds.hosts` /
   `embeds.setHosts` (owners and admins), Settings → Workspace → Embeds — which `PaperHost.embedAllowed`
   asks (the studio caches it a minute; `forgetEmbedHosts` on a switch or a save). Anything else is a
-  quiet card with an Open ↗ link; a shared link has no list, so only built-ins play there. Frames are
-  sandboxed (scripts, same-origin, popups, presentation, forms). This list is not tsuru's fetch
+  quiet card with an Open ↗ link; a shared link has no list, so only built-ins play there (unless `*`
+  is listed, D118). Frames are sandboxed (scripts, same-origin, popups, presentation, forms). This list is not tsuru's fetch
   allowlist: one is what a reader's browser loads, the other what may leave the server. `/embed <url>`
   or an https address after `/` drops one in the editor.
 - **Pages are programs (D100).** `parse` reads a page MDX-style:
