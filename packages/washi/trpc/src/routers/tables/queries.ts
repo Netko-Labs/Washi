@@ -2,6 +2,7 @@ import { rowActivityInputSchema } from '@washi/domain'
 import { historyQuerySchema, querySchema } from '@washi/ink'
 import { listTables } from '@washi/repository'
 import {
+  pagesNamingColumn,
   rowActivity,
   rowOfSheet,
   runHistory,
@@ -16,6 +17,10 @@ export const tableQueries = router({
   list: workspaceProcedure.query(({ ctx }) => listTables(ctx.ws)),
   /** Every table, its size, and the pages this viewer reads that show it (D109). */
   catalog: workspaceProcedure.query(({ ctx }) => tableCatalog(ctx.ws, ctx.viewer)),
+  /** The pages this viewer reads whose views name a column: what its rename or delete leaves. */
+  columnPages: workspaceProcedure
+    .input(z.object({ table: z.string(), column: z.string() }))
+    .query(({ ctx, input }) => pagesNamingColumn(ctx.ws, ctx.viewer, input.table, input.column)),
   trashed: workspaceProcedure.query(({ ctx }) => trashedTables(ctx.ws)),
   query: workspaceProcedure
     .input(z.object({ query: querySchema }))

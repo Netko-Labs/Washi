@@ -22,7 +22,7 @@ function aggregateTables(ast: ExprAst, out: Set<string>) {
   }
 }
 
-function walk(root: WsxElement, visit: (node: WsxElement) => void) {
+export function walk(root: WsxElement, visit: (node: WsxElement) => void) {
   const descend = (node: WsxNode) => {
     if (node.kind !== 'element') return
     visit(node)
@@ -31,7 +31,7 @@ function walk(root: WsxElement, visit: (node: WsxElement) => void) {
   descend(root)
 }
 
-const tableOf = (value: unknown): string | null => {
+export const tableOf = (value: unknown): string | null => {
   if (typeof value === 'string') return value
   if (value && typeof value === 'object' && 'table' in value) {
     const table = (value as { table: unknown }).table

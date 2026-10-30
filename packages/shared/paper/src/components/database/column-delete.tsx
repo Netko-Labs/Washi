@@ -1,13 +1,23 @@
-import { type ColumnPageProps, tableLabel, useColumnChange } from './lib'
+import {
+  type ColumnPageProps,
+  columnPagesWords,
+  tableLabel,
+  useColumnChange,
+  useColumnPages,
+} from './lib'
 
 /** Deleting a property asks once, in words, before its values go with it. */
 export function ColumnDelete({ db, column, onBack, onDone }: ColumnPageProps) {
   const { status, run } = useColumnChange()
+  const pages = useColumnPages(db.table, column.name)
   const label = tableLabel(column.name)
 
   return (
     <div className="wsx-db-panel" role="alertdialog" aria-label={`Delete ${label}`}>
       <p className="wsx-db-confirm">Delete {label}? Its values go with it.</p>
+      {pages.length > 0 && (
+        <p className="wsx-db-column-pages">{columnPagesWords(pages, label, false)}</p>
+      )}
       {status.error && (
         <p className="wsx-db-panel-error" role="alert">
           {status.error}

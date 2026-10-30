@@ -182,7 +182,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   `tables.purge` an owner's or admin's: rows, `record_changes` and row pages go (the one erase
   outside P1). `/databases` lists each table with "Shown on" chips or "Not on any page"; ⋯ opens
   its first page, or the table alone in a dialog; Trash lists trashed tables beside pages.
-  `db_list_tables` gives each table `shownOn`. Washi never trashes a table.
+  `db_list_tables` gives each table `shownOn`. Washi never trashes a table. A column's Rename and
+  Delete name the pages whose views still name it (`tables.columnPages`, `namesColumn`); none follow.
 - **The look is the page's (D64).** `icon` and `cover` are `<Sheet>` props; the source is the
   truth and `sheets.icon/cover` a cache every write re-reads off the root (`lookOf`). Never set
   the columns any other way — `sheets.updateMeta` writes a picked icon or cover into the doc

@@ -1,11 +1,19 @@
 import { useState } from 'react'
-import { type ColumnRenameProps, columnKey, tableLabel, useColumnChange } from './lib'
+import {
+  type ColumnRenameProps,
+  columnKey,
+  columnPagesWords,
+  tableLabel,
+  useColumnChange,
+  useColumnPages,
+} from './lib'
 import { PropertyIcon } from './property-icon'
 
 /** The menu opens on the property's name; Enter renames it, its values moving with it. */
 export function ColumnRename({ db, column, onDone, onRenamed }: ColumnRenameProps) {
   const [label, setLabel] = useState(tableLabel(column.name))
   const { status, run } = useColumnChange()
+  const pages = useColumnPages(db.table, column.name)
 
   const submit = async () => {
     const to = columnKey(label)
@@ -36,6 +44,11 @@ export function ColumnRename({ db, column, onDone, onRenamed }: ColumnRenameProp
           onChange={(event) => setLabel(event.currentTarget.value)}
         />
       </label>
+      {pages.length > 0 && (
+        <p className="wsx-db-column-pages">
+          {columnPagesWords(pages, tableLabel(column.name), true)}
+        </p>
+      )}
       {status.error && (
         <p className="wsx-db-panel-error" role="alert">
           {status.error}

@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import { openWorkspace, type Workspace } from '@washi/repository'
+import { createSheetFromSource } from '../sheets/service'
 import { rowActivity } from '../tables/activity'
+import { pagesNamingColumn } from '../tables/column-pages'
 import { changeColumn } from '../tables/columns'
 import { defineUserTable, runMutation, runQuery } from '../tables/service'
 
@@ -109,5 +111,25 @@ describe('a column menu’s changes', () => {
     expect(() => changeColumn(ws, { kind: 'remove', table: 'orders', column: 'price' })).toThrow(
       'the rollup “pieces” on stages',
     )
+  })
+})
+
+describe('pages that name a column', () => {
+  const page = (title: string, body: string, props = '') =>
+    createSheetFromSource(ws, { title, source: `<Sheet title="${title}"${props}>${body}</Sheet>` })
+  const Private = ' visibility="private"'
+  const titles = (column: string, viewer = { id: 'rin', isOwner: false }) =>
+    pagesNamingColumn(ws, viewer, 'orders', column).map((each) => each.title)
+
+  test('only live pages whose views over the table name it, and only those the viewer reads', () => {
+    page(
+      'Pipeline',
+      `<Database table="orders" views={[{ name: 'Board', kind: 'board', groupBy: 'stage' }]} />`,
+    )
+    page('Ledger', `<Table bind={{ table: 'orders' }} />`)
+    page('Secret', `<Board bind={{ table: 'orders' }} groupBy="stage" title="name" />`, Private)
+    expect(titles('stage')).toEqual(['Pipeline'])
+    expect(titles('stage', { id: 'juan', isOwner: true })).toEqual(['Pipeline', 'Secret'])
+    expect(titles('qty')).toEqual([])
   })
 })

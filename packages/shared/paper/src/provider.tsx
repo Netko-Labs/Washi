@@ -68,6 +68,8 @@ export interface PaperHost {
    * A host that cannot change a table (a shared link) leaves it out: the menu only sorts, hides.
    */
   changeColumn?(change: ColumnChange): Promise<void>
+  /** Titles of the pages whose views name a column — what its rename or delete leaves behind. */
+  columnPages?(table: string, column: string): Promise<string[]>
   /** BCP-47; dates and money format from the vault locale at render, never in a page. */
   locale?: string
 }

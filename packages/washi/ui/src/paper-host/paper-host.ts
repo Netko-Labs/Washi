@@ -170,5 +170,10 @@ export const paperHost: PaperHost = {
     await api.tables.changeColumn.mutate({ change })
   },
 
+  columnPages: async (table, column) => {
+    const pages = await api.tables.columnPages.query({ table, column })
+    return pages.map((page) => page.title || 'Untitled')
+  },
+
   locale: typeof navigator === 'undefined' ? 'en-US' : navigator.language,
 }

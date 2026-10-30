@@ -1,3 +1,4 @@
+export { namesColumn } from './column-refs'
 export { EMBED_PROVIDERS, embedHost, knownEmbed } from './embed-providers'
 export type { EmbedProvider, EmbedRatio, KnownEmbed } from './embed-types'
 export {
