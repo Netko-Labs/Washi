@@ -64,7 +64,9 @@ export function UserMenu({ workspace, onNavigate, placement = 'up' }: UserMenuPr
           >
             <IconUserCircle className="size-4" />
             Account settings
-            <kbd className="ml-auto font-sans text-[10.5px] text-muted-foreground">⌘,</kbd>
+            <kbd className="ml-auto font-sans text-[10.5px] text-muted-foreground pointer-coarse:hidden">
+              ⌘,
+            </kbd>
           </Link>
           <Link
             to="/w/$workspaceId/settings"

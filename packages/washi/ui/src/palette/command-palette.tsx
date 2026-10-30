@@ -61,7 +61,7 @@ export function CommandPalette() {
             placeholder="Ask Washi or search pages…"
             className="h-11 flex-1 bg-transparent text-[13.5px] outline-none placeholder:text-muted-foreground"
           />
-          <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
+          <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground pointer-coarse:hidden">
             esc
           </kbd>
         </div>
@@ -82,7 +82,7 @@ export function CommandPalette() {
               <span className="min-w-0 truncate">
                 Ask Washi: <span className="font-medium">{question}</span>
               </span>
-              <kbd className="ml-auto shrink-0 rounded border border-border bg-muted px-1 font-mono text-[10px] text-muted-foreground">
+              <kbd className="ml-auto shrink-0 rounded border border-border bg-muted px-1 font-mono text-[10px] text-muted-foreground pointer-coarse:hidden">
                 ⌘⏎
               </kbd>
             </Command.Item>
