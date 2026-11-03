@@ -22,4 +22,6 @@ export interface CapabilityContext {
   listPeople?: () => Promise<Member[]>
   /** A page just made is the page the person wants to look at. */
   onCreate?: (id: string) => void
+  /** Where a person opens a page, when the caller knows the server's address. */
+  pageUrl?: (id: string) => string
 }

@@ -1,10 +1,11 @@
 import type { TranscriptEntry } from '@washi/domain'
 import { AGENT_PRESENCE_TTL_MS, type EventBus, type PresenceBoard } from '@washi/trpc'
 
-const PAGE_WRITES = new Set(['sheet_create', 'sheet_replace', 'sheet_delete'])
+const PAGE_WRITES = new Set(['sheet_create', 'sheet_replace', 'sheet_edit', 'sheet_delete'])
 const DATA_WRITES = new Set([
   'db_define',
   'db_link_column',
+  'db_change_column',
   'db_mutate',
   'db_trash_table',
   'action_run',
@@ -23,7 +24,7 @@ export function watchAgentWrites(workspaceId: string, events: EventBus, presence
       const input = update.input as { id?: unknown } | undefined
       const sheetId = typeof input?.id === 'string' ? input.id : null
       calls.set(update.toolCallId, { name: update.title, sheetId })
-      if (update.title === 'sheet_replace' && sheetId) {
+      if ((update.title === 'sheet_replace' || update.title === 'sheet_edit') && sheetId) {
         presence.touch(
           workspaceId,
           sheetId,

@@ -1,5 +1,5 @@
 import type { Member, Viewer } from '@washi/domain'
-import type { Workspace } from '@washi/repository'
+import type { FileStore, Workspace } from '@washi/repository'
 
 /** What moved, so open pages refetch: page sources, table data, or both. */
 export type McpChange = 'page' | 'data'
@@ -12,4 +12,8 @@ export interface McpSession {
   member: { id: string; name: string }
   listPeople: () => Promise<Member[]>
   changed: (kinds: McpChange[]) => void
+  /** The workspace's uploads: with it, `file_upload` lands files an icon or a cover can wear. */
+  files?: FileStore
+  /** The server's own address, so a write can say where its page opens. */
+  baseUrl?: string
 }

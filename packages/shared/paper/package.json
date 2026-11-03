@@ -8,7 +8,8 @@
     ".": "./src/index.ts",
     "./registry": "./src/registry/index.ts",
     "./css": "./src/css/paper.css",
-    "./book": "./src/book/index.ts"
+    "./book": "./src/book/index.ts",
+    "./reference": "./src/book/reference/index.ts"
   },
   "scripts": {
     "check-types": "tsgo -p tsconfig.json --noEmit"

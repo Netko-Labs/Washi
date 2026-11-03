@@ -3,7 +3,6 @@ import {
   IconBolt,
   IconChartLine,
   IconDatabase,
-  IconDatabaseEdit,
   IconEye,
   IconFilePencil,
   IconFilePlus,
@@ -15,90 +14,16 @@ import {
   IconPhoto,
   IconSearch,
   IconTable,
-  IconTablePlus,
   IconTool,
   IconTrash,
   IconUsers,
   IconWorld,
   IconWorldSearch,
 } from '@tabler/icons-react'
-import type { TitleOf, ToolDescription } from './types'
-import { PAST_TENSE } from './values'
-
-const record = (value: unknown): Record<string, unknown> =>
-  value && typeof value === 'object' ? (value as Record<string, unknown>) : {}
-
-const text = (value: unknown): string | null =>
-  typeof value === 'string' && value.trim() ? value : null
-
-/** The first readable value of a row — its title, usually. */
-function rowLabel(data: Record<string, unknown>): string | null {
-  for (const value of Object.values(data)) {
-    if (typeof value === 'string' && value.trim()) return value
-  }
-  return null
-}
-
-function hostOf(url: string | null): string | null {
-  if (!url) return null
-  try {
-    return new URL(url).hostname
-  } catch {
-    return url
-  }
-}
-
-const base = (partial: Partial<ToolDescription> & Pick<ToolDescription, 'icon' | 'action'>) => ({
-  subject: null,
-  details: [],
-  outbound: false,
-  preview: null,
-  ...partial,
-})
-
-function describeTable(name: string, input: Record<string, unknown>): ToolDescription {
-  if (name === 'db_define') {
-    const spec = record(input.spec)
-    const columns = Array.isArray(spec.columns)
-      ? spec.columns.map((column) => text(record(column).name)).filter(Boolean)
-      : []
-    return base({
-      icon: IconTablePlus,
-      action: 'Create a table',
-      subject: text(spec.name),
-      details: columns.length ? [`Columns: ${columns.join(', ')}`] : [],
-    })
-  }
-  const mutation = record(input.mutation)
-  const table = text(mutation.table)
-  const label = rowLabel(record(mutation.data))
-  if (mutation.kind === 'insert') {
-    return base({
-      icon: IconDatabaseEdit,
-      action: label ? `Add “${label}” to` : 'Add a row to',
-      subject: table,
-    })
-  }
-  if (mutation.kind === 'delete') {
-    return base({ icon: IconDatabaseEdit, action: 'Remove rows from', subject: table })
-  }
-  if (mutation.kind === 'copy') {
-    const changed = Object.keys(record(mutation.set))
-    return base({
-      icon: IconDatabaseEdit,
-      action: 'Copy rows forward in',
-      subject: table,
-      details: changed.length ? [`Each copy changes ${changed.join(', ')}`] : [],
-    })
-  }
-  const fields = Object.keys(record(mutation.data))
-  return base({
-    icon: IconDatabaseEdit,
-    action: 'Update rows in',
-    subject: table,
-    details: fields.length ? [`Changes ${fields.join(', ')}`] : [],
-  })
-}
+import type { TitleOf, ToolDescription } from '../types'
+import { PAST_TENSE } from '../values'
+import { base, hostOf, record, text } from './shared'
+import { describeTable } from './tables'
 
 /** A title the call itself returned — what names a page once it is gone from the store. */
 function outputTitle(output: string | null | undefined): string | null {
@@ -137,6 +62,15 @@ export function describeTool(
         subject: text(args.title) ?? sheetTitle(),
         preview: text(args.source),
       })
+    case 'sheet_edit': {
+      const edits = Array.isArray(args.edits) ? args.edits.length : 0
+      return base({
+        icon: IconFilePencil,
+        action: 'Update the page',
+        subject: text(args.title) ?? sheetTitle() ?? outputTitle(output),
+        details: edits ? [edits === 1 ? 'One change' : `${edits} changes`] : [],
+      })
+    }
     case 'sheet_delete': {
       const title = sheetTitle() ?? outputTitle(output)
       return base({
@@ -152,6 +86,7 @@ export function describeTool(
       })
     }
     case 'db_define':
+    case 'db_change_column':
     case 'db_mutate':
       return describeTable(name, args)
     case 'db_link_column': {
@@ -231,6 +166,12 @@ export function describeTool(
       return base({ icon: IconEye, action: 'Read', subject: sheetTitle() })
     case 'sheet_check':
       return base({ icon: IconFileSearch, action: 'Checked the page design' })
+    case 'wsx_reference':
+      return base({ icon: IconFileSearch, action: 'Read how pages are written' })
+    case 'catalog_list':
+      return base({ icon: IconPhoto, action: 'Looked at the icons and covers' })
+    case 'file_upload':
+      return base({ icon: IconPhoto, action: 'Upload', subject: text(args.filename) })
     case 'sheet_backlinks':
       return base({ icon: IconLink, action: 'Found links to', subject: sheetTitle() })
     case 'search':

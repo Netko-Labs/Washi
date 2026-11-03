@@ -31,7 +31,8 @@ function pageOf(
   result: Extract<AgentUpdate, { kind: 'tool_call_update' }>,
 ): TurnOutcome | null {
   const made = call.title === 'sheet_create'
-  if (result.status !== 'completed' || (!made && call.title !== 'sheet_replace')) return null
+  const changed = call.title === 'sheet_replace' || call.title === 'sheet_edit'
+  if (result.status !== 'completed' || (!made && !changed)) return null
   const id = made ? createdId(result.output) : field(call.input, 'id')
   if (!id) return null
   const title = getSheet(ws, id)?.title ?? field(call.input, 'title') ?? 'Untitled'

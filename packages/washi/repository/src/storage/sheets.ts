@@ -11,7 +11,7 @@ import {
 import { sheetLinkTable, sheetTable } from '@washi/domain/db'
 import { and, desc, eq, isNull, sql } from 'drizzle-orm'
 import { newId, type Workspace } from './client'
-import { createSnapshot, mergeText, updateSnapshot, versionOf } from './loro'
+import { createSnapshot, mergeText, textAt, updateSnapshot, versionOf } from './loro'
 import { appendOp } from './oplog'
 import { clearRevisions, pushRevision } from './revisions'
 import { writeSheetTables } from './sheet-tables'
@@ -267,6 +267,16 @@ export function sheetVersion(ws: Workspace, id: string): string | null {
     .where(and(eq(sheetTable.id, id), isNull(sheetTable.deletedAt)))
     .all()
   return row ? versionOf(row.snapshot) : null
+}
+
+/** A page's source as it stood at `version`; null for a page gone. A version it never had throws. */
+export function sheetSourceAt(ws: Workspace, id: string, version: string): string | null {
+  const [row] = ws.db
+    .select({ snapshot: sheetTable.loroSnapshot })
+    .from(sheetTable)
+    .where(and(eq(sheetTable.id, id), isNull(sheetTable.deletedAt)))
+    .all()
+  return row ? textAt(row.snapshot, version) : null
 }
 
 /** `next` written against `version`, merged with every edit that landed since. */

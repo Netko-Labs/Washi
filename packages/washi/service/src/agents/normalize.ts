@@ -1,5 +1,7 @@
 import type { SDKMessage } from '@anthropic-ai/claude-agent-sdk'
 import type { AgentUpdate } from '@washi/domain'
+import { applyEdits } from '../sheets/edit'
+import type { SheetEdit } from '../sheets/types'
 
 const TOOL_KINDS: Record<string, Extract<AgentUpdate, { kind: 'tool_call' }>['toolKind']> = {
   sheet_list: 'read',
@@ -8,7 +10,10 @@ const TOOL_KINDS: Record<string, Extract<AgentUpdate, { kind: 'tool_call' }>['to
   sheet_backlinks: 'read',
   sheet_create: 'edit',
   sheet_replace: 'edit',
+  sheet_edit: 'edit',
   sheet_delete: 'delete',
+  wsx_reference: 'read',
+  catalog_list: 'read',
   search: 'search',
   db_list_tables: 'read',
   people_list: 'read',
@@ -17,6 +22,7 @@ const TOOL_KINDS: Record<string, Extract<AgentUpdate, { kind: 'tool_call' }>['to
   db_row_activity: 'read',
   db_define: 'edit',
   db_link_column: 'edit',
+  db_change_column: 'edit',
   db_mutate: 'edit',
   db_trash_table: 'delete',
   reminder_create: 'edit',
@@ -107,20 +113,38 @@ export function normalizeMessage(message: SDKMessage): AgentUpdate[] {
   return []
 }
 
-/** A sheet_replace call, restated as the diff a person reviews before approving it. */
+/** What a sheet_edit call would make of the page as it is now; null when its edits do not apply. */
+function editedText(source: string, edits: unknown): string | null {
+  if (!Array.isArray(edits)) return null
+  try {
+    return applyEdits(source, edits as SheetEdit[])
+  } catch {
+    return null
+  }
+}
+
+/** A sheet_replace or sheet_edit call, restated as the diff a person reviews before approving it. */
 export function proposedDiff(
   update: AgentUpdate,
   sheet: (id: string) => { title: string; source: string } | null | undefined,
 ): AgentUpdate | null {
-  if (update.kind !== 'tool_call' || update.title !== 'sheet_replace') return null
-  const input = update.input as { id?: string; source?: string } | undefined
-  if (!input?.id || typeof input.source !== 'string') return null
+  if (update.kind !== 'tool_call') return null
+  if (update.title !== 'sheet_replace' && update.title !== 'sheet_edit') return null
+  const input = update.input as { id?: string; source?: string; edits?: unknown } | undefined
+  if (!input?.id) return null
   const existing = sheet(input.id)
   if (!existing) return null
+  const newText =
+    update.title === 'sheet_edit'
+      ? editedText(existing.source, input.edits)
+      : typeof input.source === 'string'
+        ? input.source
+        : null
+  if (newText === null) return null
   return {
     kind: 'tool_call_update',
     toolCallId: update.toolCallId,
     status: 'in_progress',
-    diff: { path: existing.title, oldText: existing.source, newText: input.source },
+    diff: { path: existing.title, oldText: existing.source, newText },
   }
 }

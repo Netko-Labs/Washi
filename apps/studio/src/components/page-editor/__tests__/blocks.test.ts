@@ -66,9 +66,9 @@ describe('page editor blocks', () => {
     ])
   })
 
-  test('text in several runs stays locked rather than gaining or losing spaces', () => {
+  test('a literal among words is one run, its spaces kept, so it types as text', () => {
     const root = parse('<Sheet title="t"><Text>Tom {"&"} Jerry</Text></Sheet>')
-    expect(toBlocks(root).map((block) => block.kind)).toEqual(['locked'])
+    expect(toBlocks(root)).toMatchObject([{ kind: 'text', text: 'Tom & Jerry' }])
     expect(parse(serialize(toSheet(root, toBlocks(root))))).toEqual(root)
   })
 

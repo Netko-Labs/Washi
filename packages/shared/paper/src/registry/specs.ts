@@ -4,7 +4,7 @@ import type { ComponentSpec, WsxRegistry } from '@washi/wsx'
 import { z } from 'zod'
 import { EXPLAIN_SPECS, STEPS_STEP_PROPS } from './explain-specs'
 import { LAYOUT_SPECS } from './layout-specs'
-import { coverKeySchema, pageIconSchema } from './looks'
+import { coverKeySchema, SHEET_ICONS, sheetIconSchema } from './looks'
 import { MEDIA_SPECS, mediaSrcSchema } from './media-specs'
 import { PAGE_SPECS } from './page-specs'
 import { p } from './spec-kit'
@@ -32,6 +32,10 @@ export const actionRefSchema = z
   .catchall(z.union([actionEntry, z.array(z.union([scalarSchema, actionRecord])), actionRecord]))
 
 const exprSchema = z.string().min(1).max(512)
+/** A written table's cell: words (inline marks read), a number, a yes/no or nothing. */
+const staticCell = z.union([z.string().max(2000), z.number(), z.boolean(), z.null()])
+/** The most rows a page writes into one Table; more is a database. */
+const STATIC_TABLE_ROWS = 200
 const stateKey = z.string().min(1).max(64).describe('state key')
 const stateBag = z.record(stateKey, scalarSchema)
 
@@ -59,36 +63,7 @@ const memberId = z.string().min(1).max(80)
 const redact = z.array(columnName).min(1).max(32).optional()
 const width = widthSchema.optional()
 
-export const SHEET_ICONS = [
-  'notebook',
-  'book',
-  'bookmark',
-  'calendar',
-  'chart',
-  'checklist',
-  'clock',
-  'compass',
-  'flag',
-  'flask',
-  'heart',
-  'home',
-  'inbox',
-  'kanban',
-  'leaf',
-  'map',
-  'money',
-  'music',
-  'pen',
-  'plane',
-  'rocket',
-  'sparkles',
-  'star',
-  'sun',
-  'tag',
-  'target',
-  'tools',
-  'user',
-] as const
+export { SHEET_ICONS }
 
 export const sheetStateSchema = z
   .object({ local: stateBag.optional(), stored: stateBag.optional() })
@@ -99,7 +74,7 @@ const frame: Record<string, ComponentSpec> = {
     props: z
       .object({
         title: z.string().min(1).max(200),
-        icon: z.union([z.enum(SHEET_ICONS), pageIconSchema]).optional(),
+        icon: sheetIconSchema.optional(),
         cover: coverKeySchema.optional(),
         tags: z.array(z.string().min(1).max(64)).max(32).optional(),
         feel: feelSchema.optional(),
@@ -261,16 +236,48 @@ const dataOut: Record<string, ComponentSpec> = {
     },
     'none',
   ),
-  Table: p(
-    {
-      bind: bindQuerySchema,
-      width,
-      columns: z.array(columnName).max(16).optional(),
-      empty: z.string().max(160).optional(),
-      redact,
-    },
-    'none',
-  ),
+  /**
+   * A table's rows (`bind`), or a table the page writes itself (`rows`, under `columns` as its
+   * heads) — a markdown table one to one, each cell words with inline marks, a number or a yes/no.
+   */
+  Table: {
+    props: styledSchema
+      .extend({
+        bind: bindQuerySchema.optional(),
+        rows: z.array(z.array(staticCell).max(16)).max(STATIC_TABLE_ROWS).optional(),
+        width,
+        columns: z.array(columnName).max(16).optional(),
+        empty: z.string().max(160).optional(),
+        redact,
+      })
+      .strict()
+      .superRefine((props, ctx) => {
+        if (Boolean(props.bind) === Boolean(props.rows)) {
+          ctx.addIssue({
+            code: 'custom',
+            message:
+              "a Table takes bind (a table's rows) or rows (written here, with columns as its heads), exactly one",
+          })
+        }
+        if (props.rows && !props.columns?.length) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['columns'],
+            message: "a written Table names its heads: columns={['Name', 'Status']}",
+          })
+        }
+        const wide = props.rows?.findIndex((row) => row.length > (props.columns?.length ?? 0))
+        if (props.columns?.length && wide !== undefined && wide !== -1) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['rows', wide],
+            message: `row ${wide + 1} has more cells than the ${props.columns.length} columns`,
+          })
+        }
+      }),
+    children: 'none',
+    hints: { head: 'use columns', header: 'use columns', data: 'use rows', cells: 'use rows' },
+  },
   Stat: p(
     {
       value: z.union([z.string().max(32), z.number()]).optional(),

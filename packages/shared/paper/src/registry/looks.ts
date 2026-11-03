@@ -45,25 +45,124 @@ export function unsplashLink(href: string): string {
 
 export const unsplashCaption = (name: string) => `Photo by ${name} on Unsplash`
 
-/** `preset:sage` · `picture:fjord` · `file:<id>` · `unsplash:<id>` — a key, never a URL (D60). */
-export const coverKeySchema = z.string().refine(
-  (key) => {
-    const [kind, name] = [key.slice(0, key.indexOf(':')), key.slice(key.indexOf(':') + 1)]
-    if (kind === 'preset') return name in COVER_PRESETS
-    if (kind === 'picture') return COVER_PICTURES.some((picture) => picture.slug === name)
-    return FILE_KEY.test(key) || UNSPLASH_KEY.test(key)
-  },
-  { message: 'a cover is preset:<name>, picture:<name>, file:<id> or unsplash:<id>' },
-)
+/** The registry's page icons: a page wears one by name, or an emoji, or an upload. */
+export const SHEET_ICONS = [
+  'notebook',
+  'book',
+  'bookmark',
+  'calendar',
+  'chart',
+  'checklist',
+  'clock',
+  'compass',
+  'flag',
+  'flask',
+  'heart',
+  'home',
+  'inbox',
+  'kanban',
+  'leaf',
+  'map',
+  'money',
+  'music',
+  'pen',
+  'plane',
+  'rocket',
+  'sparkles',
+  'star',
+  'sun',
+  'tag',
+  'target',
+  'tools',
+  'user',
+] as const
 
-/** An emoji, a registry icon name (checked where the names live), or an upload's `file:<id>`. */
+/** Edits between two short names — enough to say "did you mean". */
+function distance(a: string, b: string): number {
+  const row = Array.from({ length: b.length + 1 }, (_, at) => at)
+  for (let i = 1; i <= a.length; i++) {
+    let diagonal = row[0] ?? 0
+    row[0] = i
+    for (let j = 1; j <= b.length; j++) {
+      const above = row[j] ?? 0
+      row[j] = Math.min(
+        above + 1,
+        (row[j - 1] ?? 0) + 1,
+        diagonal + (a[i - 1] === b[j - 1] ? 0 : 1),
+      )
+      diagonal = above
+    }
+  }
+  return row[b.length] ?? 0
+}
+
+/** The names nearest a miss, closest first: within two edits, or one holding the other. */
+export function nearestNames(miss: string, names: readonly string[], count = 3): string[] {
+  const word = miss.toLowerCase()
+  return names
+    .map((name) => ({
+      name,
+      score: name.includes(word) || word.includes(name) ? 0 : distance(word, name),
+    }))
+    .filter((each) => each.score <= 2)
+    .sort((a, b) => a.score - b.score)
+    .slice(0, count)
+    .map((each) => each.name)
+}
+
+const meant = (miss: string, names: readonly string[]) => {
+  const near = nearestNames(miss, names)
+  return near.length > 0 ? ` — did you mean ${near.join(' or ')}?` : '.'
+}
+
+export const COVER_PRESET_NAMES = Object.keys(COVER_PRESETS)
+export const COVER_PICTURE_NAMES = COVER_PICTURES.map((picture) => picture.slug)
+
+/** Why a cover key is not one, naming every key it could be; null when it is one. */
+export function coverKeyProblem(key: string): string | null {
+  const [kind, name] = [key.slice(0, key.indexOf(':')), key.slice(key.indexOf(':') + 1)]
+  if (kind === 'preset' && name in COVER_PRESETS) return null
+  if (kind === 'picture' && COVER_PICTURE_NAMES.includes(name)) return null
+  if (FILE_KEY.test(key) || UNSPLASH_KEY.test(key)) return null
+  const presets = `preset:${COVER_PRESET_NAMES.join(' · ')}`
+  const pictures = `picture:${COVER_PICTURE_NAMES.join(' · ')}`
+  const near =
+    kind === 'preset'
+      ? meant(name, COVER_PRESET_NAMES)
+      : kind === 'picture'
+        ? meant(name, COVER_PICTURE_NAMES)
+        : '.'
+  return `"${key}" is not a cover${near} A cover is ${presets}; ${pictures}; file:<id> (an upload) or unsplash:<id>`
+}
+
+/** `preset:sage` · `picture:fjord` · `file:<id>` · `unsplash:<id>` — a key, never a URL (D60). */
+export const coverKeySchema = z.string().superRefine((key, ctx) => {
+  const problem = coverKeyProblem(key)
+  if (problem) ctx.addIssue({ code: 'custom', message: problem })
+})
+
+const isEmojiIcon = (icon: string) => icon.length <= 16 && /\p{Extended_Pictographic}/u.test(icon)
+
+/** An emoji or an upload's `file:<id>` — what a page may wear besides a registry name. */
 export const pageIconSchema = z
   .string()
   .min(1)
   .max(48)
-  .refine(
-    (icon) => FILE_KEY.test(icon) || (icon.length <= 16 && /\p{Extended_Pictographic}/u.test(icon)),
-    {
-      message: 'an icon is a registry name, one emoji or file:<id>',
-    },
-  )
+  .refine((icon) => FILE_KEY.test(icon) || isEmojiIcon(icon), {
+    message: 'an icon is a registry name, one emoji or file:<id>',
+  })
+
+/** Why an icon is not one, naming every registry icon; null when it is one. */
+export function sheetIconProblem(icon: string): string | null {
+  if ((SHEET_ICONS as readonly string[]).includes(icon)) return null
+  if (icon.length >= 1 && icon.length <= 48 && (FILE_KEY.test(icon) || isEmojiIcon(icon))) {
+    return null
+  }
+  return `"${icon}" is not an icon${meant(icon, SHEET_ICONS)} An icon is one emoji, file:<id> (an upload) or a registry name: ${SHEET_ICONS.join(' · ')}`
+}
+
+/** A page's icon: a registry name, one emoji or `file:<id>` — a miss names what would do. */
+export const sheetIconSchema = z.string().superRefine((icon, ctx) => {
+  const problem = sheetIconProblem(icon)
+  if (problem) ctx.addIssue({ code: 'custom', message: problem })
+})

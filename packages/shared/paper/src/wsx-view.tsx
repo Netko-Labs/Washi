@@ -1,5 +1,5 @@
 import { hasCode, type WsxElement, type WsxNode } from '@washi/wsx'
-import { type ComponentType, createElement, type ReactNode, useMemo } from 'react'
+import { type ComponentType, createElement, Fragment, type ReactNode, useMemo } from 'react'
 import { Agenda } from './components/agenda'
 import { Board } from './components/board'
 import { Bookmark } from './components/bookmark'
@@ -23,6 +23,7 @@ import { Form } from './components/form'
 import { Divider, Grid, Row, Section, SheetFrame, Stack } from './components/frame'
 import { Gallery } from './components/gallery'
 import { Heatmap } from './components/heatmap'
+import { inlineText } from './components/inline-text'
 import { Button, Compose, Field, Slider, Switch, Task } from './components/input'
 import { Chip, Mascot, Missing } from './components/kit'
 import { Bento, Column, Columns, Tile } from './components/layout'
@@ -58,6 +59,7 @@ import { DataProvider } from './data'
 import { NowContext, PageRootContext, resolveRow, resolveRowDeep } from './lib'
 import type { Row as DataRow } from './lib/types'
 import { exprTables } from './registry/share'
+import { paperRegistry } from './registry/specs'
 import { SheetStateProvider, type SheetStateValue } from './state'
 
 interface Ctx {
@@ -86,11 +88,17 @@ function numberFootnotes(root: WsxElement): Map<WsxElement, number> {
   return numbers
 }
 
+/** Words beside blocks read their inline marks; a primitive that holds only text keeps it as typed. */
+const takesMarks = (name: string) => paperRegistry.components[name]?.children === 'nodes'
+
 /** A `{…}` hole draws nothing until the page has run and filled it. */
-function renderChildren(nodes: WsxNode[], ctx: Ctx): ReactNode[] {
+function renderChildren(nodes: WsxNode[], ctx: Ctx, marks = true): ReactNode[] {
   return nodes.map((node, index) => {
     if (node.kind === 'code') return null
-    if (node.kind === 'text') return resolveRow(node.value, ctx.row, cell)
+    if (node.kind === 'text') {
+      if (!marks) return resolveRow(node.value, ctx.row, cell)
+      return <Fragment key={index}>{inlineText(node.value, ctx.row, cell)}</Fragment>
+    }
     return <Element key={index} node={node} ctx={ctx} />
   })
 }
@@ -174,7 +182,7 @@ const COMPONENTS: Record<string, ComponentType<never>> = {
 
 function renderElement(node: WsxElement, ctx: Ctx): ReactNode {
   const p = resolveProps(node, ctx.row)
-  const kids = renderChildren(node.children, ctx)
+  const kids = renderChildren(node.children, ctx, takesMarks(node.name))
   switch (node.name) {
     case 'Sheet':
       return (

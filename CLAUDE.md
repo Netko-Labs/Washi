@@ -764,6 +764,36 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   Installable as a Claude Code plugin from this repo (`.claude-plugin/marketplace.json` → `netko-labs`,
   `plugins/washi`: `.mcp.json` reads `WASHI_MCP_URL` and `WASHI_TOKEN`, and the `backlog` skill —
   take an issue, fix it here, comment the PR on its row, move its status). `claude plugin validate`.
+- **An outside agent writes without guessing (D122).** From a real session that built a workspace
+  over MCP. `wsx_reference` (both ports and MCP, a read) is read off the registry — `wsxIndex()` /
+  `wsxDetails(names)` in `@washi/paper/reference`, a server-safe subpath of the book: every primitive
+  in one line (props, `*` required, what it holds), the look enums, `pageLimits()` and the text rules
+  (`WRITING`); named, each one's `propRows`, placement and its specimen (`specimenBlock`) plus
+  `ALSO` examples, all tested to pass. `catalog_list` lists `SHEET_ICONS`, cover keys and themes
+  (the workspace's `ws:` too); a miss names them all and the nearest (`coverKeyProblem`,
+  `sheetIconProblem`, `nearestNames`). **Inline marks**: words beside blocks (`children: 'nodes'`)
+  read `**strong**` `*em*`/`_em_` `~~strike~~` `` `code` `` and `[text](https://…|mailto:)`
+  (`inlineMarks` in paper's lib, CommonMark's flanking rules, so `2 * 3` and snake_case read as
+  typed; drawn by `inlineText`, `$row.` filled after the marks are read); text-only primitives
+  (Code, Kbd, Mark, Tag, Badge, Terminal…) keep their words. A `{"…"}` literal child is words: wsx
+  joins it with the text beside it and keeps JSX's spaces (`joinText`), so escaping `{ } < >` is a
+  literal. **A written table**: `<Table columns rows>` (no `bind`; ≤ 16 columns, 200 rows, a cell
+  text · number · boolean · null), drawn by `StaticTable`. **Writes answer small**: `sheet_create`,
+  `sheet_replace` and `sheet_edit` answer `{ id, title, parentId, version, url? }` (`verbose: true`
+  for the page). `sheet_edit` (a `CHANGE_TOOLS` write) applies `{ old, new }` pairs, each matching
+  once, to the source at `baseVersion` (`sheetSourceAt`) and writes it like a replace — merged,
+  validated, all or none (`editSheetSource`, `applyEdits`; its diff shows like a replace's).
+  `sheet_check` takes `preview` (the words it draws). **Rows**: an insert's `data` may be a list of
+  ≤ 500 (`INSERT_ROW_CAP`), one transaction, `ids` in order, a refusal naming its row; a relation
+  cell may name its rows (`relationsByName`, every write: an id passes, a name matches the
+  target's first text column as `db_link_column` does; unmatched or shared names refuse, listed).
+  The `db_define` capability merges into a table that exists (`mergedSpec`: a column left out
+  stays); `db_change_column` is `changeColumn` (rename · remove · option). **Uploads**:
+  `file_upload` (MCP only, `fileCapabilities` over the session's `files`) takes base64 under
+  `uploadRefusal` and the server's caps, answering `file:<id>` — SVG stays refused. The plugin's
+  `scripts/washi.mjs` (bun or node, no packages) sends a tool call with arguments read from files
+  (`source=@spec.wsx`, `upload <file>`), so a page never passes through the agent's context; its
+  `pages` skill says how. Links between pages were always `<Ref>`, `<PageLink>` and `<Subpages>`.
 - **An embed is https and listed (D92).** `<Embed src title ratio height>`: the registry refuses http;
   a built-in provider (`EMBED_PROVIDERS` — YouTube via youtube-nocookie, Vimeo, Spotify, Loom, Figma,
   CodePen, CodeSandbox, Miro, Google Maps, Indify) turns its page URL into its player and always plays;

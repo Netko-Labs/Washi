@@ -9,6 +9,7 @@ export const PROP_TYPES: Record<string, string> = {
   views: 'list of { name, kind, groupBy?, date?, where?, columns? }',
   defaults: 'column → value or { state }',
   seed: 'column → value',
+  rows: 'list of rows ≤ 200, each a list of cells: text (inline marks) · number · true/false · null',
 }
 
 /** What each primitive is for, in the reader's words. */
@@ -57,7 +58,7 @@ export const SUMMARIES: Record<string, string> = {
   Bento: 'A home of tiles packed densely, 3, 4 or 6 across; two across under 720px, one under 400.',
   Tile: 'One cell of a Bento: square, wide, tall, big or a banner across the row.',
   Title: 'A heading, level 1 to 3.',
-  Text: 'A paragraph; lead makes it the page’s intro.',
+  Text: 'A paragraph; lead makes it the page’s intro. Its words read inline marks: **strong**, *em*, ~~strike~~, `code`, [a link](https://…).',
   List: 'Bullets, numbers or checks around Items.',
   Item: 'One entry in a List; done ticks a check list.',
   Quote: 'A pulled quote in serif with a tone rule.',
@@ -68,7 +69,7 @@ export const SUMMARIES: Record<string, string> = {
   Money: 'An amount formatted in the reader’s locale; never hand-format money.',
   Mark: 'Highlights a phrase inside Text.',
   Kbd: 'A key cap inside Text.',
-  Ref: 'A link to another page by its id.',
+  Ref: 'A link to another page by its id, inside Text — counted in that page’s backlinks.',
   Tag: 'A small label inside Text.',
   Card: 'A box around related blocks, with an optional title.',
   Callout: 'An aside that means something: info, success, warning, danger.',
@@ -76,7 +77,8 @@ export const SUMMARIES: Record<string, string> = {
   Hero: 'A big opener: title, subtitle, alignment.',
   Figure: 'An https image with a caption; its shape is held while it loads.',
   Repeat: 'Draws its children once per row, with $row in scope.',
-  Table: 'Rows as a table; stacks into cards on a phone.',
+  Table:
+    'Rows as a table: a database table’s rows (bind), or a table written into the page itself — columns as its heads, rows as lists of cells, a markdown table one to one. Stacks into cards on a phone.',
   Stat: 'One figure with a label, a hint and a trend; reads expr aggregates, as money with currency.',
   Chart: 'Bars, lines, areas or a donut over rows, or a column over time.',
   Timeline: 'A vertical run of Steps, each with its own marker.',

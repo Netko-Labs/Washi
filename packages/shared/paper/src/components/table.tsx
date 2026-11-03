@@ -1,13 +1,21 @@
 import { formatNumber, listCell, styled, toneOf, useBind } from '../lib'
 import type { TableProps, TableValueProps } from '../lib/types'
 import { usePaperHost } from '../provider'
+import type { BindQuery } from '../registry'
 import { CardValue, tableLabel, useDatabase } from './database'
 import { Bound, cell } from './states'
+import { StaticTable } from './static-table'
 
 const SPEC_DRAWN = new Set(['select', 'status', 'person', 'multi_select'])
 
-/** Rows as a plain table; the table's spec, once read, draws choices, people and money right. */
-export function Table({ bind, columns, empty, ...rest }: TableProps) {
+/** Rows as a plain table: a table's rows (`bind`), or rows the page writes itself (`rows`). */
+export function Table({ bind, rows, columns, ...rest }: TableProps) {
+  if (rows || !bind) return <StaticTable columns={columns ?? []} rows={rows ?? []} {...rest} />
+  return <BoundTable bind={bind} columns={columns} {...rest} />
+}
+
+/** A table's rows; its spec, once read, draws choices, people and money right. */
+function BoundTable({ bind, columns, empty, ...rest }: TableProps & { bind: BindQuery }) {
   const state = useBind(bind)
   const { openRow, locale } = usePaperHost()
   const db = useDatabase(bind.table)

@@ -1141,3 +1141,29 @@ Acceptance: service + store tests pass; typecheck, Biome and `bun test` green.
 
 Acceptance: service/paper tests pass; typecheck, Biome, `bun test`, studio build green.
 
+
+
+# MCP fixes from a real agent session (2026-11-03) — D122
+
+- [x] P0 1 `catalog_list` (icons, cover keys, themes); a bad icon or cover names every valid one
+      and the nearest
+- [x] P0 2 `file_upload` (MCP, base64, the upload rules and caps) → `file:<id>` for icon/cover/media;
+      the plugin helper uploads from a path. SVG stays refused (D95): the error says to send a PNG
+- [x] P0 3 `<Table columns rows>` written in the page, cells with inline marks
+- [x] P0 4 `wsx_reference`: every primitive, props (type, required, values), placement, an example
+      tested to pass; linked from the MCP instructions
+- [x] P1 5 writes answer `{ id, title, parentId, version, url }`; `verbose: true` for the page
+- [x] P1 6 `plugins/washi/scripts/washi.mjs`: arguments from files (`source=@spec.wsx`); `pages` skill
+- [x] P1 7 `sheet_edit` `{ old, new }` pairs, all or none, against `baseVersion`, merged
+- [x] P1 8 insert takes a list of ≤ 500 rows, one transaction, ids in order
+- [x] P1 9 relation cells by name (first text column, case and spaces aside); misses listed
+- [x] P1 10 `db_define` merges (nothing dropped); `db_change_column` rename · remove · option
+- [x] P2 11 `{"…"}` joins its words with JSX's spaces; one escaping rule documented; `sheet_check`
+      `preview`
+- [x] P2 12 inline marks render in words (`**` `*` `_` `~~` `` ` `` `[](https://…)`)
+- [x] P3 13 documented: `<Ref>`, `<PageLink>`, `<Subpages>` already link pages live
+- [ ] later: `[[Page title]]` in words (Ref covers it, and is what backlinks count)
+- [ ] later: the page editor draws inline marks while typing (it shows them as typed today)
+- [ ] later: a token-free path for the helper (OAuth sign-ins have no token to send)
+
+Acceptance: MCP tests walk every acceptance check; typecheck, Biome, `bun test` green.

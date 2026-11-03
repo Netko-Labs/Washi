@@ -41,7 +41,7 @@ Bookmark(https href title description image site — a link as a card; fill what
 Explain: Steps/Step(title — a how-to; Steps numbers them) Compare(width)/Option(title pick — 2–4 choices side
 by side, pick the recommended one) Faq/Question(title — one open at a time; the answer is its children)
 Countdown(to: YYYY-MM-DD or YYYY-MM-DDTHH:MM, label — days left on the reader's clock) · Data out:
-Repeat(bind) Agenda(bind date title time end badge add addLabel view state — a week or a month) Slots(bind date minutes hours days add addLabel — free times to book: a booking's date is start/end, e.g. 2026-10-29T10:00/2026-10-29T10:30) Roadmap(bind date end title — a bar per row from date to end, or one start/end column) Heatmap(bind date value weeks label — GitHub's calendar of days: habits, workouts, a journal) Table(bind columns) Database(table views — tabs: table · board(groupBy) · timeline(date) ·
+Repeat(bind) Agenda(bind date title time end badge add addLabel view state — a week or a month) Slots(bind date minutes hours days add addLabel — free times to book: a booking's date is start/end, e.g. 2026-10-29T10:00/2026-10-29T10:30) Roadmap(bind date end title — a bar per row from date to end, or one start/end column) Heatmap(bind date value weeks label — GitHub's calendar of days: habits, workouts, a journal) Table(bind columns — or columns + rows written in the page: <Table columns={['Step', 'Owner']} rows={[['Draft', 'Rin']]} />, a markdown table one to one) Database(table views — tabs: table · board(groupBy) · timeline(date) ·
 gallery(cover: a url or cover-key column; cards a press opens)) Stat(value|expr label hint trend format=percent currency=USD) Chart(bind kind) Timeline/Step
 Progress(value|expr — in a Repeat, value="$row.ratio" or expr="$row.done / $row.total") Badge Avatar Schema(table) · Data in: Field(field kind table row) Board(bind
 groupBy groups rank kicker badge meta avatar onAdd onOpen) Button(action) Compose(action label —
@@ -136,8 +136,14 @@ and read as $name in an expr. A rollover: give the table next_date = add_months(
 forward on its own cadence (water every two months), so never clone a month by hand. Pressed twice it
 copies twice: wrap it in <Show expr="count(expenses where recurring and month = picked_month) = 0">.
 
+Words in Text, Item, Title, Quote, Callout, Card and a written Table cell read inline marks: **strong**,
+*em*, ~~strike~~, \`code\` and [a link](https://…); Code, Kbd and other text-only primitives keep words as
+written. Text holding { } < or > is a string literal child: <Item>{"Route \`/m/{slug}\`"}</Item>.
+wsx_reference lists every primitive's props and an example; catalog_list every icon, cover and theme.
+
 Budget: ~400 nodes, 8 binds, 24 expressions per sheet — over it, split into linked sheets (<Ref>).
-Always run sheet_check before sheet_create or sheet_replace and fix every diagnostic.
+Always run sheet_check before sheet_create or sheet_replace and fix every diagnostic. To change a few
+lines of a page, sheet_edit sends { old, new } pairs instead of the whole source.
 sheet_delete moves a page and its sub-pages to the Trash. Use it only when the person asks for
 that page gone — never on your own (not to tidy, dedupe or replace a page) — say which page went,
 and that they can restore it from the Trash. db_trash_table is its twin for a table: only when the
@@ -163,7 +169,7 @@ export const HANDOVER_DESCRIPTION =
   'Move this conversation to a page (by id) the person can read: the chat continues there and their screen follows. Use it when the subject has become that page; never just to read one. A note says why, in a few words.'
 
 export const DB_MUTATE_DESCRIPTION =
-  "Insert, update, delete or copy records: { kind, table, data?, where? }. copy makes every row where matches a new row, set over it: { kind: 'copy', table, where, set, params?, limit? } — a set value is a cell or { expr } over the source row in the page grammar (date: { expr: 'add_months(date, 1)' }); params fill { param } filter values and read as $name in an expr. Never sets a formula or rollup. At most 500 rows (limit lowers it), all or nothing."
+  "Insert, update, delete or copy records: { kind, table, data?, where? }. insert takes one row as data, or a list of up to 500 rows — all land or none, answering ids in the order given. A relation cell holds record ids, or the names of the rows it points at (matched on the target's first text column, case and spaces aside, as db_link_column matches): epic: ['M4 · Every stat live']; a name nothing matches, or two rows share, is refused and listed. copy makes every row where matches a new row, set over it: { kind: 'copy', table, where, set, params?, limit? } — a set value is a cell or { expr } over the source row in the page grammar (date: { expr: 'add_months(date, 1)' }); params fill { param } filter values and read as $name in an expr. Never sets a formula or rollup. At most 500 rows (limit lowers it), all or nothing."
 
 export const TURN_STALLED = 'Washi stopped hearing back — the turn was ended'
 export const TURN_INTERRUPTED = 'The server restarted while Washi was working — the turn was ended'

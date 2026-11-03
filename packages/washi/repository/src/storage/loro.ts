@@ -30,6 +30,16 @@ export function versionOf(snapshot: Uint8Array): string {
   return Buffer.from(encodeFrontiers(doc.oplogFrontiers())).toString('base64')
 }
 
+/** The text as it stood at `version` — what an edit written against that version applies to. */
+export function textAt(snapshot: Uint8Array, version: string): string {
+  const doc = new LoroDoc()
+  doc.import(snapshot)
+  return doc
+    .forkAt(decodeFrontiers(Buffer.from(version, 'base64')))
+    .getText(TEXT_KEY)
+    .toString()
+}
+
 /**
  * The client wrote `next` against `version`; whatever landed since stays. Loro forks the doc at
  * that version, replays the client's edit there, and merges it back into the present.
