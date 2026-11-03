@@ -3,23 +3,34 @@ import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/
 import {
   type Capability,
   commentCapabilities,
+  fileCapabilities,
   pageCapabilities,
   tableCapabilities,
 } from '@washi/service'
 import type { McpSession } from './types'
 import { CHANGES, DEFAULT_CHANGE, INSTRUCTIONS, SERVER_INFO } from './values'
 
-/** Everything an outside agent may do: pages, tables and comments, as the member — no fetch, search or verbs. */
+/**
+ * Everything an outside agent may do: pages, tables, comments and uploads, as the member — no
+ * fetch, search or verbs.
+ */
 function capabilitiesFor(session: McpSession): Capability[] {
+  const base = session.baseUrl?.replace(/\/+$/, '')
+  const workspace = encodeURIComponent(session.ws.id)
   const context = {
     viewer: session.viewer,
     author: session.member.id,
     listPeople: session.listPeople,
+    ...(base ? { pageUrl: (id: string) => `${base}/w/${workspace}/p/${id}` } : {}),
   }
+  const fileUrl = base
+    ? (id: string) => `${base}/api/files/${id}?workspace=${workspace}`
+    : undefined
   return [
     ...pageCapabilities(session.ws, context),
     ...tableCapabilities(session.ws, context),
     ...commentCapabilities(session.ws, { ...context, authorName: session.member.name }),
+    ...(session.files ? fileCapabilities(session.ws, session.files, fileUrl) : []),
   ]
 }
 

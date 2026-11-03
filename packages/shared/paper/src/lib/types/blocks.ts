@@ -207,8 +207,10 @@ export interface ChartDonutProps {
 }
 
 export interface TableProps extends BlockProps {
-  bind: BindQuery
+  bind?: BindQuery
   columns?: string[]
+  /** A table written into the page itself: one list of cells per row, under `columns`. */
+  rows?: StaticCell[][]
   empty?: string
 }
 
@@ -253,4 +255,19 @@ export interface BadgeProps extends BlockProps {
 
 export interface AvatarProps extends BlockProps {
   label: string
+}
+
+/** One run of a text's inline marks (`inlineMarks`): plain words, code, or a mark over more runs. */
+export type InlineToken =
+  | { kind: 'text'; text: string }
+  | { kind: 'code'; text: string }
+  | { kind: 'strong' | 'em' | 'strike'; children: InlineToken[] }
+  | { kind: 'link'; href: string; children: InlineToken[] }
+
+/** A static table's cell as a page writes it: words (with inline marks), a number, a yes/no. */
+export type StaticCell = string | number | boolean | null
+
+export interface StaticTableProps extends BlockProps {
+  columns: string[]
+  rows: StaticCell[][]
 }

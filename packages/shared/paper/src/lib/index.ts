@@ -10,6 +10,7 @@ export { PageRootContext, usePageRoot } from './hooks/use-page-root'
 export { useRunAction } from './hooks/use-run-action'
 export { useSelectOptions } from './hooks/use-select-options'
 export { useTableSpec } from './hooks/use-table-spec'
+export { inlineMarks, inlinePlain } from './inline-marks'
 export { formatNumber } from './numbers'
 export { ratioOf } from './ratio'
 export {

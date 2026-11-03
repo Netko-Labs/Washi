@@ -12,6 +12,8 @@ export {
 } from './host'
 export type { KnobDef, KnobKind } from './knobs'
 export { knobsFor, STYLED_KEYS } from './knobs'
+export type { PrimitiveDetail, PrimitiveLine, WsxDetails, WsxIndex } from './reference'
+export { wsxDetails, wsxIndex } from './reference'
 export type { MatrixAxes, PageInput, Specimen, SpecimenInput, SpecimenView } from './specimen'
 export {
   matrixAxes,
@@ -19,6 +21,7 @@ export {
   pageSource,
   SPECIMEN_STATE,
   SPECIMENS,
+  specimenBlock,
   specimenChildren,
   specimenProps,
   specimenSource,

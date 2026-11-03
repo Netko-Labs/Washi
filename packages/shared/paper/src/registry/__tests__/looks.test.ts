@@ -38,3 +38,11 @@ describe('a page wears its own look (D64)', () => {
     expect(link.searchParams.get('utm_medium')).toBe('referral')
   })
 })
+
+describe('a cover names only its own keys', () => {
+  test('an inherited object name is no preset', () => {
+    expect(passes('cover="preset:sage"')).toBe(true)
+    expect(passes('cover="preset:constructor"')).toBe(false)
+    expect(passes('cover="preset:toString"')).toBe(false)
+  })
+})

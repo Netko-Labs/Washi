@@ -24,6 +24,7 @@ import {
 } from '@washi/repository'
 import { copyRecords } from './copy'
 import { InkError } from './errors'
+import { relationsByName } from './relation-names'
 import { renameRowPages, trashRowPages } from './rows'
 import { checkData, checkFormulas, checkListUse, checkRollups } from './rules'
 
@@ -83,6 +84,16 @@ export function runQuery(ws: Workspace, query: InkQuery): QueryResult {
   return executeQuery(ws, table.id, table.spec, query)
 }
 
+/** One row of an insert checked; in a batch, a refusal says which row (1-based) and nothing lands. */
+function checkRow(ws: Workspace, spec: TableSpec, data: RecordData, at: number | null): void {
+  try {
+    checkData(ws, spec, data)
+  } catch (cause) {
+    if (at === null || !(cause instanceof InkError)) throw cause
+    throw new InkError(`row ${at + 1}: ${cause.message}; nothing was added`)
+  }
+}
+
 /** `author` is who the change log names (D78): a member id, `washi`, or null when unknown. */
 export function runMutation(
   ws: Workspace,
@@ -98,17 +109,24 @@ export function runMutation(
     checkListUse(table.spec, mutation.where)
   }
 
-  if (mutation.kind === 'insert' || mutation.kind === 'update') {
-    checkData(ws, table.spec, mutation.data)
-  }
-
   switch (mutation.kind) {
-    case 'insert':
-      return { affected: 1, id: insertRecord(ws, table.id, mutation.data, author) }
+    case 'insert': {
+      const many = Array.isArray(mutation.data)
+      const sent = Array.isArray(mutation.data) ? mutation.data : [mutation.data]
+      const rows = relationsByName(ws, table.spec, sent)
+      for (const [at, data] of rows.entries()) checkRow(ws, table.spec, data, many ? at : null)
+      if (!many) return { affected: 1, id: insertRecord(ws, table.id, rows[0] ?? {}, author) }
+      const ids = ws.sqlite.transaction(() =>
+        rows.map((data) => insertRecord(ws, table.id, data, author)),
+      )()
+      return { affected: ids.length, ids }
+    }
     case 'update': {
+      const [data = {}] = relationsByName(ws, table.spec, [mutation.data])
+      checkData(ws, table.spec, data)
       const ids = matchRecordIds(ws, table.id, table.spec, mutation.where)
-      const affected = updateRecords(ws, table.id, ids, mutation.data, author)
-      renameRowPages(ws, table.spec, mutation.data, ids)
+      const affected = updateRecords(ws, table.id, ids, data, author)
+      renameRowPages(ws, table.spec, data, ids)
       return { affected }
     }
     case 'delete': {

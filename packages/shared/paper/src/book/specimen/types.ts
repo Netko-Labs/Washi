@@ -1,6 +1,10 @@
 import type { WsxValue } from '@washi/wsx'
-import type { Feel, Tone } from '../../lib/types'
+import type { FEELS, TONES } from '../../registry/surface'
 import type { ThemeId } from '../../registry/themes'
+
+// The registry's own words, so the book's types reach no component (the reference runs on servers).
+type Feel = (typeof FEELS)[number]
+type Tone = (typeof TONES)[number]
 
 export type SpecimenView = 'single' | 'matrix' | 'scratch'
 

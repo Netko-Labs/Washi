@@ -2,11 +2,17 @@ export { namesColumn } from './column-refs'
 export { EMBED_PROVIDERS, embedHost, knownEmbed } from './embed-providers'
 export type { EmbedProvider, EmbedRatio, KnownEmbed } from './embed-types'
 export {
+  COVER_PICTURE_NAMES,
   COVER_PICTURES,
+  COVER_PRESET_NAMES,
   COVER_PRESETS,
+  coverKeyProblem,
   coverKeySchema,
   FILE_KEY,
+  nearestNames,
   pageIconSchema,
+  sheetIconProblem,
+  sheetIconSchema,
   UNSPLASH_HOME,
   UNSPLASH_KEY,
   unsplashCaption,

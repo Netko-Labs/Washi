@@ -94,6 +94,31 @@ function textOf(raw: string, keepStart: boolean, keepEnd: boolean): string | nul
   return value.length > 0 ? value : null
 }
 
+/** A literal `{"…"}` child: text as much as the words around it — `Use {"{id}"} here` is one run. */
+function isLiteralText(child: Child | undefined, slice: Slice): boolean {
+  if (child?.type !== 'JSXExpressionContainer' || child.expression.type === 'JSXEmptyExpression') {
+    return false
+  }
+  return !isHole(child, slice)
+}
+
+/** What text beside keeps its space for, as JSX does: code, an inline element, a literal. */
+function isInline(child: Child | undefined, slice: Slice): boolean {
+  return isHole(child, slice) || child?.type === 'JSXElement' || isLiteralText(child, slice)
+}
+
+/** Text runs side by side are one run, as the reader sees them — and as inline marks read them. */
+function joinText(nodes: WsxNode[]): WsxNode[] {
+  const out: WsxNode[] = []
+  for (const node of nodes) {
+    const last = out[out.length - 1]
+    if (node.kind === 'text' && last?.kind === 'text') {
+      out[out.length - 1] = { kind: 'text', value: last.value + node.value }
+    } else out.push(node)
+  }
+  return out
+}
+
 function convertChildren(children: t.JSXElement['children'], slice: Slice): WsxNode[] {
   const out: WsxNode[] = []
   children.forEach((child, at) => {
@@ -102,10 +127,12 @@ function convertChildren(children: t.JSXElement['children'], slice: Slice): WsxN
         // Beside code or an inline element, text keeps the space JSX keeps: `Read <Ref>…</Ref> first`.
         const prev = children[at - 1]
         const next = children[at + 1]
-        const keepStart = isHole(prev, slice) || prev?.type === 'JSXElement'
-        const keepEnd = isHole(next, slice) || next?.type === 'JSXElement'
+        const keepStart = isInline(prev, slice)
+        const keepEnd = isInline(next, slice)
         const value = textOf(child.value, keepStart, keepEnd)
-        const betweenHoles = isHole(prev, slice) && isHole(next, slice)
+        const wordy = (child: Child | undefined) =>
+          isHole(child, slice) || isLiteralText(child, slice)
+        const betweenHoles = wordy(prev) && wordy(next)
         if (value !== null && (value.trim().length > 0 || betweenHoles)) {
           out.push({ kind: 'text', value })
         }
@@ -128,7 +155,7 @@ function convertChildren(children: t.JSXElement['children'], slice: Slice): WsxN
         break
     }
   })
-  return out
+  return joinText(out)
 }
 
 const COMPONENT = /^[A-Z]/

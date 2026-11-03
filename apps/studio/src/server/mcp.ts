@@ -3,10 +3,13 @@ import { washiRuntime } from '@/server/runtime'
 
 const BEARER = /^Bearer\s+(\S+)$/i
 
+/** The server's own address: what it says it is, else where this request came in. */
+const originOf = (request: Request) =>
+  (process.env.WASHI_BASE_URL ?? new URL(request.url).origin).replace(/\/+$/, '')
+
 /** A 401 that says nothing about the workspace, and where an agent learns to sign in (RFC 9728). */
 function unauthorized(request: Request): Response {
-  const origin = process.env.WASHI_BASE_URL ?? new URL(request.url).origin
-  const metadata = `${origin.replace(/\/+$/, '')}/.well-known/oauth-protected-resource/mcp`
+  const metadata = `${originOf(request)}/.well-known/oauth-protected-resource/mcp`
   return Response.json(
     { error: 'sign in, or a Washi access token for this workspace' },
     { status: 401, headers: { 'www-authenticate': `Bearer resource_metadata="${metadata}"` } },
@@ -44,8 +47,11 @@ export async function mcpSessionFor(
   ])
   const role = workspaces.find((each) => each.id === granted)?.role
   const member = members.find((each) => each.id === actorId) ?? { id: actorId, name: 'A member' }
+  const resolved = runtime.resolve(granted)
   return {
-    ws: runtime.resolve(granted).workspace,
+    ws: resolved.workspace,
+    files: resolved.files,
+    baseUrl: originOf(request),
     viewer: { id: actorId, isOwner: role === 'owner' },
     member,
     listPeople: () => control.listMembers(granted),

@@ -39,6 +39,7 @@ export {
   type Capability,
   type CapabilityContext,
   commentCapabilities,
+  fileCapabilities,
   pageCapabilities,
   tableCapabilities,
 } from './capabilities'
@@ -107,6 +108,7 @@ export {
   SheetAccessError,
   SheetNotFoundError,
 } from './sheets/access'
+export { applyEdits, editSheetSource, SheetEditError } from './sheets/edit'
 export {
   forgetUnenforcedVisibility,
   liftLooksIntoSource,
@@ -145,6 +147,7 @@ export {
   SheetMoveError,
   trashSheetAs,
 } from './sheets/tree'
+export type { SheetEdit } from './sheets/types'
 export {
   approveSuggestion,
   declineSuggestion,

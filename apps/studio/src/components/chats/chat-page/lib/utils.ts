@@ -28,15 +28,25 @@ export function createdId(output: string | null): string | null {
   }
 }
 
+/** The title a page write answered with — what names a `sheet_edit`, which sends none. */
+function answeredTitle(output: string | null): string | null {
+  if (!output) return null
+  try {
+    return text(record(JSON.parse(output)).title)
+  } catch {
+    return null
+  }
+}
+
 export function touchedPage(step: ToolStep): TouchedPage | null {
   if (step.status !== 'completed') return null
   const input = record(step.input)
-  const title = text(input.title) ?? 'Untitled'
+  const title = text(input.title) ?? answeredTitle(step.output) ?? 'Untitled'
   if (step.name === 'sheet_create') {
     const id = createdId(step.output)
     return id ? { id, title, touch: 'made' } : null
   }
-  if (step.name === 'sheet_replace') {
+  if (step.name === 'sheet_replace' || step.name === 'sheet_edit') {
     const id = text(input.id)
     return id ? { id, title, touch: 'changed' } : null
   }

@@ -573,7 +573,7 @@ export class AgentHost {
     updateSession(this.ws, sessionId, { status: 'error' })
   }
 
-  /** sheet_replace proposals also render as diffs in the transcript (spec §6). */
+  /** sheet_replace and sheet_edit proposals also render as diffs in the transcript (spec §6). */
   private emit(sessionId: string, update: AgentUpdate, turn: RunningTurn) {
     this.record(sessionId, update, turn)
     const diff = proposedDiff(update, (id) => getSheet(this.ws, id))

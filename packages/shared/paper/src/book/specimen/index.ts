@@ -3,6 +3,7 @@ export {
   matrixAxes,
   matrixSource,
   pageSource,
+  specimenBlock,
   specimenChildren,
   specimenProps,
   specimenSource,

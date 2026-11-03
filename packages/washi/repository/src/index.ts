@@ -129,6 +129,7 @@ export {
   listSheets,
   mergeSheetSource,
   searchSheets,
+  sheetSourceAt,
   sheetVersion,
   updateSheet,
   updateSheetMeta,

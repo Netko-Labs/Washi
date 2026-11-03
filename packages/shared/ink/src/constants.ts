@@ -1,6 +1,9 @@
 /** The most rows one copy writes: a rollover, never a bulk import. */
 export const COPY_ROW_CAP = 500
 
+/** The most rows one insert adds: an import in one call, all or nothing. */
+export const INSERT_ROW_CAP = 500
+
 /** Columns computed on every read: nothing of theirs is stored, so nothing moves. */
 export const COMPUTED_COLUMN_TYPES: ReadonlySet<string> = new Set(['formula', 'rollup'])
 

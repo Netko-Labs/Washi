@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { COPY_ROW_CAP } from './constants'
+import { COPY_ROW_CAP, INSERT_ROW_CAP } from './constants'
 
 /** Notion's property kinds. Array-valued: `multi_select`, `relation` (record ids). */
 export const columnTypeSchema = z.enum([
@@ -175,7 +175,12 @@ export const copyValueSchema = z.union([cellSchema, z.object({ expr: z.string().
 export type CopyValue = z.infer<typeof copyValueSchema>
 
 export const mutationSchema = z.discriminatedUnion('kind', [
-  z.object({ kind: z.literal('insert'), table: z.string().min(1), data: recordDataSchema }),
+  /** One row, or up to `INSERT_ROW_CAP` at once — all of them or none, ids in the order given. */
+  z.object({
+    kind: z.literal('insert'),
+    table: z.string().min(1),
+    data: z.union([recordDataSchema, z.array(recordDataSchema).min(1).max(INSERT_ROW_CAP)]),
+  }),
   z.object({
     kind: z.literal('update'),
     table: z.string().min(1),

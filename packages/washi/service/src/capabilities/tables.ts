@@ -1,17 +1,25 @@
 import { linkColumnInputSchema, reminderAskSchema, rowActivityInputSchema } from '@washi/domain'
-import { historyQuerySchema, mutationSchema, querySchema, tableSpecSchema } from '@washi/ink'
-import type { Workspace } from '@washi/repository'
+import {
+  columnChangeSchema,
+  historyQuerySchema,
+  mutationSchema,
+  querySchema,
+  tableSpecSchema,
+} from '@washi/ink'
+import { getTableByName, type Workspace } from '@washi/repository'
 import { z } from 'zod'
 import { DB_MUTATE_DESCRIPTION } from '../agents/lib'
 import { askReminder } from '../reminders/service'
 import { rowActivity } from '../tables/activity'
 import { tablesWithPages } from '../tables/catalog'
+import { changeColumn } from '../tables/columns'
 import { runHistory } from '../tables/history'
 import { linkColumn } from '../tables/link'
 import { defineUserTable, runMutation, runQuery } from '../tables/service'
 import { trashTableAs } from '../tables/washi-trash'
 import { capability } from './define'
 import type { Capability, CapabilityContext } from './types'
+import { mergedSpec } from './utils'
 
 /** Tables as ink sees them: read as anyone in the workspace, every row write signed (P1). */
 export function tableCapabilities(ws: Workspace, context: CapabilityContext): Capability[] {
@@ -53,10 +61,17 @@ export function tableCapabilities(ws: Workspace, context: CapabilityContext): Ca
     ),
     capability(
       'db_define',
-      "Create or update a table — a database of rows, Notion-style. snake_case names. Column types: text, number, boolean, date (ISO, or start/end), select + options, multi_select + options, status + groups {todo, doing, done}, person (member id), url, relation + table (holds record ids), formula + expr — computed on every read from its own row, never written: month(date), usd * fx_rate, when(paid, false, days(now(), due) < 0); it reads the row’s columns and earlier formulas, no aggregates. Use one instead of a column you would fill by hand from other columns. rollup + rollup {table, via, fn, column?, where?, on?} — one aggregate over another table's rows that point at this row (via a relation holding its id, or a plain value equal to this row's `on`, default its first text column), never written: categories.spent = {table:'expenses', via:'category', fn:'sum', column:'amount', where:[{column:'month', op:'eq', value:{param:'month'}}]}; a query's params fill {param} (unset drops it); formulas may read rollups (left = budget - spent). A number, formula or rollup may take format: 'percent' (a ratio, 0.25 reads 25%) or a currency code ('USD', 'EUR') — set it on money and rates so every view reads them right.",
+      "Create or update a table — a database of rows, Notion-style. snake_case names. On a table that exists it merges: each column you name is defined as you send it (a new one is added), every column you leave out stays as it is — so adding one column is a spec of that column alone; nothing is ever dropped here (db_change_column renames or removes one, and adds an option). Column types: text, number, boolean, date (ISO, or start/end), select + options, multi_select + options, status + groups {todo, doing, done}, person (member id), url, relation + table (holds record ids), formula + expr — computed on every read from its own row, never written: month(date), usd * fx_rate, when(paid, false, days(now(), due) < 0); it reads the row’s columns and earlier formulas, no aggregates. Use one instead of a column you would fill by hand from other columns. rollup + rollup {table, via, fn, column?, where?, on?} — one aggregate over another table's rows that point at this row (via a relation holding its id, or a plain value equal to this row's `on`, default its first text column), never written: categories.spent = {table:'expenses', via:'category', fn:'sum', column:'amount', where:[{column:'month', op:'eq', value:{param:'month'}}]}; a query's params fill {param} (unset drops it); formulas may read rollups (left = budget - spent). A number, formula or rollup may take format: 'percent' (a ratio, 0.25 reads 25%) or a currency code ('USD', 'EUR') — set it on money and rates so every view reads them right.",
       { spec: tableSpecSchema },
       false,
-      ({ spec }) => defineUserTable(ws, spec),
+      ({ spec }) => defineUserTable(ws, mergedSpec(getTableByName(ws, spec.name)?.spec, spec)),
+    ),
+    capability(
+      'db_change_column',
+      "Change one column of a table without touching the others: { kind: 'rename', table, column, to } (its values move with it), { kind: 'remove', table, column } (its values go; refused while a formula, rollup or reminder reads it), or { kind: 'option', table, column, to } to add a select/multi_select/status option (group: todo · doing · done for a status), from + to to rename one (cells follow), from alone to remove one (cells holding it empty). Answers how many rows moved. Pages whose views name a renamed or removed column keep the old name: fix them with sheet_edit.",
+      { change: columnChangeSchema },
+      false,
+      ({ change }) => changeColumn(ws, change, context.author),
     ),
     capability(
       'db_link_column',

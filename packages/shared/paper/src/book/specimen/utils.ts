@@ -31,6 +31,12 @@ function body(name: string, props: Record<string, WsxValue>, children?: string):
   return specimen.wrap ? specimen.wrap.replace('<Here />', wsx) : wsx
 }
 
+/** One primitive as the book shows it — its specimen's props and children, wrapped where it must be. */
+export function specimenBlock(name: string): string {
+  const specimen = SPECIMENS[name] ?? {}
+  return body(name, specimen.props ?? {}, specimen.children)
+}
+
 function sheet(input: SpecimenInput, inner: string): string {
   const root: WsxElement = {
     kind: 'element',

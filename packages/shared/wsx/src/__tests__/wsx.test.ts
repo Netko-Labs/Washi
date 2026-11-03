@@ -156,3 +156,21 @@ describe('links between pages', () => {
     expect(extractRefs(root).sort()).toEqual(['a', 'b'])
   })
 })
+
+describe('a literal beside words is words', () => {
+  test('{"…"} joins the text around it, keeping the spaces JSX keeps', () => {
+    const root = parse(
+      '<Sheet title="t"><Text>Open {"`/m/{slug}`"} then {"<b>"} &amp; go</Text></Sheet>',
+    )
+    const text = root.children[0]
+    expect(text?.kind === 'element' && text.children).toEqual([
+      { kind: 'text', value: 'Open `/m/{slug}` then <b> & go' },
+    ])
+    expect(parse(serialize(root))).toEqual(root)
+  })
+
+  test('two literals keep the space between them', () => {
+    const text = parse('<Sheet title="t"><Text>{"a"} {"b"}</Text></Sheet>').children[0]
+    expect(text?.kind === 'element' && text.children).toEqual([{ kind: 'text', value: 'a b' }])
+  })
+})
