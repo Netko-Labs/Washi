@@ -121,7 +121,7 @@ export const COVER_PICTURE_NAMES = COVER_PICTURES.map((picture) => picture.slug)
 /** Why a cover key is not one, naming every key it could be; null when it is one. */
 export function coverKeyProblem(key: string): string | null {
   const [kind, name] = [key.slice(0, key.indexOf(':')), key.slice(key.indexOf(':') + 1)]
-  if (kind === 'preset' && name in COVER_PRESETS) return null
+  if (kind === 'preset' && Object.hasOwn(COVER_PRESETS, name)) return null
   if (kind === 'picture' && COVER_PICTURE_NAMES.includes(name)) return null
   if (FILE_KEY.test(key) || UNSPLASH_KEY.test(key)) return null
   const presets = `preset:${COVER_PRESET_NAMES.join(' · ')}`

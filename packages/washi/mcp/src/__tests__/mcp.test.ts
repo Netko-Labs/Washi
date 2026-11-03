@@ -214,6 +214,10 @@ describe('an agent builds a workspace without guessing (MCP fixes)', () => {
     })
     expect(svg.isError).toBe(true)
     expect(String(svg.value)).toContain('PNG')
+
+    // An extension that is an Object.prototype name is no known type, never a function.
+    const odd = await call('file_upload', { base64: PIXEL, filename: 'favicon.constructor' })
+    expect(odd.isError).toBe(true)
   })
 
   test('a write answers in under 1 KB, whatever the page weighs', async () => {

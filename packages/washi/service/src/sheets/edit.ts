@@ -14,7 +14,8 @@ const shown = (text: string) => JSON.stringify(text.length > 80 ? `${text.slice(
 
 function occurrences(source: string, text: string): number {
   let count = 0
-  for (let at = source.indexOf(text); at !== -1; at = source.indexOf(text, at + text.length)) {
+  // One step at a time, so overlapping matches count: `aa` occurs twice in `aaa`.
+  for (let at = source.indexOf(text); at !== -1; at = source.indexOf(text, at + 1)) {
     count++
   }
   return count

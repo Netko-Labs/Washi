@@ -6,8 +6,10 @@ import { capability } from './define'
 import type { Capability } from './types'
 import { MAX_BASE64_CHARS, MIME_BY_EXTENSION } from './values'
 
-const typeOf = (filename: string) =>
-  MIME_BY_EXTENSION[filename.split('.').pop()?.toLowerCase() ?? '']
+const typeOf = (filename: string) => {
+  const extension = filename.split('.').pop()?.toLowerCase() ?? ''
+  return Object.hasOwn(MIME_BY_EXTENSION, extension) ? MIME_BY_EXTENSION[extension] : undefined
+}
 
 /**
  * An upload as an outside agent makes one: bytes in base64, landing in the workspace's files like
