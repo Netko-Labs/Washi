@@ -3,6 +3,7 @@ import { AgentMascot } from '@washi/ui'
 import { useMemo } from 'react'
 import { type SharedPageProps, useSharedPage, useShareHost } from './lib'
 import { shareLook } from './share-look'
+import { SharedThemeSwitch } from './shared-theme-switch'
 import { SharedTrail } from './shared-trail'
 
 /**
@@ -41,7 +42,10 @@ export function SharedPage({ workspaceId, token, page: asked }: SharedPageProps)
           <AgentMascot state="idle" size={20} />
           Shared from Washi
         </span>
-        <span>{state.page.suggest ? 'Takes suggestions' : 'Read-only'}</span>
+        <span className="flex items-center gap-3">
+          <span>{state.page.suggest ? 'Takes suggestions' : 'Read-only'}</span>
+          <SharedThemeSwitch />
+        </span>
       </header>
       <SharedTrail page={state.page} onOpen={open} />
       <SheetLookProvider value={look}>

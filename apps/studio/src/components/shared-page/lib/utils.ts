@@ -84,6 +84,9 @@ export function shareHost(
         )
       },
     }),
+    // The page's code runs in the visitor's sandbox as a member's would (D125), compiled from the
+    // server's own copy of the page — whatever source paper hands in is not sent.
+    compilePage: () => asked({ kind: 'compile' }),
     runAction: refuse,
     toggleTask: refuse,
     resolveSheet: async (id) => {

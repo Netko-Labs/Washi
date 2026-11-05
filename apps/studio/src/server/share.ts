@@ -11,6 +11,8 @@ export const shareAskSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('table'), name: z.string().min(1).max(64) }),
   z.object({ kind: z.literal('writable'), name: z.string().min(1).max(64) }),
   z.object({ kind: z.literal('requested'), ask: requestedAskSchema }),
+  // The page's own code, compiled from the server's copy — a visitor sends no source (D125).
+  z.object({ kind: z.literal('compile') }),
 ])
 
 /** Which of the link's pages is asking: its own (none), or a sub-page it opens (D123). */
