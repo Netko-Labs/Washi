@@ -4,6 +4,7 @@ import { z } from 'zod'
 import {
   IMAGE_PRESETS,
   type ImagePurpose,
+  INLINED_TYPES,
   MAX_HTML_CHARS,
   MAX_SIDE,
   MIN_SIDE,
@@ -12,7 +13,7 @@ import {
 import { codeLimits } from '../server'
 import { capability } from './define'
 import type { Capability } from './types'
-import { IMAGE_RENDER_DESCRIPTION, INLINED_PICTURES, WEAR } from './values'
+import { IMAGE_RENDER_DESCRIPTION, WEAR } from './values'
 
 const side = z.number().int().min(MIN_SIDE).max(MAX_SIDE)
 
@@ -27,7 +28,7 @@ export function imageCapabilities(
 ): Capability[] {
   const inlineFile = async (id: string) => {
     const found = await files.get(id)
-    if (!found || !INLINED_PICTURES.has(found.file.mime)) return null
+    if (!found || !INLINED_TYPES.has(found.file.mime)) return null
     return `data:${found.file.mime};base64,${Buffer.from(found.bytes).toString('base64')}`
   }
   return [

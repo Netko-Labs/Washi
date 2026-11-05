@@ -35,14 +35,6 @@ export const MIME_BY_EXTENSION: Record<string, string> = {
 /** Base64 for the largest upload a server takes (50 MB of video), with room to spare. */
 export const MAX_BASE64_CHARS = 70_000_000
 
-/** Uploads a drawn picture may show inside it, inlined; never SVG (D95). */
-export const INLINED_PICTURES: ReadonlySet<string> = new Set([
-  'image/png',
-  'image/jpeg',
-  'image/webp',
-  'image/gif',
-])
-
 /** Where a drawn picture goes, said back with its key (D126). */
 export const WEAR: Record<'figure' | 'cover' | 'icon', (key: string) => string> = {
   figure: (key) => `<Figure src="${key}" alt="…" caption="…" />`,
