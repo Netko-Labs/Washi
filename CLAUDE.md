@@ -280,7 +280,7 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   else stays "A page you cannot open". A page any link opens counts as public to Washi
   (`onPublicLink`): it keeps its redactions and is left to a person to trash. No cache column — the
   service reads the prop off the root it already parses.
- in the workspace's files store: a row in the workspace's `files`
+- **Files.** Uploads live in the workspace's files store: a row in the workspace's `files`
   table and the bytes beside the `.db` (`<dataDir>/<workspace>.files/`) or, with
   `WASHI_FILES_S3_*` set, in a bucket under a per-workspace prefix through Bun's own S3 client.
   `POST /api/files` (multipart) and `GET /api/files/<id>` are studio routes gated like a workspace
