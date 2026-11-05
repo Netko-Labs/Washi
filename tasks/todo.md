@@ -1167,3 +1167,11 @@ Acceptance: service/paper tests pass; typecheck, Biome, `bun test`, studio build
 - [ ] later: a token-free path for the helper (OAuth sign-ins have no token to send)
 
 Acceptance: MCP tests walk every acceptance check; typecheck, Biome, `bun test` green.
+
+# One MCP sign-in, several workspaces (2026-11-04) — D124
+
+- [x] Consent ticks several workspaces; `oauth.grant({ workspaceIds })`, `oauth.granted` pre-ticks
+- [x] `oauth_workspace_grant` keyed by person · client · workspace + `position`; old key migrated at boot
+- [x] `answerMcp(request, session, workspaces?)`: `workspace` on every tool, `workspace_list`
+- [x] Membership checked per workspace on each request; one left drops out
+- [ ] Later: Settings → Account → Agents lists each agent's workspaces and lets a person drop one

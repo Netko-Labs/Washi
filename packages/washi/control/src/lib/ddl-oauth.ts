@@ -182,7 +182,34 @@ export async function ensureOAuthTables(db: ControlDB): Promise<void> {
       user_id TEXT NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
       client_id TEXT NOT NULL REFERENCES "oauth_client"(client_id) ON DELETE CASCADE,
       organization_id TEXT NOT NULL REFERENCES "organization"(id) ON DELETE CASCADE,
+      position INTEGER NOT NULL DEFAULT 0,
       created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-      PRIMARY KEY (user_id, client_id)
+      PRIMARY KEY (user_id, client_id, organization_id)
     )`)
+  await ensureManyWorkspaceGrants(db)
+}
+
+/**
+ * D124: a person may grant one agent several workspaces, so a grant's key gains the workspace
+ * and a `position` (the default is 0). A table from before keeps its rows — each one workspace,
+ * now at position 0. Run on every boot; after the first it changes nothing.
+ */
+async function ensureManyWorkspaceGrants(db: ControlDB): Promise<void> {
+  await db.execute(
+    sql`ALTER TABLE "oauth_workspace_grant" ADD COLUMN IF NOT EXISTS position INTEGER NOT NULL DEFAULT 0`,
+  )
+  await db.execute(sql`
+    DO $$
+    BEGIN
+      IF (
+        SELECT count(*) FROM information_schema.key_column_usage AS k
+        JOIN information_schema.table_constraints AS c
+          ON c.constraint_name = k.constraint_name AND c.table_name = k.table_name
+        WHERE c.table_name = 'oauth_workspace_grant' AND c.constraint_type = 'PRIMARY KEY'
+      ) = 2 THEN
+        ALTER TABLE "oauth_workspace_grant" DROP CONSTRAINT "oauth_workspace_grant_pkey";
+        ALTER TABLE "oauth_workspace_grant"
+          ADD CONSTRAINT "oauth_workspace_grant_pkey" PRIMARY KEY (user_id, client_id, organization_id);
+      END IF;
+    END $$`)
 }

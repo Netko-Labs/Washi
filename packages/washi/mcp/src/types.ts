@@ -4,7 +4,10 @@ import type { FileStore, Workspace } from '@washi/repository'
 /** What moved, so open pages refetch: page sources, table data, or both. */
 export type McpChange = 'page' | 'data'
 
-/** One request's worth of who and where: an outside agent acting as one member, in one workspace. */
+/**
+ * One request's worth of who and where: an outside agent acting as one member, in one workspace —
+ * the default one when a sign-in reaches several (`McpWorkspaces`, D124).
+ */
 export interface McpSession {
   ws: Workspace
   viewer: Viewer
@@ -16,4 +19,20 @@ export interface McpSession {
   files?: FileStore
   /** The server's own address, so a write can say where its page opens. */
   baseUrl?: string
+}
+
+/** A workspace an agent may act in, as it is named to the agent. */
+export interface McpWorkspace {
+  id: string
+  name: string
+}
+
+/**
+ * Every workspace one sign-in reaches (D124): the default first. Each tool then takes a
+ * `workspace` (an id or a name) and acts there as the same member; without one, the default.
+ */
+export interface McpWorkspaces {
+  list: McpWorkspace[]
+  /** One of them as a session, or null when it is not one of them (or they left it). */
+  open(id: string): Promise<McpSession | null>
 }

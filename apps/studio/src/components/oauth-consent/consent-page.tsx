@@ -1,9 +1,9 @@
 import { AgentMascot } from '@washi/ui'
 import { type ConsentPageProps, useConsent } from './lib'
 
-/** "Claude Code wants to work in Washi as you" — in the one workspace the person picks here. */
+/** "Claude Code wants to work in Washi as you" — in the workspaces the person ticks here (D124). */
 export function ConsentPage({ clientId }: ConsentPageProps) {
-  const { state, choose, answer } = useConsent(clientId)
+  const { state, toggle, answer } = useConsent(clientId)
   const name = state.clientName ?? 'An agent'
 
   return (
@@ -14,26 +14,29 @@ export function ConsentPage({ clientId }: ConsentPageProps) {
           {name} wants to work in Washi as you
         </h1>
         <p className="mt-2 text-[14px] text-muted-foreground leading-relaxed">
-          It will read what you can read in the workspace you pick, and write pages, rows and
-          comments as you — each in its history. It cannot reach past that workspace.
+          It will read what you can read in the workspaces you pick, and write pages, rows and
+          comments as you — each in its history. It cannot reach past them. The first one ticked is
+          where it works unless it names another.
         </p>
 
         {state.workspaces.length > 0 && (
           <fieldset className="mt-5 grid gap-1.5">
-            <legend className="mb-2 font-medium text-[13px]">Workspace</legend>
+            <legend className="mb-2 font-medium text-[13px]">Workspaces</legend>
             {state.workspaces.map((workspace) => (
               <label
                 key={workspace.id}
                 className="flex cursor-pointer items-center gap-2.5 rounded-[10px] border border-border px-3 py-2.5 text-[14px] has-[:checked]:border-primary has-[:checked]:bg-accent"
               >
                 <input
-                  type="radio"
+                  type="checkbox"
                   className="accent-primary"
-                  name="workspace"
-                  checked={state.chosen === workspace.id}
-                  onChange={() => choose(workspace.id)}
+                  checked={state.chosen.includes(workspace.id)}
+                  onChange={() => toggle(workspace.id)}
                 />
-                {workspace.name}
+                <span className="min-w-0 flex-1 truncate">{workspace.name}</span>
+                {state.chosen[0] === workspace.id && (
+                  <span className="shrink-0 text-[12px] text-muted-foreground">Default</span>
+                )}
               </label>
             ))}
           </fieldset>
@@ -56,7 +59,7 @@ export function ConsentPage({ clientId }: ConsentPageProps) {
           </button>
           <button
             type="button"
-            disabled={state.busy || !state.chosen}
+            disabled={state.busy || state.chosen.length === 0}
             onClick={() => void answer(true)}
             className="h-9 rounded-[10px] bg-foreground px-4 font-medium text-[13.5px] text-background disabled:opacity-50"
           >

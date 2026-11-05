@@ -13,4 +13,11 @@ export const oauthQueries = router({
       if (name === null) throw new TRPCError({ code: 'NOT_FOUND', message: 'unknown agent' })
       return { name }
     }),
+  /** What this person already let the agent reach, so consenting again starts from it (D124). */
+  granted: publicProcedure
+    .input(z.object({ clientId: z.string().min(1).max(200) }))
+    .query(async ({ ctx, input }) => {
+      const { oauth, actorId } = requireOAuth(ctx)
+      return oauth.workspacesOf({ actorId, clientId: input.clientId })
+    }),
 })
