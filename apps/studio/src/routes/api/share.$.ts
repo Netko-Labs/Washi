@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { suggestionAskSchema } from '@washi/domain'
 import {
+  sharedCompile,
   sharedFileAllowed,
   sharedHistory,
   sharedPage,
@@ -104,15 +105,17 @@ export const Route = createFileRoute('/api/share/$')({
           const { data } = ask
           const page = asking.data
           const answer =
-            data.kind === 'rows'
-              ? sharedQuery(ws, token, data.query, page)
-              : data.kind === 'history'
-                ? sharedHistory(ws, token, data.query, page)
-                : data.kind === 'requested'
-                  ? sharedRequested(ws, token, data.ask, page)
-                  : data.kind === 'writable'
-                    ? sharedWritable(ws, token, data.name)
-                    : sharedTable(ws, token, data.name, page)
+            data.kind === 'compile'
+              ? await sharedCompile(ws, token, page)
+              : data.kind === 'rows'
+                ? sharedQuery(ws, token, data.query, page)
+                : data.kind === 'history'
+                  ? sharedHistory(ws, token, data.query, page)
+                  : data.kind === 'requested'
+                    ? sharedRequested(ws, token, data.ask, page)
+                    : data.kind === 'writable'
+                      ? sharedWritable(ws, token, data.name)
+                      : sharedTable(ws, token, data.name, page)
           return Response.json(answer, { headers: NO_STORE })
         } catch (cause) {
           return shareFailure(cause)

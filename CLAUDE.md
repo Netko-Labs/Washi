@@ -280,6 +280,15 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   else stays "A page you cannot open". A page any link opens counts as public to Washi
   (`onPublicLink`): it keeps its redactions and is left to a person to trash. No cache column — the
   service reads the prop off the root it already parses.
+- **A link runs its page's code (D125).** The link's host lends `compilePage`, which asks
+  `{ kind: 'compile' }` with no source: `sharedCompile` bundles the server's own redacted copy of the
+  page drawn (as `scripts.page` does: the server's page packages and code limits), a `page:` import
+  resolving only to another page that link opens, redacted too. The code reads as the link reads
+  (`linkTables`): its markup's tables plus those its code names as one — `table: 'x'`, or the first
+  argument of `useRow`/`useTable`/`useInsert`/`useUpdate`/`useDelete` (`codeTables`); a name built
+  at run time or a word in prose opens nothing. Writes, members and `useMe` stay absent, so a link
+  draws but never writes. A visitor who never picked a theme follows their device on `/s/` (the
+  head script and `useTheme('system')`); the link's header has Light · Dark · Match this device.
 - **Files.** Uploads live in the workspace's files store: a row in the workspace's `files`
   table and the bytes beside the `.db` (`<dataDir>/<workspace>.files/`) or, with
   `WASHI_FILES_S3_*` set, in a bucket under a per-workspace prefix through Bun's own S3 client.

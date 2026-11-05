@@ -1184,3 +1184,10 @@ Acceptance: MCP tests walk every acceptance check; typecheck, Biome, `bun test` 
 - [x] The link's host lends `listPages` / `resolveSheet` / `openSheet`; a trail over a sub-page
 - [x] Washi: may not flip it, keeps a linked page's redactions, leaves trashing one to a person
 - [ ] Later: `<Include>` of a sub-page on a link (the host lends no `loadSheet` yet)
+
+# A link runs its page's code; shared pages follow the device's theme (2026-11-05) — D125
+
+- [x] `compilePage` on the link's host → `sharedCompile` (server's redacted copy, `page:` only within the link)
+- [x] `linkTables`: markup tables + those code names as tables (`codeTables`)
+- [x] Head script and `useTheme('system')` on `/s/`; Light · Dark · Match this device in the header
+- [ ] Later: widgets and terminals on a link (no `compileWidget` / `compileTerminal` lent yet)

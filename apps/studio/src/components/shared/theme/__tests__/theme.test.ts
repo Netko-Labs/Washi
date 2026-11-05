@@ -2,12 +2,15 @@ import { describe, expect, test } from 'bun:test'
 import { THEME_SCRIPT } from '../constants'
 import { isDarkFor, isTheme } from '../utils'
 
-function paintsDark(stored: string | null, prefersDark: boolean): boolean {
+function paintsDark(stored: string | null, prefersDark: boolean, pathname = '/w/x'): boolean {
   const classes = new Set<string>()
-  const run = new Function('localStorage', 'matchMedia', 'document', THEME_SCRIPT)
-  run({ getItem: () => stored }, () => ({ matches: prefersDark }), {
-    documentElement: { classList: { add: (name: string) => classes.add(name) } },
-  })
+  const run = new Function('localStorage', 'matchMedia', 'document', 'location', THEME_SCRIPT)
+  run(
+    { getItem: () => stored },
+    () => ({ matches: prefersDark }),
+    { documentElement: { classList: { add: (name: string) => classes.add(name) } } },
+    { pathname },
+  )
   return classes.has('dark')
 }
 
@@ -27,5 +30,12 @@ describe('theme', () => {
     expect(paintsDark('system', false)).toBe(false)
     expect(paintsDark('light', true)).toBe(false)
     expect(paintsDark(null, true)).toBe(false)
+  })
+
+  test('a shared link follows the device until its visitor chooses', () => {
+    expect(paintsDark(null, true, '/s/ws/token')).toBe(true)
+    expect(paintsDark(null, false, '/s/ws/token')).toBe(false)
+    expect(paintsDark('light', true, '/s/ws/token')).toBe(false)
+    expect(paintsDark('dark', false, '/s/ws/token')).toBe(true)
   })
 })

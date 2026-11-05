@@ -12,8 +12,8 @@ function apply(theme: Theme) {
 const useThemeStore = create<ThemeState>((set, get) => ({
   theme: 'light',
   isHydrated: false,
-  hydrate: () => {
-    let theme: Theme = 'light'
+  hydrate: (fallback) => {
+    let theme: Theme = fallback
     try {
       const stored = localStorage.getItem(THEME_KEY)
       if (isTheme(stored)) theme = stored
@@ -37,11 +37,14 @@ const useThemeStore = create<ThemeState>((set, get) => ({
   },
 }))
 
-/** Paper, ink or the device's own, one choice shared by every control that shows it. */
-export function useTheme() {
+/**
+ * Paper, ink or the device's own, one choice shared by every control that shows it. `fallback` is
+ * what a person who never chose gets: paper in the app, the device's own on a shared link.
+ */
+export function useTheme(fallback: Theme = 'light') {
   const theme = useThemeStore((state) => state.theme)
   useEffect(() => {
-    if (!useThemeStore.getState().isHydrated) useThemeStore.getState().hydrate()
-  }, [])
+    if (!useThemeStore.getState().isHydrated) useThemeStore.getState().hydrate(fallback)
+  }, [fallback])
   return { theme, setTheme: useThemeStore.getState().setTheme }
 }

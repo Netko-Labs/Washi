@@ -1,11 +1,6 @@
 import { ANY_HOST, type SheetDetail } from '@washi/domain'
 import type { HistoryQuery, InkQuery, QueryResult, TableSpec } from '@washi/ink'
-import {
-  pageTables,
-  redactedColumns,
-  redactForShare,
-  redactionSummary,
-} from '@washi/paper/registry'
+import { redactedColumns, redactForShare, redactionSummary } from '@washi/paper/registry'
 import {
   getSheet,
   getTableByName,
@@ -20,6 +15,7 @@ import { playableEmbedHosts } from '../embeds/service'
 import { runHistory } from '../tables/history'
 import { runQuery } from '../tables/service'
 import { readableSet } from './access'
+import { linkTables } from './share-tables'
 import { sharedTree, sharesSubpages } from './share-tree'
 import type { SharedTreePage } from './types'
 
@@ -137,7 +133,7 @@ function namesIn(node: unknown, into: Set<string>): Set<string> {
  * another formula — or `cop = usd * fx_rate` would hand a hidden `usd` straight to the link.
  */
 export function hiddenIn(ws: Workspace, root: WsxElement, table: string): Set<string> {
-  const readable = pageTables(root)
+  const readable = linkTables(ws, root)
   if (!readable.has(table)) {
     throw new ShareRefusedError(`this page does not read "${table}"`)
   }

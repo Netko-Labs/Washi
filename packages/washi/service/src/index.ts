@@ -141,6 +141,8 @@ export {
   sharedTable,
   shareSettings,
 } from './sheets/share'
+export { sharedCompile } from './sheets/share-code'
+export { codeTables, linkTables } from './sheets/share-tables'
 export {
   duplicateSheet,
   moveSheetTo,

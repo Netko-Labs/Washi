@@ -9,3 +9,4 @@ export type {
   ShareHostOptions,
 } from './types'
 export { base, pageQuery, shareHost, trailTo } from './utils'
+export { SHARED_THEMES } from './values'
