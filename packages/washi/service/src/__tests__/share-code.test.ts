@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
+import { afterEach, beforeEach, describe, expect, spyOn, test } from 'bun:test'
 import { liveShareFor, openWorkspace, type Workspace } from '@washi/repository'
 import { parse } from '@washi/wsx'
 import { updateSheetAccess, updateSheetShareSubpages } from '../sheets/look'
@@ -39,6 +39,27 @@ describe("a page's code on its link (D125)", () => {
     const compiled = await sharedCompile(ws, token)
     expect(compiled.ok).toBe(true)
     if (compiled.ok) expect(compiled.js).toContain('__page')
+  })
+
+  test('asking again answers from the cache, a build that fails included', async () => {
+    const builds = spyOn(Bun, 'build')
+    try {
+      // A source of its own, so no other test's cache entry answers it.
+      const { token } = publicPage(CODE.replace('open', 'opened'))
+      const first = await sharedCompile(ws, token)
+      expect(first.ok).toBe(true)
+      expect(await sharedCompile(ws, token)).toEqual(first)
+      const broken = publicPage(
+        `import { noSuchThing } from 'date-fns'\n\n<Sheet title="Broken"><Text>{String(noSuchThing)}</Text></Sheet>`,
+      )
+      const failed = await sharedCompile(ws, broken.token)
+      expect(failed.ok).toBe(false)
+      expect(await sharedCompile(ws, broken.token)).toEqual(failed)
+      // Two pages, four asks, two builds.
+      expect(builds).toHaveBeenCalledTimes(2)
+    } finally {
+      builds.mockRestore()
+    }
   })
 
   test('reads the tables its code names as tables, and no other', () => {

@@ -195,7 +195,10 @@ export async function bundle(
     })
     const output = built.outputs[0]
     if (!built.success || !output) {
-      return failure(inWords(built.logs[0]?.message ?? 'it did not compile', pages))
+      // A build that fails says the same for the same inputs, so it is kept like a success: a
+      // public link (D125) asking again never runs the bundler again. A throw (below) is not kept.
+      const said = failure(inWords(built.logs[0]?.message ?? 'it did not compile', pages))
+      return remember(hash, said)
     }
     return capped(remember(hash, { ok: true, js: await output.text() }), maxBytes)
   } catch (error) {
