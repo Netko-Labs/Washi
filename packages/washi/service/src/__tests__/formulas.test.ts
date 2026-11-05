@@ -19,12 +19,13 @@ beforeEach(() => {
       { name: 'overdue', type: 'formula', expr: 'when(paid, false, days(now(), date) < 0)' },
     ],
   })
+  // Fixed rows sit years back, so Water (three days ago, whenever the test runs) never shares their month.
   const iso = (offsetDays: number) =>
     new Date(Date.now() + offsetDays * DAY).toISOString().slice(0, 10)
   for (const [name, date, usd, paid] of [
-    ['Claude', '2026-10-01', 200, true],
+    ['Claude', '2020-10-01', 200, true],
     ['Water', iso(-3), 30, false],
-    ['Gym', '2026-11-01', 50, false],
+    ['Gym', '2020-11-01', 50, false],
   ] as const) {
     runMutation(ws, {
       kind: 'insert',
@@ -41,7 +42,7 @@ describe('formula columns (D73)', () => {
   test('are computed on read: month from the date, COP from the rate, overdue from both', () => {
     const rows = runQuery(ws, { table: 'expenses' }).rows
     const claude = rows.find((row) => row.name === 'Claude')
-    expect(claude?.month).toBe('2026-10')
+    expect(claude?.month).toBe('2020-10')
     expect(claude?.cop).toBe(800_000)
     expect(rows.find((row) => row.name === 'Water')?.overdue).toBe(true)
     expect(claude?.overdue).toBe(false)
@@ -50,7 +51,7 @@ describe('formula columns (D73)', () => {
   test('filter, order and group on a formula like on any column', () => {
     const november = runQuery(ws, {
       table: 'expenses',
-      where: [{ column: 'month', op: 'eq', value: '2026-11' }],
+      where: [{ column: 'month', op: 'eq', value: '2020-11' }],
     })
     expect(names(november.rows)).toEqual(['Gym'])
     const byCop = runQuery(ws, { table: 'expenses', orderBy: { column: 'cop', direction: 'desc' } })
@@ -60,8 +61,8 @@ describe('formula columns (D73)', () => {
       where: [{ column: 'paid', op: 'eq', value: false }],
       groupBy: { column: 'month', aggregates: [{ fn: 'sum', column: 'cop' }, { fn: 'count' }] },
     })
-    const november2 = perMonth.rows.find((row) => row.month === '2026-11')
-    expect(november2).toEqual({ month: '2026-11', sum_cop: 200_000, count: 1 })
+    const november2 = perMonth.rows.find((row) => row.month === '2020-11')
+    expect(november2).toEqual({ month: '2020-11', sum_cop: 200_000, count: 1 })
   })
 
   test('cannot be written, and a bad formula is refused when the table is defined', () => {
@@ -92,7 +93,7 @@ describe('formula columns (D73)', () => {
     runMutation(ws, {
       kind: 'update',
       table: 'expenses',
-      where: [{ column: 'month', op: 'eq', value: '2026-11' }],
+      where: [{ column: 'month', op: 'eq', value: '2020-11' }],
       data: { paid: true },
     })
     const paid = runQuery(ws, {
