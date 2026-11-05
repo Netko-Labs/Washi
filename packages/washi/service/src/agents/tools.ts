@@ -1,9 +1,9 @@
 import { createSdkMcpServer, tool } from '@anthropic-ai/claude-agent-sdk'
 import type { Member, Viewer } from '@washi/domain'
-import { getAppMeta, type Workspace } from '@washi/repository'
+import { type FileStore, getAppMeta, type Workspace } from '@washi/repository'
 import { fetchPolicySchema, guardedFetch } from '@washi/tsuru'
 import { z } from 'zod'
-import { pageCapabilities, tableCapabilities } from '../capabilities'
+import { imageCapabilities, pageCapabilities, tableCapabilities } from '../capabilities'
 import { privateNetworkAllowed, serverPolicy } from '../server'
 import { NOBODY } from '../sheets/access'
 import { HANDOVER_DESCRIPTION, type SearchKeyLookup } from './lib'
@@ -61,6 +61,8 @@ export interface ToolContext {
   viewer?: Viewer
   /** The off-list host the desk's yes let this fetch reach, taken once (`takeFetchGrant`). */
   fetchGrant?: (url: string) => string | null
+  /** The workspace's uploads: with them, `image_render` draws pictures into it (D126). */
+  files?: FileStore
 }
 
 /**
@@ -74,7 +76,11 @@ export function createWashiTools(ws: Workspace, context: ToolContext) {
     listPeople: context.listPeople,
     onCreate: context.openSheet,
   }
-  const capabilities = [...pageCapabilities(ws, shared), ...tableCapabilities(ws, shared)]
+  const capabilities = [
+    ...pageCapabilities(ws, shared),
+    ...tableCapabilities(ws, shared),
+    ...(context.files ? imageCapabilities(ws, context.files) : []),
+  ]
   return createSdkMcpServer({
     name: 'washi',
     version: '0.1.0',

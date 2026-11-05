@@ -8,8 +8,9 @@ export const CHANGES: Record<string, McpChange[]> = {
   db: ['data', 'page'],
   comment: ['page'],
   reminder: ['data'],
-  // An upload changes nothing on screen until a page wears it.
+  // An upload changes nothing on screen until a page wears it; a drawn picture is one (D126).
   file: [],
+  image: [],
 }
 export const DEFAULT_CHANGE: McpChange[] = ['page']
 
@@ -22,6 +23,8 @@ Writing pages: call wsx_reference first — every primitive with its props, and 
 <Table columns rows />, page links with <Ref>, <PageLink> and a live <Subpages />). Ask it for a few
 primitives by name to get their props and an example. catalog_list names every icon, cover and
 theme a <Sheet> may wear; file_upload turns a picture into a file:<id> key for an icon or a cover.
+image_render draws HTML into a PNG upload — a mockup for a <Figure src alt>, a cover or an icon —
+so a design is a picture on the page, never HTML or a widget.
 Run sheet_check (preview: true shows the words it draws) before sheet_create or sheet_replace.
 Writes answer { id, title, version } — pass that version back as baseVersion on your next write so a
 teammate's typing is merged, not overwritten. To change a few lines, sheet_edit sends only

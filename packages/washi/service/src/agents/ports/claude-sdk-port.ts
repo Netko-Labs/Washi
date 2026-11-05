@@ -3,7 +3,7 @@ import type { SDKUserMessage } from '@anthropic-ai/claude-agent-sdk'
 import { query } from '@anthropic-ai/claude-agent-sdk'
 import type { AgentUpdate, Member, TurnBilling } from '@washi/domain'
 import { type ModelCatalogue, priceTurn } from '@washi/models'
-import type { Workspace } from '@washi/repository'
+import type { FileStore, Workspace } from '@washi/repository'
 import type { SearchKeyLookup } from '../lib'
 import { agentEnv, MAX_PLAN_TURN_BUDGET_USD, MAX_TURN_BUDGET_USD, sessionConfigDir } from '../lib'
 import { normalizeMessage } from '../normalize'
@@ -27,6 +27,8 @@ export interface ClaudeSdkPortDeps {
   openSheet?: (id: string, sessionId: string) => void
   listPeople?: () => Promise<Member[]>
   searchKey?: SearchKeyLookup
+  /** The workspace's uploads, read as each turn starts: with them, Washi draws pictures (D126). */
+  files?: () => FileStore | undefined
   canUseTool: (
     sessionId: string,
     toolName: string,
@@ -119,6 +121,7 @@ export function createClaudeSdkPort(deps: ClaudeSdkPortDeps): AgentPort {
                 openSheet: (id) => deps.openSheet?.(id, request.sessionId),
                 listPeople: deps.listPeople,
                 searchKey: deps.searchKey,
+                files: deps.files?.(),
                 setTitle: request.setTitle,
                 handover: request.handover,
                 viewer: request.viewer,

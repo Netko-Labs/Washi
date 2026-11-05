@@ -5,8 +5,11 @@
   "dependencies": {
     "@ai-sdk/anthropic": "^4",
     "@anthropic-ai/claude-agent-sdk": "^0.3.314",
+    "@fontsource/young-serif": "^5.3.0",
+    "@fontsource/zen-kaku-gothic-new": "^5.3.0",
     "@jitl/quickjs-singlefile-mjs-release-sync": "0.32.0",
     "@openrouter/ai-sdk-provider": "^3",
+    "@resvg/resvg-wasm": "2.6.2",
     "@washi/domain": "workspace:*",
     "@washi/hanko": "workspace:*",
     "@washi/ink": "workspace:*",
@@ -22,6 +25,8 @@
     "quickjs-emscripten-core": "0.32.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
+    "satori": "0.63.2",
+    "ultrahtml": "1.7.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {

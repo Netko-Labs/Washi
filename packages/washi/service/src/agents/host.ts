@@ -123,6 +123,7 @@ export class AgentHost {
     const openSheet = (id: string, sessionId: string) => this.events?.openSheet(id, sessionId)
     const listPeople = () => this.people?.() ?? Promise.resolve([])
     const searchKey = () => this.search?.() ?? Promise.resolve(null)
+    const files = () => this.files ?? undefined
     const models = catalogue ?? createModelCatalogue()
     this.claudePort = createClaudeSdkPort({
       ws,
@@ -132,6 +133,7 @@ export class AgentHost {
       openSheet,
       listPeople,
       searchKey,
+      files,
       canUseTool: (sessionId, name, input) => this.approvals.gateSdkTool(sessionId, name, input),
       fetchGrant: (sessionId, url) => this.approvals.takeFetchGrant(sessionId, url),
     })
@@ -142,6 +144,7 @@ export class AgentHost {
       openSheet,
       listPeople,
       searchKey,
+      files,
       gate: this.approvals,
       catalogue: models,
     })

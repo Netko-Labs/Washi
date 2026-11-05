@@ -822,6 +822,18 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   `scripts/washi.mjs` (bun or node, no packages) sends a tool call with arguments read from files
   (`source=@spec.wsx`, `upload <file>`), so a page never passes through the agent's context; its
   `pages` skill says how. Links between pages were always `<Ref>`, `<PageLink>` and `<Subpages>`.
+- **Washi draws pictures from HTML (D126).** `image_render` (both ports and MCP, a `CHANGE_TOOLS`
+  write over the workspace's files — the ports get them from `AgentHost.setFiles`) lays HTML out on
+  the server with Satori and rasterizes it with resvg-wasm (`service/images`): no browser, no script,
+  no network. `markupOf` inlines `<style>` (ultrahtml), drops scripts, frames, handlers and the head,
+  stacks a block's child elements when it names no display, sizes every box border-box, maps generic
+  families to the house fonts
+  (Zen Kaku Gothic New, Young Serif — woff off `@fontsource`; no emoji), and lets a picture in only as
+  a `data:image/…` address or `file:<id>` of an upload (inlined, never SVG) — any other address is
+  refused in words. ≤ 200 000 characters, 3000 elements, 12 uploads, sides 16–2400. `purpose` sizes
+  it — figure 1200×800, cover 1500×600, icon 256×256 — and it lands as a PNG upload under the
+  server's caps, answering `{ key, width, height, wear }`. A mockup is a `<Figure>`, never a Widget or
+  page code. The studio traces the wasm, satori and the fonts into `.output` (`RUNTIME_FILE_DEPS`).
 - **An embed is https and listed (D92).** `<Embed src title ratio height>`: the registry refuses http;
   a built-in provider (`EMBED_PROVIDERS` — YouTube via youtube-nocookie, Vimeo, Spotify, Loom, Figma,
   CodePen, CodeSandbox, Miro, Google Maps, Indify) turns its page URL into its player and always plays;

@@ -53,6 +53,8 @@ export const CHANGE_TOOLS: ReadonlySet<string> = new Set([
   'db_mutate',
   'db_trash_table',
   'reminder_create',
+  // A picture drawn into the workspace's uploads (D126): nothing leaves, no page changes until one wears it.
+  'image_render',
 ])
 
 /** An unanswered approval is a denial, not a hang. */
