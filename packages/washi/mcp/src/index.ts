@@ -1,2 +1,2 @@
 export { answerMcp } from './server'
-export type { McpChange, McpSession } from './types'
+export type { McpChange, McpSession, McpWorkspace, McpWorkspaces } from './types'

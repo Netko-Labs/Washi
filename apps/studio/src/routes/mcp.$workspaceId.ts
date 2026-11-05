@@ -7,9 +7,9 @@ import { mcpSessionFor } from '@/server/mcp'
  * writes it as the member whose token it holds. Streamable HTTP, stateless, JSON answers.
  */
 async function answer({ request, params }: { request: Request; params: { workspaceId: string } }) {
-  const session = await mcpSessionFor(request, params.workspaceId)
-  if (session instanceof Response) return session
-  return answerMcp(request, session)
+  const found = await mcpSessionFor(request, params.workspaceId)
+  if (found instanceof Response) return found
+  return answerMcp(request, found.session)
 }
 
 export const Route = createFileRoute('/mcp/$workspaceId')({

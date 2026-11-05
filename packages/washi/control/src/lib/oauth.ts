@@ -3,7 +3,7 @@ import {
   oauthProviderOpenIdConfigMetadata,
 } from '@better-auth/oauth-provider'
 import type { OAuthStore } from '@washi/trpc'
-import { and, eq } from 'drizzle-orm'
+import { and, asc, eq } from 'drizzle-orm'
 import { createLocalJWKSet, type JSONWebKeySet, jwtVerify } from 'jose'
 import { oauthClient, oauthWorkspaceGrant } from '../db'
 import { mcpResource, type WashiAuth } from './auth'
@@ -35,25 +35,34 @@ export function createOAuthStore(db: ControlDB, auth: WashiAuth, baseUrl: string
       }
     },
 
-    async grant(actorId, clientId, workspaceId) {
-      await db
-        .insert(oauthWorkspaceGrant)
-        .values({ userId: actorId, clientId, organizationId: workspaceId })
-        .onConflictDoUpdate({
-          target: [oauthWorkspaceGrant.userId, oauthWorkspaceGrant.clientId],
-          set: { organizationId: workspaceId, createdAt: new Date() },
-        })
+    async grant(actorId, clientId, workspaceIds) {
+      const mine = and(
+        eq(oauthWorkspaceGrant.userId, actorId),
+        eq(oauthWorkspaceGrant.clientId, clientId),
+      )
+      // The person's answer replaces the last one whole, in the order they gave (D124).
+      await db.transaction(async (tx) => {
+        await tx.delete(oauthWorkspaceGrant).where(mine)
+        await tx.insert(oauthWorkspaceGrant).values(
+          workspaceIds.map((organizationId, position) => ({
+            userId: actorId,
+            clientId,
+            organizationId,
+            position,
+          })),
+        )
+      })
     },
 
-    async workspaceOf({ actorId, clientId }) {
-      const [row] = await db
+    async workspacesOf({ actorId, clientId }) {
+      const rows = await db
         .select({ workspaceId: oauthWorkspaceGrant.organizationId })
         .from(oauthWorkspaceGrant)
         .where(
           and(eq(oauthWorkspaceGrant.userId, actorId), eq(oauthWorkspaceGrant.clientId, clientId)),
         )
-        .limit(1)
-      return row?.workspaceId ?? null
+        .orderBy(asc(oauthWorkspaceGrant.position), asc(oauthWorkspaceGrant.createdAt))
+      return rows.map((row) => row.workspaceId)
     },
 
     async clientName(clientId) {

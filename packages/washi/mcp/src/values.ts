@@ -38,3 +38,15 @@ dropped. db_change_column renames or removes one column, or adds, renames or rem
 Working a backlog kept in Washi: find the issues table (db_list_tables), query the open rows,
 take one, comment on its row what you are doing and, when done, the pull request — then move its
 status with db_mutate. Leave rows you did not touch alone.`
+
+/** The argument every tool takes when a sign-in reaches more than one workspace (D124). */
+export const WORKSPACE_ARG =
+  'The workspace to act in: its id or its name, from workspace_list. Leave it out for the default one.'
+
+/** Added to the instructions when a sign-in reaches several workspaces. */
+export const MANY_WORKSPACES = `
+
+You may work in several workspaces: workspace_list names them, the default first. Every tool takes
+an optional workspace (an id or a name); leave it out for the default. Ids from one workspace —
+pages, rows, versions — mean nothing in another, so name the same workspace on every call about
+them. Never copy a page or rows from one workspace into another unless your person asks.`

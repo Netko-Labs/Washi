@@ -17,8 +17,10 @@ Then point it at your Washi server and sign in:
 export WASHI_MCP_URL="https://washi.example.com/mcp"
 ```
 
-Run `/mcp` in Claude Code: Washi opens in the browser, you sign in, pick the workspace it may work
-in, and allow it. For an agent with no browser (CI, a server), make a token instead in **Settings →
+Run `/mcp` in Claude Code: Washi opens in the browser, you sign in, tick the workspaces it may work
+in, and allow it. With more than one, `workspace_list` names them and every tool takes a
+`workspace` (an id or a name); the first one ticked is the default. To add one later, sign in again
+from `/mcp` — the consent screen starts from what it already has. For an agent with no browser (CI, a server), make a token instead in **Settings →
 Account → Agents** and set both — the address then names the workspace:
 
 ```bash

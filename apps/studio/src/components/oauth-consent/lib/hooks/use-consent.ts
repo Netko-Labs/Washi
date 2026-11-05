@@ -7,13 +7,14 @@ const reasonOf = (cause: unknown) => (cause instanceof Error ? cause.message : S
 
 /**
  * An agent's request to act as this person (D101): who asks, which of their workspaces it may act
- * in, and the answer — the workspace kept for this agent first, then Better Auth told yes or no.
+ * in (one or several, D124 — what it already had ticked to start), and the answer — the
+ * workspaces kept for this agent first, then Better Auth told yes or no.
  */
 export function useConsent(clientId: string | null) {
   const [state, setState] = useState<ConsentState>({
     clientName: null,
     workspaces: [],
-    chosen: null,
+    chosen: [],
     busy: false,
     error: null,
   })
@@ -21,10 +22,20 @@ export function useConsent(clientId: string | null) {
 
   useEffect(() => {
     if (!clientId) return patch({ error: 'This link is missing which agent is asking.' })
-    Promise.all([api.oauth.client.query({ clientId }), api.workspaces.list.query()])
-      .then(([client, workspaces]) =>
-        patch({ clientName: client.name, workspaces, chosen: workspaces[0]?.id ?? null }),
-      )
+    Promise.all([
+      api.oauth.client.query({ clientId }),
+      api.workspaces.list.query(),
+      api.oauth.granted.query({ clientId }).catch((): string[] => []),
+    ])
+      .then(([client, workspaces, granted]) => {
+        const had = workspaces.filter((each) => granted.includes(each.id)).map((each) => each.id)
+        const first = workspaces[0]?.id
+        patch({
+          clientName: client.name,
+          workspaces,
+          chosen: had.length ? had : first ? [first] : [],
+        })
+      })
       .catch((cause) => patch({ error: reasonOf(cause) }))
   }, [clientId])
 
@@ -33,8 +44,9 @@ export function useConsent(clientId: string | null) {
     patch({ busy: true, error: null })
     try {
       if (accept) {
-        if (!state.chosen) throw new Error('Pick the workspace it may work in.')
-        await api.oauth.grant.mutate({ clientId, workspaceId: state.chosen })
+        if (state.chosen.length === 0)
+          throw new Error('Pick at least one workspace it may work in.')
+        await api.oauth.grant.mutate({ clientId, workspaceIds: state.chosen })
       }
       const { data, error } = await auth.$fetch('/oauth2/consent', {
         method: 'POST',
@@ -49,5 +61,15 @@ export function useConsent(clientId: string | null) {
     }
   }
 
-  return { state, choose: (chosen: string) => patch({ chosen }), answer }
+  /** Ticks or unticks one, keeping the list's order so the default is the first ticked. */
+  const toggle = (id: string) =>
+    setState((now) => {
+      const ticked = now.chosen.includes(id)
+        ? now.chosen.filter((each) => each !== id)
+        : [...now.chosen, id]
+      const order = now.workspaces.map((each) => each.id)
+      return { ...now, chosen: order.filter((each) => ticked.includes(each)) }
+    })
+
+  return { state, toggle, answer }
 }

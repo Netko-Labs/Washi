@@ -761,7 +761,15 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   auth]`, `openid-configuration`, `oauth-protected-resource[/mcp]`) is a Nitro handler over
   `control.oauth.discovery`; every 401 names `resource_metadata`. OAuth tables: `db/oauth.ts`, as
   `npx auth generate` writes them (regenerate, don't hand-edit), DDL in `lib/ddl-oauth.ts`.
-  Installable as a Claude Code plugin from this repo (`.claude-plugin/marketplace.json` → `netko-labs`,
+  **One sign-in, several workspaces (D124).** Consent ticks one or more of the person's workspaces
+  (`oauth.grant` takes `workspaceIds`, the first is the default; `oauth.granted` pre-ticks what the
+  agent had, so signing in again adds one); `oauth_workspace_grant` is keyed (person · client ·
+  workspace) with a `position`, the old two-column key migrated at boot (`ensureManyWorkspaceGrants`).
+  `/mcp` answers the default's session plus `McpWorkspaces` — each granted workspace the person is
+  still a member of, opened as them only when a call names it — so every tool gains an optional
+  `workspace` (an id or a name, `workspaceNamed`) and `workspace_list` names them; a name it does
+  not reach is refused listing those it does. `/mcp/<id>` and tokens stay one workspace, no argument.
+ (`.claude-plugin/marketplace.json` → `netko-labs`,
   `plugins/washi`: `.mcp.json` reads `WASHI_MCP_URL` and `WASHI_TOKEN`, and the `backlog` skill —
   take an issue, fix it here, comment the PR on its row, move its status). `claude plugin validate`.
 - **An outside agent writes without guessing (D122).** From a real session that built a workspace
