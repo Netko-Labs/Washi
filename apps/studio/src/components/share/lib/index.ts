@@ -9,7 +9,8 @@ export type {
   SharePanelProps,
   SharePeopleProps,
   ShareSettings,
-  ShareSuggestProps,
+  ShareSwitchProps,
+  ShareToggleProps,
 } from './types'
 export { hiddenInWords, shareUrl } from './utils'
 export { AUDIENCES } from './values'

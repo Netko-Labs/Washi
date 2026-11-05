@@ -12,7 +12,14 @@ import {
 } from '@washi/service'
 import { fileResponse } from '@/server/files'
 import { washiRuntime } from '@/server/runtime'
-import { NO_STORE, shareAskSchema, sharedWorkspace, shareFailure } from '@/server/share'
+import {
+  NO_STORE,
+  shareAskSchema,
+  sharedWorkspace,
+  shareFailure,
+  sharePageOf,
+  sharePageSchema,
+} from '@/server/share'
 import { visitorHash } from '@/server/visitor'
 
 const MAX_ASK_BYTES = 16 * 1024
@@ -22,7 +29,8 @@ const MAX_SUGGEST_BYTES = 64 * 1024
  * A page's read-only link, with no session (D65). GET `<workspace>/<token>` is the page as the
  * link shows it, GET `<workspace>/<token>/file/<id>` an upload the page uses, POST
  * `<workspace>/<token>/ask` one question about a table the page reads, and POST
- * `<workspace>/<token>/suggest` a visitor's row, kept for a member to approve (D120).
+ * `<workspace>/<token>/suggest` a visitor's row, kept for a member to approve (D120). A link that
+ * opens its sub-pages names one with `?page=` (GET) or `page` (an ask), D123.
  */
 export const Route = createFileRoute('/api/share/$')({
   server: {
@@ -31,9 +39,10 @@ export const Route = createFileRoute('/api/share/$')({
         const [workspaceId = '', token = '', part, fileId] = (params._splat ?? '').split('/')
         const resolved = await sharedWorkspace(workspaceId)
         if (!resolved) return Response.json({ error: 'not found' }, { status: 404 })
+        const page = sharePageOf(request)
         try {
           if (part === 'file' && fileId) {
-            if (!sharedFileAllowed(resolved.workspace, token, fileId)) {
+            if (!sharedFileAllowed(resolved.workspace, token, fileId, page)) {
               return new Response(null, { status: 404 })
             }
             const found = await resolved.files.get(fileId)
@@ -42,7 +51,7 @@ export const Route = createFileRoute('/api/share/$')({
             return fileResponse(request, found, NO_STORE)
           }
           if (part) return Response.json({ error: 'not found' }, { status: 404 })
-          return Response.json(sharedPage(resolved.workspace, token), { headers: NO_STORE })
+          return Response.json(sharedPage(resolved.workspace, token, page), { headers: NO_STORE })
         } catch (cause) {
           return shareFailure(cause)
         }
@@ -86,20 +95,24 @@ export const Route = createFileRoute('/api/share/$')({
           }
         }
         const ask = shareAskSchema.safeParse(body)
-        if (!ask.success) return Response.json({ error: 'bad question' }, { status: 400 })
+        const asking = sharePageSchema.safeParse((body as { page?: unknown } | null)?.page)
+        if (!ask.success || !asking.success) {
+          return Response.json({ error: 'bad question' }, { status: 400 })
+        }
         try {
           const ws = resolved.workspace
           const { data } = ask
+          const page = asking.data
           const answer =
             data.kind === 'rows'
-              ? sharedQuery(ws, token, data.query)
+              ? sharedQuery(ws, token, data.query, page)
               : data.kind === 'history'
-                ? sharedHistory(ws, token, data.query)
+                ? sharedHistory(ws, token, data.query, page)
                 : data.kind === 'requested'
-                  ? sharedRequested(ws, token, data.ask)
+                  ? sharedRequested(ws, token, data.ask, page)
                   : data.kind === 'writable'
                     ? sharedWritable(ws, token, data.name)
-                    : sharedTable(ws, token, data.name)
+                    : sharedTable(ws, token, data.name, page)
           return Response.json(answer, { headers: NO_STORE })
         } catch (cause) {
           return shareFailure(cause)

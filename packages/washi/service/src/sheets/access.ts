@@ -3,6 +3,7 @@ import { redactionWeight } from '@washi/paper/registry'
 import { accessRows, closeShare, getSheet, openShare, type Workspace } from '@washi/repository'
 import type { WsxElement } from '@washi/wsx'
 import { accessOf } from './look-of'
+import { onPublicLink } from './share-tree'
 
 export class SheetNotFoundError extends Error {
   constructor(id: string) {
@@ -65,9 +66,14 @@ export function requireReadable(ws: Workspace, id: string, viewer: Viewer): void
 
 /**
  * Only a person decides who reads a page and what a link leaves out (A2): Washi may not change
- * `visibility` or `access`, nor hide less on a page that is on a public link.
+ * `visibility` or `access`, nor hide less on a page that is on a public link — its own, or a
+ * public ancestor's that shares its sub-pages (`linked`, D123).
  */
-export function guardWashiWrite(before: WsxElement | null, after: WsxElement): void {
+export function guardWashiWrite(
+  before: WsxElement | null,
+  after: WsxElement,
+  linked = false,
+): void {
   const was: SheetAccess = before ? accessOf(before) : { visibility: 'shared', access: [] }
   const now = accessOf(after)
   if (was.visibility !== now.visibility || was.access.join() !== now.access.join()) {
@@ -75,7 +81,8 @@ export function guardWashiWrite(before: WsxElement | null, after: WsxElement): v
       "Only a person changes who can read a page. Keep the Sheet's visibility and access as they are.",
     )
   }
-  if (before && was.visibility === 'public' && redactionWeight(after) < redactionWeight(before)) {
+  const isPublic = was.visibility === 'public' || linked
+  if (before && isPublic && redactionWeight(after) < redactionWeight(before)) {
     throw new SheetAccessError(
       'This page is on a public link: keep every <Redact> and redact column it has.',
     )
@@ -85,12 +92,23 @@ export function guardWashiWrite(before: WsxElement | null, after: WsxElement): v
       "Only a person decides whether a page's link takes suggestions. Keep the Sheet's suggest prop as it is.",
     )
   }
+  if ((before?.props.subpages === true) !== (after.props.subpages === true)) {
+    throw new SheetAccessError(
+      "Only a person decides whether a page's link opens its sub-pages. Keep the Sheet's subpages prop as it is.",
+    )
+  }
 }
 
-/** Only a person takes a page off its public link (A2), and trashing a page takes it off. */
+/**
+ * Only a person takes a page off its public link (A2), and trashing a page takes it off — a
+ * sub-page a public page's link opens included (D123).
+ */
 export function guardWashiDelete(ws: Workspace, ids: string[]): void {
   const pages = new Set(ids)
-  if (accessRows(ws).some((page) => pages.has(page.id) && page.visibility === 'public')) {
+  // A link's reader is nobody signed in: what NOBODY reads is what the world may.
+  const world = readableSet(ws, NOBODY)
+  const linked = ids.some((id) => onPublicLink(ws, id, world))
+  if (linked || accessRows(ws).some((page) => pages.has(page.id) && page.visibility === 'public')) {
     throw new SheetAccessError(
       'This page, or one inside it, is on a public link: only a person moves it to the trash.',
     )

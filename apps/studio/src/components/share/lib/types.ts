@@ -1,5 +1,5 @@
 import type { SheetSummary } from '@washi/domain'
-import type { RefObject } from 'react'
+import type { ComponentType, RefObject } from 'react'
 
 export type Audience = SheetSummary['visibility']
 
@@ -9,13 +9,21 @@ export interface ShareSettings {
   token: string | null
   /** The link takes suggested rows (D120). */
   suggest: boolean
+  /** The link opens the page's sub-pages too (D123). */
+  subpages: boolean
   hidden: { blocks: number; columns: Record<string, string[]> }
 }
 
-export interface ShareSuggestProps {
+export interface ShareToggleProps {
   value: boolean
   busy: boolean
-  onChange: (suggest: boolean) => void
+  onChange: (on: boolean) => void
+}
+
+export interface ShareSwitchProps extends ShareToggleProps {
+  icon: ComponentType<{ className?: string }>
+  label: string
+  detail: string
 }
 
 export interface ShareButtonProps {

@@ -127,3 +127,16 @@ export function updateSheetSuggest(ws: Workspace, id: string, suggest: boolean):
   const source = serialize({ ...root, props: suggest ? { ...props, suggest: true } : props })
   return updateSheetFromSource(ws, id, { title: sheet.title, tags: sheet.tags, source })
 }
+
+/** A person lets a public page's link open its sub-pages too (D123); off, the prop goes. */
+export function updateSheetShareSubpages(
+  ws: Workspace,
+  id: string,
+  subpages: boolean,
+): SheetDetail {
+  const sheet = requireSheet(ws, id)
+  const root = parse(sheet.source)
+  const { subpages: _subpages, ...props } = root.props
+  const source = serialize({ ...root, props: subpages ? { ...props, subpages: true } : props })
+  return updateSheetFromSource(ws, id, { title: sheet.title, tags: sheet.tags, source })
+}

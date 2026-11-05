@@ -4,6 +4,7 @@ import { type SharePanelProps, shareUrl, useShare } from './lib'
 import { ShareAudience } from './share-audience'
 import { ShareLink } from './share-link'
 import { SharePeople } from './share-people'
+import { ShareSubpages } from './share-subpages'
 import { ShareSuggest } from './share-suggest'
 
 const workspaceRoute = getRouteApi('/w/$workspaceId')
@@ -58,6 +59,11 @@ export function SharePanel({ sheet }: SharePanelProps) {
             value={settings.suggest}
             busy={share.busy}
             onChange={(suggest) => void share.setSuggest(suggest)}
+          />
+          <ShareSubpages
+            value={settings.subpages}
+            busy={share.busy}
+            onChange={(subpages) => void share.setSubpages(subpages)}
           />
         </>
       )}

@@ -1,5 +1,5 @@
 import type { PaperHost } from '@washi/paper'
-import type { ShareHostOptions } from './types'
+import type { SharedTreePage, ShareHostOptions } from './types'
 
 export const base = (workspaceId: string, token: string) =>
   `/api/share/${encodeURIComponent(workspaceId)}/${encodeURIComponent(token)}`
@@ -19,12 +19,30 @@ async function post<T>(url: string, body: unknown, refusal: string, isWordy = fa
   return (await response.json()) as T
 }
 
-const ask = <T>(workspaceId: string, token: string, body: unknown) =>
-  post<T>(`${base(workspaceId, token)}/ask`, body, 'This part of the page is not shared.')
+const ask = <T>(workspaceId: string, token: string, page: string | undefined, body: object) =>
+  post<T>(
+    `${base(workspaceId, token)}/ask`,
+    page ? { ...body, page } : body,
+    'This part of the page is not shared.',
+  )
 
-export async function fetchShared(workspaceId: string, token: string) {
-  const response = await fetch(base(workspaceId, token))
+/** `?page=<id>` for a sub-page the link opens (D123); nothing for its own page. */
+export const pageQuery = (page: string | undefined) =>
+  page ? `?page=${encodeURIComponent(page)}` : ''
+
+export async function fetchShared(workspaceId: string, token: string, page?: string) {
+  const response = await fetch(`${base(workspaceId, token)}${pageQuery(page)}`)
   return response.ok ? response.json() : null
+}
+
+/** The pages from the link's own down to `page`, for the trail over a sub-page. */
+export function trailTo(page: string, pages: SharedTreePage[]): SharedTreePage[] {
+  const byId = new Map(pages.map((entry) => [entry.id, entry]))
+  const trail: SharedTreePage[] = []
+  for (let at = byId.get(page); at && trail.length < 64; at = byId.get(at.parentId)) {
+    trail.unshift(at)
+  }
+  return trail
 }
 
 /**
@@ -35,21 +53,25 @@ export async function fetchShared(workspaceId: string, token: string) {
 export function shareHost(
   workspaceId: string,
   token: string,
-  { embedsAnySite, suggest }: ShareHostOptions,
+  { embedsAnySite, suggest, page, home, pages, open }: ShareHostOptions,
 ): PaperHost {
   const refuse = async () => {
     throw new Error('This is a read-only copy of the page.')
   }
+  const asked = <T>(body: object) => ask<T>(workspaceId, token, page, body)
   const describe = (kind: 'table' | 'writable') => (name: string) =>
-    ask(workspaceId, token, { kind, name }).catch(() => null) as ReturnType<
-      PaperHost['describeTable']
-    >
+    asked({ kind, name }).catch(() => null) as ReturnType<PaperHost['describeTable']>
+  // The pages this link opens (D123): its own and, when it shares them, its sub-pages.
+  const opens = new Map<string, { title: string; icon: string | null }>(
+    [...(home ? [home] : []), ...pages].map((entry) => [entry.id, entry]),
+  )
+  const tree = pages.length > 0 && home
   return {
-    runQuery: (query) => ask(workspaceId, token, { kind: 'rows', query }),
-    runHistory: (query) => ask(workspaceId, token, { kind: 'history', query }),
+    runQuery: (query) => asked({ kind: 'rows', query }),
+    runHistory: (query) => asked({ kind: 'history', query }),
     describeTable: describe('table'),
     requested: (table, date, from, to) =>
-      ask(workspaceId, token, { kind: 'requested', ask: { table, date, from, to } }),
+      asked({ kind: 'requested', ask: { table, date, from, to } }),
     isReadOnly: true,
     ...(suggest && {
       describeWritable: describe('writable'),
@@ -64,8 +86,20 @@ export function shareHost(
     }),
     runAction: refuse,
     toggleTask: refuse,
-    resolveSheet: async () => null,
-    openSheet: () => undefined,
+    resolveSheet: async (id) => {
+      const found = opens.get(id)
+      return found ? { title: found.title, icon: found.icon } : null
+    },
+    openSheet: (id) => {
+      if (opens.has(id)) open(id === home?.id ? undefined : id)
+    },
+    ...(tree && {
+      pageId: page ?? home.id,
+      listPages: (parentId: string) =>
+        pages
+          .filter((entry) => entry.parentId === parentId)
+          .map(({ id, title, icon, cover }) => ({ id, title, icon, cover })),
+    }),
     embedAllowed: async () => embedsAnySite,
     locale: typeof navigator === 'undefined' ? 'en-US' : navigator.language,
   }

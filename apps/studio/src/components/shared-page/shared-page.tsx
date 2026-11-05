@@ -1,26 +1,23 @@
 import { PaperProvider, SheetLookProvider, WsxView } from '@washi/paper'
 import { AgentMascot } from '@washi/ui'
 import { useMemo } from 'react'
-import { type SharedPageProps, shareHost, useSharedPage } from './lib'
+import { type SharedPageProps, useSharedPage, useShareHost } from './lib'
 import { shareLook } from './share-look'
+import { SharedTrail } from './shared-trail'
 
 /**
  * A page through its read-only link (D65): no session, no sidebar, no Washi. What arrives was
  * redacted on the server; this only draws it. Its adds are suggestions, if it takes them (D120).
+ * A link that opens its sub-pages draws a trail over them, and its links move between them (D123).
  */
-export function SharedPage({ workspaceId, token }: SharedPageProps) {
-  const state = useSharedPage(workspaceId, token)
+export function SharedPage({ workspaceId, token, page: asked }: SharedPageProps) {
+  const state = useSharedPage(workspaceId, token, asked)
   const page = state.status === 'ready' ? state.page : null
-  const embedsAnySite = page?.embedsAnySite ?? false
-  const suggest = page?.suggest ?? false
-  const host = useMemo(
-    () => shareHost(workspaceId, token, { embedsAnySite, suggest }),
-    [workspaceId, token, embedsAnySite, suggest],
-  )
-  const look = useMemo(
-    () => shareLook(workspaceId, token, page?.theme ?? null, page?.unsplash ?? null),
-    [workspaceId, token, page],
-  )
+  const { host, open } = useShareHost(workspaceId, token, page)
+  const look = useMemo(() => {
+    const sub = page && page.id !== page.home.id ? page.id : undefined
+    return shareLook(workspaceId, token, page?.theme ?? null, page?.unsplash ?? null, sub)
+  }, [workspaceId, token, page])
 
   if (state.status === 'loading') return <main className="min-h-dvh bg-background" />
   if (state.status === 'gone') {
@@ -46,9 +43,10 @@ export function SharedPage({ workspaceId, token }: SharedPageProps) {
         </span>
         <span>{state.page.suggest ? 'Takes suggestions' : 'Read-only'}</span>
       </header>
+      <SharedTrail page={state.page} onOpen={open} />
       <SheetLookProvider value={look}>
         <PaperProvider host={host}>
-          <WsxView key={state.page.hlcUpdated} root={state.root} />
+          <WsxView key={`${state.page.id}:${state.page.hlcUpdated}`} root={state.root} />
         </PaperProvider>
       </SheetLookProvider>
     </main>

@@ -1175,3 +1175,12 @@ Acceptance: MCP tests walk every acceptance check; typecheck, Biome, `bun test` 
 - [x] `answerMcp(request, session, workspaces?)`: `workspace` on every tool, `workspace_list`
 - [x] Membership checked per workspace on each request; one left drops out
 - [ ] Later: Settings → Account → Agents lists each agent's workspaces and lets a person drop one
+
+# A link opens its sub-pages (2026-11-04) — D123
+
+- [x] `<Sheet subpages>` in the registry; `sheets.setShareSubpages` (a person's), Share → "Include sub-pages"
+- [x] `sharedSheet(ws, token, page?)`: the home page or a live, world-readable descendant; else gone
+- [x] Every ask and file carries the page; a sub-page is redacted on its own and takes no suggestions
+- [x] The link's host lends `listPages` / `resolveSheet` / `openSheet`; a trail over a sub-page
+- [x] Washi: may not flip it, keeps a linked page's redactions, leaves trashing one to a person
+- [ ] Later: `<Include>` of a sub-page on a link (the host lends no `loadSheet` yet)

@@ -269,7 +269,18 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   `useSuggestionRows`, polled 30s): Approve is `runMutation` insert signed by that member (P1),
   re-checking the table and the time; Decline keeps nothing. Washi has no way to decide one (A2).
   The visitor hears nothing back yet: "Sent — the page's owner will confirm it."
-- **Files.** Uploads live in the workspace's files store: a row in the workspace's `files`
+- **A link may open its sub-pages (D123).** `<Sheet subpages>`, set only by a person (Share →
+  "Include sub-pages", `sheets.setShareSubpages`; `guardWashiWrite` refuses Washi changing it), live
+  only while the page is public. Its link then opens every live descendant the world may read
+  (`sharedTree`: a private page and all under it stay off, ≤ 500, tree order) at `/s/<ws>/<token>?page=<id>`;
+  each arrives redacted on its own, reads only its own tables (`page` on every ask, `?page=` on a
+  file) and takes no suggestions — those stay the link's own page's. The payload carries `home` and
+  `pages`, so the link's host lends `listPages`, `resolveSheet` and `openSheet` off them: Subpages,
+  PageLink and Ref move between those pages in place, a trail over a sub-page goes back up, anything
+  else stays "A page you cannot open". A page any link opens counts as public to Washi
+  (`onPublicLink`): it keeps its redactions and is left to a person to trash. No cache column — the
+  service reads the prop off the root it already parses.
+ in the workspace's files store: a row in the workspace's `files`
   table and the bytes beside the `.db` (`<dataDir>/<workspace>.files/`) or, with
   `WASHI_FILES_S3_*` set, in a bucket under a per-workspace prefix through Bun's own S3 client.
   `POST /api/files` (multipart) and `GET /api/files/<id>` are studio routes gated like a workspace

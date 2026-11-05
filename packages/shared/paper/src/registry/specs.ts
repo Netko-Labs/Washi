@@ -84,6 +84,7 @@ const frame: Record<string, ComponentSpec> = {
         visibility: z.enum(['private', 'shared', 'public']).optional(),
         access: z.array(memberId).max(64).optional(),
         suggest: z.boolean().optional(),
+        subpages: z.boolean().optional(),
         wsx: z.literal('1').optional(),
       })
       .strict(),

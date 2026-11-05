@@ -11,6 +11,7 @@ import {
   updateSheetAccess,
   updateSheetFromSource,
   updateSheetMetaAndLook,
+  updateSheetShareSubpages,
   updateSheetSuggest,
 } from '@washi/service'
 import { z } from 'zod'
@@ -78,6 +79,10 @@ export const sheetMutations = router({
   setSuggest: pageProcedure
     .input(z.object({ id: z.string(), suggest: z.boolean() }))
     .mutation(({ ctx, input }) => updateSheetSuggest(ctx.ws, input.id, input.suggest)),
+  /** Whether the page's link opens its sub-pages too (D123): a person's switch, never Washi's. */
+  setShareSubpages: pageProcedure
+    .input(z.object({ id: z.string(), subpages: z.boolean() }))
+    .mutation(({ ctx, input }) => updateSheetShareSubpages(ctx.ws, input.id, input.subpages)),
   /** Empties what this person can see; private pages of others stay in the Trash. */
   emptyTrash: workspaceProcedure.mutation(async ({ ctx }) => {
     if (!ctx.viewer.isOwner) {
