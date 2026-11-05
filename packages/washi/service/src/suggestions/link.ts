@@ -42,8 +42,13 @@ export function sharedWritable(ws: Workspace, token: string, table: string): Tab
 }
 
 /** Pending times a link's calendar draws as Requested: the times only, never who asked. */
-export function sharedRequested(ws: Workspace, token: string, ask: RequestedAsk): string[] {
-  const { root } = sharedSheet(ws, token)
+export function sharedRequested(
+  ws: Workspace,
+  token: string,
+  ask: RequestedAsk,
+  page?: string,
+): string[] {
+  const { root } = sharedSheet(ws, token, page)
   refuseReading(hiddenIn(ws, root, ask.table), [ask.date])
   return requestedSpans(ws, ask)
 }

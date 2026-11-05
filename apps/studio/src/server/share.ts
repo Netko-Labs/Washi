@@ -13,6 +13,15 @@ export const shareAskSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('requested'), ask: requestedAskSchema }),
 ])
 
+/** Which of the link's pages is asking: its own (none), or a sub-page it opens (D123). */
+export const sharePageSchema = z.string().min(1).max(64).optional()
+
+/** `?page=` off a link's request; anything that is not one reads as the link's own page. */
+export function sharePageOf(request: Request): string | undefined {
+  const page = sharePageSchema.safeParse(new URL(request.url).searchParams.get('page') ?? undefined)
+  return page.success ? page.data : undefined
+}
+
 /**
  * A link names its workspace; only one the control plane knows is opened, so a stranger's URL
  * can never conjure a workspace file.

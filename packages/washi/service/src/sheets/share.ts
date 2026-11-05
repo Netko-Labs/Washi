@@ -20,6 +20,8 @@ import { playableEmbedHosts } from '../embeds/service'
 import { runHistory } from '../tables/history'
 import { runQuery } from '../tables/service'
 import { readableSet } from './access'
+import { sharedTree, sharesSubpages } from './share-tree'
+import type { SharedTreePage } from './types'
 
 /** A link that is revoked, never was, or points at a page no longer public: all look the same. */
 export class ShareGoneError extends Error {
@@ -40,27 +42,46 @@ export class ShareRefusedError extends Error {
 const WORLD = { id: null, isOwner: false }
 
 interface Shared {
+  /** The page being drawn: the link's own, or one of its sub-pages (D123). */
   sheet: SheetDetail
   root: WsxElement
+  home: SheetDetail
+  /** The sub-pages the link opens, in tree order; empty unless its page shares them. */
+  tree: SharedTreePage[]
 }
 
-/** The page behind a live token, only while it is public and no ancestor is private. */
-export function sharedSheet(ws: Workspace, token: string): Shared {
+/**
+ * The page behind a live token, only while it is public and no ancestor is private — or, with
+ * `page`, one of its sub-pages, only while it shares them and nothing private stands between.
+ * A sub-page the link does not open reads exactly like a gone link.
+ */
+export function sharedSheet(ws: Workspace, token: string, page?: string): Shared {
   const share = shareByToken(ws, token)
-  const sheet = share ? getSheet(ws, share.sheetId) : null
-  if (sheet?.visibility !== 'public' || !readableSet(ws, WORLD).has(sheet.id)) {
-    throw new ShareGoneError()
-  }
-  return { sheet, root: parse(sheet.source) }
+  const home = share ? getSheet(ws, share.sheetId) : null
+  const world = readableSet(ws, WORLD)
+  if (home?.visibility !== 'public' || !world.has(home.id)) throw new ShareGoneError()
+  const homeRoot = parse(home.source)
+  const tree = sharedTree(ws, home, homeRoot, world)
+  if (!page || page === home.id) return { sheet: home, root: homeRoot, home, tree }
+  const sheet = tree.some((entry) => entry.id === page) ? getSheet(ws, page) : null
+  if (!sheet) throw new ShareGoneError()
+  return { sheet, root: parse(sheet.source), home, tree }
 }
 
 /**
  * What the link shows: the page with every `<Redact>` emptied server-side, and without the
  * list of who may read it. The bytes that leave are already safe; the client hides nothing.
  */
-export function sharedPage(ws: Workspace, token: string) {
-  const { sheet, root } = sharedSheet(ws, token)
-  const { access: _access, visibility: _visibility, suggest, ...props } = root.props
+export function sharedPage(ws: Workspace, token: string, page?: string) {
+  const { sheet, root, home, tree } = sharedSheet(ws, token, page)
+  const {
+    access: _access,
+    visibility: _visibility,
+    suggest,
+    subpages: _subpages,
+    ...props
+  } = root.props
+  const isHome = sheet.id === home.id
   return {
     id: sheet.id,
     title: sheet.title,
@@ -73,7 +94,10 @@ export function sharedPage(ws: Workspace, token: string) {
     unsplash: wornPhoto(ws, sheet.cover),
     // Only whether `*` is listed: a link plays any https embed then, and the list never leaves (D118).
     embedsAnySite: playableEmbedHosts(ws).includes(ANY_HOST),
-    suggest: suggest === true,
+    // Only the link's own page takes suggestions; a sub-page it opens is read-only (D123).
+    suggest: isHome && suggest === true,
+    home: { id: home.id, title: home.title, icon: home.icon },
+    pages: tree,
   }
 }
 
@@ -158,8 +182,13 @@ const withoutColumns = (result: QueryResult, hidden: Set<string>): QueryResult =
         ),
       }
 
-export function sharedQuery(ws: Workspace, token: string, query: InkQuery): QueryResult {
-  const { root } = sharedSheet(ws, token)
+export function sharedQuery(
+  ws: Workspace,
+  token: string,
+  query: InkQuery,
+  page?: string,
+): QueryResult {
+  const { root } = sharedSheet(ws, token, page)
   const hidden = hiddenIn(ws, root, query.table)
   refuseReading(hidden, [
     ...(query.where ?? []).map((filter) => filter.column),
@@ -170,8 +199,13 @@ export function sharedQuery(ws: Workspace, token: string, query: InkQuery): Quer
   return withoutColumns(runQuery(ws, query), hidden)
 }
 
-export function sharedHistory(ws: Workspace, token: string, query: HistoryQuery): QueryResult {
-  const { root } = sharedSheet(ws, token)
+export function sharedHistory(
+  ws: Workspace,
+  token: string,
+  query: HistoryQuery,
+  page?: string,
+): QueryResult {
+  const { root } = sharedSheet(ws, token, page)
   refuseReading(
     hiddenIn(ws, root, query.table),
     (query.where ?? []).map((filter) => filter.column),
@@ -180,8 +214,13 @@ export function sharedHistory(ws: Workspace, token: string, query: HistoryQuery)
 }
 
 /** A table's columns as the link sees them: redacted ones are not there at all. */
-export function sharedTable(ws: Workspace, token: string, name: string): TableSpec | null {
-  const { root } = sharedSheet(ws, token)
+export function sharedTable(
+  ws: Workspace,
+  token: string,
+  name: string,
+  page?: string,
+): TableSpec | null {
+  const { root } = sharedSheet(ws, token, page)
   const hidden = hiddenIn(ws, root, name)
   const spec = getTableByName(ws, name)?.spec
   return spec
@@ -189,24 +228,32 @@ export function sharedTable(ws: Workspace, token: string, name: string): TableSp
     : null
 }
 
-/** Only an upload the page wears as its cover or icon leaves through its link. */
-/** A link serves only the uploads its page itself uses — its look, or a block's file. */
-export function sharedFileAllowed(ws: Workspace, token: string, fileId: string): boolean {
-  const { sheet, root } = sharedSheet(ws, token)
+/**
+ * A link serves only the uploads the page drawn uses — its look, or a block's file — and the icons
+ * and covers of the pages it opens beside it, which its Subpages cards and links wear (D123).
+ */
+export function sharedFileAllowed(
+  ws: Workspace,
+  token: string,
+  fileId: string,
+  page?: string,
+): boolean {
+  const { sheet, root, home, tree } = sharedSheet(ws, token, page)
   const key = `file:${fileId}`
-  return (
-    sheet.cover === key || sheet.icon === key || extractFiles(redactForShare(root)).includes(key)
-  )
+  const worn = [sheet, home, ...tree].some((each) => each.cover === key || each.icon === key)
+  return worn || extractFiles(redactForShare(root)).includes(key)
 }
 
 /** Who reads a page, its live link, and what that link leaves out — the Share popover's view. */
 export function shareSettings(ws: Workspace, id: string) {
   const sheet = getSheet(ws, id)
+  const root = sheet ? parse(sheet.source) : null
   return {
     visibility: sheet?.visibility ?? 'shared',
     access: sheet?.access ?? [],
     token: liveShareFor(ws, id)?.token ?? null,
     suggest: sheet?.suggest ?? false,
-    hidden: sheet ? redactionSummary(parse(sheet.source)) : { blocks: 0, columns: {} },
+    subpages: root ? sharesSubpages(root) : false,
+    hidden: root ? redactionSummary(root) : { blocks: 0, columns: {} },
   }
 }

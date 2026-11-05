@@ -114,6 +114,7 @@ export {
   liftLooksIntoSource,
   updateSheetAccess,
   updateSheetMetaAndLook,
+  updateSheetShareSubpages,
   updateSheetSuggest,
 } from './sheets/look'
 export { reindexPages } from './sheets/reindex'
@@ -147,7 +148,7 @@ export {
   SheetMoveError,
   trashSheetAs,
 } from './sheets/tree'
-export type { SheetEdit } from './sheets/types'
+export type { SharedTreePage, SheetEdit } from './sheets/types'
 export {
   approveSuggestion,
   declineSuggestion,

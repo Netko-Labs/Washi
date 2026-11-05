@@ -18,11 +18,30 @@ export interface SharedPayload {
   embedsAnySite: boolean
   /** Its adds become suggestions a member approves (D120). */
   suggest: boolean
+  /** The link's own page; the page drawn is this one or one of `pages`. */
+  home: { id: string; title: string; icon: string | null }
+  /** The sub-pages the link opens beside its own, in tree order (D123); empty when it opens none. */
+  pages: SharedTreePage[]
+}
+
+/** A page the link opens: what a Subpages card or a Ref draws, and its parent. */
+export interface SharedTreePage {
+  id: string
+  parentId: string
+  title: string
+  icon: string | null
+  cover: string | null
 }
 
 export interface ShareHostOptions {
   embedsAnySite: boolean
   suggest: boolean
+  /** The sub-page drawn, when it is not the link's own page. */
+  page?: string
+  home: SharedPayload['home'] | null
+  pages: SharedTreePage[]
+  /** Opens one of the link's pages in place; `undefined` is its own. */
+  open: (page: string | undefined) => void
 }
 
 export type SharedState =
@@ -33,4 +52,11 @@ export type SharedState =
 export interface SharedPageProps {
   workspaceId: string
   token: string
+  /** One of the link's sub-pages (D123); none is the link's own page. */
+  page?: string
+}
+
+export interface SharedTrailProps {
+  page: SharedPayload
+  onOpen: (page: string | undefined) => void
 }

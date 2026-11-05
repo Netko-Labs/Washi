@@ -1,6 +1,6 @@
 import type { SheetLookHost } from '@washi/paper'
 import type { ThemePair } from '@washi/paper/registry'
-import { base, type SharedPayload } from './lib'
+import { base, pageQuery, type SharedPayload } from './lib'
 
 /** The link lends paper its pictures and the page's own uploads; nothing changes from here. */
 export function shareLook(
@@ -8,8 +8,11 @@ export function shareLook(
   token: string,
   theme: ThemePair | null,
   photo: SharedPayload['unsplash'],
+  page?: string,
 ): Omit<SheetLookHost, 'band'> {
-  const fileUrl = (id: string) => `${base(workspaceId, token)}/file/${encodeURIComponent(id)}`
+  // A sub-page's own uploads are asked for as that page's (D123).
+  const fileUrl = (id: string) =>
+    `${base(workspaceId, token)}/file/${encodeURIComponent(id)}${pageQuery(page)}`
   return {
     pictureUrl: (slug) => `/covers/${slug}.jpg`,
     fileUrl,

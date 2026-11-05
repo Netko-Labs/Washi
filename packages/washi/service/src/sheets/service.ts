@@ -27,8 +27,9 @@ import {
 import { pageCodeDiagnostics, terminalDiagnostics } from '../pages'
 import { extractAutomations, extractFormulas, scriptDiagnostics } from '../scripts/compile'
 import { pagePackagesOf } from '../server'
-import { guardWashiWrite, syncShare } from './access'
+import { guardWashiWrite, NOBODY, readableSet, syncShare } from './access'
 import { accessOf, lookOf } from './look-of'
+import { onPublicLink } from './share-tree'
 
 export interface WsxCheck {
   ok: boolean
@@ -129,7 +130,10 @@ export function updateSheetFromSource(
   parseValidated(ws, write.source, id)
   const source = mergedSource(ws, id, write, baseVersion)
   const root = parse(source)
-  if (editedBy === 'washi') guardWashiWrite(parse(requireSheet(ws, id).source), root)
+  if (editedBy === 'washi') {
+    const linked = onPublicLink(ws, id, readableSet(ws, NOBODY))
+    guardWashiWrite(parse(requireSheet(ws, id).source), root, linked)
+  }
   const access = accessOf(root)
   const updated = updateSheet(
     ws,

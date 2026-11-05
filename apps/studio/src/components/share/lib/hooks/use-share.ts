@@ -42,5 +42,8 @@ export function useShare(sheetId: string) {
   const setSuggest = (suggest: boolean) =>
     write(() => api.sheets.setSuggest.mutate({ id: sheetId, suggest }))
 
-  return { settings, busy, error, apply, setSuggest }
+  const setSubpages = (subpages: boolean) =>
+    write(() => api.sheets.setShareSubpages.mutate({ id: sheetId, subpages }))
+
+  return { settings, busy, error, apply, setSuggest, setSubpages }
 }

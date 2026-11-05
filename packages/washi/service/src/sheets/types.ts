@@ -13,3 +13,12 @@ export interface SheetEditOptions {
   /** A new title; without it the page keeps its own. */
   title?: string
 }
+
+/** A page a link opens beside its own (D123): what a Subpages card or a Ref needs, and where it sits. */
+export interface SharedTreePage {
+  id: string
+  parentId: string
+  title: string
+  icon: string | null
+  cover: string | null
+}
