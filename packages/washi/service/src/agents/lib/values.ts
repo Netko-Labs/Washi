@@ -140,6 +140,10 @@ Words in Text, Item, Title, Quote, Callout, Card and a written Table cell read i
 *em*, ~~strike~~, \`code\` and [a link](https://…); Code, Kbd and other text-only primitives keep words as
 written. Text holding { } < or > is a string literal child: <Item>{"Route \`/m/{slug}\`"}</Item>.
 wsx_reference lists every primitive's props and an example; catalog_list every icon, cover and theme.
+To show a design — a mockup, a screen, a diagram — draw it with image_render (HTML laid out on the
+server, kept as a PNG) and put the key it answers in <Figure src alt>; never write a Widget, a
+Terminal or page code to fake one. image_render with purpose cover or icon draws a page's own cover
+or icon when no preset, picture or emoji fits: set the key it answers on the Sheet.
 
 Budget: ~400 nodes, 8 binds, 24 expressions per sheet — over it, split into linked sheets (<Ref>).
 Always run sheet_check before sheet_create or sheet_replace and fix every diagnostic. To change a few

@@ -1191,3 +1191,13 @@ Acceptance: MCP tests walk every acceptance check; typecheck, Biome, `bun test` 
 - [x] `linkTables`: markup tables + those code names as tables (`codeTables`)
 - [x] Head script and `useTheme('system')` on `/s/`; Light · Dark · Match this device in the header
 - [ ] Later: widgets and terminals on a link (no `compileWidget` / `compileTerminal` lent yet)
+
+# Washi draws pictures from HTML (2026-11-05) — D126
+
+- [x] `service/images`: `markupOf` (ultrahtml, no network, uploads inlined) → Satori → resvg-wasm PNG
+- [x] `image_render` capability: figure · cover · icon presets, stored as an upload, `{ key, wear }`
+- [x] Both ports (files through the host) and MCP; a `CHANGE_TOOLS` write; "Drew a cover"
+- [x] Instructions: a mockup is a `<Figure>` of a drawn picture, never a widget or page code
+- [x] Studio traces the wasm, satori and the fonts into `.output`
+- [ ] Later: emoji in drawn pictures (Satori's `loadAdditionalAsset` would fetch — needs a local set)
+- [ ] Later: show the drawn picture in the chat's receipt

@@ -21,7 +21,7 @@ import {
   IconWorldSearch,
 } from '@tabler/icons-react'
 import type { TitleOf, ToolDescription } from '../types'
-import { PAST_TENSE } from '../values'
+import { DRAWN, PAST_TENSE } from '../values'
 import { base, hostOf, record, text } from './shared'
 import { describeTable } from './tables'
 
@@ -172,6 +172,12 @@ export function describeTool(
       return base({ icon: IconPhoto, action: 'Looked at the icons and covers' })
     case 'file_upload':
       return base({ icon: IconPhoto, action: 'Upload', subject: text(args.filename) })
+    case 'image_render':
+      return base({
+        icon: IconPhoto,
+        action: 'Draw',
+        subject: DRAWN[String(args.purpose)] ?? 'a picture',
+      })
     case 'sheet_backlinks':
       return base({ icon: IconLink, action: 'Found links to', subject: sheetTitle() })
     case 'search':

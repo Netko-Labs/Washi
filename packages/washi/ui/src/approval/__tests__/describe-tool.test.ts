@@ -31,6 +31,13 @@ describe('tool calls read like a person asked', () => {
     expect(said('chat_handover', { sheetId: 's1' })).toBe('Moved this chat to Trip to Kyoto')
   })
 
+  test('a drawn picture says what it is for (D126)', () => {
+    expect(said('image_render', { purpose: 'cover', html: '<div/>' })).toBe('Draw a cover')
+    expect(said('image_render', { purpose: 'icon', html: '<div/>' })).toBe('Draw an icon')
+    expect(said('image_render', { html: '<div/>' })).toBe('Draw a picture')
+    expect(pastTense('Draw')).toBe('Drew')
+  })
+
   test('tables name the row, not the mutation', () => {
     expect(
       said('db_mutate', {

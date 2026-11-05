@@ -26,6 +26,7 @@ const TOOL_KINDS: Record<string, Extract<AgentUpdate, { kind: 'tool_call' }>['to
   db_mutate: 'edit',
   db_trash_table: 'delete',
   reminder_create: 'edit',
+  image_render: 'edit',
   fetch_url: 'fetch',
   web_search: 'search',
   action_run: 'execute',

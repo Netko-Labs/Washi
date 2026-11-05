@@ -14,6 +14,11 @@ const RUNTIME_FILE_DEPS = [
   'date-fns',
   'lodash-es',
   'zod',
+  // A picture drawn from HTML (D126): the rasterizer's wasm and the house fonts, read off disk.
+  '@resvg/resvg-wasm',
+  'satori',
+  '@fontsource/young-serif',
+  '@fontsource/zen-kaku-gothic-new',
 ]
 // React for a widget's frame (D113), bundled at runtime off disk like a page's libraries.
 const WIDGET_FILE_DEPS = ['react', 'react-dom', 'scheduler']

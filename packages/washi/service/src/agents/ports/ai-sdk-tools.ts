@@ -1,8 +1,8 @@
 import type { Member, Viewer } from '@washi/domain'
-import type { Workspace } from '@washi/repository'
+import type { FileStore, Workspace } from '@washi/repository'
 import { tool } from 'ai'
 import { z } from 'zod'
-import { pageCapabilities, tableCapabilities } from '../../capabilities'
+import { imageCapabilities, pageCapabilities, tableCapabilities } from '../../capabilities'
 import { NOBODY } from '../../sheets/access'
 import { HANDOVER_DESCRIPTION, type SearchKeyLookup } from '../lib'
 import { webSearch } from '../search'
@@ -42,6 +42,8 @@ export interface AiToolDeps {
   viewer?: Viewer
   /** The off-list host the desk's yes let this fetch reach, taken once (`takeFetchGrant`). */
   fetchGrant?: (url: string) => string | null
+  /** The workspace's uploads: with them, `image_render` draws pictures into it (D126). */
+  files?: FileStore
 }
 
 /**
@@ -59,9 +61,14 @@ export function createAiTools({
   handover,
   viewer,
   fetchGrant,
+  files,
 }: AiToolDeps) {
   const shared = { viewer: viewer ?? NOBODY, author: 'washi', listPeople, onCreate: openSheet }
-  const capabilities = [...pageCapabilities(ws, shared), ...tableCapabilities(ws, shared)]
+  const capabilities = [
+    ...pageCapabilities(ws, shared),
+    ...tableCapabilities(ws, shared),
+    ...(files ? imageCapabilities(ws, files) : []),
+  ]
   return {
     set_conversation_title: tool({
       description:

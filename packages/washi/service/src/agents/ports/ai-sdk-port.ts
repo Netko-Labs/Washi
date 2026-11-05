@@ -2,7 +2,7 @@ import { createAnthropic } from '@ai-sdk/anthropic'
 import { createOpenRouter } from '@openrouter/ai-sdk-provider'
 import type { AgentUpdate, Member } from '@washi/domain'
 import { type ModelCatalogue, priceTurn } from '@washi/models'
-import type { Workspace } from '@washi/repository'
+import type { FileStore, Workspace } from '@washi/repository'
 import { type LanguageModel, stepCountIs, ToolLoopAgent } from 'ai'
 import type { SearchKeyLookup } from '../lib'
 import { createAiTools, isReadTool } from './ai-sdk-tools'
@@ -17,6 +17,8 @@ export interface AiSdkPortDeps {
   openSheet?: (id: string, sessionId: string) => void
   listPeople?: () => Promise<Member[]>
   searchKey?: SearchKeyLookup
+  /** The workspace's uploads, read as each turn starts: with them, Washi draws pictures (D126). */
+  files?: () => FileStore | undefined
   /** Read as each turn starts, so a change on the server reaches the next one. */
   instructions: () => string
   /** Prices the turn, so the daily breaker works on a provider that bills tokens. */
@@ -40,6 +42,7 @@ export function createAiSdkPort({
   openSheet,
   listPeople,
   searchKey,
+  files,
   instructions,
   catalogue,
 }: AiSdkPortDeps): AgentPort {
@@ -57,6 +60,7 @@ export function createAiSdkPort({
         openSheet: (id) => openSheet?.(id, request.sessionId),
         listPeople,
         searchKey,
+        files: files?.(),
         setTitle: request.setTitle,
         handover: request.handover,
         viewer: request.viewer,

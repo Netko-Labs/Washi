@@ -220,6 +220,29 @@ describe('an agent builds a workspace without guessing (MCP fixes)', () => {
     expect(odd.isError).toBe(true)
   })
 
+  test('a mockup, a cover and an icon are drawn from HTML, never fetched (D126)', async () => {
+    const cover = await ok('image_render', {
+      purpose: 'cover',
+      html: '<div style="background:linear-gradient(135deg,#1f2937,#4f46e5);color:white;padding:48px;font-size:64px;font-family:serif">Graphya</div>',
+    })
+    expect(cover.key).toMatch(/^file:/)
+    expect(cover).toMatchObject({ width: 1500, height: 600 })
+    expect(cover.wear).toBe(`<Sheet cover="${cover.key}">`)
+    const icon = await ok('image_render', {
+      purpose: 'icon',
+      html: '<div style="background:#22c55e;border-radius:48px;width:100%;height:100%"></div>',
+    })
+    const made = await ok('sheet_create', {
+      title: 'Drawn',
+      source: `<Sheet title="Drawn" icon="${icon.key}" cover="${cover.key}"><Figure src="${cover.key}" alt="The cover" /></Sheet>`,
+    })
+    expect(getSheet(ws, made.id)).toMatchObject({ icon: icon.key, cover: cover.key })
+
+    const remote = await call('image_render', { html: '<img src="https://example.com/x.png" />' })
+    expect(remote.isError).toBe(true)
+    expect(String(remote.value)).toContain('nothing is fetched')
+  })
+
   test('a write answers in under 1 KB, whatever the page weighs', async () => {
     const items = Array.from(
       { length: 300 },

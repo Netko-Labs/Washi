@@ -40,6 +40,7 @@ export {
   type CapabilityContext,
   commentCapabilities,
   fileCapabilities,
+  imageCapabilities,
   pageCapabilities,
   tableCapabilities,
 } from './capabilities'
