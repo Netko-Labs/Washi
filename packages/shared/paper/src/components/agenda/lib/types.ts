@@ -102,6 +102,8 @@ export interface AgendaAdd {
 export interface AgendaEventProps {
   row: Row
   columns: AgendaColumns
+  /** The day it is drawn on: a span over several reads its own part of the hours there. */
+  day: string
   locale?: string
   onPress?: (row: Row) => void
 }

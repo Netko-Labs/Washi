@@ -310,7 +310,7 @@ button.wsx-sheet-mark:hover {
 .wsx-code-lang {
   float: right;
   font-family: var(--font-sans);
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;

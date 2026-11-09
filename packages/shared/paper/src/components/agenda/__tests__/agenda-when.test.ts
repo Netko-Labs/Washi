@@ -31,3 +31,18 @@ describe('an event’s card reads and writes its time where the agenda keeps it 
     )
   })
 })
+
+describe('a span over several days reads its own part on each (D132)', () => {
+  test('starts on the first, ends on the last, all day between', async () => {
+    const { eventTimeOn } = await import('../lib')
+    const row = { id: 'c', d: '2026-11-13T09:00/2026-11-15T10:00' }
+    const columns = { date: 'd' }
+    expect(eventTimeOn(row, columns, '2026-11-13')).toBe('09:00 →')
+    expect(eventTimeOn(row, columns, '2026-11-14')).toBe('All day')
+    expect(eventTimeOn(row, columns, '2026-11-15')).toBe('→ 10:00')
+    expect(
+      eventTimeOn({ id: 'a', d: '2026-11-13T09:00/2026-11-13T10:00' }, columns, '2026-11-13'),
+    ).toBe('09:00–10:00')
+    expect(eventTimeOn({ id: 'b', d: '2026-11-13/2026-11-14' }, columns, '2026-11-13')).toBeNull()
+  })
+})

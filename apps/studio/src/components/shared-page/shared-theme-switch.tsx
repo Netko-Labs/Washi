@@ -19,7 +19,7 @@ export function SharedThemeSwitch() {
           aria-label={label}
           title={label}
           onClick={() => setTheme(id)}
-          className="grid size-6 place-items-center rounded-md text-muted-foreground hover:text-foreground aria-checked:bg-background aria-checked:text-foreground aria-checked:shadow-sm"
+          className="grid size-6 place-items-center rounded-md pointer-coarse:size-10 text-muted-foreground hover:text-foreground aria-checked:bg-background aria-checked:text-foreground aria-checked:shadow-sm"
         >
           <Icon className="size-3.5" />
         </button>

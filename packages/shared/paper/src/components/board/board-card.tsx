@@ -19,12 +19,12 @@ export function BoardCard({
   return (
     <article
       className="wsx-board-card"
-      draggable
+      draggable={actions.movable}
       data-card={id}
       data-slide={id}
       data-dragging={dragging || undefined}
-      onDragStart={onDragStart}
-      onDragEnd={onDragEnd}
+      onDragStart={actions.movable ? onDragStart : undefined}
+      onDragEnd={actions.movable ? onDragEnd : undefined}
       onClick={() => actions.open(row)}
       onKeyDown={(event) => event.key === 'Enter' && actions.open(row)}
       tabIndex={actions.openable ? 0 : undefined}

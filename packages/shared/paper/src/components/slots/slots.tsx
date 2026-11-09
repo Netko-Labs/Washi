@@ -1,4 +1,4 @@
-import { addModeOf, styled } from '../../lib'
+import { addModeOf, clockLabel, styled } from '../../lib'
 import { usePaperHost } from '../../provider'
 import { useAgendaPeriod } from '../agenda'
 import { FormDialog } from '../form'
@@ -110,9 +110,9 @@ export function Slots({
                         data-requested={slot.isRequested || undefined}
                         aria-label={
                           slot.isBooked
-                            ? `${slot.label}, booked`
+                            ? `${clockLabel(slot.label, host.locale)}, booked`
                             : slot.isRequested
-                              ? `${slot.label}, requested`
+                              ? `${clockLabel(slot.label, host.locale)}, requested`
                               : undefined
                         }
                         disabled={!add || !mode || slot.isBooked || slot.isRequested}
@@ -120,11 +120,13 @@ export function Slots({
                       >
                         {slot.isRequested ? (
                           <>
-                            <span className="wsx-slot-time">{slot.label}</span>
+                            <span className="wsx-slot-time">
+                              {clockLabel(slot.label, host.locale)}
+                            </span>
                             <span className="wsx-slot-note">Requested</span>
                           </>
                         ) : (
-                          slot.label
+                          clockLabel(slot.label, host.locale)
                         )}
                       </button>
                     ))}

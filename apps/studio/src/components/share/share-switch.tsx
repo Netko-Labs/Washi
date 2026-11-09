@@ -27,11 +27,12 @@ export function ShareSwitch({
       </span>
       <span
         aria-hidden
+        // The routines' and models' switch: a white knob on a track from the ink, so off reads in dark too.
         className={`mt-0.5 flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors ${
-          value ? 'justify-end bg-primary' : 'justify-start bg-muted'
+          value ? 'justify-end bg-primary' : 'justify-start bg-foreground/15'
         }`}
       >
-        <span className="size-4 rounded-full bg-background shadow-sm" />
+        <span className="size-4 rounded-full bg-white shadow-sm" />
       </span>
     </button>
   )

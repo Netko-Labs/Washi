@@ -72,7 +72,8 @@ export interface DatabaseRowsProps {
   columns: ColumnSpec[]
   title: ColumnSpec | undefined
   rows: QueryRow[]
-  commit: Commit
+  /** Without it (a read-only link) every cell reads, none edits. */
+  commit?: Commit
   onOpen?: (id: string) => void
 }
 
@@ -202,7 +203,8 @@ export interface DatabaseHeadProps {
   columns: ColumnSpec[]
   title: ColumnSpec | undefined
   local: ViewLocal
-  onAdd: AddProperty
+  /** Without it (a read-only link) no + adds a property. */
+  onAdd?: AddProperty
 }
 
 export interface ViewChipsProps {

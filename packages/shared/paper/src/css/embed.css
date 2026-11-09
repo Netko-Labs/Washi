@@ -146,7 +146,7 @@ a.wsx-file:hover {
   border-radius: 6px;
   background: var(--muted-bg);
   color: var(--muted);
-  font-size: 0.68em;
+  font-size: max(11px, 0.68em);
   font-weight: 700;
   letter-spacing: 0.04em;
 }

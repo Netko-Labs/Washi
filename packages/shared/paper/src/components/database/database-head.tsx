@@ -20,7 +20,9 @@ export function DatabaseHead({ db, columns, title, local, onAdd }: DatabaseHeadP
           )
         })}
         <th className="wsx-db-plus-cell">
-          <AddProperty onAdd={onAdd} taken={db.spec.columns.map((column) => column.name)} />
+          {onAdd && (
+            <AddProperty onAdd={onAdd} taken={db.spec.columns.map((column) => column.name)} />
+          )}
         </th>
       </tr>
     </thead>

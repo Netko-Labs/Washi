@@ -226,7 +226,8 @@
   height: calc(22px * var(--sz));
   padding: 0 calc(9px * var(--sz));
   border-radius: 999px;
-  font-size: calc(11.5px * var(--sz));
+  /* A small badge never reads below 11px. */
+  font-size: max(11px, calc(11.5px * var(--sz)));
   font-weight: 700;
   letter-spacing: 0.03em;
   white-space: nowrap;

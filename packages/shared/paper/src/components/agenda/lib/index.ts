@@ -46,6 +46,7 @@ export {
   eventDays,
   eventPatch,
   eventTime,
+  eventTimeOn,
   eventTitle,
   eventWhen,
   eventWhenWords,

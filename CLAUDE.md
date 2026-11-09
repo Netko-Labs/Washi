@@ -618,7 +618,7 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   its figure to its own column (`15cqi`), and `.wsx` clips sideways overflow, so a phone never
   scrolls a page horizontally. Coarse pointers get 44px targets and 16px inputs.
 - **Pages are apps, not forms laid flat (D83).** `<Agenda bind date title time end badge add>` is a
-  week (‹ › Today, the week the reader's, never saved; tighter from 720px, a list under 560px); a row opens in the peek;
+  week (‹ › Today, the week the reader's, never saved; a list under 720px, D132); an event opens its card (D128);
   each day's + opens a modal Form seeded with that day (`seed`, written even when not shown).
   `view="month"` (D86) draws whole weeks as a grid (`monthSpan`; neighbours dimmed, three events a
   day then +N more, a list of busy days under 560px); `state` names a `YYYY-MM` page-state key it
@@ -642,6 +642,16 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   09:00). An Agenda event pressed opens one card (`AgendaEventCard`, never the peek or a ⋯): its
   time and properties (`DatabaseCell`) changed in place by a member, read by a link; Open page ·
   Duplicate · Copy to… · Repeat… · Delete (asked twice; `table.delete`, its page to the Trash).
+- **A page works under a thumb (D132).** `css/touch.css`: on a coarse pointer every control a reader
+  presses is 44px (nav, tabs, cells, chips, card actions, outline, summary), a small-looking one (a
+  day's +, a switch, a checkbox) grows an invisible hit area instead; words in a sentence stay as they
+  read. Nothing a reader must read is under 11px. A week is a list under 720px (seven columns are
+  too narrow for "9:30 AM–10:15 AM"), tighter from 720 to 899; a month keeps 560. A span over days
+  reads its own part each day (`eventTimeOn`: "9:00 AM →", "All day", "→ 5:00 PM"). Slots, Requested
+  and the card read the reader's clock (`clockLabel`). A read-only link's database reads (`ReadCell`,
+  no add property) and its board's cards don't drag. Washi's light accent is `#B85621` (4.55:1 under
+  its words; it was `#C25F2C`, 4.02:1 — brand-assets should follow), so the contrast test names no
+  exception. Washi Lab holds a public "Mobile lab" (Calendar · Data · Layout) to test on a phone.
 - **A page can take bookings (D102).** `<Slots bind date minutes hours days add addLabel>` is
   Calendly's picker: each allowed weekday's `hours` (`09:00-17:00`) cut into `minutes` slots, those
   under a row's `date` struck through as booked (a `start/end` range; a lone moment takes `minutes`,

@@ -1,5 +1,6 @@
 import { DatabaseCell } from './database-cell'
 import { type DatabaseRowsProps, tableLabel, useRelationTitles } from './lib'
+import { ReadCell } from './read-cell'
 
 /** A table view's rows; every relation it shows is named from one read of its target. */
 export function DatabaseRows({ db, columns, title, rows, commit, onOpen }: DatabaseRowsProps) {
@@ -19,13 +20,17 @@ export function DatabaseRows({ db, columns, title, rows, commit, onOpen }: Datab
                 data-title={column === title || undefined}
                 data-label={tableLabel(column.name)}
               >
-                <DatabaseCell
-                  db={db}
-                  column={column}
-                  value={row[column.name]}
-                  titles={titles}
-                  commit={(value) => void commit(id, column.name, value)}
-                />
+                {commit ? (
+                  <DatabaseCell
+                    db={db}
+                    column={column}
+                    value={row[column.name]}
+                    titles={titles}
+                    commit={(value) => void commit(id, column.name, value)}
+                  />
+                ) : (
+                  <ReadCell db={db} column={column} value={row[column.name]} />
+                )}
                 {column === title && onOpen && (
                   <button
                     type="button"

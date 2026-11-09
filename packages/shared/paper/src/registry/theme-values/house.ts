@@ -11,7 +11,7 @@ export const HOUSE_THEMES = {
       muted: '#6B6459',
       border: '#DCD5C8',
       mutedBg: '#E9E4D9',
-      accent: '#C25F2C',
+      accent: '#B85621',
       accentInk: '#FBF9F4',
     },
     dark: {
