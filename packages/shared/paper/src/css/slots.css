@@ -5,48 +5,114 @@
   flex-direction: column;
   gap: 12px;
 }
-.wsx-slots-days {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
-  gap: 10px;
+/* A strip of the week's days, Fresha's way: weekday, date, how many free; a day with none faded. */
+.wsx-slots-pick {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
-.wsx-slots-days[aria-busy] {
+.wsx-slots-pick[aria-busy] {
   opacity: 0.6;
 }
-.wsx-slots-day {
+.wsx-slots-strip {
+  display: grid;
+  grid-auto-columns: minmax(64px, 1fr);
+  grid-auto-flow: column;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.wsx-slots-strip::-webkit-scrollbar {
+  display: none;
+}
+.wsx-slots-daybtn {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  min-width: 0;
+  align-items: center;
+  gap: 2px;
+  min-height: 64px;
+  padding: 8px 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-input);
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+  transition:
+    background var(--ease),
+    border-color var(--ease),
+    color var(--ease);
 }
-.wsx-slots-head {
-  margin: 0;
-  padding-bottom: 6px;
-  border-bottom: 1px solid var(--border);
-  font-family: var(--font-serif);
-  font-size: 17px;
-  font-weight: 400;
+.wsx-slots-daybtn:hover {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
 }
-.wsx-slots-head span {
-  margin-right: 4px;
-  color: var(--muted);
-  font-family: var(--font-sans);
+.wsx-slots-daybtn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.wsx-slots-weekday {
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
+  color: var(--muted);
 }
-.wsx-slots-day[data-today] .wsx-slots-head {
-  border-bottom-color: var(--accent);
+.wsx-slots-date {
+  font-family: var(--font-serif);
+  font-size: 19px;
+  line-height: 1.1;
+}
+.wsx-slots-count {
+  font-size: 11px;
+  color: var(--tone-success-text);
+  white-space: nowrap;
+}
+.wsx-slots-daybtn[data-today] .wsx-slots-weekday {
   color: var(--tone-accent-text);
 }
-.wsx-slots-list {
+.wsx-slots-daybtn[data-none] {
+  border-style: dashed;
+  background: none;
+}
+.wsx-slots-daybtn[data-none] .wsx-slots-date {
+  color: var(--muted);
+  text-decoration: line-through;
+  text-decoration-color: color-mix(in srgb, var(--muted) 60%, transparent);
+}
+.wsx-slots-daybtn[data-none] .wsx-slots-count {
+  color: var(--muted);
+}
+.wsx-slots-daybtn[aria-selected="true"] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.wsx-slots-daybtn[aria-selected="true"] :is(.wsx-slots-weekday, .wsx-slots-count, .wsx-slots-date) {
+  color: var(--accent-ink);
+  text-decoration: none;
+}
+.wsx-slots-panel {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 10px;
+}
+.wsx-slots-when {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+.wsx-slots-when span {
+  font-weight: 400;
+  color: var(--muted);
+}
+/* The picked day's times, Calendly's way: only what can be booked, several across as room allows. */
+.wsx-slots-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  gap: 8px;
 }
 .wsx-slot {
-  height: 34px;
+  height: 40px;
   border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
   border-radius: var(--r-chip);
   background: var(--card);
@@ -106,18 +172,15 @@
   font-size: 12.5px;
 }
 
-/* Narrow: each day a line — its name, then its times wrapping beside it. */
+/* Narrow: the strip scrolls, the times sit two or three across. */
 @container wsx (max-width: 520px) {
-  .wsx-slots-days {
-    grid-template-columns: 1fr;
-    gap: 14px;
+  .wsx-slots-strip {
+    grid-auto-columns: 56px;
   }
   .wsx-slots-list {
-    flex-direction: row;
-    flex-wrap: wrap;
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
   }
   .wsx-slot {
-    min-width: 72px;
-    height: 40px;
+    height: 44px;
   }
 }

@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { useData } from '../../../../data'
-import { resolveQuery, toRows } from '../../../../lib'
+import { clockLabel, resolveQuery, toRows } from '../../../../lib'
 import { usePaperHost } from '../../../../provider'
 import type { BindQuery } from '../../../../registry'
-import { isOpenCell } from '../../../../registry'
+import { takesTime } from '../../../../registry'
 import { useSheetState } from '../../../../state'
 import { rangeQuery } from '../../../agenda'
 import { SENT_NOTE, useLandedNote } from '../../../form'
@@ -21,6 +21,7 @@ export function useSlotBooking(
   minutes: number,
   isSuggesting = false,
   show?: string,
+  allDay: 'busy' | 'free' = 'busy',
 ): SlotBooking {
   const host = usePaperHost()
   const { values } = useSheetState()
@@ -38,7 +39,9 @@ export function useSlotBooking(
     const held = asked.map((cell) => ({ [date]: cell }))
     const rows = toRows(result.rows)
     // An Open window is where the slot sits, never what takes it (D133).
-    const holding = show ? rows.filter((row) => !isOpenCell(row[show])) : rows
+    const holding = rows.filter((row) =>
+      takesTime(row[date], show ? row[show] : undefined, { show, allDay }),
+    )
     const taken = isTaken(picked, holding, date, minutes)
       ? 'booked'
       : isTaken(picked, held, date, minutes)
@@ -46,7 +49,7 @@ export function useSlotBooking(
         : null
     if (!taken) return null
     refresh()
-    return `${picked.label} was just ${taken} — pick another time`
+    return `${clockLabel(picked.label, host.locale)} was just ${taken} — pick another time`
   }
 
   return {

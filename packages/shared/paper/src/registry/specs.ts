@@ -235,6 +235,11 @@ const dataOut: Record<string, ComponentSpec> = {
       hours: hoursSchema.optional(),
       /** A column whose `Open` rows are the only times to book; the rest of the table is busy (D133). */
       show: columnName.optional(),
+      /**
+       * Whether an all-day row takes its whole day from booking (D134): `busy` (the default) or
+       * `free`, as Outlook keeps one — then only a row its Show-as marks Busy takes the day.
+       */
+      allDay: z.enum(['busy', 'free']).optional(),
       days: z
         .array(z.enum(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']))
         .min(1)

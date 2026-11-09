@@ -442,3 +442,48 @@ describe('an Open window is found however busy the table (D133)', () => {
     expect(() => ask('2026-11-03T12:00/2026-11-03T12:30', 'ip-3')).toThrow(/not open for booking/)
   })
 })
+
+describe('an all-day event takes its day as the page decides (D134)', () => {
+  const page = (allDay: string) => `<Sheet title="Hours">
+  <Slots bind={{ table: "cal" }} date="when" show="show"${allDay} add={["title"]} />
+</Sheet>`
+  function linkWith(allDay: string, dayShow?: string) {
+    defineUserTable(ws, {
+      name: 'cal',
+      columns: [
+        { name: 'title', type: 'text' },
+        { name: 'when', type: 'date' },
+        { name: 'show', type: 'select', options: ['Busy', 'Open'] },
+      ],
+    })
+    runMutation(ws, {
+      kind: 'insert',
+      table: 'cal',
+      data: [
+        { title: 'Hours', when: '2026-11-12T14:00/2026-11-12T18:00', show: 'Open' },
+        { title: 'Haircut', when: '2026-11-12', ...(dayShow && { show: dayShow }) },
+      ],
+    })
+    const sheet = createSheetFromSource(ws, { title: 'Hours', source: page(allDay) })
+    updateSheetAccess(ws, sheet.id, { visibility: 'public', access: [] }, 'rin')
+    updateSheetSuggest(ws, sheet.id, true)
+    return liveShareFor(ws, sheet.id)?.token ?? ''
+  }
+  const ask = (token: string) =>
+    suggestRow(
+      ws,
+      token,
+      { table: 'cal', cells: { title: 'Call', when: '2026-11-12T15:00/2026-11-12T15:30' }, ...ANA },
+      'ip-a',
+    )
+
+  test('busy (the default): the whole day is taken', () => {
+    expect(() => ask(linkWith(''))).toThrow(/just booked/)
+  })
+  test('free: the day stays bookable inside its Open window', () => {
+    expect(ask(linkWith(' allDay="free"')).id).toBeString()
+  })
+  test('free, but the all-day row is marked Busy: the day is taken', () => {
+    expect(() => ask(linkWith(' allDay="free"', 'Busy'))).toThrow(/just booked/)
+  })
+})

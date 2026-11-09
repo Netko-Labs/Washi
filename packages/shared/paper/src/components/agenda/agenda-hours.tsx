@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import { hourLabel } from '../../lib'
+import { clockLabel, hourLabel } from '../../lib'
 import { AgendaEvent } from './agenda-event'
 import { AgendaHoursDay } from './agenda-hours-day'
-import { type AgendaHoursProps, dayBlocks, HOUR_PX, hourRange } from './lib'
+import { type AgendaHoursProps, clockOf, dayBlocks, HOUR_PX, hourRange } from './lib'
 
 /**
  * A week by the hour, as Teams and Outlook draw it (D133): hours down the side, a column a day,
@@ -33,6 +33,10 @@ export function AgendaHours({
   )
   const hasAllDay = perDay.some((day) => day.allDay.length > 0)
   const opening = Number(hours.split('-')[0]?.slice(0, 2) ?? 8) * 60
+  const clock = new Date()
+  const minute = clock.getHours() * 60 + clock.getMinutes()
+  const now =
+    days.some((day) => day.isToday) && minute >= range.from && minute < range.to ? minute : null
 
   // The grid opens on the page's own hours, not on midnight, when it was widened past them.
   useEffect(() => {
@@ -100,6 +104,15 @@ export function AgendaHours({
           style={{ height: `${((range.to - range.from) / 60) * HOUR_PX}px` }}
         >
           <div className="wsx-hours-gutter wsx-hours-marks" aria-hidden>
+            {/* The time now, labelled in the hour column, as Clockwise and Rise mark it. */}
+            {now !== null && (
+              <span
+                className="wsx-hours-nowlabel"
+                style={{ top: `${((now - range.from) / 60) * HOUR_PX}px` }}
+              >
+                {clockLabel(clockOf(now), locale)}
+              </span>
+            )}
             {marks.map((mark) => (
               <span key={mark} style={{ top: `${((mark - range.from) / 60) * HOUR_PX}px` }}>
                 {hourLabel(mark, locale)}

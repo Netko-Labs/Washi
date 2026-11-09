@@ -1,6 +1,6 @@
 import { isBusyCell, isOpenCell } from '../../../../registry'
 import { HOUR_DEFAULT_MINUTES } from '../constants'
-import type { AgendaColumns, DayBlocks, HourBlock, HourRange, Row } from '../types'
+import type { AgendaColumns, DayBlocks, EventAnchor, HourBlock, HourRange, Row } from '../types'
 import { eventWhen } from './when'
 
 const DAY = 24 * 60
@@ -115,4 +115,32 @@ export function slotAt(day: string, range: HourRange, offset: number, hourPx: nu
   const from = Math.min(Math.max(minute, range.from), DAY - 30)
   const to = Math.min(from + HOUR_DEFAULT_MINUTES, DAY - 1)
   return `${day}T${clockOf(from)}/${day}T${clockOf(to === DAY - 1 ? 23 * 60 + 59 : to)}`
+}
+
+/** Where an element sits on screen, for a card to open beside it. */
+export function anchorOf(element: Element): EventAnchor {
+  const box = element.getBoundingClientRect()
+  return { top: box.top, left: box.left, right: box.right, bottom: box.bottom }
+}
+
+const CARD_WIDTH = 460
+const GAP = 8
+const EDGE = 16
+
+/**
+ * Where a card opens beside its event (D134), as Proton and Teams place one: right of it if it
+ * fits, else left, its top level with the event and kept on screen. Null where the screen is too
+ * narrow for beside — a phone keeps the bottom sheet.
+ */
+export function cardPlacement(
+  anchor: EventAnchor,
+  height: number,
+  view: { width: number; height: number },
+): { top: number; left: number } | null {
+  if (view.width < 720) return null
+  const right = anchor.right + GAP
+  const left =
+    right + CARD_WIDTH + EDGE <= view.width ? right : Math.max(EDGE, anchor.left - GAP - CARD_WIDTH)
+  const top = Math.min(Math.max(EDGE, anchor.top), Math.max(EDGE, view.height - height - EDGE))
+  return { top, left }
 }

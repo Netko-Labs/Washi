@@ -91,6 +91,7 @@ function refuseTakenTime(ws: Workspace, root: WsxElement, ask: SuggestionAsk) {
       minutes: booking.minutes,
       pending: true,
       show: booking.show,
+      allDay: booking.allDay,
     })
   if (taken) {
     throw new SuggestionRefusedError(`That time was just ${taken} — pick another.`)

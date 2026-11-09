@@ -32,7 +32,9 @@ export function ShareSwitch({
           value ? 'justify-end bg-primary' : 'justify-start bg-foreground/15'
         }`}
       >
-        <span className="size-4 rounded-full bg-white shadow-sm" />
+        <span
+          className={`size-4 rounded-full shadow-sm ${value ? 'bg-primary-foreground' : 'bg-white'}`}
+        />
       </span>
     </button>
   )

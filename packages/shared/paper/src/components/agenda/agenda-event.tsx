@@ -1,6 +1,6 @@
 import { clockLabel } from '../../lib'
 import { isBusyCell, isOpenCell } from '../../registry'
-import { type AgendaEventProps, badgeOf, eventTimeOn, eventTitle, hueOf } from './lib'
+import { type AgendaEventProps, anchorOf, badgeOf, eventTimeOn, eventTitle, hueOf } from './lib'
 
 /** "10:00 AM–11:00 AM" the reader's way; a time column holding words keeps them. */
 function shownTime(time: string | null, locale?: string): string | null {
@@ -39,7 +39,7 @@ export function AgendaEvent({ row, columns, day, locale, onPress }: AgendaEventP
       data-hue={hueOf(badge)}
       {...look}
       aria-haspopup="dialog"
-      onClick={() => onPress(row)}
+      onClick={(event) => onPress(row, anchorOf(event.currentTarget))}
     >
       {body}
     </button>

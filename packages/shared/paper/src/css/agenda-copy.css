@@ -184,3 +184,28 @@
     width: 100%;
   }
 }
+
+/* The card's time in words under its title (D134), before the editor. */
+.wsx-agenda-card-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.wsx-agenda-card-sub {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+/* On a wide screen the card opens beside its event, as a popover; the page stays lit around it. */
+.wsx-agenda-card[data-beside] {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+}
+.wsx-agenda-card[data-beside]::backdrop {
+  background: transparent;
+  backdrop-filter: none;
+}

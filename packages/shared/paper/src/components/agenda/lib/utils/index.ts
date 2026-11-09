@@ -10,7 +10,7 @@ export {
   shiftDay,
   weekdayChips,
 } from './copies'
-export { clockOf, dayBlocks, hourRange, slotAt } from './hours'
+export { anchorOf, cardPlacement, clockOf, dayBlocks, hourRange, slotAt } from './hours'
 export {
   addDays,
   addMonths,

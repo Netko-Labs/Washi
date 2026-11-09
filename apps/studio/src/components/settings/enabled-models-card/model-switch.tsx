@@ -27,7 +27,7 @@ export function ModelSwitch({ model, isOn, isRecommended, onToggle }: ModelSwitc
         className={`relative h-5 w-9 shrink-0 rounded-full transition-colors ${isOn ? 'bg-primary' : 'bg-foreground/15'}`}
       >
         <span
-          className={`absolute top-0.5 left-0.5 size-4 rounded-full bg-white shadow-sm transition-transform motion-reduce:transition-none ${isOn ? 'translate-x-4' : ''}`}
+          className={`absolute top-0.5 left-0.5 size-4 rounded-full shadow-sm transition-transform motion-reduce:transition-none ${isOn ? 'translate-x-4 bg-primary-foreground' : 'bg-white'}`}
         />
       </button>
     </li>

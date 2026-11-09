@@ -37,6 +37,7 @@ function targetOf(node: WsxElement): SuggestTarget | null {
         date,
         minutes: typeof props.minutes === 'number' ? props.minutes : SLOT_MINUTES,
         ...(text(props.show) && { show: text(props.show) }),
+        ...(props.allDay === 'free' && { allDay: 'free' as const }),
       }
     case 'Board': {
       const groupBy = text(props.groupBy)
@@ -95,3 +96,18 @@ export const isBusyCell = (value: unknown): boolean =>
 /** Whether `span` lies wholly inside one of `windows` — a booking inside an open window. */
 export const insideWindow = (span: Span, windows: Span[]): boolean =>
   windows.some((window) => window.from <= span.from && span.to <= window.to)
+
+/**
+ * Whether a row takes time from booking (D133, D134): an Open window never does; with `allDay`
+ * free, a whole day does only when its Show-as says Busy.
+ */
+export function takesTime(
+  dateCell: unknown,
+  showCell: unknown,
+  options: { show?: string; allDay?: 'busy' | 'free' },
+): boolean {
+  if (options.show && isOpenCell(showCell)) return false
+  const isWholeDay = typeof dateCell === 'string' && !dateCell.includes('T')
+  if (isWholeDay && options.allDay === 'free') return isBusyCell(showCell)
+  return true
+}

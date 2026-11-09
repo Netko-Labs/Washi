@@ -58,6 +58,7 @@ export function Agenda({
   const columns = { date, title, time, end, badge, show }
   const addingOn = period.days.find((day) => day.key === adding)
   const picked = adds.pick?.kind === 'event' ? adds.pick.row : null
+  const anchor = adds.pick?.kind === 'event' ? adds.pick.anchor : undefined
   // The card follows the row as it is written: a change refetches the week underneath it.
   const shown = picked ? (period.state.rows.find((row) => row.id === picked.id) ?? picked) : null
   const unit = view === 'month' ? 'month' : 'week'
@@ -149,6 +150,7 @@ export function Agenda({
           locale={host.locale}
           canWrite={mode === 'write'}
           canCopy={mode === 'write' && Boolean(host.newRow)}
+          anchor={anchor}
           onOpenPage={host.openRow}
           onClose={adds.close}
         />

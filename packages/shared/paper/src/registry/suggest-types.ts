@@ -14,6 +14,8 @@ export interface SuggestTarget {
   minutes?: number
   /** A Slots' Show-as column (D133): a time is bookable only inside a row it marks Open. */
   show?: string
+  /** `free`: an all-day row takes no time unless its Show-as marks it Busy (D134). */
+  allDay?: 'busy' | 'free'
 }
 
 /** A stretch of wall-clock minutes since the epoch day; zones never enter. */

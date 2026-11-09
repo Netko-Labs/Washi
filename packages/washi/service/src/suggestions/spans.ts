@@ -1,5 +1,12 @@
 import type { RequestedAsk } from '@washi/domain'
-import { insideWindow, isOpenCell, type Span, spanOf, spansOverlap } from '@washi/paper/registry'
+import {
+  insideWindow,
+  isOpenCell,
+  type Span,
+  spanOf,
+  spansOverlap,
+  takesTime,
+} from '@washi/paper/registry'
 import { pendingSuggestionsFor, type Workspace } from '@washi/repository'
 import { runQuery } from '../tables/service'
 import { SPAN_LOOKBACK_DAYS, TAKEN_SCAN_ROWS } from './constants'
@@ -29,7 +36,7 @@ export function takenBy(
   table: string,
   date: string,
   span: Span,
-  { minutes, pending, show }: TakenOptions,
+  { minutes, pending, show, allDay }: TakenOptions,
 ): 'booked' | 'requested' | null {
   const from = dayKey(span.from - SPAN_LOOKBACK_DAYS * 24 * 60)
   const to = dayKey(span.to + 24 * 60)
@@ -47,7 +54,10 @@ export function takenBy(
     return held !== null && spansOverlap(held, span)
   }
   // An Open window is where a booking goes, not what takes the time (D133).
-  const holding = show ? rows.filter((row) => !isOpenCell(row[show])) : rows
+  // …and with `allDay` free, a whole day takes nothing unless marked Busy (D134).
+  const holding = rows.filter((row) =>
+    takesTime(row[date], show ? row[show] : undefined, { show, allDay }),
+  )
   if (holding.some((row) => overlaps(row[date]))) return 'booked'
   // A window too busy to read whole is never called free.
   if (rows.length >= TAKEN_SCAN_ROWS) return 'booked'

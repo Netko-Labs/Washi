@@ -58,3 +58,31 @@ describe('slots inside Open windows (D133)', () => {
     ])
   })
 })
+
+describe('who takes time from booking (D133, D134)', () => {
+  test('an Open window never; a whole day only as the page says, or when marked Busy', async () => {
+    const { takesTime } = await import('../../../registry')
+    const day = '2026-11-12'
+    const timed = '2026-11-12T10:00/2026-11-12T11:00'
+    expect(takesTime(timed, 'Open', { show: 'show' })).toBe(false)
+    expect(takesTime(timed, undefined, { show: 'show' })).toBe(true)
+    expect(takesTime(day, undefined, { show: 'show' })).toBe(true)
+    expect(takesTime(day, undefined, { show: 'show', allDay: 'free' })).toBe(false)
+    expect(takesTime(day, 'Busy', { show: 'show', allDay: 'free' })).toBe(true)
+    expect(takesTime(timed, undefined, { show: 'show', allDay: 'free' })).toBe(true)
+  })
+
+  test('a card opens beside its event when it fits, else on the left; never on a phone', async () => {
+    const { cardPlacement } = await import('../lib')
+    const event = { top: 200, left: 300, right: 400, bottom: 260 }
+    expect(cardPlacement(event, 300, { width: 1400, height: 900 })).toEqual({ top: 200, left: 408 })
+    expect(
+      cardPlacement({ ...event, left: 1100, right: 1200 }, 300, { width: 1400, height: 900 }),
+    ).toEqual({
+      top: 200,
+      left: 632,
+    })
+    expect(cardPlacement({ ...event, top: 800 }, 300, { width: 1400, height: 900 })?.top).toBe(584)
+    expect(cardPlacement(event, 300, { width: 400, height: 800 })).toBeNull()
+  })
+})
