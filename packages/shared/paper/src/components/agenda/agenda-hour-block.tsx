@@ -1,5 +1,13 @@
 import { clockLabel } from '../../lib'
-import { type AgendaHourBlockProps, badgeOf, clockOf, eventTitle, HOUR_PX, hueOf } from './lib'
+import {
+  type AgendaHourBlockProps,
+  anchorOf,
+  badgeOf,
+  clockOf,
+  eventTitle,
+  HOUR_PX,
+  hueOf,
+} from './lib'
 
 /**
  * One block on a time grid (D133), placed by its minutes and its lane among the blocks it
@@ -38,7 +46,7 @@ export function AgendaHourBlock({
       aria-label={`${title}, ${time}`}
       onClick={(event) => {
         event.stopPropagation()
-        onPress(row)
+        onPress(row, anchorOf(event.currentTarget))
       }}
     >
       {/* A button centres what overflows it; the words sit at the top of the block instead. */}

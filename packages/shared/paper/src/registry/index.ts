@@ -59,6 +59,7 @@ export {
   spanOf,
   spansOverlap,
   suggestTargets,
+  takesTime,
 } from './suggest'
 export type { Span, SuggestTarget } from './suggest-types'
 export {

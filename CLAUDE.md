@@ -665,6 +665,18 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   and only non-Open rows take time. The server holds the same rule (C3 kept: `insideOpenWindow`,
   `takenBy({ show })`): a link's request outside an Open window is refused in words, and an Open
   window never counts as a clash at send or approval. The book seeds `appointments` around today.
+- **A calendar with taste, the page's own rules (D134).** From Mobbin's references (Calendly,
+  Fresha, Clockwise, Proton, Teams): `<Slots>` is a strip of the week's days — weekday, date, "N free",
+  a day with none dashed and struck — over the picked day's free times only (`useSlots`,
+  `SlotsDays`; the taken left out, Requested kept and said so); the first day still holding a free
+  time opens. `allDay="busy|free"` on Slots is the page's choice: `busy` (default, D102's rule) an
+  all-day row takes its day; `free` (Outlook's) only when its Show-as says Busy — `takesTime` in the
+  registry decides for paper and the server alike (`takenBy({ allDay })`, send and approval). The
+  time grid: today's date in a filled pill, the time now labelled in the hour column; an event's
+  card leads with its time in words (`eventWhenWords`) and, on a screen ≥ 720px, opens beside the
+  event as a popover (`anchorOf`, `cardPlacement`: right if it fits, else left, kept on screen; no
+  dimmed page) — a phone keeps the sheet. Times in a booking's form title read the reader's clock.
+  Studio switches show their knob on in dark too (`bg-primary-foreground`).
 - **A page can take bookings (D102).** `<Slots bind date minutes hours days add addLabel>` is
   Calendly's picker: each allowed weekday's `hours` (`09:00-17:00`) cut into `minutes` slots, those
   under a row's `date` struck through as booked (a `start/end` range; a lone moment takes `minutes`,

@@ -76,7 +76,7 @@ export interface AgendaHoursProps {
   hours: string
   locale?: string
   isLoading: boolean
-  onPress: (row: Row) => void
+  onPress: (row: Row, anchor?: EventAnchor) => void
   /** A press on an empty half hour: the day and the cell to seed, `start/end`. */
   onAdd?: (day: string, cell: string) => void
 }
@@ -88,7 +88,7 @@ export interface AgendaHoursDayProps {
   columns: AgendaColumns
   locale?: string
   isPicked: boolean
-  onPress: (row: Row) => void
+  onPress: (row: Row, anchor?: EventAnchor) => void
   onAdd?: (day: string, cell: string) => void
 }
 
@@ -98,7 +98,7 @@ export interface AgendaHourBlockProps {
   columns: AgendaColumns
   locale?: string
   isWindow?: boolean
-  onPress: (row: Row) => void
+  onPress: (row: Row, anchor?: EventAnchor) => void
 }
 
 export interface AgendaDayInfo {
@@ -151,7 +151,7 @@ export interface AgendaDayProps {
   locale?: string
   onAdd?: () => void
   /** Opens the event's card: its time, its properties, and what can be done with it. */
-  onPress?: (row: Row) => void
+  onPress?: (row: Row, anchor?: EventAnchor) => void
 }
 
 /** The day a + was pressed on, and what is said once its row is sent. */
@@ -162,7 +162,7 @@ export interface AgendaAdd {
   /** The `start/end` a time grid's press seeds, when the add came from one. */
   addingAt: string | null
   open: (day: string, at?: string) => void
-  openEvent: (row: Row) => void
+  openEvent: (row: Row, anchor?: EventAnchor) => void
   close: () => void
   note: string | null
   landed: () => void
@@ -174,13 +174,21 @@ export interface AgendaEventProps {
   /** The day it is drawn on: a span over several reads its own part of the hours there. */
   day: string
   locale?: string
-  onPress?: (row: Row) => void
+  onPress?: (row: Row, anchor?: EventAnchor) => void
+}
+
+/** Where the pressed event sits on screen: a wide page opens its card beside it (D134). */
+export interface EventAnchor {
+  top: number
+  left: number
+  right: number
+  bottom: number
 }
 
 /** What a press opened over the agenda: a day's + Form (at a time, from a grid), or an event. */
 export type AgendaPick =
   | { kind: 'add'; day: string; at?: string }
-  | { kind: 'event'; row: Row }
+  | { kind: 'event'; row: Row; anchor?: EventAnchor }
   | null
 
 /** The new rows a Repeat on days writes, one per day, each its date moved `shifts` days. */
@@ -223,6 +231,8 @@ export interface AgendaEventCardProps {
   canWrite: boolean
   /** Duplicate, Copy to…, Repeat on days… — where the host adds rows. */
   canCopy: boolean
+  /** Where the event was pressed: the card opens beside it on a wide screen. */
+  anchor?: EventAnchor
   /** Opens the event as its own page; a host without row pages leaves it out. */
   onOpenPage?: (id: string) => void
   onClose: () => void

@@ -100,7 +100,7 @@ export const SUMMARIES: Record<string, string> = {
   Heatmap:
     "GitHub's calendar of days: the last weeks to today as squares, each as dark as its rows (counted, or a value summed). For habits, workouts, a journal, anything done on days.",
   Slots:
-    'Free times to book, Calendly-style: each allowed day cut into slots of `minutes` within `hours`, rows whose date overlaps struck through, the past left out; a press opens a form with the slot filled in, and the booking is said back. With `show` (a Show-as column) slots come only from rows marked Open — your office hours — and a link may book nowhere else.',
+    'Free times to book, Calendly-style: a strip of the week’s days (those with nothing free faded), then the picked day’s free times — the taken left out, the past too; a press opens a form with the slot filled in, and the booking is said back. With `show` (a Show-as column) slots come only from rows marked Open — your office hours — and a link may book nowhere else. `allDay` says whether an all-day row takes its day (`busy`, the default) or only when marked Busy (`free`).',
   Agenda:
     'A calendar: a week, a month, or `view="hours"` — a week by the hour as Teams draws it, events as blocks, overlaps side by side, one day at a time on a phone. + on a day (or a press on an empty half hour) adds one there with its hours; pressing an event opens its card — time and properties to change, Open page, Duplicate, Copy, Repeat, Delete. `show` names a Show-as column: Busy rows greyed, Open rows drawn as windows to book in.',
   Task: 'A checkbox bound to a row’s checkbox column.',

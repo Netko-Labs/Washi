@@ -4,6 +4,8 @@ export interface TakenOptions {
   pending: boolean
   /** The Show-as column (D133): its Open rows are windows to book in, never what takes a time. */
   show?: string
+  /** `free`: a whole-day row takes no time unless its Show-as says Busy (D134). */
+  allDay?: 'busy' | 'free'
 }
 
 /** The calendar a suggestion's date lands on; a Slots one holds its slot length. */
@@ -12,4 +14,5 @@ export interface Booking {
   minutes?: number
   /** The Slots' Show-as column (D133): a time must sit inside a row it marks Open. */
   show?: string
+  allDay?: 'busy' | 'free'
 }

@@ -17,7 +17,7 @@ export function useAgendaAdd(isSuggesting: boolean): AgendaAdd {
       landed.clear()
       setPick({ kind: 'add', day, at })
     },
-    openEvent: (row) => setPick({ kind: 'event', row }),
+    openEvent: (row, anchor) => setPick({ kind: 'event', row, anchor }),
     close: () => setPick(null),
     note: landed.note,
     landed: () => {

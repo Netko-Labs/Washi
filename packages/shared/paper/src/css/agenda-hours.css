@@ -1,7 +1,7 @@
 /* A week by the hour (D133): Teams' and Outlook's grid. */
 
 .wsx-agenda[data-view="hours"] .wsx-hours {
-  --gutter: 48px;
+  --gutter: 58px;
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: var(--r-card);
@@ -30,9 +30,20 @@
   padding: 10px 8px 8px;
   border-left: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
 }
-.wsx-hours-dayhead[data-today] .wsx-agenda-weekday,
-.wsx-hours-dayhead[data-today] .wsx-agenda-date {
+.wsx-hours-dayhead[data-today] .wsx-agenda-weekday {
   color: var(--tone-accent-text);
+}
+/* Today's date in a filled pill, as Clockwise, Rise and Skiff mark it. */
+.wsx-hours-dayhead[data-today] .wsx-agenda-date {
+  display: inline-grid;
+  place-items: center;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: 14px;
 }
 .wsx-hours-allday {
   border-bottom: 1px solid var(--border);
@@ -312,4 +323,20 @@
   outline: 1px dashed color-mix(in srgb, var(--tone-success) 60%, var(--border));
   outline-offset: -1px;
   background: color-mix(in srgb, var(--tone-success) 10%, transparent);
+}
+
+/* The time now, labelled in the hour column over the marks it passes. */
+.wsx-hours-nowlabel {
+  position: absolute;
+  right: 3px;
+  z-index: 1;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: var(--tone-danger);
+  color: var(--tone-danger-on);
+  font-size: 10.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  transform: translateY(-50%);
+  white-space: nowrap;
 }

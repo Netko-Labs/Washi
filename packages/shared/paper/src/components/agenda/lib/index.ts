@@ -38,13 +38,16 @@ export type {
   CopyEntries,
   CopyPlan,
   DayBlocks,
+  EventAnchor,
   EventPatch,
   HourBlock,
   HourRange,
   WeekStart,
 } from './types'
 export {
+  anchorOf,
   badgeOf,
+  cardPlacement,
   clockOf,
   copyAction,
   copyDates,

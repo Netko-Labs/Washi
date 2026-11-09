@@ -21,6 +21,7 @@ export const DATA_SPECIMENS: Record<string, Specimen> = {
       date: 'when',
       minutes: 30,
       show: 'show',
+      allDay: 'free',
       add: ['title'],
       addLabel: 'Book',
     },

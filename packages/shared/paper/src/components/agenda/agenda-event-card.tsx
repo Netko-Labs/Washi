@@ -11,6 +11,8 @@ import {
   type EventPatch,
   eventPatch,
   eventTitle,
+  eventWhen,
+  eventWhenWords,
   hueOf,
   useEventCopy,
   useEventMenu,
@@ -31,10 +33,11 @@ export function AgendaEventCard({
   locale,
   canWrite,
   canCopy,
+  anchor,
   onOpenPage,
   onClose,
 }: AgendaEventCardProps) {
-  const menu = useEventMenu()
+  const menu = useEventMenu(anchor)
   const id = typeof row.id === 'string' ? row.id : null
   const events = useEventCopy(table, String(row.id), menu.close)
   const edit = useEventWrite(table, String(row.id), menu.close)
@@ -69,7 +72,13 @@ export function AgendaEventCard({
         <div className="wsx-dialog-head">
           <div className="wsx-agenda-card-head" data-hue={hueOf(badge)}>
             <span className="wsx-agenda-card-dot" aria-hidden />
-            <h2 className="wsx-dialog-title">{title}</h2>
+            <div className="wsx-agenda-card-titles">
+              <h2 className="wsx-dialog-title">{title}</h2>
+              {/* The time in words first, as Proton and Teams lead with it; the editor sits below. */}
+              <p className="wsx-agenda-card-sub">
+                {eventWhenWords(eventWhen(row, columns), locale)}
+              </p>
+            </div>
           </div>
           <button
             type="button"
