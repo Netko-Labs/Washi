@@ -348,7 +348,7 @@ button.wsx-sheet-mark:hover {
 .wsx-source-n {
   font-family: var(--font-mono);
   font-size: 11px;
-  color: var(--accent);
+  color: var(--tone-accent-text);
   flex: none;
   padding-top: 2px;
 }

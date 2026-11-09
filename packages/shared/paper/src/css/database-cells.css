@@ -100,7 +100,7 @@
 .wsx-db-chip[data-hue] {
   --hue: var(--chart-4);
   background: color-mix(in srgb, var(--hue) 20%, transparent);
-  color: color-mix(in srgb, var(--hue) 55%, var(--ink));
+  color: color-mix(in srgb, var(--hue) var(--pill-hue), var(--ink));
 }
 .wsx-db-pill {
   display: inline-flex;
