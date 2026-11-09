@@ -269,6 +269,11 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   `useSuggestionRows`, polled 30s): Approve is `runMutation` insert signed by that member (P1),
   re-checking the table and the time; Decline keeps nothing. Washi has no way to decide one (A2).
   The visitor hears nothing back yet: "Sent — the page's owner will confirm it."
+  **On the page too (D129):** a page with requests waiting draws them under its title
+  (`PageSuggestions` in the studio's `PageChrome`, not on row pages): "N requests from the shared
+  link", each with who, what they filled in, and Approve · Decline in place (a refusal stays in
+  its words). Read off the same store as the Inbox, refreshed when the page opens and whenever the
+  count moves; shown there counts as seen (`markRead`). Nothing waiting draws nothing.
 - **A link may open its sub-pages (D123).** `<Sheet subpages>`, set only by a person (Share →
   "Include sub-pages", `sheets.setShareSubpages`; `guardWashiWrite` refuses Washi changing it), live
   only while the page is public. Its link then opens every live descendant the world may read
