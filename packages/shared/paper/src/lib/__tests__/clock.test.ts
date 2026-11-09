@@ -40,6 +40,10 @@ describe('a date cell with hours', () => {
     const timed = withTime(readWhen('2026-11-10'))
     expect(writeWhen(timed)).toBe('2026-11-10T09:00/2026-11-10T10:00')
     expect(writeWhen(withoutTime(timed))).toBe('2026-11-10')
+    // A span of days keeps its last day; the hour lands on it.
+    expect(writeWhen(withTime(readWhen('2026-11-10/2026-11-12')))).toBe(
+      '2026-11-10T09:00/2026-11-12T10:00',
+    )
   })
 
   test('a new start keeps the length, past midnight too', () => {

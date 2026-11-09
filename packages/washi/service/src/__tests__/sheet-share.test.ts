@@ -153,6 +153,26 @@ describe('a secret tab (D127)', () => {
     expect(source).not.toContain('secret')
   })
 
+  test('only its own strip’s state is scrubbed, never a shown tab’s value elsewhere', () => {
+    const sheet = createSheetFromSource(
+      ws,
+      {
+        title: 'Two strips',
+        source: `<Sheet title="Two strips" state={{ local: { a: "Notes", b: "Notes" } }}>
+  <Tabs labels={["Week", "Notes"]} state="a"><Tab><Text>w</Text></Tab><Tab secret><Text>shut</Text></Tab></Tabs>
+  <Tabs labels={["Plan", "Notes"]} state="b"><Tab><Text>p</Text></Tab><Tab><Text>open notes</Text></Tab></Tabs>
+</Sheet>`,
+      },
+      null,
+    )
+    updateSheetAccess(ws, sheet.id, { visibility: 'public', access: [] }, 'rin')
+    const { source } = sharedPage(ws, liveShareFor(ws, sheet.id)?.token ?? '')
+    expect(source).not.toContain('shut')
+    expect(source).toContain('open notes')
+    expect(source).toContain(`"b":"Notes"`)
+    expect(source).not.toContain(`"a":"Notes"`)
+  })
+
   test('a table only it shows cannot be asked about through the link', () => {
     const { token } = tabbedPage()
     expect(sharedQuery(ws, token, { table: 'deals' }).rows).toHaveLength(1)

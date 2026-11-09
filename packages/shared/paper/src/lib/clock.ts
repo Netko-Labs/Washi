@@ -62,12 +62,16 @@ export function spanMinutes(when: When): number | null {
   return Number.isNaN(from) || Number.isNaN(to) ? null : Math.round((to - from) / 60_000)
 }
 
-/** A time added to a whole day: 09:00 for an hour, unless it already had a time to keep. */
+/**
+ * A time added to a whole day: 09:00 for an hour, unless it already had a time to keep. A span of
+ * days keeps its last day, the hour landing on it: 11/10 to 11/12 becomes 09:00 to 10:00 on 11/12.
+ */
 export function withTime(when: When): When {
   if (when.time) return when
   const time = FIRST_HOUR
   const end = shiftClock(when.day, time, DEFAULT_MINUTES)
-  return { day: when.day, time, endDay: null, endTime: end.time }
+  const endDay = when.endDay && when.endDay > when.day ? when.endDay : null
+  return { day: when.day, time, endDay, endTime: end.time }
 }
 
 /** Back to a whole day: the times go, a later end day stays. */

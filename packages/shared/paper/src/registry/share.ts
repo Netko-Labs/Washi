@@ -124,15 +124,23 @@ function redactNode(node: WsxElement): WsxElement | null {
   }
 }
 
-/** The page's state with no secret tab's label as a starting value: a link never reads one. */
+/**
+ * The page's state with no secret tab's label as a starting value: a link never reads one. Only the
+ * key a Tabs with a secret tab follows is touched, and only for labels none of its shown tabs wear.
+ */
 function withoutSecretState(root: WsxElement): WsxElement {
-  const secret = new Set<WsxValue>()
+  const secret = new Map<string, Set<WsxValue>>()
   walk(root, (node) => {
-    if (node.name !== 'Tabs' || !Array.isArray(node.props.labels)) return
-    node.children.forEach((child, at) => {
-      const label = (node.props.labels as WsxValue[])[at]
-      if (isSecretTab(child) && label !== undefined) secret.add(label)
-    })
+    const key = node.props.state
+    if (node.name !== 'Tabs' || typeof key !== 'string' || !Array.isArray(node.props.labels)) return
+    const labels = node.props.labels as WsxValue[]
+    const isHidden = (at: number) => {
+      const child = node.children[at]
+      return child !== undefined && isSecretTab(child)
+    }
+    const shown = new Set(labels.filter((_, at) => !isHidden(at)))
+    const hidden = labels.filter((label, at) => isHidden(at) && !shown.has(label))
+    if (hidden.length > 0) secret.set(key, new Set([...(secret.get(key) ?? []), ...hidden]))
   })
   const state = root.props.state
   if (secret.size === 0 || !state || typeof state !== 'object' || Array.isArray(state)) return root
@@ -140,7 +148,9 @@ function withoutSecretState(root: WsxElement): WsxElement {
   for (const [scope, values] of Object.entries(state)) {
     scrubbed[scope] =
       values && typeof values === 'object' && !Array.isArray(values)
-        ? Object.fromEntries(Object.entries(values).filter(([, value]) => !secret.has(value)))
+        ? Object.fromEntries(
+            Object.entries(values).filter(([key, value]) => !secret.get(key)?.has(value)),
+          )
         : values
   }
   return { ...root, props: { ...root.props, state: scrubbed } }
