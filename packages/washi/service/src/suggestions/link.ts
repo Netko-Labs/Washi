@@ -16,7 +16,7 @@ import { checkData } from '../tables/rules'
 import { bookingFor, writableColumns } from './allowed'
 import { BURST_LIMIT, BURST_MS, DAY_LIMIT, DAY_MS, PENDING_PER_PAGE } from './constants'
 import { SuggestionRefusedError } from './errors'
-import { requestedSpans, takenBy } from './spans'
+import { insideOpenWindow, requestedSpans, takenBy } from './spans'
 
 /** The page behind a link that takes suggestions, and what it lets a visitor write in `table`. */
 function suggesting(ws: Workspace, token: string, table: string) {
@@ -81,8 +81,17 @@ function refuseTakenTime(ws: Workspace, root: WsxElement, ask: SuggestionAsk) {
   if (!booking) return null
   if (booking.minutes === undefined) return booking.date
   const span = spanOf(ask.cells[booking.date], booking.minutes)
+  // A Slots with a Show-as column books only inside its Open windows (D133).
+  if (span && booking.show && !insideOpenWindow(ws, ask.table, booking.date, booking.show, span)) {
+    throw new SuggestionRefusedError('That time is not open for booking — pick another.')
+  }
   const taken =
-    span && takenBy(ws, ask.table, booking.date, span, { minutes: booking.minutes, pending: true })
+    span &&
+    takenBy(ws, ask.table, booking.date, span, {
+      minutes: booking.minutes,
+      pending: true,
+      show: booking.show,
+    })
   if (taken) {
     throw new SuggestionRefusedError(`That time was just ${taken} — pick another.`)
   }

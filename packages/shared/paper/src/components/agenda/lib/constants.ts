@@ -11,6 +11,12 @@ export const AGENDA_COPY_LIMIT = AGENDA_SPAN_DAYS
 /** Board's own rank column: a copy lands unranked, as a new row does. */
 export const BOARD_RANK_COLUMN = 'rank'
 export const DAY_MS = 86_400_000
+/** A time grid's hour, in pixels; a block's height is its minutes at this rate (D133). */
+export const HOUR_PX = 48
+/** What a press on an empty half hour books, and a start without an end lasts. */
+export const HOUR_DEFAULT_MINUTES = 60
+/** The hours a time grid shows unless the page says. */
+export const AGENDA_HOURS = '08:00-20:00'
 /** Weekdays as `getUTCDay` counts them, Sunday 0. */
 export const EVERY_DAY: readonly number[] = [0, 1, 2, 3, 4, 5, 6]
 export const WORKDAYS: readonly number[] = [1, 2, 3, 4, 5]

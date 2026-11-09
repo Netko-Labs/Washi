@@ -56,6 +56,18 @@ export function slotsOn(
   const first = minutesOf(`${dayKey}T${open}`)
   const last = minutesOf(`${dayKey}T${close}`)
   if (first === null || last === null) return []
+  return cut(first, last, minutes, busy, now, held)
+}
+
+/** `[first, last)` cut into `minutes`, each slot booked, requested or free. */
+function cut(
+  first: number,
+  last: number,
+  minutes: number,
+  busy: Busy[],
+  now: number,
+  held: Busy[],
+): DaySlot[] {
   const slots: DaySlot[] = []
   for (let from = first; from + minutes <= last; from += minutes) {
     const to = from + minutes
@@ -66,6 +78,31 @@ export function slotsOn(
     slots.push({ start, end: momentOf(to), label: start.slice(11), isBooked, isRequested })
   }
   return slots
+}
+
+/**
+ * A day's slots inside its Open windows (D133): each window cut into `minutes` from its own start,
+ * so a window at 10:15 offers 10:15, 10:45…; the rest of the day offers nothing.
+ */
+export function windowSlotsOn(
+  dayKey: string,
+  windows: Busy[],
+  minutes: number,
+  busy: Busy[],
+  now: number,
+  held: Busy[] = [],
+): DaySlot[] {
+  const dayStart = minutesOf(dayKey)
+  if (dayStart === null) return []
+  const dayEnd = dayStart + DAY_MINUTES
+  return windows
+    .filter((window) => window.from < dayEnd && dayStart < window.to)
+    .sort((a, b) => a.from - b.from)
+    .flatMap((window) => {
+      const steps = Math.max(0, Math.ceil((dayStart - window.from) / minutes))
+      const first = window.from + steps * minutes
+      return cut(first, Math.min(window.to, dayEnd), minutes, busy, now, held)
+    })
 }
 
 /**

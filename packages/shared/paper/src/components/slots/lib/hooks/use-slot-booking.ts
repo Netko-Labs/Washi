@@ -3,6 +3,7 @@ import { useData } from '../../../../data'
 import { resolveQuery, toRows } from '../../../../lib'
 import { usePaperHost } from '../../../../provider'
 import type { BindQuery } from '../../../../registry'
+import { isOpenCell } from '../../../../registry'
 import { useSheetState } from '../../../../state'
 import { rangeQuery } from '../../../agenda'
 import { SENT_NOTE, useLandedNote } from '../../../form'
@@ -19,6 +20,7 @@ export function useSlotBooking(
   date: string,
   minutes: number,
   isSuggesting = false,
+  show?: string,
 ): SlotBooking {
   const host = usePaperHost()
   const { values } = useSheetState()
@@ -34,7 +36,10 @@ export function useSlotBooking(
       host.requested?.(bind.table, date, day, next) ?? Promise.resolve([]),
     ])
     const held = asked.map((cell) => ({ [date]: cell }))
-    const taken = isTaken(picked, toRows(result.rows), date, minutes)
+    const rows = toRows(result.rows)
+    // An Open window is where the slot sits, never what takes it (D133).
+    const holding = show ? rows.filter((row) => !isOpenCell(row[show])) : rows
+    const taken = isTaken(picked, holding, date, minutes)
       ? 'booked'
       : isTaken(picked, held, date, minutes)
         ? 'requested'

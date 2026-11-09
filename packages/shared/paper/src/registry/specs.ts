@@ -174,6 +174,15 @@ const CHART_SHAPE = {
   redact,
 }
 
+/** `09:00-17:00`: a day's open hours, wall clock, opening before closing. */
+const hoursSchema = z
+  .string()
+  .regex(/^([01]\d|2[0-3]):[0-5]\d-([01]\d|2[0-3]):[0-5]\d$/, 'hours read like 09:00-17:00')
+  .refine((hours) => {
+    const [open = '', close = ''] = hours.split('-')
+    return open < close
+  }, 'hours open before they close: 09:00-17:00')
+
 const dataOut: Record<string, ComponentSpec> = {
   Repeat: p(
     {
@@ -203,7 +212,11 @@ const dataOut: Record<string, ComponentSpec> = {
       addLabel: z.string().min(1).max(40).optional(),
       empty: z.string().max(60).optional(),
       weekStart: z.enum(['monday', 'sunday']).optional(),
-      view: z.enum(['week', 'month']).optional(),
+      view: z.enum(['week', 'month', 'hours']).optional(),
+      /** The hours a time grid shows (`view="hours"`); an event outside them widens it. */
+      hours: hoursSchema.optional(),
+      /** A column saying Busy or Open (D133): Busy blocks greyed, Open ones bookable windows. */
+      show: columnName.optional(),
       state: stateKey.optional(),
       redact,
     },
@@ -219,14 +232,9 @@ const dataOut: Record<string, ComponentSpec> = {
       bind: bindQuerySchema,
       date: columnName,
       minutes: z.number().int().min(5).max(480).optional(),
-      hours: z
-        .string()
-        .regex(/^([01]\d|2[0-3]):[0-5]\d-([01]\d|2[0-3]):[0-5]\d$/, 'hours read like 09:00-17:00')
-        .refine((hours) => {
-          const [open = '', close = ''] = hours.split('-')
-          return open < close
-        }, 'hours open before they close: 09:00-17:00')
-        .optional(),
+      hours: hoursSchema.optional(),
+      /** A column whose `Open` rows are the only times to book; the rest of the table is busy (D133). */
+      show: columnName.optional(),
       days: z
         .array(z.enum(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']))
         .min(1)

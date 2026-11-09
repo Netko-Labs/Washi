@@ -3,7 +3,7 @@ import type { BindState, BlockProps, Row, RowGuest, When } from '../../../lib/ty
 import type { BindQuery } from '../../../registry'
 
 export type WeekStart = 'monday' | 'sunday'
-export type AgendaView = 'week' | 'month'
+export type AgendaView = 'week' | 'month' | 'hours'
 
 export interface AgendaProps extends BlockProps {
   bind: BindQuery
@@ -22,6 +22,10 @@ export interface AgendaProps extends BlockProps {
   empty?: string
   weekStart?: WeekStart
   view?: AgendaView
+  /** The hours a time grid shows (`view="hours"`), `08:00-20:00`; a block outside widens it. */
+  hours?: string
+  /** A Show-as column (D133): Busy rows greyed, Open rows bookable windows behind the rest. */
+  show?: string
   /** A page-state key holding `YYYY-MM`: the month shown follows it, and ‹ › Today write it. */
   state?: string
 }
@@ -32,6 +36,69 @@ export interface AgendaColumns {
   time?: string
   end?: string
   badge?: string
+  /** The Show-as column (D133). */
+  show?: string
+}
+
+/** One timed row on one day of a time grid, in minutes past that day's midnight. */
+export interface HourBlock {
+  row: Row
+  from: number
+  to: number
+  /** It began on an earlier day, or runs past midnight: its edge is drawn open. */
+  startsBefore: boolean
+  endsAfter: boolean
+  /** Its place among the blocks it overlaps, and how many share the width. */
+  lane: number
+  lanes: number
+  /** Show-as Busy: time blocked out, drawn greyed. */
+  isBusy: boolean
+}
+
+export interface DayBlocks {
+  timed: HourBlock[]
+  /** Show-as Open: windows to book in, drawn behind the rest. */
+  windows: HourBlock[]
+  /** Whole days: the row above the hours. */
+  allDay: Row[]
+}
+
+/** The minutes past midnight a grid draws, `from` to `to`. */
+export interface HourRange {
+  from: number
+  to: number
+}
+
+export interface AgendaHoursProps {
+  days: AgendaDayInfo[]
+  rows: Row[]
+  columns: AgendaColumns
+  hours: string
+  locale?: string
+  isLoading: boolean
+  onPress: (row: Row) => void
+  /** A press on an empty half hour: the day and the cell to seed, `start/end`. */
+  onAdd?: (day: string, cell: string) => void
+}
+
+export interface AgendaHoursDayProps {
+  day: AgendaDayInfo
+  blocks: DayBlocks
+  range: HourRange
+  columns: AgendaColumns
+  locale?: string
+  isPicked: boolean
+  onPress: (row: Row) => void
+  onAdd?: (day: string, cell: string) => void
+}
+
+export interface AgendaHourBlockProps {
+  block: HourBlock
+  range: HourRange
+  columns: AgendaColumns
+  locale?: string
+  isWindow?: boolean
+  onPress: (row: Row) => void
 }
 
 export interface AgendaDayInfo {
@@ -92,7 +159,9 @@ export interface AgendaAdd {
   /** A day's + or an event's ⋯, whichever is open. */
   pick: AgendaPick
   adding: string | null
-  open: (day: string) => void
+  /** The `start/end` a time grid's press seeds, when the add came from one. */
+  addingAt: string | null
+  open: (day: string, at?: string) => void
   openEvent: (row: Row) => void
   close: () => void
   note: string | null
@@ -108,8 +177,11 @@ export interface AgendaEventProps {
   onPress?: (row: Row) => void
 }
 
-/** What a press opened over the agenda: a day's + Form, or an event's ⋯. */
-export type AgendaPick = { kind: 'add'; day: string } | { kind: 'event'; row: Row } | null
+/** What a press opened over the agenda: a day's + Form (at a time, from a grid), or an event. */
+export type AgendaPick =
+  | { kind: 'add'; day: string; at?: string }
+  | { kind: 'event'; row: Row }
+  | null
 
 /** The new rows a Repeat on days writes, one per day, each its date moved `shifts` days. */
 export interface CopyPlan {

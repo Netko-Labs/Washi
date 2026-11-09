@@ -1,4 +1,5 @@
 import { clockLabel } from '../../lib'
+import { isBusyCell, isOpenCell } from '../../registry'
 import { type AgendaEventProps, badgeOf, eventTimeOn, eventTitle, hueOf } from './lib'
 
 /** "10:00 AM–11:00 AM" the reader's way; a time column holding words keeps them. */
@@ -12,6 +13,11 @@ export function AgendaEvent({ row, columns, day, locale, onPress }: AgendaEventP
   const time = shownTime(eventTimeOn(row, columns, day), locale)
   const badge = badgeOf(row, columns)
   const title = eventTitle(row, columns)
+  const shown = columns.show ? row[columns.show] : undefined
+  const look = {
+    'data-busy': isBusyCell(shown) || undefined,
+    'data-window': isOpenCell(shown) || undefined,
+  }
   const body = (
     <>
       {time && <span className="wsx-agenda-time">{time}</span>}
@@ -21,7 +27,7 @@ export function AgendaEvent({ row, columns, day, locale, onPress }: AgendaEventP
   )
   if (!onPress) {
     return (
-      <div className="wsx-agenda-event" data-hue={hueOf(badge)}>
+      <div className="wsx-agenda-event" data-hue={hueOf(badge)} {...look}>
         {body}
       </div>
     )
@@ -31,6 +37,7 @@ export function AgendaEvent({ row, columns, day, locale, onPress }: AgendaEventP
       type="button"
       className="wsx-agenda-event"
       data-hue={hueOf(badge)}
+      {...look}
       aria-haspopup="dialog"
       onClick={() => onPress(row)}
     >

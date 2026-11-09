@@ -25,7 +25,7 @@ describe('the guide', () => {
 
   test('props read in words, off the spec', () => {
     const agenda = Object.fromEntries(propRows('Agenda').map((row) => [row.key, row]))
-    expect(agenda.view?.type).toBe('week · month')
+    expect(agenda.view?.type).toBe('week · month · hours')
     expect(agenda.bind?.required).toBe(true)
     expect(agenda.addLabel?.type).toBe('text ≤ 40')
     expect(agenda.tone?.styled).toBe(true)

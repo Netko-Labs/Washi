@@ -3,7 +3,9 @@ import { usePaperHost } from '../../provider'
 import { FormDialog } from '../form'
 import { AgendaDay } from './agenda-day'
 import { AgendaEventCard } from './agenda-event-card'
+import { AgendaHours } from './agenda-hours'
 import {
+  AGENDA_HOURS,
   AGENDA_MONTH_LIMIT,
   type AgendaProps,
   requestedByDay,
@@ -11,6 +13,16 @@ import {
   useAgendaAdd,
   useAgendaPeriod,
 } from './lib'
+
+/** The add form's fields: the day after the first, and a member's Show-as after the day. */
+function addFields(add: string[], date: string, time?: string, show?: string): string[] {
+  const withDay = time || add.includes(date) ? add : [...add.slice(0, 1), date, ...add.slice(1)]
+  if (!show || withDay.includes(show)) return withDay
+  const at = withDay.indexOf(date)
+  return at === -1
+    ? [...withDay, show]
+    : [...withDay.slice(0, at + 1), show, ...withDay.slice(at + 1)]
+}
 
 /**
  * A week or a month of rows on their dates, the way a calendar shows it: today marked, ‹ › to
@@ -31,6 +43,8 @@ export function Agenda({
   empty = 'Free',
   weekStart = 'monday',
   view = 'week',
+  hours = AGENDA_HOURS,
+  show,
   state: stateKey,
   ...rest
 }: AgendaProps) {
@@ -41,7 +55,7 @@ export function Agenda({
   const { adding } = adds
   const byDay = rowsByDay(period.state.rows, date)
   const asked = requestedByDay(period.requested)
-  const columns = { date, title, time, end, badge }
+  const columns = { date, title, time, end, badge, show }
   const addingOn = period.days.find((day) => day.key === adding)
   const picked = adds.pick?.kind === 'event' ? adds.pick.row : null
   // The card follows the row as it is written: a change refetches the week underneath it.
@@ -73,6 +87,17 @@ export function Agenda({
         <div className="wsx-empty" data-state="error" role="alert">
           This {unit} could not load — {period.state.error}
         </div>
+      ) : view === 'hours' ? (
+        <AgendaHours
+          days={period.days}
+          rows={period.state.rows}
+          columns={columns}
+          hours={hours}
+          locale={host.locale}
+          isLoading={period.state.status === 'loading'}
+          onPress={adds.openEvent}
+          onAdd={add && mode ? (day, at) => adds.open(day, at) : undefined}
+        />
       ) : (
         <div className="wsx-agenda-days" aria-busy={period.state.status === 'loading' || undefined}>
           {view === 'month' &&
@@ -106,11 +131,12 @@ export function Agenda({
           title={`${mode === 'suggest' ? 'Request' : (addLabel ?? 'Add')}${addingOn ? ` · ${addingOn.long}` : ''}`}
           table={bind.table}
           // The day sits after the first field (the title), its hours one press away — unless the
-          // agenda keeps its hours in columns of their own, offered then as hours lists.
-          fields={time || add.includes(date) ? add : [...add.slice(0, 1), date, ...add.slice(1)]}
+          // agenda keeps its hours in columns of their own, offered then as hours lists. A member
+          // also says what it is — an appointment, Busy, or Open for booking (D133).
+          fields={addFields(add, date, time, mode === 'write' ? show : undefined)}
           clocks={time ? { start: time, end } : undefined}
           submit={addLabel}
-          seed={adding ? { [date]: adding } : undefined}
+          seed={adding ? { [date]: adds.addingAt ?? adding } : undefined}
         />
       )}
       {shown && (

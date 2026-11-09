@@ -36,6 +36,7 @@ function targetOf(node: WsxElement): SuggestTarget | null {
         seeded: [date],
         date,
         minutes: typeof props.minutes === 'number' ? props.minutes : SLOT_MINUTES,
+        ...(text(props.show) && { show: text(props.show) }),
       }
     case 'Board': {
       const groupBy = text(props.groupBy)
@@ -82,3 +83,15 @@ export function spanOf(value: unknown, minutes = SLOT_MINUTES): Span | null {
 }
 
 export const spansOverlap = (a: Span, b: Span): boolean => a.from < b.to && b.from < a.to
+
+/** A Show-as cell that opens a window for booking (D133); any other value, or none, is busy. */
+export const isOpenCell = (value: unknown): boolean =>
+  typeof value === 'string' && value.trim().toLowerCase() === 'open'
+
+/** A Show-as cell that blocks time out without an appointment: drawn greyed (D133). */
+export const isBusyCell = (value: unknown): boolean =>
+  typeof value === 'string' && value.trim().toLowerCase() === 'busy'
+
+/** Whether `span` lies wholly inside one of `windows` — a booking inside an open window. */
+export const insideWindow = (span: Span, windows: Span[]): boolean =>
+  windows.some((window) => window.from <= span.from && span.to <= window.to)

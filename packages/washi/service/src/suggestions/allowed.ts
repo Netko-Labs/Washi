@@ -42,5 +42,7 @@ export function bookingFor(root: WsxElement, table: string, cells: RecordData): 
   const isTimed = (target: SuggestTarget) =>
     target.minutes !== undefined && String(cells[target.date ?? '']).includes('T')
   const held = calendars.find(isTimed) ?? calendars.find((target) => target.minutes === undefined)
-  return held?.date ? { date: held.date, minutes: held.minutes } : null
+  return held?.date
+    ? { date: held.date, minutes: held.minutes, ...(held.show && { show: held.show }) }
+    : null
 }
