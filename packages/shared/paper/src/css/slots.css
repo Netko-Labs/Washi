@@ -38,7 +38,7 @@
 }
 .wsx-slots-day[data-today] .wsx-slots-head {
   border-bottom-color: var(--accent);
-  color: var(--accent);
+  color: var(--tone-accent-text);
 }
 .wsx-slots-list {
   display: flex;

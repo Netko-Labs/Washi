@@ -13,14 +13,14 @@ export function RowActivity({ rowOf, people }: RowActivityProps) {
       <h2 className="mb-2 font-medium text-[12px] text-muted-foreground">Activity</h2>
       {days.map((day) => (
         <div key={day.label} className="mb-3">
-          <div className="mb-1 text-[11.5px] text-muted-foreground/70">{day.label}</div>
+          <div className="mb-1 text-[11.5px] text-muted-foreground">{day.label}</div>
           <ul className="flex flex-col gap-1">
             {day.entries.map((entry) => (
               <li key={entry.key} className="flex items-baseline justify-between gap-3">
                 <span className="min-w-0 text-muted-foreground">
                   <span className="font-medium text-foreground">{entry.who}</span> {entry.what}
                 </span>
-                <time className="shrink-0 text-[11.5px] text-muted-foreground/70 tabular-nums">
+                <time className="shrink-0 text-[11.5px] text-muted-foreground tabular-nums">
                   {entry.time}
                 </time>
               </li>

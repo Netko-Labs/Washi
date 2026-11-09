@@ -227,6 +227,16 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   frees an emoji's file; removing the emoji frees it only if nothing wears it (`isUploadWorn`).
   The picker's Unicode set is generated (`apps/studio/scripts/emoji-values.ts` from
   `emoji-test.txt`, ≤ Emoji 15.1) into `components/shared/emoji/values/` — never hand-edit it.
+- **Every colour reads, in every theme and mode (D130).** `css/__tests__/contrast.test.ts` composites
+  each pairing paper draws — tints mixed over the card they sit on, `color-mix` in srgb/oklab as
+  the CSS says, fixed tones and hues read off `tokens.css` — for all fifteen themes × light/dark:
+  text 4.5:1, a mark beside its label 3:1. Dark has its own hues (`--chart-*`) and info · neutral ·
+  danger fills; a pill's words are its hue deepened with ink (`--pill-hue`); links and refs are
+  `--link` (kraft toward ink); an event's time and badge are muted toward ink; small accent words
+  are `--tone-accent-text`. The one named exception is the brand's: white on Washi's orange is
+  4.02:1 (change it in brand-assets). `themeChecks` also flags (never refuses) quiet ink on the page
+  and on a quiet fill. The studio's quiet fills are `--ui-muted`/`--ui-accent`: paper's `--muted`
+  is quiet *ink*, so inside `.wsx` Tailwind's `bg-muted`/`bg-accent` read the page's own fill.
 - **A person picks a page's theme (D88).** `<Sheet theme>` is a registry id — the house eight and
   seven ported palettes (`theme-values/`, a light tone nudged in lightness where it missed the rules)
   — or `ws:<slug>`, a theme the workspace made: `workspace_themes` (workspace file), eight tokens a

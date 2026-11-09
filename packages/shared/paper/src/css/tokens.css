@@ -24,21 +24,27 @@
   --tone-warning-text: #7a5612;
   --tone-warning-on: #221f1a;
   --tone-danger: #b5543c;
-  --tone-danger-text: #9a4530;
+  --tone-danger-text: #8f3f2b;
   --tone-danger-on: #fbf9f4;
   --tone-neutral: #6f685d;
   --tone-neutral-text: #5c564c;
   --tone-neutral-on: #fbf9f4;
-  /* The accent deepened toward ink, so tinted fills keep it readable; Washi lands near #9e4a20. */
-  --tone-accent-text: color-mix(in oklab, var(--accent) 80%, var(--ink));
+  /* The accent deepened toward ink, so tinted fills keep it readable on every theme. */
+  --tone-accent-text: color-mix(in oklab, var(--accent) 65%, var(--ink));
 
+  /* Each hue reads at 3:1 on every theme's card (a mark beside its label), checked in
+     contrast.test.ts; dark has its own set below — the light ones sink into a dark card. */
   --chart-1: #c25f2c;
   --chart-2: #3d5a73;
-  --chart-3: #94a06b;
-  --chart-4: #a97f52;
-  --chart-5: #e3a99c;
+  --chart-3: #748249;
+  --chart-4: #9e7448;
+  --chart-5: #a85866;
+  /* A pill's words: its hue deepened with ink, so they read at 4.5:1 on the pill's own tint. */
+  --pill-hue: 30%;
   --kraft: #a97f52;
   --blush: #e3a99c;
+  /* Links and page references: kraft deepened toward the page's ink, 4.5:1 on every page. */
+  --link: color-mix(in oklab, var(--kraft) 40%, var(--ink));
 
   --shadow-card: 0 2px 10px rgba(34, 31, 26, 0.04);
   --shadow-drag: 0 8px 18px rgba(34, 31, 26, 0.16);
@@ -69,12 +75,26 @@
   --accent: var(--wsx-d-accent);
   --accent-ink: var(--wsx-d-accent-ink);
 
-  --tone-info-text: #9dbbd6;
-  --tone-success-text: #b9c48f;
-  --tone-warning-text: #e0b466;
-  --tone-danger-text: #e39a86;
-  --tone-neutral-text: #b5ab9b;
-  --tone-accent-text: var(--accent);
+  --tone-info: #86a5c2;
+  --tone-info-on: #1b1815;
+  --tone-neutral: #a89e8f;
+  --tone-neutral-on: #1b1815;
+  --tone-danger: #d06a50;
+  --tone-danger-on: #1b1815;
+  --tone-info-text: #a9c4dd;
+  --tone-success-text: #bfca95;
+  --tone-warning-text: #e5bc72;
+  --tone-danger-text: #eeab98;
+  --tone-neutral-text: #cfc6b8;
+  --tone-accent-text: color-mix(in oklab, var(--accent) 75%, var(--ink));
+
+  --chart-1: #e2875a;
+  --chart-2: #86a5c2;
+  --chart-3: #a9b57c;
+  --chart-4: #cba375;
+  --chart-5: #e3a99c;
+  --pill-hue: 30%;
+  --kraft: #cba375;
   --shadow-card: 0 2px 10px rgba(0, 0, 0, 0.3);
   --shadow-drag: 0 8px 18px rgba(0, 0, 0, 0.5);
 }
@@ -172,7 +192,7 @@
 
 /* emphasis = hierarchy within the current tone */
 .wsx [data-emphasis="quiet"] {
-  --em-alpha: 0.72;
+  --em-alpha: 0.8;
   --em-weight: 400;
 }
 .wsx,

@@ -14,6 +14,21 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/*
+ * Chrome drawn inside a page (its band, the editor, a row's properties) wears the page's theme.
+ * Paper names `--muted` its quiet *ink* and `--accent` its accent; the studio's quiet *fills* are
+ * `--ui-muted`/`--ui-accent`, so `bg-muted` there is the page's quiet fill, never its ink (D130).
+ */
+.wsx,
+.wsx-tokens {
+  --ui-muted: var(--muted-bg);
+  --ui-accent: var(--muted-bg);
+  --muted-foreground: var(--muted);
+  --accent-foreground: var(--ink);
+  --foreground: var(--ink);
+  --card-foreground: var(--ink);
+}
+
 /* A page set to full width drops its feel's measure; outranks every `.wsx[data-feel]`. */
 [data-full-width] .wsx,
 [data-full-width] .wsx[data-feel] {
@@ -54,9 +69,9 @@
   --card-foreground: #221f1a;
   --popover: #fffdf8;
   --popover-foreground: #221f1a;
-  --muted: #e9e4d9;
+  --ui-muted: #e9e4d9;
   --muted-foreground: #6a6359;
-  --accent: #e6e0d4;
+  --ui-accent: #e6e0d4;
   --accent-foreground: #221f1a;
   --secondary: #e9e4d9;
   --secondary-foreground: #221f1a;
@@ -82,9 +97,9 @@
   --card-foreground: #e8e6e1;
   --popover: #141414;
   --popover-foreground: #e8e6e1;
-  --muted: #161616;
+  --ui-muted: #161616;
   --muted-foreground: #8a8a85;
-  --accent: #1f1f1f;
+  --ui-accent: #1f1f1f;
   --accent-foreground: #e8e6e1;
   --secondary: #161616;
   --secondary-foreground: #e8e6e1;
@@ -107,9 +122,9 @@
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
+  --color-muted: var(--ui-muted);
   --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
+  --color-accent: var(--ui-accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);

@@ -5,6 +5,9 @@ export const THEME_RULES: readonly ThemeRule[] = [
   { fg: 'ink', on: 'bg', label: 'Ink on the page', warn: 7, refuse: 4.5 },
   { fg: 'ink', on: 'card', label: 'Ink on a card', warn: 7, refuse: 4.5 },
   { fg: 'muted', on: 'card', label: 'Quiet ink on a card', warn: 4.5, refuse: 3 },
+  // Flagged, never refused: a workspace theme saved before these rules still saves (D130).
+  { fg: 'muted', on: 'bg', label: 'Quiet ink on the page', warn: 4.5, refuse: 1 },
+  { fg: 'muted', on: 'mutedBg', label: 'Quiet ink on a quiet fill', warn: 4.5, refuse: 1 },
   { fg: 'accent', on: 'card', label: 'Accent on a card', warn: 4, refuse: 2.5 },
   { fg: 'accentInk', on: 'accent', label: 'Text on the accent', warn: 4, refuse: 3 },
   { fg: 'border', on: 'bg', label: 'Hairlines on the page', warn: 1.2, refuse: 1 },
