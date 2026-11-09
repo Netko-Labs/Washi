@@ -54,7 +54,8 @@
   padding: 3px 6px 4px 9px;
 }
 .wsx-hours-scroll {
-  max-height: min(70vh, 640px);
+  /* A fixed reach, not the window's (W3): the grid sizes to its page, and scrolls past it. */
+  max-height: 640px;
   overflow-y: auto;
   overscroll-behavior: contain;
 }

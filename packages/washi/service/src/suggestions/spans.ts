@@ -67,12 +67,16 @@ export function insideOpenWindow(
 ): boolean {
   const from = dayKey(span.from - SPAN_LOOKBACK_DAYS * 24 * 60)
   const to = dayKey(span.to + 24 * 60)
+  // Only candidate windows are read, the latest first — those nearest the time asked for — so a
+  // busy table's other rows never push an Open window past the scan.
   const { rows } = runQuery(ws, {
     table,
     where: [
       { column: date, op: 'gte', value: from },
       { column: date, op: 'lt', value: to },
+      { column: show, op: 'contains', value: 'open' },
     ],
+    orderBy: { column: date, direction: 'desc' },
     limit: TAKEN_SCAN_ROWS,
   })
   const windows = rows.flatMap((row) => {
