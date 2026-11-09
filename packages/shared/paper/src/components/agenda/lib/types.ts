@@ -1,5 +1,5 @@
 import type { Cell } from '@washi/ink'
-import type { BindState, BlockProps, Row, When } from '../../../lib/types'
+import type { BindState, BlockProps, Row, RowGuest, When } from '../../../lib/types'
 import type { BindQuery } from '../../../registry'
 
 export type WeekStart = 'monday' | 'sunday'
@@ -207,4 +207,8 @@ export interface AgendaRepeatProps extends AgendaCopyPageProps {
   weekStart: WeekStart
 }
 
-export type { Row, When }
+export interface AgendaEventGuestProps {
+  id: string | null
+}
+
+export type { Row, RowGuest, When }

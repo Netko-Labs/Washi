@@ -9,7 +9,7 @@ import {
   type Workspace,
 } from '@washi/repository'
 import type { WsxElement } from '@washi/wsx'
-import { accessOf } from '../sheets/look-of'
+import { accessOf, asksEmail } from '../sheets/look-of'
 import { hiddenIn, refuseReading, ShareRefusedError, sharedSheet } from '../sheets/share'
 import { InkError } from '../tables/errors'
 import { checkData } from '../tables/rules'
@@ -104,6 +104,9 @@ export function suggestRow(
   const { sheet, root, spec, writable } = suggesting(ws, token, ask.table)
   if (ask.trap) return { id: null }
   refuseOverLimit(ws, sheet.id, ipHash, now)
+  // The page decides whether a visitor gives an email (D131); one it does not ask for is not kept.
+  const email = asksEmail(root) ? (ask.email ?? '').trim() : ''
+  if (asksEmail(root) && !email) throw new SuggestionRefusedError('Your email is needed.')
   const names = Object.keys(ask.cells)
   if (names.length === 0) throw new SuggestionRefusedError('Fill in a field first.')
   const stray = names.find((name) => !writable.has(name))
@@ -122,7 +125,7 @@ export function suggestRow(
     dateColumn,
     cells: ask.cells,
     visitorName: ask.name,
-    visitorEmail: ask.email,
+    visitorEmail: email,
     ipHash,
   })
   return { id }

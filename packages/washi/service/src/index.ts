@@ -117,6 +117,7 @@ export {
   updateSheetMetaAndLook,
   updateSheetShareSubpages,
   updateSheetSuggest,
+  updateSheetSuggestEmail,
 } from './sheets/look'
 export { reindexPages } from './sheets/reindex'
 export { liftScriptsIntoCode } from './sheets/scripts-to-code'
@@ -155,6 +156,7 @@ export type { SharedTreePage, SheetEdit } from './sheets/types'
 export {
   approveSuggestion,
   declineSuggestion,
+  guestOfRecord,
   markSuggestionsSeen,
   requestedSpans,
   SuggestionError,

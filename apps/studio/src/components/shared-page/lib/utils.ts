@@ -53,7 +53,7 @@ export function trailTo(page: string, pages: SharedTreePage[]): SharedTreePage[]
 export function shareHost(
   workspaceId: string,
   token: string,
-  { embedsAnySite, suggest, page, home, pages, open }: ShareHostOptions,
+  { embedsAnySite, suggest, askEmail, page, home, pages, open }: ShareHostOptions,
 ): PaperHost {
   const refuse = async () => {
     throw new Error('This is a read-only copy of the page.')
@@ -74,6 +74,7 @@ export function shareHost(
       asked({ kind: 'requested', ask: { table, date, from, to } }),
     isReadOnly: true,
     ...(suggest && {
+      asksEmail: askEmail,
       describeWritable: describe('writable'),
       suggestRow: async (table, cells, visitor) => {
         await post(

@@ -126,11 +126,14 @@ export function hasEntries(entries: FormEntries): boolean {
   )
 }
 
-/** The visitor's name and a plausible email, or which of them to fill in again. */
-export function visitorGaps(visitor: Visitor): string[] {
+/**
+ * The visitor's name and, where the page asks it (D131), a plausible email — or which of them to
+ * fill in again.
+ */
+export function visitorGaps(visitor: Visitor, asksEmail = true): string[] {
   return [
     ...(visitor.name.trim() ? [] : ['name']),
-    ...(EMAIL_SHAPE.test(visitor.email.trim()) ? [] : ['email']),
+    ...(!asksEmail || EMAIL_SHAPE.test(visitor.email.trim()) ? [] : ['email']),
   ]
 }
 

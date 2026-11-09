@@ -6,6 +6,7 @@ import { ShareLink } from './share-link'
 import { SharePeople } from './share-people'
 import { ShareSubpages } from './share-subpages'
 import { ShareSuggest } from './share-suggest'
+import { ShareSuggestEmail } from './share-suggest-email'
 
 const workspaceRoute = getRouteApi('/w/$workspaceId')
 const LABEL =
@@ -60,6 +61,13 @@ export function SharePanel({ sheet }: SharePanelProps) {
             busy={share.busy}
             onChange={(suggest) => void share.setSuggest(suggest)}
           />
+          {settings.suggest && (
+            <ShareSuggestEmail
+              value={settings.askEmail}
+              busy={share.busy}
+              onChange={(askEmail) => void share.setAskEmail(askEmail)}
+            />
+          )}
           <ShareSubpages
             value={settings.subpages}
             busy={share.busy}

@@ -10,6 +10,7 @@ import {
 import { paperHost } from '@washi/ui'
 import { PROPERTY_ICONS, type RowPropertiesProps, useRowPage } from './lib'
 import { RowActivity } from './row-activity'
+import { RowGuest } from './row-guest'
 import { RowTitle } from './row-title'
 
 /** A row's page opens on the row: its name, then every property, each editable as Notion does. */
@@ -33,6 +34,7 @@ export function RowProperties({ sheetId }: RowPropertiesProps) {
       ) : (
         <h1 className="font-bold text-[32px] leading-tight">Untitled</h1>
       )}
+      <RowGuest recordId={String(row.id)} />
       <PaperProvider host={paperHost}>
         <dl className="mt-4 grid grid-cols-[150px_1fr] gap-y-1 text-[13.5px]">
           {table.spec.columns

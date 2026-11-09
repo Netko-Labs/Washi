@@ -96,6 +96,8 @@ export interface FormDraft {
   set: (column: string, value: Cell) => void
   /** `suggest` on a link that takes suggestions: the visitor says who they are. */
   mode: AddMode
+  /** Whether that visitor gives an email as well as a name (D131). */
+  asksEmail: boolean
   visitor: Visitor
   setVisitor: (field: keyof Visitor, value: string) => void
   status: FormStatus
@@ -141,6 +143,8 @@ export interface FormVisitorProps {
   onChange: (field: keyof Visitor, value: string) => void
   /** Which of `name` and `email` were turned back. */
   missing: string[]
+  /** False where the page asks only a name (D131). */
+  asksEmail?: boolean
 }
 
 export interface LandedNote {

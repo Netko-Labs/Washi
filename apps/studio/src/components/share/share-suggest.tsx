@@ -9,7 +9,7 @@ export function ShareSuggest(props: ShareToggleProps) {
       {...props}
       icon={IconInbox}
       label="Visitors can suggest rows"
-      detail="The page's forms, calendars and boards take a name and an email; each row waits in the Inbox until a member approves it. Redacted columns stay unreadable."
+      detail="The page's forms, calendars and boards take the visitor's name; each row waits on the page and in the Inbox until a member approves it. Redacted columns stay unreadable."
     />
   )
 }

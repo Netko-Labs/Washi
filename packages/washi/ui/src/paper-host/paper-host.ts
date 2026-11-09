@@ -171,6 +171,7 @@ export const paperHost: PaperHost = {
   },
 
   requested: (table, date, from, to) => api.suggestions.requested.query({ table, date, from, to }),
+  rowGuest: (recordId) => api.suggestions.guest.query({ recordId }),
 
   columnPages: async (table, column) => {
     const pages = await api.tables.columnPages.query({ table, column })

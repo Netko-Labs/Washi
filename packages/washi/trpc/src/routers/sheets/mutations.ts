@@ -13,6 +13,7 @@ import {
   updateSheetMetaAndLook,
   updateSheetShareSubpages,
   updateSheetSuggest,
+  updateSheetSuggestEmail,
 } from '@washi/service'
 import { z } from 'zod'
 import { pageProcedure, router, workspaceProcedure } from '../../init'
@@ -79,6 +80,10 @@ export const sheetMutations = router({
   setSuggest: pageProcedure
     .input(z.object({ id: z.string(), suggest: z.boolean() }))
     .mutation(({ ctx, input }) => updateSheetSuggest(ctx.ws, input.id, input.suggest)),
+  /** Whether a visitor's suggestion asks their email too (D131): a person's switch, never Washi's. */
+  setSuggestEmail: pageProcedure
+    .input(z.object({ id: z.string(), askEmail: z.boolean() }))
+    .mutation(({ ctx, input }) => updateSheetSuggestEmail(ctx.ws, input.id, input.askEmail)),
   /** Whether the page's link opens its sub-pages too (D123): a person's switch, never Washi's. */
   setShareSubpages: pageProcedure
     .input(z.object({ id: z.string(), subpages: z.boolean() }))

@@ -44,7 +44,10 @@ export function rowOf(suggestion: Suggestion, actions: SuggestionActions): Inbox
     id: `suggestion:${suggestion.id}`,
     kind: 'suggestion',
     at: editedAt(suggestion.hlcCreated),
-    who: `${suggestion.visitorName} (${suggestion.visitorEmail})`,
+    // A page that asks only a name (D131) leaves the email empty.
+    who: suggestion.visitorEmail
+      ? `${suggestion.visitorName} (${suggestion.visitorEmail})`
+      : suggestion.visitorName,
     verb: suggestion.kind === 'booking' ? 'suggested a booking on' : 'suggested a row on',
     where: suggestion.sheetTitle,
     detail: detailOf(suggestion),

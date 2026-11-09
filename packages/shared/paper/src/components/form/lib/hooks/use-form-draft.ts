@@ -33,6 +33,7 @@ export function useFormDraft({
   const [visitor, setVisitorState] = useState<Visitor>({ name: '', email: '' })
   const [status, setStatus] = useState<FormStatus>(IDLE)
   const mode = addModeOf(host)
+  const asksEmail = host.asksEmail !== false
   const values = { ...resolveDefaults(defaults, state), ...seed, ...entries }
 
   const clear = (key: string) =>
@@ -57,13 +58,16 @@ export function useFormDraft({
       return
     }
     const { name, email, trap } = visitor
-    await host.suggestRow(table, row, { name: name.trim(), email: email.trim(), trap })
+    // A page that asks only a name sends no email at all (D131).
+    const sent = asksEmail ? email.trim() : ''
+    await host.suggestRow(table, row, { name: name.trim(), email: sent, trap })
     refresh()
   }
 
   const submit = async () => {
     if (status.kind === 'busy') return null
-    const gaps = mode === 'suggest' ? visitorGaps(visitor).map((gap) => VISITOR_KEY + gap) : []
+    const gaps =
+      mode === 'suggest' ? visitorGaps(visitor, asksEmail).map((gap) => VISITOR_KEY + gap) : []
     const missing = [...missingOf(required, values), ...gaps]
     if (missing.length > 0) {
       setStatus({ kind: 'missing', columns: missing })
@@ -91,5 +95,5 @@ export function useFormDraft({
     return null
   }
 
-  return { values, set, mode, visitor, setVisitor, status, submit }
+  return { values, set, mode, asksEmail, visitor, setVisitor, status, submit }
 }

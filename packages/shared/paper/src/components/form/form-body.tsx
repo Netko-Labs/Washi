@@ -88,6 +88,7 @@ export function FormBody({
         <FormVisitor
           id={id}
           visitor={draft.visitor}
+          asksEmail={draft.asksEmail}
           onChange={draft.setVisitor}
           missing={missing.flatMap((key) =>
             key.startsWith(VISITOR) ? [key.slice(VISITOR.length)] : [],

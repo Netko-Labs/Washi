@@ -16,7 +16,8 @@ export function PageSuggestionRow({ suggestion }: PageSuggestionRowProps) {
         <p className="truncate text-[13px]">
           <span className="font-semibold">{suggestion.visitorName}</span>{' '}
           <span className="text-muted-foreground">
-            {suggestion.visitorEmail} · {relativeTime(suggestion.hlcCreated)}
+            {suggestion.visitorEmail && `${suggestion.visitorEmail} · `}
+            {relativeTime(suggestion.hlcCreated)}
           </span>
         </p>
         <p className="truncate text-[13px] text-muted-foreground">

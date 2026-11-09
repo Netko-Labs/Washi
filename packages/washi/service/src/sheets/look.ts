@@ -128,6 +128,15 @@ export function updateSheetSuggest(ws: Workspace, id: string, suggest: boolean):
   return updateSheetFromSource(ws, id, { title: sheet.title, tags: sheet.tags, source })
 }
 
+/** A person lets visitors suggest without an email (D131): off writes `suggestEmail={false}`. */
+export function updateSheetSuggestEmail(ws: Workspace, id: string, askEmail: boolean): SheetDetail {
+  const sheet = requireSheet(ws, id)
+  const root = parse(sheet.source)
+  const { suggestEmail: _ask, ...props } = root.props
+  const source = serialize({ ...root, props: askEmail ? props : { ...props, suggestEmail: false } })
+  return updateSheetFromSource(ws, id, { title: sheet.title, tags: sheet.tags, source })
+}
+
 /** A person lets a public page's link open its sub-pages too (D123); off, the prop goes. */
 export function updateSheetShareSubpages(
   ws: Workspace,
