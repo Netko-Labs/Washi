@@ -47,6 +47,7 @@ export type {
   SwitchProps,
   TableProps,
   TableValueProps,
+  TabProps,
   TabsProps,
   TaskProps,
   TextProps,
@@ -143,3 +144,4 @@ export type {
 } from './style'
 export type { AddMode, Visitor } from './suggest'
 export type { FileAs, FrameLook, TerminalProps, TerminalState } from './terminal'
+export type { ClockChoice, When } from './when'

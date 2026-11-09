@@ -1,5 +1,6 @@
 import { type Cell, CHOICE_COLUMN_TYPES, statusOptions } from '@washi/ink'
 import type { KeyboardEvent } from 'react'
+import { clockLabel, clockSpan, readWhen } from '../../../lib'
 import type { PaperHost } from '../../../provider'
 import type {
   Choice,
@@ -97,7 +98,10 @@ export function initialsOf(name: string): string {
     .toUpperCase()
 }
 
-/** `2026-11-04` reads "Nov 4, 2026"; a range "Nov 4 – 6, 2026", the locale's own way. */
+/**
+ * `2026-11-04` reads "Nov 4, 2026"; a range "Nov 4 – 6, 2026", the locale's own way. Hours read
+ * after the day — "Nov 4, 2026 · 10:00 AM – 11:30 AM" — as written, never shifted between zones.
+ */
 export function dateLabel(start: string, end: string, locale?: string): string {
   const format = new Intl.DateTimeFormat(locale, {
     month: 'short',
@@ -107,6 +111,16 @@ export function dateLabel(start: string, end: string, locale?: string): string {
   const from = new Date(`${start.slice(0, 10)}T00:00:00`)
   if (Number.isNaN(from.getTime())) return start
   const to = end ? new Date(`${end.slice(0, 10)}T00:00:00`) : null
+  const when = readWhen(end ? `${start}/${end}` : start)
+  if (when.time) {
+    const day = fullYears(format.formatToParts(from))
+    if (!to || Number.isNaN(to.getTime()) || !(to > from)) {
+      return `${day} · ${clockSpan(when, locale)}`
+    }
+    const last = fullYears(format.formatToParts(to))
+    const ends = when.endTime ? ` ${clockLabel(when.endTime, locale)}` : ''
+    return `${day} ${clockLabel(when.time, locale)} – ${last}${ends}`
+  }
   return fullYears(
     to && !Number.isNaN(to.getTime()) && to > from
       ? format.formatRangeToParts(from, to)

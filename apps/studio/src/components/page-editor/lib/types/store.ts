@@ -62,6 +62,8 @@ export interface EditorState {
   showTab: (tabsId: string, tabId: string) => void
   addTab: (tabsId: string) => void
   renameTab: (tabsId: string, tabId: string, label: string) => void
+  /** Keeps the tab off shared links, or lets it back on (D127). */
+  setTabSecret: (tabsId: string, tabId: string, isSecret: boolean) => void
   moveTab: (tabsId: string, tabId: string, step: -1 | 1) => void
   /** Its blocks go with it; down to one tab, the strip unwraps into the page. */
   removeTab: (tabsId: string, tabId: string) => void

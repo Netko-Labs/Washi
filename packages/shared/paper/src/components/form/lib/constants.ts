@@ -16,6 +16,5 @@ export const EMAIL_SHAPE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 /** The `<input type>` a one-line column takes; the rest are text. */
 export const FORM_INPUT_TYPES: Partial<Record<ColumnType, string>> = {
   number: 'number',
-  date: 'date',
   url: 'url',
 }

@@ -1,3 +1,4 @@
+import { IconLock } from '@tabler/icons-react'
 import { type DragEvent, useState } from 'react'
 import { MAX_TAB_LABEL, type TabLabelProps, useEditorStore } from './lib'
 import { TabMenu } from './tab-menu'
@@ -11,6 +12,7 @@ const takeCaret = (field: HTMLInputElement | null) => {
 export function TabLabel({ tabsId, tab, isActive }: TabLabelProps) {
   const [isRenaming, setRenaming] = useState(false)
   const store = useEditorStore.getState
+  const isSecret = tab.props.secret === true
 
   const onDragOver = (event: DragEvent<HTMLElement>) => {
     const { dragging } = store()
@@ -61,10 +63,22 @@ export function TabLabel({ tabsId, tab, isActive }: TabLabelProps) {
         onDoubleClick={() => setRenaming(true)}
         onDragOver={onDragOver}
         onDrop={onDrop}
+        title={isSecret ? 'Hidden from shared links' : undefined}
       >
+        {isSecret && (
+          <IconLock
+            aria-label="Hidden from shared links"
+            className="mr-1 inline size-3.5 align-[-2px] opacity-60"
+          />
+        )}
         {tab.label}
       </button>
-      <TabMenu tabsId={tabsId} tabId={tab.id} onRename={() => setRenaming(true)} />
+      <TabMenu
+        tabsId={tabsId}
+        tabId={tab.id}
+        isSecret={isSecret}
+        onRename={() => setRenaming(true)}
+      />
     </div>
   )
 }

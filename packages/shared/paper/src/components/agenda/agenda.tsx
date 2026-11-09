@@ -2,7 +2,7 @@ import { addModeOf, styled } from '../../lib'
 import { usePaperHost } from '../../provider'
 import { FormDialog } from '../form'
 import { AgendaDay } from './agenda-day'
-import { AgendaEventMenu } from './agenda-event-menu'
+import { AgendaEventCard } from './agenda-event-card'
 import {
   AGENDA_MONTH_LIMIT,
   type AgendaProps,
@@ -14,9 +14,10 @@ import {
 
 /**
  * A week or a month of rows on their dates, the way a calendar shows it: today marked, ‹ › to
- * move, each row opening where the reader is. With `add`, a day's + opens a modal Form on that day.
- * A host that adds rows gives each event a ⋯: Duplicate, Copy to…, Repeat on days…. A read-only
- * link draws neither, and times visitors asked for show as Requested (D120).
+ * move. An event pressed opens its card — when it is, its properties, Open page, Duplicate, Copy
+ * to…, Repeat…, Delete — changed in place by a member, read by a link. With `add`, a day's + opens
+ * a modal Form on that day with its hours one press away. Times visitors asked for show as
+ * Requested (D120).
  */
 export function Agenda({
   bind,
@@ -42,6 +43,9 @@ export function Agenda({
   const asked = requestedByDay(period.requested)
   const columns = { date, title, time, end, badge }
   const addingOn = period.days.find((day) => day.key === adding)
+  const picked = adds.pick?.kind === 'event' ? adds.pick.row : null
+  // The card follows the row as it is written: a change refetches the week underneath it.
+  const shown = picked ? (period.state.rows.find((row) => row.id === picked.id) ?? picked) : null
   const unit = view === 'month' ? 'month' : 'week'
 
   return (
@@ -86,9 +90,9 @@ export function Agenda({
               columns={columns}
               empty={empty}
               limit={view === 'month' ? AGENDA_MONTH_LIMIT : undefined}
+              locale={host.locale}
               onAdd={add && mode ? () => adds.open(day.key) : undefined}
-              onOpen={host.openRow}
-              onMenu={mode === 'write' && host.newRow ? adds.openEvent : undefined}
+              onPress={adds.openEvent}
             />
           ))}
         </div>
@@ -101,18 +105,25 @@ export function Agenda({
           isBooking
           title={`${mode === 'suggest' ? 'Request' : (addLabel ?? 'Add')}${addingOn ? ` · ${addingOn.long}` : ''}`}
           table={bind.table}
-          fields={add}
+          // The day sits after the first field (the title), its hours one press away — unless the
+          // agenda keeps its hours in columns of their own, offered then as hours lists.
+          fields={time || add.includes(date) ? add : [...add.slice(0, 1), date, ...add.slice(1)]}
+          clocks={time ? { start: time, end } : undefined}
           submit={addLabel}
           seed={adding ? { [date]: adding } : undefined}
         />
       )}
-      {adds.pick?.kind === 'event' && (
-        <AgendaEventMenu
-          row={adds.pick.row}
+      {shown && (
+        <AgendaEventCard
+          key={String(shown.id)}
+          row={shown}
           table={bind.table}
           columns={columns}
           weekStart={weekStart}
           locale={host.locale}
+          canWrite={mode === 'write'}
+          canCopy={mode === 'write' && Boolean(host.newRow)}
+          onOpenPage={host.openRow}
           onClose={adds.close}
         />
       )}

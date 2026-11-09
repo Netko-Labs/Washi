@@ -38,6 +38,7 @@ export interface TabLabelProps {
 export interface TabMenuProps {
   tabsId: string
   tabId: string
+  isSecret: boolean
   onRename: () => void
 }
 
@@ -50,7 +51,7 @@ export interface ColumnGapProps {
 
 export type TabActions = Pick<
   EditorState,
-  'shownTabs' | 'showTab' | 'addTab' | 'renameTab' | 'moveTab' | 'removeTab'
+  'shownTabs' | 'showTab' | 'addTab' | 'renameTab' | 'setTabSecret' | 'moveTab' | 'removeTab'
 >
 
 export type SaveState = 'saved' | 'saving' | 'failed' | 'invalid'

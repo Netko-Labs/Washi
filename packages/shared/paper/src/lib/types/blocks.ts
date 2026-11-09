@@ -84,6 +84,12 @@ export interface ShowProps {
 export interface TabsProps extends BlockProps {
   labels: string[]
   state?: string
+  /** Which tabs are secret, by position: marked for members, never on a link (D127). */
+  secret?: boolean[]
+}
+
+export interface TabProps extends BlockProps {
+  secret?: boolean
 }
 
 export interface RevealProps extends BlockProps {

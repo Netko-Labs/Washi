@@ -5,6 +5,7 @@ import { useEffect } from 'react'
 import { useCommentsStore } from '@/components/comments'
 import { PagePresence } from '@/components/presence'
 import { RowProperties } from '@/components/row-properties'
+import { PageSuggestions } from '@/components/suggestions'
 import { CoverPicker } from './cover-picker'
 import { IconPicker } from './icon-picker'
 import { type PageChromeProps, useLookPickerStore } from './lib'
@@ -15,7 +16,7 @@ const QUIET_BUTTON =
 
 /**
  * The studio's band under a page's icon: who is here, quiet buttons to add what the page lacks,
- * a row's properties, and the pickers. The cover and icon themselves are the page's (D64).
+ * a row's properties, what visitors asked of it through its link, and the pickers. The cover and icon themselves are the page's (D64).
  */
 export function PageChrome({ pageId }: PageChromeProps) {
   const sheet = useSheetsStore((state) => state.sheets.find((entry) => entry.id === pageId))
@@ -72,6 +73,7 @@ export function PageChrome({ pageId }: PageChromeProps) {
         </button>
       </div>
       {sheet.rowOf && <RowProperties sheetId={sheet.id} />}
+      {!sheet.rowOf && <PageSuggestions sheetId={sheet.id} />}
       {open?.part === 'icon' && (
         <IconPicker
           anchor={open.anchor}

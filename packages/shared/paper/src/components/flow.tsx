@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { styled, useExprValue } from '../lib'
-import type { BlockProps, RevealProps, ShowProps, TabsProps } from '../lib/types'
+import type { RevealProps, ShowProps, TabProps, TabsProps } from '../lib/types'
 import { useSheetState } from '../state'
 
 export function Show({ expr, children }: ShowProps) {
@@ -12,7 +12,7 @@ export function Show({ expr, children }: ShowProps) {
     : null
 }
 
-export function Tabs({ labels, state, children, ...rest }: TabsProps) {
+export function Tabs({ labels, state, secret = [], children, ...rest }: TabsProps) {
   const sheet = useSheetState()
   const [internal, setInternal] = useState(0)
   const active = state
@@ -32,6 +32,8 @@ export function Tabs({ labels, state, children, ...rest }: TabsProps) {
             role="tab"
             className="wsx-tabs-tab"
             aria-selected={index === active}
+            data-secret={secret[index] || undefined}
+            title={secret[index] ? 'Hidden from shared links' : undefined}
             onClick={() => select(index)}
           >
             {label}
@@ -43,7 +45,7 @@ export function Tabs({ labels, state, children, ...rest }: TabsProps) {
   )
 }
 
-export function Tab({ children, ...rest }: BlockProps) {
+export function Tab({ children, secret: _secret, ...rest }: TabProps) {
   return <div {...styled(rest, 'wsx-tab')}>{children}</div>
 }
 

@@ -9,9 +9,9 @@ export function AgendaDay({
   columns,
   empty,
   limit,
+  locale,
   onAdd,
-  onOpen,
-  onMenu,
+  onPress,
 }: AgendaDayProps) {
   const shown = limit === undefined ? rows : rows.slice(0, limit)
   const folded = rows.slice(shown.length)
@@ -20,8 +20,8 @@ export function AgendaDay({
       key={String(row.id ?? index)}
       row={row}
       columns={columns}
-      onOpen={onOpen}
-      onMenu={onMenu}
+      locale={locale}
+      onPress={onPress}
     />
   )
 

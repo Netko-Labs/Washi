@@ -4,7 +4,14 @@ import { parse, serialize, validate } from '@washi/wsx'
 import { moveBlock } from '../lib/columns'
 import { newBlock, toBlocks, toSheet } from '../lib/convert'
 import { flatten, isColumns, isTabs, locate, tidy } from '../lib/slots'
-import { newTabs, withNewTab, withoutTab, withTabLabel, withTabMoved } from '../lib/tabs'
+import {
+  newTabs,
+  withNewTab,
+  withoutTab,
+  withTabLabel,
+  withTabMoved,
+  withTabSecret,
+} from '../lib/tabs'
 import type { Block, TabsBlock } from '../lib/types'
 import { slashMatches } from '../lib/utils'
 
@@ -23,6 +30,17 @@ const labels = (blocks: Block[]) => strip(blocks).tabs.map((tab) => tab.label)
 const saved = (blocks: Block[]) => toSheet(ROOT, blocks)
 
 describe('tabs in the editor', () => {
+  test('a tab hidden from shared links saves as secret, and back (D127)', () => {
+    const blocks = toBlocks(parse(SOURCE))
+    const tabs = strip(blocks)
+    const second = tabs.tabs[1]?.id ?? ''
+    const hidden = withTabSecret(blocks, tabs.id, second, true)
+    const source = serialize(saved(hidden))
+    expect(source).toContain('<Tab secret>')
+    expect(validate(parse(source), paperRegistry).filter((d) => d.severity === 'error')).toEqual([])
+    expect(serialize(saved(withTabSecret(hidden, tabs.id, second, false)))).not.toContain('secret')
+  })
+
   test('a Washi-written Tabs page edits in place and saves back byte for byte', () => {
     const blocks = toBlocks(parse(SOURCE))
     const tabs = strip(blocks)

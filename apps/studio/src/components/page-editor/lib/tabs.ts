@@ -51,6 +51,18 @@ export function withTabLabel(blocks: Block[], tabsId: string, tabId: string, lab
   }))
 }
 
+/** A secret tab stays off every shared link, its label too; members always see it (D127). */
+export function withTabSecret(blocks: Block[], tabsId: string, tabId: string, isSecret: boolean) {
+  return withTabs(blocks, tabsId, (block) => ({
+    ...block,
+    tabs: block.tabs.map((tab) => {
+      if (tab.id !== tabId) return tab
+      const { secret: _secret, ...props } = tab.props
+      return { ...tab, props: isSecret ? { ...props, secret: true } : props }
+    }),
+  }))
+}
+
 export function withTabMoved(blocks: Block[], tabsId: string, tabId: string, step: -1 | 1) {
   return withTabs(blocks, tabsId, (block) => {
     const at = block.tabs.findIndex((tab) => tab.id === tabId)

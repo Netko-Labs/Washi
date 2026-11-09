@@ -1,4 +1,5 @@
-import type { BindState, BlockProps, Row } from '../../../lib/types'
+import type { Cell } from '@washi/ink'
+import type { BindState, BlockProps, Row, When } from '../../../lib/types'
 import type { BindQuery } from '../../../registry'
 
 export type WeekStart = 'monday' | 'sunday'
@@ -80,10 +81,10 @@ export interface AgendaDayProps {
   requested?: string[]
   /** Events shown before the rest fold under "+N more". */
   limit?: number
+  locale?: string
   onAdd?: () => void
-  onOpen?: (id: string) => void
-  /** The event's ⋯: Duplicate, Copy to…, Repeat on days…; without it (a read-only host) none. */
-  onMenu?: (row: Row) => void
+  /** Opens the event's card: its time, its properties, and what can be done with it. */
+  onPress?: (row: Row) => void
 }
 
 /** The day a + was pressed on, and what is said once its row is sent. */
@@ -101,8 +102,8 @@ export interface AgendaAdd {
 export interface AgendaEventProps {
   row: Row
   columns: AgendaColumns
-  onOpen?: (id: string) => void
-  onMenu?: (row: Row) => void
+  locale?: string
+  onPress?: (row: Row) => void
 }
 
 /** What a press opened over the agenda: a day's + Form, or an event's ⋯. */
@@ -123,7 +124,7 @@ export interface WeekdayChip {
   label: string
 }
 
-export type EventMenuPage = 'menu' | 'copy' | 'repeat'
+export type EventMenuPage = 'card' | 'copy' | 'repeat'
 
 export type EventCopyStatus =
   | { kind: 'idle' }
@@ -138,13 +139,59 @@ export interface EventCopy {
   copy: (entries: CopyEntries) => Promise<void>
 }
 
-export interface AgendaEventMenuProps {
+export interface AgendaEventCardProps {
   row: Row
   table: string
   columns: AgendaColumns
   weekStart: WeekStart
   locale?: string
+  /** A member's agenda: the time and properties change in place, and the event can be deleted. */
+  canWrite: boolean
+  /** Duplicate, Copy to…, Repeat on days… — where the host adds rows. */
+  canCopy: boolean
+  /** Opens the event as its own page; a host without row pages leaves it out. */
+  onOpenPage?: (id: string) => void
   onClose: () => void
+}
+
+/** A cell patch the event's card writes: its date, or its own time columns too. */
+export type EventPatch = Record<string, Cell>
+
+export type EventWriteStatus =
+  | { kind: 'idle' }
+  | { kind: 'busy' }
+  | { kind: 'refused'; reason: string }
+
+export interface EventWrite {
+  status: EventWriteStatus
+  write: (set: EventPatch) => Promise<void>
+  remove: () => Promise<void>
+}
+
+export interface AgendaEventWhenProps {
+  row: Row
+  columns: AgendaColumns
+  locale?: string
+  /** Without it the time is words; with it, the day and hours to change in place. */
+  onChange?: (when: When) => void
+}
+
+export interface AgendaEventFieldsProps {
+  row: Row
+  table: string
+  columns: AgendaColumns
+  onWrite?: (set: EventPatch) => void
+}
+
+export interface AgendaEventActionsProps {
+  id: string | null
+  canCopy: boolean
+  canDelete: boolean
+  isBusy: boolean
+  onOpenPage?: () => void
+  onDuplicate: () => void
+  onPage: (page: EventMenuPage) => void
+  onDelete: () => void
 }
 
 export interface AgendaCopyPageProps {
@@ -160,4 +207,4 @@ export interface AgendaRepeatProps extends AgendaCopyPageProps {
   weekStart: WeekStart
 }
 
-export type { Row }
+export type { Row, When }

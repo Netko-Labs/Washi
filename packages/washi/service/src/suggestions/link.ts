@@ -1,6 +1,6 @@
 import type { RequestedAsk, SuggestionAsk } from '@washi/domain'
 import type { TableSpec } from '@washi/ink'
-import { spanOf } from '@washi/paper/registry'
+import { redactForShare, spanOf } from '@washi/paper/registry'
 import {
   countPendingOnSheet,
   countSuggestionsSince,
@@ -20,7 +20,9 @@ import { requestedSpans, takenBy } from './spans'
 
 /** The page behind a link that takes suggestions, and what it lets a visitor write in `table`. */
 function suggesting(ws: Workspace, token: string, table: string) {
-  const { sheet, root } = sharedSheet(ws, token)
+  const { sheet, root: whole } = sharedSheet(ws, token)
+  // Only what the link draws takes suggestions: never a form inside a secret tab (D127).
+  const root = redactForShare(whole)
   if (!accessOf(root).suggest) throw new ShareRefusedError('this page does not take suggestions')
   const spec = getTableByName(ws, table)?.spec
   const writable = spec ? writableColumns(root, spec) : new Set<string>()

@@ -8,6 +8,7 @@ import {
   sharedPage,
   sharedQuery,
   sharedTable,
+  shareSettings,
 } from '../sheets/share'
 import { defineUserTable, runMutation } from '../tables/service'
 
@@ -126,5 +127,77 @@ describe('a shared link (D65)', () => {
     })
     const child = publicPage(parent.id)
     expect(() => sharedPage(ws, child.token)).toThrow(ShareGoneError)
+  })
+})
+
+describe('a secret tab (D127)', () => {
+  const Tabbed = `<Sheet title="Clinic" state={{ local: { view: "Ledger" } }}>
+  <Tabs labels={["Week", "Ledger"]} state="view">
+    <Tab><Table bind={{ table: "deals" }} /></Tab>
+    <Tab secret><Text>Fees we charge.</Text><Table bind={{ table: "salaries" }} /></Tab>
+  </Tabs>
+</Sheet>`
+
+  function tabbedPage() {
+    const sheet = createSheetFromSource(ws, { title: 'Clinic', source: Tabbed }, null)
+    updateSheetAccess(ws, sheet.id, { visibility: 'public', access: [] }, 'rin')
+    return { id: sheet.id, token: liveShareFor(ws, sheet.id)?.token ?? '' }
+  }
+
+  test('never leaves for a link: not its panel, not its label, not as the starting tab', () => {
+    const { token } = tabbedPage()
+    const { source } = sharedPage(ws, token)
+    expect(source).toContain('Week')
+    expect(source).not.toContain('Ledger')
+    expect(source).not.toContain('Fees we charge')
+    expect(source).not.toContain('secret')
+  })
+
+  test('only its own strip’s state is scrubbed, never a shown tab’s value elsewhere', () => {
+    const sheet = createSheetFromSource(
+      ws,
+      {
+        title: 'Two strips',
+        source: `<Sheet title="Two strips" state={{ local: { a: "Notes", b: "Notes" } }}>
+  <Tabs labels={["Week", "Notes"]} state="a"><Tab><Text>w</Text></Tab><Tab secret><Text>shut</Text></Tab></Tabs>
+  <Tabs labels={["Plan", "Notes"]} state="b"><Tab><Text>p</Text></Tab><Tab><Text>open notes</Text></Tab></Tabs>
+</Sheet>`,
+      },
+      null,
+    )
+    updateSheetAccess(ws, sheet.id, { visibility: 'public', access: [] }, 'rin')
+    const { source } = sharedPage(ws, liveShareFor(ws, sheet.id)?.token ?? '')
+    expect(source).not.toContain('shut')
+    expect(source).toContain('open notes')
+    expect(source).toContain(`"b":"Notes"`)
+    expect(source).not.toContain(`"a":"Notes"`)
+  })
+
+  test('a table only it shows cannot be asked about through the link', () => {
+    const { token } = tabbedPage()
+    expect(sharedQuery(ws, token, { table: 'deals' }).rows).toHaveLength(1)
+    expect(() => sharedQuery(ws, token, { table: 'salaries' })).toThrow(ShareRefusedError)
+  })
+
+  test('the Share popover counts it', () => {
+    const { id } = tabbedPage()
+    expect(shareSettings(ws, id).hidden).toEqual({ blocks: 0, tabs: 1, columns: {} })
+  })
+
+  test('a strip of secret tabs alone is gone whole', () => {
+    const sheet = createSheetFromSource(
+      ws,
+      {
+        title: 'Notes',
+        source:
+          '<Sheet title="Notes"><Text>Open.</Text><Tabs labels={["A"]}><Tab secret><Text>Shut.</Text></Tab></Tabs></Sheet>',
+      },
+      null,
+    )
+    updateSheetAccess(ws, sheet.id, { visibility: 'public', access: [] }, 'rin')
+    const { source } = sharedPage(ws, liveShareFor(ws, sheet.id)?.token ?? '')
+    expect(source).toContain('Open.')
+    expect(source).not.toContain('Tabs')
+    expect(source).not.toContain('Shut.')
   })
 })

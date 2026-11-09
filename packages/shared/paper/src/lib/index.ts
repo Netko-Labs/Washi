@@ -1,5 +1,23 @@
 export { addModeOf } from './add-mode'
 export { resolveQuery } from './bind'
+export {
+  CLOCK_STEP,
+  clockChoices,
+  clockLabel,
+  clockSpan,
+  DEFAULT_MINUTES,
+  durationWords,
+  FIRST_HOUR,
+  minutesOf,
+  readWhen,
+  shiftClock,
+  spanMinutes,
+  withDay,
+  withoutTime,
+  withStart,
+  withTime,
+  writeWhen,
+} from './clock'
 export { DAY, dayLabel, whenLabel } from './days'
 export { base64Of, fileAsOf, readFileAs, readTerminalFiles } from './files'
 export { useBind } from './hooks/use-bind'
@@ -33,6 +51,7 @@ export type {
   BindState,
   BlockProps,
   CellKind,
+  ClockChoice,
   Emphasis,
   Feel,
   Gap,
@@ -52,6 +71,7 @@ export type {
   Tone,
   Variant,
   Visitor,
+  When,
   Width,
 } from './types'
 export { VALUE_TONES } from './values'

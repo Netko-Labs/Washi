@@ -1,4 +1,12 @@
-import { IconArrowLeft, IconArrowRight, IconDots, IconPencil, IconTrash } from '@tabler/icons-react'
+import {
+  IconArrowLeft,
+  IconArrowRight,
+  IconDots,
+  IconLock,
+  IconLockOpen,
+  IconPencil,
+  IconTrash,
+} from '@tabler/icons-react'
 import { useRef, useState } from 'react'
 import { useDismiss } from '@/components/shared/dismiss'
 import { Floating } from '@/components/shared/floating'
@@ -7,8 +15,11 @@ import { type TabMenuProps, useEditorStore } from './lib'
 const ITEM =
   'flex h-8 w-full items-center gap-2 rounded-lg px-2 text-left text-[13px] hover:bg-black/5 dark:hover:bg-white/10'
 
-/** The ⋯ beside a tab: rename it, move it along the strip, or delete it with what it holds. */
-export function TabMenu({ tabsId, tabId, onRename }: TabMenuProps) {
+/**
+ * The ⋯ beside a tab: rename it, keep it off shared links, move it along the strip, or delete it
+ * with what it holds.
+ */
+export function TabMenu({ tabsId, tabId, isSecret, onRename }: TabMenuProps) {
   const [isOpen, setOpen] = useState(false)
   const root = useRef<HTMLDivElement>(null)
   useDismiss(root, isOpen, () => setOpen(false))
@@ -36,11 +47,25 @@ export function TabMenu({ tabsId, tabId, onRename }: TabMenuProps) {
           anchor={root}
           role="menu"
           aria-label="Tab options"
-          className="w-[200px] rounded-xl border border-border bg-popover p-1 font-sans text-popover-foreground shadow-[0_16px_48px_rgb(0_0_0/0.18)]"
+          className="w-[220px] rounded-xl border border-border bg-popover p-1 font-sans text-popover-foreground shadow-[0_16px_48px_rgb(0_0_0/0.18)]"
         >
           <button type="button" role="menuitem" onClick={() => act(onRename)} className={ITEM}>
             <IconPencil className="size-4 text-muted-foreground" />
             Rename
+          </button>
+          <button
+            type="button"
+            role="menuitemcheckbox"
+            aria-checked={isSecret}
+            onClick={() => act(() => store().setTabSecret(tabsId, tabId, !isSecret))}
+            className={ITEM}
+          >
+            {isSecret ? (
+              <IconLockOpen className="size-4 text-muted-foreground" />
+            ) : (
+              <IconLock className="size-4 text-muted-foreground" />
+            )}
+            {isSecret ? 'Show on shared links' : 'Hide from shared links'}
           </button>
           <button
             type="button"

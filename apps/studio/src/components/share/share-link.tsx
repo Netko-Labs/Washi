@@ -38,7 +38,8 @@ export function ShareLink({ url, hidden }: ShareLinkProps) {
           </span>
         ) : (
           <span className="text-muted-foreground">
-            Nothing is hidden. Wrap a block in Redact, or redact a view's columns, to keep it in.
+            Nothing is hidden. Wrap a block in Redact, redact a view's columns, or hide a tab from
+            shared links to keep it in.
           </span>
         )}
       </p>

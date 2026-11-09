@@ -133,7 +133,8 @@ function namesIn(node: unknown, into: Set<string>): Set<string> {
  * another formula — or `cop = usd * fx_rate` would hand a hidden `usd` straight to the link.
  */
 export function hiddenIn(ws: Workspace, root: WsxElement, table: string): Set<string> {
-  const readable = linkTables(ws, root)
+  // Only what the link draws reads: a table shown inside a Redact or a secret tab alone is off (D127).
+  const readable = linkTables(ws, redactForShare(root))
   if (!readable.has(table)) {
     throw new ShareRefusedError(`this page does not read "${table}"`)
   }
@@ -250,6 +251,6 @@ export function shareSettings(ws: Workspace, id: string) {
     token: liveShareFor(ws, id)?.token ?? null,
     suggest: sheet?.suggest ?? false,
     subpages: root ? sharesSubpages(root) : false,
-    hidden: root ? redactionSummary(root) : { blocks: 0, columns: {} },
+    hidden: root ? redactionSummary(root) : { blocks: 0, tabs: 0, columns: {} },
   }
 }

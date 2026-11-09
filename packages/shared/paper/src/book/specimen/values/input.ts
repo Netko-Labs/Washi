@@ -64,7 +64,8 @@ export const INPUT_SPECIMENS: Record<string, Specimen> = {
   },
   Tabs: {
     props: { labels: ['Board', 'Notes'], state: 'tab' },
-    children: '<Tab><Text>Panel one.</Text></Tab><Tab><Text>Panel two.</Text></Tab>',
+    children:
+      '<Tab><Text>Panel one.</Text></Tab><Tab secret><Text>Panel two: members only, never on a link.</Text></Tab>',
   },
   Tab: {
     children: '<Text>This panel.</Text>',
