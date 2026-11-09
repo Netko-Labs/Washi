@@ -27,6 +27,7 @@ export function useCardActions(onOpen: ActionRef | undefined, table: string): Ca
     locale: host.locale,
     isSpecRead: look.spec !== null,
     openable: Boolean(onOpen ?? host.openRow),
+    movable: !host.isReadOnly,
     open: (row: Row) => {
       if (onOpen) void run(resolveRowDeep(onOpen as never, row) as never)
       else if (typeof row.id === 'string') host.openRow?.(row.id)

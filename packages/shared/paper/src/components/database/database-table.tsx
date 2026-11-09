@@ -19,14 +19,14 @@ export function DatabaseTable({ db, view, empty }: ViewProps) {
             columns={columns}
             title={title}
             local={local}
-            onAdd={actions.addProperty}
+            onAdd={actions.canEdit ? actions.addProperty : undefined}
           />
           <DatabaseRows
             db={db}
             columns={columns}
             title={title}
             rows={rows}
-            commit={commit}
+            commit={actions.canEdit ? commit : undefined}
             onOpen={actions.canOpen ? actions.open : undefined}
           />
         </table>

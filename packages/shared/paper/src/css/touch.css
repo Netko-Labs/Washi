@@ -1,0 +1,56 @@
+/*
+ * A finger, not a pointer (D132): every control a reader presses is at least 44px on a touch
+ * screen. Where the look should stay small (a switch, a checkbox, a day's +) the hit area grows
+ * around it invisibly instead; inline words (a Ref, a link in a sentence) stay as they read.
+ */
+@media (pointer: coarse) {
+  .wsx
+    :is(
+      .wsx-agenda-nav button,
+      .wsx-db-pick-select,
+      .wsx-db-reading,
+      .wsx-db-input,
+      .wsx-when-chip,
+      .wsx-agenda-card-action,
+      .wsx-tabs-tab,
+      .wsx-outline-entry,
+      .wsx-db-open,
+      .wsx-reveal > summary,
+      .wsx-faq summary
+    ) {
+    min-height: 44px;
+  }
+  .wsx .wsx-agenda-nav button {
+    min-width: 44px;
+  }
+  .wsx :is(.wsx-dialog-close, .wsx-db-plus) {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .wsx .wsx-include-from {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  /* Small to look at, large to press: the hit area reaches past the drawn control. */
+  /* (A switch and a task's box already reach 44px: controls.css.) */
+  .wsx .wsx-agenda-add {
+    position: relative;
+  }
+  .wsx .wsx-agenda-add::after {
+    content: "";
+    position: absolute;
+    inset: -12px;
+  }
+  .wsx :is(.wsx-form-check, .wsx-db-check, .wsx-task input[type="checkbox"]) {
+    width: 22px;
+    height: 22px;
+  }
+
+  /* A canvas's own zoom buttons. */
+  .wsx .react-flow__controls-button {
+    width: 40px;
+    height: 40px;
+  }
+}

@@ -1,4 +1,4 @@
-import type { Row } from '../../lib'
+import { clockLabel, type Row } from '../../lib'
 import { AgendaEvent } from './agenda-event'
 import type { AgendaDayProps } from './lib'
 
@@ -20,6 +20,7 @@ export function AgendaDay({
       key={String(row.id ?? index)}
       row={row}
       columns={columns}
+      day={day.key}
       locale={locale}
       onPress={onPress}
     />
@@ -51,7 +52,7 @@ export function AgendaDay({
       <div className="wsx-agenda-events">
         {requested.map((time, index) => (
           <span key={`${time}-${String(index)}`} className="wsx-agenda-requested">
-            Requested{time && ` · ${time}`}
+            Requested{time && ` · ${clockLabel(time, locale)}`}
           </span>
         ))}
         {rows.length > 0

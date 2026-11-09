@@ -1,3 +1,4 @@
+import { clockLabel } from '../../../lib'
 import type { Row } from '../../../lib/types'
 import { DAY_MINUTES, WEEKDAYS } from './constants'
 import type { Busy, DaySlot, Slot, Weekday, WeekStart } from './types'
@@ -89,7 +90,7 @@ export function openingWeek(
   return 1
 }
 
-/** A booked slot in the reader's words: "Tue 3 Nov, 10:00". */
+/** A booked slot in the reader's words: "Tue 3 Nov, 10:00 AM" — the clock the reader reads (D132). */
 export function slotWords(slot: Slot, locale?: string): string {
   const day = new Date(`${slot.start.slice(0, 10)}T00:00:00Z`).toLocaleDateString(locale, {
     weekday: 'short',
@@ -97,7 +98,7 @@ export function slotWords(slot: Slot, locale?: string): string {
     month: 'short',
     timeZone: 'UTC',
   })
-  return `${day}, ${slot.label}`
+  return `${day}, ${clockLabel(slot.label, locale)}`
 }
 
 /** The reader's wall clock now, in the same minutes the slots count in. */

@@ -244,3 +244,22 @@
     opacity: 1;
   }
 }
+
+/* A read-only link's cell (D132): the value, nothing to press. */
+.wsx-db-read {
+  display: flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 8px;
+  font-size: 13.5px;
+  overflow-wrap: anywhere;
+}
+/* Words for a screen reader alone. */
+.wsx-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

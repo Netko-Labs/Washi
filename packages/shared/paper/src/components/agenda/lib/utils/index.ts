@@ -17,6 +17,7 @@ export {
   dayKeyOf,
   eventDays,
   eventTime,
+  eventTimeOn,
   eventTitle,
   hueOf,
   isoDay,

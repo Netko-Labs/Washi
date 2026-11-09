@@ -21,7 +21,7 @@
 .wsx-heatmap-months span {
   overflow: visible;
   color: var(--muted);
-  font-size: 10px;
+  font-size: 11px;
   white-space: nowrap;
 }
 .wsx-heatmap-cell {

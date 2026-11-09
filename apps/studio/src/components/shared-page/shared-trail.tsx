@@ -16,7 +16,7 @@ export function SharedTrail({ page, onOpen }: SharedTrailProps) {
         type="button"
         onClick={() => onOpen(undefined)}
         aria-current={isHome ? 'page' : undefined}
-        className="shrink-0 rounded px-1.5 py-0.5 hover:bg-accent hover:text-foreground aria-[current=page]:text-foreground"
+        className="shrink-0 rounded px-1.5 py-0.5 hover:bg-accent pointer-coarse:min-h-10 hover:text-foreground aria-[current=page]:text-foreground"
       >
         {page.home.title}
       </button>
@@ -27,7 +27,7 @@ export function SharedTrail({ page, onOpen }: SharedTrailProps) {
             type="button"
             onClick={() => onOpen(step.id)}
             aria-current={step.id === page.id ? 'page' : undefined}
-            className="max-w-[16rem] shrink-0 truncate rounded px-1.5 py-0.5 hover:bg-accent hover:text-foreground aria-[current=page]:text-foreground"
+            className="max-w-[16rem] shrink-0 truncate rounded px-1.5 py-0.5 hover:bg-accent pointer-coarse:min-h-10 hover:text-foreground aria-[current=page]:text-foreground"
           >
             {step.title}
           </button>

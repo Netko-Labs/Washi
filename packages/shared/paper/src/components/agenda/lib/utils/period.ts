@@ -173,6 +173,21 @@ export function eventTime(row: Row, columns: AgendaColumns): string | null {
   return from ?? to
 }
 
+/**
+ * The event's time as one day reads it (D132): a range over several days starts "09:00 →" on its
+ * first, ends "→ 10:00" on its last, and is "All day" between — never the same hours on each.
+ */
+export function eventTimeOn(row: Row, columns: AgendaColumns, day: string): string | null {
+  const days = columns.time ? [] : eventDays(row[columns.date])
+  if (days.length < 2) return eventTime(row, columns)
+  const [start, end] = String(row[columns.date] ?? '').split('/')
+  const from = start?.includes('T') ? clock(start) : null
+  const to = end?.includes('T') && !MIDNIGHT.test(end) ? clock(end) : null
+  if (day === days[0]) return from ? `${from} →` : null
+  if (day === days.at(-1)) return to ? `→ ${to}` : null
+  return from || to ? 'All day' : null
+}
+
 /** The named column, else the row's first word that is not its date or id. */
 export function eventTitle(row: Row, columns: AgendaColumns): string {
   const named = columns.title ? text(row[columns.title]) : null

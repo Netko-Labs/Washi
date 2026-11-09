@@ -50,6 +50,8 @@ export interface CardActions {
   /** The host's, so counts and sums read in the reader's numbers. */
   locale?: string
   openable: boolean
+  /** A read-only link moves nothing: its cards are not drawn as draggable (D132). */
+  movable: boolean
   open: (row: Row) => void
   /** A cell in words: named people, numbers in their column's format once the spec is read. */
   shown: (value: Row[string] | undefined, column?: string) => string
