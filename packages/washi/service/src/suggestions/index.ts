@@ -1,6 +1,7 @@
 export { writableColumns } from './allowed'
 export { approveSuggestion, declineSuggestion } from './decide'
 export { SuggestionError, SuggestionRefusedError } from './errors'
+export { guestOfRecord } from './guest'
 export { markSuggestionsSeen, suggestionInbox, unreadSuggestions } from './inbox'
 export { sharedRequested, sharedWritable, suggestRow } from './link'
 export { requestedSpans } from './spans'

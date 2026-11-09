@@ -9,6 +9,8 @@ export interface ShareSettings {
   token: string | null
   /** The link takes suggested rows (D120). */
   suggest: boolean
+  /** Those suggestions ask the visitor's email as well as their name (D131). */
+  askEmail: boolean
   /** The link opens the page's sub-pages too (D123). */
   subpages: boolean
   hidden: { blocks: number; tabs: number; columns: Record<string, string[]> }

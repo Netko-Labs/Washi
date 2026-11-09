@@ -12,6 +12,7 @@ export { useAgendaPeriod } from './hooks/use-agenda-period'
 export { useEventCopy } from './hooks/use-event-copy'
 export { useEventMenu } from './hooks/use-event-menu'
 export { useEventWrite } from './hooks/use-event-write'
+export { useRowGuest } from './hooks/use-row-guest'
 export type {
   AgendaAdd,
   AgendaColumns,
@@ -21,6 +22,7 @@ export type {
   AgendaEventActionsProps,
   AgendaEventCardProps,
   AgendaEventFieldsProps,
+  AgendaEventGuestProps,
   AgendaEventProps,
   AgendaEventWhenProps,
   AgendaPeriod,

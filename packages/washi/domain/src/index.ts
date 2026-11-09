@@ -143,7 +143,9 @@ export {
 } from './entities/storage'
 export {
   type RequestedAsk,
+  type RowGuest,
   requestedAskSchema,
+  rowGuestSchema,
   type Suggestion,
   type SuggestionAsk,
   type SuggestionInbox,

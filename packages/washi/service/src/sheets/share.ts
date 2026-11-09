@@ -74,6 +74,7 @@ export function sharedPage(ws: Workspace, token: string, page?: string) {
     access: _access,
     visibility: _visibility,
     suggest,
+    suggestEmail,
     subpages: _subpages,
     ...props
   } = root.props
@@ -92,6 +93,8 @@ export function sharedPage(ws: Workspace, token: string, page?: string) {
     embedsAnySite: playableEmbedHosts(ws).includes(ANY_HOST),
     // Only the link's own page takes suggestions; a sub-page it opens is read-only (D123).
     suggest: isHome && suggest === true,
+    // Whether its form asks the visitor's email as well as their name (D131).
+    askEmail: suggestEmail !== false,
     home: { id: home.id, title: home.title, icon: home.icon },
     pages: tree,
   }
@@ -250,6 +253,7 @@ export function shareSettings(ws: Workspace, id: string) {
     access: sheet?.access ?? [],
     token: liveShareFor(ws, id)?.token ?? null,
     suggest: sheet?.suggest ?? false,
+    askEmail: root ? root.props.suggestEmail !== false : true,
     subpages: root ? sharesSubpages(root) : false,
     hidden: root ? redactionSummary(root) : { blocks: 0, tabs: 0, columns: {} },
   }

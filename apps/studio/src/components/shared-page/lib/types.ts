@@ -18,6 +18,8 @@ export interface SharedPayload {
   embedsAnySite: boolean
   /** Its adds become suggestions a member approves (D120). */
   suggest: boolean
+  /** Whether those ask the visitor's email as well as their name (D131). */
+  askEmail: boolean
   /** The link's own page; the page drawn is this one or one of `pages`. */
   home: { id: string; title: string; icon: string | null }
   /** The sub-pages the link opens beside its own, in tree order (D123); empty when it opens none. */
@@ -36,6 +38,7 @@ export interface SharedTreePage {
 export interface ShareHostOptions {
   embedsAnySite: boolean
   suggest: boolean
+  askEmail: boolean
   /** The sub-page drawn, when it is not the link's own page. */
   page?: string
   home: SharedPayload['home'] | null

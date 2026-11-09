@@ -6,7 +6,8 @@ export const suggestionAskSchema = z.object({
   table: z.string().min(1).max(64),
   cells: recordDataSchema,
   name: z.string().trim().min(1).max(100),
-  email: z.string().trim().max(254).pipe(z.email()),
+  /** Empty or left out where the page asks only a name (D131); the service decides, per page. */
+  email: z.union([z.literal(''), z.string().trim().max(254).pipe(z.email())]).optional(),
   /** A field no person sees; anything in it is a bot's. */
   trap: z.string().max(200).optional(),
 })
@@ -35,6 +36,16 @@ export const suggestionSchema = z.object({
   isRead: z.boolean(),
 })
 export type Suggestion = z.infer<typeof suggestionSchema>
+
+/** Who asked for a row through a page's link, kept with the row once approved (D131). */
+export const rowGuestSchema = z.object({
+  name: z.string(),
+  /** Null where the page asked none, or for a member who does not read that page. */
+  email: z.string().nullable(),
+  sheetId: z.string(),
+  hlcAsked: z.string(),
+})
+export type RowGuest = z.infer<typeof rowGuestSchema>
 
 export const suggestionInboxSchema = z.object({
   items: z.array(suggestionSchema),

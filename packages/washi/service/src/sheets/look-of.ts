@@ -21,6 +21,9 @@ export function withLook(root: WsxElement, look: SheetLookPatch): WsxElement {
 }
 
 /** Who reads a page is the page's own too (D65): `<Sheet visibility access>`, cached like the look. */
+/** Whether a visitor's suggestion asks their email as well as their name (D131): yes unless turned off. */
+export const asksEmail = (root: WsxElement) => root.props.suggestEmail !== false
+
 export function accessOf(root: WsxElement): Required<SheetAccess> {
   const visibility = root.props.visibility
   const access = root.props.access

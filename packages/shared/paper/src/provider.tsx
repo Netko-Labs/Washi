@@ -1,7 +1,7 @@
 import type { Cell, ColumnChange, HistoryQuery, InkQuery, QueryResult, TableSpec } from '@washi/ink'
 import type { WsxElement } from '@washi/wsx'
 import { createContext, type ReactNode, useContext } from 'react'
-import type { ActionRef, CompiledScript, PageCard, Visitor } from './lib/types'
+import type { ActionRef, CompiledScript, PageCard, RowGuest, Visitor } from './lib/types'
 
 /**
  * The capability surface a rendered sheet may touch. The host app wires these
@@ -77,6 +77,13 @@ export interface PaperHost {
    * here instead of `runAction`, to wait for a member. Rejects in words.
    */
   suggestRow?(table: string, cells: Record<string, Cell>, visitor: Visitor): Promise<void>
+  /** False where the page asks a visitor only their name, not their email (D131). */
+  asksEmail?: boolean
+  /**
+   * Who asked for a row through the page's link, kept once a member approved it (D131); null for a
+   * row a member made. A host without suggestions leaves it out.
+   */
+  rowGuest?(recordId: string): Promise<RowGuest | null>
   /** The columns a suggestion may write — a redacted one by type, never a value. */
   describeWritable?(table: string): Promise<TableSpec | null>
   /** Pending times on `date` in `[from, to)`, drawn as Requested; never who asked. */

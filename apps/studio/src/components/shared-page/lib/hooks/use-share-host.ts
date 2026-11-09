@@ -21,6 +21,7 @@ export function useShareHost(
     const host = shareHost(workspaceId, token, {
       embedsAnySite: page?.embedsAnySite ?? false,
       suggest: page?.suggest ?? false,
+      askEmail: page?.askEmail ?? true,
       page: page && page.id !== page.home.id ? page.id : undefined,
       home: page?.home ?? null,
       pages: page?.pages ?? [],

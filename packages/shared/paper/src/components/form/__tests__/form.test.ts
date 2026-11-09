@@ -2,7 +2,7 @@ import { describe, expect, test } from 'bun:test'
 import type { TableSpec } from '@washi/ink'
 import { hasErrors, parse, validate } from '@washi/wsx'
 import { paperRegistry } from '../../../registry'
-import { formPlan, hasEntries, missingOf, resolveDefaults, rowOf } from '../lib'
+import { formPlan, hasEntries, missingOf, resolveDefaults, rowOf, visitorGaps } from '../lib'
 
 const expenses: TableSpec = {
   name: 'expenses',
@@ -117,5 +117,14 @@ describe('the Form primitive', () => {
     expect(hasErrors(page('required={[]}'))).toBe(true)
     expect(hasErrors(page(`action={{ verb: 'table.insert' }}`))).toBe(true)
     expect(hasErrors(page(`defaults={{ date: { state: 'picked', or: 1 } }}`))).toBe(true)
+  })
+})
+
+describe('who a visitor says they are (D120, D131)', () => {
+  test('a name and a plausible email, unless the page asks only a name', () => {
+    expect(visitorGaps({ name: '', email: 'nope' })).toEqual(['name', 'email'])
+    expect(visitorGaps({ name: 'Ana', email: 'ana@example.com' })).toEqual([])
+    expect(visitorGaps({ name: 'Ana', email: '' }, false)).toEqual([])
+    expect(visitorGaps({ name: ' ', email: '' }, false)).toEqual(['name'])
   })
 })

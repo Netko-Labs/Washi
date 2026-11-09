@@ -10,12 +10,13 @@ import {
 } from '@washi/repository'
 import { parse } from '@washi/wsx'
 import { guardWashiWrite, SheetNotFoundError } from '../sheets/access'
-import { updateSheetAccess, updateSheetSuggest } from '../sheets/look'
+import { updateSheetAccess, updateSheetSuggest, updateSheetSuggestEmail } from '../sheets/look'
 import { createSheetFromSource, updateSheetFromSource } from '../sheets/service'
 import { ShareRefusedError, sharedPage, sharedQuery } from '../sheets/share'
 import { writableColumns } from '../suggestions/allowed'
 import { approveSuggestion, declineSuggestion } from '../suggestions/decide'
 import { SuggestionError, SuggestionRefusedError } from '../suggestions/errors'
+import { guestOfRecord } from '../suggestions/guest'
 import { suggestionInbox } from '../suggestions/inbox'
 import { sharedRequested, sharedWritable, suggestRow } from '../suggestions/link'
 import { defineUserTable, runMutation, runQuery } from '../tables/service'
@@ -293,5 +294,66 @@ describe('a member decides in the Inbox', () => {
     expect(() => approveSuggestion(ws, id ?? '', { id: 'mei', isOwner: false })).toThrow(
       SheetNotFoundError,
     )
+  })
+})
+
+describe('a page may ask only a name, and the guest stays with the row (D131)', () => {
+  const slot = '2026-11-03T13:00/2026-11-03T13:30'
+  const ask = (token: string, visitor: { name: string; email?: string }) =>
+    suggestRow(
+      ws,
+      token,
+      { table: 'appts', cells: { title: 'Intro', when: slot }, ...visitor },
+      'ip-a',
+    )
+
+  test('by default the email is needed; turned off, only the name, and none is kept', () => {
+    const { id, token } = link(true)
+    expect(sharedPage(ws, token).askEmail).toBe(true)
+    expect(() => ask(token, { name: 'Ana Ruiz' })).toThrow('Your email is needed.')
+    updateSheetSuggestEmail(ws, id, false)
+    expect(getSheet(ws, id)?.source).toContain('suggestEmail={false}')
+    expect(sharedPage(ws, token).askEmail).toBe(false)
+    ask(token, { name: 'Ana Ruiz', email: 'ana@example.com' })
+    const [waiting] = suggestionInbox(ws, MEMBER).items
+    expect(waiting).toMatchObject({ visitorName: 'Ana Ruiz', visitorEmail: '' })
+    updateSheetSuggestEmail(ws, id, true)
+    expect(getSheet(ws, id)?.source).not.toContain('suggestEmail')
+  })
+
+  test('only a person changes it, never Washi', () => {
+    const before = parse('<Sheet title="T" visibility="public" suggest></Sheet>')
+    const after = parse(
+      '<Sheet title="T" visibility="public" suggest suggestEmail={false}></Sheet>',
+    )
+    expect(() => guardWashiWrite(before, after)).toThrow(/asks visitors for their email/)
+    expect(() => guardWashiWrite(after, before)).toThrow(/asks visitors for their email/)
+  })
+
+  test('an approved row keeps who asked: the name for any member, the email for its page’s readers', () => {
+    const { id: sheetId, token } = link(true)
+    const { id } = ask(token, ANA)
+    const { recordId } = approveSuggestion(ws, id ?? '', MEMBER)
+    expect(guestOfRecord(ws, recordId ?? '', MEMBER)).toMatchObject({
+      name: 'Ana Ruiz',
+      email: 'ana@example.com',
+      sheetId,
+    })
+    updateSheetAccess(ws, sheetId, { visibility: 'private', access: ['rin'] }, 'rin')
+    expect(guestOfRecord(ws, recordId ?? '', { id: 'mei', isOwner: false })).toMatchObject({
+      name: 'Ana Ruiz',
+      email: null,
+    })
+    const own = runQuery(ws, { table: 'appts' }).rows.find((row) => row.id !== recordId)
+    expect(guestOfRecord(ws, String(own?.id), MEMBER)).toBeNull()
+  })
+
+  test('a declined suggestion leaves no guest on anything', () => {
+    const { token } = link(true)
+    const { id } = ask(token, ANA)
+    declineSuggestion(ws, id ?? '', MEMBER)
+    for (const row of runQuery(ws, { table: 'appts' }).rows) {
+      expect(guestOfRecord(ws, String(row.id), MEMBER)).toBeNull()
+    }
   })
 })

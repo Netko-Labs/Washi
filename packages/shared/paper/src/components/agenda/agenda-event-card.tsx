@@ -1,6 +1,7 @@
 import { AgendaCopyTo } from './agenda-copy-to'
 import { AgendaEventActions } from './agenda-event-actions'
 import { AgendaEventFields } from './agenda-event-fields'
+import { AgendaEventGuest } from './agenda-event-guest'
 import { AgendaEventWhen } from './agenda-event-when'
 import { AgendaRepeat } from './agenda-repeat'
 import {
@@ -87,6 +88,7 @@ export function AgendaEventCard({
               locale={locale}
               onChange={write && ((when) => write(eventPatch(when, columns)))}
             />
+            <AgendaEventGuest id={id} />
             <AgendaEventFields row={row} table={table} columns={columns} onWrite={write} />
             <AgendaEventActions
               id={id}

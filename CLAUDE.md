@@ -265,7 +265,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
 - **A link may take suggestions (D120).** `<Sheet suggest>`, cached in `sheets.suggest`, set only
   by a person (Share → "Visitors can suggest rows", `sheets.setSuggest`; `guardWashiWrite` refuses
   Washi changing it either way; every update re-reads it off the root), live only while public. Its Forms, Agenda's +, Slots and a Board's + New
-  (no `onAdd`) then ask "Your name" and "Your email" (plus a hidden trap) and send through the link
+  (no `onAdd`) then ask "Your name" and "Your email" (the email only while the page asks it, D131;
+  plus a hidden trap) and send through the link
   host's `suggestRow` → `POST /api/share/<ws>/<token>/suggest`, the address (`visitorAddress`:
   `cf-connecting-ip`, else the right-most X-Forwarded-For hop, else the peer) HMAC'd with
   `WASHI_SECRET_KEY` there (C3) — no secret, no suggestions. `suggestRow` writes only the columns those elements name or seed
@@ -284,6 +285,15 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   link", each with who, what they filled in, and Approve · Decline in place (a refusal stays in
   its words). Read off the same store as the Inbox, refreshed when the page opens and whenever the
   count moves; shown there counts as seen (`markRead`). Nothing waiting draws nothing.
+- **A guest's name stays with the row (D131).** `<Sheet suggestEmail={false}>` (Share → "Ask for
+  their email", under "Visitors can suggest rows"; `sheets.setSuggestEmail`; `guardWashiWrite`
+  refuses Washi changing it) asks a visitor only their name: the link's payload says `askEmail`, the
+  host lends `asksEmail`, `FormVisitor` drops the field and `suggestRow` keeps no email it did not
+  ask for (`''`); asked, an empty one is refused in words. Approval already keeps the row it became
+  (`suggestions.record_id`): `guestOfRecord` (`suggestions.guest`, `PaperHost.rowGuest`) answers who
+  asked — the name for any member (members read every table), the email only for a reader of the
+  page it was asked on. The Agenda's event card says "Booked by <name> through the shared link" with
+  the email, and a row's page says it under its title (`RowGuest`). A member's own row draws nothing.
 - **A link may open its sub-pages (D123).** `<Sheet subpages>`, set only by a person (Share →
   "Include sub-pages", `sheets.setShareSubpages`; `guardWashiWrite` refuses Washi changing it), live
   only while the page is public. Its link then opens every live descendant the world may read

@@ -88,6 +88,17 @@ export function getSuggestion(ws: Workspace, id: string): SuggestionRecord | nul
   return row ? recordOf(row) : null
 }
 
+/** The approved suggestion a row came from, if it came through a link (D131). */
+export function approvedSuggestionFor(ws: Workspace, recordId: string): SuggestionRecord | null {
+  const row = ws.sqlite
+    .query(
+      `SELECT ${COLUMNS} FROM suggestions s
+       WHERE s.record_id = ? AND s.status = 'approved' ORDER BY s.created_at DESC LIMIT 1`,
+    )
+    .get(recordId) as Stored | null
+  return row ? recordOf(row) : null
+}
+
 /** How many this hashed address sent since `sinceMs`, whatever became of them. */
 export function countSuggestionsSince(ws: Workspace, ipHash: string, sinceMs: number): number {
   const row = ws.sqlite

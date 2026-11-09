@@ -46,6 +46,18 @@
   font-size: 14px;
   color: var(--ink);
 }
+.wsx-agenda-card-guest {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 10px;
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+.wsx-agenda-card-guest strong {
+  color: var(--ink);
+  font-weight: 600;
+}
 .wsx-agenda-card-fields {
   display: grid;
   grid-template-columns: minmax(90px, max-content) 1fr;

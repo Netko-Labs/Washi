@@ -147,6 +147,7 @@ export {
   today,
 } from './storage/spend'
 export {
+  approvedSuggestionFor,
   countPendingOnSheet,
   countSuggestionsSince,
   decideSuggestion,

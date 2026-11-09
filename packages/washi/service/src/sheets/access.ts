@@ -92,6 +92,11 @@ export function guardWashiWrite(
       "Only a person decides whether a page's link takes suggestions. Keep the Sheet's suggest prop as it is.",
     )
   }
+  if ((before?.props.suggestEmail === false) !== (after.props.suggestEmail === false)) {
+    throw new SheetAccessError(
+      "Only a person decides whether a page's link asks visitors for their email. Keep the Sheet's suggestEmail prop as it is.",
+    )
+  }
   if ((before?.props.subpages === true) !== (after.props.subpages === true)) {
     throw new SheetAccessError(
       "Only a person decides whether a page's link opens its sub-pages. Keep the Sheet's subpages prop as it is.",
