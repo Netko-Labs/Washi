@@ -31,3 +31,4 @@ export {
   weekSpan,
   weekStartOf,
 } from './period'
+export { eventPatch, eventWhen, eventWhenWords } from './when'

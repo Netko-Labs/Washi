@@ -1,52 +1,48 @@
 import { useState } from 'react'
+import { readWhen, writeWhen } from '../../lib'
 import { usePaperHost } from '../../provider'
+import { WhenInput } from '../when'
 import { type DateInputsProps, dateLabel, type ScalarCellProps } from './lib'
 
 function split(value: ScalarCellProps['value']): [string, string] {
   const [start = '', end = ''] = typeof value === 'string' ? value.split('/') : []
-  return [start.slice(0, 10), end.slice(0, 10)]
+  return [start, end]
 }
 
-/** The start and an optional end, as in Notion; leaving both puts the cell back to reading. */
+/**
+ * The day, its hours and an optional end, as in Notion — each change lands as it is picked, so
+ * adding an hour is two presses. Leaving the group puts the cell back to reading.
+ */
 function DateInputs({ column, value, commit, onDone }: DateInputsProps) {
-  const [start, end] = split(value)
-  const write = (nextStart: string, nextEnd: string) => {
-    if (!nextStart) return commit(null)
-    commit(nextEnd ? `${nextStart}/${nextEnd}` : nextStart)
-  }
+  const { locale } = usePaperHost()
+  // What was picked shows at once; the write lands behind it.
+  const [draft, setDraft] = useState(() => readWhen(value))
   return (
     <span
       role="group"
-      aria-label={column.name}
+      aria-label={`${column.name}, editing`}
       className="wsx-db-date"
       onBlur={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget as Node | null)) onDone()
       }}
     >
-      <input
-        type="date"
-        className="wsx-db-input"
-        aria-label={`${column.name} start`}
-        // biome-ignore lint/a11y/noAutofocus: the cell was pressed to edit it
+      <WhenInput
+        label={column.name}
+        look="cell"
         autoFocus
-        value={start}
-        onChange={(event) => write(event.currentTarget.value, end)}
+        locale={locale}
+        value={draft}
+        onChange={(when) => {
+          setDraft(when)
+          const cell = writeWhen(when)
+          if (cell !== (typeof value === 'string' ? value : null)) commit(cell)
+        }}
       />
-      {start && (
-        <input
-          type="date"
-          className="wsx-db-input"
-          aria-label={`${column.name} end`}
-          value={end}
-          min={start}
-          onChange={(event) => write(start, event.currentTarget.value)}
-        />
-      )}
     </span>
   )
 }
 
-/** Reads "Nov 4, 2026"; a press turns it into the pickers. */
+/** Reads "Nov 4, 2026 · 10:00 AM – 11:00 AM"; a press turns it into the pickers. */
 export function DateCell(props: ScalarCellProps) {
   const { locale } = usePaperHost()
   const [editing, setEditing] = useState(false)

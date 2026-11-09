@@ -19,6 +19,7 @@ export function FormBody({
   onAdded,
   onCancel,
   isBooking,
+  clocks,
   ...rest
 }: FormBodyProps) {
   // A seeded column is written even when it is not shown: the day a calendar's + stood on.
@@ -65,6 +66,15 @@ export function FormBody({
           column={column}
           value={draft.values[column.name]}
           people={db.people}
+          clock={
+            column.name === clocks?.start
+              ? 'start'
+              : column.name === clocks?.end
+                ? 'end'
+                : undefined
+          }
+          from={clocks?.start ? draft.values[clocks.start] : undefined}
+          hasHours={clocks?.start ? false : undefined}
           onChange={(value) => draft.set(column.name, value)}
           required={plan.required.includes(column)}
           error={

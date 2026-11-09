@@ -207,6 +207,17 @@ function renderElement(node: WsxElement, ctx: Ctx): ReactNode {
       return createElement(Source, { ...p, number: ctx.numbers.get(node) ?? 0 } as never, ...kids)
     case 'Ref':
       return createElement(Ref, p as never, ...(kids.length ? kids : []))
+    case 'Tabs':
+      return createElement(
+        Tabs,
+        {
+          ...p,
+          secret: node.children.map(
+            (child) => child.kind === 'element' && child.props.secret === true,
+          ),
+        } as never,
+        ...kids,
+      )
     case 'Widget': {
       const drawn = node.children[0]?.kind === 'element' ? node.children[0] : null
       return createElement(Widget, {

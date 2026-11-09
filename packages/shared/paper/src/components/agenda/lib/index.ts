@@ -11,14 +11,18 @@ export { useAgendaAdd } from './hooks/use-agenda-add'
 export { useAgendaPeriod } from './hooks/use-agenda-period'
 export { useEventCopy } from './hooks/use-event-copy'
 export { useEventMenu } from './hooks/use-event-menu'
+export { useEventWrite } from './hooks/use-event-write'
 export type {
   AgendaAdd,
   AgendaColumns,
   AgendaCopyPageProps,
   AgendaDayInfo,
   AgendaDayProps,
-  AgendaEventMenuProps,
+  AgendaEventActionsProps,
+  AgendaEventCardProps,
+  AgendaEventFieldsProps,
   AgendaEventProps,
+  AgendaEventWhenProps,
   AgendaPeriod,
   AgendaPick,
   AgendaProps,
@@ -26,6 +30,7 @@ export type {
   AgendaView,
   CopyEntries,
   CopyPlan,
+  EventPatch,
   WeekStart,
 } from './types'
 export {
@@ -37,8 +42,11 @@ export {
   dayKeyOf,
   dayWords,
   eventDays,
+  eventPatch,
   eventTime,
   eventTitle,
+  eventWhen,
+  eventWhenWords,
   hueOf,
   isoDay,
   isSameDays,

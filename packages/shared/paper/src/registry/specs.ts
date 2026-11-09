@@ -532,7 +532,11 @@ const flow: Record<string, ComponentSpec> = {
     { labels: z.array(z.string().min(1).max(60)).min(1).max(12), state: stateKey.optional() },
     'nodes',
   ),
-  Tab: p({}, 'nodes', { within: ['Tabs'] }),
+  // A secret tab is the members' alone: a shared link never carries it, its label included (D127).
+  Tab: p({ secret: z.boolean().optional() }, 'nodes', {
+    within: ['Tabs'],
+    hints: { private: 'use secret', hidden: 'use secret' },
+  }),
   Reveal: p({ label: z.string().min(1).max(120), state: stateKey.optional() }, 'nodes'),
   Drawer: p(
     {

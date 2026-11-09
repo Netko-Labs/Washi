@@ -109,7 +109,7 @@ export const SUMMARIES: Record<string, string> = {
   Slider: 'Writes a number to a state key.',
   Show: 'Shows its children while an expression holds.',
   Tabs: 'Tab labels over panels, one label per Tab; may write the open tab to state. A strip wider than the page scrolls sideways.',
-  Tab: 'One panel inside Tabs.',
+  Tab: 'One panel inside Tabs. `secret` keeps it, label and all, off every shared link; members see it with a lock.',
   Reveal: 'A disclosure: a label that opens what it holds.',
   Drawer: 'A side panel that opens while a state key is set; with bind, one row.',
   Chip: 'A dotted status pill.',

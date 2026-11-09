@@ -52,5 +52,12 @@ describe('a date’s label', () => {
     expect(dateLabel('2026-11-04', '', 'en-US')).toBe('Nov 4, 2026')
     expect(dateLabel('0001-01-01', '', 'en-US')).toBe('Jan 1, 0001')
     expect(dateLabel('0999-03-01', '0999-03-04', 'en-US')).toBe('Mar 1 – 4, 0999')
+    // Hours are read, never dropped: a timed cell used to read as its bare day (D128).
+    expect(dateLabel('2026-11-04T10:00', '2026-11-04T11:30', 'en-US')).toBe(
+      'Nov 4, 2026 · 10:00 AM – 11:30 AM',
+    )
+    expect(dateLabel('2026-11-04T22:00', '2026-11-05T01:00', 'en-GB')).toBe(
+      '4 Nov 2026 22:00 – 5 Nov 2026 01:00',
+    )
   })
 })

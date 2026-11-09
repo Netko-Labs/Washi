@@ -11,7 +11,7 @@ export interface ShareSettings {
   suggest: boolean
   /** The link opens the page's sub-pages too (D123). */
   subpages: boolean
-  hidden: { blocks: number; columns: Record<string, string[]> }
+  hidden: { blocks: number; tabs: number; columns: Record<string, string[]> }
 }
 
 export interface ShareToggleProps {

@@ -25,7 +25,15 @@ export interface FormProps extends BlockProps {
 
 export type FormInlineProps = Omit<FormProps, 'trigger' | 'title'>
 
+/** A calendar's own time columns, drawn as hours lists; its date then takes no hours. */
+export interface FormClocks {
+  start?: string
+  end?: string
+}
+
 export interface FormBodyProps extends Omit<FormInlineProps, 'table'> {
+  /** A calendar's time columns: hours lists instead of text. */
+  clocks?: FormClocks
   db: DatabaseContext
   /** Values the opener already knows — the day a calendar's + was pressed on. */
   seed?: Record<string, Cell>
@@ -38,6 +46,7 @@ export interface FormBodyProps extends Omit<FormInlineProps, 'table'> {
 }
 
 export interface FormDialogProps extends FormInlineProps {
+  clocks?: FormClocks
   open: boolean
   onClose: () => void
   title: string
@@ -102,9 +111,25 @@ export interface FormFieldProps {
   onChange: (value: Cell) => void
   required?: boolean
   error?: string
+  /** Drawn as an hours list: a calendar's start or end column. */
+  clock?: 'start' | 'end'
+  /** An end's start, read off the row being typed. */
+  from?: Cell
+  /** False: a date without hours, a calendar's time living in its own columns. */
+  hasHours?: boolean
 }
 
-export type FormInputProps = Omit<FormFieldProps, 'people'>
+export type FormInputProps = Omit<FormFieldProps, 'people' | 'clock' | 'from' | 'hasHours'>
+
+export interface FormWhenProps extends FormInputProps {
+  /** False where a calendar keeps its hours in columns of their own: the day alone. */
+  hasHours?: boolean
+}
+
+export interface FormClockProps extends FormInputProps {
+  /** The start this end follows, so each choice says how long it makes it. */
+  from?: Cell
+}
 
 export interface FormChoiceProps extends FormInputProps {
   choices: Choice[]

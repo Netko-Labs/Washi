@@ -1,7 +1,7 @@
 import type { StoreApi } from 'zustand'
 import { newBlock } from './convert'
 import { tidy } from './slots'
-import { withNewTab, withoutTab, withTabLabel, withTabMoved } from './tabs'
+import { withNewTab, withoutTab, withTabLabel, withTabMoved, withTabSecret } from './tabs'
 import type { EditorState, TabActions } from './types'
 
 /** The editor store's tab strip: which tab shows, and the tabs themselves. */
@@ -25,6 +25,8 @@ export function tabActions(
     },
     renameTab: (tabsId, tabId, label) =>
       set(({ blocks }) => ({ blocks: withTabLabel(blocks, tabsId, tabId, label) })),
+    setTabSecret: (tabsId, tabId, isSecret) =>
+      set(({ blocks }) => ({ blocks: withTabSecret(blocks, tabsId, tabId, isSecret) })),
     moveTab: (tabsId, tabId, step) =>
       set(({ blocks }) => ({ blocks: withTabMoved(blocks, tabsId, tabId, step) })),
     removeTab: (tabsId, tabId) =>

@@ -16,6 +16,8 @@ export type {
   FieldAria,
   FormBodyProps,
   FormChoiceProps,
+  FormClockProps,
+  FormClocks,
   FormDefault,
   FormDialogProps,
   FormDraft,
@@ -27,6 +29,7 @@ export type {
   FormStatus,
   FormUnavailableProps,
   FormVisitorProps,
+  FormWhenProps,
   LandedNote,
 } from './types'
 export {

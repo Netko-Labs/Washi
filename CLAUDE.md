@@ -598,13 +598,25 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   `view="month"` (D86) draws whole weeks as a grid (`monthSpan`; neighbours dimmed, three events a
   day then +N more, a list of busy days under 560px); `state` names a `YYYY-MM` page-state key it
   follows and ‹ › Today write, so it moves with a month `Select`.
-  Where the host adds rows (`newRow`), an event's ⋯ duplicates it, copies it to a picked day or
+  Where the host adds rows (`newRow`), an event's card duplicates it, copies it to a picked day or
   repeats it on chosen weekdays through a date (≤ 31, `copyDates`, wall clock): one `table.copy` of
   the row with `each` (one copy per entry, all or none), its date moved, hours and properties kept.
   `<Form trigger>` puts a form behind one button in a native `<dialog>` (`FormDialog`: top layer,
   Escape, a bottom sheet under 560px, the first field focused, closes when the row lands and the
   trigger says Added). `required` names fields it won't send without — each said in words, never a
   silently disabled button. An empty data view is a quiet filled line, not a dashed box.
+- **An event has hours, and one card (D128).** Every date editor is `WhenInput` (paper
+  `components/when`): the day, then start – end from an hours list (`ClockSelect`, a native select
+  every 15 min; an end's choices say how long, "(1 hr)"), `+ Add time` (09:00 for an hour), `All day`,
+  `+ End day`. A new start keeps the length, a new day carries the span (`lib/clock.ts`: `readWhen`
+  / `writeWhen` over `day[THH:MM][/end]`, wall clock, zones never enter). It is a database's date
+  cell (row peek included — a timed cell no longer reads or saves as its bare day; `dateLabel` says
+  "Nov 4, 2026 · 10:00 AM – 11:00 AM"), every Form's date field (`FormWhen`) and the Agenda's add,
+  whose day now sits after its first field. An Agenda with `time`/`end` columns gets them as hours
+  lists (`clocks`) and a day without hours. Times read the reader's way (`clockLabel`: 9:00 AM or
+  09:00). An Agenda event pressed opens one card (`AgendaEventCard`, never the peek or a ⋯): its
+  time and properties (`DatabaseCell`) changed in place by a member, read by a link; Open page ·
+  Duplicate · Copy to… · Repeat… · Delete (asked twice; `table.delete`, its page to the Trash).
 - **A page can take bookings (D102).** `<Slots bind date minutes hours days add addLabel>` is
   Calendly's picker: each allowed weekday's `hours` (`09:00-17:00`) cut into `minutes` slots, those
   under a row's `date` struck through as booked (a `start/end` range; a lone moment takes `minutes`,
@@ -668,6 +680,14 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   unwraps a lone one). Drag ⋮⋮ onto a block's outer fifth to put it beside (a new row of columns,
   or a new column, ≤5), the rest drops above or below (`moveBlock`); the gap between columns drags
   or takes ← → (`resizeColumns`, shares in sixths). Rows of columns never nest; a Bento stays locked.
+- **A tab may be secret (D127).** `<Tab secret>` is the members' alone: `redactForShare` drops it
+  and its label (a strip of only secret tabs goes whole, a starting state naming one is scrubbed),
+  so a link never learns it was there. A link reads only the tables its redacted page shows
+  (`hiddenIn` → `linkTables(redactForShare(root))`), and only its redacted page takes suggestions —
+  so a table or form inside a secret tab (or a `<Redact>`) is off the link too. It counts in
+  `redactionWeight` (Washi cannot unhide one on a public page) and in Share's "Hidden from the link"
+  (`redactionSummary.tabs`). Members see a lock on it; the editor's tab ⋯ says Hide from / Show on
+  shared links. Per-person tabs are not a thing: a page's readers are the page's (D65).
 - **A page holds tab sections (D106).** `<Tabs labels state?><Tab>` is a quiet underline strip
   (`css/flow-kit.css`) that scrolls sideways, never wraps. The editor edits it in place like Columns
   (a `TabsBlock`, each tab its own run of blocks, through the same `locate`/`writeList`/`tidy` in
