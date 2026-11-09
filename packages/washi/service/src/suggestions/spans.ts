@@ -6,6 +6,8 @@ import { SPAN_LOOKBACK_DAYS, TAKEN_SCAN_ROWS } from './constants'
 import type { TakenOptions } from './types'
 
 const dayKey = (minutes: number) => new Date(minutes * 60_000).toISOString().slice(0, 10)
+/** Wall-clock minutes as a date cell's start: `2026-11-03T10:00`. */
+const momentAt = (minutes: number) => new Date(minutes * 60_000).toISOString().slice(0, 16)
 
 /**
  * Pending times on `table`'s `date` column inside `[from, to)` — the bare cells, nobody's name:
@@ -66,14 +68,15 @@ export function insideOpenWindow(
   span: Span,
 ): boolean {
   const from = dayKey(span.from - SPAN_LOOKBACK_DAYS * 24 * 60)
-  const to = dayKey(span.to + 24 * 60)
-  // Only candidate windows are read, the latest first — those nearest the time asked for — so a
-  // busy table's other rows never push an Open window past the scan.
+  // Only rows that could hold the span are read: Open ones starting at or before it, the latest
+  // first — the nearest is the likeliest to contain it — so no other row pushes it past the scan.
+  // A date cell starts with its start, so it compares as one; `< …T09:01` keeps a window that opens
+  // exactly at 09:00 (`2026-11-03T09:00/…` sorts after `…T09:00` itself).
   const { rows } = runQuery(ws, {
     table,
     where: [
       { column: date, op: 'gte', value: from },
-      { column: date, op: 'lt', value: to },
+      { column: date, op: 'lt', value: momentAt(span.from + 1) },
       { column: show, op: 'contains', value: 'open' },
     ],
     orderBy: { column: date, direction: 'desc' },
