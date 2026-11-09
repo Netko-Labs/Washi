@@ -1,0 +1,315 @@
+/* A week by the hour (D133): Teams' and Outlook's grid. */
+
+.wsx-agenda[data-view="hours"] .wsx-hours {
+  --gutter: 48px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  background: var(--card);
+}
+.wsx-hours-head,
+.wsx-hours-allday,
+.wsx-hours-body {
+  display: flex;
+}
+.wsx-hours-gutter {
+  flex: none;
+  width: var(--gutter);
+  font-size: 11px;
+  color: var(--muted);
+}
+.wsx-hours-head {
+  border-bottom: 1px solid var(--border);
+}
+.wsx-hours-dayhead {
+  display: flex;
+  flex: 1;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  padding: 10px 8px 8px;
+  border-left: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+}
+.wsx-hours-dayhead[data-today] .wsx-agenda-weekday,
+.wsx-hours-dayhead[data-today] .wsx-agenda-date {
+  color: var(--tone-accent-text);
+}
+.wsx-hours-allday {
+  border-bottom: 1px solid var(--border);
+}
+.wsx-hours-allday > .wsx-hours-gutter {
+  padding: 8px 6px;
+  text-align: right;
+}
+.wsx-hours-alldaycell {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  padding: 4px;
+  border-left: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+}
+.wsx-hours-alldaycell .wsx-agenda-event {
+  padding: 3px 6px 4px 9px;
+}
+.wsx-hours-scroll {
+  /* A fixed reach, not the window's (W3): the grid sizes to its page, and scrolls past it. */
+  max-height: 640px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.wsx-hours-body {
+  position: relative;
+}
+.wsx-hours-marks {
+  position: relative;
+}
+.wsx-hours-marks span {
+  position: absolute;
+  right: 8px;
+  transform: translateY(-50%);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.wsx-hours-marks span:first-child {
+  transform: none;
+}
+.wsx-hours-col {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  border-left: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+  /* An hour line every hour, a fainter one at each half. */
+  background-image:
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--border) 70%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--border) 30%, transparent) 1px,
+      transparent 1px
+    );
+  background-size:
+    100% 48px,
+    100% 24px;
+}
+.wsx-hours-col[data-today] {
+  background-color: color-mix(in srgb, var(--accent) 4%, transparent);
+}
+.wsx-hours-hit {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  border: 0;
+  background: none;
+  cursor: copy;
+}
+.wsx-hours-hit:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.wsx-hours-block {
+  --bar: var(--k-fill);
+  position: absolute;
+  display: block;
+  overflow: hidden;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--bar) 18%, var(--card));
+  box-shadow:
+    inset 3px 0 0 var(--bar),
+    0 0 0 1px var(--card);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.wsx-hours-block:hover {
+  background: color-mix(in srgb, var(--bar) 28%, var(--card));
+}
+.wsx-hours-block:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  z-index: 2;
+}
+.wsx-hours-inner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  overflow: hidden;
+  padding: 4px 6px 4px 8px;
+}
+.wsx-hours-block[data-hue="1"] {
+  --bar: var(--chart-1);
+}
+.wsx-hours-block[data-hue="2"] {
+  --bar: var(--chart-2);
+}
+.wsx-hours-block[data-hue="3"] {
+  --bar: var(--chart-3);
+}
+.wsx-hours-block[data-hue="4"] {
+  --bar: var(--chart-4);
+}
+.wsx-hours-block[data-hue="5"] {
+  --bar: var(--chart-5);
+}
+.wsx-hours-title {
+  display: -webkit-box;
+  flex: none;
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.25;
+  /* Whole words: a narrow lane cuts a title at its edge rather than mid-word. */
+  overflow-wrap: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+.wsx-hours-time,
+.wsx-hours-badge {
+  overflow: hidden;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in srgb, var(--muted) 55%, var(--ink));
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.wsx-hours-block[data-short] .wsx-hours-inner {
+  flex-direction: row;
+  align-items: baseline;
+  gap: 6px;
+  padding-block: 2px;
+}
+.wsx-hours-block[data-short] .wsx-hours-title {
+  display: block;
+  flex: 0 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.wsx-hours-block[data-short] .wsx-hours-time {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* Busy: time blocked out, no appointment — hatched and quiet. */
+.wsx-hours-block[data-busy] {
+  --bar: var(--muted);
+  background: repeating-linear-gradient(
+    -45deg,
+    color-mix(in srgb, var(--muted) 14%, var(--card)) 0 6px,
+    color-mix(in srgb, var(--muted) 6%, var(--card)) 6px 12px
+  );
+}
+/* Open for booking: a window behind everything, drawn as a lit band, not an event. */
+.wsx-hours-block[data-window] {
+  --bar: var(--tone-success);
+  z-index: 0;
+  border: 1px dashed color-mix(in srgb, var(--tone-success) 60%, var(--border));
+  background: color-mix(in srgb, var(--tone-success) 10%, var(--card));
+  box-shadow: none;
+}
+.wsx-hours-block[data-window] .wsx-hours-title {
+  color: var(--tone-success-text);
+  font-weight: 600;
+}
+.wsx-hours-block:not([data-window]) {
+  z-index: 1;
+}
+
+.wsx-hours-now {
+  position: absolute;
+  right: 0;
+  left: 0;
+  z-index: 3;
+  height: 2px;
+  background: var(--tone-danger);
+  pointer-events: none;
+}
+.wsx-hours-now::before {
+  content: "";
+  position: absolute;
+  top: -3px;
+  left: -4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--tone-danger);
+}
+
+/* The day strip a phone picks from; hidden while the whole week fits. */
+.wsx-hours-strip {
+  display: none;
+}
+
+/* Under 720 a phone sees one day at a time, as Teams on a phone does. */
+@container wsx (max-width: 719px) {
+  .wsx-hours-strip {
+    display: flex;
+    gap: 4px;
+    padding: 8px;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--border);
+    scrollbar-width: none;
+  }
+  .wsx-hours-strip button {
+    display: flex;
+    flex: 1 0 44px;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    min-height: 48px;
+    padding: 4px 0;
+    border: 0;
+    border-radius: 10px;
+    background: none;
+    color: var(--muted);
+    font: inherit;
+    font-size: 11px;
+    cursor: pointer;
+  }
+  .wsx-hours-strip button strong {
+    font-family: var(--font-serif);
+    font-size: 16px;
+    color: var(--ink);
+  }
+  .wsx-hours-strip button[data-today] span,
+  .wsx-hours-strip button[data-today] strong {
+    color: var(--tone-accent-text);
+  }
+  .wsx-hours-strip button[aria-selected="true"] {
+    background: var(--muted-bg);
+  }
+  .wsx-hours-head {
+    display: none;
+  }
+  .wsx-hours-dayhead:not([data-picked]),
+  .wsx-hours-alldaycell:not([data-picked]),
+  .wsx-hours-col:not([data-picked]) {
+    display: none;
+  }
+}
+
+/* Show-as in the week and month views too: Busy hatched, Open a dashed window. */
+.wsx-agenda-event[data-busy] {
+  --bar: var(--muted);
+  background: repeating-linear-gradient(
+    -45deg,
+    color-mix(in srgb, var(--muted) 14%, transparent) 0 6px,
+    color-mix(in srgb, var(--muted) 6%, transparent) 6px 12px
+  );
+}
+.wsx-agenda-event[data-window] {
+  --bar: var(--tone-success);
+  outline: 1px dashed color-mix(in srgb, var(--tone-success) 60%, var(--border));
+  outline-offset: -1px;
+  background: color-mix(in srgb, var(--tone-success) 10%, transparent);
+}

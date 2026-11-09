@@ -168,3 +168,16 @@ export function clockSpan(when: When, locale?: string): string | null {
   const from = clockLabel(when.time, locale)
   return when.endTime ? `${from} – ${clockLabel(when.endTime, locale)}` : from
 }
+
+const hourFormats = new Map<string, Intl.DateTimeFormat>()
+
+/** An hour mark the reader's way, short: "10 AM" or "10" — a time grid's side (D133). */
+export function hourLabel(minutes: number, locale?: string): string {
+  const key = locale ?? ''
+  let format = hourFormats.get(key)
+  if (!format) {
+    format = new Intl.DateTimeFormat(locale, { hour: 'numeric', timeZone: 'UTC' })
+    hourFormats.set(key, format)
+  }
+  return format.format(new Date(Date.UTC(1970, 0, 1, 0, minutes)))
+}

@@ -1,9 +1,11 @@
 import { addModeOf, clockLabel, styled } from '../../lib'
 import { usePaperHost } from '../../provider'
+import { isOpenCell } from '../../registry'
 import { useAgendaPeriod } from '../agenda'
 import { FormDialog } from '../form'
 import {
   busyOf,
+  EVERY_WEEKDAY,
   isPast,
   nowMinutes,
   openingWeek,
@@ -14,6 +16,7 @@ import {
   slotsOn,
   useSlotBooking,
   weekdayOf,
+  windowSlotsOn,
 } from './lib'
 
 /**
@@ -28,7 +31,8 @@ export function Slots({
   date,
   minutes = SLOT_MINUTES,
   hours = SLOT_HOURS,
-  days = SLOT_DAYS,
+  days: daysAsked,
+  show,
   add,
   addLabel = 'Book',
   empty = 'Nothing free',
@@ -37,18 +41,29 @@ export function Slots({
 }: SlotsProps) {
   const host = usePaperHost()
   const now = nowMinutes()
+  const days = daysAsked ?? (show ? EVERY_WEEKDAY : SLOT_DAYS)
   const period = useAgendaPeriod({
     bind,
     date,
     weekStart,
     view: 'week',
     locale: host.locale,
-    startOffset: openingWeek(now, weekStart, days, hours, minutes),
+    // Open windows are rows: whether this week still has one is only known once they are read.
+    startOffset: show ? 0 : openingWeek(now, weekStart, days, hours, minutes),
   })
   const mode = addModeOf(host)
-  const booking = useSlotBooking(bind, date, minutes, mode === 'suggest')
+  const booking = useSlotBooking(bind, date, minutes, mode === 'suggest', show)
   const { picked } = booking
-  const busy = busyOf(period.state.rows, date, minutes)
+  const rows = period.state.rows
+  // With a Show-as column, Open rows are where to book and everything else takes time (D133).
+  const windows = show
+    ? busyOf(
+        rows.filter((row) => isOpenCell(row[show])),
+        date,
+        minutes,
+      )
+    : null
+  const busy = busyOf(show ? rows.filter((row) => !isOpenCell(row[show])) : rows, date, minutes)
   const held = busyOf(
     period.requested.map((cell) => ({ [date]: cell })),
     date,
@@ -88,7 +103,9 @@ export function Slots({
           {open.map((day) => {
             const slots =
               period.state.status === 'ready'
-                ? slotsOn(day.key, hours, minutes, busy, now, held)
+                ? windows
+                  ? windowSlotsOn(day.key, windows, minutes, busy, now, held)
+                  : slotsOn(day.key, hours, minutes, busy, now, held)
                 : []
             return (
               <section

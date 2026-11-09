@@ -36,7 +36,11 @@ function refuseBookedTime(ws: Workspace, suggestion: SuggestionRecord) {
   if (!booking || booking.minutes === undefined) return
   const span = spanOf(suggestion.cells[booking.date], booking.minutes)
   const minutes = booking.minutes
-  if (span && takenBy(ws, suggestion.tableName, booking.date, span, { minutes, pending: false })) {
+  const show = booking.show
+  if (
+    span &&
+    takenBy(ws, suggestion.tableName, booking.date, span, { minutes, pending: false, show })
+  ) {
     throw new SuggestionError('That time is booked now — decline this one, or free the time first.')
   }
 }

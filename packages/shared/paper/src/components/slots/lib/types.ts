@@ -9,6 +9,8 @@ export interface SlotsProps extends BlockProps {
   minutes?: number
   hours?: string
   days?: Weekday[]
+  /** A Show-as column (D133): slots only inside its Open rows; every other row takes time. */
+  show?: string
   add?: string[]
   addLabel?: string
   empty?: string

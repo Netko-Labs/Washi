@@ -652,6 +652,19 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   no add property) and its board's cards don't drag. Washi's light accent is `#B85621` (4.55:1 under
   its words; it was `#C25F2C`, 4.02:1 — brand-assets should follow), so the contrast test names no
   exception. Washi Lab holds a public "Mobile lab" (Calendar · Data · Layout) to test on a phone.
+- **A week by the hour, Busy and Open (D133).** `<Agenda view="hours" hours="08:00-20:00" show>`
+  is Teams' grid (`AgendaHours`): hours down the side (`hourLabel`), a column a day, each timed row a
+  block placed by its minutes (`dayBlocks`, `HOUR_PX` 48), overlaps side by side in lanes
+  (`laneOut`), bare days in an All day row, a now-line on today; `hourRange` widens the hours so no
+  block falls off, and the grid opens scrolled to the page's own. A press on empty time (a button
+  behind the blocks, `slotAt`) adds an hour from that half hour; a member's add form gains the
+  Show-as field. Under 720px one day shows, picked from a strip. `show` names a Show-as column
+  (`isOpenCell` / `isBusyCell` in the registry, case-blind): Busy rows hatched, Open rows dashed
+  windows behind the rest — in week and month views too. `<Slots show>` offers slots only inside
+  Open rows (`windowSlotsOn`, cut from each window's own start; every weekday unless `days` says),
+  and only non-Open rows take time. The server holds the same rule (C3 kept: `insideOpenWindow`,
+  `takenBy({ show })`): a link's request outside an Open window is refused in words, and an Open
+  window never counts as a clash at send or approval. The book seeds `appointments` around today.
 - **A page can take bookings (D102).** `<Slots bind date minutes hours days add addLabel>` is
   Calendly's picker: each allowed weekday's `hours` (`09:00-17:00`) cut into `minutes` slots, those
   under a row's `date` struck through as booked (a `start/end` range; a lone moment takes `minutes`,

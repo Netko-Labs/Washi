@@ -133,7 +133,47 @@ export function runHistory(table: MemoryTable, query: HistoryQuery): QueryResult
   return { rows, total: rows.length }
 }
 
-export function seedTables(seeds: SeedTable[] = SEED_TABLES): Map<string, MemoryTable> {
+/**
+ * A week of appointments around today, so a time grid always has something on it (D133): timed
+ * blocks, two that overlap, a Busy block, Open windows to book in, a whole day.
+ */
+export function thisWeekAppointments(today = new Date()): SeedTable {
+  const monday = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+  monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7))
+  const day = (offset: number) => {
+    const at = new Date(monday)
+    at.setDate(monday.getDate() + offset)
+    return `${at.getFullYear()}-${String(at.getMonth() + 1).padStart(2, '0')}-${String(at.getDate()).padStart(2, '0')}`
+  }
+  const at = (offset: number, from: string, to: string) =>
+    `${day(offset)}T${from}/${day(offset)}T${to}`
+  return {
+    spec: {
+      name: 'appointments',
+      columns: [
+        { name: 'title', type: 'text' },
+        { name: 'when', type: 'date' },
+        { name: 'kind', type: 'select', options: ['Client', 'Team', 'Personal'] },
+        { name: 'show', type: 'select', options: ['Busy', 'Open'] },
+      ],
+    },
+    rows: [
+      { title: 'Office hours', when: at(0, '09:00', '12:00'), show: 'Open' },
+      { title: 'Office hours', when: at(2, '14:00', '17:00'), show: 'Open' },
+      { title: 'Office hours', when: at(4, '09:00', '11:00'), show: 'Open' },
+      { title: 'Intro with Ana', when: at(0, '10:00', '10:30'), kind: 'Client' },
+      { title: 'Team sync', when: at(1, '09:30', '10:30'), kind: 'Team' },
+      { title: 'Design review', when: at(1, '10:00', '11:30'), kind: 'Team' },
+      { title: 'Focus time', when: at(1, '13:00', '16:00'), show: 'Busy' },
+      { title: 'Dentist', when: at(3, '16:00', '17:00'), kind: 'Personal', show: 'Busy' },
+      { title: 'Offsite', when: day(4), kind: 'Team' },
+    ],
+  }
+}
+
+export function seedTables(
+  seeds: SeedTable[] = [...SEED_TABLES, thisWeekAppointments()],
+): Map<string, MemoryTable> {
   return new Map(
     seeds.map((seed) => [
       seed.spec.name,

@@ -357,3 +357,88 @@ describe('a page may ask only a name, and the guest stays with the row (D131)', 
     }
   })
 })
+
+describe('a Slots with a Show-as column books only inside Open windows (D133)', () => {
+  const Open = `<Sheet title="Office hours">
+  <Slots bind={{ table: "cal" }} date="when" minutes={30} show="show" add={["title"]} />
+</Sheet>`
+
+  function openLink() {
+    defineUserTable(ws, {
+      name: 'cal',
+      columns: [
+        { name: 'title', type: 'text' },
+        { name: 'when', type: 'date' },
+        { name: 'show', type: 'select', options: ['Busy', 'Open'] },
+      ],
+    })
+    runMutation(ws, {
+      kind: 'insert',
+      table: 'cal',
+      data: [
+        { title: 'Office hours', when: '2026-11-03T09:00/2026-11-03T12:00', show: 'Open' },
+        { title: 'Focus', when: '2026-11-03T10:00/2026-11-03T10:30', show: 'Busy' },
+      ],
+    })
+    const sheet = createSheetFromSource(ws, { title: 'Office hours', source: Open })
+    updateSheetAccess(ws, sheet.id, { visibility: 'public', access: [] }, 'rin')
+    updateSheetSuggest(ws, sheet.id, true)
+    return liveShareFor(ws, sheet.id)?.token ?? ''
+  }
+  const ask = (token: string, when: string, ip = 'ip-a') =>
+    suggestRow(ws, token, { table: 'cal', cells: { title: 'Call', when }, ...ANA }, ip)
+
+  test('inside a window it is taken; outside, or over a Busy block, it is refused in words', () => {
+    const token = openLink()
+    expect(ask(token, '2026-11-03T09:00/2026-11-03T09:30').id).toBeString()
+    expect(() => ask(token, '2026-11-03T13:00/2026-11-03T13:30', 'ip-b')).toThrow(
+      'That time is not open for booking — pick another.',
+    )
+    expect(() => ask(token, '2026-11-03T11:45/2026-11-03T12:15', 'ip-c')).toThrow(
+      /not open for booking/,
+    )
+    expect(() => ask(token, '2026-11-03T10:00/2026-11-03T10:30', 'ip-d')).toThrow(/just booked/)
+  })
+
+  test('the window is where a booking goes, never what takes it: approval lands', () => {
+    const token = openLink()
+    const { id } = ask(token, '2026-11-03T11:00/2026-11-03T11:30')
+    const { recordId } = approveSuggestion(ws, id ?? '', MEMBER)
+    expect(recordId).toBeString()
+    expect(() => ask(token, '2026-11-03T11:00/2026-11-03T11:30', 'ip-e')).toThrow(/just booked/)
+  })
+})
+
+describe('an Open window is found however busy the table (D133)', () => {
+  test('a window that opens exactly at the time asked for holds it; one after it never does', () => {
+    defineUserTable(ws, {
+      name: 'cal',
+      columns: [
+        { name: 'title', type: 'text' },
+        { name: 'when', type: 'date' },
+        { name: 'show', type: 'select', options: ['Busy', 'Open'] },
+      ],
+    })
+    runMutation(ws, {
+      kind: 'insert',
+      table: 'cal',
+      data: [
+        { title: 'Hours', when: '2026-11-03T09:00/2026-11-03T10:00', show: 'Open' },
+        { title: 'Later hours', when: '2026-11-03T14:00/2026-11-03T15:00', show: 'Open' },
+      ],
+    })
+    const sheet = createSheetFromSource(ws, {
+      title: 'Hours',
+      source:
+        '<Sheet title="Hours"><Slots bind={{ table: "cal" }} date="when" show="show" add={["title"]} /></Sheet>',
+    })
+    updateSheetAccess(ws, sheet.id, { visibility: 'public', access: [] }, 'rin')
+    updateSheetSuggest(ws, sheet.id, true)
+    const token = liveShareFor(ws, sheet.id)?.token ?? ''
+    const ask = (when: string, ip: string) =>
+      suggestRow(ws, token, { table: 'cal', cells: { title: 'Call', when }, ...ANA }, ip)
+    expect(ask('2026-11-03T09:00/2026-11-03T09:30', 'ip-1').id).toBeString()
+    expect(ask('2026-11-03T14:30/2026-11-03T15:00', 'ip-2').id).toBeString()
+    expect(() => ask('2026-11-03T12:00/2026-11-03T12:30', 'ip-3')).toThrow(/not open for booking/)
+  })
+})

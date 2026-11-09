@@ -8,6 +8,7 @@ export {
   DEFAULT_MINUTES,
   durationWords,
   FIRST_HOUR,
+  hourLabel,
   minutesOf,
   readWhen,
   shiftClock,

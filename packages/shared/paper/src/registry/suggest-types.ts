@@ -12,6 +12,8 @@ export interface SuggestTarget {
   date?: string
   /** A Slots' slot length: a time it holds may not be asked for twice. */
   minutes?: number
+  /** A Slots' Show-as column (D133): a time is bookable only inside a row it marks Open. */
+  show?: string
 }
 
 /** A stretch of wall-clock minutes since the epoch day; zones never enter. */

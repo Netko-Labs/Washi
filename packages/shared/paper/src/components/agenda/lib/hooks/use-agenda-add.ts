@@ -12,9 +12,10 @@ export function useAgendaAdd(isSuggesting: boolean): AgendaAdd {
   return {
     pick,
     adding: pick?.kind === 'add' ? pick.day : null,
-    open: (day) => {
+    addingAt: pick?.kind === 'add' ? (pick.at ?? null) : null,
+    open: (day, at) => {
       landed.clear()
-      setPick({ kind: 'add', day })
+      setPick({ kind: 'add', day, at })
     },
     openEvent: (row) => setPick({ kind: 'event', row }),
     close: () => setPick(null),
