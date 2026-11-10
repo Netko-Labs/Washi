@@ -33,6 +33,7 @@ beforeEach(async () => {
   const session = {
     ws,
     viewer: { id: MEMBER.id, isOwner: false },
+    isSteward: false,
     member: MEMBER,
     listPeople: async () => [MEMBER],
     changed: (kinds: McpChange[]) => void changes.push(kinds),
