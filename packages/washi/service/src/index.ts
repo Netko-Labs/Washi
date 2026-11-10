@@ -38,6 +38,8 @@ export { defaultModelFor, LAST_RESORT_MODELS, PREFERRED_MODELS } from './agents/
 export {
   type Capability,
   type CapabilityContext,
+  type ContentAnswer,
+  type ContentBlock,
   capability,
   commentCapabilities,
   contextCapabilities,

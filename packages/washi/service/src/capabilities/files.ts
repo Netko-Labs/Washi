@@ -3,6 +3,7 @@ import type { FileStore, Workspace } from '@washi/repository'
 import { z } from 'zod'
 import { codeLimits } from '../server'
 import { capability } from './define'
+import { fileGetCapability } from './file-get'
 import type { Capability } from './types'
 import { MAX_BASE64_CHARS, MIME_BY_EXTENSION } from './values'
 
@@ -54,5 +55,6 @@ export function fileCapabilities(
         }
       },
     ),
+    fileGetCapability(files),
   ]
 }

@@ -1240,3 +1240,15 @@ Acceptance: MCP tests walk every acceptance check; typecheck, Biome, `bun test` 
 - [x] Tests: parser and coercion units, MCP upload → dry run → import, batches, history's author
 - [ ] Later: Washi's own ports (a person's attached CSV in chat → `db_import`)
 - [ ] Later: `.xlsx` read directly (today: export CSV first)
+
+# An agent sees what it made (2026-11-09) — D138
+
+- [x] `file_get`: a picture as MCP image content (PNG/JPEG/GIF drawn smaller by resvg, WebP as stored),
+      text as words (≤ 100 000 characters), anything else said; only this workspace's uploads
+- [x] `answersContent` + `ContentAnswer`: a capability may answer MCP content blocks as they are
+- [x] `image_render`: an inline `<svg>` drawn whole by resvg — clipPath, mask, gradients, `<use>`,
+      filters, `<text>` in the house fonts (WOFF unwrapped to sfnt); addresses still `data:`/`file:`
+- [x] Tests: pixels for each SVG feature and a Kome-like clipped logo; file_get over MCP
+- [ ] Later: `sheet_render` (a PNG of a drawn page needs a headless browser on the server)
+- [ ] Later: `file_get` on Washi's own ports (the Claude port can take an image block)
+- [ ] Later: WebP/AVIF drawn smaller (resvg reads neither)

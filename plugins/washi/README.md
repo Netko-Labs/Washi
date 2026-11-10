@@ -42,7 +42,8 @@ and `catalog_list` say what a page may be written with and wear. A workspace may
 its **agent guide** (an owner or admin, from the page's ⋯ → Agent guide or `guide_set`): its words join the server's
 instructions when an agent connects, as `CLAUDE.md` does for a repo. Large files skip the agent's
 context: `file_upload_url` answers a one-time URL to `curl -T` the file to, and `file_upload_from`
-has the server fetch an https file. Past those uploads, it cannot fetch the web or run anything
+has the server fetch an https file. `file_get` shows the agent an upload — a picture as an image it
+can see (so it checks what `image_render` drew), a text file as its words. Past those uploads, it cannot fetch the web or run anything
 outside the workspace.
 
 ## Writing from local files

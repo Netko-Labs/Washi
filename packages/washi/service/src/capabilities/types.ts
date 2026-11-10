@@ -12,7 +12,19 @@ export interface Capability {
   isReadOnly: boolean
   /** Its answer is words to read as they are (Markdown), not a value to pass as JSON. */
   answersText?: boolean
+  /** Its answer is a `ContentAnswer`: blocks a carrier hands on as they are — a picture to look at. */
+  answersContent?: boolean
   run(input: unknown): Promise<unknown>
+}
+
+/** One block of an answer as MCP carries it: words, or a picture in base64. */
+export type ContentBlock =
+  | { type: 'text'; text: string }
+  | { type: 'image'; data: string; mimeType: string }
+
+/** What a capability that `answersContent` answers (D138). */
+export interface ContentAnswer {
+  content: ContentBlock[]
 }
 
 export interface CapabilityContext {

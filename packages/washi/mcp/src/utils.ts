@@ -1,4 +1,11 @@
+import type { ContentAnswer } from '@washi/service'
 import type { McpWorkspace } from './types'
+
+/** A capability's answer that is MCP content blocks already (file_get's picture, D138). */
+export const isContentAnswer = (value: unknown): value is ContentAnswer =>
+  typeof value === 'object' &&
+  value !== null &&
+  Array.isArray((value as { content?: unknown }).content)
 
 /** The workspace a call names — its id, or its name in any case — or null when it is none of them. */
 export function workspaceNamed(list: McpWorkspace[], ref: string): McpWorkspace | null {

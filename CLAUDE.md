@@ -963,6 +963,22 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   it — figure 1200×800, cover 1500×600, icon 256×256 — and it lands as a PNG upload under the
   server's caps, answering `{ key, width, height, wear }`. A mockup is a `<Figure>`, never a Widget or
   page code. The studio traces the wasm, satori and the fonts into `.output` (`RUNTIME_FILE_DEPS`).
+- **An agent sees what it made; an inline SVG draws as SVG (D138).** `file_get` (MCP, in
+  `fileCapabilities`, a read; `answersContent`: its `ContentAnswer` blocks go out as MCP content as
+  they are) shows an upload of the session's workspace — any member reads any upload, as the files
+  route does; another workspace's id is not found. A PNG, JPEG or GIF comes back as an image, drawn
+  smaller by resvg to `maxWidth` on its longer side (default 1024, 64–2048; `scaledPicture`, the size
+  read off its header by `pictureSize`) — one that fits as stored; WebP as stored up to 3.5 MB (resvg
+  reads no WebP or AVIF); text (`text/*`, JSON) as words, cut at 100 000 characters; anything else as
+  `{ key, name, mime, bytes, shown: false, why }`. In `image_render`, each inline `<svg>` is no longer
+  Satori's to read (it dropped clip paths, masks and gradients, lost `id`s to lowercasing, refused
+  `<text>`): `svgPicture` writes it back out as its own source (tag case and `id`s kept, `url(#id)`
+  kept, every other address through the same `data:`/`file:` check, scripts, `<foreignObject>` and
+  handlers dropped, a link a group), rasterizes it with resvg at twice its size (≤ 2400 px) with the
+  house fonts unwrapped from WOFF to sfnt (`sfntOf`, `engine()` — resvg reads no WOFF), and lays it
+  out as an `<img>`. An `<svg>` needs width and height in px or a viewBox, ≤ 2400 a side.
+  `sheet_render` is not built: a page draws through paper's React and CSS in a browser, so a PNG of
+  one needs a headless browser on the server.
 - **A README is one call (D136).** `sheet_import` (MCP, `sheetImportCapabilities`; its `file` reads the
   session's `files`) turns Markdown — `markdown` (≤ 500 000 characters) or `file: 'file:<id>'` of
   an uploaded `.md`/`.txt` — into a page: `service/markdown` (`markdownToPage`) parses CommonMark +
