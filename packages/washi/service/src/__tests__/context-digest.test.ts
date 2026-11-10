@@ -129,7 +129,7 @@ describe('context_get: a workspace in one read (D135)', () => {
     expect(out).not.toContain('Not for Ana')
     expect(out).toContain('- status: Todo 9 · Doing 2 · Done 3')
     expect(out).toContain('Open rows (11 of 14')
-    expect(out).toContain('**Todo** (9)\n- Issue 6 · P2')
+    expect(out).toContain('**Todo** (9)\n- Issue 14 · P2')
     expect(out).not.toContain('Issue 1 ·')
     // A long text column is left out of the row lines and named with the call that reads it.
     expect(out).not.toContain('a long note')
@@ -142,7 +142,8 @@ describe('context_get: a workspace in one read (D135)', () => {
     const out = workspaceContext(ws, MEMBER, { maxChars: 4000 })
     expect(out.length).toBeLessThanOrEqual(4000)
     expect(out).toContain('## Left out')
-    expect(out).toMatch(/sheet_get \{ "id": "[^"]+" \}/)
+    expect(out).toContain('pages cut short')
+    expect(out).toContain('*(cut — sheet_get for the rest)*')
   })
 
   test('root and depth read part of the tree', () => {

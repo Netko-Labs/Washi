@@ -1,4 +1,3 @@
-import type { SheetSummary } from '@washi/domain'
 import type { WsxElement } from '@washi/wsx'
 
 /** What `context_get` is asked for. */
@@ -13,14 +12,6 @@ export interface ContextOptions {
   maxChars?: number
 }
 
-/** A page as the digest reads it: where it sits and its words. */
-export interface ContextPage {
-  meta: SheetSummary
-  depth: number
-  /** Its words as Markdown, or null when its source would not parse. */
-  body: string | null
-}
-
 /** What rendering a page needs to know beyond its own markup. */
 export interface RenderContext {
   /** Titles of the pages the reader may read, by id — a PageLink or a Ref names them. */
@@ -33,11 +24,19 @@ export interface RenderContext {
   evaluate?: (expr: string) => string | null
 }
 
-/** A page's words as the budget sees them. */
-export interface BudgetPage {
+/** A page the budget may give words to: its heading, and its words read only when asked. */
+export interface PageCandidate {
   id: string
   title: string
-  body: string
+  head: string
+  body: () => string
+}
+
+/** The pages that fit: each one's section, and those cut short or not read at all. */
+export interface FittedPages {
+  sections: string[]
+  cut: string[]
+  dropped: number
 }
 
 /** A table's rows as the budget sees them, and how to read them all. */
@@ -45,13 +44,8 @@ export interface BudgetRows {
   name: string
   text: string
   fetch: string
-}
-
-/** What fit: each page's and table's text, and what was cut or left out, said for fetching. */
-export interface Fitted {
-  pages: { id: string; body: string }[]
-  rows: { name: string; text: string }[]
-  leftOut: string[]
+  /** Open rows the text never held (past what was read). */
+  unshown: number
 }
 
 /** Who asks for a digest, and what the workspace is called. */
@@ -60,11 +54,21 @@ export interface ContextRequest extends ContextOptions {
   workspaceName?: string
 }
 
-/** A table's place in the digest: what it holds and, maybe, the rows still open. */
+/** A row as the digest reads it. */
+export type ContextRow = Record<string, unknown> & { id: string }
+
+/** A table's rows in words, the call that reads them all, and how many open rows went unread. */
+export interface RowsText {
+  text: string | null
+  fetch: string
+  unshown?: number
+}
+
+/** A table as the digest may say it, each part read only when it has room. */
 export interface TableDigest {
-  summary: string
-  rows: string | null
-  rowsFetch: string
+  name: string
+  summary: () => string
+  rows: () => RowsText
 }
 
 /** The agent guide as the reader may read it. */
