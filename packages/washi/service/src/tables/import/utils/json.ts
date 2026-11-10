@@ -1,5 +1,5 @@
 import { InkError } from '../../errors'
-import type { RefusedRow, SourceRow } from '../types'
+import type { ReadRows, RefusedRow, SourceRow } from '../types'
 import { refuseOverCap } from './limit'
 
 const isObject = (value: unknown): value is Record<string, unknown> =>
@@ -28,11 +28,7 @@ function rowsOf(document: unknown): unknown[] {
  * gives each item its row in the file when some were left out before (a JSON Lines line that did
  * not parse keeps its own number).
  */
-export function sourceRowsOf(
-  items: unknown[],
-  lines?: number[],
-  numbers?: number[],
-): { rows: SourceRow[]; refused: RefusedRow[] } {
+export function sourceRowsOf(items: unknown[], lines?: number[], numbers?: number[]): ReadRows {
   refuseOverCap(items.length)
   const rows: SourceRow[] = []
   const refused: RefusedRow[] = []
@@ -50,7 +46,7 @@ export function sourceRowsOf(
  * JSON Lines: one object a line, blank lines skipped; a line that does not parse is refused. A
  * row's number is its place among the non-blank lines, so a refused line never shares one.
  */
-function readJsonLines(text: string): { rows: SourceRow[]; refused: RefusedRow[] } {
+function readJsonLines(text: string): ReadRows {
   const items: unknown[] = []
   const lines: number[] = []
   const numbers: number[] = []
@@ -76,10 +72,7 @@ function readJsonLines(text: string): { rows: SourceRow[]; refused: RefusedRow[]
  * JSON text as rows: one document (an array, or an object holding one), or JSON Lines when
  * `lines` says so — or when the whole will not parse but its first line does.
  */
-export function readJson(
-  text: string,
-  lines: boolean | undefined,
-): { rows: SourceRow[]; refused: RefusedRow[] } {
+export function readJson(text: string, lines: boolean | undefined): ReadRows {
   const body = text.replace(/^﻿/, '')
   if (lines) return readJsonLines(body)
   try {

@@ -1,5 +1,5 @@
 import { InkError } from '../../errors'
-import type { RefusedRow, SourceRow } from '../types'
+import type { CsvRecord, ReadCsv, RefusedRow, SourceRow } from '../types'
 import { refuseOverCap } from './limit'
 
 const BOM = '﻿'
@@ -23,9 +23,9 @@ export function sniffDelimiter(text: string): string {
  * breaks and `""` for a quote; CRLF, LF or a lone CR end a record. Each record keeps the line it
  * starts on.
  */
-export function csvRecords(text: string, delimiter: string): { line: number; cells: string[] }[] {
+export function csvRecords(text: string, delimiter: string): CsvRecord[] {
   const source = text.startsWith(BOM) ? text.slice(1) : text
-  const records: { line: number; cells: string[] }[] = []
+  const records: CsvRecord[] = []
   let cells: string[] = []
   let cell = ''
   let quoted = false
@@ -74,10 +74,7 @@ export function csvRecords(text: string, delimiter: string): { line: number; cel
  * A CSV or TSV file as rows by its header's names. Blank lines are skipped; a row with more
  * non-empty cells than the header has names is refused in words, a short one leaves the rest empty.
  */
-export function readCsv(
-  text: string,
-  delimiter: string,
-): { header: string[]; rows: SourceRow[]; refused: RefusedRow[] } {
+export function readCsv(text: string, delimiter: string): ReadCsv {
   const records = csvRecords(text, delimiter).filter((record) => !isBlank(record.cells))
   const [head, ...body] = records
   if (!head) throw new InkError('the file is empty: a header row naming the columns comes first')

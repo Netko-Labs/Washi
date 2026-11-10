@@ -12,6 +12,7 @@ import type {
   ReadyRow,
   RefusedRow,
   SourceRow,
+  WrittenBatches,
 } from './types'
 import { coerceCell, planColumns, readSource } from './utils'
 
@@ -45,7 +46,7 @@ function writeBatches(
   table: string,
   rows: ReadyRow[],
   author: string | null,
-): { ids: string[]; batches: ImportBatch[] } {
+): WrittenBatches {
   const ids: string[] = []
   const batches: ImportBatch[] = []
   for (let at = 0; at < rows.length; at += INSERT_ROW_CAP) {

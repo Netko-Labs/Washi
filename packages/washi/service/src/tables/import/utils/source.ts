@@ -1,5 +1,5 @@
 import { InkError } from '../../errors'
-import type { ImportFormat, ImportSource, RefusedRow, SourceRow } from '../types'
+import type { ImportFormat, ImportSource, ReadSource, SourceRow } from '../types'
 import { readCsv, sniffDelimiter } from './csv'
 import { readJson, sourceRowsOf } from './json'
 
@@ -27,11 +27,7 @@ function namesOf(rows: SourceRow[]): string[] {
  * The rows a source holds by their own column names: CSV or TSV (the delimiter given, else read
  * off the first line), one JSON document, JSON Lines, or rows already parsed.
  */
-export function readSource(source: ImportSource): {
-  names: string[]
-  rows: SourceRow[]
-  refused: RefusedRow[]
-} {
+export function readSource(source: ImportSource): ReadSource {
   if (source.rows) {
     const read = sourceRowsOf(source.rows)
     return { names: namesOf(read.rows), ...read }

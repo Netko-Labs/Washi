@@ -82,3 +82,31 @@ export interface ImportResult {
   /** A dry run's first rows as they would land. */
   sample?: Record<string, unknown>[]
 }
+
+/** One CSV record as RFC 4180 splits it, with the line it starts on. */
+export interface CsvRecord {
+  line: number
+  cells: string[]
+}
+
+/** What reading a file gives: the rows it holds, and those refused while reading. */
+export interface ReadRows {
+  rows: SourceRow[]
+  refused: RefusedRow[]
+}
+
+/** A CSV or TSV file read: its header's names beside its rows. */
+export interface ReadCsv extends ReadRows {
+  header: string[]
+}
+
+/** Any source read: the names its rows use, in order, beside its rows. */
+export interface ReadSource extends ReadRows {
+  names: string[]
+}
+
+/** What the batched writes gave: the ids made, and each batch's outcome. */
+export interface WrittenBatches {
+  ids: string[]
+  batches: ImportBatch[]
+}
