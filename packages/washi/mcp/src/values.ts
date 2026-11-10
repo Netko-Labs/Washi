@@ -36,6 +36,8 @@ theme a <Sheet> may wear; file_upload turns a picture into a file:<id> key for a
 image_render draws HTML into a PNG upload — a mockup for a <Figure src alt>, a cover or an icon —
 so a design is a picture on the page, never HTML or a widget. Look at what you drew with file_get
 on its key before you put it on a page (it also reads an uploaded text file).
+A brand: theme_define makes a ws:<slug> page theme from colours; workspace_look_set (owners and
+admins) sets the icon and cover every page without its own wears, so pages need not repeat them.
 A Markdown document (a README, a spec) is one sheet_import call: it converts and checks it for you.
 Run sheet_check (preview: true shows the words it draws) before sheet_create or sheet_replace.
 Writes answer { id, title, version } — pass that version back as baseVersion on your next write so a

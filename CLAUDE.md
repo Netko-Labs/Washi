@@ -1005,6 +1005,21 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   rest go through `runMutation` inserts in batches of `INSERT_ROW_CAP`, each all or nothing (P1,
   signed by the member); a batch refused (a relation name nothing matches) is said with its rows and
   the next goes on. ≤ 20 000 rows an import; `dryRun` writes nothing and shows a sample.
+- **A workspace's brand, from outside too (D139).** `theme_define` (MCP, `themeCapabilities`; a
+  write) makes or changes `ws:<slug>` by the slug pages name (`defineWorkspaceTheme`): a new slug is
+  the caller's, an existing one changes in place for its maker or a steward — the D88 rules, the same
+  `themeChecks` gate (refused in words below `refuse`, `warnings` below `warn`) and `themeNameClash`;
+  colours read through paper's `toHex` (hex, rgb, hsl, oklch), stored `#RRGGBB`. `catalog_list`
+  answers each workspace theme's colours (`workspaceThemes`) and the default look. **A default icon
+  and cover**: app meta `default_look` `{ icon, cover }` (`workspaceLook` / `setWorkspaceLook` in
+  service `themes/look.ts`, each checked by `sheetIconProblem` / `coverKeyProblem`; left out keeps,
+  null clears); `workspaces.look` (any member) and `workspaces.setLook` (`ownerProcedure`), MCP
+  `workspace_look_set` (owners and admins: `McpSession.isSteward`, else refused in words), Settings →
+  Workspace → General → Default look (the page pickers). It is drawn, never saved: paper's
+  `SheetFrame` wears `SheetLookHost.defaults` where the page has no icon or cover of its own
+  (`useLookLends` in ui lends it to a tree page, not a row's; a locked block lends none), and
+  `SheetIcon` falls back to it (`useWorkspaceLookStore`, refreshed with the page list). A shared
+  link draws only the page's own look.
 - **An embed is https and listed (D92).** `<Embed src title ratio height>`: the registry refuses http;
   a built-in provider (`EMBED_PROVIDERS` — YouTube via youtube-nocookie, Vimeo, Spotify, Loom, Figma,
   CodePen, CodeSandbox, Miro, Google Maps, Indify) turns its page URL into its player and always plays;

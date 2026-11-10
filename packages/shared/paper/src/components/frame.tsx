@@ -47,11 +47,14 @@ export function SheetFrame({
   theme = 'washi',
   feel = 'note',
   accent = 'accent',
-  icon,
-  cover,
+  icon: ownIcon,
+  cover: ownCover,
   children,
 }: SheetFrameProps) {
-  const { band, theme: lend } = useSheetLook()
+  const { band, theme: lend, defaults } = useSheetLook()
+  // A page's own icon and cover win; one without wears the workspace's (D139).
+  const icon = ownIcon || defaults?.icon
+  const cover = ownCover || defaults?.cover
   const own = Object.hasOwn(THEMES, theme) ? THEMES[theme as ThemeId] : lend?.(theme)
   const pair = own ?? THEMES.washi
   return (

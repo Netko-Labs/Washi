@@ -30,3 +30,19 @@ export const workspaceThemeSchema = workspaceThemeWriteSchema.extend({
   hlcUpdated: z.string(),
 })
 export type WorkspaceTheme = z.infer<typeof workspaceThemeSchema>
+
+/**
+ * What a page with no `icon` or `cover` of its own wears (D139): the workspace's. Left out keeps
+ * what is set; null clears it. The source stays each page's truth — nothing is written into one.
+ */
+export const workspaceLookWriteSchema = z.object({
+  icon: z.string().trim().min(1).max(64).nullable().optional(),
+  cover: z.string().trim().min(1).max(80).nullable().optional(),
+})
+export type WorkspaceLookWrite = z.infer<typeof workspaceLookWriteSchema>
+
+export const workspaceLookSchema = z.object({
+  icon: z.string().nullable(),
+  cover: z.string().nullable(),
+})
+export type WorkspaceLook = z.infer<typeof workspaceLookSchema>

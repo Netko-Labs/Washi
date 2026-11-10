@@ -1,3 +1,4 @@
+import { workspaceLook } from '@washi/service'
 import { z } from 'zod'
 import { INTEGRATIONS, publicProcedure, router, workspaceProcedure } from '../../init'
 import type { ServerKeyUse } from '../../shared/instance'
@@ -34,4 +35,6 @@ export const workspaceQueries = router({
       ({ ctx, input }) =>
         ctx.runtime.control.secrets?.integrationInfo(ctx.workspaceId, input.integration) ?? null,
     ),
+  /** The icon and cover a page with none of its own wears (D139); both null until one is set. */
+  look: workspaceProcedure.query(({ ctx }) => workspaceLook(ctx.ws)),
 })

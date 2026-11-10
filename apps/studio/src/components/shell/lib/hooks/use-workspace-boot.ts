@@ -5,6 +5,7 @@ import {
   useThemesStore,
   useUnsplashStore,
   useViewStore,
+  useWorkspaceLookStore,
 } from '@washi/ui'
 import { useEffect } from 'react'
 import { useMentionsPoll } from '@/components/mentions'
@@ -32,6 +33,7 @@ export function useWorkspaceBoot(workspaceId: string) {
     void useSheetsStore.getState().refresh()
     void useThemesStore.getState().refresh()
     void useUnsplashStore.getState().refresh()
+    void useWorkspaceLookStore.getState().refresh()
     void useAgentStore.getState().init()
     useLiveStore.getState().connect()
     // Only the subscriptions need closing; resetting state is the loader's job, and doing it

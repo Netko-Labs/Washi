@@ -50,6 +50,7 @@ export {
   rowImportCapabilities,
   sheetImportCapabilities,
   tableCapabilities,
+  themeCapabilities,
 } from './capabilities'
 export { LOCAL_AUTHOR } from './comments/constants'
 export { CommentError, postComment, removeComment, resolveThread } from './comments/service'
@@ -216,10 +217,14 @@ export {
 export { seedTeamSpace } from './tables/team-space'
 export type { TeamSpace, TeamSpaceOptions } from './tables/types'
 export { guardWashiTableTrash, trashTableAs } from './tables/washi-trash'
+export { setWorkspaceLook, workspaceLook } from './themes/look'
 export {
   addWorkspaceTheme,
+  defineWorkspaceTheme,
   editWorkspaceTheme,
   removeWorkspaceTheme,
   themeSlug,
+  themeWarnings,
   WorkspaceThemeError,
 } from './themes/service'
+export type { DefinedTheme, ThemeChanger, ThemeDefinition } from './themes/types'

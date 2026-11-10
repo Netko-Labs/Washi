@@ -42,6 +42,8 @@ export interface SheetLookHost {
   theme?(key: string): ThemePair | undefined
   /** A read-only host leaves it out and the look stays still. */
   edit?(part: LookPart, anchor: HTMLElement): void
+  /** The workspace's icon and cover, worn by a page with none of its own (D139); never saved. */
+  defaults?: Pick<SheetLook, 'icon' | 'cover'>
 }
 
 export interface SheetLookProviderProps {

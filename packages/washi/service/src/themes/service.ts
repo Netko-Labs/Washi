@@ -9,6 +9,8 @@ import {
   type Workspace,
   workspaceThemeBySlug,
 } from '@washi/repository'
+import { THEME_SLUG, THEME_SLUG_MAX } from './constants'
+import type { DefinedTheme, ThemeChanger, ThemeDefinition } from './types'
 
 export class WorkspaceThemeError extends Error {
   constructor(message: string) {
@@ -56,7 +58,7 @@ export function addWorkspaceTheme(
   return createWorkspaceTheme(ws, { ...write, slug: freeSlug(ws, write.name) }, createdBy)
 }
 
-function requireMine(ws: Workspace, id: string, by: { id: string; mayChangeAny: boolean }) {
+function requireMine(ws: Workspace, id: string, by: ThemeChanger) {
   const theme = getWorkspaceTheme(ws, id)
   if (!theme) throw new WorkspaceThemeError('no such theme')
   if (theme.createdBy !== by.id && !by.mayChangeAny) {
@@ -70,7 +72,7 @@ export function editWorkspaceTheme(
   ws: Workspace,
   id: string,
   write: WorkspaceThemeWrite,
-  by: { id: string; mayChangeAny: boolean },
+  by: ThemeChanger,
 ): WorkspaceTheme {
   requireMine(ws, id, by)
   requireReadable(write)
@@ -81,11 +83,45 @@ export function editWorkspaceTheme(
 }
 
 /** Pages that wore it fall back to Washi; their source keeps the key. */
-export function removeWorkspaceTheme(
-  ws: Workspace,
-  id: string,
-  by: { id: string; mayChangeAny: boolean },
-): void {
+export function removeWorkspaceTheme(ws: Workspace, id: string, by: ThemeChanger): void {
   requireMine(ws, id, by)
   deleteWorkspaceTheme(ws, id)
+}
+
+/** Pairings under their `warn` floor, in words: saved, but worth a second look. */
+export function themeWarnings(write: WorkspaceThemeWrite): string[] {
+  return themeChecks(write)
+    .filter((check) => check.verdict === 'warn')
+    .map(
+      ({ rule, ratio, mode }) =>
+        `${rule.label} is ${ratio.toFixed(1)}:1 in ${mode} — it reads best at ${rule.warn}:1`,
+    )
+}
+
+/**
+ * Makes `ws:<slug>` or changes it in place (D139): an outside agent names a theme as its pages
+ * will. A new slug is made by `by`; one that exists changes only for its maker or a steward —
+ * the same contrast gate and name rule as the Settings editor.
+ */
+export function defineWorkspaceTheme(
+  ws: Workspace,
+  definition: ThemeDefinition,
+  by: ThemeChanger,
+): DefinedTheme {
+  const slug = definition.slug.replace(/^ws:/, '')
+  if (slug.length > THEME_SLUG_MAX || !THEME_SLUG.test(slug)) {
+    throw new WorkspaceThemeError(
+      `"${definition.slug}" is not a theme slug — lowercase words joined by hyphens, at most ${THEME_SLUG_MAX} characters, like "mirin-amber"`,
+    )
+  }
+  const write = { name: definition.name, light: definition.light, dark: definition.dark }
+  const found = workspaceThemeBySlug(ws, slug)
+  if (found) {
+    const theme = editWorkspaceTheme(ws, found.id, write, by)
+    return { theme, created: false, warnings: themeWarnings(write) }
+  }
+  requireReadable(write)
+  requireFreeName(ws, write.name)
+  const theme = createWorkspaceTheme(ws, { ...write, slug }, by.id)
+  return { theme, created: true, warnings: themeWarnings(write) }
 }

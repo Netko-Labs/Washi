@@ -38,8 +38,10 @@ rows (`db_query`, `db_mutate` — up to 500 rows a call; `db_import` loads a CSV
 batches of 500, up to 20 000 rows), write and edit pages (`sheet_create`, `sheet_replace`,
 `sheet_edit`), turn a Markdown file into a page (`sheet_import`), upload pictures (`file_upload`) and
 comment on a page or a row — as you, through the same checks and history as the app. `wsx_reference`
-and `catalog_list` say what a page may be written with and wear. A workspace may mark one page as
-its **agent guide** (an owner or admin, from the page's ⋯ → Agent guide or `guide_set`): its words join the server's
+and `catalog_list` say what a page may be written with and wear. `theme_define` makes a
+`ws:<slug>` page theme from your brand's colours, and `workspace_look_set` (owners and admins) gives
+every page without its own an icon and a cover. A workspace may mark one page as its **agent guide**
+(an owner or admin, from the page's ⋯ → Agent guide or `guide_set`): its words join the server's
 instructions when an agent connects, as `CLAUDE.md` does for a repo. Large files skip the agent's
 context: `file_upload_url` answers a one-time URL to `curl -T` the file to, and `file_upload_from`
 has the server fetch an https file. `file_get` shows the agent an upload — a picture as an image it

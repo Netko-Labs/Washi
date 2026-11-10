@@ -11,6 +11,7 @@ import {
   rowImportCapabilities,
   sheetImportCapabilities,
   tableCapabilities,
+  themeCapabilities,
 } from '@washi/service'
 import { z } from 'zod'
 import { asksInitialize, instructionsFor } from './instructions'
@@ -40,6 +41,7 @@ function capabilitiesFor(session: McpSession): Capability[] {
     ...sheetImportCapabilities(session.ws, context, session.files),
     ...tableCapabilities(session.ws, context),
     ...rowImportCapabilities(session.ws, context, session.files),
+    ...themeCapabilities(session.ws, { ...context, isSteward: session.isSteward }),
     ...commentCapabilities(session.ws, { ...context, authorName: session.member.name }),
     ...(session.files ? fileCapabilities(session.ws, session.files, fileUrl) : []),
     ...(session.files ? imageCapabilities(session.ws, session.files, fileUrl) : []),
