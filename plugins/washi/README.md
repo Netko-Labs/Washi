@@ -34,9 +34,9 @@ export WASHI_TOKEN="washi_pat_…"
 
 Read a whole workspace in one call (`context_get`: its agent guide, the page tree, every page as
 Markdown, each table's counts and open rows, cut to a budget), read and search pages, read and write
-rows (`db_query`, `db_mutate` — up to 500 rows a call), write and edit pages (`sheet_create`,
-`sheet_replace`, `sheet_edit`), turn a Markdown file into a page (`sheet_import`), upload pictures
-(`file_upload`) and
+rows (`db_query`, `db_mutate` — up to 500 rows a call; `db_import` loads a CSV, TSV or JSON file in
+batches of 500, up to 20 000 rows), write and edit pages (`sheet_create`, `sheet_replace`,
+`sheet_edit`), turn a Markdown file into a page (`sheet_import`), upload pictures (`file_upload`) and
 comment on a page or a row — as you, through the same checks and history as the app. `wsx_reference`
 and `catalog_list` say what a page may be written with and wear. A workspace may mark one page as
 its **agent guide** (an owner or admin, from the page's ⋯ → Agent guide or `guide_set`): its words join the server's
@@ -55,6 +55,8 @@ bun scripts/washi.mjs sheet_create title=Spec source=@spec.wsx
 bun scripts/washi.mjs sheet_import markdown=@README.md parentId=<docs page id>
 bun scripts/washi.mjs upload brand/og-card.png --workspace DashiOS
 bun scripts/washi.mjs db_mutate mutation:=@rows.json
+bun scripts/washi.mjs upload issues.csv            # answers file:<id>
+bun scripts/washi.mjs db_import table=issues file=file:<id> dryRun:=true
 ```
 
 `key=value` is text, `key:=…` JSON, `@file` a file's text (`@base64:file` its bytes), and

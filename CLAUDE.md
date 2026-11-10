@@ -976,6 +976,19 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   one is passed. Block HTML and footnotes stay byte for byte in `Code`, HTML inside a line as visible words (`<br>` a line break), each listed in `kept`; nothing
   is dropped. Checked like `sheet_check`, written like `sheet_create` (as the member, `parentId`,
   answered small + `kept`); `dryRun` answers the WSX, diagnostics and preview and saves nothing.
+- **Rows arrive from a file (D137).** `db_import` (MCP, `importCapabilities` over the session's
+  `files`; a write) takes exactly one of `file` (an upload: `.csv`, `.tsv`, `.json`, `.jsonl` —
+  `file_upload` keeps `.tsv` as `text/plain` and `.jsonl` as JSON, the name tells them apart), `csv`
+  or `json` (rows, or text). `service/tables/import`: RFC 4180 CSV (quotes, `""`, CRLF, a BOM; the
+  separator given or read off the first line), JSON (an array, `{ rows }`) or JSON Lines;
+  `planColumns` matches the file's columns by name, case-blind or snake_cased, `map` the rest (null
+  leaves one out) — no such column, an `id` or a formula/rollup is `ignoredColumns`, never fatal;
+  `coerceCell` reads cells as people write them (`1,234.5` · `1.234,5` · `25%` → 0.25, yes/no/✓,
+  choices spelt as the column spells them, lists split on `,`/`;`, empty = unset); then
+  `validateRecord` per row, so a row that won't fit is refused with its row, CSV line and words. The
+  rest go through `runMutation` inserts in batches of `INSERT_ROW_CAP`, each all or nothing (P1,
+  signed by the member); a batch refused (a relation name nothing matches) is said with its rows and
+  the next goes on. ≤ 20 000 rows an import; `dryRun` writes nothing and shows a sample.
 - **An embed is https and listed (D92).** `<Embed src title ratio height>`: the registry refuses http;
   a built-in provider (`EMBED_PROVIDERS` — YouTube via youtube-nocookie, Vimeo, Spotify, Loom, Figma,
   CodePen, CodeSandbox, Miro, Google Maps, Indify) turns its page URL into its player and always plays;

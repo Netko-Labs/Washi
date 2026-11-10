@@ -24,6 +24,10 @@ export const MIME_BY_EXTENSION: Record<string, string> = {
   pdf: 'application/pdf',
   txt: 'text/plain',
   csv: 'text/csv',
+  // Read as text; db_import tells them apart by name (D137).
+  tsv: 'text/plain',
+  jsonl: 'application/json',
+  ndjson: 'application/json',
   md: 'text/markdown',
   json: 'application/json',
   zip: 'application/zip',
@@ -60,3 +64,9 @@ export const SHEET_IMPORT_DESCRIPTION = `Turn a Markdown document into a new pag
 It converts: # headings → Title (levels 1–3; a leading # heading is the page's title unless you pass title), paragraphs → Text, - / 1. / - [ ] lists → List and Item (a checked box is done, nested lists stay nested), fenced code → Code with its language, pipe tables → a written Table (up to 16 columns, a new Table every 200 rows), > quotes → Quote, GitHub alerts (> [!NOTE], [!TIP], [!WARNING], [!CAUTION]) → Callout, --- → Divider, a picture alone on its line on https → Figure. **bold**, *em*, ~~strike~~, \`code\` and https or mailto links stay inline marks; a relative or http link keeps its address in brackets after its words. A block of HTML and a footnote are kept exactly as written in a Code block; HTML inside a line (<kbd>, <!-- comments -->) stays as visible words; each is listed in kept — nothing is dropped. { } < > are escaped for you.
 The page is checked like sheet_check before it is saved, as yours. parentId (from sheet_list) files it under a page. dryRun: true saves nothing and answers { ok, diagnostics, source, preview, kept } — reshape that source and sheet_create it when the plain conversion is not the page you want.
 Answers { id, title, parentId, version, url, kept }. Example: { markdown: "# Setup\\n\\nRun \`bun dev\`.\\n\\n- [x] Install\\n- [ ] Configure", parentId: "<a page id>" }.`
+
+export const DB_IMPORT_DESCRIPTION = `Insert many rows into a table from a file, without passing them through your context row by row. Send exactly one of: file (an uploaded .csv, .tsv, .json or .jsonl — the file:<id> key file_upload answered), csv (CSV or TSV text, a header row first) or json (an array of row objects, or JSON / JSON Lines text).
+Columns match the table's by name (exactly, ignoring case, or snake_cased: "Issue title" → issue_title); map renames the rest ({ "Summary": "title", "Internal": null } — null leaves one out). Columns that land nowhere, ids and formula/rollup columns are ignored and said in ignoredColumns, never fatal. Cells are read as people write them: numbers with thousands separators, "25%" as 0.25, yes/no/1/0/✓ for a checkbox, choices matched ignoring case, a multi_select or relation split on , or ; (a relation may name its rows). An empty cell stays empty.
+A row that does not fit is refused with its row (and line, in a CSV) and why, and left out; the rest are written in batches of 500, each all or nothing — a batch the table refuses is reported with its rows and its words, and the next goes on. Up to 20 000 rows an import. Every row is signed by you and kept in its history, like db_mutate.
+dryRun: true reads, matches and checks every row and writes nothing: run it first on a large file. Answers { inserted, ids (the first 500; idsTotal counts all), refused [{ row, line?, why }] (the first 100; refusedTotal), batches [{ from, to, inserted | error }], columns (source → table), ignoredColumns }.
+Example: file_upload a backlog.csv, then db_import { table: "backlog", file: "file:<id>", map: { "Issue": "title" }, dryRun: true }, read refused, then again without dryRun.`

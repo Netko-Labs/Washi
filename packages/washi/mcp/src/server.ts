@@ -38,6 +38,7 @@ function capabilitiesFor(session: McpSession): Capability[] {
     ...pageCapabilities(session.ws, context),
     ...importCapabilities(session.ws, context, session.files),
     ...tableCapabilities(session.ws, context),
+    ...importCapabilities(session.ws, context, session.files),
     ...commentCapabilities(session.ws, { ...context, authorName: session.member.name }),
     ...(session.files ? fileCapabilities(session.ws, session.files, fileUrl) : []),
     ...(session.files ? imageCapabilities(session.ws, session.files, fileUrl) : []),
