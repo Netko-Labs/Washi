@@ -78,6 +78,33 @@ describe('serialize', () => {
       expect(parse(serialize(root))).toEqual(root)
     }
   })
+
+  test('a string prop holding a quote, a backslash, an entity or a line break reads back as written', () => {
+    for (const title of [
+      'Say "hi"',
+      'C:\\Users\\x',
+      'both " and \\',
+      'Tom &amp; Jerry',
+      'line\nbreak',
+    ]) {
+      const root: WsxElement = { kind: 'element', name: 'Sheet', props: { title }, children: [] }
+      const text = serialize(root)
+      expect(text).toBe(`<Sheet title={${JSON.stringify(title)}} />\n`)
+      expect(parse(text)).toEqual(root)
+    }
+  })
+
+  test('a plain string prop is still written as an attribute string', () => {
+    const root: WsxElement = {
+      kind: 'element',
+      name: 'Sheet',
+      props: { title: 'Roadmap · 2026 {draft} <v2>', icon: 'map' },
+      children: [],
+    }
+    const text = serialize(root)
+    expect(text).toBe('<Sheet title="Roadmap · 2026 {draft} <v2>" icon="map" />\n')
+    expect(parse(text)).toEqual(root)
+  })
 })
 
 describe('validate', () => {
