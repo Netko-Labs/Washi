@@ -47,6 +47,22 @@ describe('JSON', () => {
     expect(lines.refused).toEqual([{ row: 3, line: 4, why: 'not JSON' }])
   })
 
+  test('a JSON Lines row is its place among non-blank lines: a refused line never shares one', () => {
+    const read = readJson('{"a":1}\nbad\n{"a":2}\n', true)
+    expect(read.refused).toEqual([{ row: 2, line: 2, why: 'not JSON' }])
+    expect(read.rows.map((row) => row.row)).toEqual([1, 3])
+  })
+
+  test('a file past the cap is refused as soon as it passes it, never read whole', () => {
+    const csv = `title\n${'x\n'.repeat(20_001)}`
+    expect(() => readSource({ text: csv })).toThrow('more than 20,000 rows')
+    expect(() => readSource({ text: `title\n${'x\n'.repeat(20_000)}` })).not.toThrow()
+    expect(() => readJson('{"a":1}\n'.repeat(20_001), true)).toThrow('split the file')
+    expect(() =>
+      readJson(JSON.stringify(Array.from({ length: 20_001 }, () => ({}))), undefined),
+    ).toThrow('split the file')
+  })
+
   test('something not a list of rows is said', () => {
     expect(() => readJson('{"a":1}', false)).toThrow('array of objects')
   })

@@ -1,30 +1,43 @@
 import { InkError } from '../../errors'
 import type { RefusedRow, SourceRow } from '../types'
+import { refuseOverCap } from './limit'
 
 const isObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value)
 
 /** The rows a JSON document holds: an array of objects, or `{ rows: [...] }` (also `data`, `records`). */
 function rowsOf(document: unknown): unknown[] {
-  if (Array.isArray(document)) return document
+  if (Array.isArray(document)) {
+    refuseOverCap(document.length)
+    return document
+  }
   if (isObject(document)) {
     for (const key of ['rows', 'data', 'records', 'items']) {
       const held = document[key]
-      if (Array.isArray(held)) return held
+      if (Array.isArray(held)) {
+        refuseOverCap(held.length)
+        return held
+      }
     }
   }
   throw new InkError('expected a JSON array of objects, or { "rows": [ … ] }')
 }
 
-/** Parsed JSON rows as source rows; anything that is not an object is refused in words. */
+/**
+ * Parsed JSON rows as source rows; anything that is not an object is refused in words. `numbers`
+ * gives each item its row in the file when some were left out before (a JSON Lines line that did
+ * not parse keeps its own number).
+ */
 export function sourceRowsOf(
   items: unknown[],
   lines?: number[],
+  numbers?: number[],
 ): { rows: SourceRow[]; refused: RefusedRow[] } {
+  refuseOverCap(items.length)
   const rows: SourceRow[] = []
   const refused: RefusedRow[] = []
   for (const [index, item] of items.entries()) {
-    const row = index + 1
+    const row = numbers?.[index] ?? index + 1
     const line = lines?.[index]
     const where = line === undefined ? {} : { line }
     if (isObject(item)) rows.push({ row, ...where, fields: item })
@@ -33,21 +46,29 @@ export function sourceRowsOf(
   return { rows, refused }
 }
 
-/** JSON Lines: one object a line, blank lines skipped; a line that does not parse is refused. */
+/**
+ * JSON Lines: one object a line, blank lines skipped; a line that does not parse is refused. A
+ * row's number is its place among the non-blank lines, so a refused line never shares one.
+ */
 function readJsonLines(text: string): { rows: SourceRow[]; refused: RefusedRow[] } {
   const items: unknown[] = []
   const lines: number[] = []
+  const numbers: number[] = []
   const refused: RefusedRow[] = []
+  let row = 0
   for (const [index, raw] of text.split(/\r?\n/).entries()) {
     if (!raw.trim()) continue
+    row++
+    refuseOverCap(row)
     try {
       items.push(JSON.parse(raw))
       lines.push(index + 1)
+      numbers.push(row)
     } catch {
-      refused.push({ row: items.length + refused.length + 1, line: index + 1, why: 'not JSON' })
+      refused.push({ row, line: index + 1, why: 'not JSON' })
     }
   }
-  const read = sourceRowsOf(items, lines)
+  const read = sourceRowsOf(items, lines, numbers)
   return { rows: read.rows, refused: [...refused, ...read.refused] }
 }
 

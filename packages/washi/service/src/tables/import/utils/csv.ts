@@ -1,7 +1,10 @@
 import { InkError } from '../../errors'
 import type { RefusedRow, SourceRow } from '../types'
+import { refuseOverCap } from './limit'
 
 const BOM = '﻿'
+
+const isBlank = (cells: string[]) => cells.every((cell) => cell.trim() === '')
 
 /** The separator a file uses, read off its first line: a tab, a semicolon, else a comma. */
 export function sniffDelimiter(text: string): string {
@@ -32,8 +35,11 @@ export function csvRecords(text: string, delimiter: string): { line: number; cel
     cells.push(cell)
     cell = ''
   }
+  // The header and every non-blank record past it count toward the cap as they are read.
+  let filled = 0
   const endRecord = () => {
     endCell()
+    if (!isBlank(cells)) refuseOverCap(filled++)
     records.push({ line: start, cells })
     cells = []
   }
@@ -63,8 +69,6 @@ export function csvRecords(text: string, delimiter: string): { line: number; cel
   if (cell !== '' || cells.length > 0) endRecord()
   return records
 }
-
-const isBlank = (cells: string[]) => cells.every((cell) => cell.trim() === '')
 
 /**
  * A CSV or TSV file as rows by its header's names. Blank lines are skipped; a row with more
