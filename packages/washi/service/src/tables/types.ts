@@ -1,3 +1,4 @@
+import type { TablePage, UserTable } from '@washi/domain'
 import type { Cell, InkMutation } from '@washi/ink'
 import type { ExprAst } from '@washi/wsx'
 
@@ -38,4 +39,10 @@ export interface TrashedByAgent {
   name: string
   rows: number
   shownOn: string[]
+}
+
+/** A table as db_list_tables answers it: its spec, its live rows (D140) and where it shows. */
+export interface ListedTable extends UserTable {
+  rows: number
+  shownOn: TablePage[]
 }

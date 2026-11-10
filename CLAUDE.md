@@ -1020,6 +1020,17 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   (`useLookLends` in ui lends it to a tree page, not a row's; a locked block lends none), and
   `SheetIcon` falls back to it (`useWorkspaceLookStore`, refreshed with the page list). A shared
   link draws only the page's own look.
+- **Search reaches rows (D140).** The `search` capability (both ports and MCP) answers `{ pages,
+  rows }`: pages from `sheets_fts` as before (readable ones only), rows from `searchRecords`
+  (repository `storage/record-search.ts`) — `{ table, recordId, title, column, snippet }`, ≤ 20,
+  newest first, matching when a row's text · url · select · status · multi_select cells hold every
+  word, case-blind. No index: a LIKE pass over `records.data` (printable-ASCII tokens, `ESCAPE`d)
+  narrows the rows, read a page of 2000 at a time, newest first, until 20 hits or 50 000 rows
+  (a word LIKE cannot narrow, München, still reaches older rows); each candidate's wordy cells
+  are read for real, so a key, an id or a number never matches. A deleted row or a trashed table (D109) never does. Workspaces hold
+  thousands of rows, not millions; an FTS index over records would have to ride every P1 write.
+  The studio's palette search is untouched (`sheets.search`, pages only). `db_list_tables` gives
+  each table `rows` (live rows, `tableStats`).
 - **An embed is https and listed (D92).** `<Embed src title ratio height>`: the registry refuses http;
   a built-in provider (`EMBED_PROVIDERS` — YouTube via youtube-nocookie, Vimeo, Spotify, Loom, Figma,
   CodePen, CodeSandbox, Miro, Google Maps, Indify) turns its page URL into its player and always plays;

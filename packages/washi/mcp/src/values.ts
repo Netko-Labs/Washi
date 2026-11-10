@@ -46,7 +46,8 @@ teammate's typing is merged, not overwritten. To change a few lines, sheet_edit 
 Trash, only when your person asks; they restore it from there; db_trash_table does the same for a
 table they name. comment_add speaks on a page, or on a row by its recordId.
 
-Tables: db_list_tables shows each table's columns; db_query filters, sorts and groups rows;
+Tables: db_list_tables shows each table's columns and row count; search finds words in pages and
+in rows (each row hit names its table, id and column); db_query filters, sorts and groups rows;
 db_mutate inserts (one row, or up to 500 in one call), updates or deletes them — a relation cell
 may name its rows instead of holding their ids; db_import loads a CSV, TSV or JSON file (an upload,
 or sent inline) in batches of 500 — dryRun first; db_row_activity says who changed a row and when.

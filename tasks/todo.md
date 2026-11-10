@@ -1265,3 +1265,44 @@ Acceptance: MCP tests walk every acceptance check; typecheck, Biome, `bun test` 
 - [x] Tests: service (slug, steward, contrast, clash, warnings, look set/clear/misses), MCP, frame
 - [ ] Later: a shared link wears the default look (its payload carries only the page's own)
 - [ ] Later: the desktop loads the default look (it reads none yet; no covers there anyway)
+
+# Search reaches rows (2026-11-09) — D140
+
+- [x] `searchRecords` (repository): every word, case-blind, over text · url · select · status ·
+      multi_select cells; a LIKE pass over `records.data` then a real read; ≤ 20, newest first
+- [x] Deleted rows and trashed tables never match; keys, ids and numbers never match
+- [x] `search` answers `{ pages, rows }` (both ports and MCP); the palette's `sheets.search` unchanged
+- [x] `db_list_tables` gives each table `rows`
+- [x] Tests: repository (words, wildcards, non-ASCII, deleted/trashed, snippet, cap) and MCP
+- [ ] Later: rows in the studio's ⌘K palette (it searches pages only)
+- [ ] Later: an FTS index over records if a workspace ever holds enough rows for the scan to show
+
+# Proposed: GitHub links on rows (2026-11-09) — not built
+
+A `url` cell that points at GitHub shows what it points at: a PR's state and checks, a commit's
+checks, a branch's checks and whether it is still there. No new column type: the cell stays a
+`url`, so imports, `db_mutate`, history (P1) and links keep working, and a table that already
+holds PR links lights up without a migration.
+
+- **What it reads.** `github.com/<o>/<r>/pull/<n>` → open · draft · merged · closed, the review
+  decision and the checks rollup on its head; `/commit/<sha>` → checks; `/tree/<branch>` → checks on
+  its head, ahead/behind the default branch, or "gone"; `/issues/<n>` → open · closed. Anything
+  else stays a plain link. A pure parser `githubRef(url)` in domain decides; tested off real URLs.
+- **Who reaches GitHub.** tsuru gains `githubStatus(ref, key)`: `api.github.com` only, GET only,
+  results trimmed to the fields above. Wired in trpc (`github.status`), never service (C3). The key
+  is the workspace's (`organization_integration` `github`, a fine-grained read-only token sealed like
+  Exa, Settings → Washi → What leaves), else the server's (D105's rule), else none: public repos
+  still answer, at GitHub's anonymous rate. Turning GitHub on is the consent for that one host, as a
+  bookmark press is for its host (D94); every fetch is a ledger row (`github_status`, `auto`).
+- **Kept, not fetched per view.** `github_links` in the workspace file (C1): url → state JSON,
+  `fetched_at`. A view asks for its visible cells in one batch; anything older than 5 min is
+  refreshed in the background, at most one call per ref in flight. A shared link reads only the
+  cache, never GitHub (it has no key and no ledger).
+- **Drawn.** `DatabaseCell` for a url: a chip (PR #42 · Merged · ✓ checks), toned with
+  `VALUE_TONES` (merged = success, failing checks = danger, draft = neutral); the hover says when it
+  was read. Boards and Tables get it free through `DatabaseCell`/`CardValue`.
+- **Agents.** `db_query` gains `github: true`, which adds `{ column: state }` per row from the cache;
+  `context_get`'s open rows show a PR's state beside its title. The backlog skill then reads "PR
+  merged, checks green" before it moves a row to Done.
+- **Later.** A GitHub App with webhooks instead of polling (needs a public endpoint and app setup);
+  a formula or filter over PR state (a computed, cached column, so a Board can group by it).

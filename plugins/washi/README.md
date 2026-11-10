@@ -33,7 +33,7 @@ export WASHI_TOKEN="washi_pat_…"
 ## What it can do
 
 Read a whole workspace in one call (`context_get`: its agent guide, the page tree, every page as
-Markdown, each table's counts and open rows, cut to a budget), read and search pages, read and write
+Markdown, each table's counts and open rows, cut to a budget), read pages, search pages and table rows (`search`), read and write
 rows (`db_query`, `db_mutate` — up to 500 rows a call; `db_import` loads a CSV, TSV or JSON file in
 batches of 500, up to 20 000 rows), write and edit pages (`sheet_create`, `sheet_replace`,
 `sheet_edit`), turn a Markdown file into a page (`sheet_import`), upload pictures (`file_upload`) and

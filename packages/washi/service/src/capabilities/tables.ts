@@ -33,7 +33,7 @@ export function tableCapabilities(ws: Workspace, context: CapabilityContext): Ca
     ),
     capability(
       'db_list_tables',
-      'List user tables, their column specs, and shownOn: the pages that show each. An empty shownOn means no page shows that table — say so when it matters, and offer to put it on a page.',
+      'List user tables, their column specs, rows (how many live rows each holds), and shownOn: the pages that show each. An empty shownOn means no page shows that table — say so when it matters, and offer to put it on a page.',
       {},
       true,
       () => tablesWithPages(ws, context.viewer),

@@ -1,4 +1,4 @@
-import type { TableCatalogEntry, TablePage, TrashedTable, UserTable, Viewer } from '@washi/domain'
+import type { TableCatalogEntry, TablePage, TrashedTable, Viewer } from '@washi/domain'
 import {
   listTables,
   listTrashedTables,
@@ -11,6 +11,7 @@ import {
 } from '@washi/repository'
 import { readableSet } from '../sheets/access'
 import { InkError } from './errors'
+import type { ListedTable } from './types'
 
 /** Each table's pages that show it, as this viewer may read them: a private page is not there. */
 export function readablePages(ws: Workspace, viewer: Viewer): (table: string) => TablePage[] {
@@ -35,13 +36,18 @@ export function tableCatalog(ws: Workspace, viewer: Viewer): TableCatalogEntry[]
     .sort((a, b) => a.name.localeCompare(b.name))
 }
 
-/** Tables as Washi lists them: their specs, and the pages that show each — none is a stray. */
-export function tablesWithPages(
-  ws: Workspace,
-  viewer: Viewer,
-): (UserTable & { shownOn: TablePage[] })[] {
+/**
+ * Tables as Washi lists them: their specs, how many live rows each holds (D140), and the pages
+ * that show each — none is a stray.
+ */
+export function tablesWithPages(ws: Workspace, viewer: Viewer): ListedTable[] {
   const pagesOf = readablePages(ws, viewer)
-  return listTables(ws).map((table) => ({ ...table, shownOn: pagesOf(table.name) }))
+  const stats = tableStats(ws)
+  return listTables(ws).map((table) => ({
+    ...table,
+    rows: stats.get(table.id)?.rows ?? 0,
+    shownOn: pagesOf(table.name),
+  }))
 }
 
 export function trashedTables(ws: Workspace): TrashedTable[] {
