@@ -1,7 +1,8 @@
 import { ELEMENT_NODE, type Node, parse, TEXT_NODE, transform } from 'ultrahtml'
 import inline from 'ultrahtml/transformers/inline'
 import { ImageRenderError } from './errors'
-import type { FileInliner, SatoriNode } from './types'
+import { svgPicture } from './svg'
+import type { AddressCheck, FileInliner, SatoriNode } from './types'
 import {
   BLOCK_TAGS,
   DROPPED_TAGS,
@@ -144,6 +145,27 @@ function fontFamily(value: string): string {
 
 const isBlank = (node: Node) => node.type === TEXT_NODE && !/\S/.test(node.value)
 
+/** An inline `<svg>` drawn ahead (D138), placed as the picture it became, in its own box. */
+async function svgImage(
+  node: Node,
+  resources: Resources,
+  check: AddressCheck,
+  tick: () => void,
+): Promise<SatoriNode> {
+  const raw = (node.attributes as Record<string, string>).style
+  const style = raw ? await resources.style(raw) : {}
+  const picture = await svgPicture(node, style, check, tick)
+  return {
+    type: 'img',
+    props: {
+      src: picture.src,
+      width: picture.width,
+      height: picture.height,
+      style: { width: picture.width, height: picture.height, ...style },
+    },
+  }
+}
+
 /**
  * A mockup's HTML as Satori lays it out (D126): `<style>` rules inlined, scripts, frames and links
  * dropped, every picture a `data:` address or an inlined upload — nothing is ever fetched. A
@@ -158,15 +180,20 @@ export async function markupOf(html: string, inlineFile: FileInliner): Promise<S
   const resources = new Resources(inlineFile)
   const document = parse(await transform(html, [inline()]))
   let count = 0
-
-  const convert = async (node: Node): Promise<SatoriNode | string | null> => {
+  const tick = () => {
     if (++count > MAX_NODES) {
       throw new ImageRenderError(`the markup holds more than ${MAX_NODES} elements; draw less`)
     }
+  }
+  const check = (where: string, raw: string) => resources.address(where, raw)
+
+  const convert = async (node: Node): Promise<SatoriNode | string | null> => {
+    tick()
     if (node.type === TEXT_NODE) return decode(node.value.replace(/\s+/g, ' '))
     if (node.type !== ELEMENT_NODE) return null
     const tag = String(node.name).toLowerCase()
     if (DROPPED_TAGS.has(tag)) return null
+    if (tag === 'svg') return svgImage(node, resources, check, tick)
     const props: Record<string, unknown> = {}
     for (const [name, value] of Object.entries(node.attributes as Record<string, string>)) {
       const key = name.toLowerCase()

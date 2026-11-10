@@ -93,6 +93,28 @@ export const FONT_FILES = [
   },
 ] as const
 
+/** Pictures resvg reads, so `file_get` can draw them smaller (D138); WebP and AVIF it cannot. */
+export const SCALABLE_TYPES = new Set(['image/png', 'image/jpeg', 'image/gif'])
+
+/** The house fonts by the names their own files give them, as resvg reads them (D138). */
+export const SVG_SANS = 'Zen Kaku Gothic New'
+export const SVG_SERIF = 'Young Serif'
+
+/** A family an inline `<svg>` names, as resvg knows it: the house names, then generic ones. */
+export const SVG_FAMILIES: Record<string, string> = {
+  'washi sans': SVG_SANS,
+  'washi serif': SVG_SERIF,
+  'system-ui': SVG_SANS,
+  sans: SVG_SANS,
+}
+
+/** Never drawn inside an `<svg>`: script, HTML inside it, its own stylesheet (already inlined). */
+export const SVG_DROPPED_TAGS = new Set(['script', 'foreignobject', 'style', 'iframe'])
+
+/** An inline `<svg>` is rasterized at up to twice its size, never past this on its longer side. */
+export const SVG_RASTER_SIDE = 2400
+export const SVG_SCALE = 2
+
 /** Names a markup may use for the house fonts; anything else falls back to Washi Sans. */
 export const FONT_ALIASES: Record<string, string> = {
   'sans-serif': 'Washi Sans',

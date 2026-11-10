@@ -16,7 +16,7 @@ import { z } from 'zod'
 import { asksInitialize, instructionsFor } from './instructions'
 import type { McpSession, McpWorkspaces } from './types'
 import { uploadCapabilities } from './uploads'
-import { notAWorkspace, workspaceNamed } from './utils'
+import { isContentAnswer, notAWorkspace, workspaceNamed } from './utils'
 import { CHANGES, DEFAULT_CHANGE, SERVER_INFO, WORKSPACE_ARG } from './values'
 
 /**
@@ -53,10 +53,13 @@ const said = (value: unknown) => ({
 })
 
 /** Words meant to be read as they are (context_get's Markdown) go out as text, not a JSON string. */
-const answered = (run: Capability, result: unknown) =>
-  run.answersText && typeof result === 'string'
+const answered = (run: Capability, result: unknown) => {
+  // A picture to look at (file_get, D138) goes out as the blocks it is.
+  if (run.answersContent && isContentAnswer(result)) return { content: result.content }
+  return run.answersText && typeof result === 'string'
     ? { content: [{ type: 'text' as const, text: result }] }
     : said(result)
+}
 
 /**
  * Where a call acts: the default session, or the workspace it names (D124) — opened once per
