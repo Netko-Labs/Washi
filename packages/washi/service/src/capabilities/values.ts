@@ -51,3 +51,12 @@ Only what your member may read. maxChars (default 15000, 2000–200000) caps the
 Example: context_get {} — or context_get { "root": "<page id>", "depth": 1, "tables": ["issues"], "maxChars": 8000 }.`
 
 export const GUIDE_SET_DESCRIPTION = `Mark one page as this workspace's agent guide — the page outside agents read first, as CLAUDE.md is for a repo — or clear it with { "id": null }. Its words (cut at 6000 characters) are appended to this server's instructions on the next connection, lead context_get's answer, and workspace_list names it. Only when your person asks for it, and only an owner or an admin of the workspace may: the page must be one they read and in the page tree (not a row's page), and a current guide they cannot read is not theirs to move. Answers { guide: { id, title } | null }. Example: guide_set { "id": "<page id>" }.`
+
+/** What an uploaded file may be for sheet_import to read it (D136). */
+export const MARKDOWN_TYPES = new Set(['text/markdown', 'text/x-markdown', 'text/plain'])
+export const MARKDOWN_FILE = /\.(md|markdown|mdown|txt)$/i
+
+export const SHEET_IMPORT_DESCRIPTION = `Turn a Markdown document into a new page in one call: a README, a spec, meeting notes. Send markdown (the text, up to 500 000 characters) or file: 'file:<id>' of an uploaded .md or .txt — never both.
+It converts: # headings → Title (levels 1–3; a leading # heading is the page's title unless you pass title), paragraphs → Text, - / 1. / - [ ] lists → List and Item (a checked box is done, nested lists stay nested), fenced code → Code with its language, pipe tables → a written Table (up to 16 columns, a new Table every 200 rows), > quotes → Quote, GitHub alerts (> [!NOTE], [!TIP], [!WARNING], [!CAUTION]) → Callout, --- → Divider, a picture alone on its line on https → Figure. **bold**, *em*, ~~strike~~, \`code\` and https or mailto links stay inline marks; a relative or http link keeps its address in brackets after its words. Raw HTML and footnotes are kept exactly as written in a Code block and listed in kept — nothing is dropped. { } < > are escaped for you.
+The page is checked like sheet_check before it is saved, as yours. parentId (from sheet_list) files it under a page. dryRun: true saves nothing and answers { ok, diagnostics, source, preview, kept } — reshape that source and sheet_create it when the plain conversion is not the page you want.
+Answers { id, title, parentId, version, url, kept }. Example: { markdown: "# Setup\\n\\nRun \`bun dev\`.\\n\\n- [x] Install\\n- [ ] Configure", parentId: "<a page id>" }.`

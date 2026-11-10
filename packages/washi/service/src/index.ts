@@ -44,6 +44,7 @@ export {
   fileCapabilities,
   fileTypeOf,
   imageCapabilities,
+  importCapabilities,
   pageCapabilities,
   tableCapabilities,
 } from './capabilities'
@@ -76,6 +77,7 @@ export {
 export { addCustomEmoji, CustomEmojiError, removeCustomEmoji } from './emojis/service'
 export { testStorage } from './files/storage'
 export type { StorageTest } from './files/types'
+export { type MarkdownPage, markdownToPage } from './markdown'
 export {
   type CompiledPage,
   compilePage,
