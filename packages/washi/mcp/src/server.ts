@@ -7,8 +7,9 @@ import {
   contextCapabilities,
   fileCapabilities,
   imageCapabilities,
-  importCapabilities,
   pageCapabilities,
+  rowImportCapabilities,
+  sheetImportCapabilities,
   tableCapabilities,
 } from '@washi/service'
 import { z } from 'zod'
@@ -36,8 +37,9 @@ function capabilitiesFor(session: McpSession): Capability[] {
     : undefined
   return [
     ...pageCapabilities(session.ws, context),
-    ...importCapabilities(session.ws, context, session.files),
+    ...sheetImportCapabilities(session.ws, context, session.files),
     ...tableCapabilities(session.ws, context),
+    ...rowImportCapabilities(session.ws, context, session.files),
     ...commentCapabilities(session.ws, { ...context, authorName: session.member.name }),
     ...(session.files ? fileCapabilities(session.ws, session.files, fileUrl) : []),
     ...(session.files ? imageCapabilities(session.ws, session.files, fileUrl) : []),

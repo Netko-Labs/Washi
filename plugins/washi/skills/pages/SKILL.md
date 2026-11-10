@@ -79,6 +79,10 @@ MCP tools instead, a page at a time.
   { url }` has the server fetch an https file itself.
 - Rows: one `db_mutate` insert takes up to 500 rows (`data: [{…}, …]`), all or nothing. A relation
   cell may name its rows — `epic: ['M4 · Every stat live']` — instead of holding their ids.
+- Many rows from a spreadsheet or an export: `upload` the `.csv` / `.tsv` / `.json` / `.jsonl`, then
+  `db_import table=issues file=file:<id> dryRun:=true` — it matches columns by name (`map:=` for the
+  rest), says each row it would refuse and why — then again without `dryRun`. Batches of 500, each
+  all or nothing, up to 20 000 rows; the rows never pass through your context.
 - Columns: `db_define` on a table that exists merges — send only the columns to add or change.
   `db_change_column` renames or removes a column, or adds, renames or removes one option.
 

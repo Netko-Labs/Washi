@@ -1228,3 +1228,15 @@ Acceptance: MCP tests walk every acceptance check; typecheck, Biome, `bun test` 
 - [x] Review fixes: tsuru inside addresses (IPv6 bytes, RFC 6890, names), DNS per hop + pinning
 - [x] Review fixes: budget shares keep context_get ≤ maxChars (400 pages, 60 tables); open rows by filter
 - [x] Review fixes: guide is a steward's, never a row page; tickets capped per member, re-authorized
+
+# Rows from a file (2026-11-09) — D137
+
+- [x] `service/tables/import`: RFC 4180 CSV/TSV (separator sniffed or given), JSON, JSON Lines
+- [x] Columns by name, case-blind or snake_cased; `map` (null leaves one out); the rest ignored, said once
+- [x] Cells as written: thousands separators, `25%`, yes/no/✓, choices case-blind, lists split
+- [x] Each row checked (`validateRecord`) and refused in words with its row and line; the rest in
+      batches of 500 through `runMutation`, signed by the member; a refused batch said, the next goes on
+- [x] `db_import` over MCP: an upload (`.csv` `.tsv` `.json` `.jsonl`), or `csv`/`json` inline; `dryRun`
+- [x] Tests: parser and coercion units, MCP upload → dry run → import, batches, history's author
+- [ ] Later: Washi's own ports (a person's attached CSV in chat → `db_import`)
+- [ ] Later: `.xlsx` read directly (today: export CSV first)

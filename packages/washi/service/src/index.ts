@@ -44,8 +44,9 @@ export {
   fileCapabilities,
   fileTypeOf,
   imageCapabilities,
-  importCapabilities,
   pageCapabilities,
+  rowImportCapabilities,
+  sheetImportCapabilities,
   tableCapabilities,
 } from './capabilities'
 export { LOCAL_AUTHOR } from './comments/constants'
@@ -196,6 +197,8 @@ export {
 export { pagesNamingColumn } from './tables/column-pages'
 export { changeColumn } from './tables/columns'
 export { runHistory } from './tables/history'
+export type { ImportResult } from './tables/import'
+export { importRows } from './tables/import'
 export { linkColumn } from './tables/link'
 export { openRowPage, rowOfSheet, rowTitle } from './tables/rows'
 export {

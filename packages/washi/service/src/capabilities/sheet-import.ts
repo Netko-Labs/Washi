@@ -24,7 +24,7 @@ async function markdownFile(files: FileStore | undefined, key: string): Promise<
  * Markdown in, a page out (D136): a README or a spec moved in one call, converted, checked like
  * sheet_check and written as the member — or, on a dry run, answered as WSX to reshape first.
  */
-export function importCapabilities(
+export function sheetImportCapabilities(
   ws: Workspace,
   context: CapabilityContext,
   files?: FileStore,
