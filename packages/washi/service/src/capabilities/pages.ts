@@ -1,6 +1,4 @@
-import type { SheetAuthor, SheetDetail } from '@washi/domain'
-import { sheetVersion, type Workspace } from '@washi/repository'
-import { extractText, parse } from '@washi/wsx'
+import type { Workspace } from '@washi/repository'
 import { z } from 'zod'
 import { pagesFor } from '../agents/lib/pages'
 import { editSheetSource } from '../sheets/edit'
@@ -9,7 +7,7 @@ import { trashSheetAs } from '../sheets/tree'
 import { capability } from './define'
 import { referenceCapabilities } from './reference'
 import type { Capability, CapabilityContext } from './types'
-import { PREVIEW_CHARS } from './values'
+import { editedByOf, previewOf, writtenAnswer } from './utils'
 
 const verbose = z
   .boolean()
@@ -18,33 +16,11 @@ const verbose = z
     'true answers with the whole page, source included; by default only its id, title and version',
   )
 
-/** A page's words as a reader sees them, for a check that wants to see what it wrote. */
-function previewOf(source: string): string | undefined {
-  try {
-    const text = extractText(parse(source))
-    return text.length > PREVIEW_CHARS ? `${text.slice(0, PREVIEW_CHARS)}…` : text
-  } catch {
-    return undefined
-  }
-}
-
 /** Reading and writing pages, as the viewer reads them and signed by the context's author. */
 export function pageCapabilities(ws: Workspace, context: CapabilityContext): Capability[] {
   const pages = pagesFor(ws, context.viewer)
-  // A page records Washi's hand or a person's; which person is the row history's to keep.
-  const editedBy: SheetAuthor = context.author === 'washi' ? 'washi' : null
-  /** What a write answers: enough to write again, never the source it was just sent. */
-  const written = (sheet: SheetDetail, full?: boolean) => {
-    const version = sheetVersion(ws, sheet.id) ?? undefined
-    if (full) return { ...sheet, version }
-    return {
-      id: sheet.id,
-      title: sheet.title,
-      parentId: sheet.parentId,
-      version,
-      ...(context.pageUrl ? { url: context.pageUrl(sheet.id) } : {}),
-    }
-  }
+  const editedBy = editedByOf(context)
+  const written = writtenAnswer(ws, context)
   return [
     capability(
       'sheet_list',

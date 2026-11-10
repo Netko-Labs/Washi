@@ -7,6 +7,7 @@ import {
   contextCapabilities,
   fileCapabilities,
   imageCapabilities,
+  importCapabilities,
   pageCapabilities,
   tableCapabilities,
 } from '@washi/service'
@@ -35,6 +36,7 @@ function capabilitiesFor(session: McpSession): Capability[] {
     : undefined
   return [
     ...pageCapabilities(session.ws, context),
+    ...importCapabilities(session.ws, context, session.files),
     ...tableCapabilities(session.ws, context),
     ...commentCapabilities(session.ws, { ...context, authorName: session.member.name }),
     ...(session.files ? fileCapabilities(session.ws, session.files, fileUrl) : []),

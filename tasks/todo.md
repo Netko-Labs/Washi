@@ -1,3 +1,15 @@
+# D136 · a README is one call: `sheet_import` (2026-11-09)
+
+- [x] `service/markdown`: CommonMark + GFM (mdast) → a WSX tree → `serialize`; headings, paragraphs,
+      lists (nested, checks), code, pipe tables (≤ 16 columns, split per 200 rows), quotes, alerts,
+      rules, lone https pictures; inline marks escaped only where they would open one
+- [x] HTML and footnotes kept byte for byte in `Code`, listed in `kept` — nothing dropped
+- [x] `sheet_import` over MCP: `markdown` or `file:<id>`, `title`, `parentId`, `dryRun`; checked like
+      `sheet_check`, written as the member
+- [x] Tests: converter, MCP; 266 real READMEs from `node_modules` all pass `checkSource`
+- [ ] Later: `sheet_import` on Washi's own ports (they write WSX already)
+- [ ] Later: a document with several `#` sections as a hub with sub-pages
+
 # D110 · a conversation lives in a place, and can move (2026-10-29)
 
 - [x] `handoff` transcript entry, `agents.moveSession` (starter only), `agents.movedFrom`

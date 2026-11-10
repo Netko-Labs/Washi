@@ -331,6 +331,9 @@
         "ai": "^7",
         "date-fns": "^4",
         "lodash-es": "^4",
+        "mdast-util-from-markdown": "^2.1.0",
+        "mdast-util-gfm": "^3.1.0",
+        "micromark-extension-gfm": "^3.0.0",
         "mirinjs": "0.1.0-alpha.19",
         "quickjs-emscripten-core": "0.32.0",
         "react": "^19.2.7",
@@ -341,6 +344,7 @@
       },
       "devDependencies": {
         "@types/bun": "latest",
+        "@types/mdast": "^4.0.4",
         "@washi/typescript-config": "workspace:*",
       },
     },
