@@ -10,7 +10,13 @@ function serializeValue(value: WsxValue): string {
 function serializeProps({ props, code = {} }: WsxElement): string {
   const literal = Object.entries(props).map(([key, value]) => {
     if (value === true) return ` ${key}`
-    if (typeof value === 'string') return ` ${key}=${JSON.stringify(value)}`
+    // A JSX attribute string has no escapes: a `"` would end it, a `\` reads as itself and `&amp;`
+    // as `&`. Such a string goes in braces, a JS string literal `parse` reads back as written.
+    if (typeof value === 'string') {
+      const quoted = JSON.stringify(value)
+      const isPlain = quoted === `"${value}"` && !value.includes('&')
+      return isPlain ? ` ${key}=${quoted}` : ` ${key}={${quoted}}`
+    }
     return ` ${key}={${serializeValue(value)}}`
   })
   const written = Object.entries(code).map(([key, source]) => ` ${key}=${hole(source)}`)
