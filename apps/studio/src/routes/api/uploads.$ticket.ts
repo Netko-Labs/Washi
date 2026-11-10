@@ -12,7 +12,9 @@ export const Route = createFileRoute('/api/uploads/$ticket')({
     handlers: {
       PUT: async ({ request, params }) => {
         const { runtime } = await washiRuntime()
-        return answerUpload(request, params.ticket, (workspaceId) => {
+        return answerUpload(request, params.ticket, async ({ workspaceId, actorId }) => {
+          // The ticket's member must still be one: leaving the workspace ends what they started.
+          if (!(await runtime.control.authorize(actorId, workspaceId))) return null
           const resolved = runtime.resolve(workspaceId)
           return { ws: resolved.workspace, files: resolved.files }
         })

@@ -17,6 +17,7 @@ import { setAddressLookup } from '@washi/tsuru'
 import { answerMcp } from '../server'
 import type { McpSession, McpWorkspaces } from '../types'
 import { answerUpload } from '../uploads'
+import { issueTicket, takeTicket } from '../uploads/tickets'
 
 const MEMBER = { id: 'u-juan', name: 'Juan' }
 const VIEWER = { id: MEMBER.id, isOwner: false }
@@ -196,7 +197,8 @@ describe('uploads that skip the context (D135)', () => {
         headers: { 'content-length': String(body.byteLength) },
       }),
       url.split('/').pop() ?? '',
-      (id) => (id === ws.id ? { ws, files } : null),
+      ({ workspaceId, actorId }) =>
+        workspaceId === ws.id && actorId === MEMBER.id ? { ws, files } : null,
     )
 
   test('one tool call, then one PUT of 5 MB: the key it promised is the file', async () => {
@@ -260,6 +262,115 @@ describe('uploads that skip the context (D135)', () => {
       expect(ledger.every((row) => row.actorId === MEMBER.id && row.origin === 'agent')).toBe(true)
     } finally {
       spy.mockRestore()
+      setAddressLookup(null)
+    }
+  })
+
+  const tokenOf = (url: string) => url.split('/').pop() ?? ''
+  const open = ({ workspaceId, actorId }: { workspaceId: string; actorId: string }) =>
+    workspaceId === ws.id && actorId === MEMBER.id ? { ws, files } : null
+
+  test('a ticket lapses after ten minutes, by the clock it is asked on', async () => {
+    await connect()
+    const ticket = await ok('file_upload_url', { filename: 'a.png', bytes: 4 })
+    const later = Date.now() + 10 * 60 * 1000 + 1
+    const lapsed = await answerUpload(
+      new Request(ticket.url, { method: 'PUT', body: new Uint8Array(4) }),
+      tokenOf(ticket.url),
+      open,
+      later,
+    )
+    expect(lapsed.status).toBe(404)
+    expect(((await lapsed.json()) as { error: string }).error).toContain('expired')
+  })
+
+  test('a body sent chunked, with no Content-Length, is taken when its size is the one promised', async () => {
+    await connect()
+    const send = (url: string, sizes: number[]) =>
+      answerUpload(
+        new Request(url, {
+          method: 'PUT',
+          body: new ReadableStream({
+            start(controller) {
+              for (const size of sizes) controller.enqueue(new Uint8Array(size).fill(3))
+              controller.close()
+            },
+          }),
+          duplex: 'half',
+        } as RequestInit),
+        tokenOf(url),
+        open,
+      )
+    const right = await ok('file_upload_url', { filename: 'c.png', bytes: 300 })
+    const landed = await send(right.url, [100, 100, 100])
+    expect(landed.status).toBe(201)
+    const long = await ok('file_upload_url', { filename: 'd.png', bytes: 300 })
+    expect((await send(long.url, [200, 200])).status).toBe(400)
+    const short = await ok('file_upload_url', { filename: 'e.png', bytes: 300 })
+    expect((await send(short.url, [100])).status).toBe(400)
+  })
+
+  test('20 unsent URLs a member at a time; another member’s are never taken to make room', async () => {
+    const rins = issueTicket({
+      workspaceId: ws.id,
+      actorId: 'u-rin',
+      name: 'r.png',
+      mime: 'image/png',
+      bytes: 1,
+    })
+    await connect()
+    const mine: { url: string }[] = []
+    for (let at = 0; at < 20; at++) {
+      mine.push(await ok('file_upload_url', { filename: `${at}.png`, bytes: 1 }))
+    }
+    const twentyFirst = await text('file_upload_url', { filename: 'x.png', bytes: 1 })
+    expect(twentyFirst.isError).toBe(true)
+    expect(twentyFirst.text).toContain('20 upload URLs waiting')
+    expect(takeTicket(rins.token)?.actorId).toBe('u-rin')
+    // Sending them frees the room.
+    for (const each of mine) {
+      const sent = await answerUpload(
+        new Request(each.url, { method: 'PUT', body: new Uint8Array(1) }),
+        tokenOf(each.url),
+        open,
+      )
+      expect(sent.status).toBe(201)
+    }
+    await ok('file_upload_url', { filename: 'again.png', bytes: 1 })
+  })
+
+  test('a member who left the workspace cannot land a ticket they took before', async () => {
+    await connect()
+    const ticket = await ok('file_upload_url', { filename: 'gone.png', bytes: 2 })
+    const refused = await answerUpload(
+      new Request(ticket.url, { method: 'PUT', body: new Uint8Array(2) }),
+      tokenOf(ticket.url),
+      () => null,
+    )
+    expect(refused.status).toBe(403)
+  })
+
+  test('file_upload_from ledgers a failure that is not tsuru’s too — a store that would not keep it', async () => {
+    setAddressLookup(async () => [{ address: '93.184.216.34', family: 4 }])
+    const fetchSpy = spyOn(globalThis, 'fetch').mockImplementation(
+      (async () =>
+        new Response(new Uint8Array([1, 2]), {
+          headers: { 'content-type': 'image/png' },
+        })) as unknown as typeof fetch,
+    )
+    const putSpy = spyOn(files, 'put').mockImplementation(async () => {
+      throw new Error('the bucket said no')
+    })
+    try {
+      await connect()
+      const failed = await text('file_upload_from', { url: 'https://cdn.example.com/a.png' })
+      expect(failed.isError).toBe(true)
+      expect(failed.text).toContain('the bucket said no')
+      const [row] = listCapabilityCalls(ws).filter((each) => each.subject === 'file_upload_from')
+      expect(row).toMatchObject({ decision: 'denied', detail: 'the bucket said no' })
+    } finally {
+      putSpy.mockRestore()
+      fetchSpy.mockRestore()
       setAddressLookup(null)
     }
   })

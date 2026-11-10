@@ -13,6 +13,16 @@ import type { McpSession } from '../types'
 import { issueTicket } from './tickets'
 import { FILE_UPLOAD_FROM_DESCRIPTION, FILE_UPLOAD_URL_DESCRIPTION } from './values'
 
+/** Why a fetch failed, in words: tsuru's own, a timeout, or the error as it came. */
+const failureWords = (cause: unknown) =>
+  cause instanceof TsuruError
+    ? cause.message
+    : cause instanceof Error && cause.name === 'TimeoutError'
+      ? 'the host took too long to answer'
+      : cause instanceof Error
+        ? cause.message
+        : String(cause)
+
 /** A refusal in the words an upload anywhere would get; SVG says why. */
 const refusalWords = (mime: string, refusal: string) =>
   mime === 'image/svg+xml' ? `${refusal}: SVG can run when served — upload a PNG` : refusal
@@ -82,34 +92,35 @@ function uploadFrom(session: McpSession, fileUrl?: (id: string) => string): Capa
           subject: 'file_upload_from',
           input: { url },
         }
-        const deny = (detail: string): never => {
-          recordCapability(ws, { ...entry, decision: 'denied', detail })
-          throw new Error(detail)
-        }
         const caps = uploadCaps(codeLimits(ws))
-        let fetched: Awaited<ReturnType<typeof fetchFile>>
+        let stored: Awaited<ReturnType<typeof files.put>>
+        let source: string
         try {
-          fetched = await fetchFile(url, {
+          const fetched = await fetchFile(url, {
             allowPrivate: privateNetworkAllowed(ws),
             maxBytes: largestUpload(caps),
           })
+          const named = filename ?? fetched.filename ?? 'file'
+          const said = fetched.contentType && uploadKindOf(fetched.contentType)
+          const mime = said
+            ? (fetched.contentType as string)
+            : (fileTypeOf(named) ?? fetched.contentType ?? '')
+          const refusal = uploadRefusal(mime, fetched.bytes.byteLength, undefined, caps)
+          if (refusal) throw new Error(refusalWords(mime, refusal))
+          stored = await files.put({ name: uploadName(named), mime, bytes: fetched.bytes })
+          source = fetched.url
         } catch (cause) {
-          if (cause instanceof TsuruError) return deny(cause.message)
-          throw cause
+          // Every way it fails is a ledger row: a refusal, a name that will not resolve, a host too
+          // slow, a store that would not keep it.
+          const detail = failureWords(cause)
+          recordCapability(ws, { ...entry, decision: 'denied', detail })
+          throw new Error(detail)
         }
-        const named = filename ?? fetched.filename ?? 'file'
-        const said = fetched.contentType && uploadKindOf(fetched.contentType)
-        const mime = said
-          ? (fetched.contentType as string)
-          : (fileTypeOf(named) ?? fetched.contentType ?? '')
-        const refusal = uploadRefusal(mime, fetched.bytes.byteLength, undefined, caps)
-        if (refusal) return deny(refusalWords(mime, refusal))
-        const stored = await files.put({ name: uploadName(named), mime, bytes: fetched.bytes })
         recordCapability(ws, { ...entry, decision: 'auto' })
         return {
           key: `file:${stored.id}`,
           ...stored,
-          source: fetched.url,
+          source,
           ...(fileUrl ? { url: fileUrl(stored.id) } : {}),
         }
       },

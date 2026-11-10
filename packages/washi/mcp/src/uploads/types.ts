@@ -17,9 +17,12 @@ export interface UploadTicket {
 /** What a ticket asks for when it is made. */
 export type TicketAsk = Omit<UploadTicket, 'token' | 'fileId' | 'expiresAt'>
 
-/** A workspace's files, opened by id when the bytes arrive. */
+/**
+ * A workspace's files, opened when the bytes arrive — or null when the ticket's member is no longer
+ * one of its members (or it is gone): the host checks again, the ticket alone is not enough then.
+ */
 export type OpenUploads = (
-  workspaceId: string,
+  ticket: Pick<UploadTicket, 'workspaceId' | 'actorId'>,
 ) =>
   | Promise<{ ws: Workspace; files: FileStore } | null>
   | { ws: Workspace; files: FileStore }

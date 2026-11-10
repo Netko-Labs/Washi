@@ -26,15 +26,17 @@ async function bodyOf(request: Request, promised: number): Promise<Uint8Array | 
 
 /**
  * A PUT of a ticket's bytes (D135): the ticket is the whole permission — made for one member's
- * agent, one workspace, one file of one size, for ten minutes, once. The bytes land as that file,
- * under the rules and caps an upload meets anywhere, re-read now in case the server changed them.
+ * agent, one workspace, one file of one size, for ten minutes, once — and that member still a
+ * member, which `open` checks again. The bytes land as that file, under the rules and caps an
+ * upload meets anywhere, re-read now in case the server changed them. A body may come chunked.
  */
 export async function answerUpload(
   request: Request,
   token: string,
   open: OpenUploads,
+  now = Date.now(),
 ): Promise<Response> {
-  const ticket = takeTicket(token)
+  const ticket = takeTicket(token, now)
   if (!ticket) {
     return refuse(
       404,
@@ -45,8 +47,10 @@ export async function answerUpload(
   if (declared !== null && Number(declared) !== ticket.bytes) {
     return refuse(400, `this URL takes exactly ${ticket.bytes} bytes; the request says ${declared}`)
   }
-  const opened = await open(ticket.workspaceId)
-  if (!opened) return refuse(404, 'that workspace is gone')
+  const opened = await open(ticket)
+  if (!opened) {
+    return refuse(403, 'the member this URL was made for no longer works in that workspace')
+  }
   const refusal = uploadRefusal(
     ticket.mime,
     ticket.bytes,
