@@ -44,7 +44,7 @@ async function sourceOfFile(
  * Bulk rows into a table from a file (D137): an upload by key, or CSV/JSON sent inline. Signed by
  * the context's author like `db_mutate`, through the same write (P1).
  */
-export function importCapabilities(
+export function rowImportCapabilities(
   ws: Workspace,
   context: CapabilityContext,
   files?: FileStore,

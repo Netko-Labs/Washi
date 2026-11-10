@@ -44,8 +44,9 @@ export {
   fileCapabilities,
   fileTypeOf,
   imageCapabilities,
-  importCapabilities,
   pageCapabilities,
+  rowImportCapabilities,
+  sheetImportCapabilities,
   tableCapabilities,
 } from './capabilities'
 export { LOCAL_AUTHOR } from './comments/constants'

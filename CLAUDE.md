@@ -963,7 +963,7 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   it — figure 1200×800, cover 1500×600, icon 256×256 — and it lands as a PNG upload under the
   server's caps, answering `{ key, width, height, wear }`. A mockup is a `<Figure>`, never a Widget or
   page code. The studio traces the wasm, satori and the fonts into `.output` (`RUNTIME_FILE_DEPS`).
-- **A README is one call (D136).** `sheet_import` (MCP, `importCapabilities`; its `file` reads the
+- **A README is one call (D136).** `sheet_import` (MCP, `sheetImportCapabilities`; its `file` reads the
   session's `files`) turns Markdown — `markdown` (≤ 500 000 characters) or `file: 'file:<id>'` of
   an uploaded `.md`/`.txt` — into a page: `service/markdown` (`markdownToPage`) parses CommonMark +
   GFM with `mdast-util-from-markdown` (+ `micromark-extension-gfm`, `mdast-util-gfm`) and writes a
@@ -976,7 +976,7 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   one is passed. Block HTML and footnotes stay byte for byte in `Code`, HTML inside a line as visible words (`<br>` a line break), each listed in `kept`; nothing
   is dropped. Checked like `sheet_check`, written like `sheet_create` (as the member, `parentId`,
   answered small + `kept`); `dryRun` answers the WSX, diagnostics and preview and saves nothing.
-- **Rows arrive from a file (D137).** `db_import` (MCP, `importCapabilities` over the session's
+- **Rows arrive from a file (D137).** `db_import` (MCP, `rowImportCapabilities` over the session's
   `files`; a write) takes exactly one of `file` (an upload: `.csv`, `.tsv`, `.json`, `.jsonl` —
   `file_upload` keeps `.tsv` as `text/plain` and `.jsonl` as JSON, the name tells them apart), `csv`
   or `json` (rows, or text). `service/tables/import`: RFC 4180 CSV (quotes, `""`, CRLF, a BOM; the
