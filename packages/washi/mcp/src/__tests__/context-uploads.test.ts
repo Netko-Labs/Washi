@@ -26,11 +26,12 @@ let other: Workspace
 let files: FileStore
 let client: Client
 
-const sessionOf = (at: Workspace, name: string): McpSession => ({
+const sessionOf = (at: Workspace, name: string, isSteward = true): McpSession => ({
   ws: at,
   name,
   viewer: VIEWER,
   member: MEMBER,
+  isSteward,
   listPeople: async () => [MEMBER],
   changed: () => {},
   files: at === ws ? files : undefined,
@@ -47,8 +48,8 @@ const TWO: McpWorkspaces = {
     id === 'dashi' ? sessionOf(ws, 'DashiOS') : id === 'lab' ? sessionOf(other, 'Lab') : null,
 }
 
-async function connect(workspaces?: McpWorkspaces) {
-  const session = sessionOf(ws, 'DashiOS')
+async function connect(workspaces?: McpWorkspaces, isSteward = true) {
+  const session = sessionOf(ws, 'DashiOS', isSteward)
   const fetch = (input: string | URL | Request, init?: RequestInit) =>
     answerMcp(
       input instanceof Request ? new Request(input, init) : new Request(String(input), init),
@@ -133,9 +134,9 @@ describe('context_get and the agent guide (D135)', () => {
 
   test('the guide is in the instructions an agent gets on connecting, and workspace_list names it', async () => {
     const guide = page(ws, 'Agent playbook', '<Text>Never force-push.</Text>')
-    setAgentGuide(ws, guide, VIEWER)
+    setAgentGuide(ws, guide, VIEWER, true)
     const labGuide = page(other, 'Lab rules', '<Text>Be kind.</Text>')
-    setAgentGuide(other, labGuide, VIEWER)
+    setAgentGuide(other, labGuide, VIEWER, true)
     await connect(TWO)
     const instructions = client.getInstructions() ?? ''
     expect(instructions).toContain('DashiOS keeps an agent guide, "Agent playbook"')
@@ -154,6 +155,16 @@ describe('context_get and the agent guide (D135)', () => {
     expect(await ok('guide_set', { id: null })).toEqual({ guide: null })
   })
 
+  test('only an owner or an admin sets the guide over MCP', async () => {
+    const guide = page(ws, 'Agent playbook', '<Text>Never force-push.</Text>')
+    await connect(undefined, false)
+    const refused = await text('guide_set', { id: guide })
+    expect(refused.isError).toBe(true)
+    expect(refused.text).toContain('owner or an admin')
+    const cleared = await text('guide_set', { id: null })
+    expect(cleared.isError).toBe(true)
+  })
+
   test('a page the member cannot read is never their guide', async () => {
     const closed = createSheetFromSource(
       ws,
@@ -167,7 +178,7 @@ describe('context_get and the agent guide (D135)', () => {
     await connect()
     const refused = await text('guide_set', { id: closed })
     expect(refused.isError).toBe(true)
-    setAgentGuide(ws, closed, { id: 'u-rin', isOwner: false })
+    setAgentGuide(ws, closed, { id: 'u-rin', isOwner: false }, true)
     await client.close()
     await connect()
     expect(client.getInstructions()).not.toContain('agent guide, "Closed"')

@@ -51,6 +51,7 @@ export { LOCAL_AUTHOR } from './comments/constants'
 export { CommentError, postComment, removeComment, resolveThread } from './comments/service'
 export {
   type AgentGuide,
+  AgentGuideError,
   agentGuide,
   agentGuideId,
   agentGuidePage,

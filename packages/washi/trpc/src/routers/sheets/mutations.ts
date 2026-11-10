@@ -17,7 +17,7 @@ import {
   updateSheetSuggestEmail,
 } from '@washi/service'
 import { z } from 'zod'
-import { pageProcedure, router, workspaceProcedure } from '../../init'
+import { ownerProcedure, pageProcedure, router, workspaceProcedure } from '../../init'
 
 const byId = z.object({ id: z.string() })
 
@@ -89,10 +89,10 @@ export const sheetMutations = router({
   setShareSubpages: pageProcedure
     .input(z.object({ id: z.string(), subpages: z.boolean() }))
     .mutation(({ ctx, input }) => updateSheetShareSubpages(ctx.ws, input.id, input.subpages)),
-  /** Marks the page outside agents read first (D135), or clears it — any member who reads it. */
-  setAgentGuide: workspaceProcedure
+  /** Marks the page outside agents read first (D135), or clears it — an owner's or an admin's. */
+  setAgentGuide: ownerProcedure
     .input(z.object({ id: z.string().nullable() }))
-    .mutation(({ ctx, input }) => setAgentGuide(ctx.ws, input.id, ctx.viewer)),
+    .mutation(({ ctx, input }) => setAgentGuide(ctx.ws, input.id, ctx.viewer, true)),
   /** Empties what this person can see; private pages of others stay in the Trash. */
   emptyTrash: workspaceProcedure.mutation(async ({ ctx }) => {
     if (!ctx.viewer.isOwner) {

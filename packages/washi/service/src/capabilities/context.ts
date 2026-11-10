@@ -13,6 +13,7 @@ export function contextCapabilities(
   ws: Workspace,
   context: CapabilityContext,
   workspaceName?: string,
+  isSteward = false,
 ): Capability[] {
   return [
     {
@@ -57,7 +58,7 @@ export function contextCapabilities(
           .describe('The page to make the agent guide, or null to have none'),
       },
       false,
-      ({ id }) => ({ guide: setAgentGuide(ws, id, context.viewer) }),
+      ({ id }) => ({ guide: setAgentGuide(ws, id, context.viewer, isSteward) }),
     ),
   ]
 }

@@ -16,6 +16,7 @@ const sessionOf = (ws: Workspace): McpSession => ({
   ws,
   viewer: { id: MEMBER.id, isOwner: false },
   member: MEMBER,
+  isSteward: false,
   listPeople: async () => [MEMBER],
   changed: (kinds) => void changed.push({ workspace: ws.id, kinds }),
 })

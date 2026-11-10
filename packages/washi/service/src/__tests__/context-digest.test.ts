@@ -2,10 +2,13 @@ import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import { openWorkspace, type Workspace } from '@washi/repository'
 import { parse } from '@washi/wsx'
 import {
+  AgentGuideError,
   agentGuide,
+  agentGuideId,
   agentGuidePage,
   createSheetFromSource,
   defineUserTable,
+  openRowPage,
   pageMarkdown,
   runMutation,
   setAgentGuide,
@@ -159,7 +162,7 @@ describe('context_get: a workspace in one read (D135)', () => {
   test('the agent guide leads, and only for a reader who may read it', () => {
     page('Home', '<Text>Top.</Text>')
     const guide = page('Playbook', '<Text>Always run the checks.</Text>')
-    expect(setAgentGuide(ws, guide, MEMBER)).toEqual({ id: guide, title: 'Playbook' })
+    expect(setAgentGuide(ws, guide, MEMBER, true)).toEqual({ id: guide, title: 'Playbook' })
     const out = workspaceContext(ws, MEMBER)
     expect(out.indexOf('## Playbook (agent guide')).toBeLessThan(out.indexOf('## Pages'))
     expect(agentGuide(ws, MEMBER)?.markdown).toBe('Always run the checks.')
@@ -171,10 +174,35 @@ describe('context_get: a workspace in one read (D135)', () => {
       null,
       ` visibility="private" access={["${OTHER.id}"]}`,
     )
-    expect(() => setAgentGuide(ws, closed, MEMBER)).toThrow()
-    setAgentGuide(ws, closed, OTHER)
+    expect(() => setAgentGuide(ws, closed, MEMBER, true)).toThrow()
+    setAgentGuide(ws, closed, OTHER, true)
     expect(agentGuide(ws, MEMBER)).toBeNull()
-    expect(setAgentGuide(ws, null, MEMBER)).toBeNull()
-    expect(agentGuidePage(ws, OTHER)).toBeNull()
+    expect(agentGuidePage(ws, OTHER)).toEqual({ id: closed, title: 'Closed' })
+  })
+
+  test('only a steward sets the guide; one they cannot read stays; a row page never is it', () => {
+    const guide = page('Playbook', '<Text>Run the checks.</Text>')
+    expect(() => setAgentGuide(ws, guide, MEMBER, false)).toThrow(AgentGuideError)
+    expect(() => setAgentGuide(ws, null, MEMBER, false)).toThrow('owner or an admin')
+    const closed = page(
+      'Closed',
+      '<Text>x</Text>',
+      null,
+      ` visibility="private" access={["${OTHER.id}"]}`,
+    )
+    setAgentGuide(ws, closed, OTHER, true)
+    // Ana, a steward who cannot read the guide in place, neither replaces nor clears it.
+    expect(() => setAgentGuide(ws, guide, MEMBER, true)).toThrow('cannot read')
+    expect(() => setAgentGuide(ws, null, MEMBER, true)).toThrow('cannot read')
+    expect(agentGuideId(ws)).toBe(closed)
+    expect(setAgentGuide(ws, null, OTHER, true)).toBeNull()
+    expect(agentGuideId(ws)).toBeNull()
+
+    const row = openRowPage(
+      ws,
+      runMutation(ws, { kind: 'insert', table: 'issues', data: { title: 'R' } }, MEMBER.id)
+        .id as string,
+    )
+    expect(() => setAgentGuide(ws, row, MEMBER, true)).toThrow("a row's page")
   })
 })

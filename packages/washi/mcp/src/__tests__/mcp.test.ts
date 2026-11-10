@@ -46,6 +46,7 @@ beforeEach(async () => {
     ws,
     viewer: { id: MEMBER.id, isOwner: false },
     member: MEMBER,
+    isSteward: false,
     listPeople: async () => [MEMBER],
     changed: (kinds: McpChange[]) => void changes.push(kinds),
     files: createFileStore(ws, localBlobStore(mkdtempSync(join(tmpdir(), 'washi-mcp-')))),

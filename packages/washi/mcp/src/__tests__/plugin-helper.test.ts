@@ -32,6 +32,7 @@ beforeAll(() => {
     ws,
     viewer: { id: 'u-juan', isOwner: false },
     member: { id: 'u-juan', name: 'Juan' },
+    isSteward: false,
     listPeople: async () => [],
     changed: () => {},
     files,

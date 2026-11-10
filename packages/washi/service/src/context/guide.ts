@@ -1,9 +1,10 @@
 import type { Viewer } from '@washi/domain'
-import { getAppMeta, setAppMeta, type Workspace } from '@washi/repository'
+import { getAppMeta, getSheet, setAppMeta, type Workspace } from '@washi/repository'
 import { parse } from '@washi/wsx'
 import { pagesFor } from '../agents/lib/pages'
 import { SheetNotFoundError } from '../sheets/access'
 import { cutAt } from './budget'
+import { AgentGuideError } from './errors'
 import { pageMarkdown } from './render'
 import { renderContextOf, treeOf } from './tree'
 import type { AgentGuide } from './types'
@@ -15,20 +16,37 @@ export function agentGuideId(ws: Workspace): string | null {
 }
 
 /**
- * Marks a page as the workspace's agent guide (D135), or clears it with null. Any member who reads
- * the page may: it is a pointer, and every agent still reads it only as its own member can.
+ * Marks a page as the workspace's agent guide (D135), or clears it with null — an owner's or an
+ * admin's call, as it speaks to every agent working here. The page must be one they read and in the
+ * tree (a row's page is its table's); a guide in place that they cannot read is not theirs to move.
  */
 export function setAgentGuide(
   ws: Workspace,
   id: string | null,
   viewer: Viewer,
+  isSteward: boolean,
 ): { id: string; title: string } | null {
+  if (!isSteward) {
+    throw new AgentGuideError('only an owner or an admin of this workspace sets its agent guide')
+  }
+  const pages = pagesFor(ws, viewer)
+  const current = agentGuideId(ws)
+  if (current && current !== id && getSheet(ws, current) && !pages.get(current)) {
+    throw new AgentGuideError(
+      'the agent guide now is a page you cannot read — whoever can read it moves or clears it',
+    )
+  }
   if (id === null) {
     setAppMeta(ws, AGENT_GUIDE_KEY, '')
     return null
   }
-  const page = pagesFor(ws, viewer).get(id)
+  const page = pages.get(id)
   if (!page) throw new SheetNotFoundError(id)
+  if (page.rowOf) {
+    throw new AgentGuideError(
+      "a row's page cannot be the agent guide — pick a page of the tree, or make one",
+    )
+  }
   setAppMeta(ws, AGENT_GUIDE_KEY, id)
   return { id: page.id, title: page.title }
 }

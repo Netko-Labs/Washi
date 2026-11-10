@@ -40,7 +40,7 @@ function capabilitiesFor(session: McpSession): Capability[] {
     ...(session.files ? fileCapabilities(session.ws, session.files, fileUrl) : []),
     ...(session.files ? imageCapabilities(session.ws, session.files, fileUrl) : []),
     ...uploadCapabilities(session, fileUrl),
-    ...contextCapabilities(session.ws, context, session.name),
+    ...contextCapabilities(session.ws, context, session.name, session.isSteward),
   ]
 }
 

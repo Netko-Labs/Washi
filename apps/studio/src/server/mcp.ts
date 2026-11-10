@@ -41,6 +41,7 @@ async function sessionIn(
     name: here?.name,
     uploads: { url: (ticket) => `${originOf(request)}/api/uploads/${ticket}` },
     viewer: { id: actorId, isOwner: role === 'owner' },
+    isSteward: role === 'owner' || role === 'admin',
     member,
     listPeople: () => control.listMembers(workspaceId),
     changed: (kinds) => {

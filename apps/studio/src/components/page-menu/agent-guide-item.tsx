@@ -1,12 +1,19 @@
 import { IconRobot } from '@tabler/icons-react'
+import { useIsSteward } from '@/components/settings/shared/stewardship'
 import type { AgentGuideItemProps } from './lib'
 import { useAgentGuide } from './lib'
 
 /**
  * "Agent guide": the page outside agents read first (D135), as CLAUDE.md is for a repo — its words
- * lead their instructions and `context_get`. One page a workspace; a press here moves it.
+ * lead their instructions and `context_get`. One page a workspace, an owner's or an admin's to
+ * move, so only they see the row; a row's page is never the guide.
  */
-export function AgentGuideItem({ sheet, className, role }: AgentGuideItemProps) {
+export function AgentGuideItem(props: AgentGuideItemProps) {
+  const isSteward = useIsSteward()
+  return isSteward && !props.sheet.rowOf ? <AgentGuideToggle {...props} /> : null
+}
+
+function AgentGuideToggle({ sheet, className, role }: AgentGuideItemProps) {
   const guide = useAgentGuide(sheet.id)
   return (
     <button
