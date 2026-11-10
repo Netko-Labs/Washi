@@ -17,3 +17,12 @@ export interface FileFetchOptions {
   /** Stands in for `fetch` in tests. */
   fetcher?: typeof fetch
 }
+
+/** One address a name answers, as `dns.lookup({ all: true })` says it. */
+export interface ResolvedAddress {
+  address: string
+  family: number
+}
+
+/** Every address a name answers. */
+export type AddressLookup = (host: string) => Promise<ResolvedAddress[]>

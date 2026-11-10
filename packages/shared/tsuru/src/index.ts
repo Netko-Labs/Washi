@@ -16,7 +16,8 @@ export {
   type PolicyVerdict,
 } from './policy'
 export { type LinkPreview, linkPreview, readPreview } from './preview'
-export type { FetchedFile, FileFetchOptions } from './types'
+export { pinned, publicAddresses, setAddressLookup } from './resolve'
+export type { AddressLookup, FetchedFile, FileFetchOptions, ResolvedAddress } from './types'
 export {
   UNSPLASH_API,
   UNSPLASH_ID,

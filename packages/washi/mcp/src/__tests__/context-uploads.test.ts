@@ -13,6 +13,7 @@ import {
   type Workspace,
 } from '@washi/repository'
 import { createSheetFromSource, defineUserTable, runMutation, setAgentGuide } from '@washi/service'
+import { setAddressLookup } from '@washi/tsuru'
 import { answerMcp } from '../server'
 import type { McpSession, McpWorkspaces } from '../types'
 import { answerUpload } from '../uploads'
@@ -222,6 +223,9 @@ describe('uploads that skip the context (D135)', () => {
 
   test('file_upload_from fetches through tsuru and keeps a ledger row either way', async () => {
     const real = globalThis.fetch
+    setAddressLookup(async (name) =>
+      name === 'cdn.example.com' ? [{ address: '93.184.216.34', family: 4 }] : [],
+    )
     const spy = spyOn(globalThis, 'fetch').mockImplementation((async (
       input: string | URL | Request,
       init?: RequestInit,
@@ -245,6 +249,7 @@ describe('uploads that skip the context (D135)', () => {
       expect(ledger.every((row) => row.actorId === MEMBER.id && row.origin === 'agent')).toBe(true)
     } finally {
       spy.mockRestore()
+      setAddressLookup(null)
     }
   })
 })

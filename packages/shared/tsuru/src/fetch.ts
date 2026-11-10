@@ -1,14 +1,8 @@
+import { TsuruError } from './errors'
 import { checkUrl, type FetchPolicy, isPrivateAddress } from './policy'
+import { pinned, publicAddresses } from './resolve'
 
-export class TsuruError extends Error {
-  readonly needsApproval: boolean
-
-  constructor(message: string, needsApproval = false) {
-    super(message)
-    this.name = 'TsuruError'
-    this.needsApproval = needsApproval
-  }
-}
+export { TsuruError }
 
 /**
  * Policy-gated fetch. Redirects are re-checked hop by hop so an allowed host
@@ -19,7 +13,11 @@ export async function guardedFetch(rawUrl: string, policy: FetchPolicy): Promise
   return readCapped(response, policy.maxResponseBytes)
 }
 
-/** The first answer that is not a redirect, each hop judged by the policy; a refusal throws. */
+/**
+ * The first answer that is not a redirect. Each hop is judged by the policy, then its name is
+ * resolved and refused if any address it answers is private, and the connection goes to the
+ * address checked (`pinned`) — unless the server lifted the private-range guard (D118).
+ */
 export async function guardedResponse(
   rawUrl: string,
   policy: FetchPolicy,
@@ -31,11 +29,15 @@ export async function guardedResponse(
   for (let hop = 0; hop < 4; hop++) {
     const verdict = checkUrl(current, policy)
     if (!verdict.ok) throw new TsuruError(verdict.reason, verdict.needsApproval ?? false)
+    const target = policy.allowPrivate
+      ? { url: verdict.url, init: {} as RequestInit }
+      : pinned(verdict.url, await publicAddresses(verdict.url.hostname))
 
-    const response = await fetcher(verdict.url, {
+    const response = await fetcher(target.url, {
+      ...target.init,
       redirect: 'manual',
       signal: AbortSignal.timeout(policy.timeoutMs),
-      headers: { accept },
+      headers: { ...(target.init.headers as Record<string, string> | undefined), accept },
     })
 
     if (response.status >= 300 && response.status < 400) {
