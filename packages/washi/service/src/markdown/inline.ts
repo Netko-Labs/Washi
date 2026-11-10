@@ -91,7 +91,12 @@ function phraseOf(node: PhrasingContent, context: Converting): string {
       return linkOf(label, url)
     }
     case 'html':
-      return /^<br\s*\/?>$/i.test(node.value.trim()) ? '\n' : escapeText(node.value)
+      if (/^<br\s*\/?>$/i.test(node.value.trim())) return '\n'
+      // Nothing on a page draws inline HTML: its characters stay as visible words, and kept says so.
+      context.kept.push(
+        `inline html ${node.value.trim()} (line ${node.position?.start.line ?? '?'})`,
+      )
+      return escapeText(node.value)
     case 'footnoteReference':
       return escapeText(`[^${node.label ?? node.identifier}]`)
     default:

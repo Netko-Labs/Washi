@@ -973,7 +973,7 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   GitHub alerts `Callout`, `---` `Divider`, a lone https picture `Figure`; inline marks as paper reads
   them (D122) — words escaped only where they would open a mark, a badge a link by its alt, a
   relative or http link its words with the address in brackets. A leading `#` is the title unless
-  one is passed. Raw HTML and footnotes stay byte for byte in `Code` and are listed in `kept`; nothing
+  one is passed. Block HTML and footnotes stay byte for byte in `Code`, HTML inside a line as visible words (`<br>` a line break), each listed in `kept`; nothing
   is dropped. Checked like `sheet_check`, written like `sheet_create` (as the member, `parentId`,
   answered small + `kept`); `dryRun` answers the WSX, diagnostics and preview and saves nothing.
 - **An embed is https and listed (D92).** `<Embed src title ratio height>`: the registry refuses http;

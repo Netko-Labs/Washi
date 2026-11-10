@@ -85,7 +85,11 @@ describe('sheet_import: a README in one call (D136)', () => {
       source: '<Sheet title="Docs"><Text>Home</Text></Sheet>',
     })
     const made = await ok('sheet_import', { markdown: README, parentId: home.id })
-    expect(made).toMatchObject({ title: 'Kome', parentId: home.id, kept: [] })
+    expect(made).toMatchObject({
+      title: 'Kome',
+      parentId: home.id,
+      kept: ['inline html <App> (line 3)'],
+    })
     expect(made.url).toBe(`https://washi.test/w/test/p/${made.id}`)
     expect(typeof made.version).toBe('string')
     expect(made.source).toBeUndefined()
@@ -109,7 +113,11 @@ describe('sheet_import: a README in one call (D136)', () => {
     })
     const before = listSheets(ws).length
     const dry = await ok('sheet_import', { file: upload.key, title: 'Kome docs', dryRun: true })
-    expect(dry).toMatchObject({ ok: true, title: 'Kome docs', kept: [] })
+    expect(dry).toMatchObject({
+      ok: true,
+      title: 'Kome docs',
+      kept: ['inline html <App> (line 3)'],
+    })
     expect(dry.source).toContain('<Sheet title="Kome docs">')
     expect(dry.source).toContain('<Title level={1}>Kome</Title>')
     expect(dry.preview).toContain('Install')
@@ -117,6 +125,21 @@ describe('sheet_import: a README in one call (D136)', () => {
 
     const made = await ok('sheet_import', { file: upload.key })
     expect(getSheet(ws, made.id)?.title).toBe('Kome')
+  })
+
+  test('a quoted heading and a picture holding " and \\ import and read back as written', async () => {
+    const made = await ok('sheet_import', {
+      markdown:
+        '# Say "hi" to C:\\Users\\rin\n\n![The "big" one, C:\\Temp](https://example.com/a.png)\n\nPress <kbd>K</kbd>.\n',
+    })
+    expect(made.title).toBe('Say "hi" to C:\\Users\\rin')
+    expect(made.kept).toEqual(['inline html <kbd> (line 5)', 'inline html </kbd> (line 5)'])
+    const sheet = getSheet(ws, made.id)
+    expect(sheet?.title).toBe('Say "hi" to C:\\Users\\rin')
+    expect(sheet?.source).toContain('title={"Say \\"hi\\" to C:\\\\Users\\\\rin"}')
+    expect(sheet?.source).toContain('alt={"The \\"big\\" one, C:\\\\Temp"}')
+    const checked = await ok('sheet_check', { source: sheet?.source })
+    expect(checked.ok).toBe(true)
   })
 
   test('refusals say why: both or neither, a picture, a page you cannot file under', async () => {
