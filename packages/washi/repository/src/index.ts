@@ -79,6 +79,7 @@ export {
   workspaceStats,
 } from './storage/maintenance'
 export { getAppMeta, setAppMeta } from './storage/meta'
+export { searchRecords } from './storage/record-search'
 export { onRecordWrite, type RecordWrite } from './storage/record-writes'
 export { createWorkspaceRegistry, type WorkspaceRegistry } from './storage/registry'
 export {

@@ -1,4 +1,4 @@
-import type { Workspace } from '@washi/repository'
+import { searchRecords, type Workspace } from '@washi/repository'
 import { z } from 'zod'
 import { pagesFor } from '../agents/lib/pages'
 import { editSheetSource } from '../sheets/edit'
@@ -8,6 +8,7 @@ import { capability } from './define'
 import { referenceCapabilities } from './reference'
 import type { Capability, CapabilityContext } from './types'
 import { editedByOf, previewOf, writtenAnswer } from './utils'
+import { SEARCH_DESCRIPTION } from './values'
 
 const verbose = z
   .boolean()
@@ -53,13 +54,10 @@ export function pageCapabilities(ws: Workspace, context: CapabilityContext): Cap
       true,
       ({ id }) => pages.backlinks(id),
     ),
-    capability(
-      'search',
-      'Full-text search across sheets.',
-      { term: z.string() },
-      true,
-      ({ term }) => pages.search(term),
-    ),
+    capability('search', SEARCH_DESCRIPTION, { term: z.string() }, true, ({ term }) => ({
+      pages: pages.search(term),
+      rows: searchRecords(ws, term),
+    })),
     capability(
       'sheet_create',
       'Create a sheet from WSX source. The source must pass sheet_check. Pass parentId (from sheet_list) to file it under another sheet, as a sub-page. Answers { id, title, parentId, version }.',

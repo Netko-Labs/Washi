@@ -69,3 +69,17 @@ export interface SuggestionDecision {
   by: string
   recordId: string | null
 }
+
+/** A row the search's LIKE pass hands over, with its table (D140). */
+export interface RecordCandidate {
+  id: string
+  data: string
+  name: string
+  spec: string
+}
+
+/** One wordy cell of a row, as the search reads it. */
+export interface WordyCell {
+  column: string
+  words: string
+}

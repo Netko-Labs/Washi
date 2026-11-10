@@ -86,3 +86,14 @@ export interface TrashedTable {
   rows: number
   deletedAt: string
 }
+
+/** A table row whose words match a search (D140): where it is and the words around the match. */
+export interface RowSearchHit {
+  table: string
+  recordId: string
+  /** The row's title: its first text column, or '' when it has none. */
+  title: string
+  /** The column the words were found in. */
+  column: string
+  snippet: string
+}

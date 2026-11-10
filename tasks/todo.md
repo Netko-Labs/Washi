@@ -1265,3 +1265,14 @@ Acceptance: MCP tests walk every acceptance check; typecheck, Biome, `bun test` 
 - [x] Tests: service (slug, steward, contrast, clash, warnings, look set/clear/misses), MCP, frame
 - [ ] Later: a shared link wears the default look (its payload carries only the page's own)
 - [ ] Later: the desktop loads the default look (it reads none yet; no covers there anyway)
+
+# Search reaches rows (2026-11-09) — D140
+
+- [x] `searchRecords` (repository): every word, case-blind, over text · url · select · status ·
+      multi_select cells; a LIKE pass over `records.data` then a real read; ≤ 20, newest first
+- [x] Deleted rows and trashed tables never match; keys, ids and numbers never match
+- [x] `search` answers `{ pages, rows }` (both ports and MCP); the palette's `sheets.search` unchanged
+- [x] `db_list_tables` gives each table `rows`
+- [x] Tests: repository (words, wildcards, non-ASCII, deleted/trashed, snippet, cap) and MCP
+- [ ] Later: rows in the studio's ⌘K palette (it searches pages only)
+- [ ] Later: an FTS index over records if a workspace ever holds enough rows for the scan to show

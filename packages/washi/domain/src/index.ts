@@ -166,6 +166,7 @@ export {
   type RowChange,
   type RowFieldChange,
   type RowOf,
+  type RowSearchHit,
   rowActivityInputSchema,
   type TableCatalogEntry,
   type TablePage,
