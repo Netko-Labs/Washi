@@ -67,6 +67,10 @@ describe('searchRecords (D140)', () => {
     expect(
       searchRecords(ws, 'one two three four five six seven eight nine').map((hit) => hit.recordId),
     ).toEqual([long])
+    expect(() =>
+      searchRecords(ws, Array.from({ length: 33 }, (_, at) => `w${at}`).join(' ')),
+    ).toThrow('up to 32 different words')
+    expect(searchRecords(ws, 'nine '.repeat(100)).map((each) => each.recordId)).toEqual([long])
     const [hit] = searchRecords(ws, 'nine')
     expect(hit?.snippet).toBe(`…${body.slice(body.indexOf('nine') - 40)}`)
   })

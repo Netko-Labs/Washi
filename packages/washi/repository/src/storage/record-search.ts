@@ -11,6 +11,8 @@ const CANDIDATE_PAGE = 2000
 const SCAN_CAP = 50_000
 /** Characters kept on each side of a match. */
 const SNIPPET_SIDE = 40
+/** The most different words one search takes: past it the search is refused in words. */
+const MAX_WORDS = 32
 /** Words the LIKE pass narrows by; every word of a term still has to match when rows are read. */
 const LIKE_TOKENS = 8
 
@@ -56,7 +58,12 @@ function snippetOf(words: string, { at, length }: TextMatch): string {
  * (D109) never match.
  */
 export function searchRecords(ws: Workspace, term: string, limit = 20): RowSearchHit[] {
-  const tokens = term.toLowerCase().split(/\s+/).filter(Boolean)
+  const tokens = [...new Set(term.toLowerCase().split(/\s+/).filter(Boolean))]
+  if (tokens.length > MAX_WORDS) {
+    throw new Error(
+      `a search takes up to ${MAX_WORDS} different words — this one has ${tokens.length}`,
+    )
+  }
   if (!tokens.length) return []
   const narrowing = tokens.filter(likeable).slice(0, LIKE_TOKENS)
   const query = ws.sqlite.query(
