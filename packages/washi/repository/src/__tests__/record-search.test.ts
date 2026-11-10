@@ -59,6 +59,18 @@ describe('searchRecords (D140)', () => {
     expect(searchRecords(ws, 'München spring').map((hit) => hit.recordId)).toEqual([old])
   })
 
+  test('every word counts, past eight too; a snippet sits on the word as written', () => {
+    // İ lowercases to two characters, so an offset read off the lowercased words would be one off.
+    const body = `İstanbul ${'x'.repeat(60)} one two three four five six seven eight nine`
+    const long = insertRecord(ws, notes, { body })
+    insertRecord(ws, notes, { body: 'one two three four five six seven eight' })
+    expect(
+      searchRecords(ws, 'one two three four five six seven eight nine').map((hit) => hit.recordId),
+    ).toEqual([long])
+    const [hit] = searchRecords(ws, 'nine')
+    expect(hit?.snippet).toBe(`…${body.slice(body.indexOf('nine') - 40)}`)
+  })
+
   test('keys, numbers and ids never match; LIKE wildcards are words', () => {
     insertRecord(ws, issues, { title: 'Plain', points: 42 })
     insertRecord(ws, issues, { title: '100% done_now' })

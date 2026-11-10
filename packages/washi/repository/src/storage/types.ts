@@ -83,3 +83,9 @@ export interface WordyCell {
   column: string
   words: string
 }
+
+/** Where a search word sits in a cell as written: its offset and its length there. */
+export interface TextMatch {
+  at: number
+  length: number
+}

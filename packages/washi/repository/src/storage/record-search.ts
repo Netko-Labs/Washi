@@ -1,7 +1,7 @@
 import type { RowSearchHit } from '@washi/domain'
 import { type ColumnType, type TableSpec, tableSpecSchema } from '@washi/ink'
 import type { Workspace } from './client'
-import type { RecordCandidate, WordyCell } from './types'
+import type { RecordCandidate, TextMatch, WordyCell } from './types'
 
 /** Columns whose cells are words a person typed or picked. */
 const WORDY: ReadonlySet<ColumnType> = new Set(['text', 'url', 'select', 'status', 'multi_select'])
@@ -11,7 +11,8 @@ const CANDIDATE_PAGE = 2000
 const SCAN_CAP = 50_000
 /** Characters kept on each side of a match. */
 const SNIPPET_SIDE = 40
-const MAX_TOKENS = 8
+/** Words the LIKE pass narrows by; every word of a term still has to match when rows are read. */
+const LIKE_TOKENS = 8
 
 const escapeLike = (token: string) => token.replace(/[\\%_]/g, (char) => `\\${char}`)
 
@@ -33,7 +34,13 @@ function wordsOf(cell: unknown): string | null {
   return null
 }
 
-function snippetOf(words: string, at: number, length: number): string {
+/** Where a token sits in a cell as written, case-blind, measured on the cell itself. */
+function matchIn(words: string, token: string): TextMatch {
+  const found = new RegExp(token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'iu').exec(words)
+  return found ? { at: found.index, length: found[0].length } : { at: 0, length: 0 }
+}
+
+function snippetOf(words: string, { at, length }: TextMatch): string {
   const start = Math.max(0, at - SNIPPET_SIDE)
   const end = Math.min(words.length, at + length + SNIPPET_SIDE)
   return `${start > 0 ? '…' : ''}${words.slice(start, end)}${end < words.length ? '…' : ''}`
@@ -49,9 +56,9 @@ function snippetOf(words: string, at: number, length: number): string {
  * (D109) never match.
  */
 export function searchRecords(ws: Workspace, term: string, limit = 20): RowSearchHit[] {
-  const tokens = term.toLowerCase().split(/\s+/).filter(Boolean).slice(0, MAX_TOKENS)
+  const tokens = term.toLowerCase().split(/\s+/).filter(Boolean)
   if (!tokens.length) return []
-  const narrowing = tokens.filter(likeable)
+  const narrowing = tokens.filter(likeable).slice(0, LIKE_TOKENS)
   const query = ws.sqlite.query(
     `SELECT r.id, r.data, t.name, t.spec FROM records r
      JOIN user_tables t ON t.id = r.table_id AND t.deleted_at IS NULL
@@ -97,7 +104,7 @@ function readPage(
       recordId: row.id,
       title: titleColumn ? (wordsOf(data[titleColumn.name]) ?? '') : '',
       column: found.column,
-      snippet: snippetOf(found.words, found.words.toLowerCase().indexOf(first), first.length),
+      snippet: snippetOf(found.words, matchIn(found.words, first)),
     })
   }
 }
