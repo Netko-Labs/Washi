@@ -151,7 +151,39 @@ describe('Markdown as a page (D136)', () => {
     expect(codes).toContain('<p align="center"><img src="logo.svg"></p>')
     expect(codes).toContain('[^1]: The note itself.')
     expect(extractText(root)).toContain('note\\[^1\\]')
-    expect(page.kept).toEqual(['html (line 40)', 'footnoteDefinition (line 44)'])
+    expect(page.kept).toEqual([
+      'inline html <angle> (line 5)',
+      'html (line 40)',
+      'footnoteDefinition (line 44)',
+    ])
+  })
+
+  test('HTML inside a line stays as visible words and is listed in kept; <br> is a line break', () => {
+    const inline = markdownToPage(
+      'Press <kbd>Ctrl</kbd>+<kbd>K</kbd> <!-- the palette -->\nthen<br>go.',
+    )
+    expect(textOf(find(parse(inline.source), 'Text'))).toBe(
+      'Press <kbd>Ctrl</kbd>+<kbd>K</kbd> <!-- the palette --> then\ngo.',
+    )
+    expect(inline.kept).toEqual([
+      'inline html <kbd> (line 1)',
+      'inline html </kbd> (line 1)',
+      'inline html <kbd> (line 1)',
+      'inline html </kbd> (line 1)',
+      'inline html <!-- the palette --> (line 1)',
+    ])
+    expect(checkSource(inline.source).ok).toBe(true)
+  })
+
+  test('a quoted title and a picture holding quotes and backslashes round-trip and pass', () => {
+    const quoted = markdownToPage(
+      '# Say "hi" from C:\\Users\\x\n\n![The "big" one, C:\\Temp](https://example.com/a.png)\n',
+    )
+    expect(quoted.title).toBe('Say "hi" from C:\\Users\\x')
+    expect(checkSource(quoted.source).ok).toBe(true)
+    const root = parse(quoted.source)
+    expect(root.props.title).toBe('Say "hi" from C:\\Users\\x')
+    expect(find(root, 'Figure')?.props.alt).toBe('The "big" one, C:\\Temp')
   })
 
   test('a table wider than paper takes stays Markdown; a long one splits by 200 rows', () => {

@@ -42,8 +42,8 @@ bun ${CLAUDE_PLUGIN_ROOT}/scripts/washi.mjs sheet_import markdown=@README.md par
 
 `sheet_import` converts headings, paragraphs, lists (checked boxes too), fenced code, pipe tables,
 quotes and GitHub alerts, keeps inline marks and links, escapes `{ } < >`, checks the page and saves
-it as your person. Raw HTML and footnotes stay as written in a Code block, listed in `kept` — look at
-those and rewrite them if they matter. Over OAuth with no token, send `markdown` through the tool
+it as your person. Block HTML and footnotes stay as written in a Code block, HTML inside a line as
+visible words, each listed in `kept` — look at those and rewrite them if they matter. Over OAuth with no token, send `markdown` through the tool
 itself, or `file_upload` the `.md` and pass `file: 'file:<id>'`. To reshape the page first, pass
 `dryRun: true`: it answers the WSX, which you edit and `sheet_create`.
 

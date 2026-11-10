@@ -28,8 +28,9 @@ const sameWords = (a: string, b: string) =>
  * A Markdown document (CommonMark + GitHub's tables, task lists, strikethrough and alerts) as a
  * page: headings Titles, paragraphs Texts, lists Lists of Items (checked boxes done), fenced code
  * Code, pipe tables written Tables, quotes Quotes or Callouts, a lone https picture a Figure, and
- * inline marks kept as paper reads them. Whatever a page cannot draw — raw HTML, footnotes — stays
- * byte for byte in a Code block, listed in `kept`. Braces and angle brackets are escaped by
+ * inline marks kept as paper reads them. Whatever a page cannot draw is listed in `kept`: block
+ * HTML and footnotes stay byte for byte in a Code block, HTML inside a line as visible words.
+ * Braces, angle brackets, quotes and backslashes are escaped by
  * `serialize`, so any text round-trips.
  */
 export function markdownToPage(markdown: string, options: MarkdownOptions = {}): MarkdownPage {
