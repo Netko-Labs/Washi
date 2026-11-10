@@ -32,7 +32,22 @@ not with a `sheet_get` per page.
    example that passes.
 3. `catalog_list` for icons, covers (`preset:*`, `picture:*`) and themes. Never guess a name.
 
-## 2. Write from files, not from your context
+## 2. Markdown comes in whole
+
+A README, a spec or notes already in Markdown is one call — never rewrite it into WSX by hand:
+
+```bash
+bun ${CLAUDE_PLUGIN_ROOT}/scripts/washi.mjs sheet_import markdown=@README.md parentId=<docs page id>
+```
+
+`sheet_import` converts headings, paragraphs, lists (checked boxes too), fenced code, pipe tables,
+quotes and GitHub alerts, keeps inline marks and links, escapes `{ } < >`, checks the page and saves
+it as your person. Block HTML and footnotes stay as written in a Code block, HTML inside a line as
+visible words, each listed in `kept` — look at those and rewrite them if they matter. Over OAuth with no token, send `markdown` through the tool
+itself, or `file_upload` the `.md` and pass `file: 'file:<id>'`. To reshape the page first, pass
+`dryRun: true`: it answers the WSX, which you edit and `sheet_create`.
+
+## 3. Write from files, not from your context
 
 A page of more than a few KB goes in from a file. Write the WSX to a local file, check it, then send
 it with the plugin's helper — the page never passes through your own tool call, and the answer is
@@ -53,7 +68,7 @@ bun ${CLAUDE_PLUGIN_ROOT}/scripts/washi.mjs db_mutate mutation:=@issues.json
 from Settings → Account → Agents); signed in over OAuth with no token, send the source through the
 MCP tools instead, a page at a time.
 
-## 3. Change pages and tables in small steps
+## 4. Change pages and tables in small steps
 
 - A few lines of a page: `sheet_edit` with `edits: [{ old, new }]` and the `version` your last read
   or write returned as `baseVersion`. Each `old` must match once; all apply or none.
@@ -67,7 +82,7 @@ MCP tools instead, a page at a time.
 - Columns: `db_define` on a table that exists merges — send only the columns to add or change.
   `db_change_column` renames or removes a column, or adds, renames or removes one option.
 
-## 4. Before you finish
+## 5. Before you finish
 
 Run `sheet_check` on every page you wrote (fix each diagnostic), and tell your person which pages and
 tables you made or changed, with their links.

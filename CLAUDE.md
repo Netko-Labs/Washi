@@ -963,6 +963,19 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   it — figure 1200×800, cover 1500×600, icon 256×256 — and it lands as a PNG upload under the
   server's caps, answering `{ key, width, height, wear }`. A mockup is a `<Figure>`, never a Widget or
   page code. The studio traces the wasm, satori and the fonts into `.output` (`RUNTIME_FILE_DEPS`).
+- **A README is one call (D136).** `sheet_import` (MCP, `importCapabilities`; its `file` reads the
+  session's `files`) turns Markdown — `markdown` (≤ 500 000 characters) or `file: 'file:<id>'` of
+  an uploaded `.md`/`.txt` — into a page: `service/markdown` (`markdownToPage`) parses CommonMark +
+  GFM with `mdast-util-from-markdown` (+ `micromark-extension-gfm`, `mdast-util-gfm`) and writes a
+  `WsxElement` tree through `serialize`, so `{ } < >` round-trip. Headings `Title` (1–3), paragraphs
+  `Text`, lists `List`/`Item` (`number` · `check` with `done` · `bullet`, nested in the Item), code
+  `Code lang`, pipe tables written `Table`s (≤ 16 columns, a new one every 200 rows), quotes `Quote`,
+  GitHub alerts `Callout`, `---` `Divider`, a lone https picture `Figure`; inline marks as paper reads
+  them (D122) — words escaped only where they would open a mark, a badge a link by its alt, a
+  relative or http link its words with the address in brackets. A leading `#` is the title unless
+  one is passed. Block HTML and footnotes stay byte for byte in `Code`, HTML inside a line as visible words (`<br>` a line break), each listed in `kept`; nothing
+  is dropped. Checked like `sheet_check`, written like `sheet_create` (as the member, `parentId`,
+  answered small + `kept`); `dryRun` answers the WSX, diagnostics and preview and saves nothing.
 - **An embed is https and listed (D92).** `<Embed src title ratio height>`: the registry refuses http;
   a built-in provider (`EMBED_PROVIDERS` — YouTube via youtube-nocookie, Vimeo, Spotify, Loom, Figma,
   CodePen, CodeSandbox, Miro, Google Maps, Indify) turns its page URL into its player and always plays;
