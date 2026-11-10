@@ -1025,8 +1025,9 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   (repository `storage/record-search.ts`) — `{ table, recordId, title, column, snippet }`, ≤ 20,
   newest first, matching when a row's text · url · select · status · multi_select cells hold every
   word, case-blind. No index: a LIKE pass over `records.data` (printable-ASCII tokens, `ESCAPE`d)
-  narrows to ≤ 2000 rows, then each candidate's wordy cells are read for real, so a key, an id or a
-  number never matches. A deleted row or a trashed table (D109) never does. Workspaces hold
+  narrows the rows, read a page of 2000 at a time, newest first, until 20 hits or 50 000 rows
+  (a word LIKE cannot narrow, München, still reaches older rows); each candidate's wordy cells
+  are read for real, so a key, an id or a number never matches. A deleted row or a trashed table (D109) never does. Workspaces hold
   thousands of rows, not millions; an FTS index over records would have to ride every P1 write.
   The studio's palette search is untouched (`sheets.search`, pages only). `db_list_tables` gives
   each table `rows` (live rows, `tableStats`).

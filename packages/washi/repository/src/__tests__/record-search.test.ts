@@ -52,6 +52,13 @@ describe('searchRecords (D140)', () => {
     expect(searchRecords(ws, 'auth')[0]).toMatchObject({ column: 'labels', snippet: 'auth' })
   })
 
+  test('a word LIKE cannot narrow still reaches rows past the first page, any case', () => {
+    const old = insertRecord(ws, notes, { body: 'Trip to MÜNCHEN in spring' })
+    for (let at = 0; at < 2100; at++) insertRecord(ws, notes, { body: `note ${at}` })
+    expect(searchRecords(ws, 'münchen').map((hit) => hit.recordId)).toEqual([old])
+    expect(searchRecords(ws, 'München spring').map((hit) => hit.recordId)).toEqual([old])
+  })
+
   test('keys, numbers and ids never match; LIKE wildcards are words', () => {
     insertRecord(ws, issues, { title: 'Plain', points: 42 })
     insertRecord(ws, issues, { title: '100% done_now' })
