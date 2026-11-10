@@ -26,7 +26,8 @@ export interface StoredFile {
 }
 
 export interface FileStore {
-  put(input: { name: string; mime: string; bytes: Uint8Array }): Promise<StoredFile>
+  /** `id` keeps a key promised before the bytes came (an upload ticket, D135); else a new one. */
+  put(input: { name: string; mime: string; bytes: Uint8Array; id?: string }): Promise<StoredFile>
   get(id: string): Promise<{ file: StoredFile; bytes: Uint8Array } | null>
   info(id: string): StoredFile | null
   /** The newest uploads first, so a picker can offer one already stored. */

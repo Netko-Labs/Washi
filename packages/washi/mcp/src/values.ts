@@ -11,12 +11,22 @@ export const CHANGES: Record<string, McpChange[]> = {
   // An upload changes nothing on screen until a page wears it; a drawn picture is one (D126).
   file: [],
   image: [],
+  // context_get reads; guide_set moves a pointer no page draws.
+  context: [],
+  guide: [],
 }
 export const DEFAULT_CHANGE: McpChange[] = ['page']
 
 export const INSTRUCTIONS = `Washi is a team's knowledge base: pages written in WSX (JSX as data, a closed set of
 primitives) and tables that work like Notion databases. You act as one member of one workspace:
 you read what they can read, and every write lands as theirs, with its history.
+
+Start with context_get: the whole workspace in one call, as Markdown — the agent guide first when
+the workspace keeps one, the page tree, every page's words, every table's columns and counts, and
+the open rows — cut to maxChars, ending with what it left out and the call that reads it. guide_set
+marks the page agents read first, only when your person asks. Large files never go through you:
+file_upload_url answers a URL to curl -T the file to, file_upload_from has the server fetch an
+https URL; file_upload (base64) is for a few KB.
 
 Writing pages: call wsx_reference first — every primitive with its props, and the rules for text
 (inline **strong** *em* \`code\` [links](https://…), escaping { } < > as {"…"}, a markdown table as

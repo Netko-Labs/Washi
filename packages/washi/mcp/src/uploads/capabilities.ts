@@ -1,0 +1,126 @@
+import { largestUpload, uploadCaps, uploadKindOf, uploadName, uploadRefusal } from '@washi/domain'
+import { recordCapability } from '@washi/repository'
+import {
+  type Capability,
+  capability,
+  codeLimits,
+  fileTypeOf,
+  privateNetworkAllowed,
+} from '@washi/service'
+import { fetchFile, TsuruError } from '@washi/tsuru'
+import { z } from 'zod'
+import type { McpSession } from '../types'
+import { issueTicket } from './tickets'
+import { FILE_UPLOAD_FROM_DESCRIPTION, FILE_UPLOAD_URL_DESCRIPTION } from './values'
+
+/** A refusal in the words an upload anywhere would get; SVG says why. */
+const refusalWords = (mime: string, refusal: string) =>
+  mime === 'image/svg+xml' ? `${refusal}: SVG can run when served — upload a PNG` : refusal
+
+/** The URL to PUT one file to: issued here, taken by the studio's route (`answerUpload`). */
+function uploadUrl(session: McpSession): Capability[] {
+  const { uploads } = session
+  if (!uploads || !session.files) return []
+  return [
+    capability(
+      'file_upload_url',
+      FILE_UPLOAD_URL_DESCRIPTION,
+      {
+        filename: z.string().min(1).max(200),
+        bytes: z.number().int().positive().describe('The file’s exact size in bytes'),
+        contentType: z.string().min(1).max(120).optional(),
+      },
+      false,
+      ({ filename, bytes, contentType }) => {
+        const mime = contentType ?? fileTypeOf(filename)
+        if (!mime) {
+          throw new Error(`what kind of file is "${filename}"? Pass contentType, like image/png`)
+        }
+        const refusal = uploadRefusal(mime, bytes, undefined, uploadCaps(codeLimits(session.ws)))
+        if (refusal) throw new Error(refusalWords(mime, refusal))
+        const ticket = issueTicket({
+          workspaceId: session.ws.id,
+          actorId: session.member.id,
+          name: uploadName(filename),
+          mime,
+          bytes,
+        })
+        const url = uploads.url(ticket.token)
+        return {
+          url,
+          method: 'PUT',
+          key: `file:${ticket.fileId}`,
+          expiresAt: new Date(ticket.expiresAt).toISOString(),
+          curl: `curl --fail-with-body -T '${filename.replace(/'/g, `'\\''`)}' '${url}'`,
+        }
+      },
+    ),
+  ]
+}
+
+/**
+ * A file the server fetches itself: the agent's call is the consent for that one host, as a
+ * person's press is for a bookmark's preview — tsuru keeps every other refusal, and the ledger
+ * keeps the request either way (C3: the network is reached here, never in service).
+ */
+function uploadFrom(session: McpSession, fileUrl?: (id: string) => string): Capability[] {
+  const { files, ws } = session
+  if (!files) return []
+  return [
+    capability(
+      'file_upload_from',
+      FILE_UPLOAD_FROM_DESCRIPTION,
+      {
+        url: z.url({ protocol: /^https$/ }).max(2048),
+        filename: z.string().min(1).max(200).optional(),
+      },
+      false,
+      async ({ url, filename }) => {
+        const entry = {
+          origin: 'agent' as const,
+          actorId: session.member.id,
+          subject: 'file_upload_from',
+          input: { url },
+        }
+        const deny = (detail: string): never => {
+          recordCapability(ws, { ...entry, decision: 'denied', detail })
+          throw new Error(detail)
+        }
+        const caps = uploadCaps(codeLimits(ws))
+        let fetched: Awaited<ReturnType<typeof fetchFile>>
+        try {
+          fetched = await fetchFile(url, {
+            allowPrivate: privateNetworkAllowed(ws),
+            maxBytes: largestUpload(caps),
+          })
+        } catch (cause) {
+          if (cause instanceof TsuruError) return deny(cause.message)
+          throw cause
+        }
+        const named = filename ?? fetched.filename ?? 'file'
+        const said = fetched.contentType && uploadKindOf(fetched.contentType)
+        const mime = said
+          ? (fetched.contentType as string)
+          : (fileTypeOf(named) ?? fetched.contentType ?? '')
+        const refusal = uploadRefusal(mime, fetched.bytes.byteLength, undefined, caps)
+        if (refusal) return deny(refusalWords(mime, refusal))
+        const stored = await files.put({ name: uploadName(named), mime, bytes: fetched.bytes })
+        recordCapability(ws, { ...entry, decision: 'auto' })
+        return {
+          key: `file:${stored.id}`,
+          ...stored,
+          source: fetched.url,
+          ...(fileUrl ? { url: fileUrl(stored.id) } : {}),
+        }
+      },
+    ),
+  ]
+}
+
+/** Uploads that never pass through the agent's context (D135). */
+export function uploadCapabilities(
+  session: McpSession,
+  fileUrl?: (id: string) => string,
+): Capability[] {
+  return [...uploadUrl(session), ...uploadFrom(session, fileUrl)]
+}

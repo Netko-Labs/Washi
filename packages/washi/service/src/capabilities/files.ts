@@ -6,7 +6,8 @@ import { capability } from './define'
 import type { Capability } from './types'
 import { MAX_BASE64_CHARS, MIME_BY_EXTENSION } from './values'
 
-const typeOf = (filename: string) => {
+/** A file's type read off its name's extension, or undefined when the name says none. */
+export const fileTypeOf = (filename: string) => {
   const extension = filename.split('.').pop()?.toLowerCase() ?? ''
   return Object.hasOwn(MIME_BY_EXTENSION, extension) ? MIME_BY_EXTENSION[extension] : undefined
 }
@@ -32,7 +33,7 @@ export function fileCapabilities(
       },
       false,
       async ({ base64, filename, contentType }) => {
-        const mime = contentType ?? typeOf(filename)
+        const mime = contentType ?? fileTypeOf(filename)
         if (!mime) {
           throw new Error(`what kind of file is "${filename}"? Pass contentType, like image/png`)
         }

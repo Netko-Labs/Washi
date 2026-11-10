@@ -1,5 +1,6 @@
 import type { Member, Viewer } from '@washi/domain'
 import type { FileStore, Workspace } from '@washi/repository'
+import type { UploadLender } from './uploads/types'
 
 /** What moved, so open pages refetch: page sources, table data, or both. */
 export type McpChange = 'page' | 'data'
@@ -19,6 +20,10 @@ export interface McpSession {
   files?: FileStore
   /** The server's own address, so a write can say where its page opens. */
   baseUrl?: string
+  /** The workspace's name, for context_get's first line and the instructions (D135). */
+  name?: string
+  /** Where a `file_upload_url` ticket's bytes go: with it, uploads skip the agent's context. */
+  uploads?: UploadLender
 }
 
 /** A workspace an agent may act in, as it is named to the agent. */

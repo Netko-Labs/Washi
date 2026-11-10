@@ -66,8 +66,8 @@ describe('one sign-in, several workspaces (D124)', () => {
     await connect(TWO())
     const { value } = await call('workspace_list')
     expect(value).toEqual([
-      { id: 'home', name: 'Graphya', isDefault: true },
-      { id: 'studio', name: 'Netko Studio', isDefault: false },
+      { id: 'home', name: 'Graphya', isDefault: true, guide: null },
+      { id: 'studio', name: 'Netko Studio', isDefault: false, guide: null },
     ])
     const { tools } = await client.listTools()
     const create = tools.find((tool) => tool.name === 'sheet_create')

@@ -6,7 +6,7 @@ import {
   searchSheets,
   sheetVersion,
 } from '@washi/repository'
-import { checkSource, readableSet, shareSettings } from '@washi/service'
+import { agentGuidePage, checkSource, readableSet, shareSettings } from '@washi/service'
 import { z } from 'zod'
 import { pageProcedure, router, workspaceProcedure } from '../../init'
 
@@ -33,6 +33,8 @@ export const sheetQueries = router({
     const readable = readableSet(ctx.ws, ctx.viewer)
     return searchSheets(ctx.ws, input.term).filter((hit) => readable.has(hit.id))
   }),
+  /** The page outside agents read first (D135), as this person may read it — or none. */
+  agentGuide: workspaceProcedure.query(({ ctx }) => agentGuidePage(ctx.ws, ctx.viewer)),
   /** Who reads the page and its link, for the Share popover (D65). */
   share: pageProcedure.input(byId).query(({ ctx, input }) => shareSettings(ctx.ws, input.id)),
   check: workspaceProcedure

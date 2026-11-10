@@ -30,3 +30,18 @@ export interface PageMenuListProps extends PageMenuPanelProps {
 }
 
 export type PageMenuQuickProps = PageMenuListProps
+
+/** Whether a page is the workspace's agent guide, and the press that flips it (D135). */
+export interface AgentGuideState {
+  /** Read yet: until then the row waits. */
+  isKnown: boolean
+  isGuide: boolean
+  toggle: () => Promise<void>
+}
+
+export interface AgentGuideItemProps {
+  sheet: SheetSummary
+  className: string
+  /** A menu's row (a checkbox to a screen reader); a phone's sheet has none. */
+  role?: string
+}

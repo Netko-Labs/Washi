@@ -38,14 +38,27 @@ export { defaultModelFor, LAST_RESORT_MODELS, PREFERRED_MODELS } from './agents/
 export {
   type Capability,
   type CapabilityContext,
+  capability,
   commentCapabilities,
+  contextCapabilities,
   fileCapabilities,
+  fileTypeOf,
   imageCapabilities,
   pageCapabilities,
   tableCapabilities,
 } from './capabilities'
 export { LOCAL_AUTHOR } from './comments/constants'
 export { CommentError, postComment, removeComment, resolveThread } from './comments/service'
+export {
+  type AgentGuide,
+  agentGuide,
+  agentGuideId,
+  agentGuidePage,
+  GUIDE_MAX_CHARS,
+  pageMarkdown,
+  setAgentGuide,
+  workspaceContext,
+} from './context'
 export {
   EmbedHostError,
   embedHostList,
