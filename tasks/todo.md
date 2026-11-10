@@ -1252,3 +1252,16 @@ Acceptance: MCP tests walk every acceptance check; typecheck, Biome, `bun test` 
 - [ ] Later: `sheet_render` (a PNG of a drawn page needs a headless browser on the server)
 - [ ] Later: `file_get` on Washi's own ports (the Claude port can take an image block)
 - [ ] Later: WebP/AVIF drawn smaller (resvg reads neither)
+
+# A workspace's brand from outside (2026-11-09) — D139
+
+- [x] `theme_define` over MCP: `ws:<slug>` made or changed in place (`defineWorkspaceTheme`), the
+      D88 rules — maker or steward, `themeChecks` refusals in words, warnings answered, a name once
+- [x] Colours as hex, rgb, hsl or oklch (paper's `toHex`); `catalog_list` gives each theme's colours
+- [x] Default icon and cover: app meta `default_look`, `workspaces.look` / `setLook` (owners and
+      admins), MCP `workspace_look_set` (`McpSession.isSteward`), Settings → General → Default look
+- [x] Drawn, never saved: `SheetLookHost.defaults` in `SheetFrame` (tree pages, not rows or locked
+      blocks), `SheetIcon` falls back to it everywhere a page's icon shows
+- [x] Tests: service (slug, steward, contrast, clash, warnings, look set/clear/misses), MCP, frame
+- [ ] Later: a shared link wears the default look (its payload carries only the page's own)
+- [ ] Later: the desktop loads the default look (it reads none yet; no covers there anyway)

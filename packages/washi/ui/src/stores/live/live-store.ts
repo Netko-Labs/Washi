@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { api } from '../../api'
 import { dataReads, pageReads } from '../../reads'
+import { useWorkspaceLookStore } from '../look/look-store'
 import { useSheetsStore } from '../sheets/sheets-store'
 import { useThemesStore } from '../themes/themes-store'
 import { useUnsplashStore } from '../unsplash/unsplash-store'
@@ -31,6 +32,7 @@ export const useLiveStore = create<LiveState>(() => ({
           void useSheetsStore.getState().refresh()
           void useThemesStore.getState().refresh()
           void useUnsplashStore.getState().refresh()
+          void useWorkspaceLookStore.getState().refresh()
         }, PAGE_REFRESH_MS)
       },
     })

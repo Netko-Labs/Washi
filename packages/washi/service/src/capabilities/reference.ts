@@ -2,6 +2,7 @@ import { wsxDetails, wsxIndex } from '@washi/paper/reference'
 import { COVER_PICTURES, COVER_PRESETS, SHEET_ICONS, THEME_IDS } from '@washi/paper/registry'
 import { listWorkspaceThemes, type Workspace } from '@washi/repository'
 import { z } from 'zod'
+import { workspaceLook } from '../themes/look'
 import { capability } from './define'
 import type { Capability } from './types'
 
@@ -17,7 +18,7 @@ export function referenceCapabilities(ws: Workspace): Capability[] {
     ),
     capability(
       'catalog_list',
-      "What a <Sheet> may wear: every icon name (or one emoji, or file:<id> from an upload), every cover key (preset:<name> gradients, picture:<name> photographs, file:<id>, unsplash:<id>) and every theme, the workspace's own (ws:<slug>) included.",
+      "What a <Sheet> may wear: every icon name (or one emoji, or file:<id> from an upload), every cover key (preset:<name> gradients, picture:<name> photographs, file:<id>, unsplash:<id>) and every theme, the workspace's own (ws:<slug>) included — workspaceThemes gives each one's colours (theme_define changes them) — and workspaceLook, the icon and cover a page with none of its own wears (workspace_look_set).",
       {},
       true,
       () => ({
@@ -31,6 +32,13 @@ export function referenceCapabilities(ws: Workspace): Capability[] {
           uploads: 'file:<id> — an upload of a picture this workspace keeps',
         },
         themes: [...THEME_IDS, ...listWorkspaceThemes(ws).map((theme) => `ws:${theme.slug}`)],
+        workspaceThemes: listWorkspaceThemes(ws).map(({ slug, name, light, dark }) => ({
+          key: `ws:${slug}`,
+          name,
+          light,
+          dark,
+        })),
+        workspaceLook: workspaceLook(ws),
       }),
     ),
   ]

@@ -23,7 +23,7 @@ export function LockedBlock({ block, rootProps }: LockedBlockProps) {
       title="A live block: move or delete it here"
     >
       {/* Its frame is a page's too: without this it draws the page's band (cover, comments, Undo) again. */}
-      <SheetLookProvider value={{ ...look, band: undefined, edit: undefined }}>
+      <SheetLookProvider value={{ ...look, band: undefined, edit: undefined, defaults: undefined }}>
         <PaperProvider host={host}>
           <WsxView
             root={{

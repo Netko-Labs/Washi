@@ -38,4 +38,6 @@ export interface CapabilityContext {
   onCreate?: (id: string) => void
   /** Where a person opens a page, when the caller knows the server's address. */
   pageUrl?: (id: string) => string
+  /** An owner or an admin: may change any workspace theme and the workspace's default look. */
+  isSteward?: boolean
 }

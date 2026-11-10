@@ -176,8 +176,12 @@ export {
 export {
   type ThemeTokensWrite,
   themeTokensSchema,
+  type WorkspaceLook,
+  type WorkspaceLookWrite,
   type WorkspaceTheme,
   type WorkspaceThemeWrite,
+  workspaceLookSchema,
+  workspaceLookWriteSchema,
   workspaceThemeSchema,
   workspaceThemeWriteSchema,
 } from './entities/themes'

@@ -1,5 +1,11 @@
 import { TRPCError } from '@trpc/server'
-import { agentCredentialSchema, agentModelSchema, integrationKeySchema } from '@washi/domain'
+import {
+  agentCredentialSchema,
+  agentModelSchema,
+  integrationKeySchema,
+  workspaceLookWriteSchema,
+} from '@washi/domain'
+import { setWorkspaceLook } from '@washi/service'
 import { z } from 'zod'
 import {
   INTEGRATIONS,
@@ -68,4 +74,8 @@ export const workspaceMutations = router({
       }
       return secrets.setIntegration(ctx.workspaceId, ctx.actorId, input.integration, input.key)
     }),
+  /** The workspace's default icon and cover (D139): owners and admins, as the brand is theirs. */
+  setLook: ownerProcedure
+    .input(workspaceLookWriteSchema)
+    .mutation(({ ctx, input }) => setWorkspaceLook(ctx.ws, input)),
 })

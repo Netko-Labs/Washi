@@ -12,7 +12,10 @@ export type McpChange = 'page' | 'data'
 export interface McpSession {
   ws: Workspace
   viewer: Viewer
-  /** The member is an owner or an admin of this workspace: they set its agent guide (D135). */
+  /**
+   * The member is an owner or an admin of this workspace: they set its agent guide (D135), change
+   * any workspace theme and its default look (D139).
+   */
   isSteward: boolean
   /** The member the agent acts for: rows are signed by their id, comments by their name. */
   member: { id: string; name: string }
