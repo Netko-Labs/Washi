@@ -1201,3 +1201,15 @@ Acceptance: MCP tests walk every acceptance check; typecheck, Biome, `bun test` 
 - [x] Studio traces the wasm, satori and the fonts into `.output`
 - [ ] Later: emoji in drawn pictures (Satori's `loadAdditionalAsset` would fetch — needs a local set)
 - [ ] Later: show the drawn picture in the chat's receipt
+
+# An outside agent loads a workspace in one call (2026-11-09) — D135
+
+- [x] `context_get`: tree, pages as Markdown, tables + counts, open rows, `maxChars` + Left out
+- [x] Agent guide: app meta `agent_guide`, `guide_set`, tRPC, page ⋯ → Agent guide; MCP instructions
+- [x] `workspace_list` names each workspace's guide; other guides named on `initialize`
+- [x] `file_upload_url` (one-time PUT, `/api/uploads/<ticket>`), `file_upload_from` (tsuru, ledgered)
+- [x] Plugin helper: `upload` by URL, `--workspace`
+- [x] Checked against DashiOS's real content: ~15k characters, every page and both tables there
+- [ ] later: Washi's own ports get `context_get` (a routine reading a workspace cold)
+- [ ] later: `context_get` names rows' ids (left out to fit the budget; db_query reads them)
+- [ ] later: ticket store across instances (it is per process: one studio replica only)

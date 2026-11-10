@@ -18,8 +18,8 @@ import { notAWorkspace, workspaceNamed } from './utils'
 import { CHANGES, DEFAULT_CHANGE, SERVER_INFO, WORKSPACE_ARG } from './values'
 
 /**
- * Everything an outside agent may do: pages, tables, comments and uploads, as the member — no
- * fetch, search or verbs.
+ * Everything an outside agent may do: pages, tables, comments, uploads and the workspace read whole,
+ * as the member — no fetch, search or verbs past the one file `file_upload_from` asks for (D135).
  */
 function capabilitiesFor(session: McpSession): Capability[] {
   const base = session.baseUrl?.replace(/\/+$/, '')

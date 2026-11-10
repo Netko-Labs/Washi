@@ -849,8 +849,8 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   the same set Washi's Claude and AI SDK ports now build from, signed `washi` there — plus
   `commentCapabilities`, MCP only: comment on a page or a row by `recordId`, its row page). Over MCP a
   row write is signed by the member's id and a page write is a person's (`editedBy` null); reads go
-  through `readableSet`; no fetch, web search or hanko verbs. Each write emits `workspaceChanged`, so
-  open pages refetch. Embedded has no token store, so no MCP.
+  through `readableSet`; no fetch, web search or hanko verbs (`file_upload_from` fetches one file,
+  D135). Each write emits `workspaceChanged`, so open pages refetch. Embedded has no token store, so no MCP.
   **Or OAuth** (`@better-auth/oauth-provider` + `jwt`, `disabledPaths: ['/token']`): an agent
   registers itself (dynamic, public, PKCE), its person signs in (`/sign-in` keeps the signed query;
   `continueUrl` follows it on) and on `/oauth/consent` picks the workspace — `oauth.grant` keeps it
@@ -902,6 +902,37 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   `scripts/washi.mjs` (bun or node, no packages) sends a tool call with arguments read from files
   (`source=@spec.wsx`, `upload <file>`), so a page never passes through the agent's context; its
   `pages` skill says how. Links between pages were always `<Ref>`, `<PageLink>` and `<Subpages>`.
+- **An outside agent loads a workspace in one call, and keeps big files out of its context (D135).**
+  From a real migration (DashiOS: 12 calls to read back, 1.5 GB of screenshots that could not move).
+  `context_get` (MCP, a read, `contextCapabilities`; logic in service `context/`) answers Markdown,
+  not JSON (`Capability.answersText`): the agent guide first, the page tree (row pages left out),
+  each page's words (`pageMarkdown`: headings, paragraphs, lists and tasks, written tables as pipe
+  tables, callouts, Steps/Timeline/Faq/Compare titles, Pairs, Stats with an `expr` worked out over
+  the tables by the page grammar, `exprEvaluator`; every block that draws rows one line —
+  "Board over `backlog` where status ne Done grouped by status"), each table's columns, row count
+  and counts per status/select value (zeros too), and the open rows (status outside its done group;
+  title + status/select/date/person/number columns, grouped by status) of the tables named, else of
+  every table with a status; a table of ≤ 12 rows is listed whole. `maxChars` (15 000; 2 000–
+  200 000) caps it: rows take up to 40 %, pages share the rest evenly (`fit`'s water level, the last
+  pages dropped to their heading below 300), and a "Left out" list names each cut with the call
+  that reads it. `root`/`depth` read a subtree. Only what the member reads (`pagesFor`).
+  **The agent guide** is app meta `agent_guide` (a page id): `guide_set` (MCP), `sheets.setAgentGuide`
+  / `sheets.agentGuide` (tRPC), the page ⋯ → Agent guide — any member who reads the page; a
+  pointer, so every agent still reads it only as its member may. On `initialize` (`asksInitialize`
+  peeks the body) `answerMcp` appends the default workspace's guide, as Markdown cut at 6 000
+  (`agentGuide`), to its instructions and names the other granted workspaces that keep one;
+  `workspace_list` gives each `guide: { id, title } | null`. **Uploads**: `file_upload_url
+  { filename, bytes, contentType? }` checks the type and size as any upload (D95, D118) and answers a
+  one-time PUT URL (`/api/uploads/<ticket>`, the studio's route; `McpSession.uploads` lends it), the
+  `file:<id>` it will be (`FileStore.put` takes a promised `id`) and a `curl -T` line: the ticket
+  (32 random bytes, `processSingleton` map, 10 min, once, ≤ 1 000 waiting) is the whole permission —
+  one member's agent, one workspace, one file of exactly `bytes`, checked again on arrival
+  (`answerUpload`). `file_upload_from { url }` has the server fetch it through tsuru's `fetchFile`
+  (that host only, https, no private ranges unless D118 lifted them, redirects re-checked, capped
+  before the body is read), wired in `@washi/mcp` — never service (C3) — and ledgered `agent` ·
+  `file_upload_from` (`auto` or `denied`): the agent's call is the consent for that one host, as a
+  press is for a bookmark. The plugin helper's `upload` uses the URL (base64 only on an older
+  server) and takes `--workspace`.
 - **Washi draws pictures from HTML (D126).** `image_render` (both ports and MCP, a `CHANGE_TOOLS`
   write over the workspace's files — the ports get them from `AgentHost.setFiles`) lays HTML out on
   the server with Satori and rasterizes it with resvg-wasm (`service/images`): no browser, no script,
