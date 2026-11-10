@@ -42,7 +42,8 @@ export async function publicAddresses(host: string): Promise<ResolvedAddress[]> 
  * check and the Host header stay the URL's own name. A literal, or a test's resolver, goes as is.
  */
 export function pinned(url: URL, addresses: ResolvedAddress[]): { url: URL; init: RequestInit } {
-  const [first] = addresses
+  // An IPv4 address first: a server without IPv6 routes would fail on an AAAA answer.
+  const first = addresses.find((each) => each.family === 4) ?? addresses[0]
   const name = url.hostname
   if (!first || isIP(name.replace(/^\[|\]$/g, '')) || testLookup) return { url, init: {} }
   const target = new URL(url)

@@ -912,27 +912,45 @@ Progress lives in `tasks/todo.md`. Phases 1–6 and the MLP+1 are done; the stud
   "Board over `backlog` where status ne Done grouped by status"), each table's columns, row count
   and counts per status/select value (zeros too), and the open rows (status outside its done group;
   title + status/select/date/person/number columns, grouped by status) of the tables named, else of
-  every table with a status; a table of ≤ 12 rows is listed whole. `maxChars` (15 000; 2 000–
-  200 000) caps it: rows take up to 40 %, pages share the rest evenly (`fit`'s water level, the last
-  pages dropped to their heading below 300), and a "Left out" list names each cut with the call
-  that reads it. `root`/`depth` read a subtree. Only what the member reads (`pagesFor`).
+  every table with a status — queried by that filter (`status in` the open values, empty included),
+  newest first, ≤ 300 read, the total off the counts; a table of ≤ 12 rows is listed whole.
+  `maxChars` (15 000; 2 000–200 000) caps everything, headings and notes included: each part has a
+  share (`SHARES`: guide 30 %, tree 12 %, table summaries 20 %, rows 35 %, Left out 6 %), tables
+  past theirs fold into "… N more tables", rows go to the first tables while there is room, and the
+  pages take what is left (`fitPages`: each its heading and ≥ 300 characters or all of a short one,
+  in tree order; past that the rest are counted in one line and never parsed; then the words share
+  evenly, a cut page closing with a stub); a last guard cuts at maxChars. `root`/`depth` read a
+  subtree. Only what the member reads (one `readableSet` a call).
   **The agent guide** is app meta `agent_guide` (a page id): `guide_set` (MCP), `sheets.setAgentGuide`
-  / `sheets.agentGuide` (tRPC), the page ⋯ → Agent guide — any member who reads the page; a
-  pointer, so every agent still reads it only as its member may. On `initialize` (`asksInitialize`
+  / `sheets.agentGuide` (tRPC, `ownerProcedure`), the page ⋯ → Agent guide (stewards only) — an
+  owner's or an admin's (`McpSession.isSteward`, set from the role), a page they read and in the
+  tree (a row's page is refused, `AgentGuideError`); a guide in place they cannot read is not theirs
+  to replace or clear. A pointer: every agent still reads it only as its member may. On `initialize` (`asksInitialize`
   peeks the body) `answerMcp` appends the default workspace's guide, as Markdown cut at 6 000
   (`agentGuide`), to its instructions and names the other granted workspaces that keep one;
   `workspace_list` gives each `guide: { id, title } | null`. **Uploads**: `file_upload_url
   { filename, bytes, contentType? }` checks the type and size as any upload (D95, D118) and answers a
   one-time PUT URL (`/api/uploads/<ticket>`, the studio's route; `McpSession.uploads` lends it), the
   `file:<id>` it will be (`FileStore.put` takes a promised `id`) and a `curl -T` line: the ticket
-  (32 random bytes, `processSingleton` map, 10 min, once, ≤ 1 000 waiting) is the whole permission —
-  one member's agent, one workspace, one file of exactly `bytes`, checked again on arrival
-  (`answerUpload`). `file_upload_from { url }` has the server fetch it through tsuru's `fetchFile`
-  (that host only, https, no private ranges unless D118 lifted them, redirects re-checked, capped
+  (32 random bytes, `processSingleton` map, 10 min, once; ≤ 20 unsent per member in a workspace and
+  10 000 in all, past either refused in words, none evicted) is the permission — one member's agent,
+  one workspace, one file of exactly `bytes` (chunked or not), checked again on arrival
+  (`answerUpload`), where the studio asks `control.authorize` again: a member who left gets a 403.
+  Tickets live per process: one studio replica. `file_upload_from { url }` has the server fetch it through tsuru's `fetchFile`
+  (that host only, https, no inside addresses unless D118 lifted them, redirects re-checked, capped
   before the body is read), wired in `@washi/mcp` — never service (C3) — and ledgered `agent` ·
-  `file_upload_from` (`auto` or `denied`): the agent's call is the consent for that one host, as a
-  press is for a bookmark. The plugin helper's `upload` uses the URL (base64 only on an older
-  server) and takes `--workspace`.
+  `file_upload_from` (`auto`, or `denied` with why for every failure, a timeout or a store error
+  too): the agent's call is the consent for that one host, as a press is for a bookmark.
+  **tsuru reads every spelling of an inside address** (`address.ts`): an IPv6 literal as its bytes
+  (`::ffff:7f00:1`, `64:ff9b::a9fe:a9fe`, 6to4 judged by the IPv4 they carry), RFC 6890's ranges
+  (100.64/10, 198.18/15, 224/4, 240/4, 0/8 …) and inside names (`localhost`, `*.local`,
+  `*.internal`, `metadata.google.internal`, `*.home.arpa`). Every hop's name is resolved
+  (`dns.lookup` all) and refused if any answer is inside, and the request is pinned to the address
+  checked — the URL's host swapped for it, SNI (`tls.serverName`), the certificate check and `Host`
+  kept on the name (`pinned`) — so DNS rebinding between check and connect does not reach inside.
+  Link previews and `fetch_url` (an agent's or a page's) share it; D118's `allowPrivate` lifts
+  all of it. Tests answer names with `setAddressLookup` (no pinning then). The plugin helper's
+  `upload` uses the URL (base64 only on an older server) and takes `--workspace`.
 - **Washi draws pictures from HTML (D126).** `image_render` (both ports and MCP, a `CHANGE_TOOLS`
   write over the workspace's files — the ports get them from `AgentHost.setFiles`) lays HTML out on
   the server with Satori and rasterizes it with resvg-wasm (`service/images`): no browser, no script,

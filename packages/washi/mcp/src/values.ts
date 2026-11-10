@@ -24,7 +24,7 @@ you read what they can read, and every write lands as theirs, with its history.
 Start with context_get: the whole workspace in one call, as Markdown — the agent guide first when
 the workspace keeps one, the page tree, every page's words, every table's columns and counts, and
 the open rows — cut to maxChars, ending with what it left out and the call that reads it. guide_set
-marks the page agents read first, only when your person asks. Large files never go through you:
+marks the page agents read first, only when your person (an owner or an admin) asks. Large files never go through you:
 file_upload_url answers a URL to curl -T the file to, file_upload_from has the server fetch an
 https URL; file_upload (base64) is for a few KB.
 

@@ -1213,3 +1213,6 @@ Acceptance: MCP tests walk every acceptance check; typecheck, Biome, `bun test` 
 - [ ] later: Washi's own ports get `context_get` (a routine reading a workspace cold)
 - [ ] later: `context_get` names rows' ids (left out to fit the budget; db_query reads them)
 - [ ] later: ticket store across instances (it is per process: one studio replica only)
+- [x] Review fixes: tsuru inside addresses (IPv6 bytes, RFC 6890, names), DNS per hop + pinning
+- [x] Review fixes: budget shares keep context_get ≤ maxChars (400 pages, 60 tables); open rows by filter
+- [x] Review fixes: guide is a steward's, never a row page; tickets capped per member, re-authorized

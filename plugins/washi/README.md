@@ -37,7 +37,7 @@ Markdown, each table's counts and open rows, cut to a budget), read and search p
 and edit pages (`sheet_create`, `sheet_replace`, `sheet_edit`), upload pictures (`file_upload`) and
 comment on a page or a row — as you, through the same checks and history as the app. `wsx_reference`
 and `catalog_list` say what a page may be written with and wear. A workspace may mark one page as
-its **agent guide** (the page's ⋯ → Agent guide, or `guide_set`): its words join the server's
+its **agent guide** (an owner or admin, from the page's ⋯ → Agent guide or `guide_set`): its words join the server's
 instructions when an agent connects, as `CLAUDE.md` does for a repo. Large files skip the agent's
 context: `file_upload_url` answers a one-time URL to `curl -T` the file to, and `file_upload_from`
 has the server fetch an https file. Past those uploads, it cannot fetch the web or run anything
