@@ -11,7 +11,7 @@ import { fetchFile, TsuruError } from '@washi/tsuru'
 import { z } from 'zod'
 import type { McpSession } from '../types'
 import { issueTicket } from './tickets'
-import { FILE_UPLOAD_FROM_DESCRIPTION, FILE_UPLOAD_URL_DESCRIPTION } from './values'
+import { FILE_UPLOAD_FROM_DESCRIPTION, FILE_UPLOAD_URL_DESCRIPTION, RUNNABLE_TYPES } from './values'
 
 /** Why a fetch failed, in words: tsuru's own, a timeout, or the error as it came. */
 const failureWords = (cause: unknown) =>
@@ -25,7 +25,22 @@ const failureWords = (cause: unknown) =>
 
 /** A refusal in the words an upload anywhere would get; SVG says why. */
 const refusalWords = (mime: string, refusal: string) =>
-  mime === 'image/svg+xml' ? `${refusal}: SVG can run when served — upload a PNG` : refusal
+  mime === 'image/svg+xml'
+    ? `${refusal}: SVG can run when served — upload a PNG`
+    : RUNNABLE_TYPES.has(mime)
+      ? `${refusal}: the host serves it as ${mime}, which a browser would run`
+      : refusal
+
+/**
+ * A fetched file's type: the host's when it names an upload kind; refused as the host declared it
+ * when that is a type a browser runs (HTML, SVG, XML, script), whatever the filename ends in; else
+ * read off the name, as a picker reads it.
+ */
+function fetchedType(declared: string | null, named: string): string {
+  const bare = declared?.split(';')[0]?.trim().toLowerCase() ?? ''
+  if (bare && (uploadKindOf(bare) || RUNNABLE_TYPES.has(bare))) return bare
+  return fileTypeOf(named) ?? bare
+}
 
 /** The URL to PUT one file to: issued here, taken by the studio's route (`answerUpload`). */
 function uploadUrl(session: McpSession): Capability[] {
@@ -101,10 +116,7 @@ function uploadFrom(session: McpSession, fileUrl?: (id: string) => string): Capa
             maxBytes: largestUpload(caps),
           })
           const named = filename ?? fetched.filename ?? 'file'
-          const said = fetched.contentType && uploadKindOf(fetched.contentType)
-          const mime = said
-            ? (fetched.contentType as string)
-            : (fileTypeOf(named) ?? fetched.contentType ?? '')
+          const mime = fetchedType(fetched.contentType, named)
           const refusal = uploadRefusal(mime, fetched.bytes.byteLength, undefined, caps)
           if (refusal) throw new Error(refusalWords(mime, refusal))
           stored = await files.put({ name: uploadName(named), mime, bytes: fetched.bytes })

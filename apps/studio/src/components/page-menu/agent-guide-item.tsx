@@ -24,10 +24,17 @@ function AgentGuideToggle({ sheet, className, role }: AgentGuideItemProps) {
       disabled={!guide.isKnown}
       onClick={() => void guide.toggle()}
       className={className}
-      title="Agents connected over MCP read this page first"
+      title={guide.error ?? 'Agents connected over MCP read this page first'}
     >
       <IconRobot className="size-4 text-muted-foreground" />
-      <span className="flex-1">Agent guide</span>
+      <span className="flex-1">
+        Agent guide
+        {guide.error && (
+          <span role="alert" className="block text-[12px] text-destructive">
+            {guide.error}
+          </span>
+        )}
+      </span>
       {guide.isGuide && <span className="text-[12px] text-muted-foreground">On</span>}
     </button>
   )

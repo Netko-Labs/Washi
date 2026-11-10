@@ -36,6 +36,8 @@ export interface AgentGuideState {
   /** Read yet: until then the row waits. */
   isKnown: boolean
   isGuide: boolean
+  /** Why the last press did not land, in the server's words; the row reads the guide again. */
+  error: string | null
   toggle: () => Promise<void>
 }
 

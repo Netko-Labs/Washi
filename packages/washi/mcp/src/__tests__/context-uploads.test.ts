@@ -247,6 +247,16 @@ describe('uploads that skip the context (D135)', () => {
       if (url === 'https://cdn.example.com/shots/home.png') {
         return new Response(new Uint8Array([1, 2, 3]), { headers: { 'content-type': 'image/png' } })
       }
+      if (url === 'https://cdn.example.com/shots/page.png') {
+        return new Response('<script>1</script>', {
+          headers: { 'content-type': 'text/html; charset=utf-8' },
+        })
+      }
+      if (url === 'https://cdn.example.com/shots/a%2F..%2Fb%5Cnamed.png') {
+        return new Response(new Uint8Array([4]), {
+          headers: { 'content-type': 'application/octet-stream' },
+        })
+      }
       return real(input, init)
     }) as typeof fetch)
     try {
@@ -254,11 +264,18 @@ describe('uploads that skip the context (D135)', () => {
       const got = await ok('file_upload_from', { url: 'https://cdn.example.com/shots/home.png' })
       expect(got).toMatchObject({ name: 'home.png', mime: 'image/png', size: 3 })
       expect(got.key).toMatch(/^file:/)
+      const html = await text('file_upload_from', { url: 'https://cdn.example.com/shots/page.png' })
+      expect(html.isError).toBe(true)
+      expect(html.text).toContain('text/html')
+      const slashed = await ok('file_upload_from', {
+        url: 'https://cdn.example.com/shots/a%2F..%2Fb%5Cnamed.png',
+      })
+      expect(slashed).toMatchObject({ name: 'named.png', mime: 'image/png' })
       const refused = await text('file_upload_from', { url: 'https://127.0.0.1/x.png' })
       expect(refused.isError).toBe(true)
       expect(refused.text).toContain('private')
       const ledger = listCapabilityCalls(ws).filter((row) => row.subject === 'file_upload_from')
-      expect(ledger.map((row) => row.decision).sort()).toEqual(['auto', 'denied'])
+      expect(ledger.map((row) => row.decision).sort()).toEqual(['auto', 'auto', 'denied', 'denied'])
       expect(ledger.every((row) => row.actorId === MEMBER.id && row.origin === 'agent')).toBe(true)
     } finally {
       spy.mockRestore()

@@ -2,10 +2,15 @@ import { guardedResponse, readCappedBytes, TsuruError } from './fetch'
 import { fetchPolicySchema } from './policy'
 import type { FetchedFile, FileFetchOptions } from './types'
 
+/** The address's last segment as a file's name: decoded, and only what follows its last / or \. */
 const nameOf = (url: URL): string | null => {
   let last: string
   try {
-    last = decodeURIComponent(url.pathname.split('/').pop() ?? '').trim()
+    last = (
+      decodeURIComponent(url.pathname.split('/').pop() ?? '')
+        .split(/[\\/]/)
+        .pop() ?? ''
+    ).trim()
   } catch {
     return null
   }
