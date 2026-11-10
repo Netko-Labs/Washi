@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { isPrivateAddress } from './address'
 import { ANY_HOST, hostMatches } from './hosts'
 
 export const fetchPolicySchema = z.object({
@@ -15,26 +16,7 @@ export type PolicyVerdict =
   | { ok: true; url: URL }
   | { ok: false; reason: string; needsApproval?: boolean }
 
-const PRIVATE_V4 = [
-  /^0\./,
-  /^10\./,
-  /^127\./,
-  /^169\.254\./,
-  /^172\.(1[6-9]|2\d|3[01])\./,
-  /^192\.168\./,
-]
-
-export function isPrivateAddress(host: string): boolean {
-  const bare = host.replace(/^\[|\]$/g, '').toLowerCase()
-  if (bare === 'localhost' || bare.endsWith('.localhost') || bare.endsWith('.local')) return true
-  if (bare === '::1' || bare === '::') return true
-  // IPv4-mapped IPv6 (::ffff:10.0.0.1) and plain v4
-  const v4 = bare.match(/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/)?.[1]
-  if (v4) return PRIVATE_V4.some((range) => range.test(v4))
-  // Unique-local / link-local IPv6
-  if (/^(fc|fd|fe8|fe9|fea|feb)/.test(bare)) return true
-  return false
-}
+export { isPrivateAddress }
 
 /**
  * Gate a URL against the policy. https-only, never loopback/private ranges unless the server's

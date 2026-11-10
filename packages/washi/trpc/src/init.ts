@@ -3,6 +3,7 @@ import { initTRPC, TRPCError } from '@trpc/server'
 import type { Viewer } from '@washi/domain'
 import type { FileStore, Workspace } from '@washi/repository'
 import {
+  AgentGuideError,
   type AgentHost,
   CommentError,
   CustomEmojiError,
@@ -198,7 +199,8 @@ export const workspaceProcedure = t.procedure
         result.error.cause instanceof EmbedHostError ||
         result.error.cause instanceof WorkspaceThemeError ||
         result.error.cause instanceof ReminderError ||
-        result.error.cause instanceof SuggestionError)
+        result.error.cause instanceof SuggestionError ||
+        result.error.cause instanceof AgentGuideError)
     ) {
       throw new TRPCError({
         code: 'BAD_REQUEST',

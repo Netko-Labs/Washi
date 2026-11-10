@@ -13,9 +13,9 @@ export function createFileStore(ws: Workspace, blobs: BlobStore): FileStore {
   }
 
   return {
-    async put({ name, mime, bytes }) {
+    async put({ name, mime, bytes, id }) {
       const file: StoredFile = {
-        id: Bun.randomUUIDv7(),
+        id: id ?? Bun.randomUUIDv7(),
         name,
         mime,
         size: bytes.byteLength,

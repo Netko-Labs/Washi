@@ -10,6 +10,7 @@ import {
 import { useSheetsStore } from '@washi/ui'
 import { useEditorStore } from '@/components/page-editor'
 import { SHEET_ROW } from '@/components/shared/bottom-sheet'
+import { AgentGuideItem } from './agent-guide-item'
 import type { PageMenuListProps } from './lib'
 import { PageMenuQuick } from './page-menu-quick'
 
@@ -84,6 +85,7 @@ export function PageMenuList({ sheet, onMode, onDone, compact }: PageMenuListPro
         <IconCode className="size-4 text-muted-foreground" />
         Edit source
       </button>
+      <AgentGuideItem sheet={sheet} className={item} role={role} />
       <hr className="my-1 border-border" />
       <button
         type="button"

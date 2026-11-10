@@ -30,14 +30,18 @@ async function sessionIn(
     control.listWorkspaces(actorId),
     control.listMembers(workspaceId),
   ])
-  const role = workspaces.find((each) => each.id === workspaceId)?.role
+  const here = workspaces.find((each) => each.id === workspaceId)
+  const role = here?.role
   const member = members.find((each) => each.id === actorId) ?? { id: actorId, name: 'A member' }
   const resolved = runtime.resolve(workspaceId)
   return {
     ws: resolved.workspace,
     files: resolved.files,
     baseUrl: originOf(request),
+    name: here?.name,
+    uploads: { url: (ticket) => `${originOf(request)}/api/uploads/${ticket}` },
     viewer: { id: actorId, isOwner: role === 'owner' },
+    isSteward: role === 'owner' || role === 'admin',
     member,
     listPeople: () => control.listMembers(workspaceId),
     changed: (kinds) => {

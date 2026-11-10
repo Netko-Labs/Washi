@@ -1,5 +1,7 @@
 export { commentCapabilities } from './comments'
-export { fileCapabilities } from './files'
+export { contextCapabilities } from './context'
+export { capability } from './define'
+export { fileCapabilities, fileTypeOf } from './files'
 export { imageCapabilities } from './images'
 export { pageCapabilities } from './pages'
 export { tableCapabilities } from './tables'

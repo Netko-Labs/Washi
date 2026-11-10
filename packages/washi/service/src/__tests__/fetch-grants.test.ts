@@ -6,6 +6,7 @@ import {
   openWorkspace,
   type Workspace,
 } from '@washi/repository'
+import { setAddressLookup } from '@washi/tsuru'
 import { ApprovalDesk } from '../agents/approvals'
 import { CapabilityDesk } from '../agents/desk'
 import { AgentHost } from '../agents/host'
@@ -23,6 +24,8 @@ let fetched: string[]
 const realFetch = globalThis.fetch
 
 beforeEach(() => {
+  // Names resolve without the network: every one a public address, so nothing is refused for it.
+  setAddressLookup(async () => [{ address: '93.184.216.34', family: 4 }])
   ws = openWorkspace({ id: 'test', path: ':memory:' })
   policy = serverPolicySchema.parse({})
   lendServerPolicy(ws, () => policy)
@@ -39,6 +42,7 @@ beforeEach(() => {
   }) as typeof fetch
 })
 afterEach(() => {
+  setAddressLookup(null)
   globalThis.fetch = realFetch
   desk.dropSession(session)
   ws.close()

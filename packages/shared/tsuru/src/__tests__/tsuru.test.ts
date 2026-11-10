@@ -58,3 +58,60 @@ describe('url policy', () => {
     expect(stranger).toMatchObject({ ok: false, needsApproval: true })
   })
 })
+
+describe('every spelling of an inside address (D135)', () => {
+  test('IPv6 carrying an inside IPv4, newer ranges, and inside names', () => {
+    for (const host of [
+      '[::ffff:7f00:1]',
+      '::ffff:7f00:1',
+      '::ffff:a9fe:a9fe',
+      '::ffff:127.0.0.1',
+      '64:ff9b::a9fe:a9fe',
+      '64:ff9b::127.0.0.1',
+      '2002:a9fe:a9fe::1',
+      '::',
+      '::127.0.0.1',
+      'ff02::1',
+      '100.64.0.1',
+      '100.127.255.254',
+      '198.18.0.1',
+      '198.19.255.255',
+      '224.0.0.1',
+      '239.255.255.250',
+      '240.0.0.1',
+      '255.255.255.255',
+      '0.1.2.3',
+      'metadata',
+      'metadata.google.internal',
+      'metadata.google.internal.',
+      'vault.internal',
+      'nas.home.arpa',
+    ]) {
+      expect([host, isPrivateAddress(host)]).toEqual([host, true])
+    }
+    for (const host of [
+      '::ffff:8.8.8.8',
+      '64:ff9b::808:808',
+      '100.128.0.1',
+      '198.20.0.1',
+      '223.255.255.1',
+    ]) {
+      expect([host, isPrivateAddress(host)]).toEqual([host, false])
+    }
+  })
+
+  test('a URL spells an address many ways; each is read as the address it is', () => {
+    const open = fetchPolicySchema.parse({ allowedHosts: ['*'] })
+    for (const href of [
+      'https://[::ffff:7f00:1]/',
+      'https://[::ffff:a9fe:a9fe]/latest/meta-data',
+      'https://[64:ff9b::a9fe:a9fe]/',
+      'https://2130706433/',
+      'https://0x7f.1/',
+      'https://169.254.169.254/',
+      'https://metadata.google.internal/computeMetadata/v1/',
+    ]) {
+      expect([href, checkUrl(href, open).ok]).toEqual([href, false])
+    }
+  })
+})

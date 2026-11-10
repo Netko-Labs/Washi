@@ -10,6 +10,8 @@ export interface Capability {
   description: string
   input: z.ZodRawShape
   isReadOnly: boolean
+  /** Its answer is words to read as they are (Markdown), not a value to pass as JSON. */
+  answersText?: boolean
   run(input: unknown): Promise<unknown>
 }
 

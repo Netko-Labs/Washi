@@ -23,6 +23,7 @@ import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiFilesSplatRouteImport } from './routes/api/files.$'
 import { Route as ApiShareSplatRouteImport } from './routes/api/share.$'
 import { Route as ApiTrpcSplatRouteImport } from './routes/api/trpc/$'
+import { Route as ApiUploadsTicketRouteImport } from './routes/api/uploads.$ticket'
 import { Route as SWorkspaceIdTokenRouteImport } from './routes/s.$workspaceId.$token'
 import { Route as WWorkspaceIdIndexRouteImport } from './routes/w/$workspaceId/index'
 import { Route as WWorkspaceIdDatabasesRouteImport } from './routes/w/$workspaceId/databases'
@@ -105,6 +106,11 @@ const ApiShareSplatRoute = ApiShareSplatRouteImport.update({
 const ApiTrpcSplatRoute = ApiTrpcSplatRouteImport.update({
   id: '/api/trpc/$',
   path: '/api/trpc/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiUploadsTicketRoute = ApiUploadsTicketRouteImport.update({
+  id: '/api/uploads/$ticket',
+  path: '/api/uploads/$ticket',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SWorkspaceIdTokenRoute = SWorkspaceIdTokenRouteImport.update({
@@ -190,6 +196,7 @@ export interface FileRoutesByFullPath {
   '/api/files/$': typeof ApiFilesSplatRoute
   '/api/share/$': typeof ApiShareSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/api/uploads/$ticket': typeof ApiUploadsTicketRoute
   '/s/$workspaceId/$token': typeof SWorkspaceIdTokenRoute
   '/w/$workspaceId/databases': typeof WWorkspaceIdDatabasesRoute
   '/w/$workspaceId/inbox': typeof WWorkspaceIdInboxRoute
@@ -218,6 +225,7 @@ export interface FileRoutesByTo {
   '/api/files/$': typeof ApiFilesSplatRoute
   '/api/share/$': typeof ApiShareSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/api/uploads/$ticket': typeof ApiUploadsTicketRoute
   '/s/$workspaceId/$token': typeof SWorkspaceIdTokenRoute
   '/w/$workspaceId/databases': typeof WWorkspaceIdDatabasesRoute
   '/w/$workspaceId/inbox': typeof WWorkspaceIdInboxRoute
@@ -248,6 +256,7 @@ export interface FileRoutesById {
   '/api/files/$': typeof ApiFilesSplatRoute
   '/api/share/$': typeof ApiShareSplatRoute
   '/api/trpc/$': typeof ApiTrpcSplatRoute
+  '/api/uploads/$ticket': typeof ApiUploadsTicketRoute
   '/s/$workspaceId/$token': typeof SWorkspaceIdTokenRoute
   '/w/$workspaceId/databases': typeof WWorkspaceIdDatabasesRoute
   '/w/$workspaceId/inbox': typeof WWorkspaceIdInboxRoute
@@ -279,6 +288,7 @@ export interface FileRouteTypes {
     | '/api/files/$'
     | '/api/share/$'
     | '/api/trpc/$'
+    | '/api/uploads/$ticket'
     | '/s/$workspaceId/$token'
     | '/w/$workspaceId/databases'
     | '/w/$workspaceId/inbox'
@@ -307,6 +317,7 @@ export interface FileRouteTypes {
     | '/api/files/$'
     | '/api/share/$'
     | '/api/trpc/$'
+    | '/api/uploads/$ticket'
     | '/s/$workspaceId/$token'
     | '/w/$workspaceId/databases'
     | '/w/$workspaceId/inbox'
@@ -336,6 +347,7 @@ export interface FileRouteTypes {
     | '/api/files/$'
     | '/api/share/$'
     | '/api/trpc/$'
+    | '/api/uploads/$ticket'
     | '/s/$workspaceId/$token'
     | '/w/$workspaceId/databases'
     | '/w/$workspaceId/inbox'
@@ -366,6 +378,7 @@ export interface RootRouteChildren {
   ApiFilesSplatRoute: typeof ApiFilesSplatRoute
   ApiShareSplatRoute: typeof ApiShareSplatRoute
   ApiTrpcSplatRoute: typeof ApiTrpcSplatRoute
+  ApiUploadsTicketRoute: typeof ApiUploadsTicketRoute
   SWorkspaceIdTokenRoute: typeof SWorkspaceIdTokenRoute
 }
 
@@ -467,6 +480,13 @@ declare module '@tanstack/react-router' {
       path: '/api/trpc/$'
       fullPath: '/api/trpc/$'
       preLoaderRoute: typeof ApiTrpcSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/uploads/$ticket': {
+      id: '/api/uploads/$ticket'
+      path: '/api/uploads/$ticket'
+      fullPath: '/api/uploads/$ticket'
+      preLoaderRoute: typeof ApiUploadsTicketRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/s/$workspaceId/$token': {
@@ -612,6 +632,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiFilesSplatRoute: ApiFilesSplatRoute,
   ApiShareSplatRoute: ApiShareSplatRoute,
   ApiTrpcSplatRoute: ApiTrpcSplatRoute,
+  ApiUploadsTicketRoute: ApiUploadsTicketRoute,
   SWorkspaceIdTokenRoute: SWorkspaceIdTokenRoute,
 }
 export const routeTree = rootRouteImport
